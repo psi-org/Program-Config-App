@@ -2,6 +2,18 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Steps to setup/run locally
+
+1. (If 1st time cloning from git, install module)
+### `npm build`
+
+2. Start the JSON Server for local temp data API (on port 4000)
+### `npx json-server --watch data/db.json --port 4000`
+
+3. Start the app locally (on port 3000)
+### `npm start`
+
+
 ## Available Scripts
 
 In the project directory, you can run:
