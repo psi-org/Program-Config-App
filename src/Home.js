@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
 import ProgramList from "./ProgramList";
 import useFetch from "./useFetch";
 
 const Home = () => {
 
-  const { data: programs, isPending, error } = useFetch( 'http://localhost:4000/programs' );
+  const url_programList = 'http://localhost:4000/programs';
+  const { data: programs, isPending, error } = useFetch( url_programList );
 
   return (
     <div className="home">
