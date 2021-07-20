@@ -2,6 +2,8 @@ import { useState } from "react";
 import Modal from 'react-modal';
 import ProgramDetail from "./programDetail";
 
+// Modal component - https://www.npmjs.com/package/react-modal
+
 const ProgramRow = ( { program } ) => {
   const [isOpen, setIsOpen ] = useState( false );
 
