@@ -1,7 +1,6 @@
-import { useState } from "react";
 import ProgramRow from "./programRow";
 
-const ProgramList = ( { programs, title } ) => {
+const ProgramList = ( { programs } ) => {
 
   return ( 
     <div className="divProgramList">
