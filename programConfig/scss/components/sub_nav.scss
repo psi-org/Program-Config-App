@@ -1,0 +1,23 @@
+.sub_nav {
+    width: 100%;
+    height: auto;
+    padding: 8px 16px;
+    background-color: #D5D6D9;
+    margin-bottom:8px;
+
+    .my_path {
+        font-size: 16px;
+        font-weight: 400;
+        height: 24px;
+
+        div {
+            line-height: 24px;
+        }
+
+        .path {
+            float: left;
+            color: #333;
+            cursor: pointer;
+        }
+    }
+}

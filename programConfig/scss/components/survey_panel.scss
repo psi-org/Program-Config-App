@@ -1,0 +1,79 @@
+.survay_panel {
+    display: grid;
+    grid-template-columns: 48px calc(100% - 96px) 48px;
+    grid-template-rows: 40px 48px calc(100% - 88px);
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    justify-content: center;
+    align-content: start;
+    justify-items: stretch;
+    align-items: start;
+    grid-template-areas:
+        "section-icon section-title section-title_cta"
+        "section-search section-search section-search"
+        "section-content-list section-content-list section-content-list";
+    width: 100%;
+    height: 100%;
+    border: 0.5px solid rgba(0, 0, 0, 0.15);
+
+    .section-icon {
+        background-color: #2E6692;
+        padding: 8px 8px 8px 16px;
+        grid-area: section-icon;
+    }
+
+    .section-title {
+        background-color: #2E6692;
+        line-height: 40px;
+        color: #fff;
+        grid-area: section-title;
+    }
+
+    .section-title_cta {
+        text-align: right;
+        background-color: #2E6692;
+        padding: 11px 8px !important;
+        grid-area: section-title_cta;
+    }
+
+    .section-search {
+        background-color: #F1F5F9;
+        grid-area: section-search;
+        padding: 8px 16px;
+        height: 48px;
+        border-bottom: 0.5px solid rgba(0, 0, 0, 0.15);
+
+        .survey-search {
+            float: left;
+            width: 220px;
+            padding-left: 8px;
+            color: #D5D6D9;
+            line-height: 28px;
+            background-color: #FAFCFF;
+            border: 0.5px solid rgba(0, 0, 0, 0.15);
+            border-radius: 15px;
+        }
+
+        #survey_btn-colaps_expand {
+            float: left;
+            text-align: right;
+            width: 80px;
+            height: 100%;
+            color: #2E6692;
+            padding-left: 8px;
+            line-height: 28px;
+        }
+    }
+
+    .section-content-list {
+        height: 100%;
+        padding: 8px;
+        background-color: #F7F4FB;
+        overflow-y: auto;
+        grid-area: section-content-list;
+
+        .survey_obj_l1, .survey_obj_l2 {
+            margin-bottom: 8px;
+        }
+    }
+}

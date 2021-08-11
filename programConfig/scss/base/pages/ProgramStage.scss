@@ -1,0 +1,39 @@
+.layout_program_stage_sections {
+    display: grid;
+    grid-template-columns: calc(100% - 336px) 336px;
+    grid-template-rows: calc(100vh - 176px) 80px;
+    gap: 8px 8px;
+    grid-auto-flow: row dense;
+    justify-content: top;
+    align-content: top;
+    grid-template-areas:
+        "list-section survey-section"
+        "fab-section cta-section";
+    width: 100%;
+    height: 100%;
+
+
+    .survey-section {
+        grid-area: survey-section;
+    }
+
+    .list-section {
+        overflow-y: auto;
+        padding-right: 1px;
+        grid-area: list-section;
+    }
+
+    .fab-section {
+        grid-area: fab-section;
+
+        .fab{
+            margin: 16px auto;
+        }
+    }
+
+    .cta-section {
+        text-align: right;
+        font-size:2em;
+        grid-area: cta-section;
+    }
+}
