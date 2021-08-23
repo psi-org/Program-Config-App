@@ -16,14 +16,15 @@
 
 @import 'components/UiPrototype/NavBarUi.scss';
 
-*{
+* {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
 
 html,
-body, .wrapper {
+body,
+.wrapper {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -68,5 +69,36 @@ code {
 }
 
 .wrapper {
-  padding: 0 16px!important;
+  padding: 0 16px !important;
+}
+
+.rdm {
+  width: 100%;
+  height: 100%;
+  padding-top: 50px;
+
+
+  .rdm_left {
+    float: left;
+    width: 224px;
+
+    img {
+      width: 200px;
+    }
+
+  }
+
+  .rdm_right {
+    float: left;
+    width: calc(100% - 224);
+    padding-top: 21px;
+    font-size: xx-large;
+    h1{
+      font-size: 50%;
+    }
+    a{
+      text-decoration:none;
+    }
+    
+  }
 }
