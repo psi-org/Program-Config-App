@@ -1,11 +1,13 @@
 .sub_nav {
     width: 100%;
-    height: auto;
-    padding: 8px 16px;
+    height: 40px;
+    padding: 8px 8px 8px 16px ;
     background-color: #D5D6D9;
     margin-bottom:8px;
 
     .my_path {
+        width: calc(100% - 126px);
+        float: left;
         font-size: 16px;
         font-weight: 400;
         height: 24px;
@@ -20,4 +22,13 @@
             cursor: pointer;
         }
     }
+    .tools{
+        float: left;
+        width: 126px;
+        height: 24px;
+
+        img{
+            margin-left: 4px;
+        }
+      }
 }
