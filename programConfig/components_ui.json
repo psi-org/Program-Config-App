@@ -1,6 +1,6 @@
 [
     {
-        "bar_slctr": [
+        "bsctr": [
             {
                 "prg": [
                     {
@@ -15,7 +15,7 @@
                         "icon_url": "images/i-drag_black.svg",
                         "color": "#333333",
                         "bk_color": "#5DD9A9",
-                        "icon_cta": "images/i-expanded-bottom_black.svg"
+                        "icon_cta": "images/i-expand-left_black.svg"
                     }
                 ],
                 "section": [
@@ -23,12 +23,20 @@
                         "icon_url": "images/i-drag_black.svg",
                         "color": "#333333",
                         "bk_color": "#8EC8C8",
-                        "icon_cta": "images/i-expanded-bottom_black.svg"
+                        "icon_cta": "images/i-expanded-bottom_black.svg",
+                        "data_elements": [
+                            {
+                                "icon_url": "images/i-drag_black.svg",
+                                "color": "#333333",
+                                "bk_color": "#29C4A9",
+                                "icon_cta": "images/i-expanded-bottom_black.svg"
+                            }
+                        ]
                     }
                 ]
             }
         ],
-        "fab":[
+        "fab": [
             {
                 "prg": [
                     {

@@ -7,10 +7,11 @@
 'base/pages/ProgramStage.scss';
 
 
-@import 'components/bar_slctr.scss',
+@import 'components/bsctr.scss',
 'components/sub_nav.scss',
 'components/survey_objs.scss',
-'components/survey_panel.scss';
+'components/survey_panel.scss',
+'components/ui_dhis2.scss';
 
 @import 'components/buttons/fab.scss';
 
@@ -101,4 +102,42 @@ code {
     }
     
   }
+}
+
+
+
+.tooltip {
+  position: relative;
+  //display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: max-content;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 8px;
+  position: absolute;
+  z-index: 1;
+  top: 120%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent black transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }

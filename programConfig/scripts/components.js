@@ -5,35 +5,42 @@ function components_ui(cmpnt_name, cmpnt_type) {
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             let cmpnt = JSON.parse(this.responseText);
-            if (cmpnt_name == 'bar_slctr') {
+            if (cmpnt_name == 'bsctr') {
                 for (let cmpnt_name of cmpnt) {
                     switch (cmpnt_type) {
                         case 'program':
-                            $(".bar_slctr-img").attr("src", cmpnt_name.bar_slctr[0].prg[0].icon_url);
-                            $('.cmpt_program_bsct').css({
-                                'color': cmpnt_name.bar_slctr[0].prg[0].color,
-                                'background-color': cmpnt_name.bar_slctr[0].prg[0].bk_color
+                            $(".bsctr-img").attr("src", cmpnt_name.bsctr[0].prg[0].icon_url);
+                            $('.bsct').css({
+                                'color': cmpnt_name.bsctr[0].prg[0].color,
+                                'background-color': cmpnt_name.bsctr[0].prg[0].bk_color
                             });
-                            $(".bar_slctr_cta").attr("src", cmpnt_name.bar_slctr[0].prg[0].icon_cta);
+                            $(".bsct_cta").attr("src", cmpnt_name.bsctr[0].prg[0].icon_cta);
                             break;
                         case 'stage':
-                            $(".bar_slctr-img").attr("src", cmpnt_name.bar_slctr[0].stage[0].icon_url);
-                            $('.cmpt_program_bsct').css({
-                                'color': cmpnt_name.bar_slctr[0].stage[0].color,
-                                'background-color': cmpnt_name.bar_slctr[0].stage[0].bk_color,
+                            $(".bsctr-img").attr("src", cmpnt_name.bsctr[0].stage[0].icon_url);
+                            $('.bsct').css({
+                                'color': cmpnt_name.bsctr[0].stage[0].color,
+                                'background-color': cmpnt_name.bsctr[0].stage[0].bk_color,
                                 'corsor': 'pointer'
                             });
-                            $(".bar_slctr_cta").attr("src", cmpnt_name.bar_slctr[0].stage[0].icon_cta);
+                            $(".bsct_cta").attr("src", cmpnt_name.bsctr[0].stage[0].icon_cta);
                             break;
 
                         case 'section':
-                            $(".bar_slctr-img").attr("src", cmpnt_name.bar_slctr[0].section[0].icon_url);
-                            $('.cmpt_program_bsct').css({
-                                'color': cmpnt_name.bar_slctr[0].section[0].color,
-                                'background-color': cmpnt_name.bar_slctr[0].section[0].bk_color,
+                            $(".bsctr-img").attr("src", cmpnt_name.bsctr[0].section[0].icon_url);
+                            $('.bsct').css({
+                                'color': cmpnt_name.bsctr[0].section[0].color,
+                                'background-color': cmpnt_name.bsctr[0].section[0].bk_color,
                                 'corsor': 'pointer'
                             });
-                            $(".bar_slctr_cta").attr("src", cmpnt_name.bar_slctr[0].section[0].icon_cta);
+                            $(".bsct_cta").attr("src", cmpnt_name.bsctr[0].section[0].icon_cta);
+                            $(".section_cont").find(".bsctr-img").attr("src", cmpnt_name.bsctr[0].section[0].data_elements[0].icon_url);
+                            $(".section_cont").children().css({
+                                'color': cmpnt_name.bsctr[0].section[0].data_elements[0].color,
+                                'background-color': cmpnt_name.bsctr[0].section[0].data_elements[0].bk_color,
+                                'corsor': 'pointer'
+                            });
+                            $(".section_cont").find(".bsct_cta").attr("src", cmpnt_name.bsctr[0].section[0].data_elements[0].icon_cta);
                             break;
                     }
                 }
@@ -55,7 +62,7 @@ function components_ui(cmpnt_name, cmpnt_type) {
                                 'background-color': cmpnt_name.fab[0].stage[0].bk_color,
                                 'corsor': 'pointer'
                             });
-                            $(".bar_slctr_cta").attr("src", cmpnt_name.bar_slctr[0].stage[0].icon_cta);
+                            $(".bsct_cta").attr("src", cmpnt_name.bsctr[0].stage[0].icon_cta);
                             break;
 
                         case 'section':
