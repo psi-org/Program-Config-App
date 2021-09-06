@@ -6,7 +6,7 @@
     margin-bottom:8px;
 
     .my_path {
-        width: calc(100% - 128px);
+        width: calc(100% - 140px);
         float: left;
         font-size: 16px;
         font-weight: 400;
@@ -24,11 +24,23 @@
     }
     .tools{
         float: left;
-        width: 128px;
+        width: 140px;
         height: 24px;
 
-        img{
-            margin-left: 4px;
+        .template-download{
+            cursor: pointer;
+        }
+        .template-upload{
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .hnqis-compiling{
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .help{
+            cursor: pointer;
+            margin-left: 8px;
         }
       }
 }
