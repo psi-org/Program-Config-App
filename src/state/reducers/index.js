@@ -1,11 +1,11 @@
 import { combineReducers } from "redux";
 
 import program from "./program";
-import programStages from "./programStages";
+import programStage from "./programStage";
 
 const reducers = combineReducers({
     program,
-    programStages
+    programStage
 });
 
 export default reducers;

@@ -1,5 +1,5 @@
 import { useDataQuery } from "@dhis2/app-runtime";
-import { DataTable, TableHead, DataTableColumnHeader, DataTableCell, DataTableRow, TableBody, Button } from "@dhis2/ui";
+import { DataTable, TableHead, DataTableColumnHeader, DataTableCell, DataTableRow, TableBody, Button, CircularLoader, NoticeBox } from "@dhis2/ui";
 import ProgramItem from "./ProgramItem";
 
 // ------------------
@@ -26,8 +26,14 @@ const ProgramList = () => {
 
     const { loading, error, data } = useDataQuery(query);
 
-    if (error) { return <span>ERROR</span> }
-    if (loading) { return <span>...</span> }
+    if (error) { 
+        return (
+            <NoticeBox title="Error retrieving programs list">
+                <span>{JSON.stringify(error)}</span>
+            </NoticeBox>
+        )
+    }
+    if (loading) { return <span><CircularLoader /></span> }
 
     return (
         <DataTable scrollHeight="800px">
