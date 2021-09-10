@@ -19,6 +19,37 @@
   box-shadow: inset 0px 0px 0px 0px #F0F0F0;
 }
 
+.tooltips {
+  position: relative;
+}
+.tooltips .tooltips_text {
+  visibility: hidden;
+  width: max-content;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 8px;
+  position: absolute;
+  z-index: 1;
+  top: 120%;
+  left: 50%;
+  margin-left: -60px;
+}
+.tooltips .tooltips_text:after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent black transparent;
+}
+.tooltips:hover .tooltips_text {
+  visibility: visible;
+}
+
 .layout_prgms_stages {
   display: grid;
   grid-template-rows: calc(100% - 176px) 80px;
@@ -33,6 +64,9 @@
   padding-right: 1px;
   grid-area: list-section;
 }
+.layout_prgms_stages .list-section .fab_section {
+  left: calc(100% - 35%);
+}
 .layout_prgms_stages .fab-section {
   grid-area: fab-section;
 }
@@ -45,7 +79,7 @@
   grid-template-columns: calc(100% - 336px) 336px;
   grid-template-rows: calc(100vh - 176px) 80px;
   gap: 8px 8px;
-  grid-auto-flow: row dense;
+  grid-auto-flow: row;
   justify-content: top;
   align-content: top;
   grid-template-areas: "list-section survey-section" "fab-section cta-section";
@@ -82,7 +116,6 @@
   grid-template-areas: "icon title warning_error cta";
   border-radius: 4px;
   padding: 12px 8px 8px;
-  margin: 0 0 8px;
 }
 .bsct .bsct-icon {
   grid-area: icon;
@@ -259,6 +292,9 @@
 .section_cont .fab {
   margin: 0 auto;
 }
+.section_cont .fab_cont {
+  margin: 0 auto;
+}
 
 .de_cont {
   display: none;
@@ -379,6 +415,38 @@
   visibility: hidden;
 }
 
+.sortable-list {
+  height: max-content;
+  width: 100%;
+}
+.sortable-list li {
+  width: 100%;
+  height: 48px;
+  margin: 0 0 8px;
+}
+.sortable-list li .placeholder {
+  height: 48px;
+}
+.sortable-list .sortable {
+  width: 100%;
+  cursor: move;
+}
+.sortable-list .sortable .ui-sortable-helper {
+  opacity: 0.5;
+}
+.sortable-list .placeholder {
+  border-radius: 4px;
+  background-color: #F7C05A;
+}
+
+.right {
+  width: 100%;
+}
+
+.left {
+  width: 100%;
+}
+
 .sub_nav {
   width: 100%;
   height: 40px;
@@ -401,23 +469,18 @@
   color: #333;
   cursor: pointer;
 }
-.sub_nav .tools {
-  float: left;
-  width: 140px;
-  height: 24px;
-}
-.sub_nav .tools .template-download {
+.sub_nav .template-download {
   cursor: pointer;
 }
-.sub_nav .tools .template-upload {
+.sub_nav .template-upload {
   cursor: pointer;
   margin-left: 8px;
 }
-.sub_nav .tools .hnqis-compiling {
+.sub_nav .hnqis-compiling {
   cursor: pointer;
   margin-left: 8px;
 }
-.sub_nav .tools .help {
+.sub_nav .help {
   cursor: pointer;
   margin-left: 8px;
 }
@@ -646,16 +709,83 @@
   text-align: center !important;
 }
 
+.dropdown_menu-fab {
+  text-align: center;
+  position: absolute;
+  list-style-type: none;
+  text-align: left;
+  z-index: 50;
+  width: 220px;
+  background-color: #FFF;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.dropdown_menu-fab li {
+  padding: 0 24px;
+  cursor: pointer;
+}
+.dropdown_menu-fab li a {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  line-height: 48px;
+}
+.dropdown_menu-fab li a img {
+  margin-right: 8px;
+}
+.dropdown_menu-fab li:hover {
+  background-color: #F5F5F5;
+}
+
 .fab {
   width: 48px;
   height: 48px;
   color: #FFF;
-  line-height: 42px;
-  text-align: center;
   border-radius: 24px;
-  font-size: 2em;
   cursor: pointer;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.fab img {
+  margin: 12px;
+}
+
+.fab_section {
+  width: 48px;
+  height: 48px;
+  color: #FFF;
+  border-radius: 24px;
+  cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.fab_section img {
+  margin: 12px;
+}
+
+[tooltip]:before {
+  content: attr(tooltip);
+  background: #585858;
+  padding: 5px 7px;
+  margin-right: 10px;
+  border-radius: 2px;
+  color: #FFF;
+  font: 500 12px Roboto;
+  white-space: nowrap;
+  position: absolute;
+  bottom: 20%;
+  right: 100%;
+  visibility: hidden;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+[tooltip]:hover:before {
+  visibility: visible;
+  opacity: 1;
 }
 
 #menu {
@@ -867,12 +997,20 @@ code {
   text-decoration: none;
 }
 
-.tooltip {
-  position: relative;
-  border-bottom: 1px dotted black;
+.aparece {
+  transition: opacity 0.5s ease;
+  opacity: 1;
 }
 
-.tooltip .tooltiptext {
+.desaparece {
+  transition: opacity 3s ease;
+  opacity: 0;
+}
+
+.tooltips_ui {
+  position: relative;
+}
+.tooltips_ui .tooltips_uitext {
   visibility: hidden;
   width: max-content;
   background-color: black;
@@ -886,8 +1024,7 @@ code {
   left: 50%;
   margin-left: -60px;
 }
-
-.tooltip .tooltiptext::after {
+.tooltips_ui .tooltips_uitext:after {
   content: "";
   position: absolute;
   bottom: 100%;
@@ -897,8 +1034,7 @@ code {
   border-style: solid;
   border-color: transparent transparent black transparent;
 }
-
-.tooltip:hover .tooltiptext {
+.tooltips_ui:hover .tooltips_uitext {
   visibility: visible;
 }
 

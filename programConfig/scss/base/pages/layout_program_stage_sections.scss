@@ -3,7 +3,7 @@
     grid-template-columns: calc(100% - 336px) 336px;
     grid-template-rows: calc(100vh - 176px) 80px;
     gap: 8px 8px;
-    grid-auto-flow: row dense;
+    grid-auto-flow: row ;
     justify-content: top;
     align-content: top;
     grid-template-areas:
@@ -26,9 +26,10 @@
     .fab-section {
         grid-area: fab-section;
 
-        .fab{
+        .fab {
             margin: 16px auto;
         }
+
     }
 
     .cta-section {

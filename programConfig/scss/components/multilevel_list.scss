@@ -9,7 +9,6 @@
         "icon title warning_error cta";
     border-radius: $radius;
     padding: 12px 8px 8px;
-    margin: 0 0 8px;
 
     .bsct-icon {
         grid-area: icon;
@@ -208,8 +207,12 @@
     padding: 8px 16px;
     margin: 0 0 8px;
     border-radius: 0 0 4px 4px;
-    
-    .fab{
+
+    .fab {
+        margin: 0 auto;
+    }
+
+    .fab_cont {
         margin: 0 auto;
     }
 }
@@ -315,12 +318,12 @@
             width: 100%;
             height: 48px;
 
-            .input_field{
+            .input_field {
                 max-width: 120px;
                 margin-right: 8px;
             }
 
-            .switch{
+            .switch {
                 max-width: 130px;
             }
         }
@@ -329,11 +332,11 @@
             width: 100%;
             height: 48px;
 
-            .input_field{
+            .input_field {
                 width: calc(100% - 138px);
             }
 
-            .switch{
+            .switch {
                 max-width: 130px;
                 margin-right: 8px;
             }
@@ -345,7 +348,7 @@
         width: 100%;
         height: 36px;
 
-        .button_icon{
+        .button_icon {
             float: right;
             min-width: 90px;
             margin-left: 8px;
@@ -355,4 +358,41 @@
 
 .slctr_hidden {
     visibility: hidden;
+}
+
+.sortable-list {
+    height: max-content;
+    width: 100%;
+
+    li {
+        width: 100%;
+        height: 48px;
+        margin: 0 0 8px;
+
+        .placeholder {
+            height: 48px;
+        }
+    }
+
+    .sortable {
+        width: 100%;;
+        cursor: move;
+
+        .ui-sortable-helper {
+            opacity: 0.5;
+        }
+    }
+
+    .placeholder {
+        border-radius: 4px;
+        background-color: #F7C05A;
+    }
+}
+
+.right {
+    width: 100%;
+}
+
+.left {
+    width: 100%;
 }

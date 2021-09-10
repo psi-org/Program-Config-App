@@ -1,0 +1,36 @@
+.dropdown_menu-fab {
+    text-align: center;
+    position: absolute;
+    list-style-type: none;
+    text-align: left;
+    z-index: 50;
+    width: 220px;
+    background-color: #FFF;
+    border-radius: 4px;
+    box-shadow: $shadown;
+
+    li {
+        padding: 0 24px;
+        cursor: pointer;
+
+        a {
+            font-family: Roboto;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 16px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            line-height: 48px;
+
+            img {
+                margin-right: 8px;
+            }
+        }
+
+        &:hover {
+            background-color: #F5F5F5;
+        }
+    }
+}

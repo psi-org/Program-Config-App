@@ -4,14 +4,15 @@
 @import 'base/theme_default.scss';
 
 @import 'base/pages/prgmsStagesList.scss',
-'base/pages/ProgramStage.scss';
+'base/pages/layout_program_stage_sections.scss';
 
 
-@import 'components/bsctr.scss',
+@import 'components/multilevel_list.scss',
 'components/sub_nav.scss',
 'components/survey_objs.scss',
 'components/survey_panel.scss',
-'components/ui_dhis2.scss';
+'components/ui_dhis2.scss',
+'components/dropdownMenu.scss';
 
 @import 'components/buttons/fab.scss';
 
@@ -94,49 +95,61 @@ code {
     width: calc(100% - 224);
     padding-top: 21px;
     font-size: xx-large;
-    h1{
+
+    h1 {
       font-size: 50%;
     }
-    a{
-      text-decoration:none;
+
+    a {
+      text-decoration: none;
     }
-    
+
   }
 }
 
+//onscroll
+.aparece {
+  transition: opacity .5s ease;
+  opacity: 1;
+}
+
+.desaparece {
+  transition: opacity 3s ease;
+  opacity: 0;
+}
 
 
-.tooltip {
+
+.tooltips_ui {
   position: relative;
-  border-bottom: 1px dotted black;
-}
 
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 8px;
-  position: absolute;
-  z-index: 1;
-  top: 120%;
-  left: 50%;
-  margin-left: -60px;
-}
+  .tooltips_uitext {
+    visibility: hidden;
+    width: max-content;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 8px;
+    position: absolute;
+    z-index: 1;
+    top: 120%;
+    left: 50%;
+    margin-left: -60px;
 
-.tooltip .tooltiptext::after {
-  content: "";
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: transparent transparent black transparent;
-}
+    &:after {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent transparent black transparent;
+    }
+  }
 
-.tooltip:hover .tooltiptext {
-  visibility: visible;
+  &:hover .tooltips_uitext {
+    visibility: visible;
+  }
 }

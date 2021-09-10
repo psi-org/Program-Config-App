@@ -13,6 +13,11 @@
         overflow-y: auto;
         padding-right: 1px;
         grid-area: list-section;
+
+        .fab_section{
+            left: calc(100% - 35%);
+        }
+
     }
 
     .fab-section {

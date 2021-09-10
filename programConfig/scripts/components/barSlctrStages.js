@@ -1,3 +1,3 @@
 $(document).ready(function () {
-      components_ui('bsctr','stage');
+      components_ui('multilevel_list','stage');
 });
