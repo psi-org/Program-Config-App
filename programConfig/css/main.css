@@ -421,7 +421,8 @@
 }
 .sortable-list li {
   width: 100%;
-  height: 48px;
+  height: max-content;
+  min-height: 48px;
   margin: 0 0 8px;
 }
 .sortable-list li .placeholder {
