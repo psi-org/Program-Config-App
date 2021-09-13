@@ -9,36 +9,36 @@
     justify-items: stretch;
     align-items: start;
     grid-template-areas:
-        "section-icon section-title section-title_cta"
-        "section-search section-search section-search"
-        "section-content-list section-content-list section-content-list";
+        "ml_item-icon ml_item-title ml_item-title_cta"
+        "ml_item-search ml_item-search ml_item-search"
+        "ml_item-content-list ml_item-content-list ml_item-content-list";
     width: 100%;
     height: 100%;
     border: 0.5px solid rgba(0, 0, 0, 0.15);
 
-    .section-icon {
+    .ml_item-icon {
         background-color: #2E6692;
         padding: 8px 8px 8px 16px;
-        grid-area: section-icon;
+        grid-area: ml_item-icon;
     }
 
-    .section-title {
+    .ml_item-title {
         background-color: #2E6692;
         line-height: 40px;
         color: #fff;
-        grid-area: section-title;
+        grid-area: ml_item-title;
     }
 
-    .section-title_cta {
+    .ml_item-title_cta {
         text-align: right;
         background-color: #2E6692;
         padding: 11px 8px !important;
-        grid-area: section-title_cta;
+        grid-area: ml_item-title_cta;
     }
 
-    .section-search {
+    .ml_item-search {
         background-color: #F1F5F9;
-        grid-area: section-search;
+        grid-area: ml_item-search;
         padding: 8px 16px;
         height: 48px;
         border-bottom: 0.5px solid rgba(0, 0, 0, 0.15);
@@ -65,12 +65,12 @@
         }
     }
 
-    .section-content-list {
+    .ml_item-content-list {
         height: 100%;
         padding: 8px;
         background-color: #F7F4FB;
         overflow-y: auto;
-        grid-area: section-content-list;
+        grid-area: ml_item-content-list;
 
         .survey_obj_l1, .survey_obj_l2 {
             margin-bottom: 8px;

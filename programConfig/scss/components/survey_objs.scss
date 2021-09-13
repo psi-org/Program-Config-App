@@ -19,26 +19,26 @@
     gap: 0px 0px;
     grid-auto-flow: row;
     grid-template-areas:
-        "section-drag section-text";
+        "ml_item-drag ml_item-text";
     cursor: pointer;
 
-    .section-drag {
+    .ml_item-drag {
         padding: 6px 4px;
         background: #F6F9FB;
         border-radius: 6px 0 0 6px;
         border-top: 0.5px solid #2E6692;
         border-left: 0.5px solid #2E6692;
         border-bottom: 0.5px solid #2E6692;
-        grid-area: section-drag;
+        grid-area: ml_item-drag;
     }
 
-    .section-text {
+    .ml_item-text {
         background: #F6F9FB;
         border-radius: 0 6px 6px 0;
         border-top: 0.5px solid #2E6692;
         border-right: 0.5px solid #2E6692;
         border-bottom: 0.5px solid #2E6692;
-        grid-area: section-text;
+        grid-area: ml_item-text;
 
         div {
             padding: 0 8px;
@@ -66,32 +66,32 @@
     gap: 0px 0px;
     grid-auto-flow: row;
     grid-template-areas:
-        "section-drag section-text";
+        "ml_item-drag ml_item-text";
     cursor: pointer;
 
-    .section-level {
+    .ml_item-level {
         padding: 6px 0 6px 24px;
-        grid-area: section-level;
+        grid-area: ml_item-level;
     }
 
-    .section-drag {
+    .ml_item-drag {
         padding: 6px 4px;
         background: #F6F9FB;
         border-radius: 6px 0 0 6px;
         border-top: 0.5px solid #29C4A9;
         border-left: 0.5px solid #29C4A9;
         border-bottom: 0.5px solid #29C4A9;
-        grid-area: section-drag;
+        grid-area: ml_item-drag;
     }
 
-    .section-text {
+    .ml_item-text {
         background: #F6F9FB;
         border-radius: 0 6px 6px 0;
         border-top: 0.5px solid #29C4A9;
         border-right: 0.5px solid #29C4A9;
         border-bottom: 0.5px solid #29C4A9;
         white-space: nowrap;
-        grid-area: section-text;
+        grid-area: ml_item-text;
 
         &:before {
             content: "";

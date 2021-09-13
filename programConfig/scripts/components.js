@@ -5,42 +5,42 @@ function components_ui(cmpnt_name, cmpnt_type) {
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             let cmpnt = JSON.parse(this.responseText);
-            if (cmpnt_name == 'multilevel_list') {
+            if (cmpnt_name == 'ml_list') {
                 for (let cmpnt_name of cmpnt) {
                     switch (cmpnt_type) {
                         case 'program':
-                            $(".multilevel_list-img").attr("src", cmpnt_name.multilevel_list[0].prg[0].icon_url);
-                            $('.bsct').css({
-                                'color': cmpnt_name.multilevel_list[0].prg[0].color,
-                                'background-color': cmpnt_name.multilevel_list[0].prg[0].bk_color
+                            $(".ml_list-img").attr("src", cmpnt_name.ml_list[0].prg[0].icon_url);
+                            $('.ml_item').css({
+                                'color': cmpnt_name.ml_list[0].prg[0].color,
+                                'background-color': cmpnt_name.ml_list[0].prg[0].bk_color
                             });
-                            $(".bsct_cta").attr("src", cmpnt_name.multilevel_list[0].prg[0].icon_cta);
+                            $(".bsct_cta").attr("src", cmpnt_name.ml_list[0].prg[0].icon_cta);
                             break;
                         case 'stage':
-                            $(".multilevel_list-img").attr("src", cmpnt_name.multilevel_list[0].stage[0].icon_url);
-                            $('.bsct').css({
-                                'color': cmpnt_name.multilevel_list[0].stage[0].color,
-                                'background-color': cmpnt_name.multilevel_list[0].stage[0].bk_color,
+                            $(".ml_list-img").attr("src", cmpnt_name.ml_list[0].stage[0].icon_url);
+                            $('.ml_item').css({
+                                'color': cmpnt_name.ml_list[0].stage[0].color,
+                                'background-color': cmpnt_name.ml_list[0].stage[0].bk_color,
                                 'corsor': 'pointer'
                             });
-                            $(".bsct_cta").attr("src", cmpnt_name.multilevel_list[0].stage[0].icon_cta);
+                            $(".bsct_cta").attr("src", cmpnt_name.ml_list[0].stage[0].icon_cta);
                             break;
 
-                        case 'section':
-                            $(".multilevel_list-img").attr("src", cmpnt_name.multilevel_list[0].section[0].icon_url);
-                            $('.bsct').css({
-                                'color': cmpnt_name.multilevel_list[0].section[0].color,
-                                'background-color': cmpnt_name.multilevel_list[0].section[0].bk_color,
+                        case 'ml_item':
+                            $(".ml_list-img").attr("src", cmpnt_name.ml_list[0].ml_item[0].icon_url);
+                            $('.ml_item').css({
+                                'color': cmpnt_name.ml_list[0].ml_item[0].color,
+                                'background-color': cmpnt_name.ml_list[0].ml_item[0].bk_color,
                                 'corsor': 'pointer'
                             });
-                            $(".bsct_cta").attr("src", cmpnt_name.multilevel_list[0].section[0].icon_cta);
-                            $(".section_cont").find(".multilevel_list-img").attr("src", cmpnt_name.multilevel_list[0].section[0].data_elements[0].icon_url);
+                            $(".bsct_cta").attr("src", cmpnt_name.ml_list[0].ml_item[0].icon_cta);
+                            $(".section_cont").find(".ml_list-img").attr("src", cmpnt_name.ml_list[0].ml_item[0].data_elements[0].icon_url);
                             $(".section_cont").children().css({
-                                'color': cmpnt_name.multilevel_list[0].section[0].data_elements[0].color,
-                                'background-color': cmpnt_name.multilevel_list[0].section[0].data_elements[0].bk_color,
+                                'color': cmpnt_name.ml_list[0].ml_item[0].data_elements[0].color,
+                                'background-color': cmpnt_name.ml_list[0].ml_item[0].data_elements[0].bk_color,
                                 'corsor': 'pointer'
                             });
-                            $(".section_cont").find(".bsct_cta").attr("src", cmpnt_name.multilevel_list[0].section[0].data_elements[0].icon_cta);
+                            $(".section_cont").find(".bsct_cta").attr("src", cmpnt_name.ml_list[0].ml_item[0].data_elements[0].icon_cta);
                             break;
                     }
                 }
@@ -61,13 +61,13 @@ function components_ui(cmpnt_name, cmpnt_type) {
                                 'background-color': cmpnt_name.fab[0].stage[0].bk_color,
                                 'corsor': 'pointer'
                             });
-                            $(".bsct_cta").attr("src", cmpnt_name.multilevel_list[0].stage[0].icon_cta);
+                            $(".bsct_cta").attr("src", cmpnt_name.ml_list[0].stage[0].icon_cta);
                             break;
 
-                        case 'section':
+                        case 'ml_item':
                             $('.fab').css({
-                                'color': cmpnt_name.fab[0].section[0].color,
-                                'background-color': cmpnt_name.fab[0].section[0].bk_color,
+                                'color': cmpnt_name.fab[0].ml_item[0].color,
+                                'background-color': cmpnt_name.fab[0].ml_item[0].bk_color,
                                 'corsor': 'pointer'
                             });
                             break;

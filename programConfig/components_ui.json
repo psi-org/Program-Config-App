@@ -1,6 +1,6 @@
 [
     {
-        "multilevel_list": [
+        "ml_list": [
             {
                 "prg": [
                     {
@@ -18,7 +18,7 @@
                         "icon_cta": "images/i-expand-left_black.svg"
                     }
                 ],
-                "section": [
+                "ml_item": [
                     {
                         "icon_url": "images/i-drag_black.svg",
                         "color": "#333333",
@@ -50,7 +50,7 @@
                         "bk_color": "#5DD9A9"
                     }
                 ],
-                "section": [
+                "ml_item": [
                     {
                         "color": "#333333",
                         "bk_color": "#8EC8C8"

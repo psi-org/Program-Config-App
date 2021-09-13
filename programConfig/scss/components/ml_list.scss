@@ -1,4 +1,4 @@
-.bsct {
+.ml_item {
     display: grid;
     grid-template-columns: 24px calc(100% - 190px) 90px auto;
     grid-template-rows: auto;
@@ -10,11 +10,12 @@
     border-radius: $radius;
     padding: 12px 8px 8px;
 
-    .bsct-icon {
+    .ml_item-icon {
         grid-area: icon;
+        cursor: move;
     }
 
-    .bsct-title {
+    .ml_item-title {
         line-height: 24px;
         text-align: left;
         grid-area: title;
@@ -24,7 +25,7 @@
         }
     }
 
-    .bsct-warning_error {
+    .ml_item-warning_error {
         position: relative;
         grid-area: warning_error;
 
@@ -33,7 +34,7 @@
             margin: 0 8px;
         }
 
-        .bsct-cw {
+        .ml_item-cw {
             position: absolute;
             top: -5;
             left: 20px;
@@ -47,7 +48,7 @@
             background-color: $c_warning_n-bk;
         }
 
-        .bsct-cont_w {
+        .ml_item-cont_w {
             position: absolute;
             top: 30;
             left: -228px;
@@ -55,7 +56,7 @@
             height: 18px;
             z-index: 9999;
 
-            .bsct-warnings {
+            .ml_item-warnings {
                 width: auto;
                 height: auto;
                 font-size: 10px;
@@ -71,7 +72,7 @@
             }
         }
 
-        .bsct-cont_e {
+        .ml_item-cont_e {
             position: absolute;
             top: 30;
             left: -180px;
@@ -79,7 +80,7 @@
             height: 18px;
             z-index: 9999;
 
-            .bsct-errors {
+            .ml_item-errors {
                 width: auto;
                 height: auto;
                 font-size: 10px;
@@ -95,7 +96,7 @@
             }
         }
 
-        .bsct-ce {
+        .ml_item-ce {
             position: absolute;
             top: -5;
             right: 7px;
@@ -110,7 +111,7 @@
         }
     }
 
-    .bsct-cta {
+    .ml_item-cta {
         position: relative;
         grid-area: cta;
 
@@ -363,6 +364,7 @@
 .sortable-list {
     height: max-content;
     width: 100%;
+    list-style-type: none;
 
     li {
         width: 100%;
@@ -376,8 +378,7 @@
     }
 
     .sortable {
-        width: 100%;;
-        cursor: move;
+        width: 100%;
 
         .ui-sortable-helper {
             opacity: 0.5;

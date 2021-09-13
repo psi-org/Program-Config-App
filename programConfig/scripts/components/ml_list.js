@@ -1,5 +1,5 @@
 $(document).ready(function () {
-      components_ui('multilevel_list', 'section');
+      components_ui('ml_list', 'ml_item');
       $('.bsct_cta').on("click", function () {
             if($(this).attr('src') == 'images/i-expanded-bottom_black.svg'){
                   $(this).attr('src', 'images/i-contracted-bottom_black.svg');
@@ -23,23 +23,19 @@ $(document).ready(function () {
       });
 
       $(function() {
-            $("#sortable, #userFacets").sortable({
+            $("#sor_sections").sortable({
               connectWith: "ul",
               placeholder: "placeholder",
               delay: 150
-            })
-            .disableSelection()
-            .dblclick( function(e){
+            }).disableSelection().dblclick( function(e){
               var item = e.target;
               if (e.currentTarget.id === 'sortable') {
-                //move from all to user
                 $(item).fadeOut('fast', function() {
-                  $(item).appendTo($('#userFacets')).fadeIn('slow');
+                  $(item).appendTo($('#survey')).fadeIn('slow');
                 });
               } else {
-                //move from user to all
                 $(item).fadeOut('fast', function() {
-                  $(item).appendTo($('#sortable')).fadeIn('slow');
+                  $(item).appendTo($('#sor_sections')).fadeIn('slow');
                 });
               }
             });

@@ -7,24 +7,24 @@
     justify-content: top;
     align-content: top;
     grid-template-areas:
-        "list-section survey-section"
-        "fab-section cta-section";
+        "list-ml_item survey-ml_item"
+        "fab-ml_item cta-ml_item";
     width: 100%;
     height: 100%;
 
 
-    .survey-section {
-        grid-area: survey-section;
+    .survey-ml_item {
+        grid-area: survey-ml_item;
     }
 
-    .list-section {
+    .list-ml_item {
         overflow-y: auto;
         padding-right: 1px;
-        grid-area: list-section;
+        grid-area: list-ml_item;
     }
 
-    .fab-section {
-        grid-area: fab-section;
+    .fab-ml_item {
+        grid-area: fab-ml_item;
 
         .fab {
             margin: 16px auto;
@@ -32,9 +32,9 @@
 
     }
 
-    .cta-section {
+    .cta-ml_item {
         text-align: right;
         font-size:2em;
-        grid-area: cta-section;
+        grid-area: cta-ml_item;
     }
 }
