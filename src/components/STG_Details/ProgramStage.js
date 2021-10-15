@@ -15,7 +15,9 @@ const query = {
         resource: 'programStages',
         id: ({programStage}) => programStage,
         params: {
-            fields:['id','name','allowGenerateNextVisit','publicAccess','reportDateToUse','formType','generatedByEnrollmentDate','displayFormName','sortOrder','hideDueDate','enableUserAssignment','minDaysFromStart','favorite','executionDateLabel','preGenerateUID','displayName','externalAccess','openAfterEnrollment','repeatable','remindCompleted','displayGenerateEventBox','validationStrategy','autoGenerateEvent','blockEntryForm','program','style','access','user','programStageDataElements','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates','programStageSections[id,name,displayName,sortOrder,dataElements[id,displayName,formName]]']
+            fields:['id','name','allowGenerateNextVisit','publicAccess','reportDateToUse','formType','generatedByEnrollmentDate','displayFormName','sortOrder','hideDueDate','enableUserAssignment','minDaysFromStart','favorite','executionDateLabel','preGenerateUID','displayName','externalAccess','openAfterEnrollment','repeatable','remindCompleted','displayGenerateEventBox','validationStrategy','autoGenerateEvent','blockEntryForm','program','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
+            'programStageDataElements',
+            'programStageSections[id,name,displayName,sortOrder,dataElements[id,displayName,formName,attributeValues,optionSet]]']
         }
     }
 };
@@ -54,9 +56,9 @@ const ProgramStage = () => {
         return <span><CircularLoader /></span> 
     }
     
-    
+    console.log(data.results.programStageSections);
 
-    return <StageSections programStage={data.results} refetch={refetch}/>
+    return <StageSections programStage={data.results} stageRefetch={refetch}/>
     
 }
 

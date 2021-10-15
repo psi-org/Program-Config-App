@@ -20,11 +20,9 @@ import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 
 const DraggableSection = ({ stageSection, index }) => {
-    //console.log("Section " +stageSection.displayName + " has "+stageSection.dataElements.length);
     
     useEffect(() => {
-        $('.bsct_cta').on("click", function () {
-            
+        $('img.bsct_cta').off().on("click", function (e) {            
             if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
                 $(this).attr('src', contracted_bottom_svg);
                 $(this).parent().parent().css({
@@ -59,17 +57,17 @@ const DraggableSection = ({ stageSection, index }) => {
                             {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span>
                         </div>
                         <div className="ml_item-warning_error ">
-                            <img src={warning_svg} alt="wrng" />
+                            {/* <img src={warning_svg} alt="wrng" />
                             <img src={error_svg} alt="err" />
                             <div className="ml_item-cw">
                                 3
                             </div>
                             <div className="ml_item-ce">
                                 2
-                            </div>
+                            </div> */}
                         </div>
                         <div className="ml_item-cta">
-                            <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} onClick={() =>{}} />
+                            <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                             <img src={move_vert_svg} alt="menu" />
                         </div>
                     </div>

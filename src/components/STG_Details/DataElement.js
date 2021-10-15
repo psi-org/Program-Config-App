@@ -20,14 +20,14 @@ const DraggableDataElement = ({dataElement,index}) => {
                         {dataElement.formName}
                     </div>
                     <div className="ml_item-warning_error slctr_hidden">
-                        <img src={warning_svg} alt="wrng" />
+                        {/* <img src={warning_svg} alt="wrng" />
                         <img src={error_svg} alt="err" />
                         <div className="ml_item-cw">
                             3
                         </div>
                         <div className="ml_item-ce">
                             2
-                        </div>
+                        </div> */}
                     </div>
                     <div className="ml_item-cta">
                         <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>

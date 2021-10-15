@@ -75,14 +75,20 @@ const progressTheme = (icon) => ({
     }
 });
 
-const StageSections = ({ programStage, refetch }) => {
-    const [sections, setSections] = useState(programStage.programStageSections);
+const StageSections = ({ programStage, stageRefetch }) => {
+    
+    // Flags
     const [hasChanges, setHasChanges] = useState(false);
-
     const [saveAndBuild, setSaveAndBuild] = useState(false);
+
+    // States
+    const [sections, setSections] = useState(programStage.programStageSections);
+
+    //Progress Bars states
     const [progressPR, setProgressPR] = useState(0);
     const [progressPRV, setProgressPRV] = useState(0);
 
+    // Create Mutation
     let metadataDM= useDataMutation(createMutation);
     const createMetadata = {
         mutate : metadataDM[0],
@@ -175,22 +181,31 @@ const StageSections = ({ programStage, refetch }) => {
 
         createMetadata.mutate({ data: metadata }).then((res) => {
             setHasChanges(false);
-            refetch().then(response => setSections(response.results.programStageSections))
+            stageRefetch().then(response => setSections(response.results.programStageSections))
         });
 
     };
 
     const run = () => {
+        // Set flag to enable/disable actions (buttons)
         setSaveAndBuild('Run');
+
+        // Fetch
         prDQ.refetch().then((prResult) => {
             const programRules = prResult.results.programRules;
             prvDQ.refetch().then((prvResult) => {
+
                 const programRuleVariables = prvResult.results.programRuleVariables;
                 
                 let stepPR = 100 / programRules.length;
                 let stepPRV = 100 / programRuleVariables.length;
 
                 const progressFunction = (origin, step, doDelete, setProgressValue, index, resolve)=>{
+                    if(origin.length == 0){
+                        setProgressValue(100);
+                        return resolve();
+                    }
+
                     doDelete({ id: origin[index].id}).then(()=>{
                         setProgressValue(step*(index+1));
                         if(index < origin.length-1){
@@ -293,7 +308,7 @@ const StageSections = ({ programStage, refetch }) => {
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
-                                        sections.map((pss, idx) => {
+                                        sections.filter(s => s.name != "Scores" && s.name !="Critical Steps Calculations" ).map((pss, idx) => {
                                             return <DraggableSection stageSection={pss} index={idx} key={pss.id} />
                                         })
                                     }
