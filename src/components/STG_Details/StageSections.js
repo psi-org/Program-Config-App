@@ -9,6 +9,10 @@ import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
 
 import { Progress } from 'react-sweet-progress';
 import "react-sweet-progress/lib/style.css";
+import Scores from "./Scores";
+import CriticalCalculations from "./CriticalCalculations";
+
+import ConfigurationGenerator from "./ConfigurationGenerator";
 
 const createMutation = {
     resource: 'metadata',
@@ -82,7 +86,10 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [saveAndBuild, setSaveAndBuild] = useState(false);
 
     // States
-    const [sections, setSections] = useState(programStage.programStageSections);
+    const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name !="Scores" && s.name !="Critical Steps Calculations"));
+    const [scoresSection, setScoresSection] = useState(programStage.programStageSections.find(s => s.name =="Scores"));
+    console.log(scoresSection);
+    const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name =="Critical Steps Calculations"));
 
     //Progress Bars states
     const [progressPR, setProgressPR] = useState(0);
@@ -237,13 +244,23 @@ const StageSections = ({ programStage, stageRefetch }) => {
         
     };
 
+    const configuration_download = () => {
+        let configurationGenerator = new ConfigurationGenerator("gsTqFmasd4e");
+        configurationGenerator.init();
+    };
+
+    const configuration_import = () => {
+
+    };
+
     return (
         <div style={{ padding: "5px" }}>
             <div style={{ margin: "5px 15px" }}>
                 <ButtonStrip>
-                    <Button disabled={!hasChanges || createMetadata.loading} onClick={() => commit()}>Save Changes</Button>
+                    <Button disabled={!hasChanges || createMetadata.loading} onClick={() => commit()}>Save Changes test</Button>
                     <Button disabled={createMetadata.loading} primary onClick={() => run()}>Run Magic!</Button>
-
+                    <Button onClick={() => configuration_download()} style={{ float: 'right'}}>Generate</Button>
+                    <Button onClick={() => configuration_import()} style={{float: 'right'}}>Import</Button>
                 </ButtonStrip>
             </div>
 
@@ -308,7 +325,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
-                                        sections.filter(s => s.name != "Scores" && s.name !="Critical Steps Calculations" ).map((pss, idx) => {
+                                        sections.map((pss, idx) => {
                                             return <DraggableSection stageSection={pss} index={idx} key={pss.id} />
                                         })
                                     }
@@ -316,6 +333,8 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 </div>
                             )}
                         </Droppable>
+                        <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />
+                        <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />
                     </div>
                 </div>
             </DragDropContext>

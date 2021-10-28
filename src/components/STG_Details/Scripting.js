@@ -8,14 +8,14 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
 const sections2 = [
     {
         "name": "Information",
-        "id": "wfPuYgFDsHV",
+        "id": "otDCiuPfTot",
         "displayName": "Information",
         "sortOrder": 10,
         "dataElements": [
             {
-                "id": "PcQ3eclLjSQ",
-                "displayName": "CD IM HNQIS2 HFR__S10Q10_Est-ce que la formation sanitaire offre de services CPN ?",
-                "formName": "Est-ce que la formation sanitaire offre de services CPN ?",
+                "id": "WpZ3ma42IjV",
+                "displayName": "MG HNQIS2 HFR__S10Q10_Est-ce que la formation sanitaire offert de services CPN ?",
+                "formName": "Est-ce que la formation sanitaire offert de services CPN ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
@@ -35,8 +35,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "iSspcsYIXB0",
-                "displayName": "CD IM HNQIS2 HFR__S10Q20_Est-ce que la formation sanitaire distribue MILDA aux enfants âgés de moins de 5 ans ?",
+                "id": "oTVdZrWRK3i",
+                "displayName": "MG HNQIS2 HFR__S10Q20_Est-ce que la formation sanitaire distribue MILDA aux enfants âgés de moins de 5 ans ?",
                 "formName": "Est-ce que la formation sanitaire distribue MILDA aux enfants âgés de moins de 5 ans ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -57,9 +57,9 @@ const sections2 = [
                 ]
             },
             {
-                "id": "DR2X25rVehj",
-                "displayName": "CD IM HNQIS2 HFR__S10Q30_Est-ce que la formation sanitaire offre de services laboratoire ?",
-                "formName": "Est-ce que la formation sanitaire offre de services laboratoire ?",
+                "id": "o5zjCeG78cK",
+                "displayName": "MG HNQIS2 HFR__S10Q30_Est-ce que la formation sanitaire offert de services laboratoire ?",
+                "formName": "Est-ce que la formation sanitaire offert de services laboratoire ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
@@ -79,9 +79,9 @@ const sections2 = [
                 ]
             },
             {
-                "id": "hKaS5pyOzNp",
-                "displayName": "CD IM HNQIS2 HFR__S10Q40_Est-ce que la formation sanitaire offre de diazépam ?",
-                "formName": "Est-ce que la formation sanitaire offre de diazépam ?",
+                "id": "abGNrG7q6Nt",
+                "displayName": "MG HNQIS2 HFR__S10Q40_Est-ce que la formation sanitaire offert de diazépam ?",
+                "formName": "Est-ce que la formation sanitaire offert de diazépam ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
@@ -101,9 +101,9 @@ const sections2 = [
                 ]
             },
             {
-                "id": "ZxRhxkErYMI",
-                "displayName": "CD IM HNQIS2 HFR__S10Q50_Est-ce que la formation sanitaire offre de sang à transfuser ?",
-                "formName": "Est-ce que la formation sanitaire offre de sang à transfuser ?",
+                "id": "FrknxcHjAAx",
+                "displayName": "MG HNQIS2 HFR__S10Q50_Est-ce que la formation sanitaire offert de sang à transfuser ?",
+                "formName": "Est-ce que la formation sanitaire offert de sang à transfuser ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
@@ -123,8 +123,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "tIzsRDZFob9",
-                "displayName": "CD IM HNQIS2 HFR__S10Q60_Est-ce qu'il y a au moins d'une ASC dans cet établissement de santé ?",
+                "id": "TTIdXlV84WI",
+                "displayName": "MG HNQIS2 HFR__S10Q60_Est-ce qu'il y a au moins d'une ASC dans cet établissement de santé ?",
                 "formName": "Est-ce qu'il y a au moins d'une ASC dans cet établissement de santé ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -145,9 +145,9 @@ const sections2 = [
                 ]
             },
             {
-                "id": "dCJTT13HA1F",
-                "displayName": "CD IM HNQIS2 HFR__S10Q70_Est-ce que la formation sanitaire offre des services pour la gestion de paludisme grave ?",
-                "formName": "Est-ce que la formation sanitaire offre des services pour la gestion de paludisme grave ?",
+                "id": "Ll7AEH0R22e",
+                "displayName": "MG HNQIS2 HFR__S10Q70_Est-ce que la formation sanitaire offert des services pour la gestion de paludisme grave ?",
+                "formName": "Est-ce que la formation sanitaire offert des services pour la gestion de paludisme grave ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
@@ -170,13 +170,13 @@ const sections2 = [
     },
     {
         "name": "Disponibilité de médicaments",
-        "id": "X4rHquJ1SkT",
+        "id": "bWgwNCeBOpc",
         "displayName": "Disponibilité de médicaments",
         "sortOrder": 20,
         "dataElements": [
             {
-                "id": "Q135i9qum0J",
-                "displayName": "CD IM HNQIS2 HFR__S20Q10_Est-ce que ces médicaments sont disponibles aujourd'hui ?",
+                "id": "XuzCevc5gHW",
+                "displayName": "MG HNQIS2 HFR__S20Q10_Est-ce que ces médicaments sont disponibles aujourd'hui ?",
                 "formName": "     ",
                 "attributeValues": [
                     {
@@ -194,15 +194,15 @@ const sections2 = [
                 ]
             },
             {
-                "id": "bTDDvHYW6K7",
-                "displayName": "CD IM HNQIS2 HFR__S20Q20_Sulfadoxine-Pyriméthamine",
+                "id": "x6IqXLKaLrO",
+                "displayName": "MG HNQIS2 HFR__S20Q20_Sulfadoxine-Pyriméthamine",
                 "formName": "Sulfadoxine-Pyriméthamine",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":2,\"scoreDen\":2}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -222,19 +222,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "B2SfjFeDHsR",
-                "displayName": "CD IM HNQIS2 HFR__S20Q30_Artéméther-Luméfantrine 2-11 mois (comprimés)",
-                "formName": "Artéméther-Luméfantrine 2-11 mois (comprimés)",
+                "id": "ZME3UjxYIkm",
+                "displayName": "MG HNQIS2 HFR__S20Q30_CTA pour enfants agés de 2-11 mois",
+                "formName": "CTA pour enfants agés de 2-11 mois",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.2",
                         "attribute": {
@@ -242,6 +236,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -250,19 +250,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "L42s9QpgFd6",
-                "displayName": "CD IM HNQIS2 HFR__S20Q40_Artéméther-Luméfantrine, 1-5 ans",
-                "formName": "Artéméther-Luméfantrine, 1-5 ans",
+                "id": "lFds4gyJ1rG",
+                "displayName": "MG HNQIS2 HFR__S20Q40_CTA pour enfants agé de 1 à 5 ans",
+                "formName": "CTA pour enfants agé de 1 à 5 ans",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.3",
                         "attribute": {
@@ -270,6 +264,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -278,19 +278,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "zFToQZZz3zp",
-                "displayName": "CD IM HNQIS2 HFR__S20Q50_Artéméther-Luméfantrine, 6-13 ans",
-                "formName": "Artéméther-Luméfantrine, 6-13 ans",
+                "id": "n4xhOpoABZx",
+                "displayName": "MG HNQIS2 HFR__S20Q50_CTA pour enfants agés 6 à 13 ans",
+                "formName": "CTA pour enfants agés 6 à 13 ans",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.4",
                         "attribute": {
@@ -298,6 +292,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -306,19 +306,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "LGpf3g79nj4",
-                "displayName": "CD IM HNQIS2 HFR__S20Q60_Artéméther-Luméfantrine, Adulte",
-                "formName": "Artéméther-Luméfantrine, Adulte",
+                "id": "QA8CCGcvvvM",
+                "displayName": "MG HNQIS2 HFR__S20Q60_CTA pour enfants agés de 14 ans et plus et adultes",
+                "formName": "CTA pour enfants agés de 14 ans et plus et adultes",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.5",
                         "attribute": {
@@ -326,6 +320,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -334,19 +334,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "Amgg1vv5MAo",
-                "displayName": "CD IM HNQIS2 HFR__S20Q70_Artésunate-Amodiaquine, 2-11 mois",
-                "formName": "Artésunate-Amodiaquine, 2-11 mois",
+                "id": "xHm8nGsPh3a",
+                "displayName": "MG HNQIS2 HFR__S20Q70_Quinine injectable",
+                "formName": "Quinine injectable",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.6",
                         "attribute": {
@@ -354,6 +348,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -362,19 +362,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "qYg1PkkMCMK",
-                "displayName": "CD IM HNQIS2 HFR__S20Q80_Artésunate-Amodiaquine, 1-5 ans",
-                "formName": "Artésunate-Amodiaquine, 1-5 ans",
+                "id": "RSj1Ki0Rrcw",
+                "displayName": "MG HNQIS2 HFR__S20Q80_Quinine comprimée",
+                "formName": "Quinine comprimée",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.7",
                         "attribute": {
@@ -382,6 +376,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -390,9 +390,9 @@ const sections2 = [
                 ]
             },
             {
-                "id": "vw8ArAPxdie",
-                "displayName": "CD IM HNQIS2 HFR__S20Q90_Artésunate-Amodiaquine, 6-13 ans",
-                "formName": "Artésunate-Amodiaquine, 6-13 ans",
+                "id": "krbET76Av6D",
+                "displayName": "MG HNQIS2 HFR__S20Q90_Artésunate injectable et/ou L'artémether injectable IM",
+                "formName": "Artésunate injectable et/ou L'artémether injectable IM",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
@@ -404,7 +404,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -418,9 +418,9 @@ const sections2 = [
                 ]
             },
             {
-                "id": "m8Z8Khah1bx",
-                "displayName": "CD IM HNQIS2 HFR__S20Q100_Artésunate-Amodiaquine, Adulte",
-                "formName": "Artésunate-Amodiaquine, Adulte",
+                "id": "Z9oTMRRA2XU",
+                "displayName": "MG HNQIS2 HFR__S20Q100_Artésunate suppositoire",
+                "formName": "Artésunate suppositoire",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
@@ -432,7 +432,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -446,19 +446,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "hcYKrwL2mwu",
-                "displayName": "CD IM HNQIS2 HFR__S20Q110_Artesunate- pyronamidine (comprimés)",
-                "formName": "Artesunate- pyronamidine (comprimés)",
+                "id": "ZWdaNDAuTWK",
+                "displayName": "MG HNQIS2 HFR__S20Q110_Fer comprimé pour la CPN",
+                "formName": "Fer comprimé pour la CPN",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.10",
                         "attribute": {
@@ -470,23 +464,23 @@ const sections2 = [
                         "attribute": {
                             "id": "NPwvdTt0Naj"
                         }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
                     }
                 ]
             },
             {
-                "id": "neCYw80tRB5",
-                "displayName": "CD IM HNQIS2 HFR__S20Q120_Quinine injectable",
-                "formName": "Quinine injectable",
+                "id": "BL5NgU21lkx",
+                "displayName": "MG HNQIS2 HFR__S20Q120_Acide folique 0,4mg pour la CPN",
+                "formName": "Acide folique 0,4mg pour la CPN",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.11",
                         "attribute": {
@@ -498,23 +492,23 @@ const sections2 = [
                         "attribute": {
                             "id": "NPwvdTt0Naj"
                         }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
                     }
                 ]
             },
             {
-                "id": "cq9fzKFppbx",
-                "displayName": "CD IM HNQIS2 HFR__S20Q130_Quinine 20% (goutte ou en suspension)",
-                "formName": "Quinine 20% (goutte ou en suspension)",
+                "id": "H40T3A3ljCt",
+                "displayName": "MG HNQIS2 HFR__S20Q130_Diazépam",
+                "formName": "Diazépam",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.12",
                         "attribute": {
@@ -522,6 +516,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"parentVarName\":\"_S10Q40\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -530,19 +530,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "F5F4kkZfAvY",
-                "displayName": "CD IM HNQIS2 HFR__S20Q140_Artésunate 60mg injectable, vial",
-                "formName": "Artésunate 60mg injectable, vial",
+                "id": "YPgMnMA4N68",
+                "displayName": "MG HNQIS2 HFR__S20Q140_Glucosé 5%",
+                "formName": "Glucosé 5%",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.13",
                         "attribute": {
@@ -550,6 +544,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -558,19 +558,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "TNzVBJsIKt0",
-                "displayName": "CD IM HNQIS2 HFR__S20Q150_Artésunate 100mg suppositoire, unité(suppositoire)",
-                "formName": "Artésunate 100mg suppositoire, unité(suppositoire)",
+                "id": "WVe2FSBqK2K",
+                "displayName": "MG HNQIS2 HFR__S20Q150_Glucosé 10%",
+                "formName": "Glucosé 10%",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "1.14",
                         "attribute": {
@@ -578,6 +572,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -586,9 +586,9 @@ const sections2 = [
                 ]
             },
             {
-                "id": "zJBMNyNTIwy",
-                "displayName": "CD IM HNQIS2 HFR__S20Q160_Fer comprimé pour la CPN",
-                "formName": "Fer comprimé pour la CPN",
+                "id": "uV4SH5oHgnE",
+                "displayName": "MG HNQIS2 HFR__S20Q160_Glucosé 30%",
+                "formName": "Glucosé 30%",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
@@ -600,7 +600,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -614,9 +614,9 @@ const sections2 = [
                 ]
             },
             {
-                "id": "y5Sxzgsc6YH",
-                "displayName": "CD IM HNQIS2 HFR__S20Q170_Acide folique 0,4mg pour la CPN",
-                "formName": "Acide folique 0,4mg pour la CPN",
+                "id": "XGrQ3KBSppe",
+                "displayName": "MG HNQIS2 HFR__S20Q170_Ringer lactate",
+                "formName": "Ringer lactate",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
@@ -628,7 +628,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -642,9 +642,9 @@ const sections2 = [
                 ]
             },
             {
-                "id": "o8vSErpodmB",
-                "displayName": "CD IM HNQIS2 HFR__S20Q180_Diazépam",
-                "formName": "Diazépam",
+                "id": "IVqDPdnMMoG",
+                "displayName": "MG HNQIS2 HFR__S20Q180_Serum salé",
+                "formName": "Serum salé",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
@@ -656,233 +656,9 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q40\",\"parentValue\":1}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "qFtndLMnuuq",
-                "displayName": "CD IM HNQIS2 HFR__S20Q190_Glucosé 5%",
-                "formName": "Glucosé 5%",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "1.18",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "bPIKIaBLqUl",
-                "displayName": "CD IM HNQIS2 HFR__S20Q200_Glucosé 10%",
-                "formName": "Glucosé 10%",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "1.19",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "cF3ebM1ZQub",
-                "displayName": "CD IM HNQIS2 HFR__S20Q210_Glucosé 50%",
-                "formName": "Glucosé 50%",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.20",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "TpTVjCVp2zF",
-                "displayName": "CD IM HNQIS2 HFR__S20Q220_Ringer lactate",
-                "formName": "Ringer lactate",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.21",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "GDwPmmJ83k4",
-                "displayName": "CD IM HNQIS2 HFR__S20Q230_Serum physiologique",
-                "formName": "Serum physiologique",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.22",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Zsey5msqmVM",
-                "displayName": "CD IM HNQIS2 HFR__S20Q240_Clindamycine",
-                "formName": "Clindamycine",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.23",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "O4jgtUIxjSk",
-                "displayName": "CD IM HNQIS2 HFR__S20Q250_Sel de réhydratation orale",
-                "formName": "Sel de réhydratation orale",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.24",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "SJ7W2by4qxl",
-                "displayName": "CD IM HNQIS2 HFR__S20Q260_Amoxoicilline",
-                "formName": "Amoxoicilline",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.25",
-                        "attribute": {
-                            "id": "LP171jpctBm"
                         }
                     },
                     {
@@ -897,13 +673,13 @@ const sections2 = [
     },
     {
         "name": "Disponibilite des commodites",
-        "id": "Siw5oYA6OWw",
+        "id": "U4OIlhOwPOB",
         "displayName": "Disponibilite des commodites",
         "sortOrder": 30,
         "dataElements": [
             {
-                "id": "mAqHRGWGepc",
-                "displayName": "CD IM HNQIS2 HFR__S30Q10_Est-ce que ces commodites sont disponibles aujourd'hui ?",
+                "id": "do9ySugkG6L",
+                "displayName": "MG HNQIS2 HFR__S30Q10_Est-ce que ces commodites sont disponibles aujourd'hui ?",
                 "formName": "     ",
                 "attributeValues": [
                     {
@@ -921,23 +697,23 @@ const sections2 = [
                 ]
             },
             {
-                "id": "zgZ05iTGmnt",
-                "displayName": "CD IM HNQIS2 HFR__S30Q20_Eau potable au site de CPN",
+                "id": "MzN6OkqmKbX",
+                "displayName": "MG HNQIS2 HFR__S30Q20_Eau potable au site de CPN",
                 "formName": "Eau potable au site de CPN",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "2.1",
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":2,\"scoreDen\":2}",
                         "attribute": {
-                            "id": "LP171jpctBm"
+                            "id": "haUflNqP85K"
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
+                        "value": "2.1",
                         "attribute": {
-                            "id": "haUflNqP85K"
+                            "id": "LP171jpctBm"
                         }
                     },
                     {
@@ -949,8 +725,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "Wm4Smv2XyHz",
-                "displayName": "CD IM HNQIS2 HFR__S30Q30_Verres jetables pour la strategie DOT de la SP pendant la CPN",
+                "id": "COAjPW4Yf13",
+                "displayName": "MG HNQIS2 HFR__S30Q30_Verres jetables pour la strategie DOT de la SP pendant la CPN",
                 "formName": "Verres jetables pour la strategie DOT de la SP pendant la CPN",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -963,33 +739,27 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
                         }
                     }
                 ]
             },
             {
-                "id": "ctpg6guA9NP",
-                "displayName": "CD IM HNQIS2 HFR__S30Q40_Gants d'examen",
+                "id": "fl4kv6OwGW7",
+                "displayName": "MG HNQIS2 HFR__S30Q40_Gants d'examen",
                 "formName": "Gants d'examen",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "2.3",
                         "attribute": {
@@ -997,6 +767,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -1005,19 +781,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "Z4t3un9Q2Tz",
-                "displayName": "CD IM HNQIS2 HFR__S30Q50_Savon ou gel",
+                "id": "grH3vYhdtys",
+                "displayName": "MG HNQIS2 HFR__S30Q50_Savon ou gel",
                 "formName": "Savon ou gel",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "2.4",
                         "attribute": {
@@ -1025,6 +795,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -1033,19 +809,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "yFw5nkmEtix",
-                "displayName": "CD IM HNQIS2 HFR__S30Q60_Boites de sécurité",
+                "id": "r1NUbZ52Iyg",
+                "displayName": "MG HNQIS2 HFR__S30Q60_Boites de sécurité",
                 "formName": "Boites de sécurité",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "2.5",
                         "attribute": {
@@ -1053,6 +823,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":3,\"scoreDen\":3}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -1061,19 +837,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "Erq5Wtu7xQm",
-                "displayName": "CD IM HNQIS2 HFR__S30Q70_Thermomètre",
+                "id": "eOqeTqvA0ce",
+                "displayName": "MG HNQIS2 HFR__S30Q70_Thermomètre",
                 "formName": "Thermomètre",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "2.6",
                         "attribute": {
@@ -1081,6 +851,12 @@ const sections2 = [
                         }
                     },
                     {
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
@@ -1089,8 +865,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "GD4lE0QaeOE",
-                "displayName": "CD IM HNQIS2 HFR__S30Q80_Balance-pèse personne",
+                "id": "n3AK7cqG9bc",
+                "displayName": "MG HNQIS2 HFR__S30Q80_Balance-pèse personne",
                 "formName": "Balance-pèse personne",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1103,7 +879,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1117,8 +893,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "k7LvZV9tPBs",
-                "displayName": "CD IM HNQIS2 HFR__S30Q90_Seringues",
+                "id": "Y1Y2YKXAfy5",
+                "displayName": "MG HNQIS2 HFR__S30Q90_Seringues",
                 "formName": "Seringues",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1131,7 +907,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1145,8 +921,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "TVrpq3LYSgH",
-                "displayName": "CD IM HNQIS2 HFR__S30Q100_Alcool",
+                "id": "NjTw44Kq1c5",
+                "displayName": "MG HNQIS2 HFR__S30Q100_Alcool",
                 "formName": "Alcool",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1159,7 +935,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1173,15 +949,15 @@ const sections2 = [
                 ]
             },
             {
-                "id": "lJuaHzB5rxd",
-                "displayName": "CD IM HNQIS2 HFR__S30Q110_Coton",
+                "id": "EASVWj7vTxH",
+                "displayName": "MG HNQIS2 HFR__S30Q110_Coton",
                 "formName": "Coton",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1201,15 +977,15 @@ const sections2 = [
                 ]
             },
             {
-                "id": "BEpB7vugKQI",
-                "displayName": "CD IM HNQIS2 HFR__S30Q120_TDR du paludisme",
+                "id": "A4GLDKPcEVw",
+                "displayName": "MG HNQIS2 HFR__S30Q120_TDR du paludisme",
                 "formName": "TDR du paludisme",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":3,\"scoreDen\":3}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1229,49 +1005,21 @@ const sections2 = [
                 ]
             },
             {
-                "id": "jEYJIVZN64z",
-                "displayName": "CD IM HNQIS2 HFR__S30Q130_MILDA pour la distribution en routine",
+                "id": "vB4lLBrQLvt",
+                "displayName": "MG HNQIS2 HFR__S30Q130_MILDA pour la distribution en routine",
                 "formName": "MILDA pour la distribution en routine",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":3,\"scoreDen\":3}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
                         "value": "2.12",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "zz5QpzzGxiv",
-                "displayName": "CD IM HNQIS2 HFR__S30Q140_Masques",
-                "formName": "Masques",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "2.13",
                         "attribute": {
                             "id": "LP171jpctBm"
                         }
@@ -1288,13 +1036,13 @@ const sections2 = [
     },
     {
         "name": "Disponibilité de la documentation",
-        "id": "tfTMQGcnTQw",
+        "id": "NipsY4B20Ie",
         "displayName": "Disponibilité de la documentation",
         "sortOrder": 40,
         "dataElements": [
             {
-                "id": "l0E5hpN8dt4",
-                "displayName": "CD IM HNQIS2 HFR__S40Q10_Est-ce que ces documents sont disponibles aujourd'hui ?",
+                "id": "H96g6WQhdjO",
+                "displayName": "MG HNQIS2 HFR__S40Q10_Est-ce que ces documents sont disponibles aujourd'hui ?",
                 "formName": "     ",
                 "attributeValues": [
                     {
@@ -1312,8 +1060,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "Be271yck8Wy",
-                "displayName": "CD IM HNQIS2 HFR__S40Q20_Guide FANOME",
+                "id": "HJGMQWnuIWB",
+                "displayName": "MG HNQIS2 HFR__S40Q20_Guide FANOME",
                 "formName": "Guide FANOME",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1340,8 +1088,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "t8ueyZCBrXr",
-                "displayName": "CD IM HNQIS2 HFR__S40Q30_Manuel de procédures Pha-G-Dis/Pha-G-Com (FANOME)",
+                "id": "Ghz2C98c5Gh",
+                "displayName": "MG HNQIS2 HFR__S40Q30_Manuel de procédures Pha-G-Dis/Pha-G-Com (FANOME)",
                 "formName": "Manuel de procédures Pha-G-Dis/Pha-G-Com (FANOME)",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1368,8 +1116,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "Qp8vK2QY4e8",
-                "displayName": "CD IM HNQIS2 HFR__S40Q40_Manuel de référence sur la gestion des intrants de santé",
+                "id": "JnVHkmQZp0F",
+                "displayName": "MG HNQIS2 HFR__S40Q40_Manuel de référence sur la gestion des intrants de santé",
                 "formName": "Manuel de référence sur la gestion des intrants de santé",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1396,8 +1144,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "pdZMKRMoM2u",
-                "displayName": "CD IM HNQIS2 HFR__S40Q50_Manuel de référence de la PEC du paludisme",
+                "id": "SkBbVeO1OzR",
+                "displayName": "MG HNQIS2 HFR__S40Q50_Manuel de référence de la PEC du paludisme",
                 "formName": "Manuel de référence de la PEC du paludisme",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1424,8 +1172,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "U5Qx6LuKSwH",
-                "displayName": "CD IM HNQIS2 HFR__S40Q60_Manuel sur la Prevention le contrôle du PPG, est-il disponible ?",
+                "id": "eaCxMCl1LMf",
+                "displayName": "MG HNQIS2 HFR__S40Q60_Manuel sur la Prevention le contrôle du PPG, est-il disponible ?",
                 "formName": "Manuel sur la Prevention le contrôle du PPG, est-il disponible ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1452,8 +1200,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "GmOyhS97RIP",
-                "displayName": "CD IM HNQIS2 HFR__S40Q70_Politique National de Santé Communautaire",
+                "id": "japHDOG7LKJ",
+                "displayName": "MG HNQIS2 HFR__S40Q70_Politique National de Santé Communautaire",
                 "formName": "Politique National de Santé Communautaire",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1480,8 +1228,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "HwJxBLFcwGg",
-                "displayName": "CD IM HNQIS2 HFR__S40Q80_Tally Sheet",
+                "id": "xIxkknQJVX6",
+                "displayName": "MG HNQIS2 HFR__S40Q80_Tally Sheet",
                 "formName": "Tally Sheet",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1508,8 +1256,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "Jom0wbfcGJR",
-                "displayName": "CD IM HNQIS2 HFR__S40Q90_Registres de consultations externes",
+                "id": "qqLB02TpkZ4",
+                "displayName": "MG HNQIS2 HFR__S40Q90_Registres de consultations externes",
                 "formName": "Registres de consultations externes",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1522,7 +1270,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1536,8 +1284,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "IYijKnz3W0a",
-                "displayName": "CD IM HNQIS2 HFR__S40Q100_Registres de consultation prénatales",
+                "id": "WTAsqOZNDBp",
+                "displayName": "MG HNQIS2 HFR__S40Q100_Registres de consultation prénatales",
                 "formName": "Registres de consultation prénatales",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1550,7 +1298,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":2,\"scoreDen\":2}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1564,15 +1312,15 @@ const sections2 = [
                 ]
             },
             {
-                "id": "q0XLh4r85hO",
-                "displayName": "CD IM HNQIS2 HFR__S40Q110_Registres de distribution des MILDA aux enfants âgés de moins de 5 ans",
+                "id": "h4jgCbvl4g6",
+                "displayName": "MG HNQIS2 HFR__S40Q110_Registres de distribution des MILDA aux enfants âgés de moins de 5 ans",
                 "formName": "Registres de distribution des MILDA aux enfants âgés de moins de 5 ans",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "{\"parentVarName\":\"_S10Q20\",\"parentValue\":1}",
+                        "value": "{\"parentVarName\":\"_S10Q20\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1592,19 +1340,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "BDlRRALcCQe",
-                "displayName": "CD IM HNQIS2 HFR__S40Q120_Registres de distribution de MILDA aux femmes enceintes",
+                "id": "pQvxyfbTR95",
+                "displayName": "MG HNQIS2 HFR__S40Q120_Registres de distribution de MILDA aux femmes enceintes",
                 "formName": "Registres de distribution de MILDA aux femmes enceintes",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "3.11",
                         "attribute": {
@@ -1616,27 +1358,33 @@ const sections2 = [
                         "attribute": {
                             "id": "NPwvdTt0Naj"
                         }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
                     }
                 ]
             },
             {
-                "id": "DuOyhRy1wrU",
-                "displayName": "CD IM HNQIS2 HFR__S40Q130_Canevas RMA",
+                "id": "fsb1qRFroCm",
+                "displayName": "MG HNQIS2 HFR__S40Q130_Canevas RMA",
                 "formName": "Canevas RMA",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
                         "value": "3.12",
                         "attribute": {
                             "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
                         }
                     },
                     {
@@ -1648,8 +1396,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "LstWv1dBPQz",
-                "displayName": "CD IM HNQIS2 HFR__S40Q140_Rapports mensuels d'activités des 6 derniers mois",
+                "id": "tcdcnr3TXp7",
+                "displayName": "MG HNQIS2 HFR__S40Q140_Rapports mensuels d'activités des 6 derniers mois",
                 "formName": "Rapports mensuels d'activités des 6 derniers mois",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1676,8 +1424,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "jz5BUgaXtAU",
-                "displayName": "CD IM HNQIS2 HFR__S40Q150_Rapports mensuels des AS",
+                "id": "OKfq0OAP17p",
+                "displayName": "MG HNQIS2 HFR__S40Q150_Rapports mensuels des AS",
                 "formName": "Rapports mensuels des AS",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1690,37 +1438,37 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "Yes",
+                        "value": "{\"parentVarName\":\"_S10Q60\",\"parentValue\":1,\"scoreNum\":2,\"scoreDen\":2}",
                         "attribute": {
-                            "id": "NPwvdTt0Naj"
+                            "id": "haUflNqP85K"
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q60\",\"parentValue\":1}",
+                        "value": "Yes",
                         "attribute": {
-                            "id": "haUflNqP85K"
+                            "id": "NPwvdTt0Naj"
                         }
                     }
                 ]
             },
             {
-                "id": "xrS5QDceUjn",
-                "displayName": "CD IM HNQIS2 HFR__S40Q160_Manuel de remplissage des supports de collecte de données",
+                "id": "EhG8tgxlpsa",
+                "displayName": "MG HNQIS2 HFR__S40Q160_Manuel de remplissage des supports de collecte de données",
                 "formName": "Manuel de remplissage des supports de collecte de données",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
                         "value": "3.15",
                         "attribute": {
                             "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
                         }
                     },
                     {
@@ -1735,13 +1483,13 @@ const sections2 = [
     },
     {
         "name": "Disponibilité des materiels",
-        "id": "QqfKXtg02zI",
+        "id": "eliMKVDMcnx",
         "displayName": "Disponibilité des materiels",
         "sortOrder": 50,
         "dataElements": [
             {
-                "id": "Okk5G7UypGM",
-                "displayName": "CD IM HNQIS2 HFR__S50Q10_Est-ce que ces materials (guides, directives, etc) sont disponibles aujourd'hui ?",
+                "id": "gzKA0H5vsLp",
+                "displayName": "MG HNQIS2 HFR__S50Q10_Est-ce que ces materials (guides, directives, etc) sont disponibles aujourd'hui ?",
                 "formName": "     ",
                 "attributeValues": [
                     {
@@ -1759,8 +1507,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "hEYWeaM1jbb",
-                "displayName": "CD IM HNQIS2 HFR__S50Q20_Tablette Disponible",
+                "id": "VlMSpT8cL2U",
+                "displayName": "MG HNQIS2 HFR__S50Q20_Tablette Disponible",
                 "formName": "Tablette Disponible",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1787,8 +1535,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "W6z3p1rLoCv",
-                "displayName": "CD IM HNQIS2 HFR__S50Q30_Tablette Fonctionelle",
+                "id": "rbkvXpV34q4",
+                "displayName": "MG HNQIS2 HFR__S50Q30_Tablette Fonctionelle",
                 "formName": "Tablette Fonctionelle",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1815,8 +1563,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "aHvTbscbImB",
-                "displayName": "CD IM HNQIS2 HFR__S50Q40_Ordinogramme TPI",
+                "id": "HdFXGuMqEY7",
+                "displayName": "MG HNQIS2 HFR__S50Q40_Ordinogramme TPI",
                 "formName": "Ordinogramme TPI",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1829,22 +1577,22 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
                         }
                     }
                 ]
             },
             {
-                "id": "ENVQxgzgZmW",
-                "displayName": "CD IM HNQIS2 HFR__S50Q50_Directives CPN",
+                "id": "wb82reSkPbH",
+                "displayName": "MG HNQIS2 HFR__S50Q50_Directives CPN",
                 "formName": "Directives CPN",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1857,22 +1605,22 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
                         }
                     }
                 ]
             },
             {
-                "id": "QeZP0Sd2OKJ",
-                "displayName": "CD IM HNQIS2 HFR__S50Q60_Directives nationales de prise en charge du paludisme",
+                "id": "Sl1LXXpzF6Q",
+                "displayName": "MG HNQIS2 HFR__S50Q60_Directives nationales de prise en charge du paludisme",
                 "formName": "Directives nationales de prise en charge du paludisme",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1885,7 +1633,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":2,\"scoreDen\":2}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1899,8 +1647,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "tN0CFHsMvrR",
-                "displayName": "CD IM HNQIS2 HFR__S50Q70_Ordinogramme de la PEC paludisme",
+                "id": "iPbYITGicrK",
+                "displayName": "MG HNQIS2 HFR__S50Q70_Ordinogramme de la PEC paludisme",
                 "formName": "Ordinogramme de la PEC paludisme",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1913,7 +1661,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1927,8 +1675,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "Bgv8I8vHUoI",
-                "displayName": "CD IM HNQIS2 HFR__S50Q80_Fiche technique PEC paludisme grave",
+                "id": "e3VWNDkszC7",
+                "displayName": "MG HNQIS2 HFR__S50Q80_Fiche technique PEC paludisme grave",
                 "formName": "Fiche technique PEC paludisme grave",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1941,7 +1689,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q70\",\"parentValue\":1}",
+                        "value": "{\"parentVarName\":\"_S10Q70\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1955,8 +1703,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "wzXD1pTIMOa",
-                "displayName": "CD IM HNQIS2 HFR__S50Q90_Ordinogramme de la PEC paludisme chez la femme enceinte",
+                "id": "IfkAagISxE3",
+                "displayName": "MG HNQIS2 HFR__S50Q90_Ordinogramme de la PEC paludisme chez la femme enceinte",
                 "formName": "Ordinogramme de la PEC paludisme chez la femme enceinte",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1969,7 +1717,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -1983,8 +1731,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "B3QUOWA3VYJ",
-                "displayName": "CD IM HNQIS2 HFR__S50Q100_Job aids",
+                "id": "s0nM2NGh8wh",
+                "displayName": "MG HNQIS2 HFR__S50Q100_Job aids",
                 "formName": "Job aids",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -1997,7 +1745,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -2011,19 +1759,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "fCaXh4c5hBq",
-                "displayName": "CD IM HNQIS2 HFR__S50Q110_Directives de distribution des MILDA",
+                "id": "IyEUZIRRLNB",
+                "displayName": "MG HNQIS2 HFR__S50Q110_Directives de distribution des MILDA",
                 "formName": "Directives de distribution des MILDA",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "4.10",
                         "attribute": {
@@ -2035,6 +1777,12 @@ const sections2 = [
                         "attribute": {
                             "id": "NPwvdTt0Naj"
                         }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
                     }
                 ]
             }
@@ -2042,13 +1790,13 @@ const sections2 = [
     },
     {
         "name": "Disponibilité de Ressources humaines formés",
-        "id": "WQPEPwFLVP1",
+        "id": "xQWXKpY5iUP",
         "displayName": "Disponibilité de Ressources humaines formés",
         "sortOrder": 60,
         "dataElements": [
             {
-                "id": "UY2wba2sTDQ",
-                "displayName": "CD IM HNQIS2 HFR__S60Q10_Nombre d'agent de santé par catégorie (prenant en charge paludisme) et selon le genre",
+                "id": "bH7b9pb6ZQr",
+                "displayName": "MG HNQIS2 HFR__S60Q10_Nombre d'agent de santé par catégorie (prenant en charge paludisme) et selon le genre",
                 "formName": "     ",
                 "attributeValues": [
                     {
@@ -2066,8 +1814,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "jpjTDVYsLvH",
-                "displayName": "CD IM HNQIS2 HFR__S60Q20_Medecins - Hommes",
+                "id": "SvHhqFWJF9O",
+                "displayName": "MG HNQIS2 HFR__S60Q20_Medecins - Hommes",
                 "formName": "Medecins - Hommes",
                 "attributeValues": [
                     {
@@ -2091,8 +1839,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "EH4oClwhd59",
-                "displayName": "CD IM HNQIS2 HFR__S60Q30_Medecins - Femmes",
+                "id": "Twm5TL2mHTx",
+                "displayName": "MG HNQIS2 HFR__S60Q30_Medecins - Femmes",
                 "formName": "Medecins - Femmes",
                 "attributeValues": [
                     {
@@ -2116,8 +1864,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "mqMDZOtBjhm",
-                "displayName": "CD IM HNQIS2 HFR__S60Q40_Sages femmes - Hommes",
+                "id": "kWRHWrQnJzG",
+                "displayName": "MG HNQIS2 HFR__S60Q40_Sages femmes - Hommes",
                 "formName": "Sages femmes - Hommes",
                 "attributeValues": [
                     {
@@ -2141,8 +1889,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "AAlMHO7ID8y",
-                "displayName": "CD IM HNQIS2 HFR__S60Q50_Sages femmes - Femmes",
+                "id": "iz1GaftGlos",
+                "displayName": "MG HNQIS2 HFR__S60Q50_Sages femmes - Femmes",
                 "formName": "Sages femmes - Femmes",
                 "attributeValues": [
                     {
@@ -2166,8 +1914,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "DlCXUepE0zX",
-                "displayName": "CD IM HNQIS2 HFR__S60Q60_Infirmiers - Hommes",
+                "id": "pQCudF7mESd",
+                "displayName": "MG HNQIS2 HFR__S60Q60_Infirmiers - Hommes",
                 "formName": "Infirmiers - Hommes",
                 "attributeValues": [
                     {
@@ -2191,8 +1939,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "VF5aAiY46sM",
-                "displayName": "CD IM HNQIS2 HFR__S60Q70_Infirmiers - Femmes",
+                "id": "GHoAWClDYNi",
+                "displayName": "MG HNQIS2 HFR__S60Q70_Infirmiers - Femmes",
                 "formName": "Infirmiers - Femmes",
                 "attributeValues": [
                     {
@@ -2216,8 +1964,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "tLCuQCbCSmh",
-                "displayName": "CD IM HNQIS2 HFR__S60Q80_Pharmaciens/PGP - Hommes",
+                "id": "p2o4HW5kJMj",
+                "displayName": "MG HNQIS2 HFR__S60Q80_Pharmaciens/PGP - Hommes",
                 "formName": "Pharmaciens/PGP - Hommes",
                 "attributeValues": [
                     {
@@ -2241,8 +1989,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "OyjELSYH56p",
-                "displayName": "CD IM HNQIS2 HFR__S60Q90_Pharmaciens/PGP - Femmes",
+                "id": "n2dITi0Vop0",
+                "displayName": "MG HNQIS2 HFR__S60Q90_Pharmaciens/PGP - Femmes",
                 "formName": "Pharmaciens/PGP - Femmes",
                 "attributeValues": [
                     {
@@ -2266,8 +2014,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "P85PWFV0cw4",
-                "displayName": "CD IM HNQIS2 HFR__S60Q100_Au moins 50% de personnel sont formé pour la prise en charge des cas de paludisme durant les deux dernieres annees selon les directives nationales ?",
+                "id": "rpak98cIMkj",
+                "displayName": "MG HNQIS2 HFR__S60Q100_Au moins 50% de personnel sont formé pour la prise en charge des cas de paludisme durant les deux dernieres annees selon les directives nationales ?",
                 "formName": "Au moins 50% de personnel sont formé pour la prise en charge des cas de paludisme durant les deux dernieres annees selon les directives nationales ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -2280,7 +2028,7 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":3,\"scoreDen\":3}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -2297,13 +2045,13 @@ const sections2 = [
     },
     {
         "name": "Disponiblité de données de qualité des 3 derniers mois",
-        "id": "t76LdzOuzeQ",
+        "id": "DOOU54CPqXw",
         "displayName": "Disponiblité de données de qualité des 3 derniers mois",
         "sortOrder": 70,
         "dataElements": [
             {
-                "id": "ouuxyIBZ73m",
-                "displayName": "CD IM HNQIS2 HFR__S70Q10_Calcul les nombre pour les 3 derniers mois",
+                "id": "aWfP9s8RXb9",
+                "displayName": "MG HNQIS2 HFR__S70Q10_Calcul les nombre pour les 3 derniers mois",
                 "formName": "     ",
                 "attributeValues": [
                     {
@@ -2324,13 +2072,13 @@ const sections2 = [
     },
     {
         "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de femme enceinte reçu en CPN 1",
-        "id": "UVQ0Vp5WiVF",
+        "id": "i8C5TyVOdLp",
         "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de femme enceinte reçu en CPN 1",
         "sortOrder": 80,
         "dataElements": [
             {
-                "id": "inYOWBOfk8S",
-                "displayName": "CD IM HNQIS2 HFR__S80Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
+                "id": "ZxRiCbng72D",
+                "displayName": "MG HNQIS2 HFR__S80Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "attributeValues": [
                     {
@@ -2354,8 +2102,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "PC6VMhqMgw6",
-                "displayName": "CD IM HNQIS2 HFR__S80Q20_Valeur rapportée dans RMA (S)",
+                "id": "lv6Flg33FYK",
+                "displayName": "MG HNQIS2 HFR__S80Q20_Valeur rapportée dans RMA (S)",
                 "formName": "Valeur rapportée dans RMA (S)",
                 "attributeValues": [
                     {
@@ -2379,8 +2127,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "v7TJNGAxU5Q",
-                "displayName": "CD IM HNQIS2 HFR__S80Q30_Valeur trouvé dans le régistre (T)",
+                "id": "zYzSy2MemyT",
+                "displayName": "MG HNQIS2 HFR__S80Q30_Valeur trouvé dans le régistre (T)",
                 "formName": "Valeur trouvé dans le régistre (T)",
                 "attributeValues": [
                     {
@@ -2404,8 +2152,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "T4TQ9sBq9mV",
-                "displayName": "CD IM HNQIS2 HFR__S80Q40_Ecart (T-S) <= 10% ?",
+                "id": "f2bOFEntBzO",
+                "displayName": "MG HNQIS2 HFR__S80Q40_Ecart (T-S) <= 10% ?",
                 "formName": "Ecart (T-S) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -2418,22 +2166,22 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
                         }
                     }
                 ]
             },
             {
-                "id": "tBsVWGS9txH",
-                "displayName": "CD IM HNQIS2 HFR__S80Q50_Ecart (T-R) <= 10% ?",
+                "id": "V7vaRY1qwbW",
+                "displayName": "MG HNQIS2 HFR__S80Q50_Ecart (T-R) <= 10% ?",
                 "formName": "Ecart (T-R) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -2446,15 +2194,15 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
                         }
                     }
                 ]
@@ -2463,13 +2211,13 @@ const sections2 = [
     },
     {
         "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de femme enceinte ayant reçu le TPI 3",
-        "id": "qnm2RNUIq7z",
+        "id": "Abqmx9oz7mW",
         "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de femme enceinte ayant reçu le TPI 3",
         "sortOrder": 90,
         "dataElements": [
             {
-                "id": "KrRZHNn9L8A",
-                "displayName": "CD IM HNQIS2 HFR__S90Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
+                "id": "kcjWpR0aNGP",
+                "displayName": "MG HNQIS2 HFR__S90Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "attributeValues": [
                     {
@@ -2493,8 +2241,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "KfUBfu9u4ko",
-                "displayName": "CD IM HNQIS2 HFR__S90Q20_Valeur rapportée dans RMA (S)",
+                "id": "oeyh9YyEDJ6",
+                "displayName": "MG HNQIS2 HFR__S90Q20_Valeur rapportée dans RMA (S)",
                 "formName": "Valeur rapportée dans RMA (S)",
                 "attributeValues": [
                     {
@@ -2518,8 +2266,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "CKDPMAL27jP",
-                "displayName": "CD IM HNQIS2 HFR__S90Q30_Valeur trouvé dans le régistre (T)",
+                "id": "kRZ7Od0vhnO",
+                "displayName": "MG HNQIS2 HFR__S90Q30_Valeur trouvé dans le régistre (T)",
                 "formName": "Valeur trouvé dans le régistre (T)",
                 "attributeValues": [
                     {
@@ -2543,8 +2291,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "nP7t9yffe8z",
-                "displayName": "CD IM HNQIS2 HFR__S90Q40_Ecart (T-S) <= 10% ?",
+                "id": "d9IPptSNFle",
+                "displayName": "MG HNQIS2 HFR__S90Q40_Ecart (T-S) <= 10% ?",
                 "formName": "Ecart (T-S) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -2557,33 +2305,27 @@ const sections2 = [
                         }
                     },
                     {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
                         "value": "Yes",
                         "attribute": {
                             "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
                         }
                     }
                 ]
             },
             {
-                "id": "qSxPnYiy06h",
-                "displayName": "CD IM HNQIS2 HFR__S90Q50_Ecart (T-R) <= 10% ?",
+                "id": "HabgamHmOYO",
+                "displayName": "MG HNQIS2 HFR__S90Q50_Ecart (T-R) <= 10% ?",
                 "formName": "Ecart (T-R) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "6.2.5",
                         "attribute": {
@@ -2595,6 +2337,12 @@ const sections2 = [
                         "attribute": {
                             "id": "NPwvdTt0Naj"
                         }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
                     }
                 ]
             }
@@ -2602,13 +2350,13 @@ const sections2 = [
     },
     {
         "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas suspects de paludisme enregistré dans la formation sanitaire",
-        "id": "QfKDp3vJPI7",
+        "id": "ANZLbmbWQOH",
         "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas suspects de paludisme enregistré dans la formation sanitaire",
         "sortOrder": 100,
         "dataElements": [
             {
-                "id": "V2PsAOPuSu2",
-                "displayName": "CD IM HNQIS2 HFR__S100Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
+                "id": "UL8fL7MoOVB",
+                "displayName": "MG HNQIS2 HFR__S100Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "attributeValues": [
                     {
@@ -2632,8 +2380,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "swgMvl5eLyv",
-                "displayName": "CD IM HNQIS2 HFR__S100Q20_Valeur rapportée dans RMA (S)",
+                "id": "wO5DaWX1mFw",
+                "displayName": "MG HNQIS2 HFR__S100Q20_Valeur rapportée dans RMA (S)",
                 "formName": "Valeur rapportée dans RMA (S)",
                 "attributeValues": [
                     {
@@ -2657,8 +2405,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "XPvq6yAV4p4",
-                "displayName": "CD IM HNQIS2 HFR__S100Q30_Valeur trouvé dans le régistre (T)",
+                "id": "izX2iNMqC9g",
+                "displayName": "MG HNQIS2 HFR__S100Q30_Valeur trouvé dans le régistre (T)",
                 "formName": "Valeur trouvé dans le régistre (T)",
                 "attributeValues": [
                     {
@@ -2682,19 +2430,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "SJ6K8cKA1TP",
-                "displayName": "CD IM HNQIS2 HFR__S100Q40_Ecart (T-S) <= 10% ?",
+                "id": "OBkWCow2L2Z",
+                "displayName": "MG HNQIS2 HFR__S100Q40_Ecart (T-S) <= 10% ?",
                 "formName": "Ecart (T-S) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "6.3.4",
                         "attribute": {
@@ -2706,19 +2448,25 @@ const sections2 = [
                         "attribute": {
                             "id": "NPwvdTt0Naj"
                         }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
                     }
                 ]
             },
             {
-                "id": "AtBI74X13Rk",
-                "displayName": "CD IM HNQIS2 HFR__S100Q50_Ecart (T-R) <= 10% ?",
+                "id": "iGwPNRcaGgx",
+                "displayName": "MG HNQIS2 HFR__S100Q50_Ecart (T-R) <= 10% ?",
                 "formName": "Ecart (T-R) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -2741,13 +2489,13 @@ const sections2 = [
     },
     {
         "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse",
-        "id": "EKOGC3u0Yr1",
+        "id": "RoNOdLW5mRT",
         "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse",
         "sortOrder": 110,
         "dataElements": [
             {
-                "id": "GQV3D8VAxoa",
-                "displayName": "CD IM HNQIS2 HFR__S110Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
+                "id": "w1wxF6YwNPC",
+                "displayName": "MG HNQIS2 HFR__S110Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "attributeValues": [
                     {
@@ -2771,8 +2519,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "P5zL5O4h3ot",
-                "displayName": "CD IM HNQIS2 HFR__S110Q20_Valeur rapportée dans RMA (S)",
+                "id": "j6whHDTD6g7",
+                "displayName": "MG HNQIS2 HFR__S110Q20_Valeur rapportée dans RMA (S)",
                 "formName": "Valeur rapportée dans RMA (S)",
                 "attributeValues": [
                     {
@@ -2796,8 +2544,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "cJNrSpOd7C0",
-                "displayName": "CD IM HNQIS2 HFR__S110Q30_Valeur trouvé dans le régistre (T)",
+                "id": "nRaT50Hzfr6",
+                "displayName": "MG HNQIS2 HFR__S110Q30_Valeur trouvé dans le régistre (T)",
                 "formName": "Valeur trouvé dans le régistre (T)",
                 "attributeValues": [
                     {
@@ -2821,19 +2569,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "BOZ0p9zyck4",
-                "displayName": "CD IM HNQIS2 HFR__S110Q40_Ecart (T-S) <= 10% ?",
+                "id": "Avo5agwMsNa",
+                "displayName": "MG HNQIS2 HFR__S110Q40_Ecart (T-S) <= 10% ?",
                 "formName": "Ecart (T-S) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "6.4.4",
                         "attribute": {
@@ -2845,19 +2587,25 @@ const sections2 = [
                         "attribute": {
                             "id": "NPwvdTt0Naj"
                         }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
                     }
                 ]
             },
             {
-                "id": "jZpSJp2wt6m",
-                "displayName": "CD IM HNQIS2 HFR__S110Q50_Ecart (T-R) <= 10% ?",
+                "id": "dPGrUgvEtX7",
+                "displayName": "MG HNQIS2 HFR__S110Q50_Ecart (T-R) <= 10% ?",
                 "formName": "Ecart (T-R) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -2880,13 +2628,13 @@ const sections2 = [
     },
     {
         "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse",
-        "id": "DdMcApp8zNP",
+        "id": "rLRDasOnjy5",
         "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse",
         "sortOrder": 120,
         "dataElements": [
             {
-                "id": "BtRhmeYw8Rr",
-                "displayName": "CD IM HNQIS2 HFR__S120Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
+                "id": "pz4JqvyF1sU",
+                "displayName": "MG HNQIS2 HFR__S120Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "attributeValues": [
                     {
@@ -2910,8 +2658,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "c5HudBhOsgn",
-                "displayName": "CD IM HNQIS2 HFR__S120Q20_Valeur rapportée dans RMA (S)",
+                "id": "a1uXn07B8l2",
+                "displayName": "MG HNQIS2 HFR__S120Q20_Valeur rapportée dans RMA (S)",
                 "formName": "Valeur rapportée dans RMA (S)",
                 "attributeValues": [
                     {
@@ -2935,8 +2683,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "x9Lk0oQDSB1",
-                "displayName": "CD IM HNQIS2 HFR__S120Q30_Valeur trouvé dans le régistre (T)",
+                "id": "n3SpbS62flv",
+                "displayName": "MG HNQIS2 HFR__S120Q30_Valeur trouvé dans le régistre (T)",
                 "formName": "Valeur trouvé dans le régistre (T)",
                 "attributeValues": [
                     {
@@ -2960,19 +2708,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "y4KvHIIsHts",
-                "displayName": "CD IM HNQIS2 HFR__S120Q40_Ecart (T-S) <= 10% ?",
+                "id": "KXDV9x3PXMF",
+                "displayName": "MG HNQIS2 HFR__S120Q40_Ecart (T-S) <= 10% ?",
                 "formName": "Ecart (T-S) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "6.5.4",
                         "attribute": {
@@ -2984,19 +2726,25 @@ const sections2 = [
                         "attribute": {
                             "id": "NPwvdTt0Naj"
                         }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
                     }
                 ]
             },
             {
-                "id": "plHgSDGC5MQ",
-                "displayName": "CD IM HNQIS2 HFR__S120Q50_Ecart (T-R) <= 10% ?",
+                "id": "Ewc0wf3zhaa",
+                "displayName": "MG HNQIS2 HFR__S120Q50_Ecart (T-R) <= 10% ?",
                 "formName": "Ecart (T-R) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "{}",
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
                         "attribute": {
                             "id": "haUflNqP85K"
                         }
@@ -3019,13 +2767,13 @@ const sections2 = [
     },
     {
         "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas paludisme simple confirmés traités avec les ACT",
-        "id": "hiS70DWOQh9",
+        "id": "txIqRpTRIDB",
         "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas paludisme simple confirmés traités avec les ACT",
         "sortOrder": 130,
         "dataElements": [
             {
-                "id": "pDAP9Xb3Djr",
-                "displayName": "CD IM HNQIS2 HFR__S130Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
+                "id": "FsteoUTZhSO",
+                "displayName": "MG HNQIS2 HFR__S130Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "attributeValues": [
                     {
@@ -3049,8 +2797,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "JpLNFLtZceZ",
-                "displayName": "CD IM HNQIS2 HFR__S130Q20_Valeur rapportée dans RMA (S)",
+                "id": "WPiNLhJrgKc",
+                "displayName": "MG HNQIS2 HFR__S130Q20_Valeur rapportée dans RMA (S)",
                 "formName": "Valeur rapportée dans RMA (S)",
                 "attributeValues": [
                     {
@@ -3074,8 +2822,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "D3J8cLJpZXU",
-                "displayName": "CD IM HNQIS2 HFR__S130Q30_Valeur trouvé dans le régistre (T)",
+                "id": "ve0cWpeKcPD",
+                "displayName": "MG HNQIS2 HFR__S130Q30_Valeur trouvé dans le régistre (T)",
                 "formName": "Valeur trouvé dans le régistre (T)",
                 "attributeValues": [
                     {
@@ -3099,19 +2847,13 @@ const sections2 = [
                 ]
             },
             {
-                "id": "SD2QeceadiP",
-                "displayName": "CD IM HNQIS2 HFR__S130Q40_Ecart (T-S) <= 10% ?",
+                "id": "jIR89oDCvtH",
+                "displayName": "MG HNQIS2 HFR__S130Q40_Ecart (T-S) <= 10% ?",
                 "formName": "Ecart (T-S) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
                     {
                         "value": "6.6.4",
                         "attribute": {
@@ -3123,27 +2865,33 @@ const sections2 = [
                         "attribute": {
                             "id": "NPwvdTt0Naj"
                         }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
                     }
                 ]
             },
             {
-                "id": "w8pvdZ3KFrB",
-                "displayName": "CD IM HNQIS2 HFR__S130Q50_Ecart (T-R) <= 10% ?",
+                "id": "QZUqwaOeeJu",
+                "displayName": "MG HNQIS2 HFR__S130Q50_Ecart (T-R) <= 10% ?",
                 "formName": "Ecart (T-R) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
                 },
                 "attributeValues": [
                     {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
                         "value": "6.6.5",
                         "attribute": {
                             "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
                         }
                     },
                     {
@@ -3158,13 +2906,13 @@ const sections2 = [
     },
     {
         "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de traitement  d’ACT consommées (sortie de la pharmacie du la structure de santé)",
-        "id": "WNNx2Wtoe22",
+        "id": "Au803npwPKb",
         "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de traitement  d’ACT consommées (sortie de la pharmacie du la structure de santé)",
         "sortOrder": 140,
         "dataElements": [
             {
-                "id": "YfpbknqVenT",
-                "displayName": "CD IM HNQIS2 HFR__S140Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
+                "id": "awiIC7gn5Ps",
+                "displayName": "MG HNQIS2 HFR__S140Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
                 "attributeValues": [
                     {
@@ -3188,8 +2936,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "QQWesno3kab",
-                "displayName": "CD IM HNQIS2 HFR__S140Q20_Valeur rapportée dans RMA (S)",
+                "id": "UEgpO4f1iNp",
+                "displayName": "MG HNQIS2 HFR__S140Q20_Valeur rapportée dans RMA (S)",
                 "formName": "Valeur rapportée dans RMA (S)",
                 "attributeValues": [
                     {
@@ -3213,8 +2961,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "RMHQwXo1gtT",
-                "displayName": "CD IM HNQIS2 HFR__S140Q30_Valeur trouvé dans le régistre (T)",
+                "id": "UGUrgLzDjbA",
+                "displayName": "MG HNQIS2 HFR__S140Q30_Valeur trouvé dans le régistre (T)",
                 "formName": "Valeur trouvé dans le régistre (T)",
                 "attributeValues": [
                     {
@@ -3238,8 +2986,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "NgVOAf25ISc",
-                "displayName": "CD IM HNQIS2 HFR__S140Q40_Ecart (T-S) <= 10% ?",
+                "id": "SAcg6CxrR6b",
+                "displayName": "MG HNQIS2 HFR__S140Q40_Ecart (T-S) <= 10% ?",
                 "formName": "Ecart (T-S) <= 10% ?",
                 "optionSet": {
                     "id": "ZCgpq2tWlIr"
@@ -3247,6 +2995,67 @@ const sections2 = [
                 "attributeValues": [
                     {
                         "value": "6.7.4",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "Yes",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "lV1KrBSu1NN",
+                "displayName": "MG HNQIS2 HFR__S140Q50_Ecart (T-R) <= 10% ?",
+                "formName": "Ecart (T-R) <= 10% ?",
+                "optionSet": {
+                    "id": "ZCgpq2tWlIr"
+                },
+                "attributeValues": [
+                    {
+                        "value": "6.7.5",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "{\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
+                        "value": "Yes",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Données hebdomadaires rapportées au cours des 4 dernières semaines - Nombre de cas de paludisme confirmés par TDR ou goutte épaisse",
+        "id": "rrlKMHwVGJZ",
+        "displayName": "Données hebdomadaires rapportées au cours des 4 dernières semaines - Nombre de cas de paludisme confirmés par TDR ou goutte épaisse",
+        "sortOrder": 150,
+        "dataElements": [
+            {
+                "id": "IR76RniW0u4",
+                "displayName": "MG HNQIS2 HFR__S150Q10_Valeur rapporté par SEIE ( R)",
+                "formName": "Valeur rapporté par SEIE ( R)",
+                "attributeValues": [
+                    {
+                        "value": "7.1.1",
                         "attribute": {
                             "id": "LP171jpctBm"
                         }
@@ -3266,23 +3075,20 @@ const sections2 = [
                 ]
             },
             {
-                "id": "BlJZUjP34j9",
-                "displayName": "CD IM HNQIS2 HFR__S140Q50_Ecart (T-R) <= 10% ?",
-                "formName": "Ecart (T-R) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
+                "id": "iKKQClRdj8o",
+                "displayName": "MG HNQIS2 HFR__S150Q20_Valeur rapporté par RSH (S)",
+                "formName": "Valeur rapporté par RSH (S)",
                 "attributeValues": [
                     {
-                        "value": "{}",
+                        "value": "7.1.2",
                         "attribute": {
-                            "id": "haUflNqP85K"
+                            "id": "LP171jpctBm"
                         }
                     },
                     {
-                        "value": "6.7.5",
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
                         "attribute": {
-                            "id": "LP171jpctBm"
+                            "id": "haUflNqP85K"
                         }
                     },
                     {
@@ -3292,14 +3098,234 @@ const sections2 = [
                         }
                     }
                 ]
+            },
+            {
+                "id": "fEZEt8pjiFp",
+                "displayName": "MG HNQIS2 HFR__S150Q30_Valeur trouvé dans le régistre (T)",
+                "formName": "Valeur trouvé dans le régistre (T)",
+                "attributeValues": [
+                    {
+                        "value": "7.1.3",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
+                        "value": "Yes",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "e76rnErX98t",
+                "displayName": "MG HNQIS2 HFR__S150Q40_Ecart (T-S) <= 10% ?",
+                "formName": "Ecart (T-S) <= 10% ?",
+                "optionSet": {
+                    "id": "ZCgpq2tWlIr"
+                },
+                "attributeValues": [
+                    {
+                        "value": "7.1.4",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "Yes",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "KIvIGtBAT6X",
+                "displayName": "MG HNQIS2 HFR__S150Q50_Ecart (T-R) <= 10% ?",
+                "formName": "Ecart (T-R) <= 10% ?",
+                "optionSet": {
+                    "id": "ZCgpq2tWlIr"
+                },
+                "attributeValues": [
+                    {
+                        "value": "7.1.5",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "Yes",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Données hebdomadaires rapportées au cours des 4 dernières semaines - Stock fin du mois en RDT du mois précedent",
+        "id": "dYFuIHfH650",
+        "displayName": "Données hebdomadaires rapportées au cours des 4 dernières semaines - Stock fin du mois en RDT du mois précedent",
+        "sortOrder": 160,
+        "dataElements": [
+            {
+                "id": "tm6PWpW52gE",
+                "displayName": "MG HNQIS2 HFR__S160Q10_Valeur rapporté par SEIE ( R)",
+                "formName": "Valeur rapporté par SEIE ( R)",
+                "attributeValues": [
+                    {
+                        "value": "7.2.1",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
+                        "value": "Yes",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "xnRnie0xQdK",
+                "displayName": "MG HNQIS2 HFR__S160Q20_Valeur rapporté par RSH (S)",
+                "formName": "Valeur rapporté par RSH (S)",
+                "attributeValues": [
+                    {
+                        "value": "7.2.2",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
+                        "value": "Yes",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "Mkt8n2k2LjC",
+                "displayName": "MG HNQIS2 HFR__S160Q30_Valeur trouvé dans le régistre (T)",
+                "formName": "Valeur trouvé dans le régistre (T)",
+                "attributeValues": [
+                    {
+                        "value": "7.2.3",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
+                        "value": "Yes",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "a6ZRVCC2zEv",
+                "displayName": "MG HNQIS2 HFR__S160Q40_Ecart (T-S) <= 10% ?",
+                "formName": "Ecart (T-S) <= 10% ?",
+                "optionSet": {
+                    "id": "ZCgpq2tWlIr"
+                },
+                "attributeValues": [
+                    {
+                        "value": "7.2.4",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "Yes",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "IY2KXEeClte",
+                "displayName": "MG HNQIS2 HFR__S160Q50_Ecart (T-R) <= 10% ?",
+                "formName": "Ecart (T-R) <= 10% ?",
+                "optionSet": {
+                    "id": "ZCgpq2tWlIr"
+                },
+                "attributeValues": [
+                    {
+                        "value": "7.2.5",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    },
+                    {
+                        "value": "Yes",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1,\"scoreNum\":1,\"scoreDen\":1}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    }
+                ]
             }
         ]
     },
     {
         "name": "Critical Steps Calculations",
-        "id": "UGgLNYkyk0w",
+        "id": "uZ0SuwekVvH",
         "displayName": "Critical Steps Calculations",
-        "sortOrder": 150,
+        "sortOrder": 170,
         "dataElements": [
             {
                 "id": "VqBfZjZhKkU",
@@ -3326,13 +3352,13 @@ const sections2 = [
     },
     {
         "name": "Scores",
-        "id": "j3CcdjYekKk",
+        "id": "vbNlzrLEmKJ",
         "displayName": "Scores",
-        "sortOrder": 160,
+        "sortOrder": 180,
         "dataElements": [
             {
-                "id": "M4LfwQ77p8W",
-                "displayName": "CD IM HNQIS2 HFR__CS1_Disponibilité de médicaments",
+                "id": "PWWtAQq28EO",
+                "displayName": "MG HNQIS2 HFR__CS1_Disponibilité de médicaments",
                 "formName": "1 Disponibilité de médicaments (%)",
                 "attributeValues": [
                     {
@@ -3356,8 +3382,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "gjHaM9yP2TV",
-                "displayName": "CD IM HNQIS2 HFR__CS2_Disponibilite des commodites",
+                "id": "YU66kSUSZId",
+                "displayName": "MG HNQIS2 HFR__CS2_Disponibilite des commodites",
                 "formName": "2 Disponibilite des commodites (%)",
                 "attributeValues": [
                     {
@@ -3381,8 +3407,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "ouotlmOd1DT",
-                "displayName": "CD IM HNQIS2 HFR__CS3_Disponibilité de la documentation",
+                "id": "cylm67hC4fv",
+                "displayName": "MG HNQIS2 HFR__CS3_Disponibilité de la documentation",
                 "formName": "3 Disponibilité de la documentation (%)",
                 "attributeValues": [
                     {
@@ -3406,8 +3432,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "PYi15p4ODRn",
-                "displayName": "CD IM HNQIS2 HFR__CS4_Disponibilité des materiels",
+                "id": "sVlWSrp9Cws",
+                "displayName": "MG HNQIS2 HFR__CS4_Disponibilité des materiels",
                 "formName": "4 Disponibilité des materiels (%)",
                 "attributeValues": [
                     {
@@ -3431,8 +3457,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "j8q4eNETmJR",
-                "displayName": "CD IM HNQIS2 HFR__CS5_Disponibilité de ressources humaines formés",
+                "id": "EAYlnHAdbSa",
+                "displayName": "MG HNQIS2 HFR__CS5_Disponibilité de ressources humaines formés",
                 "formName": "5 Disponibilité de ressources humaines formés (%)",
                 "attributeValues": [
                     {
@@ -3456,8 +3482,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "Iv4KBI7NsoA",
-                "displayName": "CD IM HNQIS2 HFR__CS6_Disponiblité de données de qualité",
+                "id": "Nt1qs8bAv91",
+                "displayName": "MG HNQIS2 HFR__CS6_Disponiblité de données de qualité",
                 "formName": "6 Disponiblité de données de qualité (%)",
                 "attributeValues": [
                     {
@@ -3481,8 +3507,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "L15riwtBlA5",
-                "displayName": "CD IM HNQIS2 HFR__CS6.1_Nombre de femme enceinte reçu en CPN 1",
+                "id": "ir4wnjCWebR",
+                "displayName": "MG HNQIS2 HFR__CS6.1_Nombre de femme enceinte reçu en CPN 1",
                 "formName": "6.1 Nombre de femme enceinte reçu en CPN 1 (%)",
                 "attributeValues": [
                     {
@@ -3506,8 +3532,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "n18zjhkDg3J",
-                "displayName": "CD IM HNQIS2 HFR__CS6.2_Nombre de femme enceinte ayant reçu le TPI 3",
+                "id": "QsF5VvSWMmt",
+                "displayName": "MG HNQIS2 HFR__CS6.2_Nombre de femme enceinte ayant reçu le TPI 3",
                 "formName": "6.2 Nombre de femme enceinte ayant reçu le TPI 3 (%)",
                 "attributeValues": [
                     {
@@ -3531,8 +3557,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "YjdpmDg2kvz",
-                "displayName": "CD IM HNQIS2 HFR__CS6.3_Nombre de cas suspects de paludisme enregistré dans la formation sanitaire",
+                "id": "XGWgDGuzRVK",
+                "displayName": "MG HNQIS2 HFR__CS6.3_Nombre de cas suspects de paludisme enregistré dans la formation sanitaire",
                 "formName": "6.3 Nombre de cas suspects de paludisme enregistré dans la formation sanitaire (%)",
                 "attributeValues": [
                     {
@@ -3556,8 +3582,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "BcnETuF7brT",
-                "displayName": "CD IM HNQIS2 HFR__CS6.4_Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse",
+                "id": "qUfScu81Zhb",
+                "displayName": "MG HNQIS2 HFR__CS6.4_Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse",
                 "formName": "6.4 Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse (%)",
                 "attributeValues": [
                     {
@@ -3581,8 +3607,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "uvLQ52uo0gB",
-                "displayName": "CD IM HNQIS2 HFR__CS6.5_Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse",
+                "id": "tH46LKBmeqH",
+                "displayName": "MG HNQIS2 HFR__CS6.5_Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse",
                 "formName": "6.5 Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse (%)",
                 "attributeValues": [
                     {
@@ -3606,8 +3632,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "Fc4B81Rogac",
-                "displayName": "CD IM HNQIS2 HFR__CS6.6_Nombre de cas paludisme simple confirmés traités avec les ACT",
+                "id": "A7MhwmtYKvT",
+                "displayName": "MG HNQIS2 HFR__CS6.6_Nombre de cas paludisme simple confirmés traités avec les ACT",
                 "formName": "6.6 Nombre de cas paludisme simple confirmés traités avec les ACT (%)",
                 "attributeValues": [
                     {
@@ -3631,8 +3657,8 @@ const sections2 = [
                 ]
             },
             {
-                "id": "c6OP6mjk4gL",
-                "displayName": "CD IM HNQIS2 HFR__CS6.7_Nombre de traitement d’ACT consommées (sortie de la pharmacie du la structure de santé)",
+                "id": "dTBQak0eyiW",
+                "displayName": "MG HNQIS2 HFR__CS6.7_Nombre de traitement d’ACT consommées (sortie de la pharmacie du la structure de santé)",
                 "formName": "6.7 Nombre de traitement d’ACT consommées (sortie de la pharmacie du la structure de santé) (%)",
                 "attributeValues": [
                     {
@@ -3654,20 +3680,512 @@ const sections2 = [
                         }
                     }
                 ]
+            },
+            {
+                "id": "GV3PejMc8gg",
+                "displayName": "MG HNQIS2 HFR__CS7_Données hebdomadaires rapportées au cours des 4 dernières semaines",
+                "formName": "7 Données hebdomadaires rapportées au cours des 4 dernières semaines (%)",
+                "attributeValues": [
+                    {
+                        "value": "{}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
+                        "value": "No",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "7",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "qd7d5ofjwGo",
+                "displayName": "MG HNQIS2 HFR__CS7.1_Nombre de cas de paludisme confirmés par TDR ou goutte épaisse",
+                "formName": "7.1 Nombre de cas de paludisme confirmés par TDR ou goutte épaisse (%)",
+                "attributeValues": [
+                    {
+                        "value": "{}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
+                        "value": "No",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "7.1",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "mpWsUWmjTEX",
+                "displayName": "MG HNQIS2 HFR__CS7.2_Stock fin du mois en RDT du mois précedent",
+                "formName": "7.2 Stock fin du mois en RDT du mois précedent (%)",
+                "attributeValues": [
+                    {
+                        "value": "{}",
+                        "attribute": {
+                            "id": "haUflNqP85K"
+                        }
+                    },
+                    {
+                        "value": "No",
+                        "attribute": {
+                            "id": "NPwvdTt0Naj"
+                        }
+                    },
+                    {
+                        "value": "7.2",
+                        "attribute": {
+                            "id": "LP171jpctBm"
+                        }
+                    }
+                ]
             }
         ]
     }
 ];
 
+const scoreSection = {
+    "name": "Scores",
+    "id": "vbNlzrLEmKJ",
+    "displayName": "Scores",
+    "sortOrder": 180,
+    "dataElements": [
+        {
+            "id": "PWWtAQq28EO",
+            "displayName": "MG HNQIS2 HFR__CS1_Disponibilité de médicaments",
+            "formName": "1 Disponibilité de médicaments (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                },
+                {
+                    "value": "1",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "YU66kSUSZId",
+            "displayName": "MG HNQIS2 HFR__CS2_Disponibilite des commodites",
+            "formName": "2 Disponibilite des commodites (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                },
+                {
+                    "value": "2",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "cylm67hC4fv",
+            "displayName": "MG HNQIS2 HFR__CS3_Disponibilité de la documentation",
+            "formName": "3 Disponibilité de la documentation (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                },
+                {
+                    "value": "3",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "sVlWSrp9Cws",
+            "displayName": "MG HNQIS2 HFR__CS4_Disponibilité des materiels",
+            "formName": "4 Disponibilité des materiels (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "4",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "EAYlnHAdbSa",
+            "displayName": "MG HNQIS2 HFR__CS5_Disponibilité de ressources humaines formés",
+            "formName": "5 Disponibilité de ressources humaines formés (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "5",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "Nt1qs8bAv91",
+            "displayName": "MG HNQIS2 HFR__CS6_Disponiblité de données de qualité",
+            "formName": "6 Disponiblité de données de qualité (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "6",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "ir4wnjCWebR",
+            "displayName": "MG HNQIS2 HFR__CS6.1_Nombre de femme enceinte reçu en CPN 1",
+            "formName": "6.1 Nombre de femme enceinte reçu en CPN 1 (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "6.1",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "QsF5VvSWMmt",
+            "displayName": "MG HNQIS2 HFR__CS6.2_Nombre de femme enceinte ayant reçu le TPI 3",
+            "formName": "6.2 Nombre de femme enceinte ayant reçu le TPI 3 (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "6.2",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "XGWgDGuzRVK",
+            "displayName": "MG HNQIS2 HFR__CS6.3_Nombre de cas suspects de paludisme enregistré dans la formation sanitaire",
+            "formName": "6.3 Nombre de cas suspects de paludisme enregistré dans la formation sanitaire (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "6.3",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "qUfScu81Zhb",
+            "displayName": "MG HNQIS2 HFR__CS6.4_Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse",
+            "formName": "6.4 Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "6.4",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "tH46LKBmeqH",
+            "displayName": "MG HNQIS2 HFR__CS6.5_Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse",
+            "formName": "6.5 Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "6.5",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "A7MhwmtYKvT",
+            "displayName": "MG HNQIS2 HFR__CS6.6_Nombre de cas paludisme simple confirmés traités avec les ACT",
+            "formName": "6.6 Nombre de cas paludisme simple confirmés traités avec les ACT (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                },
+                {
+                    "value": "6.6",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dTBQak0eyiW",
+            "displayName": "MG HNQIS2 HFR__CS6.7_Nombre de traitement d’ACT consommées (sortie de la pharmacie du la structure de santé)",
+            "formName": "6.7 Nombre de traitement d’ACT consommées (sortie de la pharmacie du la structure de santé) (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                },
+                {
+                    "value": "6.7",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "GV3PejMc8gg",
+            "displayName": "MG HNQIS2 HFR__CS7_Données hebdomadaires rapportées au cours des 4 dernières semaines",
+            "formName": "7 Données hebdomadaires rapportées au cours des 4 dernières semaines (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "7",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "qd7d5ofjwGo",
+            "displayName": "MG HNQIS2 HFR__CS7.1_Nombre de cas de paludisme confirmés par TDR ou goutte épaisse",
+            "formName": "7.1 Nombre de cas de paludisme confirmés par TDR ou goutte épaisse (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "7.1",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "mpWsUWmjTEX",
+            "displayName": "MG HNQIS2 HFR__CS7.2_Stock fin du mois en RDT du mois précedent",
+            "formName": "7.2 Stock fin du mois en RDT du mois précedent (%)",
+            "attributeValues": [
+                {
+                    "value": "No",
+                    "attribute": {
+                        "id": "NPwvdTt0Naj"
+                    }
+                },
+                {
+                    "value": "7.2",
+                    "attribute": {
+                        "id": "LP171jpctBm"
+                    }
+                },
+                {
+                    "value": "{\"elemType\":\"score\"}",
+                    "attribute": {
+                        "id": "haUflNqP85K"
+                    }
+                }
+            ]
+        }
+    ]
+};
+
 const programId = "hAzCMeYj2kY";
 
+/**
+ * 
+ * @param {*} sections 
+ * @param {*} programId 
+ * @returns {programRuleVariables,compositeValues}
+ *          programRuleVariables: <Array>{name,programRuleVariableSourceType,useCodeForOptionSet,program,|dataElement|}
+ *          compositeValues: <Array>{composite, section}
+ */
 const buildProgramRuleVariables = (sections, programId) => {
     const criticalStepCalculations = sections.find(s => s.name == "Critical Step Calculations");
     const scores = sections.find(s => s.name == "Scores");
     sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
 
     let programRuleVariables = [];
-    let compositeValues = [];
+    let compositeValues = []; // [1,1.1,...,4]
 
     // Data Elements Variables
     sections.forEach((section, secIdx) => {
@@ -3685,9 +4203,9 @@ const buildProgramRuleVariables = (sections, programId) => {
                 order
                     .map((c, idx) => order.slice(0, idx + 1).join('.'))
                     .forEach(o => {
-                        if (!compositeValues.find(cv => cv.composite == o)) compositeValues.push({ composite: o, section: section.name });
+                        if (!compositeValues.includes(o)) compositeValues.push(o);
+                        //if (!compositeValues.find(cv => cv.composite == o)) compositeValues.push({ composite: o, section: section.name });
                     })
-
         });
     });
 
@@ -3741,38 +4259,249 @@ const buildProgramRuleVariables = (sections, programId) => {
     );
 
     programRuleVariables = programRuleVariables.concat(criticalVariables);
-    console.log(programRuleVariables);
+    return {programRuleVariables, compositeValues};
 }
 
-const programRules = (sections,programId,scoreMap = {sub:[]} ) => {
+const programRules = (sections, programId, compositeValues, scoreMap = { childs: [] }) => {
+    var programRules = [];
+    
     sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
+
+    //Create Tree Object for Scoring PRs
     sections.forEach((section, secIdx) => {
         section.dataElements.forEach((dataElement, deIdx) => {
             let order = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
-            if(order) locateInTree( { subLevels:order.split("."), varName: `_S${secIdx + 1}Q${deIdx + 1}` },scoreMap)
+            let isCritical = dataElement.attributeValues.find(att => att.attribute.id == CRITICAL_QUESTION)?.value == "Yes";
+            let metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || Object());
+            if (order && metadata.scoreNum && metadata.scoreDen) {
+                locateInTree(
+                    {
+                        subLevels: order.split("."),
+                        prgVarName: `_S${secIdx + 1}Q${deIdx + 1}`,
+                        scoreNum: metadata.scoreNum,
+                        scoreDen: metadata.scoreDen,
+                        isCritical
+                    },
+                    scoreMap
+                )
+            }
         });
     });
+
+    //Define Global Scores
+    const globalScores = buildScores(scoreMap);
+    console.log(globalScores);
     console.log(scoreMap);
+
+    //Request Program Rules for Composite Scores
+    // compositeValues.forEach(compositeValue => {
+
+    //     let rules = locateOperations(compositeValue,scoreMap);
+    // })
+    
+
+
 }
 
-const locateInTree = (elem, tree) => {
-    let subLevels = elem.subLevels.length;
+/**
+ * 
+ * @param {Object} question : { subLevels: <Array> ,prgVarName: STRING,scoreNum: NUMBER, scoreDen: NUMBER,isCritical: BOOLEAN }
+ * @param {Object} branch : scoreMap __ Init as --> { childs: [] }
+ * @description Allocates each feadback order / composite score in an Object (tree structure) that stores all questions for each leaf
+ */
+const locateInTree = (question, branch) => {
+    let subLevels = question.subLevels.length;
     if (subLevels > 1) {
-        let currentOrder = elem.subLevels.shift();
+        let currentOrder = question.subLevels.shift();
         let subOrder;
-        subOrder = tree.sub.find(s => s.order == currentOrder);
+        subOrder = branch.childs.find(s => s.order == currentOrder);
         if (!subOrder) {
             subOrder = { order: currentOrder };
-            (subLevels > 2) ? subOrder.sub = [] : subOrder.ans = [];
-            tree.sub.push(subOrder);
+            (subLevels > 2) ? subOrder.childs = [] : subOrder.questions = [];
+            branch.childs.push(subOrder);
         }
-        locateInTree(elem, subOrder);
+        locateInTree(question, subOrder);
     } else if (subLevels == 1) {
-        elem.order = elem.subLevels.shift();
-        delete elem.subLevels;
-        tree.ans.push(elem);
+        /*question.order = */question.subLevels.shift();
+        delete question.subLevels;
+        branch.questions.push(question);
     }
 }
 
-//buildProgramRuleVariables(sections2, programId);
-programRules(sections2,programId);
+/**
+ * 
+ * @param {Object} branch : Init as: scoreMap __ Object (Tree) that contains allocated questions
+ * @returns {<Array>} : expressions for [critical Numerator, critical Denominator, non critical numerator, non critical denominator ]
+ * @description: Create score expressions for each scoreMap level (composite score)
+ */
+const buildScores = (branch) => {
+    let numC = [];
+    let numN = [];
+    let denC = [];
+    let denN = [];
+
+    if (branch.questions) {
+        branch.questions.forEach((a) => {
+            if (a.prgVarName) {
+                let num = `#{${a.prgVarName}}*${a.scoreNum}`;
+                let den = `d2:countIfZeroPos('${a.prgVarName}')*${a.scoreDen}`;
+                if (a.isCritical) {
+                    numC.push(num);
+                    denC.push(den);
+                } else {
+                    numN.push(num);
+                    denN.push(den);
+                }
+            }
+        });
+        branch.numC = numC.filter(e => e != "").join('+');
+        branch.denC = denC.filter(e => e != "").join('+');
+        branch.numN = numN.filter(e => e != "").join('+');
+        branch.denN = denN.filter(e => e != "").join('+');
+        return [branch.numC, branch.denC, branch.numN, branch.denN];
+    } else {
+        branch.childs.forEach(subBranch => {
+            let res = buildScores(subBranch);
+            numC.push(res[0]);
+            denC.push(res[1]);
+            numN.push(res[2]);
+            denN.push(res[3]);
+        });
+        let tmp;
+
+        tmp = numC.filter(e => e != "");
+        branch.numC = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
+
+        tmp = denC.filter(e => e != "");
+        branch.denC = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
+
+        tmp = numN.filter(e => e != "");
+        branch.numN = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
+
+        tmp = denN.filter(e => e != "");
+        branch.denN = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
+
+        return [branch.numC, branch.denC, branch.numN, branch.denN];
+    }
+}
+
+const locateOperations = (elem, tree) => {
+
+    let currentOrder = elem.subLevels.shift();
+    let programId = configS.getRange(fixedCells.programUID).getValue();
+
+    if (currentOrder && elem.subLevels.length >= 0) {
+        let subTree = tree.sub.find(s => s.order == currentOrder);
+        //if(subTree) locateOperations(elem,subTree);
+        locateOperations(elem, subTree);
+    } else {
+        if (tree) {
+
+            /**
+             * Creating PR for Scores - Two steps:
+             * 1- ASSIGN DATA to CALCULATED VALUE
+             * 2- ASSIGN CALCULATED VALUE to DATA ELEMENT
+             */
+
+            let programRuleUid, actionId, pr, name, data, pra;
+            let programRuleActionType = "ASSIGN";
+
+            // STEP 1 -
+            let num = [tree.numC, tree.numN].filter(n => n != "").join("+");
+            let den = [tree.denC, tree.denN].filter(n => n != "").join("+");
+            data = `((${num}) * 100) / (${den})`;
+
+            name = `PR - Calculated - ${elem.feedbackOrder} ${elem.formName}`;
+            programRuleUid = uidPool.codes.shift();
+            actionId = uidPool.codes.shift();
+
+            pr = JSON.parse(JSON.stringify(tmp_programRule));
+            pr.id = programRuleUid;
+            pr.priority = 1;
+            pr.name = name;
+            pr.program.id = programId;
+            pr.programRuleActions = [{ id: actionId }];
+            programRules.push(pr);
+
+            pra = {
+                "id": actionId,
+                "programRuleActionType": programRuleActionType,
+                "data": data,
+                "content": `#{_CV_${elem.prgVarName}}`,
+                "programRule": { "id": programRuleUid }
+            };
+            programRuleActions.push(pra);
+
+            // STEP 2 -
+
+            name = `PR - Score - ${elem.feedbackOrder} ${elem.formName} (%)`;
+            programRuleUid = uidPool.codes.shift();
+            actionId = uidPool.codes.shift();
+            data = `d2:round(#{_CV_${elem.prgVarName}}*100)/100`;
+
+            pr = JSON.parse(JSON.stringify(tmp_programRule));
+            pr.id = programRuleUid;
+            pr.name = name;
+            pr.program.id = programId;
+            pr.condition = `d2:hasValue('_CV_${elem.prgVarName}')`;
+            pr.programRuleActions = [{ id: actionId }];
+            programRules.push(pr);
+
+            pra = {
+                "id": actionId,
+                "programRuleActionType": programRuleActionType,
+                "data": data,
+                "dataElement": {
+                    "id": elem.uid
+                },
+                "programRule": {
+                    "id": programRuleUid
+                }
+            };
+            programRuleActions.push(pra);
+        } else {
+            let data = `''`;
+            let name = `PR - Score - ${elem.feedbackOrder} ${elem.formName} (%)`;
+            let programRuleActionType = "ASSIGN";
+
+            let programRuleUid = uidPool.codes.shift();
+            let actionId = uidPool.codes.shift();
+
+            let pr = JSON.parse(JSON.stringify(tmp_programRule));
+            pr.id = programRuleUid;
+            pr.name = name;
+            pr.program.id = programId;
+            pr.programRuleActions = [{ id: actionId }];
+            programRules.push(pr);
+
+            let pra = {
+                "id": actionId,
+                "programRuleActionType": programRuleActionType,
+                "data": data,
+                "dataElement": {
+                    "id": elem.uid
+                },
+                "programRule": {
+                    "id": programRuleUid
+                }
+            };
+            programRuleActions.push(pra);
+        }
+    }
+}
+
+const checkScores = (scores) => {
+    let composites = scores.map(score => score.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER )?.value);
+    let duplicates = composites.filter((composite,index) => composites.indexOf(composite) !== index);
+    return {
+        uniqueScores : duplicates.length == 0,
+        composites,
+        duplicates
+    };
+}
+
+//console.log(checkScores(scoreSection.dataElements));
+
+const {compositeValues} = buildProgramRuleVariables(sections2, programId);
+
+//programRules(sections2, programId);
