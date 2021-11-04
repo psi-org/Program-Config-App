@@ -1,3 +1,5 @@
+import React from 'react'
+
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js'
 import { saveAs } from 'file-saver'
 import { activeTabNumber, valueType, renderType, aggOperator, thinBorder, middleCenter } from "../../configs/TemplateConstants"
@@ -5,21 +7,49 @@ import { fillBackgroundToRange, printArray2Column, applyBorderToRange, dataValid
 import { useDataQuery } from '@dhis2/app-service-data'
 import { arrayObjectToStringConverter } from '../../configs/Utils'
 
-export default class ConfigurationGenerator
+import {NoticeBox, CircularLoader} from "@dhis2/ui";
+
+const optionSetQuery = {
+    results: {
+        resource: 'optionSets',
+        params: {
+            fields: ['id', 'name', 'options[name]'],
+            filters: ['name:like:HNQIS - '],
+            paging: false
+        }
+    }
+};
+
+const Configuration = ({ ps }) =>
 {
-    constructor(ps)
-    {
-        this.programStage = ps;
-        this.password = "cvGNE82Ua2!*YC4AWPlW";
+    const programStage = ps;
+    const password = "TOyNrNrH8fNT8W%Au&4A";
+    const {loading, error, data} = useDataQuery(optionSetQuery);
+    if (error) {
+        return (
+            <NoticeBox title="Error retrieving program stage details" error>
+                <span>{JSON.stringify(error)}</span>
+            </NoticeBox>
+        )
     }
 
-    init() 
+    const initialize = () => 
     {
-        // const optionSets = fetchOptionSets();
-        // const {loading, error, optionData} = useDataQuery(optionSetQuery);
-        console.log(this.programStage);
+        compile_report();
+        setTimeout(function(){
+            generate()
+        }, 4000)
+    }
+
+    const compile_report = () => 
+    {
+
+    }
+
+    const generate = () =>
+    {
         const workbook = new ExcelJS.Workbook();
-        this.addCreator(workbook);
+        addCreator(workbook);
         
         const instructionWS = workbook.addWorksheet("Instructions");
         const templateWS = workbook.addWorksheet("Template", {views: [{ showGridLines: false, state: 'frozen', xSplit: 3, ySplit: 2}]});
@@ -28,32 +58,33 @@ export default class ConfigurationGenerator
 
         workbook.views = [{activeTab: activeTabNumber}];
 
-        this.addInstructions(instructionWS);
+        addInstructions(instructionWS);
 
-        this.addConfigurations(templateWS);
+        addConfigurations(templateWS);
 
-        this.addMapping(mappingWS);
+        addMapping(mappingWS);
 
-        this.hideColumns(templateWS);
+        hideColumns(templateWS);
 
-        this.addProtection(templateWS);
+        addProtection(templateWS);
 
-        this.writeWorkbook(workbook);
+        writeWorkbook(workbook);
     }
     
-    addCreator(wb)
+    const addCreator = (wb) =>
     {
         wb.creator = 'Utsav Ashish Koju';
         wb.created = new Date();
     }
 
-    addInstructions(ws)
+    const addInstructions = async (ws) => 
     {
         ws.getCell("A1").value = "Instruction";
         ws.getCell("A2").value = "(WIP)";
+        await ws.protect(password);
     }
 
-    addConfigurations(ws)
+    const addConfigurations = (ws) => 
     {
         ws.columns = [
             {header: "Parent Name", key: "parent_name", width: 15},
@@ -119,19 +150,19 @@ export default class ConfigurationGenerator
         dataValidation(ws, "G3:G300", { type: 'list', allowBlank: true, formulae: ['Mapping!$H$3:$H$60'] });
         dataValidation(ws, "H3:H300", { type: 'list', allowBlank: true, formulae: ['Mapping!$O$3:$O$9'] });
 
-        this.populateConfiguration(ws);
+        populateConfiguration(ws);
     }
 
-    async populateConfiguration(ws)
+    const populateConfiguration = async (ws) =>
     {
         let dataRow = 3;
-        let program_stage_id = this.programStage.id;
-        this.programStage.programStageSections.forEach((section) => {
+        let program_stage_id = programStage.id;
+        programStage.programStageSections.forEach((section) => {
             let parent_name = section.displayName;
             let program_section_id = section.id;
             let structure = "Section";
             section.dataElements.forEach((dataElement) => {
-                let criticalSteps = this.getValueForAttribute(dataElement.attributeValues, "NPwvdTt0Naj");
+                let criticalSteps = getValueForAttribute(dataElement.attributeValues, "NPwvdTt0Naj");
                 let row = {
                             parent_name: parent_name,
                             structure: structure,
@@ -152,19 +183,21 @@ export default class ConfigurationGenerator
         applyBorderToRange(ws, 0, 3, 14, ws.lastRow._number);
     }
 
-    addMapping(ws)
+    const addMapping = async (ws) =>
     {
         printArray2Column(ws, valueType, "Value Type", "B2", "b6d7a8");
         printArray2Column(ws, renderType, "Render Type", "D2", "b6d7a8");
         printArray2Column(ws, aggOperator, "Agg. Operator", "F2", "a2c4c9");
 
-        // this.fetchNStoreOptionSets(ws, "H2");
+        console.log("options values: ", data.results);
+
+        await ws.protect(password);
     }
 
-    fetchNStoreOptionSets(ws, pos)
+    const fetchNStoreOptionSets = (ws, pos) =>
     {
         let tableData = [];
-        let optUrl = this.dhisServer + "optionSets.json?fields=id,name,options[name]&paging=false&filter=name:like:HNQIS";
+        let optUrl = dhisServer + "optionSets.json?fields=id,name,options[name]&paging=false&filter=name:like:HNQIS";
         fetch(optUrl, function(data) {
             let optionSets = data.optionSets;
             optionSets.forEach((optionSet, index) => {
@@ -180,25 +213,29 @@ export default class ConfigurationGenerator
         });
     }
 
-    hideColumns(ws)
+    const hideColumns = (ws) =>
     {
         ws.getColumn('program_stage_id').hidden = true;
         ws.getColumn('program_section_id').hidden = true;
         ws.getColumn('data_element_id').hidden = true;
     }
 
-    async addProtection(ws)
+    const addProtection = async (ws) =>
     {
-        await ws.protect(this.password);
+        for(let i = 3; i <= 500; i++) 
+        {
+            ws.getRow(i).protection = { locked: false };
+        }   
+        await ws.protect(password, {insertRows: true, deleteRows: true});
     }
 
-    async writeWorkbook(wb)
+    const writeWorkbook = async (wb) =>
     {
         const buf = await wb.xlsx.writeBuffer()
         saveAs(new Blob([buf]), `HNQIS Config_${new Date()}.xlsx`);
     }
 
-    async getValueForAttribute(attributeValues, attribute_id)
+    const getValueForAttribute = async (attributeValues, attribute_id) =>
     {
         attributeValues.forEach((a) => {
             if (a.attribute.id === attribute_id)
@@ -207,4 +244,12 @@ export default class ConfigurationGenerator
             }
         });
     }
+
+   
+    initialize();
+    // return <>initialize()</>;
+
+    return null;
 }
+
+export default Configuration;

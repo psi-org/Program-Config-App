@@ -16,7 +16,7 @@ const query = {
         id: ({programStage}) => programStage,
         params: {
             fields:['id','name','allowGenerateNextVisit','publicAccess','reportDateToUse','formType','generatedByEnrollmentDate','displayFormName','sortOrder','hideDueDate','enableUserAssignment','minDaysFromStart','favorite','executionDateLabel','preGenerateUID','displayName','externalAccess','openAfterEnrollment','repeatable','remindCompleted','displayGenerateEventBox','validationStrategy','autoGenerateEvent','blockEntryForm','program','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
-            'programStageDataElements',
+            'programStageDataElements','programStageDataElements[id,name,compulsory,dataElement[id, attributeValues]]',
             'programStageSections[id,name,displayName,sortOrder,dataElements[id,displayName,formName,attributeValues,optionSet,valueType,optionSetValue,optionSet[id,name],legendSet[id,name]]]']
         }
     }

@@ -11,8 +11,7 @@ import { Progress } from 'react-sweet-progress';
 import "react-sweet-progress/lib/style.css";
 import Scores from "./Scores";
 import CriticalCalculations from "./CriticalCalculations";
-
-import ConfigurationGenerator from "./ConfigurationGenerator";
+import Configuration from "./Configuration";
 
 const createMutation = {
     resource: 'metadata',
@@ -84,6 +83,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     // Flags
     const [hasChanges, setHasChanges] = useState(false);
     const [saveAndBuild, setSaveAndBuild] = useState(false);
+    const [exportToExcel, setExportToExcel] = useState(false);
 
     // States
     const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name !="Scores" && s.name !="Critical Steps Calculations"));
@@ -245,8 +245,8 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     const configuration_download = () => {
-        let configurationGenerator = new ConfigurationGenerator(programStage);
-        configurationGenerator.init();
+        console.log("Program Stages: ", programStage);
+        setExportToExcel(true);
     };
 
     const configuration_import = () => {
@@ -267,7 +267,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
                 </ButtonStrip>
             </div>
-
+            {exportToExcel && <Configuration ps={programStage}/>}
             {
                 createMetadata.loading &&
                 <ComponentCover translucent>
