@@ -11,8 +11,7 @@ const optionSetQuery = {
     resource: 'optionSets',
     params: {
       fields: ['id', 'name', 'options[name]'],
-      filters: ['name:like:HNQIS - '],
-      paging: false
+      filters: ['name:like:HNQIS - ']
     }
   }
 };
@@ -21,7 +20,7 @@ const healthAreasQuery = {
   results: {
     resource: 'optionSets',
     params: {
-      fields: ['name', 'option[id]','option[name]'],
+      fields: ['name', 'options[id]','options[name]'],
       filters: ['name:$like:Health%20area']
     }
   }
@@ -37,34 +36,21 @@ const legentSetsQuery = {
   }
 }
 
-const Configuration = ({
-  ps
-}) => {
+const Configuration = ({ps}) => {
   const programStage = ps;
   const password = "TOyNrNrH8fNT8W%Au&4A";
-  const {
-    loading,
-    error,
-    data
-  } = useDataQuery(optionSetQuery);
 
-  const { haLoading, haError, haData } = useDataQuery(healthAreasQuery);
-  const { lsLoading, lsError, lsData } = useDataQuery(legentSetsQuery);
+  const { loading: loading, error: error, data: data} = useDataQuery(optionSetQuery);
+  const { loading: haLoading, error: haError, data: haData } = useDataQuery(healthAreasQuery);
+  const { loading: lsLoading, error: lsError, data: lsData } = useDataQuery(legentSetsQuery);
   
   let Configures = [];
 
-  if (error) {
-    return /*#__PURE__*/React.createElement(NoticeBox, {
-      title: "Error retrieving program stage details",
-      error: true
-    }, /*#__PURE__*/React.createElement("span", null, JSON.stringify(error)));
-  }
-
   const initialize = () => {
     compile_report();
-    // setTimeout(function () {
+    setTimeout(function () {
       generate();
-    // }, 4000);
+    }, 2000);
   };
 
   const compile_report = () => {
@@ -308,7 +294,7 @@ const Configuration = ({
       }
       dataRow = dataRow + 1;
     });
-    applyBorderToRange(ws, 0, 3, 14, dataRow);
+    applyBorderToRange(ws, 0, 3, 14, dataRow - 1);
   };
 
   const addMapping = async (ws) => {
@@ -317,15 +303,14 @@ const Configuration = ({
     printArray2Column(ws, aggOperator, "Agg. Operator", "F2", "a2c4c9");
     
     addOptionSets(ws);
-    // addHealthAreas(ws);
-    // addLegendSets(ws);
+    addHealthAreas(ws);
+    addLegendSets(ws);
 
     await ws.protect(password);
   };
 
   const addOptionSets = (ws) => {
     let optionData = [];
-    let isCompleted = false;
     console.log("data: ", data)
     if(typeof data !== 'undefined')
     {
@@ -339,7 +324,6 @@ const Configuration = ({
         };
         optionData.push(data);
       });
-      isCompleted = true;
       printObjectArray(ws, optionData, "H2", "d5a6bd");
     }
     
@@ -347,7 +331,6 @@ const Configuration = ({
 
   const addHealthAreas = (ws) => {
     let healthAreaData = [];
-    let isCompleted = false;
     console.log("haData: ", haData);
     if(typeof haData !== 'undefined')
     {
@@ -362,14 +345,12 @@ const Configuration = ({
           healthAreaData.push(data);
         });
       });
-      isCompleted = true;
       printObjectArray(ws, healthAreaData, "L2", "d5a6bd")
     }
   }
 
   const addLegendSets = (ws) => {
     let legendSetData = [];
-    let isCompleted = false;
     console.log("fetching legendset: ", lsData);
     if(typeof lsData !== 'undefined')
     {
@@ -382,7 +363,6 @@ const Configuration = ({
           };
           legendSetData.push(data);
       })
-      isCompleted= true;
       printObjectArray(ws, legendSetData, "O2", "9fc5e8");
     }
   }
