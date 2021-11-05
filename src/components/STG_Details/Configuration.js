@@ -36,7 +36,7 @@ const legentSetsQuery = {
   }
 }
 
-const Configuration = ({ps}) => {
+const Configuration = ({ps, isLoading, status}) => {
   const programStage = ps;
   const password = "TOyNrNrH8fNT8W%Au&4A";
 
@@ -389,6 +389,9 @@ const Configuration = ({ps}) => {
   const writeWorkbook = async wb => {
     const buf = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buf]), `HNQIS Config_${new Date()}.xlsx`);
+    
+    isLoading(false);
+    status("Download");
   };
 
   const getValueForAttribute = async (attributeValues, attribute_id) => {
