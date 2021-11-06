@@ -11,7 +11,8 @@ import { Progress } from 'react-sweet-progress';
 import "react-sweet-progress/lib/style.css";
 import Scores from "./Scores";
 import CriticalCalculations from "./CriticalCalculations";
-import Configuration from "./Configuration";
+import Exporter from "../Excel/Exporter";
+
 
 const createMutation = {
     resource: 'metadata',
@@ -84,6 +85,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [hasChanges, setHasChanges] = useState(false);
     const [saveAndBuild, setSaveAndBuild] = useState(false);
     const [exportToExcel, setExportToExcel] = useState(false);
+    const { hasNotice, setHasNotice } = useState(false);
     const [ exportStatus, setExportStatus] = useState("Download");
 
     // States
@@ -269,7 +271,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
                 </ButtonStrip>
             </div>
-            {exportToExcel && <Configuration ps={programStage} isLoading={setExportToExcel} status={setExportStatus}/>}
+            {exportToExcel && <Exporter ps={programStage} isLoading={setExportToExcel} status={setExportStatus}/>}
             {
                 createMetadata.loading &&
                 <ComponentCover translucent>

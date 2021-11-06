@@ -36,7 +36,7 @@ const legentSetsQuery = {
   }
 }
 
-const Configuration = ({ps, isLoading, status}) => {
+const Exporter = ({ps, isLoading, status}) => {
   const programStage = ps;
   const password = "TOyNrNrH8fNT8W%Au&4A";
 
@@ -67,6 +67,7 @@ const Configuration = ({ps, isLoading, status}) => {
         row.value_type = dataElement.valueType;
         row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
         row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
+        row.description = dataElement.description;
 
         row.program_stage_id = program_stage_id;
         row.program_section_id = program_section_id;
@@ -82,6 +83,9 @@ const Configuration = ({ps, isLoading, status}) => {
         row.parent_name = (typeof metaData.parentVarName !== 'undefined') ? metaData.parentVarName : '';
         row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: '';
         row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
+        row.parent_question = (typeof metaData.parentVarName !== 'undefined') ? metaData.parentVarName : '';
+        row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : '';
+        row.critical = (typeof metaData.isCritical !== 'undefined') ? metaData.isCritical: '';
 
         let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === "LP171jpctBm");
         row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : '';
@@ -407,4 +411,4 @@ const Configuration = ({ps, isLoading, status}) => {
   return null;
 };
 
-export default Configuration;
+export default Exporter;
