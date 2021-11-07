@@ -12,6 +12,7 @@ import "react-sweet-progress/lib/style.css";
 import Scores from "./Scores";
 import CriticalCalculations from "./CriticalCalculations";
 import Exporter from "../Excel/Exporter";
+import Importer from "../Excel/Importer";
 
 
 const createMutation = {
@@ -86,7 +87,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [saveAndBuild, setSaveAndBuild] = useState(false);
     const [exportToExcel, setExportToExcel] = useState(false);
     const { hasNotice, setHasNotice } = useState(false);
+
     const [ exportStatus, setExportStatus] = useState("Download");
+    const [ importerEnabled, setImporterEnabled ] = useState(false);
 
     // States
     const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name !="Scores" && s.name !="Critical Steps Calculations"));
@@ -248,13 +251,12 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     const configuration_download = () => {
-        console.log("Program Stages: ", programStage);
         setExportToExcel(true);
         setExportStatus("Generating Configuration File...")
     };
 
     const configuration_import = () => {
-
+        setImporterEnabled(true);
     };
 
     return (
@@ -346,6 +348,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     </div>
                 </div>
             </DragDropContext>
+            {importerEnabled && <Importer displayForm={setImporterEnabled} />}
         </div>
     )
 }
