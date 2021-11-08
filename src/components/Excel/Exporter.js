@@ -6,6 +6,7 @@ import { fillBackgroundToRange, printArray2Column, applyBorderToRange, dataValid
 import { useDataQuery } from '@dhis2/app-service-data';
 import { arrayObjectToStringConverter } from '../../configs/Utils';
 import { NoticeBox, CircularLoader } from "@dhis2/ui";
+
 const optionSetQuery = {
   results: {
     resource: 'optionSets',

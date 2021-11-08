@@ -1,32 +1,154 @@
 import ImportForm from "./ImportForm";
 import { useState } from "react";
+import ExcelJS, { Workbook } from "exceljs/dist/es5/exceljs.browser";
+import NoticesBox from "../UIElements/NoticesBox";
+import { ButtonStrip, FileInput, Modal, ModalActions, ModalContent, ModalTitle, Button } from "@dhis2/ui";
+import { validWorksheets, validTemplateHeader } from "../../configs/TemplateConstants";
+
 
 const Importer = (props) => {
+    const [ selectedFile, setSelectedFile ] = useState(undefined);
+    const [ currentTask, setCurrentTask ] = useState(undefined);
+    const [ executedTasks, setExecutedTask ] = useState([]);
+    const [ output, setOutput ] = useState(undefined);
 
-    const { file, setFile } = useState(null);
-    const { validationErrors, setValidationErrors}= useState(null);
-
-    const selectedFile = (e) => {
-        console.log("File: ", e);
-        setFile(e.target.files[0]);
+    const setFile = (files) => {
+        setSelectedFile(files[0]);
     }
 
-    const startImport = () =>
+    const addExecutedTask = (Task) => {
+        // let previouslyCompletedTasks = executedTasks;
+        // // if(previouslyCompletedTasks.length > 0)
+        //     setExecutedTask([...previouslyCompletedTasks, Task]);
+        setExecutedTask([...executedTasks, Task]);
+    }
+
+    function hideForm() {
+        props.displayForm(false);
+    }
+
+    const startImportProcess = () =>
     {
-        console.log("Testing");
-        console.log("importfile: ", importFile);
-        if(importFile !== null)
+        //1. Form Validation
+        if(typeof selectedFile !== 'undefined')
         {
-            
+            //2. Validated File Type
+            fileValidation(function(status){
+                if(status) {
+                    const workbook = new ExcelJS.Workbook();
+                    const reader = new FileReader();
+
+                    reader.readAsArrayBuffer(selectedFile)
+                    reader.onload = () => {
+                        const buffer = reader.result;
+                        workbook.xlsx.load(buffer).then(workbook => {
+                            workbookValidation(workbook, function(status){
+                                if(status){
+                                    const templateWS = workbook.getWorksheet('Template');
+                                    const headers = templateWS.getRow(1).values;
+                                    headers.shift();
+                                    worksheetValidation(headers, function(status){
+                                        if(status)
+                                        {
+                                            var task = {step: 1, name: "Extracting data from XLSX", status: "success"};
+                                            setCurrentTask(task.name);
+                                            let templateData = [];
+                                            let dataRow = 3;
+                                            templateWS.eachRow((row, rowIndex) => {
+                                                if(rowIndex>=dataRow)
+                                                {
+                                                    let dataRow = {};
+                                                    let rowVals = row.values;
+                                                    validTemplateHeader.forEach((header, index) =>{
+                                                        dataRow[header] = rowVals[index+1];
+                                                    })
+                                                    templateData.push(dataRow);
+                                                }
+                                            });
+                                            addExecutedTask(task);
+                                            setCurrentTask(null);
+                                            console.log("Data: ", templateData);
+                                        }
+                                    })
+                                }
+                                
+                            })
+                        });
+                    }
+                }
+                
+            });
         }
         else
         {
-            setValidationMessage(["Please select the file"]);
+            //Some validation error WIP
+            console.log("validation erros");
         }
-
     }
 
-    return <ImportForm showForm={props.displayForm} file={file} import={startImport} selectedFile={selectedFile}/>
+    const fileValidation = (callback) => {
+        var task = {step: 1, name: "Validating File Type - XLSX", status: "error"};
+        setCurrentTask(task.name);
+        let status = false;
+        if (selectedFile.name.endsWith('xlsx'))
+        {
+            task.status = "success";
+            status = true;
+        }
+        addExecutedTask(task);
+        setCurrentTask(null);
+        callback(status);
+    }
+
+    const workbookValidation = (workbook, callback) => {
+        var task = {step: 2, name: "Validating worksheet in the workbook", status: "success"};
+        setCurrentTask(task.name);
+        let status = true;
+        validWorksheets.forEach((worksheet, index)=>{
+            if(worksheet !== workbook.getWorksheet(index+1).name)
+            {
+                task.status = "error";
+                status = false;
+            }
+        });
+        addExecutedTask(task);
+        setCurrentTask(null);
+        callback(status);
+    }
+
+    const worksheetValidation = (headers, callback) => {
+        var task = {step: 3, name: "Validating worksheet columns", status: "success"};
+        setCurrentTask(task.name);
+        let status = true;
+        headers.forEach((value, key) => {
+            console.log(value, " == ", validTemplateHeader[key]);
+            if(value !== validTemplateHeader[key])
+            {
+                status = false;
+                task.status = "error";
+            }
+        });
+        addExecutedTask(task);
+        setCurrentTask(null);
+        callback(status);
+    }
+      
+    return <Modal>
+                <ModalTitle>Select Configuration File</ModalTitle>
+                <ModalContent>
+                    {(currentTask || executedTasks.length > 0) && <NoticesBox currentTask={currentTask} executedTasks={executedTasks}/>}
+                    <br/>
+                    <input type="file" accept=".xlsx" onChange={ (e) => setFile(e.target.files) } />
+                </ModalContent>
+                <ModalActions>
+                    <ButtonStrip middle>
+                        <Button primary onClick={() => startImportProcess()}>Import</Button>
+                        <Button warning onClick={() => hideForm()}>Cancel</Button>
+                    </ButtonStrip>
+                </ModalActions>
+            </Modal>
+    
+    // <ImportForm showForm={props.displayForm} import={startImport} setFile={setFile}/>
 }
 
 export default Importer;

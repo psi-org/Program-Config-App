@@ -1,20 +1,12 @@
 import { ButtonStrip, FileInput, Modal, ModalActions, ModalContent, ModalTitle, Button } from "@dhis2/ui";
-import SelectedFile from "./SelectedFile";
 
 const ImportForm = (props) =>{
 
-    function selectedFile(e) 
+    function handleChange(files)
     {
-        console.log("Import Form: ", e);
+        props.setFile(files[0])
     }
-
-    const handleChange = (e) => 
-    {
-        // e.preventDefault();
-        let file = e.target.files[0];
-        console.log("file: ", file);
-    }
-
+    
     function hideForm() {
         props.showForm(false);
     }
@@ -22,9 +14,7 @@ const ImportForm = (props) =>{
     return  <Modal small>
                 <ModalTitle>Select Configuration File</ModalTitle>
                 <ModalContent>
-                    <FileInput buttonLabel="Browse a File" name="import" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={handleChange}>
-                    </FileInput>
-                    {/* {props.file && <SelectedFile fileName={props.file}/>} */}
+                    <input type="file" onChange={ (e) => handleChange(e.target.files) } />
                 </ModalContent>
                 <ModalActions>
                     <ButtonStrip middle>
