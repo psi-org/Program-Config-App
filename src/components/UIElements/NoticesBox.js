@@ -3,7 +3,8 @@ import CompletedTask from "./CompletedTask"
 import RunningTask from "./RunningTask"
 
 const NoticesBox = (props) =>{
-    return  <NoticeBox title="Import HNQIS Configuration">
+
+    return  <NoticeBox title="HNQIS Configuration - Import Status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">
                 {props.executedTasks.map(executedTask => <CompletedTask key={executedTask.step} name={executedTask.name} status={executedTask.status}/>)}
                 {props.currentTask && <RunningTask task={props.currentTask}/>}
             </NoticeBox>

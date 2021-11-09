@@ -9,18 +9,15 @@ import { validWorksheets, validTemplateHeader } from "../../configs/TemplateCons
 const Importer = (props) => {
     const [ selectedFile, setSelectedFile ] = useState(undefined);
     const [ currentTask, setCurrentTask ] = useState(undefined);
-    const [ executedTasks, setExecutedTask ] = useState([]);
-    const [ output, setOutput ] = useState(undefined);
+    const [ executedTasks, setExecutedTasks] = useState([]);
+    const [ buttonDisabled, setButtonDisabled ] = useState(false);
 
     const setFile = (files) => {
         setSelectedFile(files[0]);
     }
 
     const addExecutedTask = (Task) => {
-        // let previouslyCompletedTasks = executedTasks;
-        // // if(previouslyCompletedTasks.length > 0)
-        //     setExecutedTask([...previouslyCompletedTasks, Task]);
-        setExecutedTask([...executedTasks, Task]);
+        setExecutedTasks(executedTasks => [...executedTasks, Task] );
     }
 
     function hideForm() {
@@ -29,6 +26,7 @@ const Importer = (props) => {
 
     const startImportProcess = () =>
     {
+        setButtonDisabled(true);
         //1. Form Validation
         if(typeof selectedFile !== 'undefined')
         {
@@ -50,7 +48,7 @@ const Importer = (props) => {
                                     worksheetValidation(headers, function(status){
                                         if(status)
                                         {
-                                            var task = {step: 1, name: "Extracting data from XLSX", status: "success"};
+                                            var task = {step: 4, name: "Extracting data from XLSX", status: "success"};
                                             setCurrentTask(task.name);
                                             let templateData = [];
                                             let dataRow = 3;
@@ -84,6 +82,7 @@ const Importer = (props) => {
             //Some validation error WIP
             console.log("validation erros");
         }
+        setButtonDisabled(false);
     }
 
     const fileValidation = (callback) => {
@@ -142,8 +141,8 @@ const Importer = (props) => {
                 </ModalContent>
                 <ModalActions>
                     <ButtonStrip middle>
-                        <Button primary onClick={() => startImportProcess()}>Import</Button>
-                        <Button warning onClick={() => hideForm()}>Cancel</Button>
+                        <Button disabled={buttonDisabled} primary onClick={() => startImportProcess()}>Import</Button>
+                        <Button disabled={buttonDisabled} destructive onClick={() => hideForm()}>Cancel</Button>
                     </ButtonStrip>
                 </ModalActions>
             </Modal>
