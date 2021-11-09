@@ -1,8 +1,7 @@
-import ImportForm from "./ImportForm";
 import { useState } from "react";
-import ExcelJS, { Workbook } from "exceljs/dist/es5/exceljs.browser";
+import ExcelJS from "exceljs/dist/es5/exceljs.browser";
 import NoticesBox from "../UIElements/NoticesBox";
-import { ButtonStrip, FileInput, Modal, ModalActions, ModalContent, ModalTitle, Button } from "@dhis2/ui";
+import { ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Button } from "@dhis2/ui";
 import { validWorksheets, validTemplateHeader } from "../../configs/TemplateConstants";
 
 
@@ -11,6 +10,7 @@ const Importer = (props) => {
     const [ currentTask, setCurrentTask ] = useState(undefined);
     const [ executedTasks, setExecutedTasks] = useState([]);
     const [ buttonDisabled, setButtonDisabled ] = useState(false);
+    const [ isNotificationError, setNotificationError ] = useState(false);
 
     const setFile = (files) => {
         setSelectedFile(files[0]);
@@ -93,6 +93,8 @@ const Importer = (props) => {
         {
             task.status = "success";
             status = true;
+        } else {
+            setNotificationError(true);
         }
         addExecutedTask(task);
         setCurrentTask(null);
@@ -108,6 +110,7 @@ const Importer = (props) => {
             {
                 task.status = "error";
                 status = false;
+                setNotificationError(true);
             }
         });
         addExecutedTask(task);
@@ -125,6 +128,7 @@ const Importer = (props) => {
             {
                 status = false;
                 task.status = "error";
+                setNotificationError(true);
             }
         });
         addExecutedTask(task);
@@ -135,7 +139,7 @@ const Importer = (props) => {
     return <Modal>
                 <ModalTitle>Select Configuration File</ModalTitle>
                 <ModalContent>
-                    {(currentTask || executedTasks.length > 0) && <NoticesBox currentTask={currentTask} executedTasks={executedTasks}/>}
+                    {(currentTask || executedTasks.length > 0) && <NoticesBox currentTask={currentTask} executedTasks={executedTasks} isError={isNotificationError}/>}
                     <br/>
                     <input type="file" accept=".xlsx" onChange={ (e) => setFile(e.target.files) } />
                 </ModalContent>
@@ -146,8 +150,6 @@ const Importer = (props) => {
                     </ButtonStrip>
                 </ModalActions>
             </Modal>
-    
-    // <ImportForm showForm={props.displayForm} import={startImport} setFile={setFile}/>
 }
 
 export default Importer;
