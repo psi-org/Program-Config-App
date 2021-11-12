@@ -9,6 +9,10 @@ import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
 
 import { Progress } from 'react-sweet-progress';
 import "react-sweet-progress/lib/style.css";
+import Scores from "./Scores";
+import CriticalCalculations from "./CriticalCalculations";
+import {checkScores,readQuestionComposites,buildProgramRuleVariables,buildProgramRules} from "./Scripting";
+import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 
 const createMutation = {
     resource: 'metadata',
@@ -16,16 +20,31 @@ const createMutation = {
     data: ({ data }) => data
 };
 
-const pr_delMutation = {
-    resource: 'programRules',
-    id: ({ id }) => id,
-    type: 'delete'
+const deleteMetadataMutation = {
+    resource: 'metadata?importStrategy=DELETE',
+    type: 'create',
+    data: ({ data }) => data
 };
 
-const prv_delMutation = {
-    resource: 'programRuleVariables',
-    id: ({ id }) => id,
-    type: 'delete'
+// const pr_delMutation = {
+//     resource: 'programRules',
+//     id: ({ id }) => id,
+//     type: 'delete'
+// };
+
+// const prv_delMutation = {
+//     resource: 'programRuleVariables',
+//     id: ({ id }) => id,
+//     type: 'delete'
+// };
+
+const queryIds = {
+    results: {
+        resource: 'system/id.json',
+        params: ({n}) => ({
+            limit: n
+        })
+    }
 };
 
 const queryPR = {
@@ -36,7 +55,6 @@ const queryPR = {
             pageSize: 1000,
             filter: ['program.id:eq:' + programId, 'description:eq:_Scripted']
         })
-
     }
 };
 
@@ -48,7 +66,6 @@ const queryPRV = {
             pageSize: 2000,
             filter: ['program.id:eq:' + programId, 'name:$like:_']
         })
-
     }
 };
 
@@ -76,17 +93,32 @@ const progressTheme = (icon) => ({
 });
 
 const StageSections = ({ programStage, stageRefetch }) => {
+
+    // Globals
+    const programId = programStage.program.id;
+    const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
+        FEEDBACK_TEXT = "yhKEe6BLEer",
+        CRITICAL_QUESTION = "NPwvdTt0Naj",
+        METADATA = "haUflNqP85K",
+        SCORE_DEN = "l7WdLDhE3xW",
+        SCORE_NUM = "Zyr7rlDOJy8";
+
     
     // Flags
     const [hasChanges, setHasChanges] = useState(false);
     const [saveAndBuild, setSaveAndBuild] = useState(false);
+    const [progressSteps,setProgressSteps]= useState(0);
 
     // States
-    const [sections, setSections] = useState(programStage.programStageSections);
+    const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name !="Scores" && s.name !="Critical Steps Calculations"));
+    const [scoresSection, setScoresSection] = useState(programStage.programStageSections.find(s => s.name =="Scores"));
+    const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name =="Critical Steps Calculations"));
+
+    const [programStageDataElements, setProgramStageDataElements] = useState(programStage.programStageDataElements);
 
     //Progress Bars states
-    const [progressPR, setProgressPR] = useState(0);
-    const [progressPRV, setProgressPRV] = useState(0);
+    // const [progressPR, setProgressPR] = useState(0);
+    // const [progressPRV, setProgressPRV] = useState(0);
 
     // Create Mutation
     let metadataDM= useDataMutation(createMutation);
@@ -98,8 +130,13 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     //Delete mutations
-    const deletePR = useDataMutation(pr_delMutation);
-    const deletePRV = useDataMutation(prv_delMutation);
+    const deleteMetadata = useDataMutation(deleteMetadataMutation)[0];
+    // const deletePR = useDataMutation(pr_delMutation);
+    // const deletePRV = useDataMutation(prv_delMutation);
+
+    // Get Ids
+    const idsQuery = useDataQuery(queryIds, { variables: {n: programStage.programStageDataElements.length * 5 }});
+    const uidPool = idsQuery.data?.results.codes;
 
     // Fetch Program Rules from Program
     const prDQ = useDataQuery(queryPR, { variables: { programId: programStage.program.id } });
@@ -154,41 +191,64 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     const commit = () => {
 
+        // Program Stage Data Elements
         var newDataElements = [];
-        const newSections = JSON.parse(JSON.stringify(sections)).map((section, idx) => {
-            //Set new order
-            section.sortOrder = ++idx;
 
-            section.dataElements = section.dataElements.map((de, idx) => {
+        // Program Stage Sections
+        var newSections = JSON.parse(JSON.stringify(sections)).map((section, sectionIdx) => {
+            //Set new order for each section
+            section.sortOrder = ++sectionIdx;
+            section.dataElements = section.dataElements.map((de, deIdx) => {
                 //Get new order for DE
                 let newDe = programStage.programStageDataElements.find(stageDE => stageDE.dataElement.id == de.id);
-                newDe.sortOrder = ++idx;
+                newDe.sortOrder = ++deIdx;
                 newDataElements.push(newDe);
                 return de;
             });
-
             return section;
         });
 
-        programStage.programStageDataElements = newDataElements;
-        programStage.programStageSections = newSections;
+        // Critical Steps Calculation
+        criticalSection.sortOrder = newSections.length + 1;
+        criticalSection.dataElements.forEach((de,i) => { 
+            let newDe = programStage.programStageDataElements.find(stageDE => stageDE.dataElement.id == de.id);
+            if(newDe){
+                newDe.sortOrder = ++i;
+                newDataElements.push(newDe);
+            }
+        });
+        newSections.push(criticalSection);
 
+        // Scores
+        scoresSection.sortOrder = newSections.length + 2;
+        scoresSection.dataElements.forEach((de,i) => { 
+            let newDe = programStage.programStageDataElements.find(stageDE => stageDE.dataElement.id == de.id);
+            if(newDe){
+                newDe.sortOrder = ++i;
+                newDataElements.push(newDe);
+            }
+        });
+        newSections.push(scoresSection);
+        
         const metadata = {
             programStages: [programStage],
-            programStageSections: newSections,
-            programStageDataElements: newDataElements
+            programStageSections: programStage.programStageSections,
+            programStageDataElements: programStage.programStageDataElements
         };
 
-        createMetadata.mutate({ data: metadata }).then((res) => {
+        createMetadata.mutate({ data: metadata }).then(response => {
+            //console.info(response);
+            stageRefetch();
             setHasChanges(false);
-            stageRefetch().then(response => setSections(response.results.programStageSections))
         });
-
     };
 
-    const run = () => {
-        // Set flag to enable/disable actions (buttons)
-        setSaveAndBuild('Run');
+    const deleteOldMetadata = () => {
+        
+        const oldProgramRules = prDQ.data.results.programRules.map(pr => ({id:pr.id}));
+        const oldProgramRuleVariables = prvDQ.data.results.programRuleVariables.map(prv => ({id:prv.id}));
+
+        return;
 
         // Fetch
         prDQ.refetch().then((prResult) => {
@@ -225,17 +285,79 @@ const StageSections = ({ programStage, stageRefetch }) => {
                 progressPromise(programRules,stepPR,deletePR[0],setProgressPR)
                     .then(() => progressPromise(programRuleVariables,stepPRV,deletePRV[0],setProgressPRV))
                     .then(() => {
-                        // Construir JSON para importar :v
                         /**
                          * refetch() Llamar toda la stage
                          */
-                        setSaveAndBuild('Completed');
+                        
                     })
                     
             });
         });
         
     };
+
+    const run = () => {
+        // Set flag to enable/disable actions (buttons)
+        setSaveAndBuild('Run');
+
+        // --------------- PROCESSING ---------------- //
+        // Globals, States & more...
+
+        // I. Scores Checking
+        // Requires: scoresSection
+        //      Break point: When duplicated scores found
+        setProgressSteps(1);
+        
+        const { uniqueScores, compositeScores, duplicatedScores } = checkScores(scoresSection.dataElements);
+        if (!uniqueScores) throw { msg: "Duplicated scores", duplicatedScores, status: 400 };
+        const scoresMapping = scoresSection.dataElements.reduce((acc, cur) => (
+            {
+                ...acc,
+                [cur.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value]: cur
+            }), {});   // { feedbackOrder:deUid, ... }
+
+        // II. Read questions
+        // Requires: sections (with or WITHOUT scores&critical)
+        //      Breakpoint: When a score is missing
+        setProgressSteps(2);
+        
+        const questionCompositeScores = readQuestionComposites(sections);
+        const missingComposites = questionCompositeScores.filter(cs => !compositeScores.includes(cs));
+        if (missingComposites.length > 0) throw { msg: "Some questions Feedback Order don't match any Score item", missingComposites, status: 400 }
+
+        // III. Build new metadata
+        // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
+        setProgressSteps(3);
+        
+        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId);
+        const { programRules, programRuleActions } = buildProgramRules(sections, programId, compositeScores, scoresMapping, uidPool); //useCompetencyClass
+
+        const metadata = {programRuleVariables, programRules, programRuleActions};
+
+        // IV. Delete old metadata
+        setProgressSteps(4);
+        
+        const oldMetadata = {
+            programRules : prDQ.data.results.programRules.map(pr => ({id:pr.id})),
+            programRuleVariables : prvDQ.data.results.programRuleVariables.map(prv => ({id:prv.id}))
+        };
+
+        // V. Import new metadata
+
+        deleteMetadata({ data: oldMetadata }).then((res)=>{
+            console.log(res);
+            setProgressSteps(5);
+            
+            createMetadata.mutate({ data: metadata }).then(response => {
+                console.log(response);
+                setSaveAndBuild('Completed');
+
+                prDQ.refetch();
+                prvDQ.refetch();
+            });
+        });
+        
+    }
 
     return (
         <div style={{ padding: "5px" }}>
@@ -279,11 +401,37 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     </AlertBar>
                 </AlertStack>
             }
-
             {saveAndBuild &&
                 <Modal>
-                    <ModalTitle>Saving &amp; Compiling</ModalTitle>
+                    <ModalTitle>SETTING UP PROGRAM</ModalTitle>
                     <ModalContent>
+                        { (progressSteps > 0) && 
+                            <div className="progressItem">
+                                <img src={contracted_bottom_svg}/><p>Checking scores</p>
+                            </div>
+                        }
+                        { (progressSteps > 1) && 
+                            <div className="progressItem">
+                                <img src={contracted_bottom_svg}/><p>Reading assesment's questions</p>
+                            </div>
+                        }
+                        { (progressSteps > 2) && 
+                            <div className="progressItem">
+                                <img src={contracted_bottom_svg}/><p>Building new metadata</p>
+                            </div>
+                        }
+                        { (progressSteps > 3) && 
+                            <div className="progressItem">
+                                <img src={contracted_bottom_svg}/><p>Deleting old metadata</p>
+                            </div>
+                        }
+                        { (progressSteps > 4) && 
+                            <div className="progressItem">
+                                <img src={contracted_bottom_svg}/><p>Importing new metadata</p>
+                            </div>
+                        }
+                        {
+                        /*
                         <div>
                             <span>Deleting old Program Rules</span>
                             <Progress percent={progressPR} status="" theme={(progressPR < 100) ? progressTheme("❌") : progressTheme("✅")} />
@@ -292,11 +440,11 @@ const StageSections = ({ programStage, stageRefetch }) => {
                             <span>Deleting old Program Variables</span>
                             <Progress percent={progressPRV} status="" theme={(progressPRV < 100) ? progressTheme("❌") : progressTheme("✅")} />
                         </div>
-
+                        */}   
                     </ModalContent>
                     <ModalActions>
                         <ButtonStrip>
-                            <Button disabled={saveAndBuild != 'Completed'} onClick={() => setSaveAndBuild(false)}>Close</Button>
+                            <Button disabled={saveAndBuild != 'Completed'} onClick={() =>{ setSaveAndBuild(false); setProgressSteps(0); }}>Close</Button>
                         </ButtonStrip>
                     </ModalActions>
                 </Modal>
@@ -308,7 +456,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
-                                        sections.filter(s => s.name != "Scores" && s.name !="Critical Steps Calculations" ).map((pss, idx) => {
+                                        sections.map((pss, idx) => {
                                             return <DraggableSection stageSection={pss} index={idx} key={pss.id} />
                                         })
                                     }
@@ -316,6 +464,8 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 </div>
                             )}
                         </Droppable>
+                        <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />
+                        <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />
                     </div>
                 </div>
             </DragDropContext>

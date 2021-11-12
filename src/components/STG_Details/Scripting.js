@@ -5,3669 +5,690 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     SCORE_DEN = "l7WdLDhE3xW",
     SCORE_NUM = "Zyr7rlDOJy8";
 
-const sections2 = [
-    {
-        "name": "Information",
-        "id": "wfPuYgFDsHV",
-        "displayName": "Information",
-        "sortOrder": 10,
-        "dataElements": [
-            {
-                "id": "PcQ3eclLjSQ",
-                "displayName": "CD IM HNQIS2 HFR__S10Q10_Est-ce que la formation sanitaire offre de services CPN ?",
-                "formName": "Est-ce que la formation sanitaire offre de services CPN ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "iSspcsYIXB0",
-                "displayName": "CD IM HNQIS2 HFR__S10Q20_Est-ce que la formation sanitaire distribue MILDA aux enfants âgés de moins de 5 ans ?",
-                "formName": "Est-ce que la formation sanitaire distribue MILDA aux enfants âgés de moins de 5 ans ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "DR2X25rVehj",
-                "displayName": "CD IM HNQIS2 HFR__S10Q30_Est-ce que la formation sanitaire offre de services laboratoire ?",
-                "formName": "Est-ce que la formation sanitaire offre de services laboratoire ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "hKaS5pyOzNp",
-                "displayName": "CD IM HNQIS2 HFR__S10Q40_Est-ce que la formation sanitaire offre de diazépam ?",
-                "formName": "Est-ce que la formation sanitaire offre de diazépam ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "ZxRhxkErYMI",
-                "displayName": "CD IM HNQIS2 HFR__S10Q50_Est-ce que la formation sanitaire offre de sang à transfuser ?",
-                "formName": "Est-ce que la formation sanitaire offre de sang à transfuser ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "tIzsRDZFob9",
-                "displayName": "CD IM HNQIS2 HFR__S10Q60_Est-ce qu'il y a au moins d'une ASC dans cet établissement de santé ?",
-                "formName": "Est-ce qu'il y a au moins d'une ASC dans cet établissement de santé ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "dCJTT13HA1F",
-                "displayName": "CD IM HNQIS2 HFR__S10Q70_Est-ce que la formation sanitaire offre des services pour la gestion de paludisme grave ?",
-                "formName": "Est-ce que la formation sanitaire offre des services pour la gestion de paludisme grave ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponibilité de médicaments",
-        "id": "X4rHquJ1SkT",
-        "displayName": "Disponibilité de médicaments",
-        "sortOrder": 20,
-        "dataElements": [
-            {
-                "id": "Q135i9qum0J",
-                "displayName": "CD IM HNQIS2 HFR__S20Q10_Est-ce que ces médicaments sont disponibles aujourd'hui ?",
-                "formName": "     ",
-                "attributeValues": [
-                    {
-                        "value": "{\"labelFormName\":\"Est-ce que ces médicaments sont disponibles aujourd'hui ?\"}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "bTDDvHYW6K7",
-                "displayName": "CD IM HNQIS2 HFR__S20Q20_Sulfadoxine-Pyriméthamine",
-                "formName": "Sulfadoxine-Pyriméthamine",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "B2SfjFeDHsR",
-                "displayName": "CD IM HNQIS2 HFR__S20Q30_Artéméther-Luméfantrine 2-11 mois (comprimés)",
-                "formName": "Artéméther-Luméfantrine 2-11 mois (comprimés)",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "L42s9QpgFd6",
-                "displayName": "CD IM HNQIS2 HFR__S20Q40_Artéméther-Luméfantrine, 1-5 ans",
-                "formName": "Artéméther-Luméfantrine, 1-5 ans",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "zFToQZZz3zp",
-                "displayName": "CD IM HNQIS2 HFR__S20Q50_Artéméther-Luméfantrine, 6-13 ans",
-                "formName": "Artéméther-Luméfantrine, 6-13 ans",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "LGpf3g79nj4",
-                "displayName": "CD IM HNQIS2 HFR__S20Q60_Artéméther-Luméfantrine, Adulte",
-                "formName": "Artéméther-Luméfantrine, Adulte",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Amgg1vv5MAo",
-                "displayName": "CD IM HNQIS2 HFR__S20Q70_Artésunate-Amodiaquine, 2-11 mois",
-                "formName": "Artésunate-Amodiaquine, 2-11 mois",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.6",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "qYg1PkkMCMK",
-                "displayName": "CD IM HNQIS2 HFR__S20Q80_Artésunate-Amodiaquine, 1-5 ans",
-                "formName": "Artésunate-Amodiaquine, 1-5 ans",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.7",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "vw8ArAPxdie",
-                "displayName": "CD IM HNQIS2 HFR__S20Q90_Artésunate-Amodiaquine, 6-13 ans",
-                "formName": "Artésunate-Amodiaquine, 6-13 ans",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "1.8",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "m8Z8Khah1bx",
-                "displayName": "CD IM HNQIS2 HFR__S20Q100_Artésunate-Amodiaquine, Adulte",
-                "formName": "Artésunate-Amodiaquine, Adulte",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "1.9",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "hcYKrwL2mwu",
-                "displayName": "CD IM HNQIS2 HFR__S20Q110_Artesunate- pyronamidine (comprimés)",
-                "formName": "Artesunate- pyronamidine (comprimés)",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.10",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "neCYw80tRB5",
-                "displayName": "CD IM HNQIS2 HFR__S20Q120_Quinine injectable",
-                "formName": "Quinine injectable",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.11",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "cq9fzKFppbx",
-                "displayName": "CD IM HNQIS2 HFR__S20Q130_Quinine 20% (goutte ou en suspension)",
-                "formName": "Quinine 20% (goutte ou en suspension)",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.12",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "F5F4kkZfAvY",
-                "displayName": "CD IM HNQIS2 HFR__S20Q140_Artésunate 60mg injectable, vial",
-                "formName": "Artésunate 60mg injectable, vial",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.13",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "TNzVBJsIKt0",
-                "displayName": "CD IM HNQIS2 HFR__S20Q150_Artésunate 100mg suppositoire, unité(suppositoire)",
-                "formName": "Artésunate 100mg suppositoire, unité(suppositoire)",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.14",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "zJBMNyNTIwy",
-                "displayName": "CD IM HNQIS2 HFR__S20Q160_Fer comprimé pour la CPN",
-                "formName": "Fer comprimé pour la CPN",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "1.15",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "y5Sxzgsc6YH",
-                "displayName": "CD IM HNQIS2 HFR__S20Q170_Acide folique 0,4mg pour la CPN",
-                "formName": "Acide folique 0,4mg pour la CPN",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "1.16",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "o8vSErpodmB",
-                "displayName": "CD IM HNQIS2 HFR__S20Q180_Diazépam",
-                "formName": "Diazépam",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "1.17",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q40\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "qFtndLMnuuq",
-                "displayName": "CD IM HNQIS2 HFR__S20Q190_Glucosé 5%",
-                "formName": "Glucosé 5%",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "1.18",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "bPIKIaBLqUl",
-                "displayName": "CD IM HNQIS2 HFR__S20Q200_Glucosé 10%",
-                "formName": "Glucosé 10%",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "1.19",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "cF3ebM1ZQub",
-                "displayName": "CD IM HNQIS2 HFR__S20Q210_Glucosé 50%",
-                "formName": "Glucosé 50%",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.20",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "TpTVjCVp2zF",
-                "displayName": "CD IM HNQIS2 HFR__S20Q220_Ringer lactate",
-                "formName": "Ringer lactate",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.21",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "GDwPmmJ83k4",
-                "displayName": "CD IM HNQIS2 HFR__S20Q230_Serum physiologique",
-                "formName": "Serum physiologique",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.22",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Zsey5msqmVM",
-                "displayName": "CD IM HNQIS2 HFR__S20Q240_Clindamycine",
-                "formName": "Clindamycine",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.23",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "O4jgtUIxjSk",
-                "displayName": "CD IM HNQIS2 HFR__S20Q250_Sel de réhydratation orale",
-                "formName": "Sel de réhydratation orale",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.24",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "SJ7W2by4qxl",
-                "displayName": "CD IM HNQIS2 HFR__S20Q260_Amoxoicilline",
-                "formName": "Amoxoicilline",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "1.25",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponibilite des commodites",
-        "id": "Siw5oYA6OWw",
-        "displayName": "Disponibilite des commodites",
-        "sortOrder": 30,
-        "dataElements": [
-            {
-                "id": "mAqHRGWGepc",
-                "displayName": "CD IM HNQIS2 HFR__S30Q10_Est-ce que ces commodites sont disponibles aujourd'hui ?",
-                "formName": "     ",
-                "attributeValues": [
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "{\"labelFormName\":\"Est-ce que ces commodites sont disponibles aujourd'hui ?\"}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "zgZ05iTGmnt",
-                "displayName": "CD IM HNQIS2 HFR__S30Q20_Eau potable au site de CPN",
-                "formName": "Eau potable au site de CPN",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "2.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Wm4Smv2XyHz",
-                "displayName": "CD IM HNQIS2 HFR__S30Q30_Verres jetables pour la strategie DOT de la SP pendant la CPN",
-                "formName": "Verres jetables pour la strategie DOT de la SP pendant la CPN",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "2.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "ctpg6guA9NP",
-                "displayName": "CD IM HNQIS2 HFR__S30Q40_Gants d'examen",
-                "formName": "Gants d'examen",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "2.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Z4t3un9Q2Tz",
-                "displayName": "CD IM HNQIS2 HFR__S30Q50_Savon ou gel",
-                "formName": "Savon ou gel",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "2.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "yFw5nkmEtix",
-                "displayName": "CD IM HNQIS2 HFR__S30Q60_Boites de sécurité",
-                "formName": "Boites de sécurité",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "2.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Erq5Wtu7xQm",
-                "displayName": "CD IM HNQIS2 HFR__S30Q70_Thermomètre",
-                "formName": "Thermomètre",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "2.6",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "GD4lE0QaeOE",
-                "displayName": "CD IM HNQIS2 HFR__S30Q80_Balance-pèse personne",
-                "formName": "Balance-pèse personne",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "2.7",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "k7LvZV9tPBs",
-                "displayName": "CD IM HNQIS2 HFR__S30Q90_Seringues",
-                "formName": "Seringues",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "2.8",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "TVrpq3LYSgH",
-                "displayName": "CD IM HNQIS2 HFR__S30Q100_Alcool",
-                "formName": "Alcool",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "2.9",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "lJuaHzB5rxd",
-                "displayName": "CD IM HNQIS2 HFR__S30Q110_Coton",
-                "formName": "Coton",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "2.10",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "BEpB7vugKQI",
-                "displayName": "CD IM HNQIS2 HFR__S30Q120_TDR du paludisme",
-                "formName": "TDR du paludisme",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "2.11",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "jEYJIVZN64z",
-                "displayName": "CD IM HNQIS2 HFR__S30Q130_MILDA pour la distribution en routine",
-                "formName": "MILDA pour la distribution en routine",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "2.12",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "zz5QpzzGxiv",
-                "displayName": "CD IM HNQIS2 HFR__S30Q140_Masques",
-                "formName": "Masques",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "2.13",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponibilité de la documentation",
-        "id": "tfTMQGcnTQw",
-        "displayName": "Disponibilité de la documentation",
-        "sortOrder": 40,
-        "dataElements": [
-            {
-                "id": "l0E5hpN8dt4",
-                "displayName": "CD IM HNQIS2 HFR__S40Q10_Est-ce que ces documents sont disponibles aujourd'hui ?",
-                "formName": "     ",
-                "attributeValues": [
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "{\"labelFormName\":\"Est-ce que ces documents sont disponibles aujourd'hui ?\"}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Be271yck8Wy",
-                "displayName": "CD IM HNQIS2 HFR__S40Q20_Guide FANOME",
-                "formName": "Guide FANOME",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "3.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "t8ueyZCBrXr",
-                "displayName": "CD IM HNQIS2 HFR__S40Q30_Manuel de procédures Pha-G-Dis/Pha-G-Com (FANOME)",
-                "formName": "Manuel de procédures Pha-G-Dis/Pha-G-Com (FANOME)",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "3.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Qp8vK2QY4e8",
-                "displayName": "CD IM HNQIS2 HFR__S40Q40_Manuel de référence sur la gestion des intrants de santé",
-                "formName": "Manuel de référence sur la gestion des intrants de santé",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "3.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "pdZMKRMoM2u",
-                "displayName": "CD IM HNQIS2 HFR__S40Q50_Manuel de référence de la PEC du paludisme",
-                "formName": "Manuel de référence de la PEC du paludisme",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "3.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "U5Qx6LuKSwH",
-                "displayName": "CD IM HNQIS2 HFR__S40Q60_Manuel sur la Prevention le contrôle du PPG, est-il disponible ?",
-                "formName": "Manuel sur la Prevention le contrôle du PPG, est-il disponible ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "3.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "GmOyhS97RIP",
-                "displayName": "CD IM HNQIS2 HFR__S40Q70_Politique National de Santé Communautaire",
-                "formName": "Politique National de Santé Communautaire",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "3.6",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "HwJxBLFcwGg",
-                "displayName": "CD IM HNQIS2 HFR__S40Q80_Tally Sheet",
-                "formName": "Tally Sheet",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "3.7",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Jom0wbfcGJR",
-                "displayName": "CD IM HNQIS2 HFR__S40Q90_Registres de consultations externes",
-                "formName": "Registres de consultations externes",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "3.8",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "IYijKnz3W0a",
-                "displayName": "CD IM HNQIS2 HFR__S40Q100_Registres de consultation prénatales",
-                "formName": "Registres de consultation prénatales",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "3.9",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "q0XLh4r85hO",
-                "displayName": "CD IM HNQIS2 HFR__S40Q110_Registres de distribution des MILDA aux enfants âgés de moins de 5 ans",
-                "formName": "Registres de distribution des MILDA aux enfants âgés de moins de 5 ans",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q20\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "3.10",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "BDlRRALcCQe",
-                "displayName": "CD IM HNQIS2 HFR__S40Q120_Registres de distribution de MILDA aux femmes enceintes",
-                "formName": "Registres de distribution de MILDA aux femmes enceintes",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "3.11",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "DuOyhRy1wrU",
-                "displayName": "CD IM HNQIS2 HFR__S40Q130_Canevas RMA",
-                "formName": "Canevas RMA",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "3.12",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "LstWv1dBPQz",
-                "displayName": "CD IM HNQIS2 HFR__S40Q140_Rapports mensuels d'activités des 6 derniers mois",
-                "formName": "Rapports mensuels d'activités des 6 derniers mois",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "3.13",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "jz5BUgaXtAU",
-                "displayName": "CD IM HNQIS2 HFR__S40Q150_Rapports mensuels des AS",
-                "formName": "Rapports mensuels des AS",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "3.14",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q60\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "xrS5QDceUjn",
-                "displayName": "CD IM HNQIS2 HFR__S40Q160_Manuel de remplissage des supports de collecte de données",
-                "formName": "Manuel de remplissage des supports de collecte de données",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "3.15",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponibilité des materiels",
-        "id": "QqfKXtg02zI",
-        "displayName": "Disponibilité des materiels",
-        "sortOrder": 50,
-        "dataElements": [
-            {
-                "id": "Okk5G7UypGM",
-                "displayName": "CD IM HNQIS2 HFR__S50Q10_Est-ce que ces materials (guides, directives, etc) sont disponibles aujourd'hui ?",
-                "formName": "     ",
-                "attributeValues": [
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "{\"labelFormName\":\"Est-ce que ces materials (guides, directives, etc) sont disponibles aujourd'hui ?\"}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "hEYWeaM1jbb",
-                "displayName": "CD IM HNQIS2 HFR__S50Q20_Tablette Disponible",
-                "formName": "Tablette Disponible",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "4.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "W6z3p1rLoCv",
-                "displayName": "CD IM HNQIS2 HFR__S50Q30_Tablette Fonctionelle",
-                "formName": "Tablette Fonctionelle",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "4.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "aHvTbscbImB",
-                "displayName": "CD IM HNQIS2 HFR__S50Q40_Ordinogramme TPI",
-                "formName": "Ordinogramme TPI",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "4.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "ENVQxgzgZmW",
-                "displayName": "CD IM HNQIS2 HFR__S50Q50_Directives CPN",
-                "formName": "Directives CPN",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "4.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "QeZP0Sd2OKJ",
-                "displayName": "CD IM HNQIS2 HFR__S50Q60_Directives nationales de prise en charge du paludisme",
-                "formName": "Directives nationales de prise en charge du paludisme",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "4.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "tN0CFHsMvrR",
-                "displayName": "CD IM HNQIS2 HFR__S50Q70_Ordinogramme de la PEC paludisme",
-                "formName": "Ordinogramme de la PEC paludisme",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "4.6",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Bgv8I8vHUoI",
-                "displayName": "CD IM HNQIS2 HFR__S50Q80_Fiche technique PEC paludisme grave",
-                "formName": "Fiche technique PEC paludisme grave",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "4.7",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q70\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "wzXD1pTIMOa",
-                "displayName": "CD IM HNQIS2 HFR__S50Q90_Ordinogramme de la PEC paludisme chez la femme enceinte",
-                "formName": "Ordinogramme de la PEC paludisme chez la femme enceinte",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "4.8",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "B3QUOWA3VYJ",
-                "displayName": "CD IM HNQIS2 HFR__S50Q100_Job aids",
-                "formName": "Job aids",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "4.9",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "fCaXh4c5hBq",
-                "displayName": "CD IM HNQIS2 HFR__S50Q110_Directives de distribution des MILDA",
-                "formName": "Directives de distribution des MILDA",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "4.10",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponibilité de Ressources humaines formés",
-        "id": "WQPEPwFLVP1",
-        "displayName": "Disponibilité de Ressources humaines formés",
-        "sortOrder": 60,
-        "dataElements": [
-            {
-                "id": "UY2wba2sTDQ",
-                "displayName": "CD IM HNQIS2 HFR__S60Q10_Nombre d'agent de santé par catégorie (prenant en charge paludisme) et selon le genre",
-                "formName": "     ",
-                "attributeValues": [
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "{\"labelFormName\":\"Nombre d'agent de santé par catégorie (prenant en charge paludisme) et selon le genre\"}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "jpjTDVYsLvH",
-                "displayName": "CD IM HNQIS2 HFR__S60Q20_Medecins - Hommes",
-                "formName": "Medecins - Hommes",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "5.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "EH4oClwhd59",
-                "displayName": "CD IM HNQIS2 HFR__S60Q30_Medecins - Femmes",
-                "formName": "Medecins - Femmes",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "5.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "mqMDZOtBjhm",
-                "displayName": "CD IM HNQIS2 HFR__S60Q40_Sages femmes - Hommes",
-                "formName": "Sages femmes - Hommes",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "5.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "AAlMHO7ID8y",
-                "displayName": "CD IM HNQIS2 HFR__S60Q50_Sages femmes - Femmes",
-                "formName": "Sages femmes - Femmes",
-                "attributeValues": [
-                    {
-                        "value": "5.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "DlCXUepE0zX",
-                "displayName": "CD IM HNQIS2 HFR__S60Q60_Infirmiers - Hommes",
-                "formName": "Infirmiers - Hommes",
-                "attributeValues": [
-                    {
-                        "value": "5.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "VF5aAiY46sM",
-                "displayName": "CD IM HNQIS2 HFR__S60Q70_Infirmiers - Femmes",
-                "formName": "Infirmiers - Femmes",
-                "attributeValues": [
-                    {
-                        "value": "5.6",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "tLCuQCbCSmh",
-                "displayName": "CD IM HNQIS2 HFR__S60Q80_Pharmaciens/PGP - Hommes",
-                "formName": "Pharmaciens/PGP - Hommes",
-                "attributeValues": [
-                    {
-                        "value": "5.7",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "OyjELSYH56p",
-                "displayName": "CD IM HNQIS2 HFR__S60Q90_Pharmaciens/PGP - Femmes",
-                "formName": "Pharmaciens/PGP - Femmes",
-                "attributeValues": [
-                    {
-                        "value": "5.8",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "P85PWFV0cw4",
-                "displayName": "CD IM HNQIS2 HFR__S60Q100_Au moins 50% de personnel sont formé pour la prise en charge des cas de paludisme durant les deux dernieres annees selon les directives nationales ?",
-                "formName": "Au moins 50% de personnel sont formé pour la prise en charge des cas de paludisme durant les deux dernieres annees selon les directives nationales ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "5.9",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponiblité de données de qualité des 3 derniers mois",
-        "id": "t76LdzOuzeQ",
-        "displayName": "Disponiblité de données de qualité des 3 derniers mois",
-        "sortOrder": 70,
-        "dataElements": [
-            {
-                "id": "ouuxyIBZ73m",
-                "displayName": "CD IM HNQIS2 HFR__S70Q10_Calcul les nombre pour les 3 derniers mois",
-                "formName": "     ",
-                "attributeValues": [
-                    {
-                        "value": "{\"labelFormName\":\"Calcul les nombre pour les 3 derniers mois\"}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de femme enceinte reçu en CPN 1",
-        "id": "UVQ0Vp5WiVF",
-        "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de femme enceinte reçu en CPN 1",
-        "sortOrder": 80,
-        "dataElements": [
-            {
-                "id": "inYOWBOfk8S",
-                "displayName": "CD IM HNQIS2 HFR__S80Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "attributeValues": [
-                    {
-                        "value": "6.1.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "PC6VMhqMgw6",
-                "displayName": "CD IM HNQIS2 HFR__S80Q20_Valeur rapportée dans RMA (S)",
-                "formName": "Valeur rapportée dans RMA (S)",
-                "attributeValues": [
-                    {
-                        "value": "6.1.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "v7TJNGAxU5Q",
-                "displayName": "CD IM HNQIS2 HFR__S80Q30_Valeur trouvé dans le régistre (T)",
-                "formName": "Valeur trouvé dans le régistre (T)",
-                "attributeValues": [
-                    {
-                        "value": "6.1.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "T4TQ9sBq9mV",
-                "displayName": "CD IM HNQIS2 HFR__S80Q40_Ecart (T-S) <= 10% ?",
-                "formName": "Ecart (T-S) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "6.1.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "tBsVWGS9txH",
-                "displayName": "CD IM HNQIS2 HFR__S80Q50_Ecart (T-R) <= 10% ?",
-                "formName": "Ecart (T-R) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "6.1.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de femme enceinte ayant reçu le TPI 3",
-        "id": "qnm2RNUIq7z",
-        "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de femme enceinte ayant reçu le TPI 3",
-        "sortOrder": 90,
-        "dataElements": [
-            {
-                "id": "KrRZHNn9L8A",
-                "displayName": "CD IM HNQIS2 HFR__S90Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "attributeValues": [
-                    {
-                        "value": "6.2.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "KfUBfu9u4ko",
-                "displayName": "CD IM HNQIS2 HFR__S90Q20_Valeur rapportée dans RMA (S)",
-                "formName": "Valeur rapportée dans RMA (S)",
-                "attributeValues": [
-                    {
-                        "value": "6.2.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "CKDPMAL27jP",
-                "displayName": "CD IM HNQIS2 HFR__S90Q30_Valeur trouvé dans le régistre (T)",
-                "formName": "Valeur trouvé dans le régistre (T)",
-                "attributeValues": [
-                    {
-                        "value": "6.2.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "nP7t9yffe8z",
-                "displayName": "CD IM HNQIS2 HFR__S90Q40_Ecart (T-S) <= 10% ?",
-                "formName": "Ecart (T-S) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "6.2.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "qSxPnYiy06h",
-                "displayName": "CD IM HNQIS2 HFR__S90Q50_Ecart (T-R) <= 10% ?",
-                "formName": "Ecart (T-R) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.2.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas suspects de paludisme enregistré dans la formation sanitaire",
-        "id": "QfKDp3vJPI7",
-        "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas suspects de paludisme enregistré dans la formation sanitaire",
-        "sortOrder": 100,
-        "dataElements": [
-            {
-                "id": "V2PsAOPuSu2",
-                "displayName": "CD IM HNQIS2 HFR__S100Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "attributeValues": [
-                    {
-                        "value": "6.3.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "swgMvl5eLyv",
-                "displayName": "CD IM HNQIS2 HFR__S100Q20_Valeur rapportée dans RMA (S)",
-                "formName": "Valeur rapportée dans RMA (S)",
-                "attributeValues": [
-                    {
-                        "value": "6.3.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "XPvq6yAV4p4",
-                "displayName": "CD IM HNQIS2 HFR__S100Q30_Valeur trouvé dans le régistre (T)",
-                "formName": "Valeur trouvé dans le régistre (T)",
-                "attributeValues": [
-                    {
-                        "value": "6.3.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "SJ6K8cKA1TP",
-                "displayName": "CD IM HNQIS2 HFR__S100Q40_Ecart (T-S) <= 10% ?",
-                "formName": "Ecart (T-S) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.3.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "AtBI74X13Rk",
-                "displayName": "CD IM HNQIS2 HFR__S100Q50_Ecart (T-R) <= 10% ?",
-                "formName": "Ecart (T-R) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.3.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse",
-        "id": "EKOGC3u0Yr1",
-        "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse",
-        "sortOrder": 110,
-        "dataElements": [
-            {
-                "id": "GQV3D8VAxoa",
-                "displayName": "CD IM HNQIS2 HFR__S110Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "attributeValues": [
-                    {
-                        "value": "6.4.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "P5zL5O4h3ot",
-                "displayName": "CD IM HNQIS2 HFR__S110Q20_Valeur rapportée dans RMA (S)",
-                "formName": "Valeur rapportée dans RMA (S)",
-                "attributeValues": [
-                    {
-                        "value": "6.4.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "cJNrSpOd7C0",
-                "displayName": "CD IM HNQIS2 HFR__S110Q30_Valeur trouvé dans le régistre (T)",
-                "formName": "Valeur trouvé dans le régistre (T)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.4.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "BOZ0p9zyck4",
-                "displayName": "CD IM HNQIS2 HFR__S110Q40_Ecart (T-S) <= 10% ?",
-                "formName": "Ecart (T-S) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.4.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "jZpSJp2wt6m",
-                "displayName": "CD IM HNQIS2 HFR__S110Q50_Ecart (T-R) <= 10% ?",
-                "formName": "Ecart (T-R) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.4.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse",
-        "id": "DdMcApp8zNP",
-        "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse",
-        "sortOrder": 120,
-        "dataElements": [
-            {
-                "id": "BtRhmeYw8Rr",
-                "displayName": "CD IM HNQIS2 HFR__S120Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "attributeValues": [
-                    {
-                        "value": "6.5.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "c5HudBhOsgn",
-                "displayName": "CD IM HNQIS2 HFR__S120Q20_Valeur rapportée dans RMA (S)",
-                "formName": "Valeur rapportée dans RMA (S)",
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.5.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "x9Lk0oQDSB1",
-                "displayName": "CD IM HNQIS2 HFR__S120Q30_Valeur trouvé dans le régistre (T)",
-                "formName": "Valeur trouvé dans le régistre (T)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.5.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "y4KvHIIsHts",
-                "displayName": "CD IM HNQIS2 HFR__S120Q40_Ecart (T-S) <= 10% ?",
-                "formName": "Ecart (T-S) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.5.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "plHgSDGC5MQ",
-                "displayName": "CD IM HNQIS2 HFR__S120Q50_Ecart (T-R) <= 10% ?",
-                "formName": "Ecart (T-R) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.5.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas paludisme simple confirmés traités avec les ACT",
-        "id": "hiS70DWOQh9",
-        "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de cas paludisme simple confirmés traités avec les ACT",
-        "sortOrder": 130,
-        "dataElements": [
-            {
-                "id": "pDAP9Xb3Djr",
-                "displayName": "CD IM HNQIS2 HFR__S130Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.6.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "JpLNFLtZceZ",
-                "displayName": "CD IM HNQIS2 HFR__S130Q20_Valeur rapportée dans RMA (S)",
-                "formName": "Valeur rapportée dans RMA (S)",
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.6.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "D3J8cLJpZXU",
-                "displayName": "CD IM HNQIS2 HFR__S130Q30_Valeur trouvé dans le régistre (T)",
-                "formName": "Valeur trouvé dans le régistre (T)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.6.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "SD2QeceadiP",
-                "displayName": "CD IM HNQIS2 HFR__S130Q40_Ecart (T-S) <= 10% ?",
-                "formName": "Ecart (T-S) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.6.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "w8pvdZ3KFrB",
-                "displayName": "CD IM HNQIS2 HFR__S130Q50_Ecart (T-R) <= 10% ?",
-                "formName": "Ecart (T-R) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.6.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Disponiblité de données de qualité des 3 derniers mois - Nombre de traitement  d’ACT consommées (sortie de la pharmacie du la structure de santé)",
-        "id": "WNNx2Wtoe22",
-        "displayName": "Disponiblité de données de qualité des 3 derniers mois - Nombre de traitement  d’ACT consommées (sortie de la pharmacie du la structure de santé)",
-        "sortOrder": 140,
-        "dataElements": [
-            {
-                "id": "YfpbknqVenT",
-                "displayName": "CD IM HNQIS2 HFR__S140Q10_Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "formName": "Valeur rapportée dans DHIS2 ou GESIS (R)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.7.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "QQWesno3kab",
-                "displayName": "CD IM HNQIS2 HFR__S140Q20_Valeur rapportée dans RMA (S)",
-                "formName": "Valeur rapportée dans RMA (S)",
-                "attributeValues": [
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.7.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "RMHQwXo1gtT",
-                "displayName": "CD IM HNQIS2 HFR__S140Q30_Valeur trouvé dans le régistre (T)",
-                "formName": "Valeur trouvé dans le régistre (T)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.7.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "NgVOAf25ISc",
-                "displayName": "CD IM HNQIS2 HFR__S140Q40_Ecart (T-S) <= 10% ?",
-                "formName": "Ecart (T-S) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "6.7.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "{\"parentVarName\":\"_S10Q10\",\"parentValue\":1}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "BlJZUjP34j9",
-                "displayName": "CD IM HNQIS2 HFR__S140Q50_Ecart (T-R) <= 10% ?",
-                "formName": "Ecart (T-R) <= 10% ?",
-                "optionSet": {
-                    "id": "ZCgpq2tWlIr"
-                },
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "6.7.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    },
-                    {
-                        "value": "Yes",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Critical Steps Calculations",
-        "id": "UGgLNYkyk0w",
-        "displayName": "Critical Steps Calculations",
-        "sortOrder": 150,
-        "dataElements": [
-            {
-                "id": "VqBfZjZhKkU",
-                "displayName": "HNQIS2 - Critical Steps",
-                "formName": "Critical Steps",
-                "attributeValues": []
-            },
-            {
-                "id": "pzWDtDUorBt",
-                "displayName": "HNQIS2 - Non-critical Steps",
-                "formName": "Non-critical Steps",
-                "attributeValues": []
-            },
-            {
-                "id": "NAaHST5ZDTE",
-                "displayName": "HNQIS2 - Competency Class",
-                "formName": "Competency Class",
-                "optionSet": {
-                    "id": "NDfZ129owtz"
-                },
-                "attributeValues": []
-            }
-        ]
-    },
-    {
-        "name": "Scores",
-        "id": "j3CcdjYekKk",
-        "displayName": "Scores",
-        "sortOrder": 160,
-        "dataElements": [
-            {
-                "id": "M4LfwQ77p8W",
-                "displayName": "CD IM HNQIS2 HFR__CS1_Disponibilité de médicaments",
-                "formName": "1 Disponibilité de médicaments (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "gjHaM9yP2TV",
-                "displayName": "CD IM HNQIS2 HFR__CS2_Disponibilite des commodites",
-                "formName": "2 Disponibilite des commodites (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "ouotlmOd1DT",
-                "displayName": "CD IM HNQIS2 HFR__CS3_Disponibilité de la documentation",
-                "formName": "3 Disponibilité de la documentation (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "PYi15p4ODRn",
-                "displayName": "CD IM HNQIS2 HFR__CS4_Disponibilité des materiels",
-                "formName": "4 Disponibilité des materiels (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "j8q4eNETmJR",
-                "displayName": "CD IM HNQIS2 HFR__CS5_Disponibilité de ressources humaines formés",
-                "formName": "5 Disponibilité de ressources humaines formés (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Iv4KBI7NsoA",
-                "displayName": "CD IM HNQIS2 HFR__CS6_Disponiblité de données de qualité",
-                "formName": "6 Disponiblité de données de qualité (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "6",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "L15riwtBlA5",
-                "displayName": "CD IM HNQIS2 HFR__CS6.1_Nombre de femme enceinte reçu en CPN 1",
-                "formName": "6.1 Nombre de femme enceinte reçu en CPN 1 (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "6.1",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "n18zjhkDg3J",
-                "displayName": "CD IM HNQIS2 HFR__CS6.2_Nombre de femme enceinte ayant reçu le TPI 3",
-                "formName": "6.2 Nombre de femme enceinte ayant reçu le TPI 3 (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "6.2",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "YjdpmDg2kvz",
-                "displayName": "CD IM HNQIS2 HFR__CS6.3_Nombre de cas suspects de paludisme enregistré dans la formation sanitaire",
-                "formName": "6.3 Nombre de cas suspects de paludisme enregistré dans la formation sanitaire (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "6.3",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "BcnETuF7brT",
-                "displayName": "CD IM HNQIS2 HFR__CS6.4_Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse",
-                "formName": "6.4 Nombre de cas suspects de paludisme testés par TDR ou goutte épaisse (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "6.4",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "uvLQ52uo0gB",
-                "displayName": "CD IM HNQIS2 HFR__CS6.5_Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse",
-                "formName": "6.5 Nombre de cas de paludisme simple confirmés par TDR ou goutte épaisse (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "6.5",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Fc4B81Rogac",
-                "displayName": "CD IM HNQIS2 HFR__CS6.6_Nombre de cas paludisme simple confirmés traités avec les ACT",
-                "formName": "6.6 Nombre de cas paludisme simple confirmés traités avec les ACT (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "6.6",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "c6OP6mjk4gL",
-                "displayName": "CD IM HNQIS2 HFR__CS6.7_Nombre de traitement d’ACT consommées (sortie de la pharmacie du la structure de santé)",
-                "formName": "6.7 Nombre de traitement d’ACT consommées (sortie de la pharmacie du la structure de santé) (%)",
-                "attributeValues": [
-                    {
-                        "value": "{}",
-                        "attribute": {
-                            "id": "haUflNqP85K"
-                        }
-                    },
-                    {
-                        "value": "No",
-                        "attribute": {
-                            "id": "NPwvdTt0Naj"
-                        }
-                    },
-                    {
-                        "value": "6.7",
-                        "attribute": {
-                            "id": "LP171jpctBm"
-                        }
-                    }
-                ]
-            }
-        ]
+/**
+ * 
+ * @param {Object} question : { subLevels: <Array> ,prgVarName: STRING,scoreNum: NUMBER, scoreDen: NUMBER,isCritical: BOOLEAN }
+ * @param {Object} branch : scoreMap __ Init as --> { childs: [] }
+ * @description Allocates each feadback order / composite score in an Object (tree structure) that stores all questions for each leaf
+ */
+const locateInTree = (question, branch) => {
+    let subLevels = question.subLevels.length;
+    if (subLevels > 1) {
+        let currentOrder = question.subLevels.shift();
+        let subOrder;
+        subOrder = branch.childs.find(s => s.order == currentOrder);
+        if (!subOrder) {
+            subOrder = { order: currentOrder };
+            (subLevels > 2) ? subOrder.childs = [] : subOrder.questions = [];
+            branch.childs.push(subOrder);
+        }
+        locateInTree(question, subOrder);
+    } else if (subLevels == 1) {
+        /*question.order = */question.subLevels.shift();
+        delete question.subLevels;
+        branch.questions.push(question);
     }
-];
+}
 
-const programId = "hAzCMeYj2kY";
+/**
+ * 
+ * @param {Object} branch : Init as: scoreMap __ Object (Tree) that contains allocated questions
+ * @returns {<Array>} : expressions for [critical Numerator, critical Denominator, non critical numerator, non critical denominator ]
+ * @description: Create score expressions for each scoreMap level (composite score)
+ */
+const buildScores = (branch) => {
+    let numC = [];
+    let numN = [];
+    let denC = [];
+    let denN = [];
 
-const buildProgramRuleVariables = (sections, programId) => {
-    const criticalStepCalculations = sections.find(s => s.name == "Critical Step Calculations");
-    const scores = sections.find(s => s.name == "Scores");
-    sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
+    if (branch.questions) {
+        branch.questions.forEach((a) => {
+            if (a.prgVarName) {
+                let num = `#{${a.prgVarName}}*${a.scoreNum}`;
+                let den = `d2:countIfZeroPos('${a.prgVarName}')*${a.scoreDen}`;
+                if (a.isCritical) {
+                    numC.push(num);
+                    denC.push(den);
+                } else {
+                    numN.push(num);
+                    denN.push(den);
+                }
+            }
+        });
+        branch.numC = numC.filter(e => e != "").join('+');
+        branch.denC = denC.filter(e => e != "").join('+');
+        branch.numN = numN.filter(e => e != "").join('+');
+        branch.denN = denN.filter(e => e != "").join('+');
+        return [branch.numC, branch.denC, branch.numN, branch.denN];
+    } else {
+        branch.childs.forEach(subBranch => {
+            let res = buildScores(subBranch);
+            numC.push(res[0]);
+            denC.push(res[1]);
+            numN.push(res[2]);
+            denN.push(res[3]);
+        });
+        let tmp;
+
+        tmp = numC.filter(e => e != "");
+        branch.numC = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
+
+        tmp = denC.filter(e => e != "");
+        branch.denC = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
+
+        tmp = numN.filter(e => e != "");
+        branch.numN = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
+
+        tmp = denN.filter(e => e != "");
+        branch.denN = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
+
+        return [branch.numC, branch.denC, branch.numN, branch.denN];
+    }
+}
+
+/**
+ * 
+ * @param {Object} composite : subLevels, feedbackOrder, formName, prgVarName, uid
+ * @param {Object} branch : scoreMap - contains Scores Expressions
+ * @param {String} programId 
+ * @param {Array} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
+ * @returns {Object}: scorePRs , scorePRAs for the current composite score
+ */
+const getScorePR = (composite, branch, programId, uidPool) => {
+
+    //      Breakpoint: No more IDs available
+    if (uidPool.length == 0) return { scorePRs: [], scorePRAs: [] }
+
+    let currentOrder = composite.subLevels.shift();
+    if (currentOrder && composite.subLevels.length >= 0) {
+
+        branch = branch.childs.find(s => s.order == currentOrder);
+        return getScorePR(composite, branch, programId, uidPool);                // Output {scorePRs , scorePRAs}
+    } else {
+        if (branch) {     // Composite Score HAS scoring questions
+            /**
+             * Creating PR for Scores - Two steps:
+             * 1- ASSIGN DATA to CALCULATED VALUE
+             * 2- ASSIGN CALCULATED VALUE to DATA ELEMENT
+             */
+
+            let programRuleUid, actionId, name, data;
+            let programRuleActionType = "ASSIGN";
+
+            // STEP 1 -
+            let num = [branch.numC, branch.numN].filter(n => n != "").join("+");
+            let den = [branch.denC, branch.denN].filter(n => n != "").join("+");
+            data = `((${num}) * 100) / (${den})`;
+            name = `PR - Calculated - ${composite.feedbackOrder} ${composite.formName}`;
+            programRuleUid = uidPool.shift();
+            actionId = uidPool.shift();
+
+            const pr_s1 = {
+                id: programRuleUid,
+                name: name,
+                program: { id: programId },
+                condition: "true",
+                priority: 1,
+                programRuleActions: [{ id: actionId }]
+            };
+
+            const pra_s1 = {
+                id: actionId,
+                programRuleActionType: programRuleActionType,
+                data,
+                content: `#{_CV_${composite.prgVarName}}`,
+                programRule: { id: programRuleUid }
+            };
+
+            // STEP 2 -
+
+            name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
+            programRuleUid = uidPool.shift();
+            actionId = uidPool.shift();
+            data = `d2:round(#{_CV_${composite.prgVarName}}*100)/100`;
+
+            const pr_s2 = {
+                id: programRuleUid,
+                name: name,
+                program: { id: programId },
+                condition: `d2:hasValue('_CV_${composite.prgVarName}')`,
+                programRuleActions: [{ id: actionId }]
+            };
+
+            const pra_s2 = {
+                id: actionId,
+                programRuleActionType: programRuleActionType,
+                data,
+                dataElement: { id: composite.uid },
+                programRule: { id: programRuleUid }
+            };
+
+            return { scorePRs: [pr_s1, pr_s2], scorePRAs: [pra_s1, pra_s2] }
+
+        } else { // Composite Score DOESN'T HAVE scoring questions
+            let data = `''`;
+            let name = `PR - Score - ${composite.feedbackOrder} ${composite.formName} (%)`;
+            let programRuleActionType = "ASSIGN";
+
+            let programRuleUid = uidPool.shift();
+            let actionId = uidPool.shift();
+
+            const pr = {
+                id: programRuleUid,
+                name: name,
+                program: { id: programId },
+                condition: "true",
+                programRuleActions: [{ id: actionId }]
+            };
+
+            const pra = {
+                id: actionId,
+                programRuleActionType: programRuleActionType,
+                data,
+                dataElement: { id: composite.uid },
+                programRule: { id: programRuleUid }
+            };
+
+            return { scorePRs: [pr], scorePRAs: [pra] }
+        }
+    }
+}
+
+/**
+ * 
+ * @param {*} branch : scoring map - root level will be used
+ * @param {*} programId 
+ * @param {*} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
+ * @returns {Object} : { rules : <Array> , actions : <Array> }
+ */
+const buildCriticalScore = (branch, programId, uidPool) => {
+    let num = (branch.numC != "" ? branch.numC : undefined);
+    let den = (branch.denC != "" ? branch.denC : undefined);
+
+    /**
+     * Two Steps Assign
+     * 1- From data to Calculated Value
+     * 2- From Calculated Value to Data Element
+     */
+
+    let programRuleActionType = "ASSIGN";
+    let programRuleUid, actionId, pr, name, data, pra;
+
+    // STEP 1- 
+    programRuleUid = uidPool.shift();
+    actionId = uidPool.shift();
+    name = `PR - Calculated - Critical Questions`;
+    data = (num && den) ? `((${num}) * 100) / (${den})` : `100`;
+
+    const pr_s1 = {
+        id: programRuleUid,
+        name,
+        program: { id: programId },
+        condition: "true",
+        priority: 1,
+        programRuleActions: [{ id: actionId }]
+    };
+
+    const pra_s1 = {
+        id: actionId,
+        programRuleActionType,
+        data,
+        content: `#{CV_CriticalQuestions}`,
+        programRule: { id: programRuleUid }
+    };
+
+    // STEP 2-
+    programRuleUid = uidPool.shift();
+    actionId = uidPool.shift();
+    name = `PR - Score - Critical Questions (%)`;
+
+    const pr_s2 = {
+        id: programRuleUid,
+        name,
+        program: { id: programId },
+        condition: `d2:hasValue('CV_CriticalQuestions')`,
+        programRuleActions: [{ id: actionId }]
+    };
+
+    data = `#{CV_CriticalQuestions}`;
+    const pra_s2 = {
+        id: actionId,
+        programRuleActionType,
+        data,
+        dataElement: { id: 'VqBfZjZhKkU' },
+        programRule: { id: programRuleUid }
+    };
+
+    return { rules: [pr_s1, pr_s2], actions: [pra_s1, pra_s2] }
+}
+
+/**
+ * 
+ * @param {*} branch : scoring map - root level will be used
+ * @param {*} programId 
+ * @param {*} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
+ * @returns {Object}: { rules : <Array> , actions : <Array> }
+ */
+const buildNonCriticalScore = (branch, programId, uidPool) => {
+    let num = (branch.numN != "" ? branch.numN : undefined);
+    let den = (branch.denN != "" ? branch.denN : undefined);
+
+    /**
+     * Two Steps Assign
+     * 1- From data to Calculated Value
+     * 2- From Calculated Value to Data Element
+     */
+
+    let programRuleActionType = "ASSIGN";
+    let programRuleUid, actionId, pr, name, data, pra;
+
+    // STEP 1- 
+    programRuleUid = uidPool.shift();
+    actionId = uidPool.shift();
+    name = `PR - Calculated - Non-Critical Questions`;
+    data = (num && den) ? `((${num}) * 100) / (${den})` : `100`;
+
+    const pr_s1 = {
+        id: programRuleUid,
+        name,
+        program: { id: programId },
+        condition: "true",
+        priority: 1,
+        programRuleActions: [{ id: actionId }]
+    };
+
+    const pra_s1 = {
+        id: actionId,
+        programRuleActionType,
+        data,
+        content: `#{CV_CriticalQuestions}`,
+        programRule: { id: programRuleUid }
+    };
+
+    // STEP 2-
+    programRuleUid = uidPool.shift();
+    actionId = uidPool.shift();
+    name = `PR - Score - Non-Critical Questions (%)`;
+    data = `#{_CV_NonCriticalQuestions}`;
+
+    const pr_s2 = {
+        id: programRuleUid,
+        name,
+        program: { id: programId },
+        condition: `d2:hasValue('_CV_NonCriticalQuestions')`,
+        programRuleActions: [{ id: actionId }]
+    };
+
+    const pra_s2 = {
+        id: actionId,
+        programRuleActionType,
+        data,
+        dataElement: { id: 'pzWDtDUorBt' },
+        programRule: { id: programRuleUid }
+    };
+
+    return { rules: [pr_s1, pr_s2], actions: [pra_s1, pra_s2] }
+}
+
+/**
+ * 
+ * @param {*} programId 
+ * @param {*} uidPool 
+ * @returns {Object} : { competencyRules : <Array> , competencyActions : <Array> }
+ */
+const buildCompetencyRules = (programId, uidPool) => {
+    let competencyRules = [
+        {
+            name: "PR - Assign Competency - 'Competent but needs improvement'",
+            condition: "#{_criticalNewest} == 100 && (#{_NoncriticalNewest}  <  89.9  &&  #{_NoncriticalNewest} >= 79.9)",
+            program: { id: "" },
+            description: "_Scripted",
+            programRuleActions: [
+                {
+                    data: "'improvement'",
+                    programRuleActionType: "ASSIGN",
+                    dataElement: { id: "NAaHST5ZDTE" },
+                }
+            ]
+        },
+        {
+            name: "PR - Assign Competency - 'Competent'",
+            condition: "#{_criticalNewest} == 100 && #{_NoncriticalNewest} >= 89.9",
+            program: { id: "" },
+            description: "_Scripted",
+            programRuleActions: [
+                {
+                    data: "'competent'",
+                    programRuleActionType: "ASSIGN",
+                    dataElement: { id: "NAaHST5ZDTE" }
+                }
+            ]
+        },
+        {
+            name: "PR - Assign Competency - 'Not Competent'",
+            condition: "#{_criticalNewest} < 100  || (#{_NoncriticalNewest}  < 79.9 && #{_NoncriticalNewest} >= 0)",
+            program: { id: "" },
+            description: "_Scripted",
+            programRuleActions: [
+                {
+                    data: "'notcompetent'",
+                    programRuleActionType: "ASSIGN",
+                    dataElement: { id: "NAaHST5ZDTE" }
+                }
+            ]
+        }
+    ];
+
+    let competencyActions = [];
+
+    competencyRules.forEach(rule => {
+        let programRuleUid = uidPool.shift();
+
+        rule.id = programRuleUid;
+        rule.program.id = programId;
+
+        let actions = rule.programRuleActions;
+        rule.programRuleActions = [];
+
+        actions.forEach(action => {
+            let actionId = uidPool.shift();
+            action.id = actionId;
+            action.programRule = { id: programRuleUid };
+            competencyActions.push(action);
+            rule.programRuleActions.push({ id: actionId });
+        });
+    });
+
+    return { competencyRules, competencyActions }
+}
+
+const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass = "Yes", healthArea = 'FP') => {
+
+    let attributeActions = [];
+
+    let attributeRules = [
+        {
+            name: "PR - Attributes - Assign Health Area",
+            displayName: "PR - Assign Health Area",
+            condition: "true",
+            program: { id: "" },
+            description: "_Scripted",
+            programRuleActions: [
+                {
+                    data: `'${healthArea}'`,
+                    programRuleActionType: "ASSIGN",
+                    trackedEntityAttribute: { id: "Xe5hUu6KkUT" }
+                }
+            ]
+        },
+        {
+            name: "PR - Attributes - Assign Enrollment Date",
+            displayName: "PR - Attributes - Assign Enrollment Date",
+            condition: "true",
+            program: { id: "" },
+            description: "_Scripted",
+            programRuleActions: [
+                {
+                    data: "V{enrollment_date}",
+                    programRuleActionType: "ASSIGN",
+                    trackedEntityAttribute: { id: "UlUYUyZJ6o9" }
+                }
+            ]
+        },
+        {
+            name: "PR - Attributes - Assign Global Score",
+            displayName: "PR - Attributes - Assign Global Score",
+            condition: scoreMap.numC != "" ? "d2:hasValue('_criticalNewest')" : "d2:hasValue('_NoncriticalNewest')",
+            program: { id: "" },
+            description: "_Scripted",
+            programRuleActions: [
+                {
+                    data: scoreMap.numC != "" ? "#{_criticalNewest}" : "#{_NoncriticalNewest}",
+                    programRuleActionType: "ASSIGN",
+                    trackedEntityAttribute: { id: "NQdpdST0Gcx" }
+                }
+            ]
+        },
+        {
+            name: "PR - Attributes - Assign OU",
+            displayName: "PR - Attributes - Assign OU",
+            condition: "true",
+            program: { id: "" },
+            description: "_Scripted",
+            programRuleActions: [
+                {
+                    data: "V{orgunit_code}",
+                    programRuleActionType: "ASSIGN",
+                    trackedEntityAttribute: { id: "nHg1hGgtJwm" }
+                }
+            ]
+        },
+        {
+            name: `PR - Attributes - ${useCompetencyClass == "Yes" ? 'CompClass &' : ''} GlobalScore `,
+            displayName: `PR - Attributes - ${useCompetencyClass == "Yes" ? 'CompClass &' : ''} GlobalScore `,
+            description: "_Scripted",
+            condition: "!d2:hasValue('_criticalNewest') || !d2:hasValue('_NoncriticalNewest')",
+            program: { id: "" },
+            programRuleActions: (useCompetencyClass == "Yes") ?
+                [
+                    {
+                        programRuleActionType: "HIDEFIELD",
+                        trackedEntityAttribute: { id: "NQdpdST0Gcx" }
+                    },
+                    {
+                        programRuleActionType: "HIDEFIELD",
+                        trackedEntityAttribute: { id: "ulU9KKgSLYe" }
+                    }
+                ] :
+                [
+                    {
+                        programRuleActionType: "HIDEFIELD",
+                        trackedEntityAttribute: { id: "NQdpdST0Gcx" }
+                    }
+                ]
+        }
+    ];
+
+    if (useCompetencyClass == "Yes") attributeRules.push(
+        {
+            name: "PR - Attributes - Assign Competency",
+            displayName: "PR - Attributes - Assign Competency",
+            condition: "d2:hasValue('_competencyNewest')",
+            program: { id: "" },
+            description: "_Scripted",
+            programRuleActions: [
+                {
+                    data: "#{_competencyNewest}",
+                    programRuleActionType: "ASSIGN",
+                    trackedEntityAttribute: { id: "ulU9KKgSLYe" }
+                }
+            ]
+        }
+    );
+
+    attributeRules.forEach(rule => {
+        let programRuleUid = uidPool.shift();
+
+        let actions = rule.programRuleActions;
+        rule.programRuleActions = [];
+
+        rule.id = programRuleUid;
+        rule.program.id = programId;
+
+        actions.forEach(action => {
+            let actionId = uidPool.shift();
+            action.id = actionId;
+            action.programRule = { id: programRuleUid };
+            attributeActions.push(action);
+            rule.programRuleActions.push({ id: actionId });
+        });
+    });
+
+    return { attributeRules, attributeActions }
+}
+
+/**
+ * 
+ * @param {Array} scores : Data Elements linked to Scores section
+ * @returns {Object} uniqueScores:Boolean , compositeScores:<Array>, duplicatedScores:<Array>
+ */
+const checkScores = (scores) => {
+    let compositeScores = scores.map(score => score.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value);
+    let duplicatedScores = compositeScores.filter((composite, index) => compositeScores.indexOf(composite) !== index);
+    return {
+        uniqueScores: duplicatedScores.length == 0,
+        compositeScores,
+        duplicatedScores
+    };
+}
+
+const readQuestionComposites = (sections) => {
+    var questionCompositeScores = [];
+    sections.forEach(section => {
+        section.dataElements.forEach(de => {
+            let composite = de.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value.split('.').slice(0, -1)
+            if (composite) {
+
+                composite.map((v, i) =>
+                    //Create sub branches for each composite level [1,1] => [1 , 1.1]
+                    composite.slice(0, i + 1).join('.')
+                ).forEach(v => {
+                    // Check if already included in the Array
+                    if (!questionCompositeScores.includes(v)) questionCompositeScores.push(v)
+                });
+            }
+        })
+    });
+    return questionCompositeScores.sort()
+}
+
+const hideShowLogic = (hideShowGroup, programId, uidPool) => {
+    var hideShowRules = [], hideShowActions = [];
+
+    Object.keys(hideShowGroup).forEach(parentCode => {
+        Object.keys(hideShowGroup[parentCode]).forEach(answer => {
+
+            // SHOW/HIDE WHEN....IS...
+            let programRuleUid = uidPool.shift();
+            let name = `PR - Show/Hide - Show when ${parentCode} is ${answer}`;
+
+            const pr = {
+                id: programRuleUid,
+                name,
+                program: { id: programId },
+                condition: `#{${parentCode}}!=${answer}`,
+                programRuleActions: []
+            };
+
+            // MAKE FIELD MANDATORY WHEN....IS...
+            let mfm_uid = uidPool.shift();
+            let mfm_name = `PR - Make Field Mandatory - Make mandatory when ${parentCode} is ${answer}`;
+
+            const pr_mfm = {
+                id: mfm_uid,
+                name: mfm_name,
+                program: { id: programId },
+                condition: `#{${parentCode}}==${answer}`,
+                programRuleActions: []
+            };
+
+            hideShowGroup[parentCode][answer].forEach(de => {
+                // Show/Hide Logic
+                let actionId = uidPool.shift();
+
+                const pra = {
+                    id: actionId,
+                    programRuleActionType: "HIDEFIELD",
+                    dataElement: { id: de.id },
+                    content: `#{CV_CriticalQuestions}`,
+                    programRule: { id: programRuleUid }
+                };
+
+                pr.programRuleActions.push({ id: actionId });   // Add to Program Rule
+                hideShowActions.push(pra);  // Add to global JSON
+
+                // Make mandatory Logic
+                if (de.mandatory == "Yes") {
+                    let mandatoryActionId = uidPool.shift();
+                    const pra_mandatory = {
+                        id: mandatoryActionId,
+                        programRuleActionType: "SETMANDATORYFIELD",
+                        dataElement: { id: de.id },
+                        programRule: { id: mfm_uid }
+                    };
+
+                    pr_mfm.programRuleActions.push({ id: mandatoryActionId });
+                    hideShowActions.push(pra_mandatory);
+                }
+            });
+
+            hideShowRules.push(pr);
+            if (pr_mfm.programRuleActions.length > 0) hideShowRules.push(pr_mfm);
+
+        });
+    });
+
+    return { hideShowRules, hideShowActions };
+}
+
+const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
+    var labelsRules = [] , labelsActions = [];
+
+    hideShowLabels.forEach(hsRule => {
+        let programRuleUid = uidPool.shift();
+
+        var pr = {
+            id: programRuleUid,
+            name:undefined,
+            program: { id: programId },
+            condition: undefined,
+            programRuleActions: []
+        };
+
+        if (hsRule.parent == "None") {
+            pr.name = "PR - Assign labels text";
+            pr.condition = `'true'`;
+        } else {
+            pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
+            pr.condition = `#{${hsRule.parent}}==${hsRule.condition}`;
+        }
+
+        hsRule.actions.forEach(action => {
+
+            let actionId = uidPool.shift();
+            const pra = {
+                id: actionId,
+                programRuleActionType: "ASSIGN",
+                data: action.text,
+                dataElement: { id: action.id },
+                programRule: { id: programRuleUid }
+            };
+
+            pr.programRuleActions.push({ id: actionId });
+            labelsActions.push(pra);
+        });
+
+        labelsRules.push(pr);
+    });
+
+    return {labelsRules, labelsActions};
+};
+
+/**
+ * 
+ * @param {Array} sections : Sections that contains questions ONLY
+ * @param {Array} compositeScores : List of composite scores [1,2,2.1,...]
+ * @param {String} programId 
+ * @param {String} useCompetencyClass: Flag to include or not the competency class realated items
+ * @returns {Array} programRuleVariables: <Array>{name,programRuleVariableSourceType,useCodeForOptionSet,program,|dataElement|}
+ */
+const buildProgramRuleVariables = (sections, compositeScores, programId, useCompetencyClass = "Yes") => {
+    // const criticalStepCalculations = sections.find(s => s.name == "Critical Step Calculations");
+    // const scores = sections.find(s => s.name == "Scores");
+    // sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
 
     let programRuleVariables = [];
-    let compositeValues = [];
 
     // Data Elements Variables
     sections.forEach((section, secIdx) => {
@@ -3679,22 +700,13 @@ const buildProgramRuleVariables = (sections, programId) => {
                 program: { id: programId },
                 dataElement: { id: dataElement.id }
             });
-
-            let order = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value?.split('.').slice(0, -1);
-            if (order)
-                order
-                    .map((c, idx) => order.slice(0, idx + 1).join('.'))
-                    .forEach(o => {
-                        if (!compositeValues.find(cv => cv.composite == o)) compositeValues.push({ composite: o, section: section.name });
-                    })
-
         });
     });
 
     // Calculated Values
-    compositeValues.forEach(cs => {
+    compositeScores.forEach(cs => {
         programRuleVariables.push({
-            name: `_CV_CS${cs.composite}`,
+            name: `_CV_CS${cs}`,
             programRuleVariableSourceType: "CALCULATED_VALUE",
             useCodeForOptionSet: false,
             program: { id: programId }
@@ -3729,50 +741,135 @@ const buildProgramRuleVariables = (sections, programId) => {
         }
     ];
 
-    // Competency Class Variable  //if (useCompetencyClass == "Yes") {
-    criticalVariables.push(
-        {
-            name: "_competencyNewest",
-            programRuleVariableSourceType: "DATAELEMENT_NEWEST_EVENT_PROGRAM",
-            useCodeForOptionSet: true,
-            program: { id: programId },
-            dataElement: { id: "NAaHST5ZDTE" }
-        }
-    );
+    // Competency Class Variable  
+    if (useCompetencyClass == "Yes")
+        criticalVariables.push(
+            {
+                name: "_competencyNewest",
+                programRuleVariableSourceType: "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+                useCodeForOptionSet: true,
+                program: { id: programId },
+                dataElement: { id: "NAaHST5ZDTE" }
+            }
+        );
 
-    programRuleVariables = programRuleVariables.concat(criticalVariables);
-    console.log(programRuleVariables);
+    return programRuleVariables.concat(criticalVariables)
 }
 
-const programRules = (sections,programId,scoreMap = {sub:[]} ) => {
-    sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
+const buildProgramRules = (sections, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", scoreMap = { childs: [] }) => {
+    var programRules = [];
+    var programRuleActions = [];
+    var hideShowGroup = {};
+    var hideShowLabels = [{ parent: 'None', condition: 'true', actions: [] }];
+
+    //Create Tree Object for Scoring PRs
     sections.forEach((section, secIdx) => {
         section.dataElements.forEach((dataElement, deIdx) => {
             let order = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
-            if(order) locateInTree( { subLevels:order.split("."), varName: `_S${secIdx + 1}Q${deIdx + 1}` },scoreMap)
+            let isCritical = dataElement.attributeValues.find(att => att.attribute.id == CRITICAL_QUESTION)?.value == "Yes";
+            let metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
+            if (order && metadata.scoreNum && metadata.scoreDen) {
+                locateInTree(
+                    {
+                        subLevels: order.split("."),
+                        prgVarName: `_S${secIdx + 1}Q${deIdx + 1}`,
+                        scoreNum: metadata.scoreNum,
+                        scoreDen: metadata.scoreDen,
+                        isCritical
+                    },
+                    scoreMap
+                )
+            }
+
+            // Get parents hide/show logic
+            if (metadata.parentVarName && metadata.parentValue) {
+                let parentVarName = String(metadata.parentVarName);
+                let parentValue = String(metadata.parentValue);
+
+                !hideShowGroup[parentVarName] ? hideShowGroup[parentVarName] = {} : undefined;
+                !hideShowGroup[parentVarName][parentValue] ? hideShowGroup[parentVarName][parentValue] = [] : undefined;
+                !hideShowGroup[parentVarName][parentValue].push({ id: dataElement.id, mandatory: metadata.compulsory });
+
+                if (metadata.labelFormName) {
+                    let hsIdx = hideShowLabels.findIndex(hs => hs.parent == parentVarName && hs.condition == parentValue);
+                    if (hsIdx == -1) {
+                        // CREATE
+                        hideShowLabels.push({
+                            parent: parentVarName,
+                            condition: parentValue,
+                            actions: []
+                        });
+                        hsIdx = hideShowLabels.length - 1;
+                    }
+                    hideShowLabels[hsIdx].actions.push({id:dataElement.id, text: metadata.labelFormName.replaceAll("\"","'")});
+                }
+            } else if (metadata.labelFormName) {
+                hideShowLabels[0].actions.push({id:dataElement.id, text: metadata.labelFormName.replaceAll("\"","'")});
+            }
         });
     });
-    console.log(scoreMap);
-}
 
-const locateInTree = (elem, tree) => {
-    let subLevels = elem.subLevels.length;
-    if (subLevels > 1) {
-        let currentOrder = elem.subLevels.shift();
-        let subOrder;
-        subOrder = tree.sub.find(s => s.order == currentOrder);
-        if (!subOrder) {
-            subOrder = { order: currentOrder };
-            (subLevels > 2) ? subOrder.sub = [] : subOrder.ans = [];
-            tree.sub.push(subOrder);
+    //Define Global Scores
+    const globalScores = buildScores(scoreMap);
+
+    // Request Program Rules for Composite Scores
+    compositeValues.forEach(score => {
+        let compositeData = {
+            subLevels: score.split('.'),
+            feedbackOrder: score,
+            formName: scoresMapping[score].formName,
+            prgVarName: '_CS' + score,
+            uid: scoresMapping[score].id
         }
-        locateInTree(elem, subOrder);
-    } else if (subLevels == 1) {
-        elem.order = elem.subLevels.shift();
-        delete elem.subLevels;
-        tree.ans.push(elem);
-    }
+        let { scorePRs, scorePRAs } = getScorePR(compositeData, scoreMap, programId, uidPool);
+        programRules = programRules.concat(scorePRs);
+        programRuleActions = programRuleActions.concat(scorePRAs);
+    });
+
+    // Critical Calculations
+    const criticalScore = buildCriticalScore(scoreMap, programId, uidPool);
+    const nonCriticalScore = buildNonCriticalScore(scoreMap, programId, uidPool);
+
+    // Competency Class
+
+    const { competencyRules, competencyActions } = (useCompetencyClass == "Yes" ? buildCompetencyRules(programId, uidPool) : { competencyRules: [], competencyActions: [] });
+
+    // Attributes
+
+    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, scoreMap, useCompetencyClass); //Define: useCompetencyClass & healthArea
+
+    // Hide/Show Logic
+
+    const { hideShowRules, hideShowActions } = hideShowLogic(hideShowGroup, programId, uidPool);
+
+    // Labels Assign
+
+    const { labelsRules, labelsActions } = labelsRulesLogic(hideShowLabels, programId, uidPool);
+
+    programRules = programRules.concat(
+        criticalScore.rules,
+        nonCriticalScore.rules,
+        competencyRules,
+        attributeRules,
+        hideShowRules,
+        labelsRules
+    );
+
+    programRuleActions = programRuleActions.concat(
+        criticalScore.actions,
+        nonCriticalScore.actions,
+        competencyActions,
+        attributeActions,
+        hideShowActions,
+        labelsActions
+    );
+
+    return { programRules, programRuleActions }
 }
 
-//buildProgramRuleVariables(sections2, programId);
-programRules(sections2,programId);
+module.exports = {
+    checkScores,
+    readQuestionComposites,
+    buildProgramRuleVariables,
+    buildProgramRules
+};

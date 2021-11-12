@@ -16,7 +16,7 @@ const query = {
         id: ({programStage}) => programStage,
         params: {
             fields:['id','name','allowGenerateNextVisit','publicAccess','reportDateToUse','formType','generatedByEnrollmentDate','displayFormName','sortOrder','hideDueDate','enableUserAssignment','minDaysFromStart','favorite','executionDateLabel','preGenerateUID','displayName','externalAccess','openAfterEnrollment','repeatable','remindCompleted','displayGenerateEventBox','validationStrategy','autoGenerateEvent','blockEntryForm','program','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
-            'programStageDataElements',
+            'programStageDataElements[id,programStage,dataElement[id,displayName,formName,attributeValues,optionSet],compulsory,sortOrder]',
             'programStageSections[id,name,displayName,sortOrder,dataElements[id,displayName,formName,attributeValues,optionSet]]']
         }
     }
@@ -55,8 +55,6 @@ const ProgramStage = () => {
     if (loading) {
         return <span><CircularLoader /></span> 
     }
-    
-    console.log(data.results.programStageSections);
 
     return <StageSections programStage={data.results} stageRefetch={refetch}/>
     

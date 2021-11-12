@@ -51,7 +51,7 @@
 }
 
 .layout_prgms_stages {
-  display: grid;
+  /* display: grid; */
   grid-template-rows: calc(100% - 176px) 80px;
   gap: 8px 8px;
   grid-auto-flow: row;
@@ -109,6 +109,9 @@
 .de_type {
   background-color: #29C4A9 !important;
 }
+.de_label_type {
+  background-color: #e3f0c2 !important;
+}
 
 .ml_item {
   display: grid;
@@ -125,6 +128,10 @@
 .ml_item .ml_item-icon {
   grid-area: icon;
   cursor: move;
+}
+.ml_item .ml_item-icon_secondary {
+  grid-area: icon;
+  /* cursor: move; */
 }
 .ml_item .ml_item-title {
   line-height: 24px;
@@ -1046,3 +1053,15 @@ code {
 }
 
 /*# sourceMappingURL=main.css.map */
+
+/* CUSTOM STYLES FG*/
+.progressItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.progressItem > p {
+  margin-left: 0.5rem;
+}
