@@ -1053,3 +1053,15 @@ code {
 }
 
 /*# sourceMappingURL=main.css.map */
+
+/* CUSTOM STYLES FG*/
+.progressItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.progressItem > p {
+  margin-left: 0.5rem;
+}
