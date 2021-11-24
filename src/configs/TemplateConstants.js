@@ -24,3 +24,7 @@ export const aggOperator = ['NONE', 'SUM', 'AVERAGE', 'COUNT'];
 
 export const validWorksheets = ['Instructions', 'Template', 'Mapping', 'Release Notes'];
 export const validTemplateHeader = ['Parent Name', 'Structure', 'Form name', 'Critical Step', 'Compulsory', 'Value Type', 'Option Set', 'Legend', 'Score Numerator', 'Score Denominator', 'Compositive Indicator (Feedback Order)', 'Parent question', 'Answer value', 'Feedback Text', 'Description', 'Program Stage Id', 'Program Section Id', 'Data Element Id'];
+
+export const structureValidator = ['"Section,label,question,score"'];
+export const yesNoValidator = ['"Yes,No"'];
+export const template_password = "TOyNrNrH8fNT8W%Au&4A";

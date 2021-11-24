@@ -1,11 +1,10 @@
 import React from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import { saveAs } from 'file-saver';
-import { activeTabNumber, valueType, renderType, aggOperator, thinBorder, middleCenter } from "../../configs/TemplateConstants";
+import { activeTabNumber, valueType, renderType, aggOperator, middleCenter, template_password, structureValidator, yesNoValidator } from "../../configs/TemplateConstants";
 import { fillBackgroundToRange, printArray2Column, applyBorderToRange, dataValidation, printObjectArray } from "../../configs/ExcelUtils";
 import { useDataQuery } from '@dhis2/app-service-data';
 import { arrayObjectToStringConverter } from '../../configs/Utils';
-import { NoticeBox, CircularLoader } from "@dhis2/ui";
 
 const optionSetQuery = {
   results: {
@@ -39,7 +38,7 @@ const legentSetsQuery = {
 
 const Exporter = ({ps, isLoading, status}) => {
   const programStage = ps;
-  const password = "TOyNrNrH8fNT8W%Au&4A";
+  const password = template_password;
 
   const { loading: loading, error: error, data: data} = useDataQuery(optionSetQuery);
   const { loading: haLoading, error: haError, data: haData } = useDataQuery(healthAreasQuery);
@@ -108,7 +107,13 @@ const Exporter = ({ps, isLoading, status}) => {
   const generate = () => {
     const workbook = new ExcelJS.Workbook();
     addCreator(workbook);
-    const instructionWS = workbook.addWorksheet("Instructions");
+    const instructionWS = workbook.addWorksheet("Instructions", {
+      views: [{
+        showGridLines: false
+        }]
+      }
+    );
+    instructionWS.properties.defaultColWidth = 30;
     const templateWS = workbook.addWorksheet("Template", {
       views: [{
         showGridLines: false,
@@ -139,9 +144,50 @@ const Exporter = ({ps, isLoading, status}) => {
     wb.created = new Date();
   };
 
-  const addInstructions = async ws => {
-    ws.getCell("A1").value = "Instruction";
-    ws.getCell("A2").value = "(WIP)";
+  const addInstructions = async (ws) => {
+    ws.getCell("B2").value = "Welcome to DHIS2 Configuration Template";
+    ws.getCell("B4").value = "By using this spreadsheet you'll be able to configure the structure of the DHIS2 checklist. Make sure you understa how to work wiht the tools integrated in this spreadsheet before you continue working.";
+    ws.getCell("B6").value = "Define program configuration";
+    ws.getCell("B7").value = "The following information will be used to configure the checklist as a DHIS2 program compatible with HNQIS 2.0";
+    
+    ws.mergeCells('B8:C8');
+    ws.getCell("B8").value = "Program Details";
+    fillBackgroundToRange(ws, "B8:C8", "6fa8dc");
+    
+    ws.getCell("B9").value = "Program Name";
+    dataValidation(ws, "C9", {
+      type: 'textLength',
+      operator: 'lessThan',
+      showErrorMessage: true,
+      allowBlank: true,
+      formulae: [200]
+    });
+    ws.getCell("D9").value = {formula: "=VLOOKUP(C9, Mapping!H3:I13,2,FALSE)"};
+    ws.getCell("B10").value = "Use 'Competency Class'";
+    dataValidation(ws, "C10", {
+      type: 'list',
+      allowBlank: true,
+      showErrorMessage: true,
+      formulae: yesNoValidator
+    });
+    ws.getCell("B11").value = "DE Prefix";
+    ws.getCell("B12").value = "Health Area";
+    dataValidation(ws, "C12", {
+      type: 'list',
+      allowBlank: true,
+      showErrorMessage: true,
+      formulae: ['Mapping!$M$3:$M$43']
+    });
+  
+    ws.getCell("B14").value = "Program Name: THe name that will be assigned to the checklist.";
+    ws.getCell("B15").value = "Use 'Competency Class': This will determine if competency classes will be included in the program";
+    ws.getCell("B16").value = "DE Prefix: A prefix that will be added to every Data Element in DHIS2, this is used to filter information."
+    ws.getCell("B17").value = "Health Area: The Health Area where the checklist will be assigned, used for filtering.";
+
+    ws.getCell("B19").value = "This information won't change anything in this template, however, it will be used when creating program in DHIS2."
+
+    enableCellEditing(ws, ['C9', 'D9', 'C10', 'C11', 'C12']);
+
     await ws.protect(password);
   };
 
@@ -257,32 +303,35 @@ const Exporter = ({ps, isLoading, status}) => {
     ws.getRow(2).height = 100;
     ws.getRow(2).alignment = middleCenter;
     applyBorderToRange(ws, 0, 0, 14, 2);
-    dataValidation(ws, "B3:B300", {
+    dataValidation(ws, "B3:B3000", {
+      type: 'list',
+      allowBlank: false,
+      error: 'Please select the valid value from the dropdown',
+      errorTitle: 'Invalid Selection',
+      showErrorMessage: true,
+      formulae: structureValidator
+    });
+    dataValidation(ws, "D3:D3000", {
       type: 'list',
       allowBlank: true,
-      formulae: ['"Section,Label"']
+      formulae: yesNoValidator
     });
-    dataValidation(ws, "D3:D300", {
+    dataValidation(ws, "E3:E3000", {
       type: 'list',
       allowBlank: true,
-      formulae: ['"Yes,No"']
+      formulae: yesNoValidator
     });
-    dataValidation(ws, "E3:E300", {
-      type: 'list',
-      allowBlank: true,
-      formulae: ['"Yes,No"']
-    });
-    dataValidation(ws, "F3:F300", {
+    dataValidation(ws, "F3:F3000", {
       type: 'list',
       allowBlank: true,
       formulae: ['Mapping!$B$3:$B$11']
     });
-    dataValidation(ws, "G3:G300", {
+    dataValidation(ws, "G3:G3000", {
       type: 'list',
       allowBlank: true,
       formulae: ['Mapping!$H$3:$H$60']
     });
-    dataValidation(ws, "H3:H300", {
+    dataValidation(ws, "H3:H3000", {
       type: 'list',
       allowBlank: true,
       formulae: ['Mapping!$O$3:$O$9']
@@ -390,6 +439,12 @@ const Exporter = ({ps, isLoading, status}) => {
       deleteRows: true
     });
   };
+
+  const enableCellEditing = async (ws, cells) => {
+    cells.forEach((cell)=>{
+      ws.getCell(cell).protection = {locked: false}
+    });
+  }
 
   const writeWorkbook = async wb => {
     const buf = await wb.xlsx.writeBuffer();

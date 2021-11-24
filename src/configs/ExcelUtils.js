@@ -79,6 +79,20 @@ export function fillBackgroundToRange(sheet, range, backgroundColor) {
   }
 }
 export function dataValidation(sheet, range, validationRule) {
+  if(range.indexOf(":") > 0)
+  {
+    validateRange(sheet, range, validationRule)
+  }
+  validateCell(sheet, range, validationRule);
+}
+
+function validateCell(sheet, cell, validationRule)
+{
+  sheet.getCell(cell).dataValidation = validationRule;
+}
+
+function validateRange(sheet, range, validationRule)
+{
   let rangeParts = range.split(":");
   let start = splitPosition(rangeParts[0]);
   let end = splitPosition(rangeParts[1]);
