@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import { saveAs } from 'file-saver';
-import { activeTabNumber, valueType, renderType, aggOperator, middleCenter, template_password, structureValidator, yesNoValidator } from "../../configs/TemplateConstants";
+import { activeTabNumber, valueType, renderType, aggOperator, middleCenter, template_password, structureValidator, yesNoValidator, conditionalError } from "../../configs/TemplateConstants";
 import { fillBackgroundToRange, printArray2Column, applyBorderToRange, dataValidation, printObjectArray } from "../../configs/ExcelUtils";
 import { useDataQuery } from '@dhis2/app-service-data';
 import { arrayObjectToStringConverter } from '../../configs/Utils';
@@ -36,10 +36,11 @@ const legentSetsQuery = {
   }
 }
 
-const Exporter = ({ps, isLoading, status}) => {
-  const programStage = ps;
+const Exporter = (props) => {
+  const programStage = props.ps;
   const password = template_password;
 
+  const [ isDownloaded, setIsDownloaded] = useState(false);
   const { loading: loading, error: error, data: data} = useDataQuery(optionSetQuery);
   const { loading: haLoading, error: haError, data: haData } = useDataQuery(healthAreasQuery);
   const { loading: lsLoading, error: lsError, data: lsData } = useDataQuery(legentSetsQuery);
@@ -47,10 +48,11 @@ const Exporter = ({ps, isLoading, status}) => {
   let Configures = [];
 
   const initialize = () => {
-    compile_report();
-    setTimeout(function () {
-      generate();
-    }, 2000);
+      console.log("Generating excel times");
+      compile_report();
+      setTimeout(function () {
+        generate();
+      }, 2000);
   };
 
   const compile_report = () => {
@@ -78,9 +80,8 @@ const Exporter = ({ps, isLoading, status}) => {
 
         let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === "haUflNqP85K");
         let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
-
+        row.parentValue = '';
         row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
-        row.parent_name = (typeof metaData.parentVarName !== 'undefined') ? metaData.parentVarName : '';
         row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: '';
         row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
         row.parent_question = (typeof metaData.parentVarName !== 'undefined') ? metaData.parentVarName : '';
@@ -159,6 +160,8 @@ const Exporter = ({ps, isLoading, status}) => {
       type: 'textLength',
       operator: 'lessThan',
       showErrorMessage: true,
+      error: 'Program name exceeds 200 characters',
+      errorTitle: 'Invalid Length',
       allowBlank: true,
       formulae: [200]
     });
@@ -303,6 +306,12 @@ const Exporter = ({ps, isLoading, status}) => {
     ws.getRow(2).height = 100;
     ws.getRow(2).alignment = middleCenter;
     applyBorderToRange(ws, 0, 0, 14, 2);
+    addValidation(ws);
+    addConditionalFormatting(ws);
+    populateConfiguration(ws);
+  };
+
+  const addValidation = (ws) => {
     dataValidation(ws, "B3:B3000", {
       type: 'list',
       allowBlank: false,
@@ -336,13 +345,87 @@ const Exporter = ({ps, isLoading, status}) => {
       allowBlank: true,
       formulae: ['Mapping!$O$3:$O$9']
     });
-    populateConfiguration(ws);
-  };
+    dataValidation(ws, "I3:J3000", {
+      type: "decimal",
+      showInputMessage: true,
+      promptTitle: 'Decimal',
+      prompt: 'Value is not numeric'
+    });
+    dataValidation(ws, "I3:J3000", {
+      type: 'decimal',
+      operator: 'greaterThan',
+      showErrorMessage: true,
+      allowBlank: true,
+      formulae: [0],
+      error: 'The numerator or denominator for the specified question have to be greater that zero',
+      errorTitle: 'Invalid score',
+    });
+  }
+
+  const addConditionalFormatting = (ws) => {
+    ws.addConditionalFormatting({
+      ref: 'C3:C3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['AND(ISBLANK($C3),NOT(ISBLANK($B3)))'],
+          style: conditionalError,
+        }
+      ],
+      promptTitle: 'Form name not defined',
+      prompt: 'A form name was not defined for the specified element.'
+    });
+    //conditional formatting for structure=label and Value type <> LONG TEXT
+    ws.addConditionalFormatting({
+      ref:'F3:F3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['AND($B3="label", $F3<>"LONG_TEXT")'],
+          style: conditionalError
+        }
+      ]
+    });
+    //conditional formatting for structure=scores and valuetype=NUMBER
+    ws.addConditionalFormatting({
+      ref:'F4:F3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['AND($B3="score", $F3<>"NUMBER")'],
+          style: conditionalError
+        }
+      ]
+    });
+    //conditional formatting checking Feedback order if either score (numerator or denominator is available)
+    ws.addConditionalFormatting({
+      ref:'K3:K3000',
+      rules:[
+        {
+          type: 'expression',
+          formulae: ['AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3))'],
+          style: conditionalError
+        }
+      ]
+    });
+    //Conditional formatting checking incomplete scoring
+    ws.addConditionalFormatting({
+      ref:'I3:J3000',
+      rules:[
+        {
+          type: 'expression',
+          formulae: ['OR($I3 = "",$J3 = "")'],
+          style: conditionalError
+        }
+      ]
+    });
+  }
 
   const populateConfiguration = async ws => {
     let dataRow = 3;
     Configures.forEach((configure) => {
       ws.getRow(dataRow).values = configure;
+      // ws.getCell("A"+dataRow).value = {formula: `=IF(INDIRECT(CONCAT("B",ROW()))="Section","",CONCAT("_S",COUNTIF(INDIRECT(CONCAT("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(CONCAT("B1:B",ROW())))*("Section"=INDIRECT(CONCAT("B1:B",ROW())))))+1))`};
       if (configure.structure === "Section") {
         fillBackgroundToRange(ws, "A"+dataRow+":R"+dataRow, "f8c291")
       }
@@ -365,7 +448,6 @@ const Exporter = ({ps, isLoading, status}) => {
 
   const addOptionSets = (ws) => {
     let optionData = [];
-    console.log("data: ", data)
     if(typeof data !== 'undefined')
     {
       let optionSets = data.results.optionSets;
@@ -385,10 +467,8 @@ const Exporter = ({ps, isLoading, status}) => {
 
   const addHealthAreas = (ws) => {
     let healthAreaData = [];
-    console.log("haData: ", haData);
     if(typeof haData !== 'undefined')
     {
-      console.log("haData: ", haData.results);
       const healthAreas = haData.results.optionSets;
       healthAreas.forEach((ha) => {
         ha.options.forEach((option) => {
@@ -405,10 +485,8 @@ const Exporter = ({ps, isLoading, status}) => {
 
   const addLegendSets = (ws) => {
     let legendSetData = [];
-    console.log("fetching legendset: ", lsData);
     if(typeof lsData !== 'undefined')
     {
-      console.log("lsData: ", lsData.results);
       let legendSets = lsData.results.legendSets;
       legendSets.forEach((legendSet) => {
         let data = {
@@ -450,8 +528,7 @@ const Exporter = ({ps, isLoading, status}) => {
     const buf = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buf]), `HNQIS Config_${new Date()}.xlsx`);
     
-    isLoading(false);
-    status("Download");
+    props.isLoading(false);
   };
 
   const getValueForAttribute = async (attributeValues, attribute_id) => {

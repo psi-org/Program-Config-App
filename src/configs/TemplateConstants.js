@@ -18,6 +18,7 @@ export const middleCenter = {
   vertical: 'middle',
   horizontal: 'center'
 };
+export const conditionalError = {fill: {type: 'pattern', pattern: 'solid', bgColor: {argb: 'dc3545'}}};
 export const valueType = ['NUMBER', 'INTEGER', 'INTEGER_POSITIVE', 'INTEGER_ZERO_OR_POSITIVE', 'TEXT', 'LONG_TEXT', 'PERCENTAGE', 'DATE', 'TIME'];
 export const renderType = ['DEFAULT', 'DROPDOWN', 'VERTICAL_RADIOBUTTONS', 'HORIZONTAL_RADIOBUTTONS', 'VERTICAL_CHECKBOXES', 'HORIZONTAL_CHECKBOXES', 'VALUE'];
 export const aggOperator = ['NONE', 'SUM', 'AVERAGE', 'COUNT'];
