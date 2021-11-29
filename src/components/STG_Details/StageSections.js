@@ -11,7 +11,7 @@ import { Progress } from 'react-sweet-progress';
 import "react-sweet-progress/lib/style.css";
 import Scores from "./Scores";
 import CriticalCalculations from "./CriticalCalculations";
-import Exporter from "../Excel/Exporter";
+import DataProcessor from "../Excel/DataProcessor";
 import Importer from "../Excel/Importer";
 import {checkScores,readQuestionComposites,buildProgramRuleVariables,buildProgramRules} from "./Scripting";
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
@@ -378,7 +378,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
                 </ButtonStrip>
             </div>
-            {exportToExcel && <Exporter ps={programStage} isLoading={setExportToExcel}/>}
+            {exportToExcel && <DataProcessor ps={programStage} isLoading={setExportToExcel}/>}
             {
                 createMetadata.loading &&
                 <ComponentCover translucent>
