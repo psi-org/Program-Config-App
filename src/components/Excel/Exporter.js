@@ -3,6 +3,7 @@ import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import { saveAs } from 'file-saver';
 import { activeTabNumber, valueType, renderType, aggOperator, middleCenter, template_password, structureValidator, yesNoValidator, conditionalError } from "../../configs/TemplateConstants";
 import { fillBackgroundToRange, printArray2Column, applyBorderToRange, dataValidation, printObjectArray } from "../../configs/ExcelUtils";
+import {ReleaseNotes} from "../../configs/ReleaseNotes";
 
 const Exporter = (props) => {
   const password = template_password;
@@ -42,6 +43,7 @@ const Exporter = (props) => {
     addInstructions(instructionWS);
     addConfigurations(templateWS);
     addMapping(mappingWS);
+    addReleaseNotes(realeaseNotesWS);
     hideColumns(templateWS);
     addProtection(templateWS);
     writeWorkbook(workbook);
@@ -186,7 +188,7 @@ const Exporter = (props) => {
     fillBackgroundToRange(ws, "L1:M1", "c9daf8");
     ws.getRow(1).height = 35;
     ws.getRow(1).alignment = middleCenter;
-    const subHeader = {
+    ws.getRow(2).values = {
       parent_name: "",
       structure: "",
       form_name: "Question text that will be displayed in the assessment",
@@ -206,7 +208,6 @@ const Exporter = (props) => {
       program_section_id: "",
       data_element_id: ""
     };
-    ws.getRow(2).values = subHeader;
     ws.getRow(2).fill = {
       type: "pattern",
       pattern: "solid",
@@ -355,6 +356,35 @@ const Exporter = (props) => {
     printObjectArray(ws, props.programData, "R2", "9fc5e8");
     await ws.protect(password);
   };
+
+  const addReleaseNotes = async (ws) => {
+    ws.columns = [
+      { header: "Version", key: "version", width: 15},
+      { header: "Date", key: "date", width: 12},
+      { header: "New Features / Bug Fixes", key: "description", width: 100}
+    ];
+
+    ws.duplicateRow(1,1,false);
+
+    for (let i = 1; i < 2; i++) {
+      ws.getRow(i).value = [];
+    }
+
+    ws.getCell("A1").value = "Release Notes";
+    ws.mergeCells("A1:C1");
+
+    let row = 2;
+
+    for (let i = 0; i < ReleaseNotes.length; i++) {
+      row = row + 1;
+      ws.getRow(row).values = ReleaseNotes[i];
+    }
+
+    ws.getColumn('version').alignment = {vertical: "middle"};
+    ws.getColumn('date').alignment = {vertical: "middle"};
+    ws.getColumn('description').alignment = {wrapText: true};
+    applyBorderToRange(ws, 0, 2, 2, parseInt(ws.lastRow._number));
+  }
 
   const hideColumns = ws => {
     ws.getColumn('program_stage_id').hidden = true;
