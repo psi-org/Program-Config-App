@@ -2,7 +2,14 @@ import React from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import { saveAs } from 'file-saver';
 import { activeTabNumber, valueType, renderType, aggOperator, middleCenter, template_password, structureValidator, yesNoValidator, conditionalError } from "../../configs/TemplateConstants";
-import { fillBackgroundToRange, printArray2Column, applyBorderToRange, dataValidation, printObjectArray } from "../../configs/ExcelUtils";
+import {
+  fillBackgroundToRange,
+  printArray2Column,
+  applyBorderToRange,
+  dataValidation,
+  printObjectArray,
+  applyStyleToRange
+} from "../../configs/ExcelUtils";
 import {ReleaseNotes} from "../../configs/ReleaseNotes";
 
 const Exporter = (props) => {
@@ -55,30 +62,38 @@ const Exporter = (props) => {
   };
 
   const addInstructions = async (ws) => {
+    ws.getColumn("A").width = 5;
     ws.getCell("B2").value = "Welcome to DHIS2 Configuration Template";
+    ws.getCell("B2").style = {font: {bold: true}};
     ws.getCell("B4").value = "By using this spreadsheet you'll be able to configure the structure of the DHIS2 checklist. Make sure you understa how to work wiht the tools integrated in this spreadsheet before you continue working.";
     ws.getCell("B6").value = "Define program configuration";
+    ws.getCell("B6").style = {font: {bold: true}};
     ws.getCell("B7").value = "The following information will be used to configure the checklist as a DHIS2 program compatible with HNQIS 2.0";
     
     ws.mergeCells('B8:C8');
     ws.getCell("B8").value = "Program Details";
-    fillBackgroundToRange(ws, "B8:C8", "6fa8dc");
-    
-    ws.getCell("D9").value = {formula: "=VLOOKUP(C9, Mapping!R3:S300,2,FALSE)"};
+
     ws.getCell("B10").value = "Use 'Competency Class'";
     ws.getCell("B11").value = "DE Prefix";
     ws.getCell("B12").value = "Health Area";
-    ws.getCell("B14").value = "Program Name: THe name that will be assigned to the checklist.";
+    ws.getCell("B14").value = "Program Name: The name that will be assigned to the checklist.";
     ws.getCell("B15").value = "Use 'Competency Class': This will determine if competency classes will be included in the program";
     ws.getCell("B16").value = "DE Prefix: A prefix that will be added to every Data Element in DHIS2, this is used to filter information."
     ws.getCell("B17").value = "Health Area: The Health Area where the checklist will be assigned, used for filtering.";
     ws.getCell("B19").value = "This information won't change anything in this template, however, it will be used when creating program in DHIS2."
 
-    fillBackgroundToRange(ws, "B9:C12", "6fa8dc");
-    
+    ws.getCell("B8").style = {font: {bold: true, size: 10}};
+    fillBackgroundToRange(ws, "B8:C8", "6fa8dc");
+    applyStyleToRange(ws, 'B9:B12', {font: {bold: true, size: 10}});
+    fillBackgroundToRange(ws, "B9:B12", "9fc5e8");
+    fillBackgroundToRange(ws, 'C9:C12', "cfe2f3");
+
+    ws.getCell("D9").value = {formula: "=VLOOKUP(C9, Mapping!R3:S300,2,FALSE)"};
+    ws.getCell('C9').value = props.programName;
+    // ws.getCell("D9").style = {font: {color: {'argb': 'ffffff'}}}
+
     instructionValidations(ws);
     enableCellEditing(ws, ['C9', 'D9', 'C10', 'C11', 'C12']);
-
     await ws.protect(password);
   };
 
@@ -414,7 +429,7 @@ const Exporter = (props) => {
   const writeWorkbook = async wb => {
     const buf = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buf]), `HNQIS Config_${new Date()}.xlsx`);
-    
+
     props.isLoading(false);
   };
 
