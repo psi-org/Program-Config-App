@@ -65,8 +65,9 @@ const Scores = ({ stageSection, index }) => {
             <div className="section_cont" >
                 {
                     stageSection.dataElements.map((dataElement, i) => {
+                        let classNames = "ml_item de_type" + ((dataElement.importStatus) ? ' import_'+dataElement.importStatus:'');
                         return(
-                            <div id={"de_"+dataElement.id} className={"ml_item de_type"} key={i}>
+                            <div id={"de_"+dataElement.id} className={classNames} key={i}>
                                 <div className="ml_item-icon">
                                     <img className="ml_list-img" alt="de" src={scores_svg} />
                                 </div>
