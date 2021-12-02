@@ -113,6 +113,10 @@
   background-color: #e3f0c2 !important;
 }
 
+.import_update {
+  background-color: #0abde3 !important;
+}
+
 .ml_item {
   display: grid;
   grid-template-columns: 24px calc(100% - 190px) 90px auto;

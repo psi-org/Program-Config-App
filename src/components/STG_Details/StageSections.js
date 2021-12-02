@@ -1,8 +1,8 @@
 // DHIS2 UI
-import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Card, Modal, ModalTitle, ModalContent, ModalActions, LinearLoader } from "@dhis2/ui";
+import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Card, Modal, ModalTitle, ModalContent, ModalActions, LinearLoader, Chip } from "@dhis2/ui";
 
 // React Hooks
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DraggableSection from "./Section";
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
@@ -15,6 +15,8 @@ import Exporter from "../Excel/Exporter";
 import Importer from "../Excel/Importer";
 import {checkScores,readQuestionComposites,buildProgramRuleVariables,buildProgramRules} from "./Scripting";
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
+import SaveMetadata from "./SaveMetadata";
+import { Link } from "react-router-dom";
 
 const createMutation = {
     resource: 'metadata',
@@ -23,7 +25,7 @@ const createMutation = {
 };
 
 const deleteMetadataMutation = {
-    resource: 'metadata?importStrategy=DELETE',
+    resource: 'metadata?ca=DELETE',
     type: 'create',
     data: ({ data }) => data
 };
@@ -94,7 +96,7 @@ const progressTheme = (icon) => ({
     }
 });
 
-const StageSections = ({ programStage, stageRefetch }) => {
+const StageSections = ({programStage, stageRefetch }) => {
 
     // Globals
     const programId = programStage.program.id;
@@ -104,16 +106,20 @@ const StageSections = ({ programStage, stageRefetch }) => {
         METADATA = "haUflNqP85K",
         SCORE_DEN = "l7WdLDhE3xW",
         SCORE_NUM = "Zyr7rlDOJy8";
-
     
     // Flags
-    const [hasChanges, setHasChanges] = useState(false);
+    const [saveStatus, setSaveStatus] = useState('Validate');
     const [saveAndBuild, setSaveAndBuild] = useState(false);
+
+    const [savingMetadata, setSavingMetadata] = useState(false);
+    const [savedAndValidated, setSavedAndValidated] = useState(false)
+
     const [exportToExcel, setExportToExcel] = useState(false);
-    const { hasNotice, setHasNotice } = useState(false);
+    //const { hasNotice, setHasNotice } = useState(false);
 
     const [ exportStatus, setExportStatus] = useState("Download");
     const [ importerEnabled, setImporterEnabled ] = useState(false);
+    const [ importResults, setImportResults] = useState(false);
     const [progressSteps,setProgressSteps]= useState(0);
 
     // States
@@ -121,10 +127,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [scoresSection, setScoresSection] = useState(programStage.programStageSections.find(s => s.name =="Scores"));
     const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name =="Critical Steps Calculations"));
     const [programStageDataElements, setProgramStageDataElements] = useState(programStage.programStageDataElements);
-
-    //Progress Bars states
-    // const [progressPR, setProgressPR] = useState(0);
-    // const [progressPRV, setProgressPRV] = useState(0);
 
     // Create Mutation
     let metadataDM= useDataMutation(createMutation);
@@ -137,8 +139,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     //Delete mutations
     const deleteMetadata = useDataMutation(deleteMetadataMutation)[0];
-    // const deletePR = useDataMutation(pr_delMutation);
-    // const deletePRV = useDataMutation(prv_delMutation);
 
     // Get Ids
     const idsQuery = useDataQuery(queryIds, { variables: {n: programStage.programStageDataElements.length * 5 }});
@@ -172,7 +172,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     result.source.index,
                     result.destination.index
                 );
-                setHasChanges(true);
+                setSaveStatus('Save & Validate');
                 break;
             case 'DATA_ELEMENT':
                 if (result.source.droppableId == result.destination.droppableId) {
@@ -188,7 +188,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     let element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
                     newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
                 }
-                setHasChanges(true);
+                setSaveStatus('Save & Validate');
                 break;
             default:
         }
@@ -196,6 +196,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     const commit = () => {
+
+        setSavingMetadata(true);
+        return;
 
         // Program Stage Data Elements
         var newDataElements = [];
@@ -245,61 +248,8 @@ const StageSections = ({ programStage, stageRefetch }) => {
         createMetadata.mutate({ data: metadata }).then(response => {
             //console.info(response);
             stageRefetch();
-            setHasChanges(false);
+            setSaveStatus(true);
         });
-    };
-
-    const deleteOldMetadata = () => {
-        
-        const oldProgramRules = prDQ.data.results.programRules.map(pr => ({id:pr.id}));
-        const oldProgramRuleVariables = prvDQ.data.results.programRuleVariables.map(prv => ({id:prv.id}));
-
-        return;
-
-        // Fetch
-        prDQ.refetch().then((prResult) => {
-            const programRules = prResult.results.programRules;
-            prvDQ.refetch().then((prvResult) => {
-
-                const programRuleVariables = prvResult.results.programRuleVariables;
-                
-                let stepPR = 100 / programRules.length;
-                let stepPRV = 100 / programRuleVariables.length;
-
-                const progressFunction = (origin, step, doDelete, setProgressValue, index, resolve)=>{
-                    if(origin.length == 0){
-                        setProgressValue(100);
-                        return resolve();
-                    }
-
-                    doDelete({ id: origin[index].id}).then(()=>{
-                        setProgressValue(step*(index+1));
-                        if(index < origin.length-1){
-                            setTimeout(progressFunction(origin, step, doDelete, setProgressValue, index+1, resolve),0)
-                        }else{
-                            return resolve();
-                        }
-                    });
-                }
-
-                function progressPromise(origin, step, doDelete, setProgressValue, index = 0){
-                    return new Promise((resolve, reject)=>{
-                        progressFunction(origin, step, doDelete, setProgressValue, index, resolve)
-                    })
-                }
-
-                progressPromise(programRules,stepPR,deletePR[0],setProgressPR)
-                    .then(() => progressPromise(programRuleVariables,stepPRV,deletePRV[0],setProgressPRV))
-                    .then(() => {
-                        /**
-                         * refetch() Llamar toda la stage
-                         */
-                        
-                    })
-                    
-            });
-        });
-        
     };
 
     const configuration_download = () => {
@@ -360,7 +310,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
         // V. Import new metadata
 
         deleteMetadata({ data: oldMetadata }).then((res)=>{
-            console.log(res);
             setProgressSteps(5);
             
             createMetadata.mutate({ data: metadata }).then(response => {
@@ -376,10 +325,21 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     return (
         <div style={{ padding: "5px" }}>
-            <div style={{ margin: "5px 15px" }}>
+            <div style={{ margin: "5px 15px" , display:'flex'}}>
+                <div>
+                    <Link to={'/'}><Chip>Home</Chip></Link>
+                    <Link to={'/program/'+programStage.program.id}><Chip>Program: {programStage.program.name}</Chip></Link>
+                    <Link to={'/programStage/'+programStage.id}><Chip>Stage: {programStage.displayName}</Chip></Link>
+                </div>
                 <ButtonStrip>
-                    <Button disabled={!hasChanges || createMetadata.loading} onClick={() => commit()}>Save Changes test</Button>
-                    <Button disabled={createMetadata.loading} primary onClick={() => run()}>Run Magic!</Button>
+                {
+                    /**
+                     * 1 . Validate Configuration
+                     * When import || d&d -> 2. Save and validate
+                     */
+                }
+                    <Button disabled={createMetadata.loading} onClick={() => commit()}>{saveStatus}</Button>
+                    <Button disabled={!savedAndValidated} primary onClick={() => run()}>Run Magic!</Button>
                     <Button name="generator" icon={exportToExcel ? '' : <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M20 14a1 1 0 01.993.883L21 15v3a3 3 0 01-2.824 2.995L18 21H6a3 3 0 01-2.995-2.824L3 18v-3a1 1 0 011.993-.117L5 15v3a1 1 0 00.883.993L6 19h12a1 1 0 00.993-.883L19 18v-3a1 1 0 011-1zM12 3a1 1 0 01.993.883L13 4v9.584l2.293-2.291a1 1 0 011.32-.083l.094.083a1 1 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.32.083l-.094-.083-4-4a1 1 0 011.32-1.497l.094.083L11 13.584V4a1 1 0 011-1z" fill="currentColor"></path></svg>}
                        loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}> {exportStatus}</Button>
 
@@ -477,7 +437,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
                                         sections.map((pss, idx) => {
-                                            return <DraggableSection stageSection={pss} index={idx} key={pss.id} />
+                                            return <DraggableSection stageSection={pss} index={idx} key={pss.id || idx} />
                                         })
                                     }
                                     {provided.placeholder}
@@ -489,7 +449,21 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     </div>
                 </div>
             </DragDropContext>
-            {importerEnabled && <Importer displayForm={setImporterEnabled} />}
+            {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{sections,setSections, scoresSection, setScoresSection}} setSaveStatus={setSaveStatus} setImportResults={setImportResults}/>}
+            {
+                savingMetadata && 
+                <SaveMetadata 
+                    newDEQty={importResults ? importResults.questions.new + importResults.scores.new + importResults.sections.new : 0} 
+                    programStage={programStage}
+                    importedSections={sections}
+                    importedScores={scoresSection}
+                    criticalSection={criticalSection}
+                    // createMetadata={createMetadata}
+                    setSavingMetadata={setSavingMetadata}
+                    setSavedAndValidated={setSavedAndValidated}
+                    />
+            }
+
         </div>
     )
 }

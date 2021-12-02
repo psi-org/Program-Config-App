@@ -1,6 +1,6 @@
 import { useDataQuery } from "@dhis2/app-runtime";
 import { useSelector } from "react-redux";
-import {CircularLoader, NoticeBox} from '@dhis2/ui';
+import {Chip, CircularLoader, NoticeBox} from '@dhis2/ui';
 
 // ------------------
 import { Link, useParams } from "react-router-dom";
@@ -52,6 +52,10 @@ const ProgramDetails = () => {
 
     return (
         <div className="wrapper">
+            <div>
+                <Link to={'/'}><Chip>Home</Chip></Link>
+                <Link to={'/program/'+program}><Chip>Program: {data.results.displayName}</Chip></Link>
+            </div>
             <div className="layout_prgms_stages">
                 <div className="list-ml_item">
                 {

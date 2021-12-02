@@ -19,6 +19,8 @@ import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 
+import {colors,IconAdd16,IconDelete16,IconEdit16 } from '@dhis2/ui';
+
 const DraggableSection = ({ stageSection, index }) => {
     
     useEffect(() => {
@@ -45,16 +47,35 @@ const DraggableSection = ({ stageSection, index }) => {
         });
     }, []);
 
+    // Import Values //
+    var sectionImportStatus = undefined;
+    if(stageSection.importStatus){
+        switch (stageSection.importStatus){
+            case 'new':
+                sectionImportStatus = <span style={{verticalAlign:'top'}}><IconAdd16 color={colors.white}/></span>;
+                break;
+            case 'delete':
+                sectionImportStatus = <span style={{verticalAlign:'top'}}><IconDelete16 color={colors.white}/></span>;
+                break;
+            case 'update':
+            default:
+                sectionImportStatus = <span style={{verticalAlign:'top'}}><IconEdit16 color={colors.white}/></span>;
+                break;
+        }
+    }
+
+    var classNames = (stageSection.importStatus) ? ' import_'+stageSection.importStatus:'';
+
     return (
-        <Draggable key={stageSection.id} draggableId={stageSection.id} index={index}>
+        <Draggable key={stageSection.id || 'section'+index } draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus!=undefined}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
-                    <div className="ml_item" style={{ color: "#333333", backgroundColor: "#8EC8C8" }}>
+                    <div style={{ color: "#333333", backgroundColor: "#8EC8C8" }} className={"ml_item" + classNames}>
                         <div className="ml_item-icon">
                             <img className="ml_list-img" alt="sec" src={sec_svg} />
                         </div>
                         <div className="ml_item-title">
-                            {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span>
+                            {sectionImportStatus} {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span>
                         </div>
                         <div className="ml_item-warning_error ">
                             {/* <img src={warning_svg} alt="wrng" />
@@ -71,12 +92,12 @@ const DraggableSection = ({ stageSection, index }) => {
                             <img src={move_vert_svg} alt="menu" />
                         </div>
                     </div>
-                    <Droppable droppableId={stageSection.id} type="DATA_ELEMENT">
+                    <Droppable droppableId={stageSection.id || 'dropSec'+index} type="DATA_ELEMENT">
                         {(provided, snapshot) => (
                             <div {...provided.droppableProps} ref={provided.innerRef} className="section_cont" >
                                 {
                                     stageSection.dataElements.map((de,i) => {
-                                        return <DraggableDataElement dataElement={de} index={i} key={de.id}/>;
+                                        return <DraggableDataElement dataElement={de} index={i} key={de.id || i}/>;
                                     })
                                 }
                                 {provided.placeholder}

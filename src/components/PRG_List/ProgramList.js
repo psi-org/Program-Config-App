@@ -1,5 +1,6 @@
 import { useDataQuery } from "@dhis2/app-runtime";
-import { CircularLoader, NoticeBox} from "@dhis2/ui";
+import { Chip, CircularLoader, NoticeBox} from "@dhis2/ui";
+import { Link } from "react-router-dom";
 
 // ------------------
 import ProgramItem from "./ProgramItem";
@@ -23,6 +24,9 @@ const ProgramList = () => {
 
   return (
     <div className="wrapper">
+      <div>
+          <Link to={'/'}><Chip>Home</Chip></Link>
+      </div>
       <div className="layout_prgms_stages">
         <div className="list-ml_item">
           {
