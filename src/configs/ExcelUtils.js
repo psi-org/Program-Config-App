@@ -63,8 +63,7 @@ export function fillBackgroundToRange(sheet, range, backgroundColor) {
   let rangeParts = range.split(":");
   let start = splitPosition(rangeParts[0]);
   let end = splitPosition(rangeParts[1]);
-
-  for (let i = start[1]; i <= end[1]; i++) {
+  for (let i = parseInt(start[1]); i <= parseInt(end[1]); i++) {
     for (let j = character2Number(start[0]); j <= character2Number(end[0]); j++) {
       const colChar = number2Character(j);
       const cellAxis = colChar + i.toString();
@@ -78,7 +77,36 @@ export function fillBackgroundToRange(sheet, range, backgroundColor) {
     }
   }
 }
+
+export function applyStyleToRange(sheet, range, userStyle)
+{
+  let rangeParts = range.split(":");
+  let start = splitPosition(rangeParts[0]);
+  let end = splitPosition(rangeParts[1]);
+  for (let i = parseInt(start[1]); i <= parseInt(end[1]); i++) {
+    for (let j = character2Number(start[0]); j <= character2Number(end[0]); j++) {
+      const colChar = number2Character(j);
+      const cellAxis = colChar + i.toString();
+      sheet.getCell(cellAxis).style = userStyle;
+    }
+  }
+}
+
 export function dataValidation(sheet, range, validationRule) {
+  if(range.indexOf(":") > 0)
+  {
+    validateRange(sheet, range, validationRule)
+  }
+  validateCell(sheet, range, validationRule);
+}
+
+function validateCell(sheet, cell, validationRule)
+{
+  sheet.getCell(cell).dataValidation = validationRule;
+}
+
+function validateRange(sheet, range, validationRule)
+{
   let rangeParts = range.split(":");
   let start = splitPosition(rangeParts[0]);
   let end = splitPosition(rangeParts[1]);

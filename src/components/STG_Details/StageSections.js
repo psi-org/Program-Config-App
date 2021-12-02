@@ -11,7 +11,7 @@ import { Progress } from 'react-sweet-progress';
 import "react-sweet-progress/lib/style.css";
 import Scores from "./Scores";
 import CriticalCalculations from "./CriticalCalculations";
-import Exporter from "../Excel/Exporter";
+import DataProcessor from "../Excel/DataProcessor";
 import Importer from "../Excel/Importer";
 import {checkScores,readQuestionComposites,buildProgramRuleVariables,buildProgramRules} from "./Scripting";
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
@@ -110,17 +110,17 @@ const StageSections = ({programStage, stageRefetch }) => {
     // Flags
     const [saveStatus, setSaveStatus] = useState('Validate');
     const [saveAndBuild, setSaveAndBuild] = useState(false);
-
     const [savingMetadata, setSavingMetadata] = useState(false);
     const [savedAndValidated, setSavedAndValidated] = useState(false)
-
     const [exportToExcel, setExportToExcel] = useState(false);
     //const { hasNotice, setHasNotice } = useState(false);
 
-    const [ exportStatus, setExportStatus] = useState("Download");
+
+    const [exportToExcel, setExportToExcel] = useState(false);
     const [ importerEnabled, setImporterEnabled ] = useState(false);
     const [ importResults, setImportResults] = useState(false);
     const [progressSteps,setProgressSteps]= useState(0);
+
 
     // States
     const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name !="Scores" && s.name !="Critical Steps Calculations"));
@@ -348,7 +348,7 @@ const StageSections = ({programStage, stageRefetch }) => {
 
                 </ButtonStrip>
             </div>
-            {exportToExcel && <Exporter ps={programStage} isLoading={setExportToExcel} status={setExportStatus}/>}
+            {exportToExcel && <DataProcessor ps={programStage} isLoading={setExportToExcel}/>}
             {
                 createMetadata.loading &&
                 <ComponentCover translucent>

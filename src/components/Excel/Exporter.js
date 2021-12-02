@@ -1,114 +1,35 @@
 import React from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import { saveAs } from 'file-saver';
-import { activeTabNumber, valueType, renderType, aggOperator, thinBorder, middleCenter } from "../../configs/TemplateConstants";
-import { fillBackgroundToRange, printArray2Column, applyBorderToRange, dataValidation, printObjectArray } from "../../configs/ExcelUtils";
-import { useDataQuery } from '@dhis2/app-service-data';
-import { arrayObjectToStringConverter } from '../../configs/Utils';
-import { NoticeBox, CircularLoader } from "@dhis2/ui";
+import { activeTabNumber, valueType, renderType, aggOperator, middleCenter, template_password, structureValidator, yesNoValidator, conditionalError } from "../../configs/TemplateConstants";
+import {
+  fillBackgroundToRange,
+  printArray2Column,
+  applyBorderToRange,
+  dataValidation,
+  printObjectArray,
+  applyStyleToRange
+} from "../../configs/ExcelUtils";
+import {ReleaseNotes} from "../../configs/ReleaseNotes";
 
-const optionSetQuery = {
-  results: {
-    resource: 'optionSets',
-    params: {
-      fields: ['id', 'name', 'options[name]'],
-      filters: ['name:like:HNQIS - ']
-    }
-  }
-};
-
-const healthAreasQuery = {
-  results: {
-    resource: 'optionSets',
-    params: {
-      fields: ['name', 'options[id]','options[name]'],
-      filters: ['name:$like:Health%20area']
-    }
-  }
-};
-
-const legentSetsQuery = {
-  results: {
-    resource: 'legendSets',
-    params: {
-      fields: ['id','name'],
-      filter: ['name:$like:HNQIS']
-    }
-  }
-}
-
-const Exporter = ({ps, isLoading, status}) => {
-  const programStage = ps;
-  const password = "TOyNrNrH8fNT8W%Au&4A";
-
-  const { loading: loading, error: error, data: data} = useDataQuery(optionSetQuery);
-  const { loading: haLoading, error: haError, data: haData } = useDataQuery(healthAreasQuery);
-  const { loading: lsLoading, error: lsError, data: lsData } = useDataQuery(legentSetsQuery);
-  
-  let Configures = [];
+const Exporter = (props) => {
+  const password = template_password;
 
   const initialize = () => {
-    compile_report();
-    setTimeout(function () {
+      console.log("Generating excel times");
       generate();
-    }, 2000);
   };
-
-  const compile_report = () => {
-    let program_stage_id = programStage.id;
-    programStage.programStageSections.forEach((programSection) => {
-      let program_section_id = programSection.id;
-      let row = {};
-      row.structure = "Section";
-      row.form_name = programSection.displayName;
-      Configures.push(row);
-      programSection.dataElements.forEach((dataElement) => {
-        let row = {};
-        row.form_name = dataElement.displayName;
-        row.value_type = dataElement.valueType;
-        row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
-        row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
-        row.description = dataElement.description;
-
-        row.program_stage_id = program_stage_id;
-        row.program_section_id = program_section_id;
-        row.data_element_id = dataElement.id;
-
-        let critical = dataElement.attributeValues.filter(av => av.attribute.id === "NPwvdTt0Naj");
-        row.critical = (critical.length > 0) ? critical[0].value : '';
-
-        let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === "haUflNqP85K");
-        let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
-
-        row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
-        row.parent_name = (typeof metaData.parentVarName !== 'undefined') ? metaData.parentVarName : '';
-        row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: '';
-        row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
-        row.parent_question = (typeof metaData.parentVarName !== 'undefined') ? metaData.parentVarName : '';
-        row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : '';
-        row.critical = (typeof metaData.isCritical !== 'undefined') ? metaData.isCritical: '';
-
-        let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === "LP171jpctBm");
-        row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : '';
-
-        let feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === "yhKEe6BLEer");
-        row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : '';
-
-        row.compulsory = getCompulsoryStatusForDE(dataElement.id);
-        Configures.push(row);
-      });
-    });
-  };
-
-  const getCompulsoryStatusForDE = (dataElement_id) => {
-    let de = programStage.programStageDataElements.filter( psde => psde.dataElement.id === dataElement_id);
-    return (de.length > 0) ? de[0].compulsory : false;
-  }
 
   const generate = () => {
     const workbook = new ExcelJS.Workbook();
     addCreator(workbook);
-    const instructionWS = workbook.addWorksheet("Instructions");
+    const instructionWS = workbook.addWorksheet("Instructions", {
+      views: [{
+        showGridLines: false
+        }]
+      }
+    );
+    instructionWS.properties.defaultColWidth = 30;
     const templateWS = workbook.addWorksheet("Template", {
       views: [{
         showGridLines: false,
@@ -129,6 +50,7 @@ const Exporter = ({ps, isLoading, status}) => {
     addInstructions(instructionWS);
     addConfigurations(templateWS);
     addMapping(mappingWS);
+    addReleaseNotes(realeaseNotesWS);
     hideColumns(templateWS);
     addProtection(templateWS);
     writeWorkbook(workbook);
@@ -139,11 +61,66 @@ const Exporter = ({ps, isLoading, status}) => {
     wb.created = new Date();
   };
 
-  const addInstructions = async ws => {
-    ws.getCell("A1").value = "Instruction";
-    ws.getCell("A2").value = "(WIP)";
+  const addInstructions = async (ws) => {
+    ws.getColumn("A").width = 5;
+    ws.getCell("B2").value = "Welcome to DHIS2 Configuration Template";
+    ws.getCell("B2").style = {font: {bold: true}};
+    ws.getCell("B4").value = "By using this spreadsheet you'll be able to configure the structure of the DHIS2 checklist. Make sure you understa how to work wiht the tools integrated in this spreadsheet before you continue working.";
+    ws.getCell("B6").value = "Define program configuration";
+    ws.getCell("B6").style = {font: {bold: true}};
+    ws.getCell("B7").value = "The following information will be used to configure the checklist as a DHIS2 program compatible with HNQIS 2.0";
+    
+    ws.mergeCells('B8:C8');
+    ws.getCell("B8").value = "Program Details";
+
+    ws.getCell("B10").value = "Use 'Competency Class'";
+    ws.getCell("B11").value = "DE Prefix";
+    ws.getCell("B12").value = "Health Area";
+    ws.getCell("B14").value = "Program Name: The name that will be assigned to the checklist.";
+    ws.getCell("B15").value = "Use 'Competency Class': This will determine if competency classes will be included in the program";
+    ws.getCell("B16").value = "DE Prefix: A prefix that will be added to every Data Element in DHIS2, this is used to filter information."
+    ws.getCell("B17").value = "Health Area: The Health Area where the checklist will be assigned, used for filtering.";
+    ws.getCell("B19").value = "This information won't change anything in this template, however, it will be used when creating program in DHIS2."
+
+    ws.getCell("B8").style = {font: {bold: true, size: 10}};
+    fillBackgroundToRange(ws, "B8:C8", "6fa8dc");
+    applyStyleToRange(ws, 'B9:B12', {font: {bold: true, size: 10}});
+    fillBackgroundToRange(ws, "B9:B12", "9fc5e8");
+    fillBackgroundToRange(ws, 'C9:C12', "cfe2f3");
+
+    ws.getCell("D9").value = {formula: "=VLOOKUP(C9, Mapping!R3:S300,2,FALSE)"};
+    ws.getCell('C9').value = props.programName;
+    // ws.getCell("D9").style = {font: {color: {'argb': 'ffffff'}}}
+
+    instructionValidations(ws);
+    enableCellEditing(ws, ['C9', 'D9', 'C10', 'C11', 'C12']);
     await ws.protect(password);
   };
+
+  const instructionValidations = (ws) => {
+    ws.getCell("B9").value = "Program Name";
+    dataValidation(ws, "C9", {
+      type: 'textLength',
+      operator: 'lessThan',
+      showErrorMessage: true,
+      error: 'Program name exceeds 200 characters',
+      errorTitle: 'Invalid Length',
+      allowBlank: true,
+      formulae: [200]
+    });
+    dataValidation(ws, "C10", {
+      type: 'list',
+      allowBlank: true,
+      showErrorMessage: true,
+      formulae: yesNoValidator
+    });
+    dataValidation(ws, "C12", {
+      type: 'list',
+      allowBlank: true,
+      showErrorMessage: true,
+      formulae: ['Mapping!$M$3:$M$43']
+    });
+  }
 
   const addConfigurations = ws => {
     ws.columns = [{
@@ -226,7 +203,7 @@ const Exporter = ({ps, isLoading, status}) => {
     fillBackgroundToRange(ws, "L1:M1", "c9daf8");
     ws.getRow(1).height = 35;
     ws.getRow(1).alignment = middleCenter;
-    const subHeader = {
+    ws.getRow(2).values = {
       parent_name: "",
       structure: "",
       form_name: "Question text that will be displayed in the assessment",
@@ -246,7 +223,6 @@ const Exporter = ({ps, isLoading, status}) => {
       program_section_id: "",
       data_element_id: ""
     };
-    ws.getRow(2).values = subHeader;
     ws.getRow(2).fill = {
       type: "pattern",
       pattern: "solid",
@@ -257,43 +233,126 @@ const Exporter = ({ps, isLoading, status}) => {
     ws.getRow(2).height = 100;
     ws.getRow(2).alignment = middleCenter;
     applyBorderToRange(ws, 0, 0, 14, 2);
-    dataValidation(ws, "B3:B300", {
+    addValidation(ws);
+    addConditionalFormatting(ws);
+    populateConfiguration(ws);
+  };
+
+  const addValidation = (ws) => {
+    dataValidation(ws, "B3:B3000", {
+      type: 'list',
+      allowBlank: false,
+      error: 'Please select the valid value from the dropdown',
+      errorTitle: 'Invalid Selection',
+      showErrorMessage: true,
+      formulae: structureValidator
+    });
+    dataValidation(ws, "D3:D3000", {
       type: 'list',
       allowBlank: true,
-      formulae: ['"Section,Label"']
+      formulae: yesNoValidator
     });
-    dataValidation(ws, "D3:D300", {
+    dataValidation(ws, "E3:E3000", {
       type: 'list',
       allowBlank: true,
-      formulae: ['"Yes,No"']
+      formulae: yesNoValidator
     });
-    dataValidation(ws, "E3:E300", {
-      type: 'list',
-      allowBlank: true,
-      formulae: ['"Yes,No"']
-    });
-    dataValidation(ws, "F3:F300", {
+    dataValidation(ws, "F3:F3000", {
       type: 'list',
       allowBlank: true,
       formulae: ['Mapping!$B$3:$B$11']
     });
-    dataValidation(ws, "G3:G300", {
+    dataValidation(ws, "G3:G3000", {
       type: 'list',
       allowBlank: true,
       formulae: ['Mapping!$H$3:$H$60']
     });
-    dataValidation(ws, "H3:H300", {
+    dataValidation(ws, "H3:H3000", {
       type: 'list',
       allowBlank: true,
       formulae: ['Mapping!$O$3:$O$9']
     });
-    populateConfiguration(ws);
-  };
+    dataValidation(ws, "I3:J3000", {
+      type: "decimal",
+      showInputMessage: true,
+      promptTitle: 'Decimal',
+      prompt: 'Value is not numeric'
+    });
+    dataValidation(ws, "I3:J3000", {
+      type: 'decimal',
+      operator: 'greaterThan',
+      showErrorMessage: true,
+      allowBlank: true,
+      formulae: [0],
+      error: 'The numerator or denominator for the specified question have to be greater that zero',
+      errorTitle: 'Invalid score',
+    });
+  }
+
+  const addConditionalFormatting = (ws) => {
+    ws.addConditionalFormatting({
+      ref: 'C3:C3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['AND(ISBLANK($C3),NOT(ISBLANK($B3)))'],
+          style: conditionalError,
+        }
+      ],
+      promptTitle: 'Form name not defined',
+      prompt: 'A form name was not defined for the specified element.'
+    });
+    //conditional formatting for structure=label and Value type <> LONG TEXT
+    ws.addConditionalFormatting({
+      ref:'F3:F3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['AND($B3="label", $F3<>"LONG_TEXT")'],
+          style: conditionalError
+        }
+      ]
+    });
+    //conditional formatting for structure=scores and valuetype=NUMBER
+    ws.addConditionalFormatting({
+      ref:'F4:F3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['AND($B3="score", $F3<>"NUMBER")'],
+          style: conditionalError
+        }
+      ]
+    });
+    //conditional formatting checking Feedback order if either score (numerator or denominator is available)
+    ws.addConditionalFormatting({
+      ref:'K3:K3000',
+      rules:[
+        {
+          type: 'expression',
+          formulae: ['AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3))'],
+          style: conditionalError
+        }
+      ]
+    });
+    //Conditional formatting checking incomplete scoring
+    ws.addConditionalFormatting({
+      ref:'I3:J3000',
+      rules:[
+        {
+          type: 'expression',
+          formulae: ['OR($I3 = "",$J3 = "")'],
+          style: conditionalError
+        }
+      ]
+    });
+  }
 
   const populateConfiguration = async ws => {
     let dataRow = 3;
-    Configures.forEach((configure) => {
+    props.Configures.forEach((configure) => {
       ws.getRow(dataRow).values = configure;
+      ws.getCell("A"+dataRow).value = {formula:'_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1))'};
       if (configure.structure === "Section") {
         fillBackgroundToRange(ws, "A"+dataRow+":R"+dataRow, "f8c291")
       }
@@ -306,70 +365,40 @@ const Exporter = ({ps, isLoading, status}) => {
     printArray2Column(ws, valueType, "Value Type", "B2", "b6d7a8");
     printArray2Column(ws, renderType, "Render Type", "D2", "b6d7a8");
     printArray2Column(ws, aggOperator, "Agg. Operator", "F2", "a2c4c9");
-    
-    addOptionSets(ws);
-    addHealthAreas(ws);
-    addLegendSets(ws);
-
+    printObjectArray(ws, props.optionData, "H2", "d5a6bd");
+    printObjectArray(ws, props.healthAreaData, "L2", "d5a6bd")
+    printObjectArray(ws, props.legendSetData, "O2", "9fc5e8");
+    printObjectArray(ws, props.programData, "R2", "9fc5e8");
     await ws.protect(password);
   };
 
-  const addOptionSets = (ws) => {
-    let optionData = [];
-    console.log("data: ", data)
-    if(typeof data !== 'undefined')
-    {
-      let optionSets = data.results.optionSets;
-      optionSets.forEach((optionSet) => {
-        let options = arrayObjectToStringConverter(optionSet.options, "name");
-        let data = {
-          "Option Sets": optionSet.name,
-          "UID": optionSet.id,
-          "Options": options
-        };
-        optionData.push(data);
-      });
-      printObjectArray(ws, optionData, "H2", "d5a6bd");
-    }
-    
-  };
+  const addReleaseNotes = async (ws) => {
+    ws.columns = [
+      { header: "Version", key: "version", width: 15},
+      { header: "Date", key: "date", width: 12},
+      { header: "New Features / Bug Fixes", key: "description", width: 100}
+    ];
 
-  const addHealthAreas = (ws) => {
-    let healthAreaData = [];
-    console.log("haData: ", haData);
-    if(typeof haData !== 'undefined')
-    {
-      console.log("haData: ", haData.results);
-      const healthAreas = haData.results.optionSets;
-      healthAreas.forEach((ha) => {
-        ha.options.forEach((option) => {
-          let data = {
-            "Code": option.id,
-            "Health Area": option.name
-          };
-          healthAreaData.push(data);
-        });
-      });
-      printObjectArray(ws, healthAreaData, "L2", "d5a6bd")
-    }
-  }
+    ws.duplicateRow(1,1,false);
 
-  const addLegendSets = (ws) => {
-    let legendSetData = [];
-    console.log("fetching legendset: ", lsData);
-    if(typeof lsData !== 'undefined')
-    {
-      console.log("lsData: ", lsData.results);
-      let legendSets = lsData.results.legendSets;
-      legendSets.forEach((legendSet) => {
-        let data = {
-            "Legend Set" : legendSet.name,
-            "UID" : legendSet.id
-          };
-          legendSetData.push(data);
-      })
-      printObjectArray(ws, legendSetData, "O2", "9fc5e8");
+    for (let i = 1; i < 2; i++) {
+      ws.getRow(i).value = [];
     }
+
+    ws.getCell("A1").value = "Release Notes";
+    ws.mergeCells("A1:C1");
+
+    let row = 2;
+
+    for (let i = 0; i < ReleaseNotes.length; i++) {
+      row = row + 1;
+      ws.getRow(row).values = ReleaseNotes[i];
+    }
+
+    ws.getColumn('version').alignment = {vertical: "middle"};
+    ws.getColumn('date').alignment = {vertical: "middle"};
+    ws.getColumn('description').alignment = {wrapText: true};
+    applyBorderToRange(ws, 0, 2, 2, parseInt(ws.lastRow._number));
   }
 
   const hideColumns = ws => {
@@ -391,20 +420,17 @@ const Exporter = ({ps, isLoading, status}) => {
     });
   };
 
+  const enableCellEditing = async (ws, cells) => {
+    cells.forEach((cell)=>{
+      ws.getCell(cell).protection = {locked: false}
+    });
+  }
+
   const writeWorkbook = async wb => {
     const buf = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buf]), `HNQIS Config_${new Date()}.xlsx`);
-    
-    isLoading(false);
-    status("Download");
-  };
 
-  const getValueForAttribute = async (attributeValues, attribute_id) => {
-    attributeValues.forEach(a => {
-      if (a.attribute.id === attribute_id) {
-        return a.value;
-      }
-    });
+    props.isLoading(false);
   };
 
   initialize(); // return <>initialize()</>;
