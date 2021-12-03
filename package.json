@@ -1,6 +1,7 @@
 {
-  "name": "hnqis2_fg",
-  "version": "1.0.0",
+  "name": "programconfigapp",
+  "author": "Fernando Gomez - Mario Lopez - Utsav Koju",
+  "version": "1.0.0-r.c.1",
   "description": "",
   "license": "BSD-3-Clause",
   "private": true,

@@ -1,6 +1,7 @@
 import { useDataQuery } from "@dhis2/app-runtime";
-import { Chip, CircularLoader, NoticeBox} from "@dhis2/ui";
+import { Chip, CircularLoader, NoticeBox, Pagination} from "@dhis2/ui";
 import { Link } from "react-router-dom";
+import {useState,useEffect} from "react";
 
 // ------------------
 import ProgramItem from "./ProgramItem";
@@ -9,33 +10,51 @@ const query = {
   results: {
     resource: "programs",
     paging: false,
-    params: {
+    params: ({pageSize,page})=>({
+      pageSize,
+      page,
       // filter: "name:ilike:HNQIS",
       fields: ["id", "name", "displayName","programStages"],
-    },
+    }),
   },
 };
 
 const ProgramList = () => {
-  const { loading, error, data } = useDataQuery(query);
+  const [pageSize,setPageSize] = useState(10);
+  const [currentPage,setCurrentPage] = useState(1);
+
+  const { loading, error, data, refetch } = useDataQuery(query,{variables: { pageSize, page:currentPage} });
 
   if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
   if (loading) return <CircularLoader />
-
+  console.log(data);
   return (
     <div className="wrapper">
       <div>
-          <Link to={'/'}><Chip>Home</Chip></Link>
+          <Chip>Home</Chip>
+      </div>
+      <div>
+        <h2>List of programs</h2>
       </div>
       <div className="layout_prgms_stages">
         <div className="list-ml_item">
           {
+            console.log(data.results.pager),
             data.results.programs.map((program) => {
               return <ProgramItem program={program} key={program.id}/>
             })
           }
         </div>
       </div>
+      <Pagination 
+        page={data.results.pager.page}
+        pageSize={data.results.pager.pageSize}
+        pageCount={data.results.pager.pageCount}
+        total={data.results.pager.pageCount}
+        pageSizes={["5","10","15","20","25","50","100"]}
+        onPageSizeChange={(pageSize)=>{setPageSize(pageSize); refetch({pageSize,page:1})}}
+        onPageChange={(page)=>{ setCurrentPage(page); refetch({page,pageSize}) }}
+      />
     </div>
   );
 };

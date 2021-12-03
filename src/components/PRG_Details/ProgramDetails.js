@@ -53,8 +53,11 @@ const ProgramDetails = () => {
     return (
         <div className="wrapper">
             <div>
-                <Link to={'/'}><Chip>Home</Chip></Link>
-                <Link to={'/program/'+program}><Chip>Program: {data.results.displayName}</Chip></Link>
+                <Link to={'/'}><Chip>Home</Chip></Link>/
+                <Chip>Program: {data.results.displayName}</Chip>
+            </div>
+            <div>
+                <h2>Program stages for {data.results.displayName}</h2>
             </div>
             <div className="layout_prgms_stages">
                 <div className="list-ml_item">

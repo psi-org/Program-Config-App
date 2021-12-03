@@ -330,9 +330,9 @@ const StageSections = ({programStage, stageRefetch }) => {
         <div style={{ padding: "5px" }}>
             <div style={{ margin: "5px 15px" , display:'flex'}}>
                 <div>
-                    <Link to={'/'}><Chip>Home</Chip></Link>
-                    <Link to={'/program/'+programStage.program.id}><Chip>Program: {programStage.program.name}</Chip></Link>
-                    <Link to={'/programStage/'+programStage.id}><Chip>Stage: {programStage.displayName}</Chip></Link>
+                    <Link to={'/'}><Chip>Home</Chip></Link>/
+                    <Link to={'/program/'+programStage.program.id}><Chip>Program: {programStage.program.name}</Chip></Link>/
+                    <Chip>Stage: {programStage.displayName}</Chip>
                 </div>
                 <ButtonStrip>
                 {
@@ -350,6 +350,9 @@ const StageSections = ({programStage, stageRefetch }) => {
                         onClick={() => configuration_import()}> Import</Button>
 
                 </ButtonStrip>
+            </div>
+            <div className="wrapper">
+                <h2>Sections for program stage {programStage.displayName} </h2>
             </div>
             {exportToExcel && <DataProcessor ps={programStage} isLoading={setExportToExcel}/>}
             {
