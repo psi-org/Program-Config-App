@@ -28,6 +28,7 @@ const Importer = (props) => {
     }
 
     const startImportProcess = () => {
+        setExecutedTasks([]);
         setButtonDisabled(true);
         //1. Form Validation
         if (typeof selectedFile !== 'undefined') {
@@ -48,7 +49,7 @@ const Importer = (props) => {
                                     headers.shift();
                                     worksheetValidation(headers, function (status) {
                                         if (status) {
-                                            var task = { step: 4, name: "Extracting data from XLSX", status: "success" };
+                                            var task = { step:4, name: "Extracting data from XLSX", status: "success" };
                                             setCurrentTask(task.name);
                                             let templateData = [];
                                             let dataRow = 3;
@@ -97,10 +98,6 @@ const Importer = (props) => {
 
             });
         }
-        else {
-            //Some validation error WIP
-            console.log("validation erros");
-        }
         setButtonDisabled(false);
     }
 
@@ -140,7 +137,6 @@ const Importer = (props) => {
         setCurrentTask(task.name);
         let status = true;
         headers.forEach((value, key) => {
-            console.log(value, " == ", validTemplateHeader[key]);
             if (value !== validTemplateHeader[key]) {
                 status = false;
                 task.status = "error";

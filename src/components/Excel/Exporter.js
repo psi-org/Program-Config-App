@@ -16,7 +16,6 @@ const Exporter = (props) => {
   const password = template_password;
 
   const initialize = () => {
-      console.log("Generating excel times");
       generate();
   };
 
@@ -90,7 +89,7 @@ const Exporter = (props) => {
 
     ws.getCell("D9").value = {formula: "=VLOOKUP(C9, Mapping!R3:S300,2,FALSE)"};
     ws.getCell('C9').value = props.programName;
-    // ws.getCell("D9").style = {font: {color: {'argb': 'ffffff'}}}
+    ws.getCell("D9").style = {font: {color: {'argb': 'ffffff'}}}
 
     instructionValidations(ws);
     enableCellEditing(ws, ['C9', 'D9', 'C10', 'C11', 'C12']);
@@ -103,21 +102,34 @@ const Exporter = (props) => {
       type: 'textLength',
       operator: 'lessThan',
       showErrorMessage: true,
-      error: 'Program name exceeds 200 characters',
+      error: 'Program name exceeds 225 characters',
       errorTitle: 'Invalid Length',
       allowBlank: true,
-      formulae: [200]
+      formulae: [226]
+    });
+    dataValidation(ws, "C11", {
+      type: 'textLength',
+      operator: 'lessThan',
+      showErrorMessage: true,
+      error: 'DE Prefix exceeds 2 characters',
+      errorTitle: 'Invalid Length',
+      allowBlank: true,
+      formulae: [3]
     });
     dataValidation(ws, "C10", {
       type: 'list',
       allowBlank: true,
       showErrorMessage: true,
+      error: 'Please select the valid option from the List',
+      errorTitle: 'Invalid option',
       formulae: yesNoValidator
     });
     dataValidation(ws, "C12", {
       type: 'list',
       allowBlank: true,
       showErrorMessage: true,
+      error: 'Please select the valid option from the List',
+      errorTitle: 'Invalid option',
       formulae: ['Mapping!$M$3:$M$43']
     });
   }

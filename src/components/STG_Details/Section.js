@@ -78,14 +78,14 @@ const DraggableSection = ({ stageSection, index }) => {
                             {sectionImportStatus} {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span>
                         </div>
                         <div className="ml_item-warning_error ">
-                            {/* <img src={warning_svg} alt="wrng" />
-                            <img src={error_svg} alt="err" />
-                            <div className="ml_item-cw">
-                                3
-                            </div>
-                            <div className="ml_item-ce">
-                                2
-                            </div> */}
+                        <img src={warning_svg} alt="wrng" />
+                        <img src={error_svg} alt="err" />
+                        <div className="ml_item-cw">
+                            3
+                        </div>
+                        <div className="ml_item-ce">
+                            2
+                        </div>
                         </div>
                         <div className="ml_item-cta">
                             <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
