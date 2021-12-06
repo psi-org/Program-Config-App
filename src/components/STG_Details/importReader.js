@@ -126,7 +126,6 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
     };
 
     templateData.forEach(row => {
-        //console.log(row[importMap.programSection]);
         switch (row.Structure) {
             case 'Section':
                 if(row["Form name"]=="Critical Steps Calculations" || row["Form name"]=="Scores") break;
@@ -165,11 +164,13 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
     var removedQuestions = currentData.sections.map( sec => {
         // Section removed -> Increase counter
         if (!importedSections.find( i_sec => i_sec.id == sec.id)) importSummaryValues.sections.removed++ ;
-        return sec.dataElements.filter( de => {
+        return sec.dataElements.filter( de => 
             !importedSections.find( i_sec => i_sec.dataElements.find( i_de => i_de.id == de.id) )
-        })
+        )
     }).flat();
+
     importSummaryValues.questions.removed = removedQuestions.length;
+    importSummaryValues.questions.removedItems = removedQuestions;
 
     // New scores
     importedScores.forEach( i_score => {
@@ -182,6 +183,9 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
         !importedScores.find(i_score => i_score.id == de.id)
     );
     importSummaryValues.scores.removed = removedScores.length;
+    importSummaryValues.scores.removedItems = removedScores;
+
+    console.log(importSummaryValues);
 
     return {importedSections,importedScores,importSummaryValues};
 

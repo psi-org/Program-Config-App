@@ -1,7 +1,9 @@
 import { useDataQuery } from "@dhis2/app-runtime";
-import { Chip, CircularLoader, NoticeBox, Pagination} from "@dhis2/ui";
+import { Button, Chip, CircularLoader, NoticeBox, Pagination} from "@dhis2/ui";
 import { Link } from "react-router-dom";
 import {useState,useEffect} from "react";
+import download_svg from './../../images/i-download.svg';
+import upload_svg from './../../images/i-upload.svg';
 
 // ------------------
 import ProgramItem from "./ProgramItem";
@@ -30,8 +32,10 @@ const ProgramList = () => {
   console.log(data);
   return (
     <div className="wrapper">
-      <div>
+      <div style={{display:"flex", alignItems:"center"}}>
           <Chip>Home</Chip>
+          <Button disabled={true}><img src={download_svg}/> Download Template</Button>
+          <Button disabled={true}><img src={upload_svg}/> Import Template</Button>
       </div>
       <div>
         <h2>List of programs</h2>

@@ -17,6 +17,7 @@ import {checkScores,readQuestionComposites,buildProgramRuleVariables,buildProgra
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import SaveMetadata from "./SaveMetadata";
 import { Link } from "react-router-dom";
+import Removed from "./Removed";
 
 const createMutation = {
     resource: 'metadata',
@@ -29,18 +30,6 @@ const deleteMetadataMutation = {
     type: 'create',
     data: ({ data }) => data
 };
-
-// const pr_delMutation = {
-//     resource: 'programRules',
-//     id: ({ id }) => id,
-//     type: 'delete'
-// };
-
-// const prv_delMutation = {
-//     resource: 'programRuleVariables',
-//     id: ({ id }) => id,
-//     type: 'delete'
-// };
 
 const queryIds = {
     results: {
@@ -72,29 +61,6 @@ const queryPRV = {
         })
     }
 };
-
-const progressTheme = (icon) => ({
-    error: {
-        symbol: icon,
-        trailColor: 'pink',
-        color: 'red'
-    },
-    default: {
-        symbol: icon,
-        trailColor: 'lightblue',
-        color: 'blue'
-    },
-    active: {
-        symbol: icon,
-        trailColor: 'lightblue',
-        color: 'blue'
-    },
-    success: {
-        symbol: icon,
-        trailColor: 'lime',
-        color: 'green'
-    }
-});
 
 const StageSections = ({programStage, stageRefetch }) => {
 
@@ -438,6 +404,10 @@ const StageSections = ({programStage, stageRefetch }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
+                        {
+                            importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
+                            <Removed importResults={importResults} index={0} key={"removedSec"} />
+                        }
                         <Droppable droppableId="dpb-sections" type="SECTION">
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">

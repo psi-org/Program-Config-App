@@ -22,27 +22,30 @@ const ProgramItem = ({program}) => {
 
   return (
     <div className="ml_item" style={{color:"#333333" , backgroundColor: "#37D196"}}>
-      <div className="ml_item-icon">
+      <div className=""> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
         <img className="ml_list-img" alt="prg" src={prg_svg} />
       </div>
       <div className="ml_item-title">
         {program.displayName} | <span>{program.programStages.length} program stages</span>
       </div>
       <div className="ml_item-warning_error ">
-        <img src={warning_svg} alt="wrng" />
-        <img src={error_svg} alt="err" />
+        {/*
+          <img src={warning_svg} alt="wrng" />
+          <img src={error_svg} alt="err" />
+        
         <div className="ml_item-cw">
           3
         </div>
         <div className="ml_item-ce">
           2
         </div>
+        */}
       </div>
       <div className="ml_item-cta">
         <Link to={"/program/"+program.id}>
           <img className="bsct_cta" alt="exp" src={expand_left_svg} onClick={()=> setProgram(program.id)}/>
         </Link>
-        <img src={move_vert_svg} alt="menu"  />
+        { /* Kebab menu icon : <img src={move_vert_svg} alt="menu"  />*/}
       </div>
     </div>
   );
