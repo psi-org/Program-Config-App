@@ -327,7 +327,7 @@ const Exporter = (props) => {
     });
     //conditional formatting for structure=scores and valuetype=NUMBER
     ws.addConditionalFormatting({
-      ref:'F4:F3000',
+      ref:'F3:F3000',
       rules: [
         {
           type: 'expression',
@@ -353,7 +353,7 @@ const Exporter = (props) => {
       rules:[
         {
           type: 'expression',
-          formulae: ['OR($I3 = "",$J3 = "")'],
+          formulae: ['OR(AND($I3<>"",$J3=""), AND($I3="",$J3<>""))'],
           style: conditionalError
         }
       ]
@@ -442,6 +442,7 @@ const Exporter = (props) => {
     const buf = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buf]), `HNQIS Config_${new Date()}.xlsx`);
 
+    props.setStatus("Download");
     props.isLoading(false);
   };
 

@@ -184,7 +184,7 @@ const DataProcessor = (props) => {
 
     return (
         <>
-            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={props.ps.program.name} />}
+            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={props.ps.program.name} setStatus={props.setStatus}/>}
         </>
     );
 }

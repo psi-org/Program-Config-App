@@ -1,5 +1,5 @@
 // DHIS2 UI
-import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Card, Modal, ModalTitle, ModalContent, ModalActions, LinearLoader, Chip } from "@dhis2/ui";
+import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Card, Modal, ModalTitle, ModalContent, ModalActions, LinearLoader, Chip, IconDownload24, IconUpload24 } from "@dhis2/ui";
 
 // React Hooks
 import { useState, useEffect } from "react";
@@ -120,7 +120,6 @@ const StageSections = ({programStage, stageRefetch }) => {
     const [ importerEnabled, setImporterEnabled ] = useState(false);
     const [ importResults, setImportResults] = useState(false);
     const [progressSteps,setProgressSteps]= useState(0);
-
 
     // States
     const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name !="Scores" && s.name !="Critical Steps Calculations"));
@@ -340,15 +339,15 @@ const StageSections = ({programStage, stageRefetch }) => {
                 }
                     <Button disabled={createMetadata.loading} onClick={() => commit()}>{saveStatus}</Button>
                     <Button disabled={!savedAndValidated} primary onClick={() => run()}>Run Magic!</Button>
-                    <Button name="generator" icon={exportToExcel ? '' : <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M20 14a1 1 0 01.993.883L21 15v3a3 3 0 01-2.824 2.995L18 21H6a3 3 0 01-2.995-2.824L3 18v-3a1 1 0 011.993-.117L5 15v3a1 1 0 00.883.993L6 19h12a1 1 0 00.993-.883L19 18v-3a1 1 0 011-1zM12 3a1 1 0 01.993.883L13 4v9.584l2.293-2.291a1 1 0 011.32-.083l.094.083a1 1 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.32.083l-.094-.083-4-4a1 1 0 011.32-1.497l.094.083L11 13.584V4a1 1 0 011-1z" fill="currentColor"></path></svg>}
+                    <Button name="generator" icon={exportToExcel ? null : <IconDownload24/>}
                         loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}> {exportStatus}</Button>
 
-                    <Button name="importer" icon={<svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M20 14a1 1 0 01.993.883L21 15v3a3 3 0 01-2.824 2.995L18 21H6a3 3 0 01-2.995-2.824L3 18v-3a1 1 0 011.993-.117L5 15v3a1 1 0 00.883.993L6 19h12a1 1 0 00.993-.883L19 18v-3a1 1 0 011-1zM12 4h.02c.023 0 .046.002.07.004L12 4a1.008 1.008 0 01.625.22l.082.073 4 4a1 1 0 01-1.32 1.497l-.094-.083L13 7.415V16a1 1 0 01-1.993.117L11 16V7.413L8.707 9.707a1 1 0 01-1.32.083l-.094-.083a1 1 0 01-.083-1.32l.083-.094 4-4 .082-.073.008-.007-.09.08A1.008 1.008 0 0111.982 4H12z" fill="currentColor"></path></svg>}
+                    <Button name="importer" icon={<IconUpload24/>}
                         onClick={() => setImporterEnabled(true)}> Import</Button>
 
                 </ButtonStrip>
             </div>
-            {exportToExcel && <DataProcessor ps={programStage} isLoading={setExportToExcel}/>}
+            {exportToExcel && <DataProcessor ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus}/>}
             {
                 createMetadata.loading &&
                 <ComponentCover translucent>
@@ -461,6 +460,7 @@ const StageSections = ({programStage, stageRefetch }) => {
                     // createMetadata={createMetadata}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
+                    previous={{sections,setSections, scoresSection, setScoresSection}}
                     />
             }
 

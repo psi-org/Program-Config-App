@@ -11,6 +11,8 @@ import error_svg from './../../images/i-error.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
+import Warnings from "./Warnings";
+import Errors from "./Errors";
 
 const Scores = ({ stageSection, index }) => {
 
@@ -74,15 +76,9 @@ const Scores = ({ stageSection, index }) => {
                                 <div className="ml_item-title">
                                     {dataElement.formName}
                                 </div>
-                                <div className="ml_item-warning_error slctr_hidden">
-                                    {/* <img src={warning_svg} alt="wrng" />
-                                    <img src={error_svg} alt="err" />
-                                    <div className="ml_item-cw">
-                                        3
-                                    </div>
-                                    <div className="ml_item-ce">
-                                        2
-                                    </div> */}
+                                <div className="ml_item-warning_error">
+                                    {dataElement.warnings && dataElement.warnings.length > 0 && <Warnings counts={dataElement.warnings.length}/> }
+                                    {dataElement.errors && dataElement.errors.length > 0 && <Errors counts={dataElement.errors.length}/> }
                                 </div>
                                 <div className="ml_item-cta">
                                     <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>
