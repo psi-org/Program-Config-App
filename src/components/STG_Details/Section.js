@@ -19,7 +19,7 @@ import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 
-import {colors,IconAdd16,IconDelete16,IconEdit16 } from '@dhis2/ui';
+import {colors,IconAdd16,IconDelete16,IconEdit16, Tag } from '@dhis2/ui';
 
 const DraggableSection = ({ stageSection, index }) => {
     
@@ -52,14 +52,14 @@ const DraggableSection = ({ stageSection, index }) => {
     if(stageSection.importStatus){
         switch (stageSection.importStatus){
             case 'new':
-                sectionImportStatus = <span style={{verticalAlign:'top'}}><IconAdd16 color={colors.white}/></span>;
+                sectionImportStatus = <Tag positive>New</Tag>;
                 break;
-            case 'delete':
-                sectionImportStatus = <span style={{verticalAlign:'top'}}><IconDelete16 color={colors.white}/></span>;
-                break;
+            // case 'delete':
+            //     sectionImportStatus = <Tag negative>Removed</Tag>;
+            //     break;
             case 'update':
             default:
-                sectionImportStatus = <span style={{verticalAlign:'top'}}><IconEdit16 color={colors.white}/></span>;
+                sectionImportStatus = <Tag neutral>Updated</Tag>;
                 break;
         }
     }
@@ -87,7 +87,7 @@ const DraggableSection = ({ stageSection, index }) => {
                     </div>
                     <Droppable droppableId={stageSection.id || 'dropSec'+index} type="DATA_ELEMENT">
                         {(provided, snapshot) => (
-                            <div {...provided.droppableProps} ref={provided.innerRef} className="section_cont" >
+                            <div {...provided.droppableProps} ref={provided.innerRef} className={"section_cont "} >
                                 {
                                     stageSection.dataElements.map((de,i) => {
                                         return <DraggableDataElement dataElement={de} index={i} key={de.id || i}/>;

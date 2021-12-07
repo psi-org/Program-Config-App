@@ -5,8 +5,8 @@ import de_svg from './../../images/i-drag_black.svg';
 import warning_svg from './../../images/i-warning.svg';
 import error_svg from './../../images/i-error.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
+import {colors,IconAdd16,IconDelete16,IconEdit16, Tag } from '@dhis2/ui';
 
-import {colors,IconAdd16,IconDelete16,IconEdit16 } from '@dhis2/ui';
 import Warnings from "./Warnings";
 import Errors from "./Errors";
 
@@ -30,17 +30,18 @@ const DraggableDataElement = ({dataElement,index}) => {
 
     // Import Values //
     var deImportStatus = undefined;
+
     if(dataElement.importStatus){
         switch (dataElement.importStatus){
             case 'new':
-                deImportStatus = <span style={{verticalAlign:'top'}}><IconAdd16 color={colors.white}/></span>;
+                deImportStatus = <Tag positive>New</Tag>;
                 break;
-            case 'delete':
-                deImportStatus = <span style={{verticalAlign:'top'}}><IconDelete16 color={colors.white}/></span>;
-                break;
+            // case 'delete':
+            //     deImportStatus = <Tag negative>Removed</Tag>;
+            //     break;
             case 'update':
             default:
-                deImportStatus = <span style={{verticalAlign:'top'}}><IconEdit16 color={colors.white}/></span>;
+                deImportStatus = <Tag neutral>Updated</Tag>;
                 break;
         }
     }

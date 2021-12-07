@@ -17,6 +17,7 @@ import {checkScores,readQuestionComposites,buildProgramRuleVariables,buildProgra
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import SaveMetadata from "./SaveMetadata";
 import { Link } from "react-router-dom";
+import Removed from "./Removed";
 import ValidateMetadata from "./ValidateMetadata";
 
 const createMutation = {
@@ -30,18 +31,6 @@ const deleteMetadataMutation = {
     type: 'create',
     data: ({ data }) => data
 };
-
-// const pr_delMutation = {
-//     resource: 'programRules',
-//     id: ({ id }) => id,
-//     type: 'delete'
-// };
-
-// const prv_delMutation = {
-//     resource: 'programRuleVariables',
-//     id: ({ id }) => id,
-//     type: 'delete'
-// };
 
 const queryIds = {
     results: {
@@ -74,29 +63,6 @@ const queryPRV = {
     }
 };
 
-const progressTheme = (icon) => ({
-    error: {
-        symbol: icon,
-        trailColor: 'pink',
-        color: 'red'
-    },
-    default: {
-        symbol: icon,
-        trailColor: 'lightblue',
-        color: 'blue'
-    },
-    active: {
-        symbol: icon,
-        trailColor: 'lightblue',
-        color: 'blue'
-    },
-    success: {
-        symbol: icon,
-        trailColor: 'lime',
-        color: 'green'
-    }
-});
-
 const StageSections = ({programStage, stageRefetch }) => {
 
     // Globals
@@ -120,6 +86,7 @@ const StageSections = ({programStage, stageRefetch }) => {
     const [ importerEnabled, setImporterEnabled ] = useState(false);
     const [ importResults, setImportResults] = useState(false);
     const [progressSteps,setProgressSteps]= useState(0);
+
 
     // States
     const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name !="Scores" && s.name !="Critical Steps Calculations"));
@@ -256,6 +223,10 @@ const StageSections = ({programStage, stageRefetch }) => {
         setExportStatus("Generating Configuration File...")
     };
 
+    const configuration_import = () => {
+        setImporterEnabled(true);
+    };
+
     const run = () => {
 
         if(!savedAndValidated) return;
@@ -326,9 +297,9 @@ const StageSections = ({programStage, stageRefetch }) => {
         <div style={{ padding: "5px" }}>
             <div style={{ margin: "5px 15px" , display:'flex'}}>
                 <div>
-                    <Link to={'/'}><Chip>Home</Chip></Link>
-                    <Link to={'/program/'+programStage.program.id}><Chip>Program: {programStage.program.name}</Chip></Link>
-                    <Link to={'/programStage/'+programStage.id}><Chip>Stage: {programStage.displayName}</Chip></Link>
+                    <Link to={'/'}><Chip>Home</Chip></Link>/
+                    <Link to={'/program/'+programStage.program.id}><Chip>Program: {programStage.program.name}</Chip></Link>/
+                    <Chip>Stage: {programStage.displayName}</Chip>
                 </div>
                 <ButtonStrip>
                 {
@@ -346,6 +317,9 @@ const StageSections = ({programStage, stageRefetch }) => {
                         onClick={() => setImporterEnabled(true)}> Import</Button>
 
                 </ButtonStrip>
+            </div>
+            <div className="wrapper">
+                <h2>Sections for program stage {programStage.displayName} </h2>
             </div>
             {exportToExcel && <DataProcessor ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus}/>}
             {
@@ -431,6 +405,10 @@ const StageSections = ({programStage, stageRefetch }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
+                        {
+                            importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
+                            <Removed importResults={importResults} index={0} key={"removedSec"} />
+                        }
                         <Droppable droppableId="dpb-sections" type="SECTION">
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
