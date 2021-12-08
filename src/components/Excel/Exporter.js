@@ -70,7 +70,7 @@ const Exporter = (props) => {
     ws.getCell("B4").value = "By using this spreadsheet you'll be able to configure the structure of the DHIS2 checklist. Make sure you understand how to work with the tools integrated in this spreadsheet before you continue working.";
     ws.getCell("B5").value = `You're currently working with version ${ReleaseNotes.at(-1).version} of this template, please refer to the \"Release Notes\" tab to check the latest features.`;
 
-    ws.getCell("B7").value = "Define program configuration";
+    ws.getCell("B7").value = "Define the program configuration";
     ws.getCell("B7").style = {font: {bold: true}};
     ws.getCell("B8").value = "The following information will be used to configure the checklist as a DHIS2 program compatible with HNQIS 2.0";
     ws.getCell("B9").value = "Note: Some fields are filled automatically when the template is downloaded from a server.";
@@ -119,8 +119,8 @@ const Exporter = (props) => {
     ws.getCell("B26").alignment = {vertical: "middle"};
     ws.mergeCells('C26:F26');
     ws.getCell('C26').alignment = {wrapText: true};
-    ws.getRow("26").height = 32;
-    ws.getCell("C26").value = `[Question & Label Only]\r\n Indentifier to use as reference in the "Parent question" column. This field is generated automatically when certain conditions are met.`;
+    ws.getRow("26").height = 85;
+    ws.getCell("C26").value = `[Question & Label Only] \n Identifier to use as reference in the "Parent question" column. This field is generated automatically when certain conditions are met. \n Parent Names follow the structure "_S#Q#" where the S means "Section" followed by the number of the section (1 for the first one, 2 for the second one, and so on...) and Q means "Question" followed by the number of the question in the section (the same way as the sections but the numbers restart with each section).`;
 
     ws.getCell('B27').value = "Structure";
     ws.getCell("B27").style = {font: {bold: true}};
@@ -128,7 +128,7 @@ const Exporter = (props) => {
     ws.mergeCells('C27:F27');
     ws.getCell('C27').alignment = {wrapText: true};
     ws.getRow("27").height = 115;
-    ws.getCell("C27").value = `Determines what is being configured in the row. The value in this column will define which validations are applied to the row. \n The possible structure values are:\n Section - Defines a section in the assessment, all the rows under it will create Data Elements contained in the section until another ""Section"" row is defined.\n Question - Defines a question Data Element that can be answered in some way (text field, numeric field, opton set, etc.).\n Label - Defines a label Data Element, usually these are used to display instructions or help text.\n Score - Defines a score Data Element that will contain the value of the score calculations.`;
+    ws.getCell("C27").value = `Determines what is being configured in the row. The value in this column will define which validations are applied to the row.  \n The possible structure values are: \n Section - Defines a section in the assessment, all the rows under it will create Data Elements contained in the section until another "Section" row is defined. \n Question - Defines a question Data Element that can be answered in some way (text field, numeric field, option set, etc.). \n Label - Defines a label Data Element, usually these are used to display instructions or help text. \n Score - Defines a score Data Element that will contain the value of the score calculations.`;
 
     ws.getCell('B28').value = "Form name";
     ws.getCell("B28").style = {font: {bold: true}};
@@ -144,15 +144,15 @@ const Exporter = (props) => {
     ws.mergeCells('C29:F29');
     ws.getCell('C29').alignment = {wrapText: true};
     ws.getRow("30").height = 48;
-    ws.getCell("C29").value = `[Question Only] \n Scores are divided in critical and non-critical, this is mostly used for the ""competency classification"" but can also be used in other types of classification in analytics as well. A critical step will count for the critical score. Select ""Yes"" if you want to define a critical question.`;
+    ws.getCell("C29").value = `[Question Only] \n Scores are divided in critical and non-critical, this is mostly used for the "competency classification" but can also be used in other types of classification in analytics as well. A critical step will count for the critical score. Select "Yes" if you want to define a critical question.`;
 
     ws.getCell('B30').value = "Compulsory";
     ws.getCell("B30").style = {font: {bold: true}};
     ws.getCell("B30").alignment = {vertical: "middle"};
     ws.mergeCells('C30:F30');
     ws.getCell('C30').alignment = {wrapText: true};
-    ws.getRow("30").height = 30;
-    ws.getCell("C30").value = `[Question Only] \n A compulsory question must be answered to complete an assessment. Select ""Yes"" if you want define a mandatory question.`;
+    ws.getRow("30").height = 32;
+    ws.getCell("C30").value = `[Question Only] \n A compulsory question must be answered to complete an assessment. Select "Yes" if you want define a mandatory question.`;
 
     fillBackgroundToRange(ws, 'B29:B30', "f4cccc");
 
@@ -160,19 +160,25 @@ const Exporter = (props) => {
     ws.getCell("B31").style = {font: {bold: true}};
     ws.getCell("B31").alignment = {vertical: "middle"};
     ws.mergeCells("C31:F31");
-    ws.getCell("C31").value = `[Question, Label & Score]`;
+    ws.getCell('C31').alignment = {wrapText: true};
+    ws.getRow("31").height = 48;
+    ws.getCell("C31").value = `[Question, Label & Score] \n Determines the type of input if there's no Option Set selected. If there's an Option Set selected, the "Value Type" cell must match the Value Type of the Option Set.`;
 
     ws.getCell('B32').value = "Option Set";
     ws.getCell("B32").style = {font: {bold: true}};
     ws.getCell("B32").alignment = {vertical: "middle"};
     ws.mergeCells("C32:F32");
-    ws.getCell("C32").value = `[Question Only]`;
+    ws.getCell('C32').alignment = {wrapText: true};
+    ws.getRow("32").height = 32;
+    ws.getCell("C32").value = `[Question Only] \n Select the Option Set that provides available answers for this question (forces Value Type)`;
 
     ws.getCell('B33').value = "Legend";
     ws.getCell("B33").style = {font: {bold: true}};
     ws.getCell("B33").alignment = {vertical: "middle"};
     ws.mergeCells("C33:F33");
-    ws.getCell("C33").value = `[Question Only]`;
+    ws.getCell('C33').alignment = {wrapText: true};
+    ws.getRow("33").height = 32;
+    ws.getCell("C33").value = `[Question Only] \n Select the legend that will be applied to the question. The legend will be displayed in the data entry form and in the Feedback Module in the app.`;
 
     fillBackgroundToRange(ws, 'B31:B33', "d9ead3");
 
@@ -180,19 +186,25 @@ const Exporter = (props) => {
     ws.getCell("B34").style = {font: {bold: true}};
     ws.getCell("B34").alignment = {vertical: "middle"};
     ws.mergeCells("C34:F34");
-    ws.getCell("C34").value = `[Question Only]`;
+    ws.getCell('C34').alignment = {wrapText: true};
+    ws.getRow("34").height = 32;
+    ws.getCell("C34").value = `[Question Only]\n Numerator for scores calculation. This value will be used in the formulas that calculate scores. Each numerator will contribute to the scores calculation formulas.`;
 
     ws.getCell('B35').value = "Score Denominator";
     ws.getCell("B35").style = {font: {bold: true}};
     ws.getCell("B35").alignment = {vertical: "middle"};
     ws.mergeCells("C35:F35");
-    ws.getCell("C35").value = `[Question Only]`;
+    ws.getCell('C35').alignment = {wrapText: true};
+    ws.getRow("35").height = 32;
+    ws.getCell("C35").value = `[Question Only] \n Denominator for scores calculation. This value will be used in the formulas that calculate scores. Each numerator will contribute to the scores calculation formulas.`;
 
     ws.getCell('B36').value = "Compositive indicator (Feedback Order)";
     ws.getCell("B36").style = {font: {bold: true}};
     ws.getCell("B36").alignment = {vertical: "middle"};
     ws.mergeCells("C36:F36");
-    ws.getCell("C36").value = `[Question, Label & Score]`;
+    ws.getCell('C36').alignment = {wrapText: true};
+    ws.getRow("36").height = 126;
+    ws.getCell("C36").value = `[Question, Label & Score] \n This number will generate the feedback hierarchy in the app, while also grouping the scores to calculate the composite scores. \n Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc. There cannot exist gaps in the Compositive indicators, for example: \n Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.  \n This limitation applies in the same level of the compositive indicator (Levels being level1.level2.level3.(...).levelN), meaning that the previous error (1.3) was located in level 2 (value 3) of the compositive indicator of value 1. \n Questions are not required to be grouped together to belong to the same level of the compositive indicator, for example: \n Having [ 1, 1.1, 1.2, 1.3, 2, 2.1, 2.2, 1.4 ] is a valid configuration as there are no gaps in the same level of the compositive indicator.`;
 
     fillBackgroundToRange(ws, 'B34:B36', "fff2cc");
 
@@ -200,13 +212,17 @@ const Exporter = (props) => {
     ws.getCell("B37").style = {font: {bold: true}};
     ws.getCell("B37").alignment = {vertical: "middle"};
     ws.mergeCells("C37:F37");
-    ws.getCell("C37").value = ``;
+    ws.getCell('C37').alignment = {wrapText: true};
+    ws.getRow("37").height = 48;
+    ws.getCell("C37").value = `[Question & Label Only] \n Select the "Parent Name" of the question that will act as parent of the question/label defined in the row. Essentially the Data Element defined in the row won't be displayed in the data entry form until a certain condition applies to the selected parent.`;
 
     ws.getCell('B38').value = "Answer Value";
     ws.getCell("B38").style = {font: {bold: true}};
     ws.getCell("B38").alignment = {vertical: "middle"};
     ws.mergeCells("C38:F38");
-    ws.getCell("C38").value = ``;
+    ws.getCell('C38').alignment = {wrapText: true};
+    ws.getRow("38").height = 60;
+    ws.getCell("C38").value = `[Question & Label Only] \n Specify the value that will trigger the "show" rule of the question/label defined in the row. \n The condition that will be evaluated is: [Parent question] == [Answer value]. If it matches then the question/label defined in the row will be displayed in the data entry for.`;
 
     fillBackgroundToRange(ws, 'B37:B38', "c9daf8");
 
@@ -214,13 +230,32 @@ const Exporter = (props) => {
     ws.getCell("B39").style = {font: {bold: true}};
     ws.getCell("B39").alignment = {vertical: "middle"};
     ws.mergeCells("C39:F39");
-    ws.getCell("C39").value = ``;
+    ws.getCell('C39').alignment = {wrapText: true};
+    ws.getRow("39").height = 32;
+    ws.getCell("C39").value = `[Question & Label Only]\n Text that will be displayed in the Feedback app for each question.`;
 
     ws.getCell('B40').value = "Description";
     ws.getCell("B40").style = {font: {bold: true}};
     ws.getCell("B40").alignment = {vertical: "middle"};
     ws.mergeCells("C40:F40");
-    ws.getCell("C40").value = ``;
+    ws.getCell('C40').alignment = {wrapText: true};
+    ws.getRow("40").height = 32;
+    ws.getCell("C40").value = `Enter the help text that will display to the supervisor during data entry. This text will appear as an ( i ) icon in the data entry form.`;
+
+    ws.getCell("B42").value = `Every row in the "Template" tab starting from row 3 will generate the necessary components for the program when this file gets imported to the server. `;
+    ws.getCell("B43").value = `The template will highlight in red some cells automatically while you're working on it, this means that there's a validation error in that cell and you must fix it before importing.`;
+    ws.getCell("B44").value = `Also, keep in mind that this file is protected so you can only modify some specific cell ranges (most of the unlocked cells are in the "Template" tab).`;
+
+    ws.getCell("B46").value = `Please ensure this content is clean. Everything will appear in the program just as it is submitted to the server. The developers will not correct any spelling mistakes or spacing errors. `;
+
+    ws.getCell("B48").value = `Once you're done with the configurations proceed by uploading this template to the Config Web App to process it.`;
+    ws.getCell("B49").value = `After uploading please check that the content has been configured as expected using the preview, then save the changes.`;
+
+    ws.getCell("B51").value = `Now we're done!`;
+    ws.getCell("B51").style = {font: {bold: true}};
+
+    ws.getCell("B52").value = `Test your configurations both on the web and the Android app, then make changes using this template if necessary.`;
+    ws.getCell("B53").value = `Remember that once uploaded you can download a copy of this template from the server.`;
 
     applyBorderToRange(ws, 1, 26, 2, 40);
     instructionValidations(ws);
