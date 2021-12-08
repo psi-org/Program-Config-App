@@ -1,7 +1,18 @@
 import React from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import { saveAs } from 'file-saver';
-import { activeTabNumber, valueType, renderType, aggOperator, middleCenter, template_password, structureValidator, yesNoValidator, conditionalError } from "../../configs/TemplateConstants";
+import {
+  activeTabNumber,
+  valueType,
+  renderType,
+  aggOperator,
+  middleCenter,
+  template_password,
+  structureValidator,
+  yesNoValidator,
+  conditionalError,
+  sectionHighlighting
+} from "../../configs/TemplateConstants";
 import {
   fillBackgroundToRange,
   printArray2Column,
@@ -358,6 +369,16 @@ const Exporter = (props) => {
         }
       ]
     });
+    ws.addConditionalFormatting({
+      ref: 'I3:R3',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['if($B3 === "Section")'],
+          style: sectionHighlighting
+        }
+      ]
+    })
   }
 
   const populateConfiguration = async ws => {

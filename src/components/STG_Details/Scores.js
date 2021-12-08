@@ -50,14 +50,8 @@ const Scores = ({ stageSection, index }) => {
                     {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span>
                 </div>
                 <div className="ml_item-warning_error ">
-                    {/* <img src={warning_svg} alt="wrng" />
-                            <img src={error_svg} alt="err" />
-                            <div className="ml_item-cw">
-                                3
-                            </div>
-                            <div className="ml_item-ce">
-                                2
-                            </div> */}
+                    {stageSection.warnings && stageSection.warnings > 0 && <Warnings counts={stageSection.warnings}/> }
+                    {stageSection.errors && stageSection.errors > 0 && <Errors counts={stageSection.errors}/> }
                 </div>
                 <div className="ml_item-cta">
                     <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />

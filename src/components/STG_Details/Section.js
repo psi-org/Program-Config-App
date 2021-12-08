@@ -20,6 +20,8 @@ import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 
 import {colors,IconAdd16,IconDelete16,IconEdit16, Tag } from '@dhis2/ui';
+import Warnings from "./Warnings";
+import Errors from "./Errors";
 
 const DraggableSection = ({ stageSection, index }) => {
     
@@ -78,7 +80,8 @@ const DraggableSection = ({ stageSection, index }) => {
                             {sectionImportStatus} {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span>
                         </div>
                         <div className="ml_item-warning_error ">
-
+                            {stageSection.warnings && stageSection.warnings > 0 && <Warnings counts={stageSection.warnings}/> }
+                            {stageSection.errors && stageSection.errors > 0 && <Errors counts={stageSection.errors}/> }
                         </div>
                         <div className="ml_item-cta">
                             <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />

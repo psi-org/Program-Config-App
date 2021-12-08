@@ -16,16 +16,28 @@ const ValidateMetadata = (props) => {
         let errorCounts = 0;
 
         importedSections.forEach((section) => {
+            let section_errors = 0;
             section.dataElements.forEach((dataElement) => {
                 validateSections(dataElement);
-                errorCounts+=dataElement.errors.length;
+                if(dataElement.errors)
+                {
+                    errorCounts+=dataElement.errors.length;
+                    section_errors+=dataElement.errors.length;
+                }
             });
+            if(section_errors > 0) section.errors = section_errors;
         });
 
+        let score_errors = 0;
         importedScore.dataElements.forEach((dataElement) => {
              validateScores(dataElement);
-            errorCounts+=dataElement.errors.length;
+             if (dataElement.errors)
+             {
+                 errorCounts+=dataElement.errors.length;
+                 score_errors += dataElement.errors.length;
+             }
         });
+        if(score_errors > 0 ) importedScore.errors = score_errors;
 
         console.log("errors count: ", errorCounts);
         if(errorCounts === 0) setValid(true);
@@ -47,7 +59,7 @@ const ValidateMetadata = (props) => {
             if (!hasBothNumeratorDenominator(metaData)) errors.push({"EXW106": "The specified question lacks one of the scores (numerator or denominator)"});
             if (!isNumeric(metaData, "scoreNum")) errors.push({"EXW105": "The specified question numerator is not numeric"});
             if (!isNumeric(metaData, "scoreDen")) errors.push({"EXW108": "The specified question denominator is not numeric"});
-            dataElement.errors = errors;
+            if(errors.length > 0) dataElement.errors = errors;
         }
 
         function validateScores(dataElement)
@@ -57,7 +69,7 @@ const ValidateMetadata = (props) => {
             let metaData = getHNQISMetadata(dataElement);
             if (!structureMatchesValue(metaData, dataElement, "score", "NUMBER")) errors.push({"EXW102": "The expected value type for the score Data Element is NUMBER"});
             if (!hasBothNumeratorDenominator(metaData)) errors.push({"EXW106": "The specified question lacks one of the scores (numerator or denominator)"});
-            dataElement.errors = errors;
+            if(errors.length > 0) dataElement.errors = errors;
         }
 
         function checkHasFormName(metaData, dataElement)
