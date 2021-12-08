@@ -44,6 +44,11 @@ const Importer = (props) => {
                             workbookValidation(workbook, function (status) {
                                 if (status) {
                                     const templateWS = workbook.getWorksheet('Template');
+                                    const instructionWS = workbook.getWorksheet('Instructions');
+                                    const mappingWS = workbook.getWorksheet('Mapping');
+
+                                    const programDetails = getProgramDetails(instructionWS);
+                                    const mappingDetails = getMappingList(mappingWS);
                                     const headers = templateWS.getRow(1).values;
                                     headers.shift();
                                     worksheetValidation(headers, function (status) {
@@ -74,6 +79,8 @@ const Importer = (props) => {
                                             console.log(importedSections);
                                             console.log(importedScores);
                                             console.log(importSummaryValues);
+                                            console.log(programDetails);
+                                            console.log(mappingDetails);
                                             //props.setNewDeQty(importSummaryValues.questions.new);
 
                                             // Set new sections & questions
@@ -102,6 +109,42 @@ const Importer = (props) => {
             console.log("validation erros");
         }
         setButtonDisabled(false);
+    }
+
+    const getProgramDetails = (ws) => {
+        let program = {};
+        program.id = ws.getCell("D12").value.result;
+        program.name = ws.getCell("C12").value;
+        program.useCompetencyClass = ws.getCell("C13").value;
+        program.dePrefix = ws.getCell("C14").value;
+        program.healthArea = ws.getCell("C15").value;
+        return program;
+    }
+
+    const getMappingList = (ws) => {
+        let mapping = {};
+        mapping.optionSets = [];
+        mapping.legendSets = [];
+        for (let i = 3; i <= 100; i++) {
+            let option = {};
+            if(ws.getCell("I"+i).value !== null)
+            {
+                option.id = ws.getCell("I"+i).value;
+                option.optionSet = ws.getCell("H"+i).value;
+                mapping.optionSets.push(option);
+            }
+        }
+
+        for (let i = 3; i < 100; i++) {
+            let legend = {};
+            if(ws.getCell("P"+i).value !== null)
+            {
+                legend.id = ws.getCell("P"+i).value;
+                legend.legendSet = ws.getCell("O"+i).value;
+                mapping.legendSets.push(legend);
+            }
+        }
+        return mapping;
     }
 
     const fileValidation = (callback) => {
@@ -140,7 +183,6 @@ const Importer = (props) => {
         setCurrentTask(task.name);
         let status = true;
         headers.forEach((value, key) => {
-            console.log(value, " == ", validTemplateHeader[key]);
             if (value !== validTemplateHeader[key]) {
                 status = false;
                 task.status = "error";
