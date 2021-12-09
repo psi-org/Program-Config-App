@@ -10,6 +10,8 @@ const ValidateMetadata = (props) => {
     const [processed, setProcessed] = useState(false);
     const [valid, setValid] = useState(false);
 
+    console.log("props: ", props);
+
     useEffect(()=> {
         const importedSections = props.importedSections;
         const importedScore = props.importedScores;
@@ -57,8 +59,11 @@ const ValidateMetadata = (props) => {
             if (!structureMatchesValue(metaData, dataElement, "label", "LONG_TEXT")) errors.push({"EXW103":"The expected value type for the label Data Element is LONG_TEXT"});
             if (!hasFeedbackOrder(metaData, dataElement)) errors.push({"EXW107": "The specified question has numerator and denominator assigned but does not contribute to any score."});
             if (!hasBothNumeratorDenominator(metaData)) errors.push({"EXW106": "The specified question lacks one of the scores (numerator or denominator)"});
+            if (!validAggregationType(metaData, dataElement, "label", "NONE")) errors.push({"EW104": "The expected aggregation operator for the label Data Element is NONE"})
+            if (!validAggregationQuestion(metaData, dataElement)) errors.push({"EW105": "The Data Element aggregation operator was not defined correctly. (SUM or AVERAGE for numeric types and NONE for text inputs)"});
             if (!isNumeric(metaData, "scoreNum")) errors.push({"EXW105": "The specified question numerator is not numeric"});
             if (!isNumeric(metaData, "scoreDen")) errors.push({"EXW108": "The specified question denominator is not numeric"});
+            if (!hasBothParentQuestionNAnswerValue(metaData)) errors.push({"EXW109": "The specified question lacks one of the components for the parent logic."});
             if(errors.length > 0) dataElement.errors = errors;
         }
 
@@ -69,6 +74,7 @@ const ValidateMetadata = (props) => {
             let metaData = getHNQISMetadata(dataElement);
             if (!structureMatchesValue(metaData, dataElement, "score", "NUMBER")) errors.push({"EXW102": "The expected value type for the score Data Element is NUMBER"});
             if (!hasBothNumeratorDenominator(metaData)) errors.push({"EXW106": "The specified question lacks one of the scores (numerator or denominator)"});
+            if (!validAggregationType(metaData, dataElement, "score", "AVERAGE")) errors.push({"EW103": "The expected aggregation operator for the score Data Element is AVERAGE"});
             if(errors.length > 0) dataElement.errors = errors;
         }
 
@@ -104,6 +110,13 @@ const ValidateMetadata = (props) => {
             return true;
         }
 
+        function hasBothParentQuestionNAnswerValue(metaData)
+        {
+            if(hasAttributeValue(metaData, "parentVarName")) return hasAttributeValue(metaData, "parentValue");
+            else if(hasAttributeValue(metaData, "parentValue")) return false;
+            return true;
+        }
+
         function getHNQISMetadata(dataElement)
         {
             let jsonData = dataElement.attributeValues.filter(attributeValue => attributeValue.attribute.id === METADATA);
@@ -120,6 +133,23 @@ const ValidateMetadata = (props) => {
         {
             let feedbackOrder = dataElement.attributeValues.filter(attributeValue => attributeValue.attribute.id === FEEDBACK_ORDER);
             return (feedbackOrder.length > 0) ? feedbackOrder[0].value : '';
+        }
+
+        function validAggregationType(metaData, dataElement, element, aggregationOperation)
+        {
+            if(metaData.elemType === element) return (dataElement.aggregationType === aggregationOperation);
+            return true;
+        }
+
+        function validAggregationQuestion(metaData, dataElement)
+        {
+            if(metaData.elemType === "question")
+            {
+                if(dataElement.valueType === "NUMBER") return (dataElement.aggregationType === "SUM" || dataElement.aggregationType === "AVERAGE");
+                else if (dataElement.valueType === "LONG_TEXT") return (dataElement.aggregationType === "NONE");
+                return true;
+            }
+            return true;
         }
 
         function hasAttributeValue(json, key)

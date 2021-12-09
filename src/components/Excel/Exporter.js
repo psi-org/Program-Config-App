@@ -536,6 +536,17 @@ const Exporter = (props) => {
         }
       ]
     });
+    //Conditional formatting checking incomplete parent and answer
+    ws.addConditionalFormatting({
+      ref: 'L3:M3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['OR(AND($L3<>"", $M3=""), AND($L3="", $M3<>""))'],
+          style: conditionalError
+        }
+      ]
+    })
     ws.addConditionalFormatting({
       ref: 'A3:R3000',
       rules: [

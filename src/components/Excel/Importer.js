@@ -111,7 +111,7 @@ const Importer = (props) => {
 
     const getProgramDetails = (ws) => {
         let program = {};
-        program.id = ws.getCell("D12").value.result;
+        program.id = (ws.getCell("D12").value !== null) ? ws.getCell("D12").value.result: null;
         program.name = ws.getCell("C12").value;
         program.useCompetencyClass = ws.getCell("C13").value;
         program.dePrefix = ws.getCell("C14").value;
