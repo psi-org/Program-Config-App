@@ -9,6 +9,7 @@ const ValidateMetadata = (props) => {
 
     const [processed, setProcessed] = useState(false);
     const [valid, setValid] = useState(false);
+    const [save, setSave] = useState(false);
 
     console.log("props: ", props);
 
@@ -80,7 +81,12 @@ const ValidateMetadata = (props) => {
 
         function checkHasFormName(metaData, dataElement)
         {
-            return (metaData.elemType !== "" && dataElement.displayName !== "");
+            if (metaData.elem !== "")
+            {
+                return (!isBlank(dataElement.formName)); //displayname ? formName
+
+            }
+            return true;
         }
 
         function structureMatchesValue(metaData, dataElement, element, valueType)
@@ -168,21 +174,45 @@ const ValidateMetadata = (props) => {
         {
             return !isNaN(value);
         }
+
+        function isEmpty(str)
+        {
+            return (!str || str.length === 0 );
+        }
+
+        function isBlank(str)
+        {
+            return (!str || /^\s*$/.test(str));
+        }
     });
 
     return <Modal>
         <ModalTitle>Assessment Validation</ModalTitle>
         <ModalContent>
-            <NoticeBox title={processed ? "Sections and Scores Validated": "Validating Sections and Scores"}>
+            <NoticeBox error = {!valid} title={processed ? "Sections and Scores Validated": "Validating Sections and Scores"}>
                 {!processed && <CircularLoader small/> }
+                {!valid && <em>Some Validation issue occurred. Please fix these issues before saving.</em>}
+                {valid && <em>Validation Pass. Please press 'SAVE' to proceed saving these data elements.</em>}
             </NoticeBox>
         </ModalContent>
         <ModalActions>
             <ButtonStrip right>
-                <Button disabled={!valid} primary onClick={()=>props.setSaveMetadata(true)}>Save</Button>
+                <Button disabled={!valid} primary onClick={()=>setSave(true)}>Save</Button>
                 <Button disabled={!processed} default onClick={()=>props.setSavingMetadata(false)}>Close</Button>
             </ButtonStrip>
         </ModalActions>
+        {
+            save &&
+            <SaveMetadata
+                newDEQty={props.newDEQty}
+                programStage={props.programStage}
+                importedSections={props.importedSections}
+                importedScores={props.importedScores}
+                criticalSection={props.criticalSection}
+                setSavingMetadata={props.setSavingMetadata}
+                setSavedAndValidated={props.setSavedAndValidated}
+            />
+        }
     </Modal>
 }
 

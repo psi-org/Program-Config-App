@@ -83,6 +83,7 @@ const Importer = (props) => {
                                             console.log(importSummaryValues);
                                             console.log(programDetails);
                                             console.log(mappingDetails);
+                                            importSummaryValues.program = programDetails;
                                             //props.setNewDeQty(importSummaryValues.questions.new);
 
                                             // Set new sections & questions

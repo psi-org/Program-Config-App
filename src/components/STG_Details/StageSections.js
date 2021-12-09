@@ -440,6 +440,7 @@ const StageSections = ({programStage, stageRefetch }) => {
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
                     previous={{sections,setSections, scoresSection, setScoresSection}}
+                    importResults = {importResults}
                     />
             }
 
