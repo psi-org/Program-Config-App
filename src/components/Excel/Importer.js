@@ -75,7 +75,8 @@ const Importer = (props) => {
                                             //console.log("Data: ", templateData);
 
                                             //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous);
-                                            let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,"PREFIX",[],[]);
+                                            //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,"PREFIX",[],[]);
+                                            let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,programDetails.dePrefix,mappingDetails.optionSets,mappingDetails.legendSets);
                                             console.log(importedSections);
                                             console.log(importedScores);
                                             console.log(importSummaryValues);

@@ -65,13 +65,14 @@ const queryPRV = {
 const StageSections = ({programStage, stageRefetch }) => {
 
     // Globals
-    const programId = programStage.program.id;
     const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
         FEEDBACK_TEXT = "yhKEe6BLEer",
         CRITICAL_QUESTION = "NPwvdTt0Naj",
         METADATA = "haUflNqP85K",
         SCORE_DEN = "l7WdLDhE3xW",
         SCORE_NUM = "Zyr7rlDOJy8";
+
+    const programId = programStage.program.id;
     
     // Flags
     const [saveStatus, setSaveStatus] = useState('Validate');

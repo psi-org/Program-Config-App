@@ -104,6 +104,8 @@ const Exporter = (props) => {
 
     ws.getCell("D12").value = {formula: "=VLOOKUP(C12, Mapping!R3:S300,2,FALSE)"};
     ws.getCell('C12').value = props.programName;
+    ws.getCell('C13').value = props.useCompetencyClass;
+    ws.getCell('C14').value = props.programPrefix;
     ws.getCell("D12").style = {font: {color: {'argb': 'ffffff'}}}
 
     ws.getCell('B20').value = "Server mapping";
