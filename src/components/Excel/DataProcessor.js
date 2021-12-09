@@ -8,7 +8,7 @@ const optionSetQuery = {
         resource: 'optionSets',
         params: {
             fields: ['id', 'name', 'options[name]'],
-            filters: ['name:like:HNQIS - ']
+            filter: ['name:ilike:HNQIS - ']
         }
     }
 };
@@ -28,7 +28,7 @@ const legendSetsQuery = {
         resource: 'legendSets',
         params: {
             fields: ['id','name'],
-            filter: ['name:$like:HNQIS']
+            filter: ['name:ilike:HNQIS']
         }
     }
 }
