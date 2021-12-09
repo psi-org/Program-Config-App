@@ -500,11 +500,11 @@ const Exporter = (props) => {
       ]
     });
     ws.addConditionalFormatting({
-      ref: 'I3:R3',
+      ref: 'A3:R3000',
       rules: [
         {
           type: 'expression',
-          formulae: ['if($B3 === "Section")'],
+          formulae: ['$B3 = "Section"'],
           style: sectionHighlighting
         }
       ]
