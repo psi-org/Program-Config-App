@@ -19,7 +19,7 @@ import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 
-import {colors,IconAdd16,IconDelete16,IconEdit16, Tag } from '@dhis2/ui';
+import {colors,IconAdd16,IconDelete16,IconEdit16, Tag, Tooltip } from '@dhis2/ui';
 import Warnings from "./Warnings";
 import Errors from "./Errors";
 
@@ -51,6 +51,7 @@ const DraggableSection = ({ stageSection, index }) => {
 
     // Import Values //
     var sectionImportStatus = undefined;
+    var sectionImportSummary = undefined;
     if(stageSection.importStatus){
         switch (stageSection.importStatus){
             case 'new':
@@ -64,6 +65,7 @@ const DraggableSection = ({ stageSection, index }) => {
                 sectionImportStatus = <Tag neutral>Updated</Tag>;
                 break;
         }
+        sectionImportSummary = <><Tag positive>New: {stageSection.newDataElements}</Tag> <Tag neutral>Updated: {stageSection.updatedDataElements}</Tag></>
     }
 
     var classNames = (stageSection.importStatus) ? ' import_'+stageSection.importStatus:'';
@@ -77,7 +79,7 @@ const DraggableSection = ({ stageSection, index }) => {
                             <img className="ml_list-img" alt="sec" src={sec_svg} />
                         </div>
                         <div className="ml_item-title">
-                            {sectionImportStatus} {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span>
+                            {sectionImportStatus} {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span> {sectionImportSummary}
                         </div>
                         <div className="ml_item-warning_error ">
                             {stageSection.warnings && stageSection.warnings > 0 && <Warnings counts={stageSection.warnings}/> }

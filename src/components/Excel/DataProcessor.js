@@ -8,7 +8,7 @@ const optionSetQuery = {
         resource: 'optionSets',
         params: {
             fields: ['id', 'name', 'options[name]'],
-            filters: ['name:like:HNQIS - ']
+            filter: ['name:ilike:HNQIS - ']
         }
     }
 };
@@ -18,7 +18,7 @@ const healthAreasQuery = {
         resource: 'optionSets',
         params: {
             fields: ['name', 'options[id]','options[name]'],
-            filters: ['name:$like:Health%20area']
+            filter: ['name:ilike:Health area']
         }
     }
 };
@@ -28,7 +28,7 @@ const legendSetsQuery = {
         resource: 'legendSets',
         params: {
             fields: ['id','name'],
-            filter: ['name:$like:HNQIS']
+            filter: ['name:ilike:HNQIS']
         }
     }
 }
@@ -44,6 +44,9 @@ const programsQuery = {
 
 const DataProcessor = (props) => {
     const programStage = props.ps;
+    const programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
+    const programPrefix = programMetadata?.dePrefix || programStage.program.id;
+    const useCompetencyClass = programMetadata?.useCompetencyClass || "Yes";
 
     const [ isDownloaded, setIsDownloaded] = useState(false);
     const { data: data} = useDataQuery(optionSetQuery);
@@ -61,12 +64,13 @@ const DataProcessor = (props) => {
         compile_report();
         getOptionSets();
         setTimeout(function() {
-           setIsDownloaded(true);
+            setIsDownloaded(true);
         }, 2000);
     }
 
     const compile_report = () => {
         let program_stage_id = programStage.id;
+
         programStage.programStageSections.forEach((programSection) => {
             let program_section_id = programSection.id;
 
@@ -79,7 +83,7 @@ const DataProcessor = (props) => {
 
             programSection.dataElements.forEach((dataElement) => {
                 let row = {};
-                row.form_name = dataElement.displayName;
+                row.form_name = dataElement.formName;
                 row.value_type = dataElement.valueType;
                 row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
                 row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
@@ -96,6 +100,7 @@ const DataProcessor = (props) => {
                 let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
                 row.parentValue = '';
                 row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
+                if(row.structure == 'label') row.form_name = metaData.labelFormName || '';
                 row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: '';
                 row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
                 row.parent_question = (typeof metaData.parentVarName !== 'undefined') ? metaData.parentVarName : '';
@@ -184,7 +189,7 @@ const DataProcessor = (props) => {
 
     return (
         <>
-            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={props.ps.program.name} setStatus={props.setStatus}/>}
+            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={props.ps.program.name} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass}  setStatus={props.setStatus}/>}
         </>
     );
 }

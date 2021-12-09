@@ -30,17 +30,18 @@ const importMap = {
     ]
 */
 const getOptionSetId = (optionSetName,optionSets)=>{
-    return optionSets.find(os => os.name == optionSetName)?.id
+    console.info(optionSetName);
+    return optionSets.find(os => os.optionSet == optionSetName)?.id
 };
 
 const getLegendSetId = (legendSetName,legendSets)=>{
-    return legendSets.find(ls => ls.name == legendSetName)?.id
+    return legendSets.find(ls => ls.legendSet == legendSetName)?.id
 };
 
 //Question
 const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
-
-    let code = programPrefix + '_' + data[importMap.parentName];
+    console.info(data[importMap.parentName]);
+    let code = programPrefix + '_' + data[importMap.parentName]?.result;
 
     let aggType;
     if(type=='score'){
@@ -73,6 +74,12 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         //legendSet: data[importMap.legend] != "" ? { id: getLegendSetId(data[importMap.legend],legendSets) } : {},
         attributeValues: []
     };
+
+    if(data[importMap.optionSet] && data[importMap.optionSet] != ""){
+        parsedDE.optionSet = { id: getOptionSetId(data[importMap.optionSet],optionSets) };
+        parsedDE.optionSetValue = true
+    }
+    if(data[importMap.legend] && data[importMap.legend] != "") parsedDE.legendSet = { id: getLegendSetId(data[importMap.legend],legendSets) };
 
     if (data[importMap.feedbackOrder] != "") parsedDE.attributeValues.push(
         { 
@@ -153,12 +160,35 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
 
     // Get new questions (no uid)
     importedSections.forEach( i_section => {
+        i_section.newDataElements = 0;
+        i_section.updatedDataElements = 0;
+
         i_section.dataElements.map( i_de => {
-            i_de.importStatus = i_de.id == null ? 'new' : 'update'; 
-            i_de.id == null ? importSummaryValues.questions.new++ : importSummaryValues.questions.updated++;
+            if(i_de.id==null){
+                //New DE
+                i_de.importStatus = 'new'; 
+                importSummaryValues.questions.new++;
+                i_section.newDataElements++;
+            }else{
+                //Updated DE
+                i_de.importStatus = 'update'; 
+                importSummaryValues.questions.updated++;
+                i_section.updatedDataElements++;
+            }
             return i_de;
         })
     });
+
+    /*
+    importedSections.map(section => {
+        let resultsCount = section.dataElements.reduce((acc,de)=>{
+            return de.importStatus=='new' ?[acc[0]+1,acc[1]]:[acc[0],acc[1]+1]
+        },[0,0])
+        section.newDataElements = resultsCount[0];
+        section.updatedDataElements = resultsCount[1];
+        return section
+    })
+     */
 
     // Compare previous questions with imported data -> Get removed data
     var removedQuestions = currentData.sections.map( sec => {

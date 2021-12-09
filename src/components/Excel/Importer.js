@@ -76,7 +76,8 @@ const Importer = (props) => {
                                             //console.log("Data: ", templateData);
 
                                             //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous);
-                                            let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,"PREFIX",[],[]);
+                                            //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,"PREFIX",[],[]);
+                                            let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,programDetails.dePrefix,mappingDetails.optionSets,mappingDetails.legendSets);
                                             console.log(importedSections);
                                             console.log(importedScores);
                                             console.log(importSummaryValues);
@@ -122,24 +123,22 @@ const Importer = (props) => {
         let mapping = {};
         mapping.optionSets = [];
         mapping.legendSets = [];
-        for (let i = 3; i <= 100; i++) {
+        let i = 3;
+        while(ws.getCell("I"+i).value !== null) {
             let option = {};
-            if(ws.getCell("I"+i).value !== null)
-            {
-                option.id = ws.getCell("I"+i).value;
-                option.optionSet = ws.getCell("H"+i).value;
-                mapping.optionSets.push(option);
-            }
+            option.id = ws.getCell("I"+i).value;
+            option.optionSet = ws.getCell("H"+i).value;
+            mapping.optionSets.push(option);
+            i++;
         }
-
-        for (let i = 3; i < 100; i++) {
+        i = 3;
+        while(ws.getCell("P"+i).value !== null)
+        {
             let legend = {};
-            if(ws.getCell("P"+i).value !== null)
-            {
-                legend.id = ws.getCell("P"+i).value;
-                legend.legendSet = ws.getCell("O"+i).value;
-                mapping.legendSets.push(legend);
-            }
+            legend.id = ws.getCell("P"+i).value;
+            legend.legendSet = ws.getCell("O"+i).value;
+            mapping.legendSets.push(legend);
+            i++;
         }
         return mapping;
     }
