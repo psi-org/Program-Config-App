@@ -17,7 +17,7 @@ const importMap = {
     scoreDen:"Score Denominator",
     feedbackOrder:"Compositive Indicator (Feedback Order)",
     parentQuestion:"Parent question",
-    answerValue:"Answer value",
+    parentValue:"Answer value",
     feedbackText:"Feedback Text",
     programStage:"Program Stage Id",
     programSection:"Program Section Id",
@@ -104,7 +104,7 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
     if (data[importMap.scoreNum] != "") metadata.scoreNum = data[importMap.scoreNum];
     if (data[importMap.scoreDen] != "") metadata.scoreDen = data[importMap.scoreDen];
     if (data[importMap.parentQuestion]!="") metadata.parentVarName = data[importMap.parentQuestion];   // REPLACE WITH PARENT DATA ELEMENT'S UID
-    if (data[importMap.answerValue]!="") metadata.answerValue = data[importMap.answerValue];
+    if (data[importMap.parentValue]!="") metadata.parentValue = data[importMap.parentValue];
 
     // For Labels
     if(type=='label') metadata.labelFormName = data[importMap.formName];

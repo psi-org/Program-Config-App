@@ -79,11 +79,12 @@ const Importer = (props) => {
                                             //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,"PREFIX",[],[]);
                                             let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,programDetails.dePrefix,mappingDetails.optionSets,mappingDetails.legendSets);
                                             console.log(importedSections);
-                                            console.log(importedScores);
-                                            console.log(importSummaryValues);
-                                            console.log(programDetails);
-                                            console.log(mappingDetails);
+                                            // console.log(importedScores);
+                                            // console.log(importSummaryValues);
+                                            // console.log(programDetails);
+                                            // console.log(mappingDetails);
                                             importSummaryValues.program = programDetails;
+                                            importSummaryValues.mapping = mappingDetails;
                                             //props.setNewDeQty(importSummaryValues.questions.new);
 
                                             // Set new sections & questions
@@ -124,6 +125,7 @@ const Importer = (props) => {
         let mapping = {};
         mapping.optionSets = [];
         mapping.legendSets = [];
+        mapping.programs = [];
         let i = 3;
         while(ws.getCell("I"+i).value !== null) {
             let option = {};
@@ -139,6 +141,15 @@ const Importer = (props) => {
             legend.id = ws.getCell("P"+i).value;
             legend.legendSet = ws.getCell("O"+i).value;
             mapping.legendSets.push(legend);
+            i++;
+        }
+        i = 3;
+        while(ws.getCell("R"+i).value !== null)
+        {
+            let program = {};
+            program.id = ws.getCell("S"+i).value;
+            program.name = ws.getCell("R"+i).value;
+            mapping.programs.push(program);
             i++;
         }
         return mapping;

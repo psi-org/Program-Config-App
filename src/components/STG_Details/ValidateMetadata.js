@@ -10,46 +10,72 @@ const ValidateMetadata = (props) => {
     const [processed, setProcessed] = useState(false);
     const [valid, setValid] = useState(false);
     const [save, setSave] = useState(false);
-
-    console.log("props: ", props);
+    const [validationMessage, setValidationMessage] = useState("Validation Pass. Please press 'SAVE' to proceed saving these data elements.");
 
     useEffect(()=> {
         const importedSections = props.importedSections;
         const importedScore = props.importedScores;
         let errorCounts = 0;
 
-        importedSections.forEach((section) => {
-            let section_errors = 0;
-            section.dataElements.forEach((dataElement) => {
-                validateSections(dataElement);
-                if(dataElement.errors)
+        if(verifyProgramDetail(props.importResults))
+        {
+            importedSections.forEach((section) => {
+                let section_errors = 0;
+                section.dataElements.forEach((dataElement) => {
+                    validateSections(dataElement);
+                    if(dataElement.errors)
+                    {
+                        errorCounts+=dataElement.errors.length;
+                        section_errors+=dataElement.errors.length;
+                    }
+                });
+                if(section_errors > 0) section.errors = section_errors;
+            });
+
+            let score_errors = 0;
+            importedScore.dataElements.forEach((dataElement) => {
+                validateScores(dataElement);
+                if (dataElement.errors)
                 {
                     errorCounts+=dataElement.errors.length;
-                    section_errors+=dataElement.errors.length;
+                    score_errors += dataElement.errors.length;
                 }
             });
-            if(section_errors > 0) section.errors = section_errors;
-        });
+            if(score_errors > 0 ) importedScore.errors = score_errors;
 
-        let score_errors = 0;
-        importedScore.dataElements.forEach((dataElement) => {
-             validateScores(dataElement);
-             if (dataElement.errors)
-             {
-                 errorCounts+=dataElement.errors.length;
-                 score_errors += dataElement.errors.length;
-             }
-        });
-        if(score_errors > 0 ) importedScore.errors = score_errors;
-
-        console.log("errors count: ", errorCounts);
-        if(errorCounts === 0) setValid(true);
-
+            if(errorCounts === 0)
+            {
+                setValid(true);
+            }
+            else
+            {
+                setValidationMessage("Some Validation Errors occurred. Please check / fix the issues before proceeding.")
+            }
+            // console.log("Imported Section: ", importedSections);
+            props.previous.setSections(importedSections);
+            props.previous.setScoresSection(importedScore);
+        } else {
+            setValid(false);
+        }
         setProcessed(true);
-        console.log("Imported Score: ", importedScore);
 
-        props.previous.setSections(importedSections);
-        props.previous.setScoresSection(importedScore);
+        function verifyProgramDetail(importResults)
+        {
+            if (props.importResults)
+            {
+                if (props.importResults.program.id !== null && props.importResults.program.name !== null)
+                {
+                    let programDetail = props.importResults.mapping.programs.filter(prog => prog.name === props.importResults.program.name);
+                    if (programDetail.length > 0 && programDetail[0].id === props.importResults.program.id)
+                    {
+                        return true;
+                    }
+                }
+                setValidationMessage("Programs Name and Id doesn't exist or is not valid. Please check the details again");
+                return false;
+            }
+            return true;
+        }
 
         function validateSections(dataElement)
         {
@@ -83,6 +109,7 @@ const ValidateMetadata = (props) => {
         {
             if (metaData.elem !== "")
             {
+                if(metaData.elemType === "label") return (!isBlank(dataElement.name));
                 return (!isBlank(dataElement.formName)); //displayname ? formName
 
             }
@@ -191,8 +218,7 @@ const ValidateMetadata = (props) => {
         <ModalContent>
             <NoticeBox error = {!valid} title={processed ? "Sections and Scores Validated": "Validating Sections and Scores"}>
                 {!processed && <CircularLoader small/> }
-                {!valid && <em>Some Validation issue occurred. Please fix these issues before saving.</em>}
-                {valid && <em>Validation Pass. Please press 'SAVE' to proceed saving these data elements.</em>}
+                {validationMessage}
             </NoticeBox>
         </ModalContent>
         <ModalActions>
