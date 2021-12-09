@@ -1,5 +1,6 @@
 import { Modal, ModalTitle, ModalContent, ModalActions, NoticeBox, CircularLoader, ButtonStrip, Button } from "@dhis2/ui";
 import {useEffect, useState} from "react";
+import SaveMetadata from "./SaveMetadata";
 
 const   METADATA = "haUflNqP85K",
         CRITICAL_QUESTION = "NPwvdTt0Naj",
