@@ -43,7 +43,6 @@ const ProgramList = () => {
       <div className="layout_prgms_stages">
         <div className="list-ml_item">
           {
-            console.log(data.results.pager),
             data.results.programs.map((program) => {
               return <ProgramItem program={program} key={program.id}/>
             })

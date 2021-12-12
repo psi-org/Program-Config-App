@@ -1,5 +1,5 @@
 import warning_svg from './../../images/i-warning.svg';
-const Warnings = (props) => {
+const BadgeWarnings = (props) => {
     return  <>
         <img src={warning_svg} alt={"err"}/>
         <div className={"ml_item-ce"}>
@@ -8,4 +8,4 @@ const Warnings = (props) => {
     </>
 }
 
-export default Warnings
+export default BadgeWarnings

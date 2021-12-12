@@ -7,11 +7,36 @@ const   METADATA = "haUflNqP85K",
         FEEDBACK_ORDER = 'LP171jpctBm';
 
 const ValidateMetadata = (props) => {
-
+    let validationResults = {};
     const [processed, setProcessed] = useState(false);
     const [valid, setValid] = useState(false);
     const [save, setSave] = useState(false);
     const [validationMessage, setValidationMessage] = useState("Validation Pass. Please press 'SAVE' to proceed saving these data elements.");
+
+    const validationSettings = {
+        programDetails: {
+            enable: true,
+            checkHasFormName: {enable: true, title: "Form name defined for element", errorMsg: {code: "EXW100", text: "A form name was not defined for the specified element."}},
+            structureMatchesValue: {enable: true, title: "Label should be LONG_TEXT", errorMsg: {code: "EXW103", text: "The expected value type for the label Data Element is LONG_TEXT."}},
+            hasFeedbackOrder: {enable: true, title: "Verifies Feedback orders", errorMsg: {code: "EXW107", text: "The specified question has numerator and denominator assigned but does not contribute to any score."}},
+            hasBothNumeratorDenominator: {enable: true, title: "Numerator and Denominator exists", errorMsg: {code: "EXW106", text: "The specified question lacks one of the scores (numerator or denominator)"}},
+            validAggregationType: {enable: true, title: "Valid Aggregation TYpe", errorMsg: {code: "EW104", text: "The expected aggregation operator for the label Data Element is NONE"}},
+            validAggregationQuestion: {enable: true, title: "Valid Aggregation Type", errorMsg: {code: "EW105", text: "The Data Element aggregation operator was not defined correctly. (SUM or AVERAGE for numeric types and NONE for text inputs)"}},
+            isNumeratorNumeric: {enable: true, title: "Score is Numeric", errorMsg: {code: "EXW105", text: "The specified question numerator is not numeric"}},
+            isDenominatorNumeric: {enable: true, title: "Score is Numeric", errorMsg: {code: "EXW108", text: "The specified question numerator is not numeric"}},
+            hasParentQuestionNAnswerValue: {enable: true, title: "Complete Parent Logic", errorMsg: {code: "EXW109", text: "The specified question lacks one of the components for the parent logic."}}
+
+        },
+        scores: {
+            enable: true,
+            checkHasFormName: {enable: true, title: "Form name defined for element", errorMsg: {code: "EXW100", text: "A form name was not defined for the specified element."}},
+            structureMatchesValue: {enable: true, title: "Label should be LONG_TEXT", errorMsg: {code: "EXW102", text: "The expected value type for the score Data Element is NUMBER."}},
+            hasBothNumeratorDenominator: {enable: true, title: "Numerator and Denominator exists", errorMsg: {code: "EXW106", text: "The specified question lacks one of the scores (numerator or denominator)"}},
+            validAggregationType: {enable: true, title: "Valid Aggregation Type", errorMsg: {code: "EW103", text: "The expected aggregation operator for the score Data Element is AVERAGE"}},
+
+        }
+    }
+
 
     useEffect(()=> {
         const importedSections = props.importedSections;
@@ -20,6 +45,8 @@ const ValidateMetadata = (props) => {
 
         if(verifyProgramDetail(props.importResults))
         {
+            let questions = [];
+            let scores = [];
             importedSections.forEach((section) => {
                 let section_errors = 0;
                 section.dataElements.forEach((dataElement) => {
@@ -28,6 +55,7 @@ const ValidateMetadata = (props) => {
                     {
                         errorCounts+=dataElement.errors.length;
                         section_errors+=dataElement.errors.length;
+                        questions.push(dataElement);
                     }
                 });
                 if(section_errors > 0) section.errors = section_errors;
@@ -40,8 +68,11 @@ const ValidateMetadata = (props) => {
                 {
                     errorCounts+=dataElement.errors.length;
                     score_errors += dataElement.errors.length;
+                    scores.push(dataElement);
                 }
             });
+            validationResults.questions = questions;
+            validationResults.scores = scores;
             if(score_errors > 0 ) importedScore.errors = score_errors;
 
             if(errorCounts === 0)
@@ -50,11 +81,14 @@ const ValidateMetadata = (props) => {
             }
             else
             {
-                setValidationMessage("Some Validation Errors occurred. Please check / fix the issues before proceeding.")
+                setValidationMessage("Some Validation Errors occurred. Please check / fix the issues before proceeding.");
+                props.setSavingMetadata(false);
+                props.setValidationResults(validationResults);
             }
-            // console.log("Imported Section: ", importedSections);
             props.previous.setSections(importedSections);
             props.previous.setScoresSection(importedScore);
+
+
         } else {
             setValid(false);
         }
@@ -80,30 +114,39 @@ const ValidateMetadata = (props) => {
 
         function validateSections(dataElement)
         {
-            let errors = [];
-            let warnings = [];
-            let metaData = getHNQISMetadata(dataElement);
-            if (!checkHasFormName(metaData, dataElement)) errors.push({"EXW100": "A form name was not defined for the specified element."});
-            if (!structureMatchesValue(metaData, dataElement, "label", "LONG_TEXT")) errors.push({"EXW103":"The expected value type for the label Data Element is LONG_TEXT"});
-            if (!hasFeedbackOrder(metaData, dataElement)) errors.push({"EXW107": "The specified question has numerator and denominator assigned but does not contribute to any score."});
-            if (!hasBothNumeratorDenominator(metaData)) errors.push({"EXW106": "The specified question lacks one of the scores (numerator or denominator)"});
-            if (!validAggregationType(metaData, dataElement, "label", "NONE")) errors.push({"EW104": "The expected aggregation operator for the label Data Element is NONE"})
-            if (!validAggregationQuestion(metaData, dataElement)) errors.push({"EW105": "The Data Element aggregation operator was not defined correctly. (SUM or AVERAGE for numeric types and NONE for text inputs)"});
-            if (!isNumeric(metaData, "scoreNum")) errors.push({"EXW105": "The specified question numerator is not numeric"});
-            if (!isNumeric(metaData, "scoreDen")) errors.push({"EXW108": "The specified question denominator is not numeric"});
-            if (!hasBothParentQuestionNAnswerValue(metaData)) errors.push({"EXW109": "The specified question lacks one of the components for the parent logic."});
-            if(errors.length > 0) dataElement.errors = errors;
+            const programDetailsValidationSettings = validationSettings.programDetails;
+            if (programDetailsValidationSettings.enable) {
+                let errors = [];
+                let warnings = [];
+                let metaData = getHNQISMetadata(dataElement);
+                if (programDetailsValidationSettings.checkHasFormName.enable && !checkHasFormName(metaData, dataElement)) errors.push(programDetailsValidationSettings.checkHasFormName.errorMsg);
+                if (programDetailsValidationSettings.structureMatchesValue.enable && !structureMatchesValue(metaData, dataElement, "label", "LONG_TEXT")) errors.push(programDetailsValidationSettings.structureMatchesValue.errorMsg);
+                if (programDetailsValidationSettings.hasFeedbackOrder.enable && !hasFeedbackOrder(metaData, dataElement)) errors.push(programDetailsValidationSettings.hasFeedbackOrder.errorMsg);
+                if (programDetailsValidationSettings.hasBothNumeratorDenominator.enable && !hasBothNumeratorDenominator(metaData)) errors.push(programDetailsValidationSettings.hasBothNumeratorDenominator.errorMsg);
+                if (programDetailsValidationSettings.validAggregationType.enable && !validAggregationType(metaData, dataElement, "label", "NONE")) errors.push(programDetailsValidationSettings.validAggregationType.errorMsg);
+                if (programDetailsValidationSettings.validAggregationQuestion.enable && !validAggregationQuestion(metaData, dataElement)) errors.push(programDetailsValidationSettings.validAggregationQuestion.errorMsg);
+                if (programDetailsValidationSettings.isNumeratorNumeric.enable && !isNumeric(metaData, "scoreNum")) errors.push(programDetailsValidationSettings.isNumeratorNumeric.errorMsg);
+                if (programDetailsValidationSettings.isDenominatorNumeric.enable && !isNumeric(metaData, "scoreDen")) errors.push(programDetailsValidationSettings.isDenominatorNumeric.errorMsg);
+                if (programDetailsValidationSettings.hasParentQuestionNAnswerValue.enable && !hasBothParentQuestionNAnswerValue(metaData)) errors.push(programDetailsValidationSettings.hasParentQuestionNAnswerValue.errorMsg);
+                if(errors.length > 0) dataElement.errors = errors;
+            }
         }
 
         function validateScores(dataElement)
         {
-            let errors = [];
-            let warnings = [];
-            let metaData = getHNQISMetadata(dataElement);
-            if (!structureMatchesValue(metaData, dataElement, "score", "NUMBER")) errors.push({"EXW102": "The expected value type for the score Data Element is NUMBER"});
-            if (!hasBothNumeratorDenominator(metaData)) errors.push({"EXW106": "The specified question lacks one of the scores (numerator or denominator)"});
-            if (!validAggregationType(metaData, dataElement, "score", "AVERAGE")) errors.push({"EW103": "The expected aggregation operator for the score Data Element is AVERAGE"});
-            if(errors.length > 0) dataElement.errors = errors;
+            const scoreValidationSettings = validationSettings.scores;
+            if(scoreValidationSettings.enable)
+            {
+                let errors = [];
+                let warnings = [];
+                let metaData = getHNQISMetadata(dataElement);
+                if (scoreValidationSettings.checkHasFormName.enable && !checkHasFormName(metaData, dataElement)) errors.push(scoreValidationSettings.checkHasFormName.errorMsg);
+                if (scoreValidationSettings.structureMatchesValue.enable && !structureMatchesValue(metaData, dataElement, "score", "NUMBER")) errors.push(scoreValidationSettings.structureMatchesValue.errorMsg);
+                if (scoreValidationSettings.hasBothNumeratorDenominator.enable && !hasBothNumeratorDenominator(metaData)) errors.push(scoreValidationSettings.hasBothNumeratorDenominator.errorMsg);
+                if (scoreValidationSettings.validAggregationType.enable && !validAggregationType(metaData, dataElement, "score", "AVERAGE")) errors.push(scoreValidationSettings.validAggregationType.errorMsg);
+
+                if(errors.length > 0) dataElement.errors = errors;
+            }
         }
 
         function checkHasFormName(metaData, dataElement)

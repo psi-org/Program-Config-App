@@ -7,8 +7,10 @@ import error_svg from './../../images/i-error.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import {colors,IconAdd16,IconDelete16,IconEdit16, Tag } from '@dhis2/ui';
 
-import Warnings from "./Warnings";
-import Errors from "./Errors";
+import BadgeWarnings from "./BadgeWarnings";
+import BadgeErrors from "./BadgeErrors";
+import ValidationMessages from "./ValidationMessages";
+import {useState} from "react";
 
 const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     FEEDBACK_TEXT = "yhKEe6BLEer",
@@ -18,6 +20,8 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     SCORE_NUM = "Zyr7rlDOJy8";
 
 const DraggableDataElement = ({dataElement,index}) => {
+
+    const [showValidationMessage, setShowValidationMessage] = useState(false);
 
     let classNames = '';
     
@@ -57,14 +61,15 @@ const DraggableDataElement = ({dataElement,index}) => {
                     <div className="ml_item-title"> 
                         {deImportStatus} { renderFormName || dataElement.formName}
                     </div>
-                    <div className="ml_item-warning_error">
-                        {dataElement.warnings && dataElement.warnings.length > 0 && <Warnings counts={dataElement.warnings.length}/> }
-                        {dataElement.errors && dataElement.errors.length > 0 && <Errors counts={dataElement.errors.length}/> }
+                    <div className="ml_item-warning_error" onClick={()=>setShowValidationMessage(!showValidationMessage)}>
+                        {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length}/> }
+                        {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
                     </div>
                     <div className="ml_item-cta">
                         <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>
                     </div>
                 </div>
+                {showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }
             </div>
         )}
     </Draggable>

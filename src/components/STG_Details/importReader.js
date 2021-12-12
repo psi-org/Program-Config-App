@@ -30,7 +30,7 @@ const importMap = {
     ]
 */
 const getOptionSetId = (optionSetName,optionSets)=>{
-    console.info(optionSetName);
+    // console.info(optionSetName);
     return optionSets.find(os => os.optionSet == optionSetName)?.id
 };
 
@@ -40,7 +40,7 @@ const getLegendSetId = (legendSetName,legendSets)=>{
 
 //Question
 const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
-    console.info(data[importMap.parentName]);
+    // console.info(data[importMap.parentName]);
     let code = programPrefix + '_' + data[importMap.parentName]?.result;
 
     let aggType;
@@ -215,7 +215,7 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
     importSummaryValues.scores.removed = removedScores.length;
     importSummaryValues.scores.removedItems = removedScores;
 
-    console.log(importSummaryValues);
+    // console.log(importSummaryValues);
 
     return {importedSections,importedScores,importSummaryValues};
 

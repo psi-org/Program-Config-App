@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 
 // *** Modules ***
 import $ from 'jquery';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 
 // *** IMAGES ***
 import sec_svg from './../../images/i-drag_black.svg';
@@ -20,11 +20,12 @@ import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 
 import {colors,IconAdd16,IconDelete16,IconEdit16, Tag, Tooltip } from '@dhis2/ui';
-import Warnings from "./Warnings";
-import Errors from "./Errors";
+import BadgeWarnings from "./BadgeWarnings";
+import BadgeErrors from "./BadgeErrors";
+import ValidationMessages from "./ValidationMessages";
 
 const DraggableSection = ({ stageSection, index }) => {
-    
+    const [showValidationMessage, setShowValidationMessage] = useState(false);
     useEffect(() => {
         $('img.bsct_cta').off().on("click", function (e) {            
             if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
@@ -81,9 +82,9 @@ const DraggableSection = ({ stageSection, index }) => {
                         <div className="ml_item-title">
                             {sectionImportStatus} {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span> {sectionImportSummary}
                         </div>
-                        <div className="ml_item-warning_error ">
-                            {stageSection.warnings && stageSection.warnings > 0 && <Warnings counts={stageSection.warnings}/> }
-                            {stageSection.errors && stageSection.errors > 0 && <Errors counts={stageSection.errors}/> }
+                        <div className="ml_item-warning_error " onClick={()=>setShowValidationMessage(!showValidationMessage)}>
+                            {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
+                            {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                         </div>
                         <div className="ml_item-cta">
                             <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
@@ -102,6 +103,7 @@ const DraggableSection = ({ stageSection, index }) => {
                             </div>
                         )}
                     </Droppable>
+                    {showValidationMessage && <ValidationMessages dataElements={stageSection.dataElements} showValidationMessage={setShowValidationMessage} /> }
                 </div>
             )}
         </Draggable>

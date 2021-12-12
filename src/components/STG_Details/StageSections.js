@@ -19,6 +19,7 @@ import SaveMetadata from "./SaveMetadata";
 import { Link } from "react-router-dom";
 import Removed from "./Removed";
 import ValidateMetadata from "./ValidateMetadata";
+import Errors from "./Errors";
 
 const createMutation = {
     resource: 'metadata',
@@ -86,7 +87,9 @@ const StageSections = ({programStage, stageRefetch }) => {
     const [ exportStatus, setExportStatus] = useState("Download");
     const [ importerEnabled, setImporterEnabled ] = useState(false);
     const [ importResults, setImportResults] = useState(false);
-    const [progressSteps,setProgressSteps]= useState(0);
+    const [ progressSteps,setProgressSteps ]= useState(0);
+    const [ isValid, setIsValid ] = useState(true);
+    const [ validationResults, setValidationResults] = useState(false);
 
 
     // States
@@ -410,6 +413,10 @@ const StageSections = ({programStage, stageRefetch }) => {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
                             <Removed importResults={importResults} index={0} key={"removedSec"} />
                         }
+                        {
+                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0) &&
+                            <Errors validationResults={validationResults} index={0} key={"validationSec"}/>
+                        }
                         <Droppable droppableId="dpb-sections" type="SECTION">
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
@@ -441,6 +448,8 @@ const StageSections = ({programStage, stageRefetch }) => {
                     setSavedAndValidated={setSavedAndValidated}
                     previous={{sections,setSections, scoresSection, setScoresSection}}
                     importResults = {importResults}
+                    setIsValid = {setIsValid}
+                    setValidationResults = {setValidationResults}
                     />
             }
 
