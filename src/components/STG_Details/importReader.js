@@ -17,7 +17,7 @@ const importMap = {
     scoreDen:"Score Denominator",
     feedbackOrder:"Compositive Indicator (Feedback Order)",
     parentQuestion:"Parent question",
-    answerValue:"Answer value",
+    parentValue:"Answer value",
     feedbackText:"Feedback Text",
     programStage:"Program Stage Id",
     programSection:"Program Section Id",
@@ -39,7 +39,7 @@ const getLegendSetId = (legendSetName,legendSets)=>{
 
 //Question
 const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
-    console.info(data[importMap.parentName]);
+    // console.info(data[importMap.parentName]);
     let code = programPrefix + '_' + data[importMap.parentName]?.result;
 
     let aggType;
@@ -211,7 +211,7 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
     importSummaryValues.scores.removed = removedScores.length;
     importSummaryValues.scores.removedItems = removedScores;
 
-    console.log(importSummaryValues);
+    // console.log(importSummaryValues);
 
     return {importedSections,importedScores,importSummaryValues};
 

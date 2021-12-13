@@ -28,6 +28,7 @@ const Importer = (props) => {
     }
 
     const startImportProcess = () => {
+        setExecutedTasks([]);
         setButtonDisabled(true);
         //1. Form Validation
         if (typeof selectedFile !== 'undefined') {
@@ -53,7 +54,7 @@ const Importer = (props) => {
                                     headers.shift();
                                     worksheetValidation(headers, function (status) {
                                         if (status) {
-                                            var task = { step: 4, name: "Extracting data from XLSX", status: "success" };
+                                            var task = { step:4, name: "Extracting data from XLSX", status: "success" };
                                             setCurrentTask(task.name);
                                             let templateData = [];
                                             let dataRow = 3;
@@ -77,11 +78,13 @@ const Importer = (props) => {
                                             //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous);
                                             //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,"PREFIX",[],[]);
                                             let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,programDetails.dePrefix,mappingDetails.optionSets,mappingDetails.legendSets);
-                                            console.log(importedSections);
-                                            console.log(importedScores);
-                                            console.log(importSummaryValues);
-                                            console.log(programDetails);
-                                            console.log(mappingDetails);
+                                            // console.log(importedSections);
+                                            // console.log(importedScores);
+                                            // console.log(importSummaryValues);
+                                            // console.log(programDetails);
+                                            // console.log(mappingDetails);
+                                            importSummaryValues.program = programDetails;
+                                            importSummaryValues.mapping = mappingDetails;
                                             //props.setNewDeQty(importSummaryValues.questions.new);
 
                                             // Set new sections & questions
@@ -105,16 +108,12 @@ const Importer = (props) => {
 
             });
         }
-        else {
-            //Some validation error WIP
-            console.log("validation erros");
-        }
         setButtonDisabled(false);
     }
 
     const getProgramDetails = (ws) => {
         let program = {};
-        program.id = ws.getCell("D12").value.result;
+        program.id = (ws.getCell("D12").value !== null) ? ws.getCell("D12").value.result: null;
         program.name = ws.getCell("C12").value;
         program.useCompetencyClass = ws.getCell("C13").value;
         program.dePrefix = ws.getCell("C14").value;
@@ -126,6 +125,7 @@ const Importer = (props) => {
         let mapping = {};
         mapping.optionSets = [];
         mapping.legendSets = [];
+        mapping.programs = [];
         let i = 3;
         while(ws.getCell("I"+i).value !== null) {
             let option = {};
@@ -141,6 +141,15 @@ const Importer = (props) => {
             legend.id = ws.getCell("P"+i).value;
             legend.legendSet = ws.getCell("O"+i).value;
             mapping.legendSets.push(legend);
+            i++;
+        }
+        i = 3;
+        while(ws.getCell("R"+i).value !== null)
+        {
+            let program = {};
+            program.id = ws.getCell("S"+i).value;
+            program.name = ws.getCell("R"+i).value;
+            mapping.programs.push(program);
             i++;
         }
         return mapping;
