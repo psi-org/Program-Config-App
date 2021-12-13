@@ -19,7 +19,7 @@ const StageItem = ({stage}) => {
   const { setProgramStage } = bindActionCreators(actionCreators, dispatch);
 
   return (
-    <div className="ml_item" style={{color:"#333333" , backgroundColor: "#5DD9A9"}}>
+    <div className="ml_item" style={{color:"#333333" , backgroundColor: "#e3f2fd", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
       <div className=""> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
         <img className="ml_list-img" alt="prg" src={stg_svg} />
       </div>
