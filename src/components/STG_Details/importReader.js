@@ -30,7 +30,6 @@ const importMap = {
     ]
 */
 const getOptionSetId = (optionSetName,optionSets)=>{
-    console.info(optionSetName);
     return optionSets.find(os => os.optionSet == optionSetName)?.id
 };
 
@@ -65,14 +64,10 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         code,
         formName: type=='label'?'     ':data[importMap.formName],
         domainType: 'TRACKER',
-        //zeroIsSignificant: '',
         valueType: data[importMap.valueType],
         aggregationType: aggType,
-        //categoryCombo :  { id :  '' },
-        //optionSetValue: data[importMap.optionSet] != "",
-        //optionSet: data[importMap.optionSet] != "" ? { id: getOptionSetId(data[importMap.optionSet],optionSets) } : {},
-        //legendSet: data[importMap.legend] != "" ? { id: getLegendSetId(data[importMap.legend],legendSets) } : {},
-        attributeValues: []
+        attributeValues: [],
+        parentName: data[importMap.parentName]?.result
     };
 
     if(data[importMap.optionSet] && data[importMap.optionSet] != ""){
@@ -103,12 +98,12 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
     };
     if (data[importMap.scoreNum] != "") metadata.scoreNum = data[importMap.scoreNum];
     if (data[importMap.scoreDen] != "") metadata.scoreDen = data[importMap.scoreDen];
-    if (data[importMap.parentQuestion]!="") metadata.parentVarName = data[importMap.parentQuestion];   // REPLACE WITH PARENT DATA ELEMENT'S UID
+    //if (data[importMap.parentQuestion]!="") metadata.parentVarName = data[importMap.parentQuestion];
+    if (data[importMap.parentQuestion]!="") parsedDE.parentQuestion = data[importMap.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
     if (data[importMap.answerValue]!="") metadata.answerValue = data[importMap.answerValue];
 
     // For Labels
     if(type=='label') metadata.labelFormName = data[importMap.formName];
-
 
     parsedDE.attributeValues.push(
         { 
@@ -175,6 +170,7 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
                 importSummaryValues.questions.updated++;
                 i_section.updatedDataElements++;
             }
+
             return i_de;
         })
     });

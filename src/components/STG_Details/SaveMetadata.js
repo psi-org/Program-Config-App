@@ -22,6 +22,10 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     SCORE_DEN = "l7WdLDhE3xW",
     SCORE_NUM = "Zyr7rlDOJy8";
 
+const getParentUid=(parentName,dataElements)=>{
+    return dataElements.find(de => de.parentName == parentName)?.id
+};
+
 const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,criticalSection,setSavingMetadata,setSavedAndValidated}) => {
 
     const [completed, setCompleted] = useState(false);
@@ -73,11 +77,18 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                 });
                 //return dataElement;
             });
-    
+
+            
             delete section.importStatus;
             section.sortOrder = secIdx+1;
             //return section
         });
+
+        // Map parent name with data element uid
+        // let importedDataElements = importedSections.map(sec => sec.dataElements).flat();
+        // importedSections.map(section =>{
+        //     section.dataElements.map()
+        // })
 
         /**
          * Edit imported scores
