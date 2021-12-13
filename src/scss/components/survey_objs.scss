@@ -1,0 +1,117 @@
+.survey_obj-i_l1 {
+    float: left;
+    width: 24px;
+    height: 24px;
+    margin: 6px 0;
+}
+
+.survey_obj-i_l2 {
+    float: left;
+    width: 24px;
+    height: 24px;
+    margin: 6px 0 6px 32px;
+}
+
+.survey_obj_l1 {
+    display: grid;
+    grid-template-columns: 32px calc(100% - 32px);
+    grid-template-rows: auto;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+        "section-drag section-text";
+    cursor: pointer;
+
+    .section-drag {
+        padding: 6px 4px;
+        background: #F6F9FB;
+        border-radius: 6px 0 0 6px;
+        border-top: 0.5px solid #2E6692;
+        border-left: 0.5px solid #2E6692;
+        border-bottom: 0.5px solid #2E6692;
+        grid-area: section-drag;
+    }
+
+    .section-text {
+        background: #F6F9FB;
+        border-radius: 0 6px 6px 0;
+        border-top: 0.5px solid #2E6692;
+        border-right: 0.5px solid #2E6692;
+        border-bottom: 0.5px solid #2E6692;
+        grid-area: section-text;
+
+        div {
+            padding: 0 8px;
+            font-size: 10px;
+            width: 100%;
+        }
+
+        .title {
+            padding-top: 2px;
+            font-weight: 700;
+            color: #006BBD;
+        }
+
+        .elmnts {
+            padding-bottom: 2px;
+            color: #8D8E8F;
+        }
+    }
+}
+
+.survey_obj_l2 {
+    display: grid;
+    grid-template-columns: 32px calc(100% - 32px);
+    grid-template-rows: auto;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+        "section-drag section-text";
+    cursor: pointer;
+
+    .section-level {
+        padding: 6px 0 6px 24px;
+        grid-area: section-level;
+    }
+
+    .section-drag {
+        padding: 6px 4px;
+        background: #F6F9FB;
+        border-radius: 6px 0 0 6px;
+        border-top: 0.5px solid #29C4A9;
+        border-left: 0.5px solid #29C4A9;
+        border-bottom: 0.5px solid #29C4A9;
+        grid-area: section-drag;
+    }
+
+    .section-text {
+        background: #F6F9FB;
+        border-radius: 0 6px 6px 0;
+        border-top: 0.5px solid #29C4A9;
+        border-right: 0.5px solid #29C4A9;
+        border-bottom: 0.5px solid #29C4A9;
+        white-space: nowrap;
+        grid-area: section-text;
+
+        &:before {
+            content: "";
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+        }
+
+        div {
+            padding: 0 8px;
+            font-size: 10px;
+            width: 100%;
+        }
+
+        .title {
+            display: inline-block;
+            vertical-align: middle;
+            white-space: normal;
+            font-weight: 700;
+            color: #29C4A9;
+        }
+    }
+}

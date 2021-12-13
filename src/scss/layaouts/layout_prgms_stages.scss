@@ -1,0 +1,58 @@
+// program list
+.list-ml_item {
+    width: 100%;
+    height: calc(100vh - 365px);
+
+    .ml_item {
+        display: grid;
+        grid-template-columns: auto 1fr auto auto;
+        grid-template-rows: auto;
+        grid-auto-columns: 1fr;
+        gap: 0px 0px;
+        grid-auto-flow: row;
+        grid-template-areas:
+            "ml_list-icon ml_item-title ml_item-warning_error ml_item-cta";
+        padding: 8px;
+        margin-bottom: 8px;
+
+        .ml_list-icon {
+            padding-top: 2px;
+            display: flex;
+            align-items: center;
+            grid-area: ml_list-icon;
+        }
+    
+        .ml_item-title {
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            grid-area: ml_item-title;
+        }
+    
+        .ml_item-warning_error {
+            display: flex;
+            align-items: center;
+            grid-area: ml_item-warning_error;
+        }
+    
+        .ml_item-cta {
+            display: flex;
+            align-items: center;
+            grid-area: ml_item-cta;
+        }
+    }
+}
+
+// Stage
+
+.cont_stage{
+    .title{
+        margin: 0 8px 0 16px;
+    }
+
+    DragDropContext {
+        .wrapper {
+            background-color: lightcoral;
+        }
+    }
+}
