@@ -498,8 +498,17 @@
 .cont_stage .title {
   margin: 0 8px 0 16px;
 }
-.cont_stage DragDropContext .wrapper {
-  background-color: lightcoral;
+.cont_stage .section_cont {
+  display: none;
+  width: 100%;
+  min-height: 70px;
+  background-color: #8ec8c863;
+  padding: 8px 16px;
+  margin: 0 0 8px;
+  border-radius: 0 0 4px 4px;
+}
+.cont_stage .section_cont .fab, .cont_stage .section_cont .fab_cont {
+  margin: 0 auto;
 }
 
 .fab {
