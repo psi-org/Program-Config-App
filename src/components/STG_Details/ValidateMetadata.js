@@ -189,7 +189,7 @@ const ValidateMetadata = (props) => {
 
         function hasBothParentQuestionNAnswerValue(metaData)
         {
-            if(hasAttributeValue(metaData, "parentVarName")) return hasAttributeValue(metaData, "parentValue");
+            if(hasAttributeValue(metaData, "parentQuestion")) return hasAttributeValue(metaData, "parentValue");
             else if(hasAttributeValue(metaData, "parentValue")) return false;
             return true;
         }
@@ -281,6 +281,8 @@ const ValidateMetadata = (props) => {
                 criticalSection={props.criticalSection}
                 setSavingMetadata={props.setSavingMetadata}
                 setSavedAndValidated={props.setSavedAndValidated}
+                removedItems={props.removedItems}
+                programMetadata={props.programMetadata}
             />
         }
     </Modal>

@@ -1,5 +1,5 @@
 // DHIS2 UI
-import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Card, Modal, ModalTitle, ModalContent, ModalActions, LinearLoader, Chip, IconDownload24, IconUpload24 } from "@dhis2/ui";
+import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Card, Modal, ModalTitle, ModalContent, ModalActions, LinearLoader, Chip, IconDownload24, IconUpload24, IconSync24 } from "@dhis2/ui";
 
 // React Hooks
 import { useState, useEffect } from "react";
@@ -28,7 +28,7 @@ const createMutation = {
 };
 
 const deleteMetadataMutation = {
-    resource: 'metadata?ca=DELETE',
+    resource: 'metadata?importStrategy=DELETE',
     type: 'create',
     data: ({ data }) => data
 };
@@ -97,6 +97,9 @@ const StageSections = ({programStage, stageRefetch }) => {
     const [scoresSection, setScoresSection] = useState(programStage.programStageSections.find(s => s.name =="Scores"));
     const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name =="Critical Steps Calculations"));
     const [programStageDataElements, setProgramStageDataElements] = useState(programStage.programStageDataElements);
+    const [programMetadata,setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
+
+    //console.info(sections);
 
     // Create Mutation
     let metadataDM= useDataMutation(createMutation);
@@ -267,8 +270,8 @@ const StageSections = ({programStage, stageRefetch }) => {
         // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
         setProgressSteps(3);
         
-        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId);
-        const { programRules, programRuleActions } = buildProgramRules(sections, programId, compositeScores, scoresMapping, uidPool); //useCompetencyClass
+        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId,programMetadata.useCompetencyClass);
+        const { programRules, programRuleActions } = buildProgramRules(sections, programId, compositeScores, scoresMapping, uidPool,programMetadata.useCompetencyClass); //useCompetencyClass
 
         const metadata = {programRuleVariables, programRules, programRuleActions};
 
@@ -286,7 +289,7 @@ const StageSections = ({programStage, stageRefetch }) => {
             setProgressSteps(5);
             
             createMetadata.mutate({ data: metadata }).then(response => {
-                console.log(response);
+                //console.log(response);
                 setSaveAndBuild('Completed');
                 setSavedAndValidated(false);
 
@@ -306,20 +309,13 @@ const StageSections = ({programStage, stageRefetch }) => {
                     <Chip>Stage: {programStage.displayName}</Chip>
                 </div>
                 <ButtonStrip>
-                {
-                    /**
-                     * 1 . Validate Configuration
-                     * When import || d&d -> 2. Save and validate
-                     */
-                }
                     <Button disabled={createMetadata.loading} onClick={() => commit()}>{saveStatus}</Button>
-                    <Button disabled={!savedAndValidated} primary onClick={() => run()}>Run Magic!</Button>
+                    <Button disabled={!savedAndValidated} primary onClick={() => run()}>Set up program</Button>
                     <Button name="generator" icon={exportToExcel ? null : <IconDownload24/>}
                         loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}> {exportStatus}</Button>
-
                     <Button name="importer" icon={<IconUpload24/>}
                         onClick={() => setImporterEnabled(true)}> Import</Button>
-
+                    <Button name="Reload" icon={<IconSync24/>} onClick={()=> {window.location.reload()}}>Reload</Button>
                 </ButtonStrip>
             </div>
             <div className="wrapper">
@@ -434,7 +430,7 @@ const StageSections = ({programStage, stageRefetch }) => {
                     </div>
                 </div>
             </DragDropContext>
-            {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{sections,setSections, scoresSection, setScoresSection}} setSaveStatus={setSaveStatus} setImportResults={setImportResults}/>}
+            {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{sections,setSections, scoresSection, setScoresSection}} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{programMetadata,setProgramMetadata}} />}
             {
                 savingMetadata &&
                 <ValidateMetadata
@@ -443,6 +439,8 @@ const StageSections = ({programStage, stageRefetch }) => {
                     importedSections={sections}
                     importedScores={scoresSection}
                     criticalSection={criticalSection}
+                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems):[]}
+
                     // createMetadata={createMetadata}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
@@ -450,6 +448,7 @@ const StageSections = ({programStage, stageRefetch }) => {
                     importResults = {importResults}
                     setIsValid = {setIsValid}
                     setValidationResults = {setValidationResults}
+                    programMetadata={programMetadata}
                     />
             }
 

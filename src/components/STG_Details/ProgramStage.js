@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import {NoticeBox, CircularLoader} from "@dhis2/ui";
 import { Link, useParams } from "react-router-dom";
 import StageSections from "./StageSections";
+import { ajax } from "jquery";
 
 const query = {
     results: {
@@ -17,8 +18,8 @@ const query = {
         params: {
             fields:[
                 'id','name','allowGenerateNextVisit','publicAccess','reportDateToUse','formType','generatedByEnrollmentDate','displayFormName','sortOrder','hideDueDate','enableUserAssignment','minDaysFromStart','favorite','executionDateLabel','preGenerateUID','displayName','externalAccess','openAfterEnrollment','repeatable','remindCompleted','displayGenerateEventBox','validationStrategy','autoGenerateEvent','blockEntryForm','program[id,name,attributeValues]','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
-                'programStageDataElements[id,name,compulsory,programStage,dataElement[id,name,shortName,code,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],attributeValues,displayName],sortOrder]',
-                'programStageSections[id,name,displayName,sortOrder,dataElements[id,name,shortName,code,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],attributeValues,displayName]]',
+                'programStageDataElements[id,name,compulsory,programStage,dataElement[id,name,shortName,code,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],attributeValues,displayName],sortOrder]',
+                'programStageSections[id,name,displayName,sortOrder,dataElements[id,name,shortName,code,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],attributeValues,displayName]]',
             ]
         }
     }
