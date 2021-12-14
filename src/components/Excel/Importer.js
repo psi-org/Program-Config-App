@@ -85,7 +85,6 @@ const Importer = (props) => {
                                             // console.log(mappingDetails);
                                             importSummaryValues.program = programDetails;
                                             importSummaryValues.mapping = mappingDetails;
-                                            //props.setNewDeQty(importSummaryValues.questions.new);
 
                                             // Set new sections & questions
                                             setImportSummary(importSummaryValues);
@@ -97,6 +96,11 @@ const Importer = (props) => {
 
                                             props.previous.setSections(importedSections);
                                             props.previous.setScoresSection(newScoresSection);
+
+                                            let programMetadata_new = props.programMetadata.programMetadata;
+                                            programMetadata_new.dePrefix = programDetails.dePrefix;
+                                            programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
+                                            props.programMetadata.setProgramMetadata(programMetadata_new);
                                         }
                                     })
                                 }
@@ -114,6 +118,7 @@ const Importer = (props) => {
     const getProgramDetails = (ws) => {
         let program = {};
         program.id = (ws.getCell("D12").value !== null) ? ws.getCell("D12").value.result: null;
+        // program.id = (ws.getCell("D12").value !== null) ? ws.getCell("D12").value: null;
         program.name = ws.getCell("C12").value;
         program.useCompetencyClass = ws.getCell("C13").value;
         program.dePrefix = ws.getCell("C14").value;

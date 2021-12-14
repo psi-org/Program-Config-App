@@ -189,7 +189,7 @@ const ValidateMetadata = (props) => {
 
         function hasBothParentQuestionNAnswerValue(metaData)
         {
-            if(hasAttributeValue(metaData, "parentVarName")) return hasAttributeValue(metaData, "parentValue");
+            if(hasAttributeValue(metaData, "parentQuestion")) return hasAttributeValue(metaData, "parentValue");
             else if(hasAttributeValue(metaData, "parentValue")) return false;
             return true;
         }
@@ -257,33 +257,35 @@ const ValidateMetadata = (props) => {
         }
     });
 
-    return  <Modal>
-                <ModalTitle>Assessment Validation</ModalTitle>
-                <ModalContent>
-                    <NoticeBox error = {!valid} title={processed ? "Sections and Scores Validated": "Validating Sections and Scores"}>
-                        {!processed && <CircularLoader small/> }
-                        {validationMessage}
-                    </NoticeBox>
-                </ModalContent>
-                <ModalActions>
-                    <ButtonStrip right>
-                        <Button disabled={!valid} primary onClick={()=>setSave(true)}>Save</Button>
-                        <Button disabled={!processed} default onClick={()=>props.setSavingMetadata(false)}>Close</Button>
-                    </ButtonStrip>
-                </ModalActions>
-                {
-                    save &&
-                    <SaveMetadata
-                        newDEQty={props.newDEQty}
-                        programStage={props.programStage}
-                        importedSections={props.importedSections}
-                        importedScores={props.importedScores}
-                        criticalSection={props.criticalSection}
-                        setSavingMetadata={props.setSavingMetadata}
-                        setSavedAndValidated={props.setSavedAndValidated}
-                    />
-                }
-            </Modal>
+    return <Modal>
+        <ModalTitle>Assessment Validation</ModalTitle>
+        <ModalContent>
+            <NoticeBox error = {!valid} title={processed ? "Sections and Scores Validated": "Validating Sections and Scores"}>
+                {!processed && <CircularLoader small/> }
+                {validationMessage}
+            </NoticeBox>
+        </ModalContent>
+        <ModalActions>
+            <ButtonStrip right>
+                <Button disabled={!valid} primary onClick={()=>setSave(true)}>Save</Button>
+                <Button disabled={!processed} default onClick={()=>props.setSavingMetadata(false)}>Close</Button>
+            </ButtonStrip>
+        </ModalActions>
+        {
+            save &&
+            <SaveMetadata
+                newDEQty={props.newDEQty}
+                programStage={props.programStage}
+                importedSections={props.importedSections}
+                importedScores={props.importedScores}
+                criticalSection={props.criticalSection}
+                setSavingMetadata={props.setSavingMetadata}
+                setSavedAndValidated={props.setSavedAndValidated}
+                removedItems={props.removedItems}
+                programMetadata={props.programMetadata}
+            />
+        }
+    </Modal>
 }
 
 export default ValidateMetadata;

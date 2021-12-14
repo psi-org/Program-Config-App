@@ -93,8 +93,8 @@ const DataProcessor = (props) => {
                 row.program_section_id = program_section_id;
                 row.data_element_id = dataElement.id;
 
-                let critical = dataElement.attributeValues.filter(av => av.attribute.id === "NPwvdTt0Naj");
-                row.critical = (critical.length > 0) ? critical[0].value : '';
+                //let critical = dataElement.attributeValues.filter(av => av.attribute.id === "NPwvdTt0Naj");
+                //row.critical = (critical.length > 0) ? critical[0].value : '';
 
                 let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === "haUflNqP85K");
                 let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
@@ -103,9 +103,10 @@ const DataProcessor = (props) => {
                 if(row.structure == 'label') row.form_name = metaData.labelFormName || '';
                 row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: '';
                 row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
-                row.parent_question = (typeof metaData.parentVarName !== 'undefined') ? metaData.parentVarName : '';
+                row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion) : '';
                 row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : '';
-                row.critical = (typeof metaData.isCritical !== 'undefined') ? metaData.isCritical: '';
+                row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined') ? metaData.isCompulsory: '';
+                row.isCritical = (typeof metaData.isCritical !== 'undefined') ? metaData.isCritical: '';
 
                 let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === "LP171jpctBm");
                 row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : '';
@@ -113,7 +114,7 @@ const DataProcessor = (props) => {
                 let feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === "yhKEe6BLEer");
                 row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : '';
 
-                row.compulsory = getCompulsoryStatusForDE(dataElement.id);
+                //row.isCompulsory = getCompulsoryStatusForDE(dataElement.id);
                 Configures.push(row);
             });
         });
@@ -122,6 +123,12 @@ const DataProcessor = (props) => {
     const getCompulsoryStatusForDE = (dataElement_id) => {
         let de = programStage.programStageDataElements.filter( psde => psde.dataElement.id === dataElement_id);
         return (de.length > 0) ? de[0].compulsory : false;
+    }
+
+    const getVarNameFromParentUid = (parentUid) =>{
+        let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
+        let deMetadata = JSON.parse(parentDe.attributeValues.find(av => av.attribute.id === "haUflNqP85K")?.value || "{}");
+        return deMetadata.varName;
     }
 
     const getOptionSets = () => {

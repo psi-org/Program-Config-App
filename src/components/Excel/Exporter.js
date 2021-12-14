@@ -327,11 +327,11 @@ const Exporter = (props) => {
       width: 55
     }, {
       header: "Critical Step",
-      key: "critical_step",
+      key: "isCritical",
       width: 14
     }, {
       header: "Compulsory",
-      key: "compulsory",
+      key: "isCompulsory",
       width: 14
     }, {
       header: "Value Type",
@@ -398,7 +398,7 @@ const Exporter = (props) => {
       structure: `Defines what is being configured in the row`,
       form_name: `Text that will be displayed in the form during the assessment`,
       critical_step: "A critical step will count for the critical score",
-      compulsory: "A compulsory question must be answered to complete an assessment",
+      isCompulsory: "A compulsory question must be answered to complete an assessment",
       value_type: `Determines the type of input if there's no Option Set selected`,
       optionSet: `Select the option set that provides available answers for this question (forces Value Type)`,
       legend: "Select the legend that will be applied to the question",
