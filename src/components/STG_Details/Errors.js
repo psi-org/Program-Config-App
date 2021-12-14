@@ -21,14 +21,18 @@ const Errors = (props) => {
                     'margin': '0px',
                     'border-radius': '4px 4px 0 0'
                 });
-                $("#section_validation").show();
+                $(this).parent().parent().next().css({
+                    'display': 'block'
+                });
             } else {
                 $(this).attr('src', expanded_bottom_svg);
                 $(this).parent().parent().css({
                     'margin': '0 0 8px',
                     'border-radius': '4px'
                 });
-                $("#section_validation").hide();
+                $(this).parent().parent().next().css({
+                    'display': 'none'
+                });
             }
         });
     }, []);
@@ -53,7 +57,7 @@ const Errors = (props) => {
                             <img src={move_vert_svg} alt="menu" />
                         </div>
                     </div>
-                    <div className="section_cont" id="section_validation" style={{backgroundColor:"#fab1a0", display: "none"}}>
+                    <div className="section_cont" style={{backgroundColor:"#fab1a0"}}>
                         {
                             props.validationResults.questions.map((question, i) => {
                                 let classNames = "ml_item";
@@ -65,7 +69,7 @@ const Errors = (props) => {
                                         <div className="ml_item-title">
                                             <div><strong>Question: </strong>{question.formName}</div>
                                         </div>
-                                        <div className="ml_item-warning_error" onClick={()=>showIssues([question])}>
+                                        <div className="ml_item-cta ml_item-warning_error" onClick={()=>showIssues([question])}>
                                             {question.warnings && question.warnings.length > 0 && <BadgeWarnings counts={question.warnings.length}/> }
                                             {question.errors && question.errors.length > 0 && <BadgeErrors counts={question.errors.length}/> }
                                         </div>
@@ -84,7 +88,7 @@ const Errors = (props) => {
                                         <div className="ml_item-title">
                                             <div><strong>Score: </strong>{score.formName}</div>
                                         </div>
-                                        <div className="ml_item-warning_error" onClick={()=>showIssues([score])}>
+                                        <div className="ml_item-cta ml_item-warning_error" onClick={()=>showIssues([score])}>
                                             {score.warnings && score.warnings.length > 0 && <BadgeWarnings counts={score.warnings.length}/> }
                                             {score.errors && score.errors.length > 0 && <BadgeErrors counts={score.errors.length}/> }
                                         </div>
