@@ -41,7 +41,7 @@ const Removed = ({ importResults, index }) => {
     return (
         <>
             <div className="ml_item" style={{ color: "#333333", backgroundColor: "#ff7675" }}>
-                <div className="ml_item-icon_secondary">
+                <div className="ml_list-icon">
                     <img className="ml_list-img" alt="sec" src={error_svg} />
                 </div>
                 <div className="ml_item-title">

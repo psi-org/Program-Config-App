@@ -41,7 +41,7 @@ const CriticalCalculations = ({ stageSection, index }) => {
     return (
         <>
             <div className="ml_item" style={{ color: "#333333", backgroundColor: "#e3f2fd" }}>
-                <div className="ml_item-icon_secondary">
+                <div className="ml_list-icon">
                     <img className="ml_list-img" alt="sec" src={cogs_svg} />
                 </div>
                 <div className="ml_item-title">

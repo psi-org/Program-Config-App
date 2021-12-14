@@ -79,6 +79,76 @@
         margin: 0 0 8px;
         border-radius: 0 0 4px 4px;
 
+        div {
+            //border: 1px solid red;
+
+            .ml_item {
+                display: grid;
+                grid-template-columns: auto 1fr auto auto auto;
+                grid-template-rows: auto;
+                grid-auto-columns: 1fr;
+                gap: 0px 0px;
+                grid-auto-flow: row;
+                grid-template-areas:
+                    "ml_list-icon ml_item-title ml_item-desc ml_item-warning_error ml_item-cta";
+                padding: 8px;
+                margin-bottom: 8px;
+                background-color: #e0f2f1;
+
+                .ml_list-icon {
+                    padding-top: 2px;
+                    display: flex;
+                    align-items: center;
+                    border: px solid red;
+                    grid-area: ml_list-icon;
+
+                    .ml_list-img{
+                        width: 24px;
+                        height: 24px;
+                    }
+                }
+
+                .ml_item-title {
+                    display: flex;
+                    align-items: center;
+                    padding-left: 8px;
+                    grid-area: ml_item-title;
+                }
+
+                .ml_item-desc {
+                    display: flex;
+                    align-items: center;
+                    padding-left: 8px;
+                    grid-area: ml_item-desc;
+
+                    div {
+                        width: auto;
+                        height: 24px;
+                        padding: 4px 8px;
+                        font-size: 12px;
+                        display: flex;
+                        align-items: center;
+                        color: #FFFFFF;
+                        margin-right: 8px;
+                        background-color: #333;
+                        border-radius: 4px;
+                    }
+                }
+
+                .ml_item-warning_error {
+                    display: flex;
+                    align-items: center;
+                    grid-area: ml_item-warning_error;
+                }
+
+                .ml_item-cta {
+                    display: flex;
+                    align-items: center;
+                    grid-area: ml_item-cta;
+                }
+            }
+        }
+
         .fab,
         .fab_cont {
             margin: 0 auto;
