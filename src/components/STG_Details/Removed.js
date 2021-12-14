@@ -45,12 +45,13 @@ const Removed = ({ importResults, index }) => {
                     <img className="ml_list-img" alt="sec" src={error_svg} />
                 </div>
                 <div className="ml_item-title">
-                    Removed | <span>{importResults.questions.removed + importResults.scores.removed} data elements</span>
+                    Removed
                 </div>
+                <div className="ml_item-desc"><div>{importResults.questions.removed + importResults.scores.removed} data elements</div></div>
                 <div className="ml_item-warning_error "></div>
                 <div className="ml_item-cta">
+                <img src={move_vert_svg} alt="menu" />
                     <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
-                    <img src={move_vert_svg} alt="menu" />
                 </div>
             </div>
             <div className="section_cont" style={{backgroundColor:"#fab1a0"}}>
@@ -63,8 +64,9 @@ const Removed = ({ importResults, index }) => {
                                     <img className="ml_list-img" alt="de" src={error_svg} />
                                 </div>
                                 <div className="ml_item-title">
-                                    <div><strong>Question: </strong> {dataElement.formName}</div>
+                                    <div><strong>Question: </strong></div>
                                 </div>
+                                <div className="ml_item-desc">{dataElement.formName}</div>
                                 <div className="ml_item-warning_error slctr_hidden"></div>
                                 <div className="ml_item-cta">
                                     <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>

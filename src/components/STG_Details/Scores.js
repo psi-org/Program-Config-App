@@ -40,13 +40,14 @@ const Scores = ({ stageSection, index }) => {
 
     return (
         <>
-            <div className="ml_item" style={{ color: "#333333", backgroundColor: "#8EC8C8" }}>
+            <div className="ml_item" style={{ color: "#333333", backgroundColor: "#e3f2fd" }}>
                 <div className="ml_item-icon_secondary">
                     <img className="ml_list-img" alt="sec" src={scores_svg} />
                 </div>
                 <div className="ml_item-title">
-                    {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span>
+                    {stageSection.displayName}
                 </div>
+                <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div></div>
                 <div className="ml_item-warning_error ">
                     {/* <img src={warning_svg} alt="wrng" />
                             <img src={error_svg} alt="err" />
@@ -58,16 +59,16 @@ const Scores = ({ stageSection, index }) => {
                             </div> */}
                 </div>
                 <div className="ml_item-cta">
-                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                     <img src={move_vert_svg} alt="menu" />
+                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                 </div>
             </div>
             <div className="section_cont" >
                 {
                     stageSection.dataElements.map((dataElement, i) => {
-                        let classNames = "ml_item de_type" + ((dataElement.importStatus) ? ' import_'+dataElement.importStatus:'');
-                        return(
-                            <div id={"de_"+dataElement.id} className={classNames} key={i}>
+                        let classNames = "ml_item de_type" + ((dataElement.importStatus) ? ' import_' + dataElement.importStatus : '');
+                        return (
+                            <div id={"de_" + dataElement.id} className={classNames} key={i}>
                                 <div className="ml_item-icon">
                                     <img className="ml_list-img" alt="de" src={scores_svg} />
                                 </div>
@@ -85,7 +86,7 @@ const Scores = ({ stageSection, index }) => {
                                     </div> */}
                                 </div>
                                 <div className="ml_item-cta">
-                                    <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>
+                                    <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>
                                 </div>
                             </div>
                         )

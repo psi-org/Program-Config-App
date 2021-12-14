@@ -24,8 +24,9 @@ const StageItem = ({stage}) => {
         <img className="ml_list-img" alt="prg" src={stg_svg} />
       </div>
       <div className="ml_item-title">
-        {stage.displayName} | <span>{stage.programStageSections.length} program stages sections</span>
+        {stage.displayName}
       </div>
+      <div className="ml_item-desc"><div>{stage.programStageSections.length} program stages sections</div></div>
       <div className="ml_item-warning_error ">
         {/*
         <img src={warning_svg} alt="wrng" />
