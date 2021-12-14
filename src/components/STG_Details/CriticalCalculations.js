@@ -68,7 +68,7 @@ const CriticalCalculations = ({ stageSection, index }) => {
                     stageSection.dataElements.map((dataElement, i) => {
                         return(
                             <div id={"de_"+dataElement.id} className={"ml_item de_type"} key={i}>
-                                <div className="ml_item-icon_secondary">
+                                <div className="ml_list-icon">
                                     <img className="ml_list-img" alt="de" src={cogs_svg} />
                                 </div>
                                 <div className="ml_item-title">

@@ -22,7 +22,7 @@ const ProgramItem = ({program}) => {
 
   return (
     <div className="ml_item" style={{color:"#333333" , backgroundColor: "#F8F8F8", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
-      <div className=""> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
+      <div className="ml_list-icon"> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
         <img className="ml_list-img" alt="prg" src={prg_svg} />
       </div>
       <div className="ml_item-title">

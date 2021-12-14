@@ -516,16 +516,19 @@
 .cont_stage .title {
   margin: 0 8px 0 16px;
 }
-.cont_stage .section_cont {
+.cont_stage .wrapper .layout_prgms_stages {
+  background-color: chartreuse;
+}
+.cont_stage .wrapper .layout_prgms_stages div .section_cont {
   display: none;
   width: 100%;
-  min-height: 70px;
+  background-color: #2f00ff;
   background-color: #f5fbff;
   padding: 8px 16px;
   margin: 0 0 8px;
   border-radius: 0 0 4px 4px;
 }
-.cont_stage .section_cont div .ml_item {
+.cont_stage .wrapper .layout_prgms_stages div .section_cont div .ml_item {
   display: grid;
   grid-template-columns: auto 1fr auto auto auto;
   grid-template-rows: auto;
@@ -537,30 +540,30 @@
   margin-bottom: 8px;
   background-color: #e0f2f1;
 }
-.cont_stage .section_cont div .ml_item .ml_list-icon {
+.cont_stage .wrapper .layout_prgms_stages div .section_cont div .ml_item .ml_list-icon {
   padding-top: 2px;
   display: flex;
   align-items: center;
   border: px solid red;
   grid-area: ml_list-icon;
 }
-.cont_stage .section_cont div .ml_item .ml_list-icon .ml_list-img {
+.cont_stage .wrapper .layout_prgms_stages div .section_cont div .ml_item .ml_list-icon .ml_list-img {
   width: 24px;
   height: 24px;
 }
-.cont_stage .section_cont div .ml_item .ml_item-title {
+.cont_stage .wrapper .layout_prgms_stages div .section_cont div .ml_item .ml_item-title {
   display: flex;
   align-items: center;
   padding-left: 8px;
   grid-area: ml_item-title;
 }
-.cont_stage .section_cont div .ml_item .ml_item-desc {
+.cont_stage .wrapper .layout_prgms_stages div .section_cont div .ml_item .ml_item-desc {
   display: flex;
   align-items: center;
   padding-left: 8px;
   grid-area: ml_item-desc;
 }
-.cont_stage .section_cont div .ml_item .ml_item-desc div {
+.cont_stage .wrapper .layout_prgms_stages div .section_cont div .ml_item .ml_item-desc div {
   width: auto;
   height: 24px;
   padding: 4px 8px;
@@ -572,19 +575,77 @@
   background-color: #333;
   border-radius: 4px;
 }
-.cont_stage .section_cont div .ml_item .ml_item-warning_error {
+.cont_stage .wrapper .layout_prgms_stages div .section_cont div .ml_item .ml_item-warning_error {
   display: flex;
   align-items: center;
   grid-area: ml_item-warning_error;
 }
-.cont_stage .section_cont div .ml_item .ml_item-cta {
+.cont_stage .wrapper .layout_prgms_stages div .section_cont div .ml_item .ml_item-cta {
   display: flex;
   align-items: center;
   grid-area: ml_item-cta;
 }
-.cont_stage .section_cont .fab,
-.cont_stage .section_cont .fab_cont {
+.cont_stage .wrapper .layout_prgms_stages div .section_cont .fab,
+.cont_stage .wrapper .layout_prgms_stages div .section_cont .fab_cont {
   margin: 0 auto;
+}
+.cont_stage .wrapper .list-ml_item .ml_item {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  grid-template-rows: auto;
+  grid-auto-columns: 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas: "ml_list-icon ml_item-title ml_item-desc ml_item-warning_error ml_item-cta";
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #1100ff;
+  background-color: #e0f2f1;
+}
+.cont_stage .wrapper .list-ml_item .ml_item .ml_list-icon {
+  padding-top: 2px;
+  display: flex;
+  align-items: center;
+  border: 1px solid red;
+  grid-area: ml_list-icon;
+}
+.cont_stage .wrapper .list-ml_item .ml_item .ml_list-icon .ml_list-img {
+  width: 24px;
+  height: 24px;
+}
+.cont_stage .wrapper .list-ml_item .ml_item .ml_item-title {
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  grid-area: ml_item-title;
+}
+.cont_stage .wrapper .list-ml_item .ml_item .ml_item-desc {
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  grid-area: ml_item-desc;
+}
+.cont_stage .wrapper .list-ml_item .ml_item .ml_item-desc div {
+  width: auto;
+  height: 24px;
+  padding: 4px 8px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  color: #FFFFFF;
+  margin-right: 8px;
+  background-color: #333;
+  border-radius: 4px;
+}
+.cont_stage .wrapper .list-ml_item .ml_item .ml_item-warning_error {
+  display: flex;
+  align-items: center;
+  grid-area: ml_item-warning_error;
+}
+.cont_stage .wrapper .list-ml_item .ml_item .ml_item-cta {
+  display: flex;
+  align-items: center;
+  grid-area: ml_item-cta;
 }
 
 .fab {

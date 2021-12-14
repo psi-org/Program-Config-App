@@ -41,7 +41,7 @@ const Scores = ({ stageSection, index }) => {
     return (
         <>
             <div className="ml_item" style={{ color: "#333333", backgroundColor: "#e3f2fd" }}>
-                <div className="ml_item-icon_secondary">
+                <div className="ml_list-icon">
                     <img className="ml_list-img" alt="sec" src={scores_svg} />
                 </div>
                 <div className="ml_item-title">
@@ -66,7 +66,7 @@ const Scores = ({ stageSection, index }) => {
             <div className="section_cont" >
                 {
                     stageSection.dataElements.map((dataElement, i) => {
-                        let classNames = "ml_item de_type" + ((dataElement.importStatus) ? ' import_' + dataElement.importStatus : '');
+                        let classNames = "ml_item" + ((dataElement.importStatus) ? ' import_' + dataElement.importStatus : '');
                         return (
                             <div id={"de_" + dataElement.id} className={classNames} key={i}>
                                 <div className="ml_item-icon">
