@@ -47,9 +47,9 @@ const Importer = (props) => {
                                     const templateWS = workbook.getWorksheet('Template');
                                     const instructionWS = workbook.getWorksheet('Instructions');
                                     const mappingWS = workbook.getWorksheet('Mapping');
-
-                                    const programDetails = getProgramDetails(instructionWS);
                                     const mappingDetails = getMappingList(mappingWS);
+                                    const programDetails = getProgramDetails(instructionWS, mappingDetails);
+
                                     const headers = templateWS.getRow(1).values;
                                     headers.shift();
                                     worksheetValidation(headers, function (status) {
@@ -115,11 +115,13 @@ const Importer = (props) => {
         setButtonDisabled(false);
     }
 
-    const getProgramDetails = (ws) => {
+    const getProgramDetails = (ws, mappingDetails) => {
         let program = {};
-        program.id = (ws.getCell("D12").value !== null) ? ws.getCell("D12").value.result: null;
-        // program.id = (ws.getCell("D12").value !== null) ? ws.getCell("D12").value: null;
         program.name = ws.getCell("C12").value;
+
+        let result = mappingDetails.programs.filter(prog => prog.name === program.name);
+        program.id = result[0].id;
+
         program.useCompetencyClass = ws.getCell("C13").value;
         program.dePrefix = ws.getCell("C14").value;
         program.healthArea = ws.getCell("C15").value;
@@ -131,33 +133,52 @@ const Importer = (props) => {
         mapping.optionSets = [];
         mapping.legendSets = [];
         mapping.programs = [];
+
+        mapping.optionSets = getOptionSets(ws);
+        mapping.legendSets = getLegendSets(ws);
+        mapping.programs = getProgramsMap(ws);
+        return mapping;
+    }
+
+    const getOptionSets = (ws) => {
         let i = 3;
+        let optionSets = [];
         while(ws.getCell("I"+i).value !== null) {
             let option = {};
             option.id = ws.getCell("I"+i).value;
             option.optionSet = ws.getCell("H"+i).value;
-            mapping.optionSets.push(option);
+            optionSets.push(option);
             i++;
         }
-        i = 3;
+        return optionSets;
+    }
+
+    const getLegendSets = (ws) => {
+        let i = 3;
+        let legendSets = [];
         while(ws.getCell("P"+i).value !== null)
         {
             let legend = {};
             legend.id = ws.getCell("P"+i).value;
             legend.legendSet = ws.getCell("O"+i).value;
-            mapping.legendSets.push(legend);
+            legendSets.push(legend);
             i++;
         }
-        i = 3;
+        return legendSets
+    }
+
+    const getProgramsMap = (ws) => {
+        let i = 3;
+        let programs = [];
         while(ws.getCell("R"+i).value !== null)
         {
             let program = {};
             program.id = ws.getCell("S"+i).value;
             program.name = ws.getCell("R"+i).value;
-            mapping.programs.push(program);
+            programs.push(program);
             i++;
         }
-        return mapping;
+        return programs
     }
 
     const fileValidation = (callback) => {
