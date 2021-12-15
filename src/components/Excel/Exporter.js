@@ -563,7 +563,7 @@ const Exporter = (props) => {
     let dataRow = 3;
     props.Configures.forEach((configure) => {
       ws.getRow(dataRow).values = configure;
-      ws.getCell("A"+dataRow).value = {formula:'_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1))'};
+      ws.getCell("A"+dataRow).value = {formula:'_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section","",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1)))'};
       if (configure.structure === "Section") {
         fillBackgroundToRange(ws, "A"+dataRow+":R"+dataRow, "f8c291")
       }
