@@ -40,13 +40,15 @@ const getLegendSetId = (legendSetName,legendSets)=>{
 
 //Question
 const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
-    // console.info(data[importMap.parentName]);
-    let code = programPrefix + '_' + data[importMap.parentName]?.result;
+    //console.info(data[importMap.parentName]);
+    let code = "";
 
     let aggType;
     if(type=='score'){
-        aggType='AVERAGE'
+        code = programPrefix + '_CS' + data[importMap.feedbackOrder];
+        aggType='AVERAGE';
     }else{
+        code = programPrefix + '_' + data[importMap.parentName]?.result;
         switch(data[importMap.valueType]){
             case 'TEXT':
             case 'LONG_TEXT':

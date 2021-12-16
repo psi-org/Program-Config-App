@@ -1,5 +1,6 @@
 {
   "name": "programconfigapp",
+  "short_name":"Program Config App",
   "author": "Fernando Gomez - Mario Lopez - Utsav Koju",
   "version": "1.0.0-r.c.1",
   "description": "",
