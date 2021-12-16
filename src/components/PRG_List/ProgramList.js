@@ -15,8 +15,9 @@ const query = {
     params: ({ pageSize, page }) => ({
       pageSize,
       page,
-      // filter: "name:ilike:HNQIS",
-      fields: ["id", "name", "displayName", "programStages"],
+      filter: "attributeValues.attribute.id:eq:yB5tFAAN7bI",
+      filter: "attributeValues.value:eq:HNQIS2",
+      fields: ["id", "name", "displayName","programStages"],
     }),
   },
 };
@@ -29,7 +30,7 @@ const ProgramList = () => {
 
   if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
   if (loading) return <CircularLoader />
-  console.log(data);
+  
   return (
     <div>
       <div className="sub_nav">

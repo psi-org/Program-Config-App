@@ -1,6 +1,6 @@
 // *** Modules ***
 import $ from 'jquery';
-import { useEffect } from 'react';
+import {useEffect, useState} from 'react';
 
 // *** IMAGES ***
 import sec_svg from './../../images/i-drag_black.svg';
@@ -11,9 +11,13 @@ import error_svg from './../../images/i-error.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
+import BadgeWarnings from "./BadgeWarnings";
+import BadgeErrors from "./BadgeErrors";
+import ValidationMessages from "./ValidationMessages";
 
 const Scores = ({ stageSection, index }) => {
-
+    const [showValidationMessage, setShowValidationMessage] = useState(false);
+    const [ errors, setErrors ] = useState([]);
     useEffect(() => {
         $('img.bsct_cta').off().on("click", function (e) {
             if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
@@ -38,6 +42,11 @@ const Scores = ({ stageSection, index }) => {
         });
     }, []);
 
+    const showIssues = function(dataElements) {
+        setShowValidationMessage(true);
+        setErrors(dataElements);
+    }
+
     return (
         <div>
             <div className="ml_item" style={{color:"#333333" , backgroundColor: "#B2DFDB", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
@@ -48,15 +57,9 @@ const Scores = ({ stageSection, index }) => {
                     {stageSection.displayName}
                 </div>
                 <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div></div>
-                <div className="ml_item-warning_error ">
-                    {/* <img src={warning_svg} alt="wrng" />
-                            <img src={error_svg} alt="err" />
-                            <div className="ml_item-cw">
-                                3
-                            </div>
-                            <div className="ml_item-ce">
-                                2
-                            </div> */}
+                <div className="ml_item-warning_error " onClick={()=>showIssues(stageSection.dataElements)}>
+                  {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
+                  {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                 </div>
                 <div className="ml_item-cta">
                     <img src={move_vert_svg} alt="menu" />
@@ -75,15 +78,9 @@ const Scores = ({ stageSection, index }) => {
                                 <div className="ml_item-title">
                                     {dataElement.formName}
                                 </div>
-                                <div className="ml_item-warning_error slctr_hidden">
-                                    {/* <img src={warning_svg} alt="wrng" />
-                                    <img src={error_svg} alt="err" />
-                                    <div className="ml_item-cw">
-                                        3
-                                    </div>
-                                    <div className="ml_item-ce">
-                                        2
-                                    </div> */}
+                                <div className="ml_item-warning_error" onClick={()=>showIssues([dataElement])}>
+                                    {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length}/> }
+                                    {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
                                 </div>
                                 <div className="ml_item-cta">
                                     <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>
@@ -93,6 +90,7 @@ const Scores = ({ stageSection, index }) => {
                         //return <DraggableDataElement dataElement={de} index={i} key={de.id} />;
                     })
                 }
+                {showValidationMessage && <ValidationMessages dataElements={errors} showValidationMessage={setShowValidationMessage} /> }
             </div>
         </div>
     );

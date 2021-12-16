@@ -7,7 +7,7 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
 
 /**
  * 
- * @param {Object} question : { subLevels: <Array> ,prgVarName: STRING,scoreNum: NUMBER, scoreDen: NUMBER,isCritical: BOOLEAN }
+ * @param {Object} question : { subLevels: <Array> ,prgVarName: STRING,scoreNum: NUMBER, scoreDen: NUMBER,isCritical: STRING [Yes,No] }
  * @param {Object} branch : scoreMap __ Init as --> { childs: [] }
  * @description Allocates each feadback order / composite score in an Object (tree structure) that stores all questions for each leaf
  */
@@ -47,7 +47,7 @@ const buildScores = (branch) => {
             if (a.prgVarName) {
                 let num = `#{${a.prgVarName}}*${a.scoreNum}`;
                 let den = `d2:countIfZeroPos('${a.prgVarName}')*${a.scoreDen}`;
-                if (a.isCritical) {
+                if (a.isCritical=="Yes") {
                     numC.push(num);
                     denC.push(den);
                 } else {
@@ -127,6 +127,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
             const pr_s1 = {
                 id: programRuleUid,
                 name: name,
+                description: "_Scripted",
                 program: { id: programId },
                 condition: "true",
                 priority: 1,
@@ -137,7 +138,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
                 id: actionId,
                 programRuleActionType: programRuleActionType,
                 data,
-                content: `#{_CV_${composite.prgVarName}}`,
+                content: `#{_CV${composite.prgVarName}}`,
                 programRule: { id: programRuleUid }
             };
 
@@ -146,13 +147,14 @@ const getScorePR = (composite, branch, programId, uidPool) => {
             name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
             programRuleUid = uidPool.shift();
             actionId = uidPool.shift();
-            data = `d2:round(#{_CV_${composite.prgVarName}}*100)/100`;
+            data = `d2:round(#{_CV${composite.prgVarName}}*100)/100`;
 
             const pr_s2 = {
                 id: programRuleUid,
                 name: name,
+                description: "_Scripted",
                 program: { id: programId },
-                condition: `d2:hasValue('_CV_${composite.prgVarName}')`,
+                condition: `d2:hasValue('_CV${composite.prgVarName}')`,
                 programRuleActions: [{ id: actionId }]
             };
 
@@ -177,6 +179,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
             const pr = {
                 id: programRuleUid,
                 name: name,
+                description: "_Scripted",
                 program: { id: programId },
                 condition: "true",
                 programRuleActions: [{ id: actionId }]
@@ -224,6 +227,7 @@ const buildCriticalScore = (branch, programId, uidPool) => {
     const pr_s1 = {
         id: programRuleUid,
         name,
+        description: "_Scripted",
         program: { id: programId },
         condition: "true",
         priority: 1,
@@ -234,7 +238,7 @@ const buildCriticalScore = (branch, programId, uidPool) => {
         id: actionId,
         programRuleActionType,
         data,
-        content: `#{CV_CriticalQuestions}`,
+        content: `#{_CV_CriticalQuestions}`,
         programRule: { id: programRuleUid }
     };
 
@@ -246,12 +250,13 @@ const buildCriticalScore = (branch, programId, uidPool) => {
     const pr_s2 = {
         id: programRuleUid,
         name,
+        description: "_Scripted",
         program: { id: programId },
-        condition: `d2:hasValue('CV_CriticalQuestions')`,
+        condition: `d2:hasValue('_CV_CriticalQuestions')`,
         programRuleActions: [{ id: actionId }]
     };
 
-    data = `#{CV_CriticalQuestions}`;
+    data = `#{_CV_CriticalQuestions}`;
     const pra_s2 = {
         id: actionId,
         programRuleActionType,
@@ -292,6 +297,7 @@ const buildNonCriticalScore = (branch, programId, uidPool) => {
     const pr_s1 = {
         id: programRuleUid,
         name,
+        description: "_Scripted",
         program: { id: programId },
         condition: "true",
         priority: 1,
@@ -302,7 +308,7 @@ const buildNonCriticalScore = (branch, programId, uidPool) => {
         id: actionId,
         programRuleActionType,
         data,
-        content: `#{CV_CriticalQuestions}`,
+        content: `#{_CV_CriticalQuestions}`,
         programRule: { id: programRuleUid }
     };
 
@@ -315,6 +321,7 @@ const buildNonCriticalScore = (branch, programId, uidPool) => {
     const pr_s2 = {
         id: programRuleUid,
         name,
+        description: "_Scripted",
         program: { id: programId },
         condition: `d2:hasValue('_CV_NonCriticalQuestions')`,
         programRuleActions: [{ id: actionId }]
@@ -439,7 +446,7 @@ const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass =
         {
             name: "PR - Attributes - Assign Global Score",
             displayName: "PR - Attributes - Assign Global Score",
-            condition: scoreMap.numC != "" ? "d2:hasValue('_criticalNewest')" : "d2:hasValue('_NoncriticalNewest')",
+            condition: scoreMap.numC != "" ? "d2:hasValue(#{_criticalNewest})" : "d2:hasValue(#{_NoncriticalNewest})",
             program: { id: "" },
             description: "_Scripted",
             programRuleActions: [
@@ -468,7 +475,7 @@ const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass =
             name: `PR - Attributes - ${useCompetencyClass == "Yes" ? 'CompClass &' : ''} GlobalScore `,
             displayName: `PR - Attributes - ${useCompetencyClass == "Yes" ? 'CompClass &' : ''} GlobalScore `,
             description: "_Scripted",
-            condition: "!d2:hasValue('_criticalNewest') || !d2:hasValue('_NoncriticalNewest')",
+            condition: "!d2:hasValue(#{_criticalNewest}) || !d2:hasValue(#{_NoncriticalNewest})",
             program: { id: "" },
             programRuleActions: (useCompetencyClass == "Yes") ?
                 [
@@ -576,6 +583,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
             const pr = {
                 id: programRuleUid,
                 name,
+                description:'_Scripted',
                 program: { id: programId },
                 condition: `#{${parentCode}}!=${answer}`,
                 programRuleActions: []
@@ -588,6 +596,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
             const pr_mfm = {
                 id: mfm_uid,
                 name: mfm_name,
+                description:'_Scripted',
                 program: { id: programId },
                 condition: `#{${parentCode}}==${answer}`,
                 programRuleActions: []
@@ -601,7 +610,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
                     id: actionId,
                     programRuleActionType: "HIDEFIELD",
                     dataElement: { id: de.id },
-                    content: `#{CV_CriticalQuestions}`,
+                    content: `#{_CV_CriticalQuestions}`,
                     programRule: { id: programRuleUid }
                 };
 
@@ -641,6 +650,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
         var pr = {
             id: programRuleUid,
             name:undefined,
+            description:'_Scripted',
             program: { id: programId },
             condition: undefined,
             programRuleActions: []
@@ -762,11 +772,16 @@ const buildProgramRules = (sections, programId, compositeValues, scoresMapping, 
     var hideShowGroup = {};
     var hideShowLabels = [{ parent: 'None', condition: 'true', actions: [] }];
 
+    const varNameRef = sections.map(sec => sec.dataElements.map(de => {
+        let metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || "{}")
+        return { id:de.id , varName:metadata.varName }
+    })).flat();
+
     //Create Tree Object for Scoring PRs
     sections.forEach((section, secIdx) => {
         section.dataElements.forEach((dataElement, deIdx) => {
             let order = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
-            let isCritical = dataElement.attributeValues.find(att => att.attribute.id == CRITICAL_QUESTION)?.value == "Yes";
+            //let isCritical = dataElement.attributeValues.find(att => att.attribute.id == CRITICAL_QUESTION)?.value == "Yes";
             let metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
             if (order && metadata.scoreNum && metadata.scoreDen) {
                 locateInTree(
@@ -775,27 +790,27 @@ const buildProgramRules = (sections, programId, compositeValues, scoresMapping, 
                         prgVarName: `_S${secIdx + 1}Q${deIdx + 1}`,
                         scoreNum: metadata.scoreNum,
                         scoreDen: metadata.scoreDen,
-                        isCritical
+                        isCritical: metadata.isCritical
                     },
                     scoreMap
                 )
             }
 
             // Get parents hide/show logic
-            if (metadata.parentVarName && metadata.parentValue) {
-                let parentVarName = String(metadata.parentVarName);
+            if (metadata.parentQuestion && metadata.parentValue) {
+                let parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
                 let parentValue = String(metadata.parentValue);
 
-                !hideShowGroup[parentVarName] ? hideShowGroup[parentVarName] = {} : undefined;
-                !hideShowGroup[parentVarName][parentValue] ? hideShowGroup[parentVarName][parentValue] = [] : undefined;
-                !hideShowGroup[parentVarName][parentValue].push({ id: dataElement.id, mandatory: metadata.compulsory });
+                !hideShowGroup[parentQuestion] ? hideShowGroup[parentQuestion] = {} : undefined;
+                !hideShowGroup[parentQuestion][parentValue] ? hideShowGroup[parentQuestion][parentValue] = [] : undefined;
+                !hideShowGroup[parentQuestion][parentValue].push({ id: dataElement.id, mandatory: metadata.isCompulsory });
 
                 if (metadata.labelFormName) {
-                    let hsIdx = hideShowLabels.findIndex(hs => hs.parent == parentVarName && hs.condition == parentValue);
+                    let hsIdx = hideShowLabels.findIndex(hs => hs.parent == parentQuestion && hs.condition == parentValue);
                     if (hsIdx == -1) {
                         // CREATE
                         hideShowLabels.push({
-                            parent: parentVarName,
+                            parent: parentQuestion,
                             condition: parentValue,
                             actions: []
                         });

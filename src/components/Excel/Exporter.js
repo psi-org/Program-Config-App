@@ -1,7 +1,18 @@
 import React from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import { saveAs } from 'file-saver';
-import { activeTabNumber, valueType, renderType, aggOperator, middleCenter, template_password, structureValidator, yesNoValidator, conditionalError } from "../../configs/TemplateConstants";
+import {
+  activeTabNumber,
+  valueType,
+  renderType,
+  aggOperator,
+  middleCenter,
+  template_password,
+  structureValidator,
+  yesNoValidator,
+  conditionalError,
+  sectionHighlighting
+} from "../../configs/TemplateConstants";
 import {
   fillBackgroundToRange,
   printArray2Column,
@@ -16,7 +27,6 @@ const Exporter = (props) => {
   const password = template_password;
 
   const initialize = () => {
-      console.log("Generating excel times");
       generate();
   };
 
@@ -74,7 +84,7 @@ const Exporter = (props) => {
     ws.getCell("B7").style = {font: {bold: true}};
     ws.getCell("B8").value = "The following information will be used to configure the checklist as a DHIS2 program compatible with HNQIS 2.0";
     ws.getCell("B9").value = "Note: Some fields are filled automatically when the template is downloaded from a server.";
-    
+
     ws.mergeCells('B11:C11');
     ws.getCell("B11").value = "Program Details";
     ws.getCell("B12").value = "Program Name";
@@ -270,21 +280,34 @@ const Exporter = (props) => {
       type: 'textLength',
       operator: 'lessThan',
       showErrorMessage: true,
-      error: 'Program name exceeds 200 characters',
+      error: 'Program name exceeds 225 characters',
       errorTitle: 'Invalid Length',
       allowBlank: true,
-      formulae: [200]
+      formulae: [226]
+    });
+    dataValidation(ws, "C11", {
+      type: 'textLength',
+      operator: 'lessThan',
+      showErrorMessage: true,
+      error: 'DE Prefix exceeds 2 characters',
+      errorTitle: 'Invalid Length',
+      allowBlank: true,
+      formulae: [3]
     });
     dataValidation(ws, "C13", {
       type: 'list',
       allowBlank: true,
       showErrorMessage: true,
+      error: 'Please select the valid option from the List',
+      errorTitle: 'Invalid option',
       formulae: yesNoValidator
     });
     dataValidation(ws, "C15", {
       type: 'list',
       allowBlank: true,
       showErrorMessage: true,
+      error: 'Please select the valid option from the List',
+      errorTitle: 'Invalid option',
       formulae: ['Mapping!$M$3:$M$43']
     });
   }
@@ -304,11 +327,11 @@ const Exporter = (props) => {
       width: 55
     }, {
       header: "Critical Step",
-      key: "critical_step",
+      key: "isCritical",
       width: 14
     }, {
       header: "Compulsory",
-      key: "compulsory",
+      key: "isCompulsory",
       width: 14
     }, {
       header: "Value Type",
@@ -375,7 +398,7 @@ const Exporter = (props) => {
       structure: `Defines what is being configured in the row`,
       form_name: `Text that will be displayed in the form during the assessment`,
       critical_step: "A critical step will count for the critical score",
-      compulsory: "A compulsory question must be answered to complete an assessment",
+      isCompulsory: "A compulsory question must be answered to complete an assessment",
       value_type: `Determines the type of input if there's no Option Set selected`,
       optionSet: `Select the option set that provides available answers for this question (forces Value Type)`,
       legend: "Select the legend that will be applied to the question",
@@ -482,7 +505,7 @@ const Exporter = (props) => {
     });
     //conditional formatting for structure=scores and valuetype=NUMBER
     ws.addConditionalFormatting({
-      ref:'F4:F3000',
+      ref:'F3:F3000',
       rules: [
         {
           type: 'expression',
@@ -508,18 +531,39 @@ const Exporter = (props) => {
       rules:[
         {
           type: 'expression',
-          formulae: ['OR($I3 = "",$J3 = "")'],
+          formulae: ['OR(AND($I3<>"",$J3=""), AND($I3="",$J3<>""))'],
           style: conditionalError
         }
       ]
     });
+    //Conditional formatting checking incomplete parent and answer
+    ws.addConditionalFormatting({
+      ref: 'L3:M3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['OR(AND($L3<>"", $M3=""), AND($L3="", $M3<>""))'],
+          style: conditionalError
+        }
+      ]
+    })
+    ws.addConditionalFormatting({
+      ref: 'A3:R3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['$B3 = "Section"'],
+          style: sectionHighlighting
+        }
+      ]
+    })
   }
 
   const populateConfiguration = async ws => {
     let dataRow = 3;
     props.Configures.forEach((configure) => {
       ws.getRow(dataRow).values = configure;
-      ws.getCell("A"+dataRow).value = {formula:'_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1))'};
+      ws.getCell("A"+dataRow).value = {formula:'_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section","",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1)))'};
       if (configure.structure === "Section") {
         fillBackgroundToRange(ws, "A"+dataRow+":R"+dataRow, "f8c291")
       }
@@ -597,6 +641,7 @@ const Exporter = (props) => {
     const buf = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buf]), `HNQIS Config_${new Date()}.xlsx`);
 
+    props.setStatus("Download");
     props.isLoading(false);
   };
 

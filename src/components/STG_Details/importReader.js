@@ -9,7 +9,8 @@ const importMap = {
     parentName:"Parent Name",
     structure:"Structure",
     formName:"Form name",
-    compulsory:"Compulsory",
+    isCritical: "Critical Step",
+    isCompulsory:"Compulsory",
     valueType:"Value Type",
     optionSet:"Option Set",
     legend:"Legend",
@@ -17,7 +18,7 @@ const importMap = {
     scoreDen:"Score Denominator",
     feedbackOrder:"Compositive Indicator (Feedback Order)",
     parentQuestion:"Parent question",
-    answerValue:"Answer value",
+    parentValue:"Answer value",
     feedbackText:"Feedback Text",
     programStage:"Program Stage Id",
     programSection:"Program Section Id",
@@ -30,7 +31,6 @@ const importMap = {
     ]
 */
 const getOptionSetId = (optionSetName,optionSets)=>{
-    console.info(optionSetName);
     return optionSets.find(os => os.optionSet == optionSetName)?.id
 };
 
@@ -40,7 +40,7 @@ const getLegendSetId = (legendSetName,legendSets)=>{
 
 //Question
 const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
-    console.info(data[importMap.parentName]);
+    // console.info(data[importMap.parentName]);
     let code = programPrefix + '_' + data[importMap.parentName]?.result;
 
     let aggType;
@@ -65,21 +65,22 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         code,
         formName: type=='label'?'     ':data[importMap.formName],
         domainType: 'TRACKER',
-        //zeroIsSignificant: '',
         valueType: data[importMap.valueType],
         aggregationType: aggType,
-        //categoryCombo :  { id :  '' },
-        //optionSetValue: data[importMap.optionSet] != "",
-        //optionSet: data[importMap.optionSet] != "" ? { id: getOptionSetId(data[importMap.optionSet],optionSets) } : {},
-        //legendSet: data[importMap.legend] != "" ? { id: getLegendSetId(data[importMap.legend],legendSets) } : {},
-        attributeValues: []
+        attributeValues: [],
+        parentName: data[importMap.parentName]?.result
     };
 
     if(data[importMap.optionSet] && data[importMap.optionSet] != ""){
         parsedDE.optionSet = { id: getOptionSetId(data[importMap.optionSet],optionSets) };
         parsedDE.optionSetValue = true
     }
-    if(data[importMap.legend] && data[importMap.legend] != "") parsedDE.legendSet = { id: getLegendSetId(data[importMap.legend],legendSets) };
+    if(data[importMap.legend] && data[importMap.legend] != ""){
+        parsedDE.legendSet = { id: getLegendSetId(data[importMap.legend],legendSets) };
+        parsedDE.legendSets = [
+            { id: getLegendSetId(data[importMap.legend],legendSets) }
+        ];
+    }
 
     if (data[importMap.feedbackOrder] != "") parsedDE.attributeValues.push(
         { 
@@ -95,20 +96,25 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         }
     );
 
-    //if(data[importMap.criticalStep]!="") parsedDE.attributeValues.push({CRITICAL_QUESTION:data[importMap.criticalStep]});
-
     const metadata = { 
-        compulsory: data[importMap.compulsory] ? "Yes" : "No",
-        elemType : type
+        isCompulsory: data[importMap.isCompulsory] || "No"/* ? "Yes" : "No"*/,
+        isCritical: data[importMap.isCritical] || "No"/* ? "Yes" : "No"*/,
+        elemType : type,
+        varName : data[importMap.parentName]?.result
     };
     if (data[importMap.scoreNum] != "") metadata.scoreNum = data[importMap.scoreNum];
     if (data[importMap.scoreDen] != "") metadata.scoreDen = data[importMap.scoreDen];
-    if (data[importMap.parentQuestion]!="") metadata.parentVarName = data[importMap.parentQuestion];   // REPLACE WITH PARENT DATA ELEMENT'S UID
-    if (data[importMap.answerValue]!="") metadata.answerValue = data[importMap.answerValue];
+
+    if (data[importMap.parentQuestion]!=""){
+        metadata.parentQuestion = data[importMap.parentQuestion];
+        parsedDE.parentQuestion = data[importMap.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
+    }
+    if (data[importMap.parentValue]!="") metadata.parentValue = data[importMap.parentValue];
+    
+    
 
     // For Labels
     if(type=='label') metadata.labelFormName = data[importMap.formName];
-
 
     parsedDE.attributeValues.push(
         { 
@@ -175,6 +181,7 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
                 importSummaryValues.questions.updated++;
                 i_section.updatedDataElements++;
             }
+
             return i_de;
         })
     });
@@ -215,7 +222,7 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
     importSummaryValues.scores.removed = removedScores.length;
     importSummaryValues.scores.removedItems = removedScores;
 
-    console.log(importSummaryValues);
+    //console.log(importSummaryValues);
 
     return {importedSections,importedScores,importSummaryValues};
 

@@ -28,6 +28,7 @@ const Importer = (props) => {
     }
 
     const startImportProcess = () => {
+        setExecutedTasks([]);
         setButtonDisabled(true);
         //1. Form Validation
         if (typeof selectedFile !== 'undefined') {
@@ -46,14 +47,14 @@ const Importer = (props) => {
                                     const templateWS = workbook.getWorksheet('Template');
                                     const instructionWS = workbook.getWorksheet('Instructions');
                                     const mappingWS = workbook.getWorksheet('Mapping');
-
-                                    const programDetails = getProgramDetails(instructionWS);
                                     const mappingDetails = getMappingList(mappingWS);
+                                    const programDetails = getProgramDetails(instructionWS, mappingDetails);
+
                                     const headers = templateWS.getRow(1).values;
                                     headers.shift();
                                     worksheetValidation(headers, function (status) {
                                         if (status) {
-                                            var task = { step: 4, name: "Extracting data from XLSX", status: "success" };
+                                            var task = { step:4, name: "Extracting data from XLSX", status: "success" };
                                             setCurrentTask(task.name);
                                             let templateData = [];
                                             let dataRow = 3;
@@ -77,12 +78,13 @@ const Importer = (props) => {
                                             //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous);
                                             //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,"PREFIX",[],[]);
                                             let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,programDetails.dePrefix,mappingDetails.optionSets,mappingDetails.legendSets);
-                                            console.log(importedSections);
-                                            console.log(importedScores);
-                                            console.log(importSummaryValues);
-                                            console.log(programDetails);
-                                            console.log(mappingDetails);
-                                            //props.setNewDeQty(importSummaryValues.questions.new);
+                                            // console.log(importedSections);
+                                            // console.log(importedScores);
+                                            // console.log(importSummaryValues);
+                                            // console.log(programDetails);
+                                            // console.log(mappingDetails);
+                                            importSummaryValues.program = programDetails;
+                                            importSummaryValues.mapping = mappingDetails;
 
                                             // Set new sections & questions
                                             setImportSummary(importSummaryValues);
@@ -94,6 +96,11 @@ const Importer = (props) => {
 
                                             props.previous.setSections(importedSections);
                                             props.previous.setScoresSection(newScoresSection);
+
+                                            let programMetadata_new = props.programMetadata.programMetadata;
+                                            programMetadata_new.dePrefix = programDetails.dePrefix;
+                                            programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
+                                            props.programMetadata.setProgramMetadata(programMetadata_new);
                                         }
                                     })
                                 }
@@ -105,17 +112,16 @@ const Importer = (props) => {
 
             });
         }
-        else {
-            //Some validation error WIP
-            console.log("validation erros");
-        }
         setButtonDisabled(false);
     }
 
-    const getProgramDetails = (ws) => {
+    const getProgramDetails = (ws, mappingDetails) => {
         let program = {};
-        program.id = ws.getCell("D12").value.result;
         program.name = ws.getCell("C12").value;
+
+        let result = mappingDetails.programs.filter(prog => prog.name === program.name);
+        program.id = result[0].id;
+
         program.useCompetencyClass = ws.getCell("C13").value;
         program.dePrefix = ws.getCell("C14").value;
         program.healthArea = ws.getCell("C15").value;
@@ -126,24 +132,53 @@ const Importer = (props) => {
         let mapping = {};
         mapping.optionSets = [];
         mapping.legendSets = [];
+        mapping.programs = [];
+
+        mapping.optionSets = getOptionSets(ws);
+        mapping.legendSets = getLegendSets(ws);
+        mapping.programs = getProgramsMap(ws);
+        return mapping;
+    }
+
+    const getOptionSets = (ws) => {
         let i = 3;
+        let optionSets = [];
         while(ws.getCell("I"+i).value !== null) {
             let option = {};
             option.id = ws.getCell("I"+i).value;
             option.optionSet = ws.getCell("H"+i).value;
-            mapping.optionSets.push(option);
+            optionSets.push(option);
             i++;
         }
-        i = 3;
+        return optionSets;
+    }
+
+    const getLegendSets = (ws) => {
+        let i = 3;
+        let legendSets = [];
         while(ws.getCell("P"+i).value !== null)
         {
             let legend = {};
             legend.id = ws.getCell("P"+i).value;
             legend.legendSet = ws.getCell("O"+i).value;
-            mapping.legendSets.push(legend);
+            legendSets.push(legend);
             i++;
         }
-        return mapping;
+        return legendSets
+    }
+
+    const getProgramsMap = (ws) => {
+        let i = 3;
+        let programs = [];
+        while(ws.getCell("R"+i).value !== null)
+        {
+            let program = {};
+            program.id = ws.getCell("S"+i).value;
+            program.name = ws.getCell("R"+i).value;
+            programs.push(program);
+            i++;
+        }
+        return programs
     }
 
     const fileValidation = (callback) => {
