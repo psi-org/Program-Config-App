@@ -48,29 +48,30 @@ const Scores = ({ stageSection, index }) => {
     }
 
     return (
-        <>
-            <div className="ml_item" style={{ color: "#333333", backgroundColor: "#8EC8C8" }}>
-                <div className="ml_item-icon_secondary">
+        <div>
+            <div className="ml_item" style={{color:"#333333" , backgroundColor: "#B2DFDB", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
+                <div className="ml_list-icon">
                     <img className="ml_list-img" alt="sec" src={scores_svg} />
                 </div>
                 <div className="ml_item-title">
-                    {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span>
+                    {stageSection.displayName}
                 </div>
+                <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div></div>
                 <div className="ml_item-warning_error " onClick={()=>showIssues(stageSection.dataElements)}>
-                    {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
-                    {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
+                  {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
+                  {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                 </div>
                 <div className="ml_item-cta">
-                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                     <img src={move_vert_svg} alt="menu" />
+                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                 </div>
             </div>
             <div className="section_cont" >
                 {
                     stageSection.dataElements.map((dataElement, i) => {
-                        let classNames = "ml_item de_type" + ((dataElement.importStatus) ? ' import_'+dataElement.importStatus:'');
-                        return(
-                            <div id={"de_"+dataElement.id} className={classNames} key={i}>
+                        let classNames = "ml_item" + ((dataElement.importStatus) ? ' import_' + dataElement.importStatus : '');
+                        return (
+                            <div id={"de_" + dataElement.id} className={classNames} key={i}>
                                 <div className="ml_item-icon">
                                     <img className="ml_list-img" alt="de" src={scores_svg} />
                                 </div>
@@ -82,7 +83,7 @@ const Scores = ({ stageSection, index }) => {
                                     {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
                                 </div>
                                 <div className="ml_item-cta">
-                                    <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>
+                                    <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>
                                 </div>
                             </div>
                         )
@@ -91,7 +92,7 @@ const Scores = ({ stageSection, index }) => {
                 }
                 {showValidationMessage && <ValidationMessages dataElements={errors} showValidationMessage={setShowValidationMessage} /> }
             </div>
-        </>
+        </div>
     );
 };
 

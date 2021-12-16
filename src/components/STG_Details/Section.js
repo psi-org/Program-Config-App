@@ -27,7 +27,7 @@ import ValidationMessages from "./ValidationMessages";
 const DraggableSection = ({ stageSection, index }) => {
     const [showValidationMessage, setShowValidationMessage] = useState(false);
     useEffect(() => {
-        $('img.bsct_cta').off().on("click", function (e) {            
+        $('img.bsct_cta').off().on("click", function (e) {
             if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
                 $(this).attr('src', contracted_bottom_svg);
                 $(this).parent().parent().css({
@@ -53,8 +53,8 @@ const DraggableSection = ({ stageSection, index }) => {
     // Import Values //
     var sectionImportStatus = undefined;
     var sectionImportSummary = undefined;
-    if(stageSection.importStatus){
-        switch (stageSection.importStatus){
+    if (stageSection.importStatus) {
+        switch (stageSection.importStatus) {
             case 'new':
                 sectionImportStatus = <Tag positive>New</Tag>;
                 break;
@@ -69,34 +69,35 @@ const DraggableSection = ({ stageSection, index }) => {
         sectionImportSummary = <><Tag positive>New: {stageSection.newDataElements}</Tag> <Tag neutral>Updated: {stageSection.updatedDataElements}</Tag></>
     }
 
-    var classNames = (stageSection.importStatus) ? ' import_'+stageSection.importStatus:'';
+    var classNames = (stageSection.importStatus) ? ' import_' + stageSection.importStatus : '';
 
     return (
-        <Draggable key={stageSection.id || 'section'+index } draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus!=undefined}>
+        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
-                    <div style={{ color: "#333333", backgroundColor: "#8EC8C8" }} className={"ml_item" + classNames}>
+                    <div className={"ml_item" + classNames} style={{color:"#333333" , backgroundColor: "#b2dfdb", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
                         <div className="ml_item-icon">
                             <img className="ml_list-img" alt="sec" src={sec_svg} />
                         </div>
                         <div className="ml_item-title">
-                            {sectionImportStatus} {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span> {sectionImportSummary}
+                            {sectionImportStatus} {stageSection.displayName} 
                         </div>
+                        <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div> {sectionImportSummary}</div>
                         <div className="ml_item-warning_error " onClick={()=>setShowValidationMessage(!showValidationMessage)}>
                             {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
                             {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                         </div>
                         <div className="ml_item-cta">
-                            <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                             <img src={move_vert_svg} alt="menu" />
+                            <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                         </div>
                     </div>
-                    <Droppable droppableId={stageSection.id || 'dropSec'+index} type="DATA_ELEMENT">
+                    <Droppable droppableId={stageSection.id || 'dropSec' + index} type="DATA_ELEMENT">
                         {(provided, snapshot) => (
                             <div {...provided.droppableProps} ref={provided.innerRef} className={"section_cont "} >
                                 {
-                                    stageSection.dataElements.map((de,i) => {
-                                        return <DraggableDataElement dataElement={de} index={i} key={de.id || i}/>;
+                                    stageSection.dataElements.map((de, i) => {
+                                        return <DraggableDataElement dataElement={de} index={i} key={de.id || i} />;
                                     })
                                 }
                                 {provided.placeholder}

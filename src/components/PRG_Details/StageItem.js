@@ -19,13 +19,14 @@ const StageItem = ({stage}) => {
   const { setProgramStage } = bindActionCreators(actionCreators, dispatch);
 
   return (
-    <div className="ml_item" style={{color:"#333333" , backgroundColor: "#5DD9A9"}}>
-      <div className=""> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
+    <div className="ml_item" style={{color:"#333333" , backgroundColor: "#c5e3fc", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
+      <div className="ml_list-icon"> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
         <img className="ml_list-img" alt="prg" src={stg_svg} />
       </div>
       <div className="ml_item-title">
-        {stage.displayName} | <span>{stage.programStageSections.length} program stages sections</span>
+        {stage.displayName}
       </div>
+      <div className="ml_item-desc"><div>{stage.programStageSections.length} program stages sections</div></div>
       <div className="ml_item-warning_error ">
         {/*
         <img src={warning_svg} alt="wrng" />

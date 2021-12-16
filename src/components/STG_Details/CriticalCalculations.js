@@ -40,13 +40,14 @@ const CriticalCalculations = ({ stageSection, index }) => {
 
     return (
         <>
-            <div className="ml_item" style={{ color: "#333333", backgroundColor: "#8EC8C8" }}>
-                <div className="ml_item-icon_secondary">
+            <div className="ml_item" style={{color:"#333333" , backgroundColor: "#b2dfdb", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
+                <div className="ml_list-icon">
                     <img className="ml_list-img" alt="sec" src={cogs_svg} />
                 </div>
                 <div className="ml_item-title">
-                    {stageSection.displayName} | <span>{stageSection.dataElements.length} data elements</span>
+                    {stageSection.displayName}
                 </div>
+                <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div></div>
                 <div className="ml_item-warning_error ">
                     {/* <img src={warning_svg} alt="wrng" />
                             <img src={error_svg} alt="err" />
@@ -58,16 +59,16 @@ const CriticalCalculations = ({ stageSection, index }) => {
                             </div> */}
                 </div>
                 <div className="ml_item-cta">
+                <img src={move_vert_svg} alt="menu" />
                     <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
-                    <img src={move_vert_svg} alt="menu" />
                 </div>
             </div>
             <div className="section_cont" >
                 {
                     stageSection.dataElements.map((dataElement, i) => {
                         return(
-                            <div id={"de_"+dataElement.id} className={"ml_item de_type"} key={i}>
-                                <div className="ml_item-icon_secondary">
+                            <div id={"de_"+dataElement.id} className={"ml_item"} key={i} style={{color:"#333333" , backgroundColor: "#b2dfdb", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
+                                <div className="ml_list-icon">
                                     <img className="ml_list-img" alt="de" src={cogs_svg} />
                                 </div>
                                 <div className="ml_item-title">
