@@ -23,7 +23,7 @@ const DraggableDataElement = ({dataElement,index}) => {
     if(metadata) metadata=JSON.parse(metadata);
     let renderFormName = metadata?.labelFormName;
 
-    classNames+= (metadata?.labelFormName) ? " ml_item de_label_type" : " ml_item de_type";
+    classNames+= (metadata?.labelFormName) ? " ml_item" : " ml_item";
     classNames+= (dataElement.importStatus) ? ' import_'+dataElement.importStatus:'';
 
     // Import Values //
@@ -48,7 +48,7 @@ const DraggableDataElement = ({dataElement,index}) => {
     <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined}>
         {(provided, snapshot) => (
             <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
-                <div id={"de_"+dataElement.id} className={classNames}>
+                <div id={"de_"+dataElement.id} className={classNames} style={{color:"#333333" , backgroundColor: "#e0f2f1", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
                     <div className="ml_item-icon">
                         <img className="ml_list-img" alt="de" src={de_svg} />
                     </div>

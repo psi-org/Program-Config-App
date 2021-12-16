@@ -72,7 +72,7 @@ const DraggableSection = ({ stageSection, index }) => {
         <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
-                    <div style={{ color: "#333333", backgroundColor: "#e3f2fd" }} className={"ml_item" + classNames}>
+                    <div className={"ml_item" + classNames} style={{color:"#333333" , backgroundColor: "#b2dfdb", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
                         <div className="ml_item-icon">
                             <img className="ml_list-img" alt="sec" src={sec_svg} />
                         </div>

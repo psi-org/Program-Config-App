@@ -39,8 +39,8 @@ const Scores = ({ stageSection, index }) => {
     }, []);
 
     return (
-        <>
-            <div className="ml_item" style={{ color: "#333333", backgroundColor: "#e3f2fd" }}>
+        <div>
+            <div className="ml_item" style={{color:"#333333" , backgroundColor: "#B2DFDB", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
                 <div className="ml_list-icon">
                     <img className="ml_list-img" alt="sec" src={scores_svg} />
                 </div>
@@ -94,7 +94,7 @@ const Scores = ({ stageSection, index }) => {
                     })
                 }
             </div>
-        </>
+        </div>
     );
 };
 

@@ -40,7 +40,7 @@ const CriticalCalculations = ({ stageSection, index }) => {
 
     return (
         <>
-            <div className="ml_item" style={{ color: "#333333", backgroundColor: "#e3f2fd" }}>
+            <div className="ml_item" style={{color:"#333333" , backgroundColor: "#b2dfdb", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
                 <div className="ml_list-icon">
                     <img className="ml_list-img" alt="sec" src={cogs_svg} />
                 </div>
@@ -67,7 +67,7 @@ const CriticalCalculations = ({ stageSection, index }) => {
                 {
                     stageSection.dataElements.map((dataElement, i) => {
                         return(
-                            <div id={"de_"+dataElement.id} className={"ml_item de_type"} key={i}>
+                            <div id={"de_"+dataElement.id} className={"ml_item"} key={i} style={{color:"#333333" , backgroundColor: "#b2dfdb", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
                                 <div className="ml_list-icon">
                                     <img className="ml_list-img" alt="de" src={cogs_svg} />
                                 </div>
