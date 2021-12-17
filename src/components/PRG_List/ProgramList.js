@@ -7,6 +7,7 @@ import upload_svg from './../../images/i-upload.svg';
 
 // ------------------
 import ProgramItem from "./ProgramItem";
+import DataProcessor from "../Excel/DataProcessor";
 
 const query = {
   results: {
@@ -25,11 +26,18 @@ const query = {
 const ProgramList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [exportToExcel, setExportToExcel] = useState(false);
+  const [ exportStatus, setExportStatus] = useState("Download");
 
   const { loading, error, data, refetch } = useDataQuery(query, { variables: { pageSize, page: currentPage } });
 
   if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
   if (loading) return <CircularLoader />
+
+  const configuration_download = () => {
+    setExportToExcel(true);
+    setExportStatus("Generating Configuration File...")
+  };
   
   return (
     <div>
@@ -37,11 +45,12 @@ const ProgramList = () => {
         <div className="cnt_p"><Chip>Home</Chip></div>
         <div className="c_srch"></div>
         <div className="c_btns">
-          <Button disabled={true}><img src={download_svg} /> Download Template</Button>
+          <Button loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> Download Template</Button>
           <Button disabled={true}><img src={upload_svg} /> Import Template</Button>
         </div>
       </div>
       <div className="wrapper">
+        {exportToExcel && <DataProcessor ps="null" isLoading={setExportToExcel} setStatus={setExportStatus}/>}
         <div className="title">List of programs</div>
         <div className="layout_prgms_stages">
           <div className="list-ml_item">

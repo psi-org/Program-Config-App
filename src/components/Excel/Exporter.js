@@ -258,24 +258,117 @@ const Exporter = (props) => {
     ws.getCell("B43").value = `The template will highlight in red some cells automatically while you're working on it, this means that there's a validation error in that cell and you must fix it before importing.`;
     ws.getCell("B44").value = `Also, keep in mind that this file is protected so you can only modify some specific cell ranges (most of the unlocked cells are in the "Template" tab).`;
 
-    ws.getCell("B46").value = `Please ensure this content is clean. Everything will appear in the program just as it is submitted to the server. The developers will not correct any spelling mistakes or spacing errors. `;
+    ws.getCell("B46").value = "Excel Validation";
+    ws.getCell("B46").style = {font: {bold: true}};
+    ws.getCell("B47").value = "Worksheet";
+    ws.getCell("C47").value = "Column / Cell";
+    ws.getCell("D47").value = "Validation Type";
+    ws.getCell("E47").value = "Rule & Messages";
+    ws.mergeCells("B48:B52");
+    ws.getCell("B48").value = "Instruction";
+    ws.getCell("B48").alignment = {vertical: "middle"};
+    ws.mergeCells("C48:C49");
+    ws.getCell("C48").value = "Program Name";
+    ws.getCell("C48").alignment = {vertical: "middle"};
+    ws.getCell("D48").value = "Conditional Validation";
+    ws.getCell("D49").value = "Data Validation";
+    ws.getCell("E48").value = "'=Instructions!C12' cell will be highlighted with RED Color";
+    ws.getCell('E48').alignment = {wrapText: true};
+    ws.getCell("E49").value = "A Dialogbox will show up with the proper message";
+    ws.getCell('E49').alignment = {wrapText: true};
+    ws.getCell("C50").value = "Prefix";
+    ws.getCell("D50").value = "Data Validation";
+    ws.getCell("E50").value = "A Dialogbox will show up with the proper message";
+    ws.getCell('E50').alignment = {wrapText: true};
+    ws.getCell("C51").value = "Competency Class";
+    ws.getCell("D51").value = "Data Validation";
+    ws.getCell("E51").value = "Only 'Yes' or 'No' can be selected. A dialogbox will pop up with anything else is selected";
+    ws.getCell('E51').alignment = {wrapText: true};
+    ws.getCell("C52").value = "Health Area";
+    ws.getCell("D52").value = "Data Validation";
+    ws.getCell("E52").value = "If value entered doesn't match with any of the provided option, a dialogbox will popup";
+    ws.getCell("E52").alignment = {wrapText: true};
 
-    ws.getCell("B48").value = `Once you're done with the configurations proceed by uploading this template to the Config Web App to process it.`;
-    ws.getCell("B49").value = `After uploading please check that the content has been configured as expected using the preview, then save the changes.`;
+    ws.mergeCells("B53:B61");
+    ws.getCell("B53").value = "Template";
+    ws.getCell("B53").alignment = {vertical: "middle"};
+    ws.getCell("C53").value = "Structure";
+    ws.getCell("D53").value = "Data Validation";
+    ws.getCell("E53").value = "Either 'Section', 'question', 'label', or 'score' can be selected. A Dialogbox will show to select the proper valid option from the list.";
+    ws.getCell("E53").alignment = {wrapText: true};
 
-    ws.getCell("B51").value = `Now we're done!`;
-    ws.getCell("B51").style = {font: {bold: true}};
+    ws.getCell("C54").value = "Critical Step and Compulsory column";
+    ws.getCell("D54").value = "Data Validation";
+    ws.getCell("E54").value = "Only 'Yes' or 'No' can be selected. A dialogbox will pop up with anything else is selected";
+    ws.getCell("E54").alignment = {wrapText: true};
 
-    ws.getCell("B52").value = `Test your configurations both on the web and the Android app, then make changes using this template if necessary.`;
-    ws.getCell("B53").value = `Remember that once uploaded you can download a copy of this template from the server.`;
+    ws.getCell("C55").value = "\"Value Type\n Option Set\n Legend\"\n";
+    ws.getCell("C55").alignment = {wrapText: true};
+    ws.getCell("D55").value = "Data Validation";
+    ws.getCell("E55").value = "Only valid value can be entered\n";
+    ws.getCell("E55").alignment = {wrapText: true};
+
+    ws.getCell("C56").value = "Score Numerator & Score Denominator\n";
+    ws.getCell("D56").value = "Data Validation";
+    ws.getCell("E56").value = "Value should be numeric and should be greater than 0\n";
+    ws.getCell("E56").alignment = {wrapText: true};
+
+    ws.getCell("C57").value = "Form Name\n";
+    ws.getCell("D57").value = "Conditional Validation";
+    ws.getCell("E57").value = "Cell will be highlighted RED if corresponding Structure is present but form name is missing";
+    ws.getCell("E57").alignment = {wrapText: true};
+
+    ws.getCell("C58").value = "Value Type";
+    ws.getCell("D58").value = "Conditional Validation";
+    ws.getCell("E58").value = "If the Structure is label then Value type should be LONG_TEXT; or if the Structure is Score Value type should be Number otherwise the cell will be highlighted";
+    ws.getCell("E58").alignment = {wrapText: true};
+
+    ws.getCell("C59").value = "Feedback Order";
+    ws.getCell("D59").value = "Conditional Validation";
+    ws.getCell("E59").value = "If either Numerator or Denominator is present then Feedback order should be provided otherwise the corresponding cell will be highlighted RED";
+    ws.getCell("E59").alignment = {wrapText: true};
+
+    ws.getCell("C60").value = "Score Numerator & Score Denominator";
+    ws.getCell("D60").value = "Conditional Validation";
+    ws.getCell("E60").value = "If either of the score is present and other one is absent then the missing side will be highlighted RED";
+    ws.getCell("E60").alignment = {wrapText: true};
+
+    ws.getCell("C61").value = "Parent Question and Answer \n";
+    ws.getCell("D61").value = "Conditional Validation";
+    ws.getCell("E61").value = "If Parent Question is present, answer should exist and vice versa otherwise the missing cell will be highlighted RED";
+    ws.getCell("E61").alignment = {wrapText: true};
+
+    fillBackgroundToRange(ws, 'B47:E47', "FABF8F");
+
+    ws.getCell("B63").value = `Please ensure this content is clean. Everything will appear in the program just as it is submitted to the server. The developers will not correct any spelling mistakes or spacing errors. `;
+
+    ws.getCell("B65").value = `Once you're done with the configurations proceed by uploading this template to the Config Web App to process it.`;
+    ws.getCell("B66").value = `After uploading please check that the content has been configured as expected using the preview, then save the changes.`;
+
+    ws.getCell("B68").value = `Now we're done!`;
+    ws.getCell("B68").style = {font: {bold: true}};
+
+    ws.getCell("B69").value = `Test your configurations both on the web and the Android app, then make changes using this template if necessary.`;
+    ws.getCell("B70").value = `Remember that once uploaded you can download a copy of this template from the server.`;
 
     applyBorderToRange(ws, 1, 26, 2, 40);
+    applyBorderToRange(ws, 1, 47, 4, 61);
     instructionValidations(ws);
     enableCellEditing(ws, ['C12', 'D12', 'C13', 'C14', 'C15']);
     await ws.protect(password);
   };
 
   const instructionValidations = (ws) => {
+    ws.addConditionalFormatting({
+        ref: '$C$12',
+        rules: [
+          {
+            type: 'expression',
+            formulae: ['ISERROR(VLOOKUP(C12,Mapping!R3:R100,1,FALSE))'],
+            style: conditionalError,
+          }
+        ]
+      });
     dataValidation(ws, "C12", {
       type: 'textLength',
       operator: 'lessThan',
@@ -285,14 +378,14 @@ const Exporter = (props) => {
       allowBlank: true,
       formulae: [226]
     });
-    dataValidation(ws, "C11", {
+    dataValidation(ws, "C14", {
       type: 'textLength',
       operator: 'lessThan',
       showErrorMessage: true,
-      error: 'DE Prefix exceeds 2 characters',
+      error: 'DE Prefix exceeds 25 characters',
       errorTitle: 'Invalid Length',
       allowBlank: true,
-      formulae: [3]
+      formulae: [26]
     });
     dataValidation(ws, "C13", {
       type: 'list',
@@ -561,15 +654,17 @@ const Exporter = (props) => {
 
   const populateConfiguration = async ws => {
     let dataRow = 3;
-    props.Configures.forEach((configure) => {
-      ws.getRow(dataRow).values = configure;
-      ws.getCell("A"+dataRow).value = {formula:'_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section","",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1)))'};
-      if (configure.structure === "Section") {
-        fillBackgroundToRange(ws, "A"+dataRow+":R"+dataRow, "f8c291")
-      }
-      dataRow = dataRow + 1;
-    });
-    applyBorderToRange(ws, 0, 3, 14, dataRow - 1);
+    if(props.Configures.length > 0) {
+      props.Configures.forEach((configure) => {
+        ws.getRow(dataRow).values = configure;
+        ws.getCell("A" + dataRow).value = {formula: '_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section","",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1)))'};
+        if (configure.structure === "Section") {
+          fillBackgroundToRange(ws, "A" + dataRow + ":R" + dataRow, "f8c291")
+        }
+        dataRow = dataRow + 1;
+      });
+      applyBorderToRange(ws, 0, 3, 14, dataRow - 1);
+    }
   };
 
   const addMapping = async (ws) => {

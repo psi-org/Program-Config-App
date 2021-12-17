@@ -44,9 +44,18 @@ const programsQuery = {
 
 const DataProcessor = (props) => {
     const programStage = props.ps;
-    const programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
-    const programPrefix = programMetadata?.dePrefix || programStage.program.id;
-    const useCompetencyClass = programMetadata?.useCompetencyClass || "Yes";
+    let programMetadata = "";
+    let programPrefix = "";
+    let useCompetencyClass = "";
+    let programName = "";
+    if(typeof programStage.program !== "undefined")
+    {
+        programName = programStage.program.name;
+        console.log("PS: ", programStage);
+        programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
+        programPrefix = programMetadata?.dePrefix || programStage.program.id;
+        useCompetencyClass = programMetadata?.useCompetencyClass || "Yes";
+    }
 
     const [ isDownloaded, setIsDownloaded] = useState(false);
     const { data: data} = useDataQuery(optionSetQuery);
@@ -61,7 +70,7 @@ const DataProcessor = (props) => {
     let programData = [];
 
     const initialize = () => {
-        compile_report();
+        if(typeof programStage.program !== "undefined") compile_report();
         getOptionSets();
         setTimeout(function() {
             setIsDownloaded(true);
@@ -196,7 +205,7 @@ const DataProcessor = (props) => {
 
     return (
         <>
-            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={props.ps.program.name} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass}  setStatus={props.setStatus}/>}
+            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass}  setStatus={props.setStatus}/>}
         </>
     );
 }
