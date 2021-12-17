@@ -5,6 +5,7 @@ import de_svg from './../../images/i-drag_black.svg';
 import warning_svg from './../../images/i-warning.svg';
 import error_svg from './../../images/i-error.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
+import open_external_svg from './../../images/open_external.svg';
 import {colors,IconAdd16,IconDelete16,IconEdit16, Tag } from '@dhis2/ui';
 
 import BadgeWarnings from "./BadgeWarnings";
@@ -66,7 +67,7 @@ const DraggableDataElement = ({dataElement,index}) => {
                         {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
                     </div>
                     <div className="ml_item-cta">
-                        <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>
+                        <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>
                     </div>
                 </div>
                 {showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }
