@@ -1,5 +1,8 @@
 // DHIS2 UI
-import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Card, Modal, ModalTitle, ModalContent, ModalActions, LinearLoader, Chip, IconDownload24, IconUpload24, IconSync24 } from "@dhis2/ui";
+import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Modal, ModalTitle, ModalContent, ModalActions, Chip, IconSync24 } from "@dhis2/ui";
+
+import download_svg from './../../images/i-download.svg';
+import upload_svg from './../../images/i-upload.svg';
 
 // React Hooks
 import { useState, useEffect } from "react";
@@ -84,7 +87,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [exportToExcel, setExportToExcel] = useState(false);
     //const { hasNotice, setHasNotice } = useState(false);
 
-    const [ exportStatus, setExportStatus] = useState("Download");
+    const [ exportStatus, setExportStatus] = useState("Download Template");
     const [ importerEnabled, setImporterEnabled ] = useState(false);
     const [ importResults, setImportResults] = useState(false);
     const [ progressSteps,setProgressSteps ]= useState(0);
@@ -313,10 +316,10 @@ const StageSections = ({ programStage, stageRefetch }) => {
                 <ButtonStrip>
                     <Button disabled={createMetadata.loading} onClick={() => commit()}>{saveStatus}</Button>
                     <Button disabled={!savedAndValidated} primary onClick={() => run()}>Set up program</Button>
-                    <Button name="generator" icon={exportToExcel ? null : <IconDownload24/>}
-                        loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}> {exportStatus}</Button>
-                    <Button name="importer" icon={<IconUpload24/>}
-                        onClick={() => setImporterEnabled(true)}> Import</Button>
+                    <Button name="generator"
+                        loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> {exportStatus}</Button>
+                    <Button name="importer"
+                        onClick={() => setImporterEnabled(true)}><img src={upload_svg} /> Import Template</Button>
                     <Button name="Reload" icon={<IconSync24/>} onClick={()=> {window.location.reload()}}>Reload</Button>
                 </ButtonStrip>
                 </div>
