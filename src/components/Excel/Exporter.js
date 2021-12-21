@@ -113,9 +113,15 @@ const Exporter = (props) => {
     fillBackgroundToRange(ws, 'C12:C15', "cfe2f3");
 
     ws.getCell("D12").value = {formula: "=VLOOKUP(C12, Mapping!R3:S300,2,FALSE)"};
+    //ws.getCell("D15").value = {formula: "=INDEX(Mapping!L1:L100;MATCH(Instructions!C15;Mapping!M1:M100;0))"};
     ws.getCell('C12').value = props.programName;
     ws.getCell('C13').value = props.useCompetencyClass;
     ws.getCell('C14').value = props.programPrefix;
+    let healthAreaFound = props.healthAreaData.find(ha => ha["Code"] == props.programHealthArea);
+    ws.getCell('C15').value = healthAreaFound ? healthAreaFound["Health Area"] : "Family Planning";
+    
+    
+    //ws.getCell("D15").style = {font: {color: {'argb': 'ffffff'}}};
     ws.getCell("D12").style = {font: {color: {'argb': 'ffffff'}}}
 
     ws.getCell('B20').value = "Server mapping";

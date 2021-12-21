@@ -2,7 +2,7 @@ import { Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Button, Lin
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
 import { useState } from "react";
 
-const BUILD_VERSION = "0.2";
+const BUILD_VERSION = "1.0";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -240,23 +240,24 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
          */
         // ATTRIBUTE VALUES
         let programMetadataIdx = programPayload.attributeValues.findIndex(att => att.attribute.id === METADATA);
-        let progMetadata = JSON.parse(programPayload.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
+        let new_programMetadata = JSON.parse(programPayload.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
         
-        progMetadata.dePrefix = programMetadata.dePrefix;
-        progMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
-        progMetadata.buildVersion = BUILD_VERSION;
+        new_programMetadata.dePrefix = programMetadata.dePrefix;
+        new_programMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
+        new_programMetadata.healthArea = programMetadata.healthArea;
+        new_programMetadata.buildVersion = BUILD_VERSION;
 
         programPayload.attributeValues[programMetadataIdx] = {
             attribute : { id: METADATA },
-            value : JSON.stringify(progMetadata)
+            value : JSON.stringify(new_programMetadata)
         };
 
         // PROGRAM TRACKED ENTITY ATTRIBUTES
         let currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === "ulU9KKgSLYe");
-        if(progMetadata.useCompetencyClass=="Yes" && !currentCompetencyAttribute){
+        if(new_programMetadata.useCompetencyClass=="Yes" && !currentCompetencyAttribute){
             competencyClassAttribute.program.id = programPayload.id;
             programPayload.programTrackedEntityAttributes.push(competencyClassAttribute);
-        }else if(progMetadata.useCompetencyClass=="No"){
+        }else if(new_programMetadata.useCompetencyClass=="No"){
             programPayload.programTrackedEntityAttributes = programPayload.programTrackedEntityAttributes.filter(att => att.trackedEntityAttribute.id != "ulU9KKgSLYe");
         }
 

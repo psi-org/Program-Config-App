@@ -1,5 +1,5 @@
 import { useDataQuery } from "@dhis2/app-runtime";
-import { Button, Chip, CircularLoader, NoticeBox, Pagination } from "@dhis2/ui";
+import { Button, Chip, CircularLoader, NoticeBox, Pagination, IconAddCircle24, Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Input, InputField, SwitchField } from "@dhis2/ui";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import download_svg from './../../images/i-download.svg';
@@ -29,6 +29,8 @@ const ProgramList = () => {
   const [exportToExcel, setExportToExcel] = useState(false);
   const [ exportStatus, setExportStatus] = useState("Download");
 
+  const [competencyClassParam,setCompetencyClassParam] = useState(false);
+
   const { loading, error, data, refetch } = useDataQuery(query, { variables: { pageSize, page: currentPage } });
 
   if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
@@ -44,7 +46,7 @@ const ProgramList = () => {
       <div className="sub_nav">
         <div className="cnt_p"><Chip>Home</Chip></div>
         <div className="c_srch"></div>
-        <div className="c_btns">
+        <div className="c_btns">     
           <Button loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> Download Template</Button>
           <Button disabled={true}><img src={upload_svg} /> Import Template</Button>
         </div>

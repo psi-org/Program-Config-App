@@ -17,8 +17,9 @@ const healthAreasQuery = {
     results: {
         resource: 'optionSets',
         params: {
-            fields: ['name', 'options[id]','options[name]'],
-            filter: ['name:ilike:Health area']
+            fields: ['name', 'options[id,code,name]'],
+            filter: ['id:eq:y752HEwvCGi']
+            //filter: ['name:ilike:Health area']
         }
     }
 };
@@ -47,6 +48,7 @@ const DataProcessor = (props) => {
     let programMetadata = "";
     let programPrefix = "";
     let useCompetencyClass = "";
+    let programHealthArea = "";
     let programName = "";
     if(typeof programStage.program !== "undefined")
     {
@@ -54,6 +56,7 @@ const DataProcessor = (props) => {
         console.log("PS: ", programStage);
         programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
         programPrefix = programMetadata?.dePrefix || programStage.program.id;
+        programHealthArea = programMetadata?.healthArea || "FP";
         useCompetencyClass = programMetadata?.useCompetencyClass || "Yes";
     }
 
@@ -162,7 +165,7 @@ const DataProcessor = (props) => {
             healthAreas.forEach((ha) => {
                 ha.options.forEach((option) => {
                     let data = {
-                        "Code": option.id,
+                        "Code": option.code,//option.id,
                         "Health Area": option.name
                     };
                     healthAreaData.push(data);
@@ -205,7 +208,7 @@ const DataProcessor = (props) => {
 
     return (
         <>
-            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass}  setStatus={props.setStatus}/>}
+            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
         </>
     );
 }

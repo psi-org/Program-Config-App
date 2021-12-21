@@ -274,7 +274,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
         setProgressSteps(3);
         
         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId,programMetadata.useCompetencyClass);
-        const { programRules, programRuleActions } = buildProgramRules(sections, programId, compositeScores, scoresMapping, uidPool,programMetadata.useCompetencyClass); //useCompetencyClass
+        const { programRules, programRuleActions } = buildProgramRules(sections, programId, compositeScores, scoresMapping, uidPool,programMetadata.useCompetencyClass,programMetadata.healthArea); //useCompetencyClass
 
         const metadata = { programRuleVariables, programRules, programRuleActions };
 

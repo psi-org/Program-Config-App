@@ -410,7 +410,7 @@ const buildCompetencyRules = (programId, uidPool) => {
     return { competencyRules, competencyActions }
 }
 
-const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass = "Yes", healthArea = 'FP') => {
+const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass = "Yes", healthArea) => {
 
     let attributeActions = [];
 
@@ -766,7 +766,7 @@ const buildProgramRuleVariables = (sections, compositeScores, programId, useComp
     return programRuleVariables.concat(criticalVariables)
 }
 
-const buildProgramRules = (sections, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", scoreMap = { childs: [] }) => {
+const buildProgramRules = (sections, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea="FP", scoreMap = { childs: [] }) => {
     var programRules = [];
     var programRuleActions = [];
     var hideShowGroup = {};
@@ -851,7 +851,7 @@ const buildProgramRules = (sections, programId, compositeValues, scoresMapping, 
 
     // Attributes
 
-    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, scoreMap, useCompetencyClass); //Define: useCompetencyClass & healthArea
+    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, scoreMap, useCompetencyClass,healthArea); //Define: useCompetencyClass & healthArea
 
     // Hide/Show Logic
 

@@ -100,6 +100,7 @@ const Importer = (props) => {
                                             let programMetadata_new = props.programMetadata.programMetadata;
                                             programMetadata_new.dePrefix = programDetails.dePrefix;
                                             programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
+                                            programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
                                             props.programMetadata.setProgramMetadata(programMetadata_new);
                                         }
                                     })
@@ -136,6 +137,7 @@ const Importer = (props) => {
 
         mapping.optionSets = getOptionSets(ws);
         mapping.legendSets = getLegendSets(ws);
+        mapping.healthAreas = getHealthAreas(ws);
         mapping.programs = getProgramsMap(ws);
         return mapping;
     }
@@ -151,6 +153,19 @@ const Importer = (props) => {
             i++;
         }
         return optionSets;
+    }
+
+    const getHealthAreas = (ws) => {
+        let i = 3;
+        let healthAreas = [];
+        while(ws.getCell("L"+i).value !== null) {
+            let healthArea = {};
+            healthArea.code = ws.getCell("L"+i).value;
+            healthArea.name = ws.getCell("M"+i).value;
+            healthAreas.push(healthArea);
+            i++;
+        }
+        return healthAreas;
     }
 
     const getLegendSets = (ws) => {
