@@ -88,9 +88,10 @@ const Exporter = (props) => {
     ws.mergeCells('B11:C11');
     ws.getCell("B11").value = "Program Details";
     ws.getCell("B12").value = "Program Name";
-    ws.getCell("B13").value = "Use 'Competency Class'";
-    ws.getCell("B14").value = "DE Prefix";
-    ws.getCell("B15").value = "Health Area";
+    ws.getCell("B13").value = "Program Short Name";
+    ws.getCell("B14").value = "Use 'Competency Class'";
+    ws.getCell("B15").value = "DE Prefix";
+    ws.getCell("B16").value = "Health Area";
 
     ws.mergeCells('F11:H11');
     ws.getCell('F11').value = "Help";
@@ -102,23 +103,24 @@ const Exporter = (props) => {
     ws.getCell("F15").value = "Health Area: The Health Area where the checklist will be assigned, used for filtering.";
     fillBackgroundToRange(ws, "F12:H15", "f2f2f2");
 
-    ws.getCell("B16").value = "*All the fields are required";
-    ws.getCell("B16").style = {font: {color: {'argb': 'ff0000'}}}
+    ws.getCell("B17").value = "*All the fields are required";
+    ws.getCell("B17").style = {font: {color: {'argb': 'ff0000'}}}
     ws.getCell("B18").value = "This information won't change anything in this template, however, it will be used when creating program in DHIS2."
-
+    ws.getRow("18").height = 20;
     ws.getCell("B11").style = {font: {bold: true, size: 10}};
     fillBackgroundToRange(ws, "B11:C11", "6fa8dc");
-    applyStyleToRange(ws, 'B12:B15', {font: {bold: true, size: 10}});
-    fillBackgroundToRange(ws, "B12:B15", "9fc5e8");
-    fillBackgroundToRange(ws, 'C12:C15', "cfe2f3");
+    applyStyleToRange(ws, 'B12:B16', {font: {bold: true, size: 10}});
+    fillBackgroundToRange(ws, "B12:B16", "9fc5e8");
+    fillBackgroundToRange(ws, 'C12:C16', "cfe2f3");
 
     ws.getCell("D12").value = {formula: "=VLOOKUP(C12, Mapping!R3:S300,2,FALSE)"};
     //ws.getCell("D15").value = {formula: "=INDEX(Mapping!L1:L100;MATCH(Instructions!C15;Mapping!M1:M100;0))"};
     ws.getCell('C12').value = props.programName;
-    ws.getCell('C13').value = props.useCompetencyClass;
-    ws.getCell('C14').value = props.programPrefix;
+    ws.getCell('C13').value = props.programShortName;
+    ws.getCell('C14').value = props.useCompetencyClass;
+    ws.getCell('C15').value = props.programPrefix;
     let healthAreaFound = props.healthAreaData.find(ha => ha["Code"] == props.programHealthArea);
-    ws.getCell('C15').value = healthAreaFound ? healthAreaFound["Health Area"] : "Family Planning";
+    ws.getCell('C16').value = healthAreaFound ? healthAreaFound["Health Area"] : "Family Planning";
     
     
     //ws.getCell("D15").style = {font: {color: {'argb': 'ffffff'}}};
@@ -360,7 +362,7 @@ const Exporter = (props) => {
     applyBorderToRange(ws, 1, 26, 2, 40);
     applyBorderToRange(ws, 1, 47, 4, 61);
     instructionValidations(ws);
-    enableCellEditing(ws, ['C12', 'D12', 'C13', 'C14', 'C15']);
+    enableCellEditing(ws, ['C12', 'D12', 'C13', 'C14', 'C15', 'C16']);
     await ws.protect(password);
   };
 
@@ -384,7 +386,7 @@ const Exporter = (props) => {
       allowBlank: true,
       formulae: [226]
     });
-    dataValidation(ws, "C14", {
+    dataValidation(ws, "C15", {
       type: 'textLength',
       operator: 'lessThan',
       showErrorMessage: true,
@@ -393,7 +395,7 @@ const Exporter = (props) => {
       allowBlank: true,
       formulae: [26]
     });
-    dataValidation(ws, "C13", {
+    dataValidation(ws, "C14", {
       type: 'list',
       allowBlank: true,
       showErrorMessage: true,
@@ -401,7 +403,7 @@ const Exporter = (props) => {
       errorTitle: 'Invalid option',
       formulae: yesNoValidator
     });
-    dataValidation(ws, "C15", {
+    dataValidation(ws, "C16", {
       type: 'list',
       allowBlank: true,
       showErrorMessage: true,
