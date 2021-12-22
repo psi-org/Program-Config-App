@@ -50,9 +50,11 @@ const DataProcessor = (props) => {
     let useCompetencyClass = "";
     let programHealthArea = "";
     let programName = "";
+    let programShortName = "";
     if(typeof programStage.program !== "undefined")
     {
         programName = programStage.program.name;
+        programShortName = programStage.program.shortName;
         console.log("PS: ", programStage);
         programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
         programPrefix = programMetadata?.dePrefix || programStage.program.id;
@@ -208,7 +210,7 @@ const DataProcessor = (props) => {
 
     return (
         <>
-            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
+            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
         </>
     );
 }

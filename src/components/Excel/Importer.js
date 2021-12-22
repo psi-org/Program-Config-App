@@ -119,7 +119,7 @@ const Importer = (props) => {
     const getProgramDetails = (ws, mappingDetails) => {
         let program = {};
         program.name = ws.getCell("C12").value;
-
+        program.shortName = ws.getCell("C13").value;
         let result = mappingDetails.programs.filter(prog => prog.name === program.name);
         program.id = result[0].id;
 
