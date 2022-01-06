@@ -1,0 +1,32 @@
+{
+  "name": "programconfigapp",
+  "short_name":"Program Config App",
+  "author": "Fernando Gomez - Mario Lopez - Utsav Koju",
+  "version": "1.0.0-r.c.1",
+  "description": "",
+  "license": "BSD-3-Clause",
+  "private": true,
+  "scripts": {
+    "build": "d2-app-scripts build",
+    "start": "d2-app-scripts start",
+    "test": "d2-app-scripts test",
+    "deploy": "d2-app-scripts deploy"
+  },
+  "devDependencies": {
+    "@dhis2/cli-app-scripts": "^8.3.2",
+    "react-scripts": "^0.8.4"
+  },
+  "dependencies": {
+    "@dhis2/app-runtime": "^3.2.0",
+    "@dhis2/ui": "^7.2.0",
+    "exceljs": "^4.2.1",
+    "file-saver": "^2.0.5",
+    "jquery": "^3.6.0",
+    "react-beautiful-dnd": "^13.1.0",
+    "react-redux": "^7.2.5",
+    "react-router-dom": "^5.3.0",
+    "react-sweet-progress": "^1.1.2",
+    "redux": "^4.1.1",
+    "redux-thunk": "^2.3.0"
+  }
+}
