@@ -1,0 +1,62 @@
+@mixin comp-tf-sc {
+    float: left;
+    width: 100%;
+    height: auto;
+    min-height: 48px;
+    text-align: left;    
+}
+
+@mixin radio-structure($color) {
+    content: "";
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    left: 0;
+    top: -1px;
+    border-radius: 50%;
+    border: 2px solid $color;
+}
+
+@mixin rwd-max($screen) {
+    @media (max-width: $screen+'px') {
+        @content;
+    }
+}
+
+@mixin box-sizing($box) {
+    box-sizing: $box;
+    -webkit-box-sizing: $box;
+    -moz-box-sizing: $box;
+}
+
+@mixin color_cases() {
+
+    @for $i from 1 through $cases_count {
+        @if $i==1 {
+            .c_#{$i} {
+                background-color: $case1;
+                border-radius: $radius;
+            }
+        }
+
+        @if $i==2 {
+            .c_#{$i} {
+                background-color: $case2;
+                border-radius: $radius;
+            }
+        }
+
+        @if $i==3 {
+            .c_#{$i} {
+                background-color: $case3;
+                border-radius: $radius;
+            }
+        }
+        @if $i==4 {
+            .c_#{$i} {
+                background-color: $case4;
+                border-radius: $radius;
+            }
+        }
+    }
+}

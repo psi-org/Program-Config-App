@@ -1,0 +1,31 @@
+.sub_nav {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: 1fr;
+    grid-auto-columns: 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+        "cnt_p c_srch c_btns";
+    background-color: #F8F8F8;
+    filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.25));
+
+    .cnt_p {
+        padding: 8px 4px 8px 16px;
+        grid-area: cnt_p;
+    }
+
+    .c_srch {
+        padding: 8px 4px 8px 4px;
+        grid-area: c_srch;
+    }
+
+    .c_btns {
+        padding: 8px 16px 8px 4px;
+        grid-area: c_btns;
+
+        Button {
+            margin-left: 8px;
+        }
+    }
+}
