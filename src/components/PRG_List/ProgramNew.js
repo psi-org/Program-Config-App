@@ -1,9 +1,9 @@
 import React from 'react';
 import { useState } from "react";
 import {Modal, ModalTitle, ModalContent, ReactFinalForm, InputFieldFF, SwitchFieldFF, SingleSelectFieldFF, hasValue, InputField, ButtonStrip, Button} from "@dhis2/ui";
-import { useDataQuery } from '@dhis2/app-runtime'
-import { ProgramTemplate } from './../../configs/ProgramTemplate'
+import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 import styles from './Program.module.css'
+import { Program, PS_AssessmentStage, PS_ActionPlanStage, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
 
 const { Form, Field } = ReactFinalForm
 
@@ -17,13 +17,43 @@ const query = {
     }
 };
 
+const queryId = {
+    results: {
+        resource: 'system/id.json',
+        params: ({n}) => ({ limit: 5 })
+    }
+};
+
+const metadataMutation = {
+    resource: 'metadata',
+    type: 'create',
+    data: ({ data }) => data
+};
+
+const METADATA = "haUflNqP85K",
+    COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe",
+    COMPETENCY_CLASS = "NAaHST5ZDTE",
+    BUILD_VERSION = "1.0";
+
 const ProgramNew = (props) =>
 {
-    let optns = [{value: "none", label: "Select Health Area"}];
+    // Create Mutation
+    let metadataDM= useDataMutation(metadataMutation);
+    const metadataRequest = {
+        mutate : metadataDM[0],
+        loading : metadataDM[1].loading,
+        error : metadataDM[1].error,
+        data : metadataDM[1].data,
+        called: metadataDM[1].called
+    };
 
     const haQuery = useDataQuery(query);
     const haOptions = haQuery.data?.results.optionSets[0].options;
 
+    const idsQuery = useDataQuery(queryId);
+    const uidPool = idsQuery.data?.results.codes;
+
+    let optns = [{value: "none", label: "Select Health Area"}];
     if(haOptions)
     {
         optns = optns.concat(haOptions.map(op => {
@@ -38,13 +68,107 @@ const ProgramNew = (props) =>
 
     function submission(values)
     {
-        let prgrm = ProgramTemplate.programs;
-        prgrm[0].name = values.programName;
-        prgrm[0].shortName = values.shortName
-        console.log("Program: ", prgrm);
+        if (uidPool && !metadataRequest.called) {
+            const programId = uidPool.shift();
+            const assessmentId = uidPool.shift();
+            const actionPlanId = uidPool.shift();
+            const stepsSectionId = uidPool.shift();
+            const scoresSectionId = uidPool.shift();
+
+            let prgrm = Program;
+            prgrm.name = values.programName;
+            prgrm.shortName = values.shortName;
+            prgrm.id = programId;
+
+            createOrUpdateMetaData(prgrm.attributeValues, values);
+            prgrm.programStages.push({id: assessmentId});
+            prgrm.programStages.push({id: actionPlanId});
+
+            let assessmentStage = PS_AssessmentStage;
+            assessmentStage.id = assessmentId;
+            assessmentStage.name = values.prefix + assessmentStage.name;
+            assessmentStage.programStageSections.push({id: stepsSectionId});
+            assessmentStage.programStageSections.push({id: scoresSectionId});
+
+            let actionPlanStage = PS_ActionPlanStage;
+            actionPlanStage.id = actionPlanId;
+            actionPlanStage.name = values.prefix + actionPlanStage.name;
+            actionPlanStage.program.id = programId;
+
+
+            let criticalSteps = PSS_CriticalSteps;
+            criticalSteps.id = stepsSectionId;
+            criticalSteps.programStage.id = assessmentId;
+            criticalSteps.name = values.prefix + criticalSteps.name
+
+            let scores = PSS_Scores;
+            scores.id = scoresSectionId;
+            scores.name = values.prefix + scores.name;
+            scores.programStage.id = assessmentId;
+
+            if (!values.useCompentencyClass) {
+                removeCompetencyAttribute(prgrm.programTrackedEntityAttributes);
+                removeCompetencyClass(criticalSteps.dataElements);
+            }
+
+            let metadata = {
+                programs: [prgrm],
+                programStages: [assessmentStage, actionPlanStage],
+                programStageSections: [criticalSteps, scores]
+            }
+            console.log("MetaData: ", metadata);
+
+            metadataRequest.mutate({data: metadata}).then(response => {
+                if (response.status != 'OK')
+                {
+                    console.log("Error encountered");
+                    return;
+                }
+                setShowProgramForm(false);
+            })
+        }
     }
 
-    return  <Modal onClose={() => hideForm()} position="middle">
+    function createOrUpdateMetaData(attributeValues, values)
+    {
+        let metaDataArray = attributeValues.filter(av=>av.attribute.id === METADATA);
+        if (metaDataArray.length > 0)
+        {
+
+            let metaData_value = JSON.parse(metaDataArray[0].value);
+            metaData_value.buildVersion = BUILD_VERSION;
+            metaData_value.useCompetencyClass = values.useCompentencyClass?'Yes':'No';
+            metaData_value.dePrefix = values.prefix;
+            metaData_value.healthArea = values.healthArea;
+            metaDataArray[0].value = JSON.stringify(metaData_value);
+        }
+        else
+        {
+            let attr = {id: METADATA};
+            let val = {buildVersion: BUILD_VERSION, useCompetencyClass: values.useCompentencyClass, dePrefix: values.prefix, healthArea: values.healthArea};
+            let attributeValue = {attribute: attr, value: JSON.stringify(val)}
+            attributeValues.push(attributeValue);
+        }
+    }
+
+    function removeCompetencyAttribute(programTrackedEntityAttributes)
+    {
+        const index = programTrackedEntityAttributes.findIndex(attr => {
+           return attr.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE
+        });
+        programTrackedEntityAttributes.splice(index, 1);
+    }
+
+    function removeCompetencyClass(dataElements)
+    {
+        const index = dataElements.findIndex(de => {
+            return de.id === COMPETENCY_CLASS;
+        })
+        dataElements.splice(index,1);
+    }
+
+    return <>
+            <Modal onClose={() => hideForm()} position="middle">
                 <ModalTitle>Create New Program</ModalTitle>
                 <ModalContent>
                     <Form onSubmit={submission}>
@@ -104,6 +228,7 @@ const ProgramNew = (props) =>
                     </Form>
                 </ModalContent>
             </Modal>
+        </>
 }
 
 export default ProgramNew;
