@@ -89,6 +89,7 @@ const ProgramNew = (props) =>
             assessmentStage.name = values.prefix + assessmentStage.name;
             assessmentStage.programStageSections.push({id: stepsSectionId});
             assessmentStage.programStageSections.push({id: scoresSectionId});
+            assessmentStage.program.id = programId;
 
             let actionPlanStage = PS_ActionPlanStage;
             actionPlanStage.id = actionPlanId;
@@ -116,7 +117,6 @@ const ProgramNew = (props) =>
                 programStages: [assessmentStage, actionPlanStage],
                 programStageSections: [criticalSteps, scores]
             }
-            console.log("MetaData: ", metadata);
 
             metadataRequest.mutate({data: metadata}).then(response => {
                 if (response.status != 'OK')
@@ -124,7 +124,7 @@ const ProgramNew = (props) =>
                     console.log("Error encountered");
                     return;
                 }
-                setShowProgramForm(false);
+                props.setShowProgramForm(false);
             })
         }
     }

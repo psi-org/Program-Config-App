@@ -101,10 +101,7 @@ const PS_AssessmentStage = {
     "openAfterEnrollment": true,
     "program": {"id": "programId"},
     "programStageDataElements": [],
-    "programStageSections": [
-        {"id": "stepsSectionId"},
-        {"id": "scoresSectionId"}
-    ],
+    "programStageSections": [],
     "publicAccess": "--------",
     "remindCompleted": true,
     "repeatable": false,
