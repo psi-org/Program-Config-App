@@ -20,12 +20,15 @@ const query = {
 const ProgramNew = (props) =>
 {
     let optns = [{value: "none", label: "Select Health Area"}];
-    const {loading, error, data, refetch } = useDataQuery(query);
 
-    if(!loading) {
-        data.results.optionSets[0].options.forEach((dt) => {
-            optns.push({label: dt.name, value: dt.code});
-        })
+    const haQuery = useDataQuery(query);
+    const haOptions = haQuery.data?.results.optionSets[0].options;
+
+    if(haOptions)
+    {
+        optns = optns.concat(haOptions.map(op => {
+            return {label: op.name, value: op.code}
+        }));
     }
 
     function hideForm()

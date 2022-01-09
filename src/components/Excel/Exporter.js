@@ -27,6 +27,7 @@ const Exporter = (props) => {
   const password = template_password;
 
   const initialize = () => {
+    console.log("Load: ", "Exporter");
       generate();
   };
 

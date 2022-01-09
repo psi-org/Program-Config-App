@@ -43,6 +43,7 @@ const programsQuery = {
 }
 
 const DataProcessor = (props) => {
+    console.log("Called Component: ", "Data processor");
     const programStage = props.ps;
     let programMetadata = "";
     let programPrefix = "";
@@ -73,9 +74,41 @@ const DataProcessor = (props) => {
     let legendSetData = [];
     let programData = [];
 
+    let optionPool = data?.results.optionSets;
+    if (optionPool)
+    {
+        optionData = optionPool.map(op=>{
+            return {"Option Sets": op.name, UID: op.id, Options: arrayObjectToStringConverter(op.options, "name")}
+        })
+    }
+
+    let haPools = haData?.results.optionSets[0].options;
+    if (haPools)
+    {
+        healthAreaData = haPools.map(hp=>{
+            return {code: hp.code, "Health Area": hp.name}
+        });
+    }
+
+    let legendPool = lsData?.results.legendSets;
+    if (legendPool)
+    {
+        legendSetData = legendPool.map(lp => {
+           return {"Legend Set": lp.name, UID: lp.id}
+        });
+    }
+
+    let prgPool = progData?.results.programs;
+    if (prgPool)
+    {
+        programData = prgPool.map(pp=>{
+            return {Program: pp.name, UID: pp.id}
+        });
+    }
+
     const initialize = () => {
+        console.log("Loading : ", "Data Processor");
         if(typeof programStage.program !== "undefined") compile_report();
-        getOptionSets();
         setTimeout(function() {
             setIsDownloaded(true);
         }, 2000);
@@ -142,67 +175,6 @@ const DataProcessor = (props) => {
         let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
         let deMetadata = JSON.parse(parentDe.attributeValues.find(av => av.attribute.id === "haUflNqP85K")?.value || "{}");
         return deMetadata.varName;
-    }
-
-    const getOptionSets = () => {
-        if(typeof data !== 'undefined') {
-            let optionSets = data.results.optionSets;
-            optionSets.forEach((optionSet) => {
-                let options = arrayObjectToStringConverter(optionSet.options, "name");
-                let data = {
-                    "Option Sets": optionSet.name,
-                    "UID": optionSet.id,
-                    "Options": options
-                };
-                optionData.push(data);
-            })
-            getHealthAreas();
-        }
-    }
-
-    const getHealthAreas = () => {
-        if(typeof haData !== 'undefined') {
-            const healthAreas = haData.results.optionSets;
-            healthAreas.forEach((ha) => {
-                ha.options.forEach((option) => {
-                    let data = {
-                        "Code": option.code,//option.id,
-                        "Health Area": option.name
-                    };
-                    healthAreaData.push(data);
-                });
-            });
-            getLegendSet();
-        }
-    }
-
-    const getLegendSet = () => {
-        if(typeof lsData !== 'undefined')
-        {
-            let legendSets = lsData.results.legendSets;
-            legendSets.forEach((legendSet) => {
-                let data = {
-                    "Legend Set" : legendSet.name,
-                    "UID" : legendSet.id
-                };
-                legendSetData.push(data);
-            })
-            getProgramData();
-        }
-    }
-
-    const getProgramData = () => {
-        if(typeof progData !== 'undefined')
-        {
-            let ps = progData.results.programs;
-            ps.forEach((program) => {
-                let data = {
-                    "Program": program.name,
-                    "UID": program.id
-                };
-                programData.push(data);
-            });
-        }
     }
 
     initialize();
