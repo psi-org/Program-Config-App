@@ -86,25 +86,25 @@ const ProgramNew = (props) =>
 
             let assessmentStage = PS_AssessmentStage;
             assessmentStage.id = assessmentId;
-            assessmentStage.name = values.prefix + assessmentStage.name;
+            assessmentStage.name = values.prefix +'_'+ assessmentStage.name;
             assessmentStage.programStageSections.push({id: stepsSectionId});
             assessmentStage.programStageSections.push({id: scoresSectionId});
             assessmentStage.program.id = programId;
 
             let actionPlanStage = PS_ActionPlanStage;
             actionPlanStage.id = actionPlanId;
-            actionPlanStage.name = values.prefix + actionPlanStage.name;
+            actionPlanStage.name = values.prefix +'_'+ actionPlanStage.name;
             actionPlanStage.program.id = programId;
 
 
             let criticalSteps = PSS_CriticalSteps;
             criticalSteps.id = stepsSectionId;
             criticalSteps.programStage.id = assessmentId;
-            criticalSteps.name = values.prefix + criticalSteps.name
+            criticalSteps.name = criticalSteps.name
 
             let scores = PSS_Scores;
             scores.id = scoresSectionId;
-            scores.name = values.prefix + scores.name;
+            scores.name = scores.name;
             scores.programStage.id = assessmentId;
 
             if (!values.useCompentencyClass) {
@@ -117,7 +117,7 @@ const ProgramNew = (props) =>
                 programStages: [assessmentStage, actionPlanStage],
                 programStageSections: [criticalSteps, scores]
             }
-
+            console.log("Metadata: ", metadata);
             metadataRequest.mutate({data: metadata}).then(response => {
                 if (response.status != 'OK')
                 {
@@ -125,6 +125,7 @@ const ProgramNew = (props) =>
                     return;
                 }
                 props.setShowProgramForm(false);
+                props.programsRefetch();
             })
         }
     }
@@ -177,6 +178,14 @@ const ProgramNew = (props) =>
                                 <div className={styles.row}>
                                     <Field
                                         required
+                                        name="prefix"
+                                        label="DE Prefix"
+                                        component={InputFieldFF}
+                                    />
+                                </div>
+                                <div className={styles.row}>
+                                    <Field
+                                        required
                                         name="programName"
                                         label="Name"
                                         component={InputFieldFF}
@@ -199,13 +208,6 @@ const ProgramNew = (props) =>
                                     label="Use Competency Class"
                                     component={SwitchFieldFF}
                                     initialValue={false}
-                                    />
-                                </div>
-                                <div className={styles.row}>
-                                    <Field
-                                    name="prefix"
-                                    label="DE Prefix"
-                                    component={InputFieldFF}
                                     />
                                 </div>
                                 <div className={styles.row}>

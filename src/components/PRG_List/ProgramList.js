@@ -78,7 +78,7 @@ const ProgramList = () => {
           onPageChange={(page) => { setCurrentPage(page); refetch({ page, pageSize }) }}
         />
       </div>
-      {showProgramForm && <ProgramNew setShowProgramForm={setShowProgramForm}/>}
+      {showProgramForm && <ProgramNew setShowProgramForm={setShowProgramForm} programsRefetch={refetch}/>}
     </div>
   );
 };

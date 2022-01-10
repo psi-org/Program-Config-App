@@ -55,7 +55,8 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     CRITICAL_QUESTION = "NPwvdTt0Naj",
     METADATA = "haUflNqP85K",
     SCORE_DEN = "l7WdLDhE3xW",
-    SCORE_NUM = "Zyr7rlDOJy8";
+    SCORE_NUM = "Zyr7rlDOJy8",
+    COMPETENCY_CLASS = "NAaHST5ZDTE";
 
 const getParentUid=(parentName,dataElements)=>{
     return dataElements.find(de => de.parentName == parentName)?.id
@@ -257,8 +258,10 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
         if(new_programMetadata.useCompetencyClass=="Yes" && !currentCompetencyAttribute){
             competencyClassAttribute.program.id = programPayload.id;
             programPayload.programTrackedEntityAttributes.push(competencyClassAttribute);
+            criticalSection.dataElements.push({id: COMPETENCY_CLASS})
         }else if(new_programMetadata.useCompetencyClass=="No"){
             programPayload.programTrackedEntityAttributes = programPayload.programTrackedEntityAttributes.filter(att => att.trackedEntityAttribute.id != "ulU9KKgSLYe");
+            criticalSection.dataElements = criticalSection.dataElements.filter(de=>de.id != COMPETENCY_CLASS);
         }
 
         // ========================================================== //
