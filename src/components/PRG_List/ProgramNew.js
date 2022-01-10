@@ -52,6 +52,14 @@ const ProgramNew = (props) =>
 
     const idsQuery = useDataQuery(queryId);
     const uidPool = idsQuery.data?.results.codes;
+    if (uidPool)
+    {
+        const programId = uidPool.shift();
+        const assessmentId = uidPool.shift();
+        const actionPlanId = uidPool.shift();
+        const stepsSectionId = uidPool.shift();
+        const scoresSectionId = uidPool.shift();
+    }
 
     let optns = [{value: "none", label: "Select Health Area"}];
     if(haOptions)
@@ -68,13 +76,7 @@ const ProgramNew = (props) =>
 
     function submission(values)
     {
-        if (uidPool && !metadataRequest.called) {
-            const programId = uidPool.shift();
-            const assessmentId = uidPool.shift();
-            const actionPlanId = uidPool.shift();
-            const stepsSectionId = uidPool.shift();
-            const scoresSectionId = uidPool.shift();
-
+        if (!metadataRequest.called) {
             let prgrm = Program;
             prgrm.name = values.programName;
             prgrm.shortName = values.shortName;
@@ -117,7 +119,7 @@ const ProgramNew = (props) =>
                 programStages: [assessmentStage, actionPlanStage],
                 programStageSections: [criticalSteps, scores]
             }
-            console.log("Metadata: ", metadata);
+
             metadataRequest.mutate({data: metadata}).then(response => {
                 if (response.status != 'OK')
                 {
