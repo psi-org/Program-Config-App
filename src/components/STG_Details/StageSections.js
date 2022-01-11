@@ -228,9 +228,11 @@ const StageSections = ({ programStage, stageRefetch }) => {
         });
     };
 
-    const configuration_download = () => {
+    const configuration_download = (e) => {
+        e.preventDefault();
         setExportToExcel(true);
         setExportStatus("Generating Configuration File...")
+        console.log("Twice....");
     };
 
     const configuration_import = () => {
@@ -317,13 +319,14 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     <Button disabled={createMetadata.loading} onClick={() => commit()}>{saveStatus}</Button>
                     <Button disabled={!savedAndValidated} primary onClick={() => run()}>Set up program</Button>
                     <Button name="generator"
-                        loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> {exportStatus}</Button>
+                        loading={exportToExcel ? true : false} onClick={() => configuration_download(event)} disabled={exportToExcel}><img src={download_svg} /> {exportStatus}</Button>
                     <Button name="importer"
                         onClick={() => setImporterEnabled(true)}><img src={upload_svg} /> Import Template</Button>
                     <Button name="Reload" icon={<IconSync24/>} onClick={()=> {window.location.reload()}}>Reload</Button>
                 </ButtonStrip>
                 </div>
             </div>
+            {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{sections,setSections, scoresSection, setScoresSection}} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{programMetadata,setProgramMetadata}} />}
             <div className="title">Sections for program stage {programStage.displayName}</div>
             {exportToExcel && <DataProcessor ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus}/>}
             {
@@ -434,7 +437,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     </div>
                 </div>
             </DragDropContext>
-            {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{sections,setSections, scoresSection, setScoresSection}} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{programMetadata,setProgramMetadata}} />}
             {
                 savingMetadata &&
                 <ValidateMetadata

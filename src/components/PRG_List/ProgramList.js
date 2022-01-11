@@ -2,6 +2,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { Button, Chip, CircularLoader, NoticeBox, Pagination, IconAddCircle24, Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Input, InputField, SwitchField } from "@dhis2/ui";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import ProgramNew from './ProgramNew'
 import download_svg from './../../images/i-download.svg';
 import upload_svg from './../../images/i-upload.svg';
 
@@ -28,6 +29,7 @@ const ProgramList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [exportToExcel, setExportToExcel] = useState(false);
   const [ exportStatus, setExportStatus] = useState("Download");
+  const [ showProgramForm, setShowProgramForm ] = useState(false);
 
   const [competencyClassParam,setCompetencyClassParam] = useState(false);
 
@@ -46,7 +48,8 @@ const ProgramList = () => {
       <div className="sub_nav">
         <div className="cnt_p"><Chip>Home</Chip></div>
         <div className="c_srch"></div>
-        <div className="c_btns">     
+        <div className="c_btns">
+          <Button onClick={()=>setShowProgramForm(true)} disabled={showProgramForm}><IconAddCircle24></IconAddCircle24>  Program</Button>
           <Button loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> Download Template</Button>
           <Button disabled={true}><img src={upload_svg} /> Import Template</Button>
         </div>
@@ -75,6 +78,7 @@ const ProgramList = () => {
           onPageChange={(page) => { setCurrentPage(page); refetch({ page, pageSize }) }}
         />
       </div>
+      {showProgramForm && <ProgramNew setShowProgramForm={setShowProgramForm} programsRefetch={refetch}/>}
     </div>
   );
 };
