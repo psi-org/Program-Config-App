@@ -63,7 +63,8 @@ const Importer = (props) => {
                                                     let dataRow = {};
                                                     let rowVals = row.values;
                                                     validTemplateHeader.forEach((header, index) => {
-                                                        dataRow[header] = rowVals[index + 1];
+                                                        if(index === 0) dataRow[header] = rowVals[index+1].result;
+                                                        else dataRow[header] = rowVals[index + 1];
                                                     })
                                                     templateData.push(dataRow);
                                                 }
@@ -72,7 +73,7 @@ const Importer = (props) => {
                                             setCurrentTask(null);
 
                                             // Start import reading
-                                            
+
                                             //console.log("Data: ", templateData);
 
                                             //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous);
