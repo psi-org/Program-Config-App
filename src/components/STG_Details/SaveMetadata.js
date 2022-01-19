@@ -62,7 +62,7 @@ const getParentUid=(parentName,dataElements)=>{
     return dataElements.find(de => de.parentName == parentName)?.id
 };
 
-const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,criticalSection,setSavingMetadata,setSavedAndValidated,removedItems,programMetadata}) => {
+const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,criticalSection,setSavingMetadata,setSavedAndValidated,removedItems,programMetadata,setImportResults}) => {
 
     const [completed, setCompleted] = useState(false);
     const [errorStatus,setErrorStatus] = useState(false);
@@ -274,6 +274,7 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
         };
         // ========================================================== //
         const gotResponseError = (response) => {
+            console.log(response);
             setErrorStatus(true);
             setTypeReports(response.typeReports);
             setCompleted(true);
@@ -293,6 +294,7 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                 setCompleted(true);
                 setSuccessStatus(true);
                 setSavedAndValidated(true);
+                setImportResults(false);
             });
         });
 
@@ -328,7 +330,10 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                 {
                     errorStatus && 
                     <div>
-                        <p><strong>Process ended with errors</strong></p>
+                        <p><strong>Process ended with errors </strong></p>
+                        {
+                            console.log(errorStatus)
+                        }
                     </div>
                 }
             </NoticeBox>

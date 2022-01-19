@@ -20,6 +20,7 @@ const importMap = {
     parentQuestion:"Parent question",
     parentValue:"Answer value",
     feedbackText:"Feedback Text",
+    description:"Description",
     programStage:"Program Stage Id",
     programSection:"Program Section Id",
     dataElementId:"Data Element Id",
@@ -49,6 +50,7 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         aggType='AVERAGE';
     }else{
         code = programPrefix + '_' + data[importMap.parentName]?.result;
+        console.log(data[importMap.parentName]);
         switch(data[importMap.valueType]){
             case 'TEXT':
             case 'LONG_TEXT':
@@ -65,6 +67,7 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         name: code + '_' + data[importMap.formName],
         shortName: (code + '_' + data[importMap.formName]).slice(0,50),
         code,
+        description: data[importMap.description],
         formName: type=='label'?'     ':data[importMap.formName],
         domainType: 'TRACKER',
         valueType: data[importMap.valueType],
@@ -87,7 +90,7 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
     if (data[importMap.feedbackOrder] != "") parsedDE.attributeValues.push(
         { 
             attribute: { id : FEEDBACK_ORDER },
-            value: data[importMap.feedbackOrder] 
+            value: String(data[importMap.feedbackOrder])
         }
     );
 

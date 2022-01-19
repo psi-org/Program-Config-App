@@ -41,21 +41,23 @@ const Removed = ({ importResults, index }) => {
     return (
         <>
             <div className="ml_item" style={{ color: "#333333", backgroundColor: "#ff7675" }}>
-                <div className="ml_list-icon">
+                <div className="ml_item-icon">
                     <img className="ml_list-img" alt="sec" src={error_svg} />
                 </div>
                 <div className="ml_item-title">
                     Removed
                 </div>
-                <div className="ml_item-desc"><div>{importResults.questions.removed + importResults.scores.removed} data elements</div></div>
+                <div className="ml_item-desc">
+                    <div>{importResults.questions.removed + importResults.scores.removed} data elements</div>
+                </div>
                 <div className="ml_item-warning_error "></div>
                 <div className="ml_item-cta">
-                <img src={move_vert_svg} alt="menu" />
+                    <img src={move_vert_svg} alt="menu" />
                     <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                 </div>
             </div>
             <div className="section_cont" style={{backgroundColor:"#fab1a0"}}>
-                {
+            {
                     importResults.questions.removedItems.map((dataElement,i)=>{
                         let classNames = "ml_item";// + ((dataElement.importStatus) ? ' import_'+dataElement.importStatus:'');
                         return(
@@ -77,10 +79,9 @@ const Removed = ({ importResults, index }) => {
                 }
                 {
                     importResults.scores.removedItems.map((dataElement,i)=>{
-                        let classNames = "ml_item";// + ((dataElement.importStatus) ? ' import_'+dataElement.importStatus:'');
                         return(
-                            <div id={"de_"+dataElement.id} className={classNames} key={i} style={{backgroundColor:"#ffdad1"}}>
-                                <div className="ml_item-icon">
+                            <div id={"de_"+dataElement.id} className={"ml_item"} key={i} style={{backgroundColor:"#ffdad1"}}>
+                                <div className="ml_list-icon">
                                     <img className="ml_list-img" alt="de" src={error_svg} />
                                 </div>
                                 <div className="ml_item-title">

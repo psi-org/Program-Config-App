@@ -171,8 +171,16 @@ const PS_ActionPlanStage = {
     ]
 }
 
-const PSS_CriticalSteps = {
+const PSS_Default = {
     "sortOrder": 10,
+    "name": "Default",
+    "programStage": {"id": "assessmentId"},
+    "dataElements": [],
+    "id": "defaultSectionId"
+}
+
+const PSS_CriticalSteps = {
+    "sortOrder": 20,
     "name": "Critical Steps Calculations",
     "programStage": {"id": "assessmentId"},
     "dataElements": [
@@ -184,7 +192,7 @@ const PSS_CriticalSteps = {
 }
 
 const PSS_Scores = {
-    "sortOrder": 20,
+    "sortOrder": 30,
     "name": "Scores",
     "programStage": {"id": "assessmentId"},
     "dataElements": [],
@@ -195,6 +203,7 @@ module.exports = {
     Program,
     PS_AssessmentStage,
     PS_ActionPlanStage,
+    PSS_Default,
     PSS_CriticalSteps,
     PSS_Scores
 }

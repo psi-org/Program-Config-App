@@ -3,7 +3,7 @@ import { useState } from "react";
 import {Modal, ModalTitle, ModalContent, ReactFinalForm, InputFieldFF, SwitchFieldFF, SingleSelectFieldFF, hasValue, InputField, ButtonStrip, Button} from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 import styles from './Program.module.css'
-import { Program, PS_AssessmentStage, PS_ActionPlanStage, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
+import { Program, PS_AssessmentStage, PS_ActionPlanStage, PSS_Default , PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
 
 const { Form, Field } = ReactFinalForm
 
@@ -20,7 +20,7 @@ const query = {
 const queryId = {
     results: {
         resource: 'system/id.json',
-        params: ({n}) => ({ limit: 5 })
+        params: ({n}) => ({ limit: 6 })
     }
 };
 
@@ -52,13 +52,21 @@ const ProgramNew = (props) =>
 
     const idsQuery = useDataQuery(queryId);
     const uidPool = idsQuery.data?.results.codes;
+
+    var programId = undefined;
+    var assessmentId = undefined;
+    var actionPlanId = undefined;
+    var defaultSectionId = undefined;
+    var stepsSectionId = undefined;
+    var scoresSectionId = undefined;
     if (uidPool)
     {
-        const programId = uidPool.shift();
-        const assessmentId = uidPool.shift();
-        const actionPlanId = uidPool.shift();
-        const stepsSectionId = uidPool.shift();
-        const scoresSectionId = uidPool.shift();
+        programId = uidPool.shift();
+        assessmentId = uidPool.shift();
+        actionPlanId = uidPool.shift();
+        defaultSectionId = uidPool.shift();
+        stepsSectionId = uidPool.shift();
+        scoresSectionId = uidPool.shift();
     }
 
     let optns = [{value: "none", label: "Select Health Area"}];
@@ -89,6 +97,7 @@ const ProgramNew = (props) =>
             let assessmentStage = PS_AssessmentStage;
             assessmentStage.id = assessmentId;
             assessmentStage.name = values.prefix +'_'+ assessmentStage.name;
+            assessmentStage.programStageSections.push({id: defaultSectionId});
             assessmentStage.programStageSections.push({id: stepsSectionId});
             assessmentStage.programStageSections.push({id: scoresSectionId});
             assessmentStage.program.id = programId;
@@ -98,11 +107,15 @@ const ProgramNew = (props) =>
             actionPlanStage.name = values.prefix +'_'+ actionPlanStage.name;
             actionPlanStage.program.id = programId;
 
+            let defaultSection = PSS_Default;
+            defaultSection.id = defaultSectionId;
+            defaultSection.programStage.id = assessmentId;
+            //defaultSection.name = defaultSection.name
 
             let criticalSteps = PSS_CriticalSteps;
             criticalSteps.id = stepsSectionId;
             criticalSteps.programStage.id = assessmentId;
-            criticalSteps.name = criticalSteps.name
+            //criticalSteps.name = criticalSteps.name
 
             let scores = PSS_Scores;
             scores.id = scoresSectionId;
@@ -117,7 +130,7 @@ const ProgramNew = (props) =>
             let metadata = {
                 programs: [prgrm],
                 programStages: [assessmentStage, actionPlanStage],
-                programStageSections: [criticalSteps, scores]
+                programStageSections: [defaultSection, criticalSteps, scores]
             }
 
             metadataRequest.mutate({data: metadata}).then(response => {
@@ -181,7 +194,7 @@ const ProgramNew = (props) =>
                                     <Field
                                         required
                                         name="prefix"
-                                        label="DE Prefix"
+                                        label="Program Data Element Prefix"
                                         component={InputFieldFF}
                                     />
                                 </div>

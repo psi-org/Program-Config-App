@@ -40,7 +40,7 @@ const StageItem = ({stage}) => {
         */}
       </div>
       <div className="ml_item-cta">
-        <Link to={"/programStage/"+stage.id}>
+        <Link to={ stage.programStageSections.length > 0 ? "/programStage/"+stage.id : "#"}>
           <img className="bsct_cta" alt="exp" src={expand_left_svg} onClick={()=> setProgramStage(stage.id)}/>
         </Link>
         {/* Kebab menu icon <img src={move_vert_svg} alt="menu"  />*/}
