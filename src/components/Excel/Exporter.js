@@ -11,7 +11,9 @@ import {
   structureValidator,
   yesNoValidator,
   conditionalError,
-  sectionHighlighting
+  sectionHighlighting,
+  questionHighlighting,
+  labelHighlighting
 } from "../../configs/TemplateConstants";
 import {
   fillBackgroundToRange,
@@ -91,7 +93,7 @@ const Exporter = (props) => {
     ws.getCell("B12").value = "Program Name";
     ws.getCell("B13").value = "Program Short Name";
     ws.getCell("B14").value = "Use 'Competency Class'";
-    ws.getCell("B15").value = "DE Prefix";
+    ws.getCell("B15").value = "Program DE Prefix";
     ws.getCell("B16").value = "Health Area";
 
     ws.mergeCells('F11:H11');
@@ -164,7 +166,7 @@ const Exporter = (props) => {
     ws.getCell("B29").alignment = {vertical: "middle"};
     ws.mergeCells('C29:F29');
     ws.getCell('C29').alignment = {wrapText: true};
-    ws.getRow("30").height = 48;
+    ws.getRow("29").height = 48;
     ws.getCell("C29").value = `[Question Only] \n Scores are divided in critical and non-critical, this is mostly used for the "competency classification" but can also be used in other types of classification in analytics as well. A critical step will count for the critical score. Select "Yes" if you want to define a critical question.`;
 
     ws.getCell('B30').value = "Compulsory";
@@ -260,7 +262,7 @@ const Exporter = (props) => {
     ws.getCell("B40").alignment = {vertical: "middle"};
     ws.mergeCells("C40:F40");
     ws.getCell('C40').alignment = {wrapText: true};
-    ws.getRow("40").height = 32;
+    ws.getRow("40").height = 16;
     ws.getCell("C40").value = `Enter the help text that will display to the supervisor during data entry. This text will appear as an ( i ) icon in the data entry form.`;
 
     ws.getCell("B42").value = `Every row in the "Template" tab starting from row 3 will generate the necessary components for the program when this file gets imported to the server. `;
@@ -499,7 +501,7 @@ const Exporter = (props) => {
       parent_name: `Indentifier to use as reference in the "Parent question" column`,
       structure: `Defines what is being configured in the row`,
       form_name: `Text that will be displayed in the form during the assessment`,
-      critical_step: "A critical step will count for the critical score",
+      isCritical: "A critical step will count for the critical score",
       isCompulsory: "A compulsory question must be answered to complete an assessment",
       value_type: `Determines the type of input if there's no Option Set selected`,
       optionSet: `Select the option set that provides available answers for this question (forces Value Type)`,
@@ -583,6 +585,18 @@ const Exporter = (props) => {
 
   const addConditionalFormatting = (ws) => {
     ws.addConditionalFormatting({
+      ref: 'A3:A3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['AND(ISBLANK($A3),OR($B3="question",$B3="label"))'],
+          style: conditionalError,
+        }
+      ],
+      promptTitle: 'Parent name not defined',
+      prompt: 'A parent name was not defined for the specified element.'
+    });
+    ws.addConditionalFormatting({
       ref: 'C3:C3000',
       rules: [
         {
@@ -656,6 +670,16 @@ const Exporter = (props) => {
           type: 'expression',
           formulae: ['$B3 = "Section"'],
           style: sectionHighlighting
+        },
+        {
+          type: 'expression',
+          formulae: ['$B3 = "question"'],
+          style: questionHighlighting
+        },
+        {
+          type: 'expression',
+          formulae: ['$B3 = "label"'],
+          style: labelHighlighting
         }
       ]
     })
@@ -670,6 +694,10 @@ const Exporter = (props) => {
         if (configure.structure === "Section") {
           fillBackgroundToRange(ws, "A" + dataRow + ":R" + dataRow, "f8c291")
         }
+        if (configure.structure === "label") {
+          fillBackgroundToRange(ws, "A" + dataRow + ":R" + dataRow, "c6e0b4")
+        }
+        
         dataRow = dataRow + 1;
       });
       applyBorderToRange(ws, 0, 3, 14, dataRow - 1);
@@ -745,7 +773,7 @@ const Exporter = (props) => {
     const buf = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buf]), `HNQIS Config_${new Date()}.xlsx`);
 
-    props.setStatus("Download");
+    props.setStatus("Download Template");
     props.isLoading(false);
   };
 

@@ -119,7 +119,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
             // STEP 1 -
             let num = [branch.numC, branch.numN].filter(n => n != "").join("+");
             let den = [branch.denC, branch.denN].filter(n => n != "").join("+");
-            data = `((${num}) * 100) / (${den})`;
+            data = `(((${num}) * 100) / (${den}))*100`;
             name = `PR - Calculated - ${composite.feedbackOrder} ${composite.formName}`;
             programRuleUid = uidPool.shift();
             actionId = uidPool.shift();
@@ -147,7 +147,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
             name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
             programRuleUid = uidPool.shift();
             actionId = uidPool.shift();
-            data = `d2:round(#{_CV${composite.prgVarName}}*100)/100`;
+            data = `d2:round(#{_CV${composite.prgVarName}})/100`;
 
             const pr_s2 = {
                 id: programRuleUid,
@@ -308,7 +308,7 @@ const buildNonCriticalScore = (branch, programId, uidPool) => {
         id: actionId,
         programRuleActionType,
         data,
-        content: `#{_CV_CriticalQuestions}`,
+        content: `#{_CV_NonCriticalQuestions}`,
         programRule: { id: programRuleUid }
     };
 
@@ -554,7 +554,7 @@ const readQuestionComposites = (sections) => {
     var questionCompositeScores = [];
     sections.forEach(section => {
         section.dataElements.forEach(de => {
-            let composite = de.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value.split('.').slice(0, -1)
+            let composite = de.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value?.split('.').slice(0, -1)
             if (composite) {
 
                 composite.map((v, i) =>

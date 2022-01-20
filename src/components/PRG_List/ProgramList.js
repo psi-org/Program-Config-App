@@ -49,7 +49,7 @@ const ProgramList = () => {
         <div className="cnt_p"><Chip>Home</Chip></div>
         <div className="c_srch"></div>
         <div className="c_btns">
-          <Button onClick={()=>setShowProgramForm(true)} disabled={showProgramForm}><IconAddCircle24></IconAddCircle24>  Program</Button>
+          <Button onClick={()=>setShowProgramForm(true)} disabled={showProgramForm}><IconAddCircle24></IconAddCircle24>   Add Program</Button>
           <Button loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> Download Template</Button>
           <Button disabled={true}><img src={upload_svg} /> Import Template</Button>
         </div>

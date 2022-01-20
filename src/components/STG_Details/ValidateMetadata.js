@@ -19,6 +19,7 @@ const ValidateMetadata = (props) => {
             checkHasFormName: {enable: true, title: "Form name defined for element", errorMsg: {code: "EXW100", text: "A form name was not defined for the specified element."}},
             structureMatchesValue: {enable: true, title: "Label should be LONG_TEXT", errorMsg: {code: "EXW103", text: "The expected value type for the label Data Element is LONG_TEXT."}},
             hasFeedbackOrder: {enable: true, title: "Verifies Feedback orders", errorMsg: {code: "EXW107", text: "The specified question has numerator and denominator assigned but does not contribute to any score."}},
+            hasVarName: {enable: true, title: "Verifies Parent Name field", errorMsg: {code: "EXW110", text: "The specified question does not have a valid parent name."}},
             hasBothNumeratorDenominator: {enable: true, title: "Numerator and Denominator exists", errorMsg: {code: "EXW106", text: "The specified question lacks one of the scores (numerator or denominator)"}},
             validAggregationType: {enable: true, title: "Valid Aggregation TYpe", errorMsg: {code: "EW104", text: "The expected aggregation operator for the label Data Element is NONE"}},
             validAggregationQuestion: {enable: true, title: "Valid Aggregation Type", errorMsg: {code: "EW105", text: "The Data Element aggregation operator was not defined correctly. (SUM or AVERAGE for numeric types and NONE for text inputs)"}},
@@ -78,6 +79,7 @@ const ValidateMetadata = (props) => {
             if(errorCounts === 0)
             {
                 setValid(true);
+                props.setValidationResults(false);
             }
             else
             {
@@ -122,6 +124,7 @@ const ValidateMetadata = (props) => {
                 if (programDetailsValidationSettings.checkHasFormName.enable && !checkHasFormName(metaData, dataElement)) errors.push(programDetailsValidationSettings.checkHasFormName.errorMsg);
                 if (programDetailsValidationSettings.structureMatchesValue.enable && !structureMatchesValue(metaData, dataElement, "label", "LONG_TEXT")) errors.push(programDetailsValidationSettings.structureMatchesValue.errorMsg);
                 if (programDetailsValidationSettings.hasFeedbackOrder.enable && !hasFeedbackOrder(metaData, dataElement)) errors.push(programDetailsValidationSettings.hasFeedbackOrder.errorMsg);
+                if (programDetailsValidationSettings.hasVarName.enable && !hasVarName(metaData, dataElement)) errors.push(programDetailsValidationSettings.hasVarName.errorMsg);
                 if (programDetailsValidationSettings.hasBothNumeratorDenominator.enable && !hasBothNumeratorDenominator(metaData)) errors.push(programDetailsValidationSettings.hasBothNumeratorDenominator.errorMsg);
                 if (programDetailsValidationSettings.validAggregationType.enable && !validAggregationType(metaData, dataElement, "label", "NONE")) errors.push(programDetailsValidationSettings.validAggregationType.errorMsg);
                 if (programDetailsValidationSettings.validAggregationQuestion.enable && !validAggregationQuestion(metaData, dataElement)) errors.push(programDetailsValidationSettings.validAggregationQuestion.errorMsg);
@@ -178,6 +181,11 @@ const ValidateMetadata = (props) => {
             if(hasAttributeValue(metaData, "scoreNum") && hasAttributeValue(metaData, "scoreDen"))
                 return (getFeedbackOrder(dataElement) !== "");
             return true;
+        }
+
+        function hasVarName(metaData, dataElement)
+        {
+            return hasAttributeValue(metaData, "varName") && isValidParentName(metaData,"varName")
         }
 
         function hasBothNumeratorDenominator(metaData)
@@ -255,6 +263,11 @@ const ValidateMetadata = (props) => {
         {
             return (!str || /^\s*$/.test(str));
         }
+
+        function isValidParentName(json,key)
+        {
+            return (/_S\d+Q\d+/.test(json[key]))
+        }
     });
 
     return  <Modal>
@@ -283,6 +296,7 @@ const ValidateMetadata = (props) => {
                         setSavedAndValidated={props.setSavedAndValidated}
                         removedItems={props.removedItems}
                         programMetadata={props.programMetadata}
+                        setImportResults={props.setImportResults}
                     />
                 }
             </Modal>

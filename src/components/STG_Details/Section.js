@@ -66,7 +66,7 @@ const DraggableSection = ({ stageSection, index }) => {
                 sectionImportStatus = <Tag neutral>Updated</Tag>;
                 break;
         }
-        sectionImportSummary = <><Tag positive>New: {stageSection.newDataElements}</Tag> <Tag neutral>Updated: {stageSection.updatedDataElements}</Tag></>
+        sectionImportSummary = <><Tag positive>{"New: "+stageSection.newDataElements}</Tag> <Tag neutral>{"Updated: "+stageSection.updatedDataElements}</Tag></>
     }
 
     var classNames = (stageSection.importStatus) ? ' import_' + stageSection.importStatus : '';

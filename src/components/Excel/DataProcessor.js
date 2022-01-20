@@ -118,7 +118,12 @@ const DataProcessor = (props) => {
         let program_stage_id = programStage.id;
 
         programStage.programStageSections.forEach((programSection) => {
+            let criticalStepsDataElements = ['NAaHST5ZDTE','VqBfZjZhKkU','pzWDtDUorBt'];
+
             let program_section_id = programSection.id;
+
+            // Skip 'Critical Steps Calculations' Section
+            if(programSection.dataElements.find(de => criticalStepsDataElements.includes(de.id))) return;
 
             let row = {};
             row.structure = "Section";

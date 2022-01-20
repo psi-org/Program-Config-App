@@ -148,7 +148,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     result.source.index,
                     result.destination.index
                 );
-                setSaveStatus('Save & Validate');
+                setSaveStatus('Validate & Save');
                 break;
             case 'DATA_ELEMENT':
                 if (result.source.droppableId == result.destination.droppableId) {
@@ -164,7 +164,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     let element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
                     newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
                 }
-                setSaveStatus('Save & Validate');
+                setSaveStatus('Validate & Save');
                 break;
             default:
         }
@@ -241,6 +241,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     const run = () => {
 
+        console.log(sections);
         if (!savedAndValidated) return;
 
         // Set flag to enable/disable actions (buttons)
@@ -390,17 +391,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 <img src={contracted_bottom_svg} /><p>Importing new metadata</p>
                             </div>
                         }
-                        {
-                        /*
-                        <div>
-                            <span>Deleting old Program Rules</span>
-                            <Progress percent={progressPR} status="" theme={(progressPR < 100) ? progressTheme("❌") : progressTheme("✅")} />
-                        </div>
-                        <div>
-                            <span>Deleting old Program Variables</span>
-                            <Progress percent={progressPRV} status="" theme={(progressPRV < 100) ? progressTheme("❌") : progressTheme("✅")} />
-                        </div>
-                        */}
                     </ModalContent>
                     <ModalActions>
                         <ButtonStrip>
@@ -412,14 +402,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
-                        {
-                            importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
-                            <Removed importResults={importResults} index={0} key={"removedSec"} />
-                        }
-                        {
-                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0) &&
-                            <Errors validationResults={validationResults} index={0} key={"validationSec"}/>
-                        }
+                        
                         <Droppable droppableId="dpb-sections" type="SECTION">
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
@@ -432,8 +415,16 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 </div>
                             )}
                         </Droppable>
-                        <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />
                         <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />
+                        <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />
+                        {
+                            importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
+                            <Removed importResults={importResults} index={0} key={"removedSec"} />
+                        }
+                        {
+                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0) &&
+                            <Errors validationResults={validationResults} index={0} key={"validationSec"}/>
+                        }
                     </div>
                 </div>
             </DragDropContext>
@@ -451,6 +442,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
                     previous={{sections,setSections, scoresSection, setScoresSection}}
+                    setImportResults = {setImportResults}
                     importResults = {importResults}
                     setIsValid = {setIsValid}
                     setValidationResults = {setValidationResults}
