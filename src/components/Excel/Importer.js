@@ -63,8 +63,7 @@ const Importer = (props) => {
                                                     let dataRow = {};
                                                     let rowVals = row.values;
                                                     validTemplateHeader.forEach((header, index) => {
-                                                        if(index === 0) dataRow[header] = rowVals[index+1].result;
-                                                        else dataRow[header] = rowVals[index + 1];
+                                                        dataRow[header] = (isObject(rowVals[index+1]) && rowVals[index+1].hasOwnProperty('result')) ? rowVals[index+1].result : rowVals[index+1];
                                                     })
                                                     templateData.push(dataRow);
                                                 }
@@ -242,6 +241,11 @@ const Importer = (props) => {
         addExecutedTask(task);
         setCurrentTask(null);
         callback(status);
+    }
+
+    function isObject(val) {
+        if (val === null) { return false;}
+        return ( (typeof val === 'function') || (typeof val === 'object') );
     }
 
     return <Modal>
