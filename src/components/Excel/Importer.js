@@ -78,18 +78,18 @@ const Importer = (props) => {
                                             //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous);
                                             //let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,"PREFIX",[],[]);
                                             let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,programDetails.dePrefix,mappingDetails.optionSets,mappingDetails.legendSets);
-                                            console.log(importedSections);
-                                            console.log(importedScores);
-                                            console.log(importSummaryValues);
-                                            console.log(programDetails);
-                                            console.log(mappingDetails);
+                                            // console.log(importedSections);
+                                            // console.log(importedScores);
+                                            // console.log(importSummaryValues);
+                                            // console.log(programDetails);
+                                            // console.log(mappingDetails);
                                             importSummaryValues.program = programDetails;
                                             importSummaryValues.mapping = mappingDetails;
 
                                             // Set new sections & questions
                                             setImportSummary(importSummaryValues);
                                             props.setImportResults(importSummaryValues);
-                                            props.setSaveStatus('Save & Validate');
+                                            props.setSaveStatus('Validate & Save');
 
                                             var newScoresSection = props.previous.scoresSection;
                                             newScoresSection.dataElements = importedScores;
@@ -123,9 +123,9 @@ const Importer = (props) => {
         let result = mappingDetails.programs.filter(prog => prog.name === program.name);
         program.id = result[0].id;
 
-        program.useCompetencyClass = ws.getCell("C13").value;
-        program.dePrefix = ws.getCell("C14").value;
-        program.healthArea = ws.getCell("C15").value;
+        program.useCompetencyClass = ws.getCell("C14").value;
+        program.dePrefix = ws.getCell("C15").value;
+        program.healthArea = ws.getCell("C16").value;
         return program;
     }
 
