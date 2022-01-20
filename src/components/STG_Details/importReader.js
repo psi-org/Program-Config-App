@@ -41,7 +41,7 @@ const getLegendSetId = (legendSetName,legendSets)=>{
 
 //Question
 const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
-    //console.info(data[importMap.parentName]);
+    //console.info(data);
     let code = "";
 
     let aggType;
@@ -50,7 +50,7 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         aggType='AVERAGE';
     }else{
         code = programPrefix + '_' + data[importMap.parentName]?.result;
-        console.log(data[importMap.parentName]);
+        //console.log(data[importMap.parentName]);
         switch(data[importMap.valueType]){
             case 'TEXT':
             case 'LONG_TEXT':
@@ -87,14 +87,14 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         ];
     }
 
-    if (data[importMap.feedbackOrder] != "") parsedDE.attributeValues.push(
+    if (data[importMap.feedbackOrder] && data[importMap.feedbackOrder] != "") parsedDE.attributeValues.push(
         { 
             attribute: { id : FEEDBACK_ORDER },
             value: String(data[importMap.feedbackOrder])
         }
     );
 
-    if (data[importMap.feedbackText] != "") parsedDE.attributeValues.push(
+    if (data[importMap.feedbackOrder] && data[importMap.feedbackText] != "") parsedDE.attributeValues.push(
         { 
             attribute:{ id : FEEDBACK_TEXT },
             value: data[importMap.feedbackText] 
