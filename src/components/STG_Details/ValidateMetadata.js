@@ -17,7 +17,8 @@ const ValidateMetadata = (props) => {
         programDetails: {
             enable: true,
             checkHasFormName: {enable: true, title: "Form name defined for element", errorMsg: {code: "EXW100", text: "A form name was not defined for the specified element."}},
-            structureMatchesValue: {enable: true, title: "Label should be LONG_TEXT", errorMsg: {code: "EXW103", text: "The expected value type for the label Data Element is LONG_TEXT."}},
+            //Disabled validation EXW103
+            structureMatchesValue: {enable: false, title: "Label should be LONG_TEXT", errorMsg: {code: "EXW103", text: "The expected value type for the label Data Element is LONG_TEXT."}},
             hasFeedbackOrder: {enable: true, title: "Verifies Feedback orders", errorMsg: {code: "EXW107", text: "The specified question has numerator and denominator assigned but does not contribute to any score."}},
             hasVarName: {enable: true, title: "Verifies Parent Name field", errorMsg: {code: "EXW110", text: "The specified question does not have a valid parent name."}},
             hasBothNumeratorDenominator: {enable: true, title: "Numerator and Denominator exists", errorMsg: {code: "EXW106", text: "The specified question lacks one of the scores (numerator or denominator)"}},
@@ -31,7 +32,9 @@ const ValidateMetadata = (props) => {
         scores: {
             enable: true,
             checkHasFormName: {enable: true, title: "Form name defined for element", errorMsg: {code: "EXW100", text: "A form name was not defined for the specified element."}},
-            structureMatchesValue: {enable: true, title: "Label should be LONG_TEXT", errorMsg: {code: "EXW102", text: "The expected value type for the score Data Element is NUMBER."}},
+            //Disabled validation EXW102
+            structureMatchesValue: {enable: false, title: "Score should be NUMBER", errorMsg: {code: "EXW102", text: "The expected value type for the score Data Element is NUMBER."}},
+            hasScoreFeedbackOrder: {enable: true, title: "Verifies Feedback orders for score Data Elements", errorMsg: {code: "EXW111", text: "The specified score Data Element lacks Feedback Order."}},
             hasBothNumeratorDenominator: {enable: true, title: "Numerator and Denominator exists", errorMsg: {code: "EXW106", text: "The specified question lacks one of the scores (numerator or denominator)"}},
             validAggregationType: {enable: true, title: "Valid Aggregation Type", errorMsg: {code: "EW103", text: "The expected aggregation operator for the score Data Element is AVERAGE"}},
 
@@ -145,6 +148,7 @@ const ValidateMetadata = (props) => {
                 let metaData = getHNQISMetadata(dataElement);
                 if (scoreValidationSettings.checkHasFormName.enable && !checkHasFormName(metaData, dataElement)) errors.push(scoreValidationSettings.checkHasFormName.errorMsg);
                 if (scoreValidationSettings.structureMatchesValue.enable && !structureMatchesValue(metaData, dataElement, "score", "NUMBER")) errors.push(scoreValidationSettings.structureMatchesValue.errorMsg);
+                if (scoreValidationSettings.hasScoreFeedbackOrder.enable && !hasScoreFeedbackOrder(metaData, dataElement)) errors.push(scoreValidationSettings.hasScoreFeedbackOrder.errorMsg);
                 if (scoreValidationSettings.hasBothNumeratorDenominator.enable && !hasBothNumeratorDenominator(metaData)) errors.push(scoreValidationSettings.hasBothNumeratorDenominator.errorMsg);
                 if (scoreValidationSettings.validAggregationType.enable && !validAggregationType(metaData, dataElement, "score", "AVERAGE")) errors.push(scoreValidationSettings.validAggregationType.errorMsg);
 
@@ -179,6 +183,13 @@ const ValidateMetadata = (props) => {
         function hasFeedbackOrder(metaData, dataElement)
         {
             if(hasAttributeValue(metaData, "scoreNum") && hasAttributeValue(metaData, "scoreDen"))
+                return (getFeedbackOrder(dataElement) !== "");
+            return true;
+        }
+
+        function hasScoreFeedbackOrder(metaData, dataElement)
+        {
+            if(metaData.elemType === "score")
                 return (getFeedbackOrder(dataElement) !== "");
             return true;
         }

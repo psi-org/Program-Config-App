@@ -23,7 +23,7 @@ const Scores = ({ stageSection, index }) => {
             if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
                 $(this).attr('src', contracted_bottom_svg);
                 $(this).parent().parent().css({
-                    'margin': '0px',
+                    'margin': '8px 8px 0px 8px',
                     'border-radius': '4px 4px 0 0'
                 });
                 $(this).parent().parent().next().css({
@@ -32,7 +32,7 @@ const Scores = ({ stageSection, index }) => {
             } else {
                 $(this).attr('src', expanded_bottom_svg);
                 $(this).parent().parent().css({
-                    'margin': '0 0 8px',
+                    'margin': '0x',
                     'border-radius': '4px'
                 });
                 $(this).parent().parent().next().css({
@@ -58,8 +58,8 @@ const Scores = ({ stageSection, index }) => {
                 </div>
                 <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div></div>
                 <div className="ml_item-warning_error " onClick={()=>showIssues(stageSection.dataElements)}>
-                  {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
-                  {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
+                    {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
+                    {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                 </div>
                 <div className="ml_item-cta">
                     <img src={move_vert_svg} alt="menu" />
@@ -87,7 +87,6 @@ const Scores = ({ stageSection, index }) => {
                                 </div>
                             </div>
                         )
-                        //return <DraggableDataElement dataElement={de} index={i} key={de.id} />;
                     })
                 }
                 {showValidationMessage && <ValidationMessages dataElements={errors} showValidationMessage={setShowValidationMessage} /> }

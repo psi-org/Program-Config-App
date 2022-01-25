@@ -31,7 +31,7 @@ const DraggableSection = ({ stageSection, index }) => {
             if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
                 $(this).attr('src', contracted_bottom_svg);
                 $(this).parent().parent().css({
-                    'margin': '0px',
+                    'margin': '8px 8px 0px 8px',
                     'border-radius': '4px 4px 0 0'
                 });
                 $(this).parent().parent().next().css({
@@ -40,7 +40,7 @@ const DraggableSection = ({ stageSection, index }) => {
             } else {
                 $(this).attr('src', expanded_bottom_svg);
                 $(this).parent().parent().css({
-                    'margin': '0 0 8px',
+                    'margin': '0x',
                     'border-radius': '4px'
                 });
                 $(this).parent().parent().next().css({

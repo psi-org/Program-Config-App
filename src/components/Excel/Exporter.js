@@ -11,6 +11,7 @@ import {
   structureValidator,
   yesNoValidator,
   conditionalError,
+  conditionalDisable,
   sectionHighlighting,
   questionHighlighting,
   labelHighlighting
@@ -329,9 +330,9 @@ const Exporter = (props) => {
     ws.getCell("E57").value = "Cell will be highlighted RED if corresponding Structure is present but form name is missing";
     ws.getCell("E57").alignment = {wrapText: true};
 
-    ws.getCell("C58").value = "Value Type";
+    ws.getCell("C58").value = "Feedback Order";
     ws.getCell("D58").value = "Conditional Validation";
-    ws.getCell("E58").value = "If the Structure is label then Value type should be LONG_TEXT; or if the Structure is Score Value type should be Number otherwise the cell will be highlighted";
+    ws.getCell("E58").value = "If the Structure is score then a compositive indicator should be provided";
     ws.getCell("E58").alignment = {wrapText: true};
 
     ws.getCell("C59").value = "Feedback Order";
@@ -460,7 +461,8 @@ const Exporter = (props) => {
     }, {
       header: "Compositive Indicator (Feedback Order)",
       key: "compositive_indicator",
-      width: 22
+      width: 22,
+      style: { numFmt: '@' }
     }, {
       header: "Parent question",
       key: "parent_question",
@@ -508,7 +510,7 @@ const Exporter = (props) => {
       legend: "Select the legend that will be applied to the question",
       score_numerator: "Numerator for scores calculation",
       score_denominator: "Denominator for scores calculation",
-      compositive_indicator: "This number will generate the feedback tree in the app, accepted values are:1, 1.1, 1.1.1, 1.1.2, 1.1..., 1.2, etc.  [See more]",
+      compositive_indicator: "This number will generate the feedback tree in the app, accepted values are:1, 1.1, 1.1.1, 1.1.2, 1.1..., 1.2, etc.",
       parent_question: "Select the Parent Name of the question that will act as parent",
       answer_value: `Specify the value that will trigger the "show" rule of the question`,
       feedback_text: `Text that will be displayed in the Feedback app for each question`,
@@ -608,35 +610,37 @@ const Exporter = (props) => {
       promptTitle: 'Form name not defined',
       prompt: 'A form name was not defined for the specified element.'
     });
-    //conditional formatting for structure=label and Value type <> LONG TEXT
+    //conditional formatting for structure=label
     ws.addConditionalFormatting({
       ref:'F3:F3000',
       rules: [
         {
           type: 'expression',
-          formulae: ['AND($B3="label", $F3<>"LONG_TEXT")'],
-          style: conditionalError
+          formulae: ['$B3="label"'],
+          style: conditionalDisable
         }
       ]
     });
-    //conditional formatting for structure=scores and valuetype=NUMBER
+    //conditional formatting for structure=scores
     ws.addConditionalFormatting({
       ref:'F3:F3000',
       rules: [
         {
           type: 'expression',
-          formulae: ['AND($B3="score", $F3<>"NUMBER")'],
-          style: conditionalError
+          formulae: ['$B3="score"'],
+          style: conditionalDisable
         }
       ]
     });
+    //conditional formatting for structure=scores and compositive indicator is empty
+    //or
     //conditional formatting checking Feedback order if either score (numerator or denominator is available)
     ws.addConditionalFormatting({
       ref:'K3:K3000',
       rules:[
         {
           type: 'expression',
-          formulae: ['AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3))'],
+          formulae: ['OR(AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3)), AND($B3="score", ISBLANK($K3)))'],
           style: conditionalError
         }
       ]
@@ -751,7 +755,7 @@ const Exporter = (props) => {
   };
 
   const addProtection = async ws => {
-    for (let i = 3; i <= 500; i++) {
+    for (let i = 3; i <= 3000; i++) {
       ws.getRow(i).protection = {
         locked: false
       };

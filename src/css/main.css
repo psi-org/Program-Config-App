@@ -27,8 +27,8 @@
 
 .layout_prgms_stages {
   display: grid;
-  grid-template-rows: calc(100% - 176px) 80px;
-  gap: 8px 8px;
+  /*grid-template-rows: calc(100% - 176px) 80px;*/
+  /*gap: 8px 8px;*/
   grid-auto-flow: row;
   grid-template-areas: "list-section" "fab-section";
   width: 100%;
@@ -600,7 +600,7 @@
   grid-auto-flow: row;
   grid-template-areas: "ml_list-icon ml_item-title ml_item-desc ml_item-warning_error ml_item-cta";
   padding: 8px;
-  margin: 18px 0 8px;
+  margin: 8px;
 }
 .cont_stage .wrapper .layout_prgms_stages .ml_item .ml_list-icon {
   padding-top: 2px;
@@ -648,10 +648,10 @@
 }
 .cont_stage .wrapper .layout_prgms_stages .section_cont {
   display: none;
-  width: 100%;
+  /*width: 100%;*/
   background-color: #f5fbff;
   padding: 8px 16px;
-  margin: 0 0 8px;
+  margin: 0px 8px;
   border-radius: 0 0 4px 4px;
 }
 .cont_stage .wrapper .layout_prgms_stages .section_cont .ml_item {

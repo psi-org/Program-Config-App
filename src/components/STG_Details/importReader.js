@@ -48,7 +48,10 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
     if(type=='score'){
         code = programPrefix + '_CS' + data[importMap.feedbackOrder];
         aggType='AVERAGE';
+        data[importMap.valueType] = 'NUMBER';
     }else{
+        if(type=='label') data[importMap.valueType] = 'LONG_TEXT';
+        
         code = programPrefix + '_' + data[importMap.parentName]?.result;
         //console.log(data[importMap.parentName]);
         switch(data[importMap.valueType]){

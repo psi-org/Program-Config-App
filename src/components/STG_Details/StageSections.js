@@ -94,6 +94,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [ isValid, setIsValid ] = useState(true);
     const [ validationResults, setValidationResults] = useState(false);
 
+    const [ uidPool, setUidPool ] = useState([]);
+
+    console.info(programStage.programStageSections);
 
     // States
     const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations"));
@@ -101,8 +104,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"));
     const [programStageDataElements, setProgramStageDataElements] = useState(programStage.programStageDataElements);
     const [programMetadata,setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
-
-    //console.info(sections);
 
     // Create Mutation
     let metadataDM = useDataMutation(createMutation);
@@ -118,13 +119,22 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     // Get Ids
     const idsQuery = useDataQuery(queryIds, { variables: { n: programStage.programStageDataElements.length * 5 } });
-    const uidPool = idsQuery.data?.results.codes;
+    //setUidPool(idsQuery.data?.results.codes);
 
     // Fetch Program Rules from Program
     const prDQ = useDataQuery(queryPR, { variables: { programId: programStage.program.id } });
 
     // Fetch Program Rule Variables from Program
     const prvDQ = useDataQuery(queryPRV, { variables: { programId: programStage.program.id } });
+
+    useEffect(()=>{
+        let n = (sections.reduce((prev,acu)=> prev + acu.dataElements.length,0) + scoresSection.dataElements.length + criticalSection.dataElements.length) * 5;
+        idsQuery.refetch({n}).then(data=>{
+            if(data){
+                setUidPool(data.results.codes)
+            }
+        })
+    },[sections]);
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
@@ -175,57 +185,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
         setSavingMetadata(true);
         return;
-
-        // Program Stage Data Elements
-        var newDataElements = [];
-
-        // Program Stage Sections
-        var newSections = JSON.parse(JSON.stringify(sections)).map((section, sectionIdx) => {
-            //Set new order for each section
-            section.sortOrder = ++sectionIdx;
-            section.dataElements = section.dataElements.map((de, deIdx) => {
-                //Get new order for DE
-                let newDe = programStage.programStageDataElements.find(stageDE => stageDE.dataElement.id == de.id);
-                newDe.sortOrder = ++deIdx;
-                newDataElements.push(newDe);
-                return de;
-            });
-            return section;
-        });
-
-        // Critical Steps Calculation
-        criticalSection.sortOrder = newSections.length + 1;
-        criticalSection.dataElements.forEach((de, i) => {
-            let newDe = programStage.programStageDataElements.find(stageDE => stageDE.dataElement.id == de.id);
-            if (newDe) {
-                newDe.sortOrder = ++i;
-                newDataElements.push(newDe);
-            }
-        });
-        newSections.push(criticalSection);
-
-        // Scores
-        scoresSection.sortOrder = newSections.length + 2;
-        scoresSection.dataElements.forEach((de, i) => {
-            let newDe = programStage.programStageDataElements.find(stageDE => stageDE.dataElement.id == de.id);
-            if (newDe) {
-                newDe.sortOrder = ++i;
-                newDataElements.push(newDe);
-            }
-        });
-        newSections.push(scoresSection);
-
-        const metadata = {
-            programStages: [programStage],
-            programStageSections: programStage.programStageSections,
-            programStageDataElements: programStage.programStageDataElements
-        };
-
-        createMetadata.mutate({ data: metadata }).then(response => {
-            //console.info(response);
-            stageRefetch();
-            setSaveStatus(true);
-        });
     };
 
     const configuration_download = (e) => {
@@ -402,7 +361,14 @@ const StageSections = ({ programStage, stageRefetch }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
-                        
+                        {
+                            importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
+                            <Removed importResults={importResults} index={0} key={"removedSec"} />
+                        }
+                        {
+                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0) &&
+                            <Errors validationResults={validationResults} index={0} key={"validationSec"}/>
+                        }
                         <Droppable droppableId="dpb-sections" type="SECTION">
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
@@ -417,14 +383,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                         </Droppable>
                         <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />
                         <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />
-                        {
-                            importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
-                            <Removed importResults={importResults} index={0} key={"removedSec"} />
-                        }
-                        {
-                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0) &&
-                            <Errors validationResults={validationResults} index={0} key={"validationSec"}/>
-                        }
+                        
                     </div>
                 </div>
             </DragDropContext>

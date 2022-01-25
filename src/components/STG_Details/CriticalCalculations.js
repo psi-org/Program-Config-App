@@ -19,7 +19,7 @@ const CriticalCalculations = ({ stageSection, index }) => {
             if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
                 $(this).attr('src', contracted_bottom_svg);
                 $(this).parent().parent().css({
-                    'margin': '0px',
+                    'margin': '8px 8px 0px 8px',
                     'border-radius': '4px 4px 0 0'
                 });
                 $(this).parent().parent().next().css({
@@ -28,7 +28,7 @@ const CriticalCalculations = ({ stageSection, index }) => {
             } else {
                 $(this).attr('src', expanded_bottom_svg);
                 $(this).parent().parent().css({
-                    'margin': '0 0 8px',
+                    'margin': '0x',
                     'border-radius': '4px'
                 });
                 $(this).parent().parent().next().css({
@@ -48,16 +48,7 @@ const CriticalCalculations = ({ stageSection, index }) => {
                     {stageSection.displayName}
                 </div>
                 <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div></div>
-                <div className="ml_item-warning_error ">
-                    {/* <img src={warning_svg} alt="wrng" />
-                            <img src={error_svg} alt="err" />
-                            <div className="ml_item-cw">
-                                3
-                            </div>
-                            <div className="ml_item-ce">
-                                2
-                            </div> */}
-                </div>
+                <div className="ml_item-warning_error "></div>
                 <div className="ml_item-cta">
                 <img src={move_vert_svg} alt="menu" />
                     <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
