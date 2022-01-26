@@ -50,8 +50,10 @@ const ProgramList = () => {
         <div className="c_srch"></div>
         <div className="c_btns">
           <Button onClick={()=>setShowProgramForm(true)} disabled={showProgramForm}><IconAddCircle24></IconAddCircle24>   Add Program</Button>
-          <Button loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> Download Template</Button>
-          <Button disabled={true}><img src={upload_svg} /> Import Template</Button>
+          {/*
+            <Button loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> Download Template</Button>
+            <Button disabled={true}><img src={upload_svg} /> Import Template</Button>
+          */}
         </div>
       </div>
       <div className="wrapper">
@@ -67,16 +69,17 @@ const ProgramList = () => {
             }
           </div>
         </div>
-
+      </div>
+      <div className="wrapper" >
         <Pagination
-          page={data.results.pager.page}
-          pageSize={data.results.pager.pageSize}
-          pageCount={data.results.pager.pageCount}
-          total={data.results.pager.pageCount}
-          pageSizes={["5", "10", "15", "20", "25", "50", "100"]}
-          onPageSizeChange={(pageSize) => { setPageSize(pageSize); refetch({ pageSize, page: 1 }) }}
-          onPageChange={(page) => { setCurrentPage(page); refetch({ page, pageSize }) }}
-        />
+            page={data.results.pager.page}
+            pageSize={data.results.pager.pageSize}
+            pageCount={data.results.pager.pageCount}
+            total={data.results.pager.pageCount}
+            pageSizes={["5", "10", "15", "20", "25", "50", "100"]}
+            onPageSizeChange={(pageSize) => { setPageSize(pageSize); refetch({ pageSize, page: 1 }) }}
+            onPageChange={(page) => { setCurrentPage(page); refetch({ page, pageSize }) }}
+          />
       </div>
       {showProgramForm && <ProgramNew setShowProgramForm={setShowProgramForm} programsRefetch={refetch}/>}
     </div>
