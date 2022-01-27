@@ -199,6 +199,8 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
 
             new_dataElements.push(score);
         });
+
+        importedScores.sortOrder = importedSections.length + 1;
         
         /**
          * Set new critical scores section : order

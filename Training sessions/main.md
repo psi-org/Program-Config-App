@@ -11,8 +11,8 @@ The exercises are distributed in sessions to help you assimilate the concepts. A
 
 The training sessions are detailed and available below:
 - [Session #1: Starting with the Program Config App & HNQIS2](#session-1-starting-with-the-program-config-app--hnqis2)
-- [Session #2: Updating checklists & Setting Parents Logic]()
-- [Session #3: Customization of HNQIS2 programs (TBD)]()
+- [Session #2: Updating checklists](#session-2-updating-checklists)
+- [Session #3: Parents Hide/Show Logic](#session-3-parents-hideshow-logic)
 
 # Session #1: Starting with the Program Config App & HNQIS2
 
@@ -71,6 +71,7 @@ The training sessions are detailed and available below:
 To start working on this excercise access to the **Program Config App** from your *Apps Menu*.
 
 This guide consists of 8 steps to help you create a new HNQIS2 enabled program. The steps are the following:
+
 1. [Create a new HNQIS2 program](#1-create-a-new-hnqis2-program)
 2. [Download the Unified Configuration Template](#2-download-the-unified-configuration-template)
 3. [Edit the Template](#3-edit-the-template)
@@ -175,9 +176,9 @@ This template uses four type of elements defined by the value selected in the "S
     ```
     > **NOTE:**
     >
-    > Remember to select ***label*** in the **Structure** column. Consider that the Value Type for labels is ***LONG_TEXT***.
+    > Remember to select ***label*** in the **Structure** column. You're not required to select a **Value Type** for labels.
     
-    You may have noticed that the **Value Type** column was highlighted in red as soon as you selected ***label***. This is the representation of validation errors in the Template, you will be able to check a list of all those validations in the HNQIS2 General Wiki in the future.
+    You may have noticed that the **Form name** column was highlighted in red as soon as you selected ***label***. This is the representation of validation errors in the Template, you will be able to check a list of all those validations in the HNQIS2 General Wiki in the future.
 
 3. Next, we will **add two questions right after the label we just created** considering the following requirements:
     * An *open* "TEXT" ***question*** with the following text:  
@@ -261,8 +262,8 @@ This template uses four type of elements defined by the value selected in the "S
         General Information
         ```
     
-        - Add a Compositive Indicator of **1** to this score.
-        - Select ***NUMBER*** in the Value Type column.
+        Add a Compositive Indicator of **1** to this score.
+
 
     * In the next row select ***score*** once again, and add the following text:
         
@@ -270,8 +271,11 @@ This template uses four type of elements defined by the value selected in the "S
         Facility Evaluation
         ```
     
-        - Add a Compositive Indicator of **2** to this score.
-        - Select ***NUMBER*** in the Value Type column.
+        Add a Compositive Indicator of **2** to this score.
+    
+    > **NOTE:**
+    >
+    > When defining scores you're only required to specify a Name and a Compositive Indicator.
 
     </br>
     
@@ -386,12 +390,330 @@ The last step before we can check the program in the **Tracker Capture App** is 
 
 After assigning an Org Unit you should be able to test your configurations from both the **Tracker Capture App** and the **Android Capture Application**.
 
-# Session #2: Updating checklists & Setting Parents Logic
- ```
- (WIP)...
- ```
+## Training Session #1 Feedback
 
-# Session #3: Customization of HNQIS2 programs (TBD)
+Please take some minutes to let us know your opinion about this Training Session 😊
+
+You can provide your feedback in the following [form](https://docs.google.com/forms/d/e/1FAIpQLSc7hQVUL3bW76I3rRteYawLOczH-TkyMT62obO76oS0fgZApA/viewform?usp=sf_link).
+
+> If you're unable to access the Feedback form, try copying this URL https://forms.gle/udcxviDtXxwd8YLL8
+
+This will help us improve for future sessions.
+
+Thank you for being part of this project!
+
+# Session #2: Updating checklists
+
+## Objectives
+
+- To identify the checklist updating possibilities that the Program Config App offers so the participants will be able to add, update and remove components from their checklists in future implementations.
+- To further demonstrate the usage of other Unified Configuration Template features not shown previously so the participants have full knowledge of the tools at their disposal.
+- To experiment with the interactions of the Program Config App and DHIS2 servers so the participants will understand clearly how to properly apply their changes.
+  
+## Agenda
+
+* Welcome (RM) [5 min]
+* Brief recap (FG) [10 min]
+* Instructions for the Guided Exercises (ML) [5 min]
+* Guided Exercise: Updating an existing checklist using the Unified Configuration Template [35 min]
+* Guided Exercise:  Updating an existing checklist using the Program Config App [15 min]
+* Q&A (ML & FG) [10 min]
+* Closure (RM) [5 min]
+
+## Instructions
+### Work Environment
+
+**Work server:** [https://236dev.psi-mis.org](https://236dev.psi-mis.org)
+
+**Username:** *\<First letter of your name\>\<Your last name\>*.h2t
+
+**Password:** *\<The one you defined in the previous session\>*
+
+### Reminder of all participants usernames
+
+| Participant  | Username  |
+|---|---|
+|Abdi Ali Abdi| aabdi.h2t|
+|Adam Qodax | aqodax.h2t |
+|Aleck Dhliwayo | adhiliwayo.h2t|
+|Amber Sheets | asheets.h2t|
+|Ana María Espinoza| aespinoza.h2t|
+|Cristina Lussiana | clussiana.h2t|
+|Frackson Shaba| fshaba.h2t|
+|Herald Luwizghie | hluwizghie.h2t|
+|James Omutsani | jomutsani.h2t|
+|Leslie Bidi | lbidi.h2t|
+|Luigi Nunez | lnunez.h2t|
+|Rodolfo Melia | rmelia.h2t|
+|Ruth Mwende | rmwende.h2t|
+|Victor Mutoma | vmutoma.h2t|
+
+## Guided Exercise: Updating an existing checklist using the Unified Configuration Template
+
+For this exercise we will continue working on the program we created in the last session. **Let's access the Program Confg App** and find our Training Program. Remember that your program name should follow the format **Training1 HNQIS2 *\<username\>***.
+
+Once you've found your program, navigate through the app until you reach your program's Assessment section and you can see the checklist we created.
+
+This guide consists of 6 steps to help you update a HNQIS2 enabled program from the import of a template. The steps are the following:
+
+1. [Download the Unified Configuration Template](#1-download-the-unified-configuration-template)
+2. [Remove a compontent in the Template](#2-remove-a-compontent-in-the-template)
+3. [Modify components in the Template](#3-modify-components-in-the-template)
+4. [Add components in the Template](#4-add-components-in-the-template)
+5. [Import the Template](#5-import-the-template-1)
+6. [Validate, Save, Set up & Test the program](#6-validate-save-set-up--test-the-program)
+
+### 1. Download the Unified Configuration Template
+
+Just like in the previous session, to download the template of your program let's **click on the "Download Template" button** and then open the downloaded file.
+
+![img_ts1_7](https://drive.google.com/uc?export=view&id=1thFf1afJVpS0CxCyvPqNOhv5cAduXwsw)
+
+>**NOTE:**
+>
+>Remember that there is a bug that downloads two templates. Both files are exactly the same, so you can delete any of those.
+
+Now let's **open the updated template** (the one that you just downloaded).
+
+### 2. Remove a compontent in the Template
+
+To remove a component in the template you simply have to **delete the whole row containing the desired component**.
+
+In this exercise we will delete the question containing the text:
+```
+Is this a Real or Simulated assessment?
+```
+You can identify it by checking that the **Parent Name** of the question is ***_S1Q3***. To remove it **delete row 6**, which should be the row containing that question in this exercise.
+
+![img_ts2_1](https://drive.google.com/uc?export=view&id=11xXjhIt9OvliMOLL2H2kCjbpDqBM150W)
+
+>**NOTE:**
+>
+>Make sure that you are deleting the whole row and not just a range of cells. You can delete a complete row by right-clicking it and selecting **Delete**.
+
+After that, make sure you **save your file** so you don't lose any progress if anything happens.
+
+>**NOTE:**
+>
+>When you're working on any checklist, you can remove as many components as you want (including sections). Remember that **all the Data Elements must be contained inside of a section**.
+
+### 3. Modify components in the Template
+
+Now, to update any component you simply have to edit the contents of any cell. In this exercise we will change the text of the *label* with **Parent name** ***_S1Q1*** from:
+
+```
+For this test assessment you will be able to experience the main features of HNQIS 2.0. Please provide the requested information.
+```
+
+To:
+
+```
+Please provide all the requested information.
+```
+
+Also, for **ALL** the questions in the **Facility Evaluation** section do the following:
+* Change both Numerator and Denominator from **1** to **2**.
+* Add the legend "HNQIS - YesNo" (In case it is missing).
+
+Next, we'll set the Feedback Text and Description (leave empty if not specified) for each of those questions in the **Facility Evaluation** section as follows:
+* For question ***_S2Q1*** (Row 7):
+    
+    **Description**
+
+    ```
+    Make sure that you're evaluating using the most recent biological guidelines. This question is critical.
+    ```
+
+* For question ***_S2Q2*** (Row 8):
+
+    **Feedback Text**
+    
+    ```
+    This way the client will remember what one line on either the control or test area mean and what two lines or no line mean. They must also be able to determine what to do after getting either result.
+    ```
+
+    **Description**
+
+    ```
+    This question is critical.
+    ```
+    
+* For question ***_S2Q3*** (Row 9):
+
+    **Description**
+
+    ```
+    Evaluate accordingly with the profile provided. This question is non-critical.
+    ```
+
+Remember to **save your changes**.
+
+### 4. Add components in the Template
+
+Lastly, let's add a non-critical but compulsory ***question*** right before the **Scores** section with the following text:
+
+```
+Has nurse tester undergone a proficiency test in the past 12 months?
+```
+- Use the option set "HNQIS - Yes1No0" (Value Type **NUMBER**).
+- Use "HNQIS - YesNo" as legend for this question.
+- Leave blank both Numerator and Denominator.
+- Add a Compositive Indicator of **2.4** to this question.
+- Add a Description with the following text:
+
+    ```
+    Answering "Yes" to this question enables a new set of questions.
+    ```
+
+Let's **add a new Section** before the **Scores** section with the text:
+
+```
+Proficiency testings
+```
+
+Then lets create a non-critical and non-compulsory *open* ***DATE question*** in that new section with the following text:
+
+```
+When did the nurse tester undergo proficiency testing? [REVIEW LATER]
+```
+
+Remember to drag the formula in **cell A9** of your worksheet up until you reach the last row used in **column A** (should be row 15 for this exercise).
+
+>**NOTE:**
+>
+>We're currently working on a feature to skip this formula copying step.
+
+After applying all the changes you should end up having a configuration like this:
+
+![img_ts2_2](https://drive.google.com/uc?export=view&id=1LgAc3zD_73QAh04VAIwSU5GG0YXv3VDR)
+
+Now we're done with the checklist update, **save your changes** and proceed with the next step.
+
+### 5. Import the Template
+
+Import the template following the same steps described in [Session #1](#5-import-the-template).
+
+After importing, you'll notice that a new *Temporary Section* named **Removed** appeared at the top. This section contains all the questions that will be removed from the program after saving the changes. Currently it should contain exactly 1 Data Element.
+
+![img_ts2_3](https://drive.google.com/uc?export=view&id=1l8VY4eqhiGGvWfD-pZyuxPi84mKWXYws)
+
+### 6. Validate, Save, Set up & Test the program
+
+After checking that the configurations are correct, remember to **click on "Validate & Save"**. In the new window, if all the validations pass then **click on "Save"** and then close the window.
+
+The structure of the checklist should now look like this:
+
+![img_ts2_4](https://drive.google.com/uc?export=view&id=1x4sgjjF36bgudtNs7bTKiXjVditVXy1b)
+
+Now **click on "Set up program"** to re-generate the program rules.
+
+>**NOTE:**
+>
+>Keep in mind that if you run into any issues in any of these steps, **reloading the app may solve most of the issues**.
+
+Finally, we can **test the program using the Tracker Capture App or the Android Capture App**.
+
+## Guided Exercise: Updating an existing checklist using the Program Config App
+
+Once you've completed the previous exercise you can proceed with the update process using the Program Config App.
+
+For this exercise you'll have to follow these steps:
+1. [Reorder components (Sections & Questions)](#1-reorder-components-sections--questions)
+2. [Edit Data Elements](#2-edit-data-elements)
+3. [Set up & Test the program](#3-set-up--test-the-program)
+
+### 1. Reorder components (Sections & Questions)
+
+Now we've experienced the configuration capabilities of the Unified Configuration Template, but there's also other ways to configure your programs in the Program Config App.
+
+For instance, you're able to reorder the components of your checklists (questions, labels & sections) by simply dragging and dropping in the app.
+
+For this little excercise we will temporarily reorder our sections. Start by left-clicking and holding the **=** icon in the ***General Information*** section.
+
+![img_ts2_5](https://drive.google.com/uc?export=view&id=1ReuE1tdHiGY6UmX3HdyZCBxxvBd1bZ8X)
+
+Then, while still holding your mouse's left-click, move the section after the ***Facility Evaluation*** section. The result should look like this:
+
+![img_ts2_6](https://drive.google.com/uc?export=view&id=1TRE8070hXubk04RKBjfsbkLdbU9w4Roq)
+
+This change hasn't yet been saved in the server, to do so you will need to click the "Validate & Save" button, but first let's reorder our questions in the **General Information** section. **Expand the section by clicking on the ˅ icon** on the far-right.
+
+>**NOTE:**
+>
+>You'll notice that the **˅** icon will change to a **^** icon after expanding the section, this indicates that clicking it once more will collapse its content.
+
+Then, shift the position of **Name of the evaluator** and **Please provide all the requested information** in the same way you moved the **General Information** section. The result should look like this:
+
+![img_ts2_7](https://drive.google.com/uc?export=view&id=18_Bp4ZeMjCFsm-Swn5hFEHe9tFs-UOlb)
+
+Now, if you want your changes to be applied you should **click on the "Validate & Save" button**. Also, after the changes are applied don't forget to **rebuild your program rules by clicking the "Set up program" button**.
+
+You can check that your changes have been applied by reloading the app, or by testing the checklist in the Tracker Capture App or the Android Capture App.
+
+**However**, this is not the structure that we want in our program, so let's return our checklist to the original order. If you didn't save your changes you can reload the app and the changes will be discarded, but if you saved the changes reorder your program so it looks like this:
+
+![img_ts2_4](https://drive.google.com/uc?export=view&id=1x4sgjjF36bgudtNs7bTKiXjVditVXy1b)
+
+Then **click on "Validate & Save"** and then **click on "Set up program"**.
+
+### 2. Edit Data Elements
+
+You may have noticed that one of the new questions included the text ***[REVIEW LATER]***, we will now remove that text by updating the Data Element directly from DHIS2.
+
+Start by expanding the **Proficency testings** section to find the question with the text:
+
+```
+When did the nurse tester undergo proficiency testing? [REVIEW LATER]
+```
+
+You can open the Data Element in DHIS2 by clicking the icon on the far-right of the question. 
+
+![img_ts2_8](https://drive.google.com/uc?export=view&id=1Rnnhzb_bXjfV106pFwBmnN8KNwMpkR7z)
+
+This will open a new Tab with the *Maintenance Page* for that specific Data Element, now let's change the **Form Name** of the Data Element to:
+
+```
+When did the nurse tester undergo proficiency testing?
+```
+
+Which should look like this:
+
+![img_ts2_9](https://drive.google.com/uc?export=view&id=1LXaMQEy36kmcGsvzN9Y8z6r7xSUC3OyP)
+
+You can change several configurations of every question from the Maintenance App, not just the *Form Name* of the Data Element. This can be used in case you made a mistake in one or two questions so you don't have to download the Template, make the changes and upload it once again.
+
+>**IMPORTANT NOTE:**
+>
+>Many of the configurations are made in the **HNQIS2 Metadata** Attribute, and are stored in *JSON format*. We don't recommend changing any values directly from this Attribute as this may severely impact the operations of the Program Config App. 
+
+After you're done with the changes, make sure you **click the "Save" button** at the bottom of the page. Then you'll be redirected to the Maintenance App, you can close this Tab and return to the Program Config App.
+
+![img_ts2_10](https://drive.google.com/uc?export=view&id=1XTMskMKyeugd4Hw2N02VDdvFSMgeyXGA)
+
+### 3. Set up & Test the program
+
+To reflect the changes made you'll have to **reload the Program Config App**, then **click on "Validate"**, then **click on "Save"** and finally **click on the "Set up program" button**.
+
+After all the process, the result should look like this:
+
+![img_ts2_11](https://drive.google.com/uc?export=view&id=1csM5sVnCRqPc6jijZkNZKUfheoe9O4tx)
+
+Then you can check your changes in the Tracker Capture App or the Android Capture App.
+In the next session we will dive deeper in the creation of Hide/Show rules for checklists.
+
+## Training Session #2 Feedback
+
+Please take some minutes to let us know your opinion about this Training Session 😊
+
+You can provide your feedback in the following [form](https://docs.google.com/forms/d/e/1FAIpQLSc7hQVUL3bW76I3rRteYawLOczH-TkyMT62obO76oS0fgZApA/viewform?usp=sf_link).
+
+> If you're unable to access the Feedback form, try copying this URL https://forms.gle/udcxviDtXxwd8YLL8
+
+This will help us improve for future sessions.
+
+Thank you for being part of this project!
+
+# Session #3: Parents Hide/Show Logic
  ```
  (WIP)...
  ```

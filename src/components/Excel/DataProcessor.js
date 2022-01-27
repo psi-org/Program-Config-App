@@ -94,7 +94,7 @@ const DataProcessor = (props) => {
     if (legendPool)
     {
         legendSetData = legendPool.map(lp => {
-           return {"Legend Set": lp.name, UID: lp.id}
+            return {"Legend Set": lp.name, UID: lp.id}
         });
     }
 
@@ -135,7 +135,7 @@ const DataProcessor = (props) => {
             programSection.dataElements.forEach((dataElement) => {
                 let row = {};
                 row.form_name = dataElement.formName;
-                row.value_type = dataElement.valueType;
+                row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : '';
                 row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
                 row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
                 row.description = dataElement.description;
@@ -143,9 +143,6 @@ const DataProcessor = (props) => {
                 row.program_stage_id = program_stage_id;
                 row.program_section_id = program_section_id;
                 row.data_element_id = dataElement.id;
-
-                //let critical = dataElement.attributeValues.filter(av => av.attribute.id === "NPwvdTt0Naj");
-                //row.critical = (critical.length > 0) ? critical[0].value : '';
 
                 let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === "haUflNqP85K");
                 let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
@@ -156,8 +153,8 @@ const DataProcessor = (props) => {
                 row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
                 row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion) : '';
                 row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : '';
-                row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined') ? metaData.isCompulsory: '';
-                row.isCritical = (typeof metaData.isCritical !== 'undefined') ? metaData.isCritical: '';
+                row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: '';
+                row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: '';
 
                 let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === "LP171jpctBm");
                 row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : '';

@@ -15,6 +15,8 @@ import BadgeWarnings from "./BadgeWarnings";
 import BadgeErrors from "./BadgeErrors";
 import ValidationMessages from "./ValidationMessages";
 
+const FEEDBACK_ORDER = "LP171jpctBm";
+
 const Scores = ({ stageSection, index }) => {
     const [showValidationMessage, setShowValidationMessage] = useState(false);
     const [ errors, setErrors ] = useState([]);
@@ -70,13 +72,14 @@ const Scores = ({ stageSection, index }) => {
                 {
                     stageSection.dataElements.map((dataElement, i) => {
                         let classNames = "ml_item" + ((dataElement.importStatus) ? ' import_' + dataElement.importStatus : '');
+                        let compositiveIndicator = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
                         return (
                             <div id={"de_" + dataElement.id} className={classNames} key={i}>
                                 <div className="ml_item-icon">
                                     <img className="ml_list-img" alt="de" src={scores_svg} />
                                 </div>
                                 <div className="ml_item-title">
-                                    {dataElement.formName}
+                                    {`[ ${compositiveIndicator} ] ${dataElement.formName}`}
                                 </div>
                                 <div className="ml_item-warning_error" onClick={()=>showIssues([dataElement])}>
                                     {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length}/> }
