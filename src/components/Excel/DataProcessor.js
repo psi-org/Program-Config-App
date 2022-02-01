@@ -125,44 +125,34 @@ const DataProcessor = (props) => {
             // Skip 'Critical Steps Calculations' Section
             if(programSection.dataElements.find(de => criticalStepsDataElements.includes(de.id))) return;
 
-            let row = {};
-            row.structure = "Section";
-            row.form_name = programSection.displayName;
-            row.program_stage_id = program_stage_id;
-            row.program_section_id = program_section_id;
+            let row = ['','Section', programSection.displayName, '', '', '', '', '', '', '', '', '', '', '', '', program_stage_id, program_section_id, ''];
             Configures.push(row);
 
             programSection.dataElements.forEach((dataElement) => {
-                let row = {};
-                row.form_name = dataElement.formName;
-                row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : '';
-                row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
-                row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
-                row.description = dataElement.description;
-
-                row.program_stage_id = program_stage_id;
-                row.program_section_id = program_section_id;
-                row.data_element_id = dataElement.id;
-
                 let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === "haUflNqP85K");
                 let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
-                row.parentValue = '';
-                row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
-                if(row.structure == 'label') row.form_name = metaData.labelFormName || '';
-                row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: '';
-                row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
-                row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion) : '';
-                row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : '';
-                row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: '';
-                row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: '';
-
-                let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === "LP171jpctBm");
-                row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : '';
-
                 let feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === "yhKEe6BLEer");
-                row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : '';
-
-                //row.isCompulsory = getCompulsoryStatusForDE(dataElement.id);
+                let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === "LP171jpctBm");
+                row = [
+                    '',
+                    (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '',
+                    (metaData.elemType == 'label') ? metaData.labelFormName || '' : dataElement.formName,
+                    (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: '',
+                    (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: '',
+                    (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : '',
+                    (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '',
+                    (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '',
+                    (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: '',
+                    (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '',
+                    (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : '',
+                    (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion) : '',
+                    (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : '',
+                    (feedbackText.length > 0) ? feedbackText[0].value : '',
+                    (typeof dataElement.description !== 'undefined') ? dataElement.description : '',
+                    program_stage_id,
+                    program_section_id,
+                    dataElement.id
+                ];
                 Configures.push(row);
             });
         });

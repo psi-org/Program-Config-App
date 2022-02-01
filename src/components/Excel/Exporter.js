@@ -690,22 +690,50 @@ const Exporter = (props) => {
   }
 
   const populateConfiguration = async ws => {
-    let dataRow = 3;
-    if(props.Configures.length > 0) {
-      props.Configures.forEach((configure) => {
-        ws.getRow(dataRow).values = configure;
-        ws.getCell("A" + dataRow).value = {formula: '_xlfn.IF(OR(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section",ISBLANK(INDIRECT(_xlfn.CONCAT("B",ROW())))),"",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1)))'};
-        if (configure.structure === "Section") {
-          fillBackgroundToRange(ws, "A" + dataRow + ":R" + dataRow, "f8c291")
-        }
-        if (configure.structure === "label") {
-          fillBackgroundToRange(ws, "A" + dataRow + ":R" + dataRow, "c6e0b4")
-        }
-        
-        dataRow = dataRow + 1;
-      });
-      applyBorderToRange(ws, 0, 3, 14, dataRow - 1);
-    }
+    console.log("Configure: ", props.Configures);
+    ws.addTable({
+      name: 'HNQIS_Configurations',
+      ref: 'A3',
+      headerRow: false,
+      totalsRow: false,
+      columns: [
+        { name: "Parent Name", calculatedColumnFormula: '_xlfn.IF(OR(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section",ISBLANK(INDIRECT(_xlfn.CONCAT("B",ROW())))),"",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1)))'},
+        { name: "Structure" },
+        { name: "Form name" },
+        { name: "Critical Step" },
+        { name: "Compulsory" },
+        { name: "Value Type" },
+        { name: "Option Set" },
+        { name: "Legend" },
+        { name: "Score Numerator" },
+        { name: "Score Denominator" },
+        { name: "Compositive Indicator (Feedback Order)" },
+        { name: "Parent question" },
+        { name: "Answer value" },
+        { name: "Feedback Text" },
+        { name: "Description"},
+        { name: "Program Stage Id" },
+        { name: "Program Section Id" },
+        { name: "Data Element Id" }
+      ],
+      rows: props.Configures
+    });
+    // let dataRow = 3;
+    // if(props.Configures.length > 0) {
+    //   props.Configures.forEach((configure) => {
+    //     ws.getRow(dataRow).values = configure;
+    //     ws.getCell("A" + dataRow).value = {formula: '_xlfn.IF(OR(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section",ISBLANK(INDIRECT(_xlfn.CONCAT("B",ROW())))),"",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1)))'};
+    //     if (configure.structure === "Section") {
+    //       fillBackgroundToRange(ws, "A" + dataRow + ":R" + dataRow, "f8c291")
+    //     }
+    //     if (configure.structure === "label") {
+    //       fillBackgroundToRange(ws, "A" + dataRow + ":R" + dataRow, "c6e0b4")
+    //     }
+    //
+    //     dataRow = dataRow + 1;
+    //   });
+    //   applyBorderToRange(ws, 0, 3, 14, dataRow - 1);
+    // }
   };
 
   const addMapping = async (ws) => {
