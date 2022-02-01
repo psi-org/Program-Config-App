@@ -134,7 +134,7 @@ const DataProcessor = (props) => {
                 let feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === "yhKEe6BLEer");
                 let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === "LP171jpctBm");
                 row = [
-                    '',
+                    null,
                     (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '',
                     (metaData.elemType == 'label') ? metaData.labelFormName || '' : dataElement.formName,
                     (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: '',
