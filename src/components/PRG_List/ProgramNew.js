@@ -33,7 +33,7 @@ const metadataMutation = {
 const METADATA = "haUflNqP85K",
     COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe",
     COMPETENCY_CLASS = "NAaHST5ZDTE",
-    BUILD_VERSION = "1.0";
+    BUILD_VERSION = "1.1.0";
 
 const ProgramNew = (props) =>
 {
@@ -136,7 +136,7 @@ const ProgramNew = (props) =>
             metadataRequest.mutate({data: metadata}).then(response => {
                 if (response.status != 'OK')
                 {
-                    console.log("Error encountered");
+                    //console.log("Error encountered");
                     return;
                 }
                 props.setShowProgramForm(false);

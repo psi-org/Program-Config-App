@@ -26,11 +26,14 @@ import {
 } from "../../configs/ExcelUtils";
 import {ReleaseNotes} from "../../configs/ReleaseNotes";
 
+const MAX_FORM_NAME_LENGTH = 220;
+const MIN_FORM_NAME_LENGTH = 2;
+
 const Exporter = (props) => {
   const password = template_password;
 
   const initialize = () => {
-    console.log("Load: ", "Exporter");
+    //console.log("Load: ", "Exporter");
       generate();
   };
 
@@ -102,8 +105,8 @@ const Exporter = (props) => {
     ws.getCell("F11").style = {font: {bold: true}};
     fillBackgroundToRange(ws, "F11:H11", "bfbfbf");
     ws.getCell("F12").value = "Program Name: The name that will be assigned to the checklist.";
-    ws.getCell("F13").value = "Use 'Competency Class': This will determine if competency classes will be included in the program";
-    ws.getCell("F14").value = "DE Prefix: A prefix that will be added to every Data Element in DHIS2, this is used to filter information."
+    ws.getCell("F13").value = "Use 'Competency Class': This will determine if competency classes will be included in the program.";
+    ws.getCell("F14").value = "DE Prefix: A prefix that will be added to every Data Element in DHIS2, make sure that it is unique."
     ws.getCell("F15").value = "Health Area: The Health Area where the checklist will be assigned, used for filtering.";
     fillBackgroundToRange(ws, "F12:H15", "f2f2f2");
 
@@ -609,6 +612,19 @@ const Exporter = (props) => {
       ],
       promptTitle: 'Form name not defined',
       prompt: 'A form name was not defined for the specified element.'
+    });
+    //conditional formatting for form name out of range
+    ws.addConditionalFormatting({
+      ref: 'C3:C3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: [`AND(NOT(ISBLANK($B3)),OR(LEN($C3)<${MIN_FORM_NAME_LENGTH},LEN($C3)>${MAX_FORM_NAME_LENGTH}))`],
+          style: conditionalError,
+        }
+      ],
+      promptTitle: 'Form name is too long',
+      prompt: `Given form name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`
     });
     //conditional formatting for structure=label
     ws.addConditionalFormatting({

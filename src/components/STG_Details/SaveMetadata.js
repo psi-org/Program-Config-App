@@ -2,7 +2,7 @@ import { Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Button, Lin
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
 import { useState } from "react";
 
-const BUILD_VERSION = "1.0";
+const BUILD_VERSION = "1.1.0";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -62,12 +62,20 @@ const getParentUid=(parentName,dataElements)=>{
     return dataElements.find(de => de.parentName == parentName)?.id
 };
 
-const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,criticalSection,setSavingMetadata,setSavedAndValidated,removedItems,programMetadata,setImportResults}) => {
+const parseErrors = (e) => {
+    let data = e.typeReports.map(tr=>{
+        let type = tr.klass.split('.').pop()
+        return tr.objectReports.map(or =>  or.errorReports.map(er => ({type,uid:or.uid,errorCode:er.errorCode,message:er.message})))
+    })
+    return data.flat().flat()
+}
+
+const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,criticalSection,setSavingMetadata,setSavedAndValidated,removedItems,programMetadata,setImportResults,setErrorReports}) => {
 
     const [completed, setCompleted] = useState(false);
     const [errorStatus,setErrorStatus] = useState(false);
     const [successStatus,setSuccessStatus] = useState(false);
-    const [typeReports,setTypeReports] = useState([]);
+    const [typeReports,setTypeReports] = useState({});
 
     // Create Mutation
     let metadataDM= useDataMutation(metadataMutation);
@@ -211,17 +219,19 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
         /**
          * Update Items with suffix [X] to ensure no Update conflicts
          */
-        let suffix = "[X]";
+        //let suffix = `${String(+ new Date()).slice(-7)}[X]`;
         let removed = removedItems.map(de => {
-            de.name = de.name.slice(0,227)+suffix;
-            de.shortName = de.id+suffix;
+            let suffix = `${String(+ new Date()).slice(-7)}[X]`;
+            de.name = de.name.slice(0,220)+suffix;
+            de.shortName = de.id+' '+suffix;
             delete de.code;
             return de
         });
         let toUpdateDE = JSON.parse(JSON.stringify(new_dataElements));
         let tempUpdate = toUpdateDE.map(de => {
-            de.name = de.name.slice(0,227)+suffix;
-            de.shortName = de.id+suffix;
+            let suffix = `${String(+ new Date()).slice(-7)}[X]`;
+            de.name = de.name.slice(0,220)+suffix;
+            de.shortName = de.id+' '+suffix;
             delete de.code;
             return de
         });
@@ -276,11 +286,15 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
         };
         // ========================================================== //
         const gotResponseError = (response) => {
-            console.log(response);
             setErrorStatus(true);
-            setTypeReports(response.typeReports);
+            setTypeReports(response);
             setCompleted(true);
+            setErrorReports(parseErrors(response))
         };
+
+        /**
+         * CALL METADATA REQUESTS - POST DHIS2
+         */
 
         metadataRequest.mutate({data:tempMetadata}).then(response =>{
             if(response.status!='OK'){
@@ -299,16 +313,8 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                 setImportResults(false);
             });
         });
-
-        /* programRequest.mutate({data:programDefinitions}).then(response =>{
-            console.log(response);
-            if(response.status!='OK'){
-                gotResponseError(response);
-                return;
-            }
-            
-        }); */
     }
+
     return <Modal>
         <ModalTitle>Save assesment</ModalTitle>
         <ModalContent>
@@ -333,9 +339,7 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                     errorStatus && 
                     <div>
                         <p><strong>Process ended with errors </strong></p>
-                        {
-                            console.log(errorStatus)
-                        }
+                        <p><strong>Please check the Errors Summary </strong></p>
                     </div>
                 }
             </NoticeBox>

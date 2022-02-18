@@ -41,7 +41,6 @@ const getLegendSetId = (legendSetName,legendSets)=>{
 
 //Question
 const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
-    //console.info(data);
     let code = "";
 
     let aggType;
@@ -64,14 +63,24 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         }
     }
     
+    // Name max: 230
+    // CODE_FORMNAME
+    // REST : 230 - CODE.LENGTH - FIXED
+    // FORMNAME.SLICE(0,REST)
+
+    const FIXED_VALUES = 5;
+    const formNameMaxLength = 230 - code.length - FIXED_VALUES;
 
     const parsedDE = {
         id: data[importMap.dataElementId] || undefined,
-        name: code + '_' + data[importMap.formName],
+        name: code + '_' + data[importMap.formName].slice(0,formNameMaxLength),
         shortName: (code + '_' + data[importMap.formName]).slice(0,50),
         code,
         description: data[importMap.description],
-        formName: type=='label'?'     ':data[importMap.formName],
+        formName: type=='label'?
+                    '     ':
+                    (
+                        data[importMap.formName] + (data[importMap.isCritical]=='Yes'?' [C]':'')),
         domainType: 'TRACKER',
         valueType: data[importMap.valueType],
         aggregationType: aggType,

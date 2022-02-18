@@ -6,6 +6,9 @@ const   METADATA = "haUflNqP85K",
         CRITICAL_QUESTION = "NPwvdTt0Naj",
         FEEDBACK_ORDER = 'LP171jpctBm';
 
+const MAX_FORM_NAME_LENGTH = 220;
+const MIN_FORM_NAME_LENGTH = 2;
+
 const ValidateMetadata = (props) => {
     let validationResults = {};
     const [processed, setProcessed] = useState(false);
@@ -17,6 +20,7 @@ const ValidateMetadata = (props) => {
         programDetails: {
             enable: true,
             checkHasFormName: {enable: true, title: "Form name defined for element", errorMsg: {code: "EXW100", text: "A form name was not defined for the specified element."}},
+            checkFormNameLength: {enable: true, title: "Form name length for element", errorMsg: {code: "EXW112", text: `Given form name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`}},
             //Disabled validation EXW103
             structureMatchesValue: {enable: false, title: "Label should be LONG_TEXT", errorMsg: {code: "EXW103", text: "The expected value type for the label Data Element is LONG_TEXT."}},
             hasFeedbackOrder: {enable: true, title: "Verifies Feedback orders", errorMsg: {code: "EXW107", text: "The specified question has numerator and denominator assigned but does not contribute to any score."}},
@@ -32,6 +36,7 @@ const ValidateMetadata = (props) => {
         scores: {
             enable: true,
             checkHasFormName: {enable: true, title: "Form name defined for element", errorMsg: {code: "EXW100", text: "A form name was not defined for the specified element."}},
+            checkFormNameLength: {enable: true, title: "Form name length for element", errorMsg: {code: "EXW112", text: `Given form name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`}},
             //Disabled validation EXW102
             structureMatchesValue: {enable: false, title: "Score should be NUMBER", errorMsg: {code: "EXW102", text: "The expected value type for the score Data Element is NUMBER."}},
             hasScoreFeedbackOrder: {enable: true, title: "Verifies Feedback orders for score Data Elements", errorMsg: {code: "EXW111", text: "The specified score Data Element lacks Feedback Order."}},
@@ -125,6 +130,7 @@ const ValidateMetadata = (props) => {
                 let warnings = [];
                 let metaData = getHNQISMetadata(dataElement);
                 if (programDetailsValidationSettings.checkHasFormName.enable && !checkHasFormName(metaData, dataElement)) errors.push(programDetailsValidationSettings.checkHasFormName.errorMsg);
+                if (programDetailsValidationSettings.checkFormNameLength.enable && !checkFormNameLength(metaData, dataElement)) errors.push(programDetailsValidationSettings.checkFormNameLength.errorMsg);
                 if (programDetailsValidationSettings.structureMatchesValue.enable && !structureMatchesValue(metaData, dataElement, "label", "LONG_TEXT")) errors.push(programDetailsValidationSettings.structureMatchesValue.errorMsg);
                 if (programDetailsValidationSettings.hasFeedbackOrder.enable && !hasFeedbackOrder(metaData, dataElement)) errors.push(programDetailsValidationSettings.hasFeedbackOrder.errorMsg);
                 if (programDetailsValidationSettings.hasVarName.enable && !hasVarName(metaData, dataElement)) errors.push(programDetailsValidationSettings.hasVarName.errorMsg);
@@ -163,6 +169,15 @@ const ValidateMetadata = (props) => {
                 if(metaData.elemType === "label") return (!isBlank(dataElement.name));
                 return (!isBlank(dataElement.formName)); //displayname ? formName
 
+            }
+            return true;
+        }
+
+        function checkFormNameLength(metaData, dataElement)
+        {
+            if (metaData.elem !== "")
+            {
+                return (dataElement.formName.length <= MAX_FORM_NAME_LENGTH && dataElement.formName.length >= MIN_FORM_NAME_LENGTH )
             }
             return true;
         }
@@ -308,6 +323,7 @@ const ValidateMetadata = (props) => {
                         removedItems={props.removedItems}
                         programMetadata={props.programMetadata}
                         setImportResults={props.setImportResults}
+                        setErrorReports={props.setErrorReports}
                     />
                 }
             </Modal>

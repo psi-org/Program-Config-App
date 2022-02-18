@@ -23,6 +23,7 @@ import { Link } from "react-router-dom";
 import Removed from "./Removed";
 import ValidateMetadata from "./ValidateMetadata";
 import Errors from "./Errors";
+import ErrorReports from "./ErrorReports";
 
 const createMutation = {
     resource: 'metadata',
@@ -96,7 +97,12 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     const [ uidPool, setUidPool ] = useState([]);
 
-    console.info(programStage.programStageSections);
+    useEffect(()=> { 
+        if(importerEnabled){
+            setErrorReports(undefined)
+            setValidationResults(false)
+        }
+    },[importerEnabled])
 
     // States
     const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations"));
@@ -104,6 +110,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"));
     const [programStageDataElements, setProgramStageDataElements] = useState(programStage.programStageDataElements);
     const [programMetadata,setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
+    const [errorReports,setErrorReports] = useState(undefined)
 
     // Create Mutation
     let metadataDM = useDataMutation(createMutation);
@@ -191,7 +198,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
         e.preventDefault();
         setExportToExcel(true);
         setExportStatus("Generating Configuration File...")
-        console.log("Twice....");
+        //console.log("Twice....");
     };
 
     const configuration_import = () => {
@@ -199,8 +206,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     const run = () => {
-
-        console.log(sections);
         if (!savedAndValidated) return;
 
         // Set flag to enable/disable actions (buttons)
@@ -369,6 +374,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
                             validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0) &&
                             <Errors validationResults={validationResults} index={0} key={"validationSec"}/>
                         }
+                        {
+                            errorReports && <ErrorReports errors={errorReports} />
+                        }
                         <Droppable droppableId="dpb-sections" type="SECTION">
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
@@ -406,6 +414,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     setIsValid = {setIsValid}
                     setValidationResults = {setValidationResults}
                     programMetadata={programMetadata}
+                    setErrorReports={setErrorReports}
                     />
             }
 
