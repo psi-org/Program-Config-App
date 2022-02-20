@@ -5,6 +5,8 @@ import { ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Button, Not
 import { validWorksheets, validTemplateHeader } from "../../configs/TemplateConstants";
 import {readTemplateData} from '../STG_Details/importReader';
 
+const MAX_FORM_NAME_LENGTH = 220;
+const MIN_FORM_NAME_LENGTH = 2;
 
 const Importer = (props) => {
     const [selectedFile, setSelectedFile] = useState(undefined);
@@ -12,8 +14,10 @@ const Importer = (props) => {
     const [executedTasks, setExecutedTasks] = useState([]);
     const [buttonDisabled, setButtonDisabled] = useState(false);
     const [isNotificationError, setNotificationError] = useState(false);
+    const [validationErrors, setValidationErrors] = useState(false);
 
     const [importSummary,setImportSummary] = useState(false);
+    const [errorLists, setErrorLists] = useState(undefined);
 
     const setFile = (files) => {
         setSelectedFile(files[0]);
@@ -73,28 +77,59 @@ const Importer = (props) => {
                                             addExecutedTask(task);
                                             setCurrentTask(null);
 
-                                            // Start import reading
-                                            let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,programDetails.dePrefix,mappingDetails.optionSets,mappingDetails.legendSets);
+                                            dataValidation(templateData, function(status, invalidRows) {
+                                                task = {step: 5, name: "Validating Template data from XLSX", status: "success"};
+                                                setCurrentTask(task.name);
+                                                if (status) {
+                                                    addExecutedTask(task);
+                                                    setCurrentTask(null);
 
-                                            importSummaryValues.program = programDetails;
-                                            importSummaryValues.mapping = mappingDetails;
+                                                    // Start import reading
+                                                    let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,programDetails.dePrefix,mappingDetails.optionSets,mappingDetails.legendSets);
 
-                                            // Set new sections & questions
-                                            setImportSummary(importSummaryValues);
-                                            props.setImportResults(importSummaryValues);
-                                            props.setSaveStatus('Validate & Save');
+                                                    importSummaryValues.program = programDetails;
+                                                    importSummaryValues.mapping = mappingDetails;
 
-                                            var newScoresSection = props.previous.scoresSection;
-                                            newScoresSection.dataElements = importedScores;
+                                                    // Set new sections & questions
+                                                    setImportSummary(importSummaryValues);
+                                                    props.setImportResults(importSummaryValues);
+                                                    props.setSaveStatus('Validate & Save');
 
-                                            props.previous.setSections(importedSections);
-                                            props.previous.setScoresSection(newScoresSection);
+                                                    var newScoresSection = props.previous.scoresSection;
+                                                    newScoresSection.dataElements = importedScores;
 
-                                            let programMetadata_new = props.programMetadata.programMetadata;
-                                            programMetadata_new.dePrefix = programDetails.dePrefix;
-                                            programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
-                                            programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
-                                            props.programMetadata.setProgramMetadata(programMetadata_new);
+                                                    props.previous.setSections(importedSections);
+                                                    props.previous.setScoresSection(newScoresSection);
+
+                                                    let programMetadata_new = props.programMetadata.programMetadata;
+                                                    programMetadata_new.dePrefix = programDetails.dePrefix;
+                                                    programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
+                                                    programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
+                                                    props.programMetadata.setProgramMetadata(programMetadata_new);
+                                                }
+                                                else {
+                                                    task = {step: 5, name: "Validating Template data from XLSX", status: "error"};
+                                                    addExecutedTask(task);
+                                                    setCurrentTask(null);
+                                                    setValidationErrors(true);
+                                                    console.log("InvalidRows: ", invalidRows);
+                                                    setErrorLists(
+                                                        <ul>
+                                                            {invalidRows.map((row) =>
+                                                                <li key={row.index}>Row : {row.index}
+                                                                    <ul>
+                                                                        {row.message.map((msg)=>
+                                                                            <li key={msg.code}>{msg.text}</li>
+                                                                        )}
+                                                                    </ul>
+                                                                </li>
+                                                            )};
+                                                        </ul>
+                                                    );
+                                                }
+                                            })
+
+
                                         }
                                     })
                                 }
@@ -236,11 +271,85 @@ const Importer = (props) => {
         callback(status);
     }
 
+    const dataValidation = (data, callback) => {
+        let msgs = [];
+        let dataRow = 3;
+        data.forEach((dt, index) => {
+            let rowIndex = index+dataRow;
+            let msg = [];
+            if(!checkHasFormName(dt)) msg.push({code: "EXW100", text: "A form name was not defined for the specified element."});
+            if (!checkFormNameLength(dt)) msg.push({code: "EXW112", text: `Given form name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`});
+            if (!structureMatchesValue(dt)) if(dt['Structure'] = 'score') { msg.push({code: "EXW102", text: "The expected value type for the score Data Element is NUMBER."}) } else { msg.push({code: "EXW103", text: "The expected value type for the label Data Element is LONG_TEXT."})};
+            if (!hasFeedbackOrder(dt)) msg.push({code: "EXW107", text: "The specified question has numerator and denominator assigned but does not contribute to any score."});
+            if (!hasBothNumeratorDenominator(dt)) msg.push({code: "EXW106", text: "The specified question lacks one of the scores (numerator or denominator)"});
+            if(msg.length > 0)
+            {
+                msgs.push({index: rowIndex, message: msg});
+            }
+        });
+        return callback((msgs.length === 0), msgs);
+    }
+
+    function checkHasFormName(data)
+    {
+        return (!isBlank(data['Form name']));
+    }
+
+    function checkFormNameLength(data)
+    {
+        if(!isBlank(data['Form name']))
+        {
+            return (data['Form name'].length <= MAX_FORM_NAME_LENGTH && data['Form name'].length >= MIN_FORM_NAME_LENGTH);
+        }
+        return true;
+    }
+
+    function structureMatchesValue(data)
+    {
+        if(data['Structure'] === 'label') { return (data['Value Type'] === 'LONG_TEXT')}
+        if(data['Structure'] === 'score') { return (data['Value Type'] === 'NUMBER')}
+        return true;
+    }
+
+    function hasFeedbackOrder(data)
+    {
+        if(data['Score Numerator'] !== "" && data['Score Denominator'] !== "")
+            return (data['Compositive Indicator (Feedback Order)'] !== "")
+        return true;
+    }
+
+    function hasBothNumeratorDenominator(data)
+    {
+        if(data['Score Numerator'] !== "") return (data['Score Denominator'] !== "");
+        else if(data['Score Denominator'] !== "") return false;
+        return true;
+    }
+
+    function isEmpty(str)
+    {
+        return (!str || str.length === 0 );
+    }
+
+    function isBlank(str)
+    {
+        return (!str || /^\s*$/.test(str));
+    }
+
+    function isValidParentName(json,key)
+    {
+        return (/_S\d+Q\d+/.test(json[key]))
+    }
+
     return <Modal>
         <ModalTitle>Select Configuration File</ModalTitle>
         <ModalContent>
             {(currentTask || executedTasks.length > 0) && <NoticesBox currentTask={currentTask} executedTasks={executedTasks} isError={isNotificationError} />}
             <br />
+            {(validationErrors) &&
+                <NoticeBox error title="Validation Errors">
+                    <ul>{errorLists}</ul>
+                </NoticeBox>
+            }
             {(importSummary) && 
                 <NoticeBox title='Import Summary'>
                     <div style={{display:'flex', alignContent:'center', width:'20rem'}}>
