@@ -2,7 +2,7 @@ import { Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Button, Lin
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
 import { useState } from "react";
 
-const BUILD_VERSION = "1.1.0";
+const BUILD_VERSION = "1.2.0";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -129,7 +129,34 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
             if(section.importStatus == 'new') section.id = uidPool.shift();
 
             section.dataElements.forEach((dataElement,deIdx) => {
+
                 let DE_metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
+
+                let newVarName = `_S${secIdx+1}Q${deIdx+1}`;
+                let newCode = `${programMetadata.dePrefix}_${newVarName}`;
+                 // Name max: 230
+                // CODE_FORMNAME
+                // REST : 230 - CODE.LENGTH - FIXED
+                // FORMNAME.SLICE(0,REST)
+
+                const FIXED_VALUES = 5;
+                const formNameMaxLength = 230 - newCode.length - FIXED_VALUES;
+
+                let formName = DE_metadata.elemType=='label' ? DE_metadata.labelFormName : dataElement.formName;
+                
+                if (formName.slice(-4)==' [C]') formName = formName.substring(0,formName.length-4);
+                
+                if (DE_metadata.isCritical=='Yes') formName+=' [C]'
+
+                let name = (newCode + '_' + formName).slice(0,formNameMaxLength)
+                let shortName = (newCode + '_' + formName).slice(0,50)
+
+                DE_metadata.varName = newVarName;
+                
+                dataElement.name = name
+                dataElement.shortName = shortName
+                dataElement.code = newCode
+                DE_metadata.elemType=='label' ? DE_metadata.labelFormName=formName : dataElement.formName=formName;
                 
                 // Check if new DE
                 if(dataElement.importStatus=='new'){
@@ -143,6 +170,8 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                     sortOrder: deIdx+1,
                     dataElement: { id: dataElement.id }
                 });
+
+                dataElement.attributeValues.find(att => att.attribute.id == METADATA).value = JSON.stringify(DE_metadata)
                 //return dataElement;
             });
 
@@ -208,13 +237,19 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
             new_dataElements.push(score);
         });
 
-        importedScores.sortOrder = importedSections.length + 1;
-        
         /**
          * Set new critical scores section : order
          */
 
-        criticalSection.sortOrder = importedSections.length + 2;
+        criticalSection.sortOrder = importedSections.length + 1;
+
+        /**
+         * Set new scores section : order
+         */
+
+        importedScores.sortOrder = importedSections.length + 2;
+        
+        
 
         /**
          * Update Items with suffix [X] to ensure no Update conflicts

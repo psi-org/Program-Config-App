@@ -1,4 +1,4 @@
-import React from 'react';
+import {React,useEffect} from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import { saveAs } from 'file-saver';
 import {
@@ -30,10 +30,10 @@ const MAX_FORM_NAME_LENGTH = 220;
 const MIN_FORM_NAME_LENGTH = 2;
 
 const Exporter = (props) => {
-  const password = template_password;
 
+  const password = template_password;
   const initialize = () => {
-    //console.log("Load: ", "Exporter");
+      console.log("Load: ", "Exporter");
       generate();
   };
 
@@ -789,15 +789,30 @@ const Exporter = (props) => {
     });
   }
 
+  const formatDate = (date) => {
+    let d = date.split('.')[0].split('T')
+    let dateYMD = d[0]
+    let dateHMS = d[1].split(":")
+    return `${dateYMD} [${dateHMS[0]}h ${dateHMS[1]}m]`
+  }
+
   const writeWorkbook = async wb => {
     const buf = await wb.xlsx.writeBuffer();
-    saveAs(new Blob([buf]), `HNQIS Config_${new Date()}.xlsx`);
+    saveAs(new Blob([buf]), `${props.programName} - ${formatDate(new Date().toISOString())}.xlsx`);
 
     props.setStatus("Download Template");
     props.isLoading(false);
   };
-
-  initialize(); // return <>initialize()</>;
+  /* if(props.flag){
+    initialize(); // return <>initialize()</>;
+  } */
+  
+  useEffect(()=>{
+    if(props.flag){
+      initialize()
+      props.setFlag(!props.flag)
+    }
+  },[])
 
   return null;
 };

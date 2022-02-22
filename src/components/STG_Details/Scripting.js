@@ -95,7 +95,7 @@ const buildScores = (branch) => {
  * @param {Array} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
  * @returns {Object}: scorePRs , scorePRAs for the current composite score
  */
-const getScorePR = (composite, branch, programId, uidPool) => {
+const getScorePR = (composite, branch, programId, stageId, uidPool) => {
 
     //      Breakpoint: No more IDs available
     if (uidPool.length == 0) return { scorePRs: [], scorePRAs: [] }
@@ -104,7 +104,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
     if (currentOrder && composite.subLevels.length >= 0) {
 
         branch = branch.childs.find(s => s.order == currentOrder);
-        return getScorePR(composite, branch, programId, uidPool);                // Output {scorePRs , scorePRAs}
+        return getScorePR(composite, branch, programId, stageId, uidPool);                // Output {scorePRs , scorePRAs}
     } else {
         if (branch) {     // Composite Score HAS scoring questions
             /**
@@ -129,6 +129,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
                 name: name,
                 description: "_Scripted",
                 program: { id: programId },
+                //programStage : {id : stageId},
                 condition: "true",
                 priority: 1,
                 programRuleActions: [{ id: actionId }]
@@ -154,6 +155,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
                 name: name,
                 description: "_Scripted",
                 program: { id: programId },
+                programStage : {id : stageId},
                 condition: `d2:hasValue('_CV${composite.prgVarName}')`,
                 programRuleActions: [{ id: actionId }]
             };
@@ -170,7 +172,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
 
         } else { // Composite Score DOESN'T HAVE scoring questions
             let data = `''`;
-            let name = `PR - Score - ${composite.feedbackOrder} ${composite.formName} (%)`;
+            let name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
             let programRuleActionType = "ASSIGN";
 
             let programRuleUid = uidPool.shift();
@@ -181,6 +183,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
                 name: name,
                 description: "_Scripted",
                 program: { id: programId },
+                programStage : {id : stageId},
                 condition: "true",
                 programRuleActions: [{ id: actionId }]
             };
@@ -205,7 +208,7 @@ const getScorePR = (composite, branch, programId, uidPool) => {
  * @param {*} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
  * @returns {Object} : { rules : <Array> , actions : <Array> }
  */
-const buildCriticalScore = (branch, programId, uidPool) => {
+const buildCriticalScore = (branch, stageId, programId, uidPool) => {
     let num = (branch.numC != "" ? branch.numC : undefined);
     let den = (branch.denC != "" ? branch.denC : undefined);
 
@@ -229,6 +232,7 @@ const buildCriticalScore = (branch, programId, uidPool) => {
         name,
         description: "_Scripted",
         program: { id: programId },
+        //programStage : {id : stageId},
         condition: "true",
         priority: 1,
         programRuleActions: [{ id: actionId }]
@@ -252,6 +256,7 @@ const buildCriticalScore = (branch, programId, uidPool) => {
         name,
         description: "_Scripted",
         program: { id: programId },
+        programStage : {id : stageId},
         condition: `d2:hasValue('_CV_CriticalQuestions')`,
         programRuleActions: [{ id: actionId }]
     };
@@ -275,7 +280,7 @@ const buildCriticalScore = (branch, programId, uidPool) => {
  * @param {*} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
  * @returns {Object}: { rules : <Array> , actions : <Array> }
  */
-const buildNonCriticalScore = (branch, programId, uidPool) => {
+const buildNonCriticalScore = (branch, stageId, programId, uidPool) => {
     let num = (branch.numN != "" ? branch.numN : undefined);
     let den = (branch.denN != "" ? branch.denN : undefined);
 
@@ -299,6 +304,7 @@ const buildNonCriticalScore = (branch, programId, uidPool) => {
         name,
         description: "_Scripted",
         program: { id: programId },
+        //programStage : {id : stageId},
         condition: "true",
         priority: 1,
         programRuleActions: [{ id: actionId }]
@@ -323,6 +329,7 @@ const buildNonCriticalScore = (branch, programId, uidPool) => {
         name,
         description: "_Scripted",
         program: { id: programId },
+        programStage : {id : stageId},
         condition: `d2:hasValue('_CV_NonCriticalQuestions')`,
         programRuleActions: [{ id: actionId }]
     };
@@ -344,7 +351,7 @@ const buildNonCriticalScore = (branch, programId, uidPool) => {
  * @param {*} uidPool 
  * @returns {Object} : { competencyRules : <Array> , competencyActions : <Array> }
  */
-const buildCompetencyRules = (programId, uidPool) => {
+const buildCompetencyRules = (programId, stageId, uidPool) => {
     let competencyRules = [
         {
             name: "PR - Assign Competency - 'Competent but needs improvement'",
@@ -394,6 +401,7 @@ const buildCompetencyRules = (programId, uidPool) => {
 
         rule.id = programRuleUid;
         rule.program.id = programId;
+        rule.programStage = { id : stageId }
 
         let actions = rule.programRuleActions;
         rule.programRuleActions = [];
@@ -610,7 +618,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
                     id: actionId,
                     programRuleActionType: "HIDEFIELD",
                     dataElement: { id: de.id },
-                    content: `#{_CV_CriticalQuestions}`,
+                    //content: `#{_CV_CriticalQuestions}`,
                     programRule: { id: programRuleUid }
                 };
 
@@ -766,7 +774,8 @@ const buildProgramRuleVariables = (sections, compositeScores, programId, useComp
     return programRuleVariables.concat(criticalVariables)
 }
 
-const buildProgramRules = (sections, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea="FP", scoreMap = { childs: [] }) => {
+const buildProgramRules = (sections, stageId, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea="FP", scoreMap = { childs: [] }) => {
+
     var programRules = [];
     var programRuleActions = [];
     var hideShowGroup = {};
@@ -836,18 +845,18 @@ const buildProgramRules = (sections, programId, compositeValues, scoresMapping, 
             prgVarName: '_CS' + score,
             uid: scoresMapping[score].id
         }
-        let { scorePRs, scorePRAs } = getScorePR(compositeData, scoreMap, programId, uidPool);
+        let { scorePRs, scorePRAs } = getScorePR(compositeData, scoreMap, programId, stageId, uidPool);
         programRules = programRules.concat(scorePRs);
         programRuleActions = programRuleActions.concat(scorePRAs);
     });
 
     // Critical Calculations
-    const criticalScore = buildCriticalScore(scoreMap, programId, uidPool);
-    const nonCriticalScore = buildNonCriticalScore(scoreMap, programId, uidPool);
+    const criticalScore = buildCriticalScore(scoreMap, stageId, programId, uidPool);
+    const nonCriticalScore = buildNonCriticalScore(scoreMap, stageId, programId, uidPool);
 
     // Competency Class
 
-    const { competencyRules, competencyActions } = (useCompetencyClass == "Yes" ? buildCompetencyRules(programId, uidPool) : { competencyRules: [], competencyActions: [] });
+    const { competencyRules, competencyActions } = (useCompetencyClass == "Yes" ? buildCompetencyRules(programId, stageId, uidPool) : { competencyRules: [], competencyActions: [] });
 
     // Attributes
 

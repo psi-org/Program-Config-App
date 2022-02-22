@@ -43,7 +43,6 @@ const programsQuery = {
 }
 
 const DataProcessor = (props) => {
-    //console.log("Called Component: ", "Data processor");
     const programStage = props.ps;
     let programMetadata = "";
     let programPrefix = "";
@@ -63,6 +62,7 @@ const DataProcessor = (props) => {
     }
 
     const [ isDownloaded, setIsDownloaded] = useState(false);
+    const [ exportFlag, setExportFlag] = useState(true);
     const { data: data} = useDataQuery(optionSetQuery);
     const { data: haData } = useDataQuery(healthAreasQuery);
     const { data: lsData } = useDataQuery(legendSetsQuery);
@@ -183,7 +183,7 @@ const DataProcessor = (props) => {
 
     return (
         <>
-            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
+            {isDownloaded && exportFlag && <Exporter programName={props.programName} flag={exportFlag} setFlag={setExportFlag} Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
         </>
     );
 }

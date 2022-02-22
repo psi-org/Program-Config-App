@@ -33,7 +33,7 @@ const metadataMutation = {
 const METADATA = "haUflNqP85K",
     COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe",
     COMPETENCY_CLASS = "NAaHST5ZDTE",
-    BUILD_VERSION = "1.1.0";
+    BUILD_VERSION = "1.2.0";
 
 const ProgramNew = (props) =>
 {
@@ -209,29 +209,29 @@ const ProgramNew = (props) =>
                                 </div>
                                 <div className={styles.row}>
                                     <Field
-                                    required
-                                    name="shortName"
-                                    label="Short Name"
-                                    component={InputFieldFF}
-                                    validate={hasValue}
+                                        required
+                                        name="shortName"
+                                        label="Short Name"
+                                        component={InputFieldFF}
+                                        validate={hasValue}
                                     />
                                 </div>
                                 <div className={styles.row}>
                                     <Field
-                                    type="checkbox"
-                                    name="useCompentencyClass"
-                                    label="Use Competency Class"
-                                    component={SwitchFieldFF}
-                                    initialValue={false}
+                                        type="checkbox"
+                                        name="useCompentencyClass"
+                                        label="Use Competency Class"
+                                        component={SwitchFieldFF}
+                                        initialValue={false}
                                     />
                                 </div>
                                 <div className={styles.row}>
                                     <Field
-                                    name="healthArea"
-                                    label="Health Area"
-                                    component={SingleSelectFieldFF}
-                                    initialValue="none"
-                                    options={optns}
+                                        name="healthArea"
+                                        label="Health Area"
+                                        component={SingleSelectFieldFF}
+                                        initialValue="none"
+                                        options={optns}
                                     />
                                 </div>
                                 <div className={styles.row}>

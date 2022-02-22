@@ -1,5 +1,5 @@
 // DHIS2 UI
-import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Modal, ModalTitle, ModalContent, ModalActions, Chip, IconSync24 } from "@dhis2/ui";
+import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Modal, ModalTitle, ModalContent, ModalActions, Chip, IconSync24, IconCheckmarkCircle24, IconCross24 } from "@dhis2/ui";
 
 import download_svg from './../../images/i-download.svg';
 import upload_svg from './../../images/i-upload.svg';
@@ -24,6 +24,7 @@ import Removed from "./Removed";
 import ValidateMetadata from "./ValidateMetadata";
 import Errors from "./Errors";
 import ErrorReports from "./ErrorReports";
+
 
 const createMutation = {
     resource: 'metadata',
@@ -136,6 +137,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     useEffect(()=>{
         let n = (sections.reduce((prev,acu)=> prev + acu.dataElements.length,0) + scoresSection.dataElements.length + criticalSection.dataElements.length) * 5;
+        //No Sections , get minimum ids for core Program Rules
+        if(n<50) n=50
+
         idsQuery.refetch({n}).then(data=>{
             if(data){
                 setUidPool(data.results.codes)
@@ -189,7 +193,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     const commit = () => {
-
+        if(createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
         setSavingMetadata(true);
         return;
     };
@@ -198,7 +202,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
         e.preventDefault();
         setExportToExcel(true);
         setExportStatus("Generating Configuration File...")
-        //console.log("Twice....");
     };
 
     const configuration_import = () => {
@@ -241,7 +244,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
         setProgressSteps(3);
         
         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId,programMetadata.useCompetencyClass);
-        const { programRules, programRuleActions } = buildProgramRules(sections, programId, compositeScores, scoresMapping, uidPool,programMetadata.useCompetencyClass,programMetadata.healthArea); //useCompetencyClass
+        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool,programMetadata.useCompetencyClass,programMetadata.healthArea); //useCompetencyClass
 
         const metadata = { programRuleVariables, programRules, programRuleActions };
 
@@ -256,18 +259,34 @@ const StageSections = ({ programStage, stageRefetch }) => {
         // V. Import new metadata
 
         deleteMetadata({ data: oldMetadata }).then((res) => {
-            setProgressSteps(5);
+            if(res.status=='OK'){
+                setProgressSteps(5);
 
-            createMetadata.mutate({ data: metadata }).then(response => {
-                //console.log(response);
-                setSaveAndBuild('Completed');
-                setSavedAndValidated(false);
+                createMetadata.mutate({ data: metadata }).then(response => {
+                    
+                    if(response.status=='OK'){
+                        setSaveAndBuild('Completed');
+                        setSavedAndValidated(false);
 
-                prDQ.refetch();
-                prvDQ.refetch();
-            });
+                        prDQ.refetch();
+                        prvDQ.refetch();
+                        setProgressSteps(6);
+                    }
+                });
+            }
+            
         });
 
+        
+
+    }
+
+    const parseErrors = (e) => {
+        let data = e.typeReports.map(tr=>{
+            let type = tr.klass.split('.').pop()
+            return tr.objectReports.map(or =>  or.errorReports.map(er => ({type,uid:or.uid,errorCode:er.errorCode,message:er.message})))
+        })
+        return data.flat().flat()
     }
 
     return (
@@ -293,13 +312,10 @@ const StageSections = ({ programStage, stageRefetch }) => {
             </div>
             {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{sections,setSections, scoresSection, setScoresSection}} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{programMetadata,setProgramMetadata}} />}
             <div className="title">Sections for program stage {programStage.displayName}</div>
-            {exportToExcel && <DataProcessor ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus}/>}
+            {exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus}/>}
             {
                 createMetadata.loading &&
                 <ComponentCover translucent>
-                    <CenteredContent>
-                        <CircularLoader large />
-                    </CenteredContent>
                 </ComponentCover>
             }
 
@@ -319,10 +335,10 @@ const StageSections = ({ programStage, stageRefetch }) => {
                 </AlertStack>
             }
 
-            {createMetadata.data && (!createMetadata.data.status || createMetadata.data.status == "ERROR") &&
+            {createMetadata.data && (createMetadata.data.status == "ERROR") &&
                 <AlertStack>
                     <AlertBar critical>
-                        {"Process ended with error in the following objects: " + createMetadata.data.typeReports.map(tr => tr.klass.split('.').at(-1)).join(', ') + "."}
+                        {"Process ended with error. Please check Errors Summary section for more details."}
                     </AlertBar>
                 </AlertStack>
             }
@@ -332,33 +348,54 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     <ModalContent>
                         {(progressSteps > 0) &&
                             <div className="progressItem">
-                                <img src={contracted_bottom_svg} /><p>Checking scores</p>
+                                {progressSteps===1 && <CircularLoader small/>}
+                                {progressSteps===1 && createMetadata?.data?.status=="ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps!==1 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Checking scores</p>
                             </div>
                         }
                         {(progressSteps > 1) &&
                             <div className="progressItem">
-                                <img src={contracted_bottom_svg} /><p>Reading assesment's questions</p>
+                                {progressSteps===2 && <CircularLoader small/>}
+                                {progressSteps===2 && createMetadata?.data?.status=="ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps!==2 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Reading assesment's questions</p>
                             </div>
                         }
                         {(progressSteps > 2) &&
                             <div className="progressItem">
-                                <img src={contracted_bottom_svg} /><p>Building new metadata</p>
+                                {progressSteps===3 && <CircularLoader small/>}
+                                {progressSteps===3 && createMetadata?.data?.status==="ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps!==3 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Building new metadata</p>
                             </div>
                         }
                         {(progressSteps > 3) &&
                             <div className="progressItem">
-                                <img src={contracted_bottom_svg} /><p>Deleting old metadata</p>
+                                {progressSteps===4 && createMetadata?.data?.status!=="ERROR" && <CircularLoader small/>}
+                                {progressSteps===4 && createMetadata?.data?.status==="ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps!==4 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Deleting old metadata</p>
                             </div>
                         }
                         {(progressSteps > 4) &&
                             <div className="progressItem">
-                                <img src={contracted_bottom_svg} /><p>Importing new metadata</p>
+                                {progressSteps===5 && createMetadata?.data?.status!=="ERROR" && <CircularLoader small/>}
+                                {progressSteps===5 && createMetadata?.data?.status==="ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps!==5 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Importing new metadata</p>
+                            </div>
+                        }
+                        {(progressSteps > 5) &&
+                            <div className="progressItem">
+                                <IconCheckmarkCircle24 color={'#00b894'} />
+                                <p> Done!</p>
                             </div>
                         }
                     </ModalContent>
                     <ModalActions>
                         <ButtonStrip>
-                            <Button disabled={saveAndBuild != 'Completed'} onClick={() => { setSaveAndBuild(false); setProgressSteps(0); }}>Close</Button>
+                            <Button disabled={(saveAndBuild != 'Completed') && (createMetadata?.data?.status !== 'ERROR')} onClick={() => { setSaveAndBuild(false); setProgressSteps(0); }}>{`Close`}</Button>
                         </ButtonStrip>
                     </ModalActions>
                 </Modal>
@@ -376,6 +413,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
                         }
                         {
                             errorReports && <ErrorReports errors={errorReports} />
+                        }
+                        {
+                            createMetadata.data && createMetadata.data.status =='ERROR' && <ErrorReports errors={parseErrors(createMetadata.data)} />
                         }
                         <Droppable droppableId="dpb-sections" type="SECTION">
                             {(provided, snapshot) => (
