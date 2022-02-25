@@ -408,7 +408,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                             <Removed importResults={importResults} index={0} key={"removedSec"} />
                         }
                         {
-                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0) &&
+                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0 || validationResults.feedbacks.length > 0) &&
                             <Errors validationResults={validationResults} index={0} key={"validationSec"}/>
                         }
                         {

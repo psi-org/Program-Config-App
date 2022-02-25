@@ -31,7 +31,6 @@ const ValidateMetadata = (props) => {
             isNumeratorNumeric: {enable: true, title: "Score is Numeric", errorMsg: {code: "EXW105", text: "The specified question numerator is not numeric"}},
             isDenominatorNumeric: {enable: true, title: "Score is Numeric", errorMsg: {code: "EXW108", text: "The specified question numerator is not numeric"}},
             hasParentQuestionNAnswerValue: {enable: true, title: "Complete Parent Logic", errorMsg: {code: "EXW109", text: "The specified question lacks one of the components for the parent logic."}}
-
         },
         scores: {
             enable: true,
@@ -41,10 +40,51 @@ const ValidateMetadata = (props) => {
             structureMatchesValue: {enable: false, title: "Score should be NUMBER", errorMsg: {code: "EXW102", text: "The expected value type for the score Data Element is NUMBER."}},
             hasScoreFeedbackOrder: {enable: true, title: "Verifies Feedback orders for score Data Elements", errorMsg: {code: "EXW111", text: "The specified score Data Element lacks Feedback Order."}},
             hasBothNumeratorDenominator: {enable: true, title: "Numerator and Denominator exists", errorMsg: {code: "EXW106", text: "The specified question lacks one of the scores (numerator or denominator)"}},
-            validAggregationType: {enable: true, title: "Valid Aggregation Type", errorMsg: {code: "EW103", text: "The expected aggregation operator for the score Data Element is AVERAGE"}},
-
+            validAggregationType: {enable: true, title: "Valid Aggregation Type", errorMsg: {code: "EW103", text: "The expected aggregation operator for the score Data Element is AVERAGE"}}
+        },
+        feedbackOrder: {
+            enable:true,
+            checkGaps: {enable: true, title: "Verifies Feedback orders gaps in Data Elements", errorMsg: {code: "EW106", text: "One or more gaps were found in the feedback order configurations, please check your template to fix the issue."}},
+            checkDuplicated: {enable: true, title: "Verifies unique Feedback orders in Data Elements", errorMsg: {code: "EW107", text: "The specified Feedback Order is shared by the following elements with codes"}}
         }
     }
+
+    const checkDuplicatedFeedbacks = (scores) => scores.filter(score => scores.find(match => match.feedbackOrder === score.feedbackOrder && match.code !== score.code) );
+    
+    const groupBy = (data, key) => {
+        return data.reduce((acu, cur) => {
+            let b = acu.find(elem => elem[key] === cur[key])
+            if(!b) acu.push({feedbackOrder:cur[key], elements: [cur.code]})
+            else b.elements.push(cur.code)
+            return acu;
+        }, []);
+    };
+
+    const getFeedbackData = (sections) => 
+        sections.map(section =>{
+            return section.dataElements.map(de => ({
+                code: de.code,
+                feedbackOrder: de.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
+            }))
+            .filter(de => de.feedbackOrder)
+        }).flat()
+        .sort((a,b)=> {
+            let aStruct = a.feedbackOrder.split(".");
+            let bStruct = b.feedbackOrder.split(".");
+
+            while(true){
+                let x = aStruct.shift(), y = bStruct.shift();
+                
+                if(!x && !y) break;
+                if(!x && y) return -1;
+                if(x && !y) return 1;
+                
+                if(parseInt(x)>parseInt(y)) return 1;
+                if(parseInt(x)<parseInt(y)) return -1;
+            }
+
+            return 0;
+        });
 
 
     useEffect(()=> {
@@ -52,10 +92,12 @@ const ValidateMetadata = (props) => {
         const importedScore = props.importedScores;
         let errorCounts = 0;
 
+        
         if(verifyProgramDetail(props.importResults))
         {
             let questions = [];
             let scores = [];
+
             importedSections.forEach((section) => {
                 let section_errors = 0;
                 section.dataElements.forEach((dataElement) => {
@@ -84,6 +126,12 @@ const ValidateMetadata = (props) => {
             validationResults.scores = scores;
             if(score_errors > 0 ) importedScore.errors = score_errors;
 
+            // CHECK FEEDBACK DATA
+            let {feedbacksErrors,feedbacksWarnings} = validateFeedbacks(importedSections.concat(importedScore))
+            errorCounts+=feedbacksErrors.length
+            validationResults.feedbacks = feedbacksErrors;
+
+            // SUMMARY - RESULTS
             if(errorCounts === 0)
             {
                 setValid(true);
@@ -160,6 +208,32 @@ const ValidateMetadata = (props) => {
 
                 if(errors.length > 0) dataElement.errors = errors;
             }
+        }
+
+        function validateFeedbacks(sections)
+        {
+            let feedbacksErrors = [];
+            let feedbacksWarnings = [];
+
+            const feedbackOrderValidationSettings = validationSettings.feedbackOrder;
+            if (feedbackOrderValidationSettings.enable) {
+                
+                let feedbackData = getFeedbackData(sections)
+                let duplicatedFeedbacks = groupBy(checkDuplicatedFeedbacks(feedbackData),'feedbackOrder')                
+
+                if (feedbackOrderValidationSettings.checkDuplicated.enable){
+                    duplicatedFeedbacks.forEach(df => {
+                        feedbacksErrors.push({msg:feedbackOrderValidationSettings.checkDuplicated.errorMsg, instance:df});
+                    })
+                }
+
+                //if (feedbackOrderValidationSettings.checkGaps.enable && !checkGaps(metaData, dataElement)) errors.push(feedbackOrderValidationSettings.checkHasFormName.errorMsg);
+                
+                
+
+                
+            }
+            return {feedbacksErrors,feedbacksWarnings}
         }
 
         function checkHasFormName(metaData, dataElement)
