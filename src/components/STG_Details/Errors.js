@@ -68,7 +68,7 @@ const Errors = (props) => {
                                         <img src={error_svg} alt="error_dataElement" className="ml_list-img"/>
                                     </div>
                                     <div className="ml_item-title">
-                                        <div><strong>{labelFormName ? "[Label]" :"[Question]"} </strong>{labelFormName || question.formName}</div>
+                                        <div><strong>{labelFormName ? "[ Label ]" :"[ Question ]"} </strong>{labelFormName || question.formName}</div>
                                     </div>
                                     <div className="ml_item-warning_error" onClick={()=>showIssues([question])}>
                                         {question.warnings && question.warnings.length > 0 && <BadgeWarnings counts={question.warnings.length}/> }
@@ -87,7 +87,7 @@ const Errors = (props) => {
                                         <img src={error_svg} alt="error_dataElement" className="ml_list-img"/>
                                     </div>
                                     <div className="ml_item-title">
-                                        <div><strong>[Score] </strong>{score.formName}</div>
+                                        <div><strong>[ Score ] </strong>{score.formName}</div>
                                     </div>
                                     <div className="ml_item-warning_error" onClick={()=>showIssues([score])}>
                                         {score.warnings && score.warnings.length > 0 && <BadgeWarnings counts={score.warnings.length}/> }
@@ -106,7 +106,7 @@ const Errors = (props) => {
                                         <img src={error_svg} alt="error_FeedbackOrder" className="ml_list-img"/>
                                     </div>
                                     <div className="ml_item-title">
-                                        <div><strong>[ {error.instance.feedbackOrder} ] </strong> {error.msg.text + ': ' + error.instance.elements.join(', ')+'.'}</div>
+                                        <div><strong>[ Feedback Order {error.instance.feedbackOrder} ] </strong> {error.msg.text + ': ' + error.instance.elements.join(', ')+'.'}</div>
                                         
                                     </div>
                                     <div className="ml_item-warning_error" >

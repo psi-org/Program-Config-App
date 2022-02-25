@@ -45,7 +45,9 @@ const ValidateMetadata = (props) => {
         feedbackOrder: {
             enable:true,
             checkGaps: {enable: true, title: "Verifies Feedback orders gaps in Data Elements", errorMsg: {code: "EW106", text: "One or more gaps were found in the feedback order configurations, please check your template to fix the issue."}},
-            checkDuplicated: {enable: true, title: "Verifies unique Feedback orders in Data Elements", errorMsg: {code: "EW107", text: "The specified Feedback Order is shared by the following elements with codes"}}
+            checkDuplicated: {enable: true, title: "Verifies unique Feedback orders in Data Elements", errorMsg: {code: "EW107", text: "The specified Feedback Order is shared by the Data Elements with the following codes"}},
+            //Error Equivalents for Data Elements
+            duplicatedFO: {enable: true, title: "Verifies unique Feedback orders in Data Elements", errorMsg: {code: "EW107", text: "The specified Data Element contains a duplicated Feedback Order."}}
         }
     }
 
@@ -63,6 +65,7 @@ const ValidateMetadata = (props) => {
     const getFeedbackData = (sections) => 
         sections.map(section =>{
             return section.dataElements.map(de => ({
+                id: de.id,
                 code: de.code,
                 feedbackOrder: de.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
             }))
@@ -91,22 +94,38 @@ const ValidateMetadata = (props) => {
         const importedSections = props.importedSections;
         const importedScore = props.importedScores;
         let errorCounts = 0;
-
         
         if(verifyProgramDetail(props.importResults))
         {
             let questions = [];
             let scores = [];
 
+            validationResults.questions = questions;
+            validationResults.scores = scores;
+
+            // CHECK FEEDBACK DATA
+            let {feedbacksErrors,feedbacksWarnings} = validateFeedbacks(importedSections.concat(importedScore))
+            errorCounts+=feedbacksErrors.length
+            validationResults.feedbacks = feedbacksErrors;
+            
+            //ADD FEEDBACK ERRORS TO DATA ELEMENTS
             importedSections.forEach((section) => {
                 let section_errors = 0;
                 section.dataElements.forEach((dataElement) => {
+
                     validateSections(dataElement);
-                    if(dataElement.errors)
-                    {
+                    if(dataElement.errors) questions.push(dataElement);
+
+                    if(feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))){
+                        let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id===FEEDBACK_ORDER)?.value
+                        
+                        let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
+                        dataElement.errors = dataElement.errors ? dataElement.errors.push(deErrs) : [deErrs];
+                    }
+                    
+                    if(dataElement.errors){
                         errorCounts+=dataElement.errors.length;
                         section_errors+=dataElement.errors.length;
-                        questions.push(dataElement);
                     }
                 });
                 if(section_errors > 0) section.errors = section_errors;
@@ -114,22 +133,24 @@ const ValidateMetadata = (props) => {
 
             let score_errors = 0;
             importedScore.dataElements.forEach((dataElement) => {
-                validateScores(dataElement);
-                if (dataElement.errors)
-                {
-                    errorCounts+=dataElement.errors.length;
-                    score_errors += dataElement.errors.length;
-                    scores.push(dataElement);
-                }
-            });
-            validationResults.questions = questions;
-            validationResults.scores = scores;
-            if(score_errors > 0 ) importedScore.errors = score_errors;
 
-            // CHECK FEEDBACK DATA
-            let {feedbacksErrors,feedbacksWarnings} = validateFeedbacks(importedSections.concat(importedScore))
-            errorCounts+=feedbacksErrors.length
-            validationResults.feedbacks = feedbacksErrors;
+                validateScores(dataElement);
+                if (dataElement.errors) scores.push(dataElement);    
+
+                if(feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))){
+                    let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id===FEEDBACK_ORDER)?.value
+                    
+                    let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
+                    dataElement.errors = dataElement.errors ? dataElement.errors.push(deErrs) : [deErrs];
+                }
+                
+                if(dataElement.errors){
+                    errorCounts+=dataElement.errors.length;
+                    score_errors+=dataElement.errors.length;
+                }
+
+            });
+            if(score_errors > 0 ) importedScore.errors = score_errors;
 
             // SUMMARY - RESULTS
             if(errorCounts === 0)
@@ -223,7 +244,7 @@ const ValidateMetadata = (props) => {
 
                 if (feedbackOrderValidationSettings.checkDuplicated.enable){
                     duplicatedFeedbacks.forEach(df => {
-                        feedbacksErrors.push({msg:feedbackOrderValidationSettings.checkDuplicated.errorMsg, instance:df});
+                        feedbacksErrors.push({msg:feedbackOrderValidationSettings.checkDuplicated.errorMsg, instance:df, elementError: feedbackOrderValidationSettings.duplicatedFO});
                     })
                 }
 
