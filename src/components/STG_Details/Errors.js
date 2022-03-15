@@ -106,7 +106,7 @@ const Errors = (props) => {
                                         <img src={error_svg} alt="error_FeedbackOrder" className="ml_list-img"/>
                                     </div>
                                     <div className="ml_item-title">
-                                        <div><strong>[ Feedback Order {error.instance.feedbackOrder} ] </strong> {error.msg.text + ': ' + error.instance.elements.join(', ')+'.'}</div>
+                                        <div><strong>[ Feedback Order {error.instance.feedbackOrder} ] </strong> {error.msg.text + ': ' + (!error.instance.expectedValues?error.instance.elements.join(', '):error.instance.expectedValues.join(' or '))+'.'}</div>
                                         
                                     </div>
                                     <div className="ml_item-warning_error" >

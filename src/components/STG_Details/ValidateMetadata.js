@@ -44,10 +44,11 @@ const ValidateMetadata = (props) => {
         },
         feedbackOrder: {
             enable:true,
-            checkGaps: {enable: true, title: "Verifies Feedback orders gaps in Data Elements", errorMsg: {code: "EW106", text: "One or more gaps were found in the feedback order configurations, please check your template to fix the issue."}},
+            checkGaps: {enable: true, title: "Verifies Feedback orders gaps in Data Elements", errorMsg: {code: "EW106", text: "A feedback Order Gap was found, was expecting one of the following values"}},
             checkDuplicated: {enable: true, title: "Verifies unique Feedback orders in Data Elements", errorMsg: {code: "EW107", text: "The specified Feedback Order is shared by the Data Elements with the following codes"}},
             //Error Equivalents for Data Elements
-            duplicatedFO: {enable: true, title: "Verifies unique Feedback orders in Data Elements", errorMsg: {code: "EW107", text: "The specified Data Element contains a duplicated Feedback Order."}}
+            duplicatedFO: {enable: true, title: "Verifies unique Feedback orders in Data Elements", errorMsg: {code: "EW107", text: "The specified Data Element contains a duplicated Feedback Order."}},
+            gapFO: {enable: true, title: "Verifies Feedback orders gaps in Data Elements", errorMsg: {code: "EW106", text: "The specified Data Element generates a gap in the Feedback Order sequence."}}
         }
     }
 
@@ -61,6 +62,32 @@ const ValidateMetadata = (props) => {
             return acu;
         }, []);
     };
+
+    const compareFeddbackAandB = (a, b)=>{
+        //Assumes A < B
+        let records = [0];
+        let pos = 0;
+        while(pos < b.length){
+            let x = a[pos] || 0;
+            let y = b[pos];
+    
+            let diff = parseInt(y)-parseInt(x);
+            records.push(diff);
+    
+            pos++;
+        }
+    
+        records.shift()
+    
+        for (let index = 0; index < records.length; index++) {
+            if(records[index]>1 || records[index-1]==1){
+                return {records, expectedIndex:index}
+            }
+            
+        }
+    
+        return false
+    }
 
     const getFeedbackData = (sections) => 
         sections.map(section =>{
@@ -240,7 +267,9 @@ const ValidateMetadata = (props) => {
             if (feedbackOrderValidationSettings.enable) {
                 
                 let feedbackData = getFeedbackData(sections)
-                let duplicatedFeedbacks = groupBy(checkDuplicatedFeedbacks(feedbackData),'feedbackOrder')                
+                console.log(feedbackData)
+                let duplicatedFeedbacks = groupBy(checkDuplicatedFeedbacks(feedbackData),'feedbackOrder')
+                console.log(duplicatedFeedbacks)            
 
                 if (feedbackOrderValidationSettings.checkDuplicated.enable){
                     duplicatedFeedbacks.forEach(df => {
@@ -248,9 +277,44 @@ const ValidateMetadata = (props) => {
                     })
                 }
 
-                //if (feedbackOrderValidationSettings.checkGaps.enable && !checkGaps(metaData, dataElement)) errors.push(feedbackOrderValidationSettings.checkHasFormName.errorMsg);
+                let index = 0
+
+                while(index < feedbackData.length-1){
+                    let current = {
+                        feedbackObject: feedbackData[index],
+                        val: feedbackData[index].feedbackOrder,
+                        levels: feedbackData[index].feedbackOrder.split('.')
+                    }
+                    let next = {
+                        feedbackObject: feedbackData[index+1],
+                        val: feedbackData[index+1].feedbackOrder,
+                        levels: feedbackData[index+1].feedbackOrder.split('.')
+                    }
                 
+                    let result = compareFeddbackAandB(current.levels, next.levels)
+                    //console.log(current.val+' vs '+next.val+(!result?'':' <<<<<< Feedback Order Gap Found'))
+                    if(result) {
+                        let errorIndex = result.expectedIndex
+                        let expected = []
                 
+                        for (let i = errorIndex+1; i >= 0; i--) {
+                            let guess = current.levels.slice(0,i+1);
+                            guess[i] = (guess[i]?parseInt(guess[i]):0) + 1
+                            if(!guess.includes(undefined)) expected.push(guess.join('.'))
+                        }
+
+                        let instance = {
+                            feedbackOrder: next.feedbackObject.feedbackOrder, 
+                            elements: [next.feedbackObject.code],
+                            expectedValues: expected
+                        }
+
+                        if (feedbackOrderValidationSettings.checkGaps.enable) feedbacksErrors.push({msg: feedbackOrderValidationSettings.checkGaps.errorMsg, instance, elementError: feedbackOrderValidationSettings.gapFO});
+                
+                    }
+                
+                    index++
+                }
 
                 
             }
