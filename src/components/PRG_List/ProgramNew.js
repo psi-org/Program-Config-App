@@ -24,6 +24,16 @@ const queryId = {
     }
 };
 
+const queryProgramType = {
+    results: {
+        resource: 'attributes',
+        params: {
+            fields: ['id'],
+            filter: ['code:eq:PROGRAM_TYPE']
+        }
+    }
+};
+
 const metadataMutation = {
     resource: 'metadata',
     type: 'create',
@@ -47,6 +57,9 @@ const ProgramNew = (props) =>
         called: metadataDM[1].called
     };
 
+    const prgTypeQuery = useDataQuery(queryProgramType);
+    const prgTypeId = prgTypeQuery.data?.results.attributes[0].id;
+
     const haQuery = useDataQuery(query);
     const haOptions = haQuery.data?.results.optionSets[0].options;
 
@@ -59,6 +72,13 @@ const ProgramNew = (props) =>
     var defaultSectionId = undefined;
     var stepsSectionId = undefined;
     var scoresSectionId = undefined;
+    let optns = [{value: "none", label: "Select Health Area"}];
+    if(haOptions)
+    {
+        optns = optns.concat(haOptions.map(op => {
+            return {label: op.name, value: op.code}
+        }));
+    }
     if (uidPool)
     {
         programId = uidPool.shift();
@@ -69,14 +89,6 @@ const ProgramNew = (props) =>
         scoresSectionId = uidPool.shift();
     }
 
-    let optns = [{value: "none", label: "Select Health Area"}];
-    if(haOptions)
-    {
-        optns = optns.concat(haOptions.map(op => {
-            return {label: op.name, value: op.code}
-        }));
-    }
-
     function hideForm()
     {
         props.setShowProgramForm(false);
@@ -84,11 +96,17 @@ const ProgramNew = (props) =>
 
     function submission(values)
     {
+        //let prgTypeId = 'yB5tFAAN7bI';
         if (!metadataRequest.called) {
             let prgrm = Program;
             prgrm.name = values.programName;
             prgrm.shortName = values.shortName;
             prgrm.id = programId;
+
+            prgrm.attributeValues.push({
+                "value": "HNQIS2",
+                "attribute": {"id": prgTypeId}
+            });
 
             createOrUpdateMetaData(prgrm.attributeValues, values);
             prgrm.programStages.push({id: assessmentId});
@@ -136,7 +154,7 @@ const ProgramNew = (props) =>
             metadataRequest.mutate({data: metadata}).then(response => {
                 if (response.status != 'OK')
                 {
-                    //console.log("Error encountered");
+                    //console.log(response);
                     return;
                 }
                 props.setShowProgramForm(false);
@@ -184,7 +202,7 @@ const ProgramNew = (props) =>
     }
 
     return <>
-            <Modal onClose={() => hideForm()} position="middle">
+            <Modal position="middle">
                 <ModalTitle>Create New Program</ModalTitle>
                 <ModalContent>
                     <Form onSubmit={submission}>

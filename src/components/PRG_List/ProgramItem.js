@@ -3,8 +3,12 @@ import { useDispatch } from "react-redux";
 import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
 
+//UI Elements
+import {FlyoutMenu, MenuItem, Popper, Layer, IconDownload24, IconDelete24, IconEdit24} from "@dhis2/ui";
+
 // *** Routing ***
 import { Link } from "react-router-dom";
+import { useRef, useState } from "react";
 
 // *** IMAGES ***
 import prg_svg from './../../images/i-program_black.svg';
@@ -15,7 +19,11 @@ import expand_left_svg from './../../images/i-expand-left_black.svg';
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
-const ProgramItem = ({program}) => {
+const ProgramItem = ({program, downloadMetadata, deleteProgram}) => {
+  const [ref, setRef] = useState(undefined);
+  const [open, setOpen] = useState(false)
+
+  const toggle = () => setOpen(!open)
 
   const dispatch = useDispatch();
   const { setProgram } = bindActionCreators(actionCreators, dispatch);
@@ -43,10 +51,22 @@ const ProgramItem = ({program}) => {
         */}
       </div>
       <div className="ml_item-cta">
+        <img src={move_vert_svg} id={'menu'+program.id} alt="menu" onClick={()=>{setRef(document.getElementById('menu'+program.id)); toggle()}} style={{cursor:'pointer'}}/>
+        {open &&
+          <Layer onClick={toggle}>
+            <Popper reference={ref} placement="bottom-end">
+                <FlyoutMenu>
+                  <MenuItem label="Edit Program" icon={<IconEdit24 />} onClick={()=>{toggle(); /* Add function */} }/>
+                  <MenuItem label="Export JSON Metadata" icon={<IconDownload24 />} onClick={()=>{toggle(); downloadMetadata(program.id)} }/>
+                  <MenuItem destructive label="Delete Program" icon={<IconDelete24/>} onClick={()=>{toggle(); deleteProgram(program.id)} }/>
+                </FlyoutMenu>
+              </Popper>
+          </Layer>
+        }
+
         <Link to={"/program/"+program.id}>
           <img className="bsct_cta" alt="exp" src={expand_left_svg} onClick={()=> setProgram(program.id)}/>
         </Link>
-        { /* Kebab menu icon : <img src={move_vert_svg} alt="menu"  />*/}
       </div>
     </div>
   );

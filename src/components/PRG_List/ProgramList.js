@@ -10,19 +10,51 @@ import upload_svg from './../../images/i-upload.svg';
 import ProgramItem from "./ProgramItem";
 import DataProcessor from "../Excel/DataProcessor";
 
-const query = {
+const queryProgramType = {
   results: {
-    resource: "programs",
-    paging: false,
-    params: ({ pageSize, page }) => ({
-      pageSize,
-      page,
-      filter: "attributeValues.attribute.id:eq:yB5tFAAN7bI",
-      filter: "attributeValues.value:eq:HNQIS2",
-      fields: ["id", "name", "displayName","programStages"],
-    }),
-  },
+      resource: 'attributes',
+      params: {
+          fields: ['id'],
+          filter: ['code:eq:PROGRAM_TYPE']
+      }
+  }
 };
+
+const query = (pgrTypeAttrId) => {
+  return {
+    results: {
+      resource: "programs",
+      paging: false,
+      params: ({ pageSize, page }) => ({
+        pageSize,
+        page,
+        filter: "attributeValues.attribute.id:eq:"+pgrTypeAttrId,
+        filter: "attributeValues.value:eq:HNQIS2",
+        fields: ["id", "name", "displayName","programStages"],
+      }),
+    },
+  }
+};
+
+const queryProgramData = (program) => {
+  return {
+    results: {
+        resource: 'programs',
+        params: {
+            fields: ['*'],
+            filter: ['id:eq:'+program]
+        }
+    }
+  }
+};
+
+const downloadMetadata = (program) => {
+
+}
+
+const deleteProgram = (program) => {
+
+}
 
 const ProgramList = () => {
   const [pageSize, setPageSize] = useState(10);
@@ -33,7 +65,10 @@ const ProgramList = () => {
 
   const [competencyClassParam,setCompetencyClassParam] = useState(false);
 
-  const { loading, error, data, refetch } = useDataQuery(query, { variables: { pageSize, page: currentPage } });
+  const prgTypeQuery = useDataQuery(queryProgramType);
+  const prgTypeId = prgTypeQuery.data?.results.attributes[0].id;
+
+  const { loading, error, data, refetch } = useDataQuery(query(prgTypeId), { variables: { pageSize, page: currentPage } });
 
   if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
   if (loading) return <CircularLoader />
@@ -63,7 +98,7 @@ const ProgramList = () => {
           <div className="list-ml_item">
             {
               data.results.programs.map((program) => {
-                return <ProgramItem program={program} key={program.id} />
+                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} deleteProgram={deleteProgram}/>
               })
             }
           </div>
