@@ -63,7 +63,8 @@ const Importer = (props) => {
                                                     let dataRow = {};
                                                     let rowVals = row.values;
                                                     validTemplateHeader.forEach((header, index) => {
-                                                        dataRow[header] = (isObject(rowVals[index+1]) && rowVals[index+1].hasOwnProperty('result')) ? rowVals[index+1].result : rowVals[index+1];
+                                                        /* dataRow[header] = (isObject(rowVals[index+1]) && rowVals[index+1].hasOwnProperty('result')) ? rowVals[index+1].result : rowVals[index+1]; */
+                                                        dataRow[header] = rowVals[index+1]
                                                     })
                                                     templateData.push(dataRow);
                                                 }

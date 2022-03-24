@@ -143,8 +143,9 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                 const formNameMaxLength = 230 - newCode.length - FIXED_VALUES;
 
                 let formName = DE_metadata.elemType=='label' ? DE_metadata.labelFormName : dataElement.formName;
-                
-                if (formName.slice(-4)==' [C]') formName = formName.substring(0,formName.length-4);
+
+                formName = formName.replaceAll(' [C]','');
+                //if (formName.slice(-4)==' [C]') formName = formName.substring(0,formName.length-4);
                 
                 if (DE_metadata.isCritical=='Yes') formName+=' [C]'
 

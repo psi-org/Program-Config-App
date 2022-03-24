@@ -85,7 +85,7 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         valueType: data[importMap.valueType],
         aggregationType: aggType,
         attributeValues: [],
-        parentName: data[importMap.parentName]
+        parentName: data[importMap.parentName]?.result
     };
 
     if(data[importMap.optionSet] && data[importMap.optionSet] != ""){

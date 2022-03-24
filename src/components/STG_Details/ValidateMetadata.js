@@ -277,45 +277,46 @@ const ValidateMetadata = (props) => {
                     })
                 }
 
-                let index = 0
+                if (feedbackOrderValidationSettings.checkGaps.enable){
+                    let index = 0
 
-                while(index < feedbackData.length-1){
-                    let current = {
-                        feedbackObject: feedbackData[index],
-                        val: feedbackData[index].feedbackOrder,
-                        levels: feedbackData[index].feedbackOrder.split('.')
-                    }
-                    let next = {
-                        feedbackObject: feedbackData[index+1],
-                        val: feedbackData[index+1].feedbackOrder,
-                        levels: feedbackData[index+1].feedbackOrder.split('.')
-                    }
-                
-                    let result = compareFeddbackAandB(current.levels, next.levels)
-                    //console.log(current.val+' vs '+next.val+(!result?'':' <<<<<< Feedback Order Gap Found'))
-                    if(result) {
-                        let errorIndex = result.expectedIndex
-                        let expected = []
-                
-                        for (let i = errorIndex+1; i >= 0; i--) {
-                            let guess = current.levels.slice(0,i+1);
-                            guess[i] = (guess[i]?parseInt(guess[i]):0) + 1
-                            if(!guess.includes(undefined)) expected.push(guess.join('.'))
+                    while(index < feedbackData.length-1){
+                        let current = {
+                            feedbackObject: feedbackData[index],
+                            val: feedbackData[index].feedbackOrder,
+                            levels: feedbackData[index].feedbackOrder.split('.')
                         }
-
-                        let instance = {
-                            feedbackOrder: next.feedbackObject.feedbackOrder, 
-                            elements: [next.feedbackObject.code],
-                            expectedValues: expected
+                        let next = {
+                            feedbackObject: feedbackData[index+1],
+                            val: feedbackData[index+1].feedbackOrder,
+                            levels: feedbackData[index+1].feedbackOrder.split('.')
                         }
+                    
+                        let result = compareFeddbackAandB(current.levels, next.levels)
+                        //console.log(current.val+' vs '+next.val+(!result?'':' <<<<<< Feedback Order Gap Found'))
+                        if(result) {
+                            let errorIndex = result.expectedIndex
+                            let expected = []
+                    
+                            for (let i = errorIndex+1; i >= 0; i--) {
+                                let guess = current.levels.slice(0,i+1);
+                                guess[i] = (guess[i]?parseInt(guess[i]):0) + 1
+                                if(!guess.includes(undefined)) expected.push(guess.join('.'))
+                            }
 
-                        if (feedbackOrderValidationSettings.checkGaps.enable) feedbacksErrors.push({msg: feedbackOrderValidationSettings.checkGaps.errorMsg, instance, elementError: feedbackOrderValidationSettings.gapFO});
-                
+                            let instance = {
+                                feedbackOrder: next.feedbackObject.feedbackOrder, 
+                                elements: [next.feedbackObject.code],
+                                expectedValues: expected
+                            }
+
+                            feedbacksErrors.push({msg: feedbackOrderValidationSettings.checkGaps.errorMsg, instance, elementError: feedbackOrderValidationSettings.gapFO});
+                    
+                        }
+                    
+                        index++
                     }
-                
-                    index++
                 }
-
                 
             }
             return {feedbacksErrors,feedbacksWarnings}

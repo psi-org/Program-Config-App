@@ -134,7 +134,8 @@ const DataProcessor = (props) => {
 
             programSection.dataElements.forEach((dataElement) => {
                 let row = {};
-                row.form_name = dataElement.formName;
+
+                row.form_name = dataElement.formName.replaceAll(' [C]','');
                 row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : '';
                 row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
                 row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
@@ -183,7 +184,7 @@ const DataProcessor = (props) => {
 
     return (
         <>
-            {isDownloaded && exportFlag && <Exporter programName={props.programName} flag={exportFlag} setFlag={setExportFlag} Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
+            {isDownloaded && exportFlag && <Exporter flag={exportFlag} setFlag={setExportFlag} Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
         </>
     );
 }
