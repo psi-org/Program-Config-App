@@ -6,12 +6,19 @@ import warning_svg from './../../images/i-warning.svg';
 import error_svg from './../../images/i-error.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import open_external_svg from './../../images/open_external.svg';
-import {colors,IconAdd16,IconDelete16,IconEdit16, Tag } from '@dhis2/ui';
+import {FlyoutMenu, MenuItem, Popper, Layer, colors,IconAdd16,IconDelete16,IconEdit16, Tag } from '@dhis2/ui';
 
 import BadgeWarnings from "./BadgeWarnings";
 import BadgeErrors from "./BadgeErrors";
 import ValidationMessages from "./ValidationMessages";
 import {useState} from "react";
+
+import move_vert_svg from './../../images/i-more_vert_black.svg';
+
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DownIcon from '@mui/icons-material/ArrowDownward';
+import UpIcon from '@mui/icons-material/ArrowUpward';
 
 const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     FEEDBACK_TEXT = "yhKEe6BLEer",
@@ -21,6 +28,11 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     SCORE_NUM = "Zyr7rlDOJy8";
 
 const DraggableDataElement = ({dataElement,index}) => {
+
+    const [ref, setRef] = useState(undefined);
+    const [openMenu, setOpenMenu] = useState(false)
+
+    const toggle = () => setOpenMenu(!openMenu)
 
     const [showValidationMessage, setShowValidationMessage] = useState(false);
 
@@ -67,7 +79,20 @@ const DraggableDataElement = ({dataElement,index}) => {
                         {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
                     </div>
                     <div className="ml_item-cta">
-                        <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>
+                    <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>
+                        {openMenu &&
+                            <Layer onClick={toggle}>
+                                <Popper reference={ref} placement="bottom-end">
+                                    <FlyoutMenu>
+                                        <MenuItem label="Edit This Data Element" icon={<EditIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                                        <MenuItem label="Add Data Element Above" icon={<UpIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                                        <MenuItem label="Add Data Element Below" icon={<DownIcon />} onClick={()=>{toggle(); } }/>
+                                        <MenuItem destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
+                                    </FlyoutMenu>
+                                </Popper>
+                            </Layer>
+                        }
+                        {/*<a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
                     </div>
                 </div>
                 {showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }

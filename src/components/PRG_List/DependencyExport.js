@@ -9,6 +9,16 @@ import { useState } from "react";
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
+const queryLegends = {
+  results: {
+    resource: 'legendSets',
+    paging: false,
+    params: {
+      fields: ['name', 'id', 'attributeValues', 'legends', 'translations']
+    }
+  }
+};
+
 const DependencyExport = ({ program, setExportProgramId }) => {
 
   const queryProgramMetadata = {
@@ -16,6 +26,9 @@ const DependencyExport = ({ program, setExportProgramId }) => {
       resource: 'programs/' + program + '/metadata.json?skipSharing=true'
     }
   };
+
+  const legendsQuery = useDataQuery(queryLegends);
+  const legends = legendsQuery.data?.results.legendSets;
 
   const prgExportQuery = useDataQuery(queryProgramMetadata);
   const programMetadata = prgExportQuery.data?.results;
@@ -150,6 +163,74 @@ const DependencyExport = ({ program, setExportProgramId }) => {
   const downloadFile = ()=> {
     //https://theroadtoenterprise.com/blog/how-to-download-csv-and-json-files-in-react
     let metadata = cleanMetadata;
+    
+    let legendSets = []
+
+    legends.forEach(legend => {
+      if(metadata.dataElements.find(de => de.legendSets?.find(l=>l.id==legend.id))){
+        legend.legends?.forEach(l=>{
+          delete l.created;
+          delete l.lastUpdated;
+          delete l.access;
+        })
+        legendSets.push(legend)
+      }
+    })
+
+    metadata.legendSets = legendSets
+
+    metadata.optionSets.push({
+      "name": "DB - Program Type",
+      "id": "TOcCuCN2CLm",
+      "version": 7,
+      "valueType": "TEXT",
+      "attributeValues": [],
+      "translations": [],
+      "options": [
+          {"id": "Ip3IqzzqgLN"},
+          {"id": "Jz4YKD15lnK"},
+          {"id": "QR0HHcQri91"},
+          {"id": "v9XPATv6G3N"}
+      ]
+    });
+
+    let prgTypeOptions = [
+      {
+        "code": "HNQIS",
+        "name": "HNQIS",
+        "id": "Ip3IqzzqgLN",
+        "sortOrder": 1,
+        "optionSet": {"id": "TOcCuCN2CLm"},
+        "translations": []
+      },
+      {
+          "code": "HNQIS2",
+          "name": "HNQIS 2.0",
+          "id": "Jz4YKD15lnK",
+          "sortOrder": 2,
+          "optionSet": {"id": "TOcCuCN2CLm"},
+          "translations": []
+      },
+      {
+          "code": "RDQA",
+          "name": "RDQA",
+          "id": "QR0HHcQri91",
+          "sortOrder": 3,
+          "optionSet": {"id": "TOcCuCN2CLm"},
+          "translations": []
+      },
+      {
+          "code": "EDS",
+          "name": "EDS",
+          "id": "v9XPATv6G3N",
+          "sortOrder": 4,
+          "optionSet": {"id": "TOcCuCN2CLm"},
+          "translations": []
+      }
+    ];
+
+    metadata.options = metadata.options.concat(prgTypeOptions);
+
     setDownloading(true);
 
     const blob = new Blob([JSON.stringify(metadata)], { type: 'text/json' });
@@ -179,7 +260,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
             <div><CircularLoader small /><p>Exporting metadata and creating file...</p></div>
           }
           
-          {documentReady && cleanMetadata &&
+          {documentReady && cleanMetadata && legends &&
             <div style={{lineHeight: '1.5em'}}>
               <p><strong>Your file is ready!</strong></p>
               <p>You can now download the metadata related to the program by clicking "Download Now".</p>

@@ -1,6 +1,6 @@
 {
   "name": "programconfigapp",
-  "short_name":"Program Config App",
+  "short_name": "Program Config App",
   "author": "Fernando Gomez - Mario Lopez - Utsav Koju",
   "version": "1.2.0",
   "description": "",
@@ -13,11 +13,16 @@
     "deploy": "d2-app-scripts deploy"
   },
   "devDependencies": {
-    "@dhis2/cli-app-scripts": "^8.3.2"
+    "@dhis2/cli-app-scripts": "^8.3.2",
+    "react-error-overlay": "6.0.9"
   },
   "dependencies": {
     "@dhis2/app-runtime": "^3.2.9",
     "@dhis2/ui": "^7.2.0",
+    "@emotion/react": "^11.8.2",
+    "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.5.1",
+    "@mui/material": "^5.5.2",
     "exceljs": "^4.2.1",
     "file-saver": "^2.0.5",
     "jquery": "^3.6.0",

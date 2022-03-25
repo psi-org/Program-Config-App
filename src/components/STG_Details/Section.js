@@ -19,12 +19,24 @@ import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 
-import {colors,IconAdd16,IconDelete16,IconEdit16, Tag, Tooltip } from '@dhis2/ui';
+import {FlyoutMenu, MenuItem, Popper, Layer, colors,IconAdd16,IconDelete16,IconEdit16, Tag, Tooltip } from '@dhis2/ui';
 import BadgeWarnings from "./BadgeWarnings";
 import BadgeErrors from "./BadgeErrors";
 import ValidationMessages from "./ValidationMessages";
 
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DownIcon from '@mui/icons-material/ArrowDownward';
+import UpIcon from '@mui/icons-material/ArrowUpward';
+
 const DraggableSection = ({ stageSection, index }) => {
+
+    //FLoating Menu
+    const [ref, setRef] = useState(undefined);
+    const [openMenu, setOpenMenu] = useState(false)
+
+    const toggle = () => setOpenMenu(!openMenu)
+
     const [showValidationMessage, setShowValidationMessage] = useState(false);
     useEffect(() => {
         $('img.bsct_cta').off().on("click", function (e) {
@@ -88,7 +100,19 @@ const DraggableSection = ({ stageSection, index }) => {
                             {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                         </div>
                         <div className="ml_item-cta">
-                            <img src={move_vert_svg} alt="menu" />
+                            <img src={move_vert_svg} alt="menu" id={'menu'+stageSection.id} onClick={()=>{setRef(document.getElementById('menu'+stageSection.id)); toggle()}} style={{cursor:'pointer'}}/>
+                            {openMenu &&
+                                <Layer onClick={toggle}>
+                                    <Popper reference={ref} placement="bottom-end">
+                                        <FlyoutMenu>
+                                            <MenuItem label="Edit This Section" icon={<EditIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                                            <MenuItem label="Create New Section Above" icon={<UpIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                                            <MenuItem label="Create New Section Below" icon={<DownIcon />} onClick={()=>{toggle(); } }/>
+                                            <MenuItem destructive label="Delete This Section" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
+                                        </FlyoutMenu>
+                                    </Popper>
+                                </Layer>
+                            }
                             <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                         </div>
                     </div>
