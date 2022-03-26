@@ -56,9 +56,9 @@ const ProgramItem = ({program, downloadMetadata, deleteProgram}) => {
           <Layer onClick={toggle}>
             <Popper reference={ref} placement="bottom-end">
                 <FlyoutMenu>
-                  <MenuItem label="Edit Program" icon={<IconEdit24 />} onClick={()=>{toggle(); /* Add function */} }/>
+                  <MenuItem disabled={true} label="Edit Program" icon={<IconEdit24 />} onClick={()=>{toggle(); /* Add function */} }/>
                   <MenuItem label="Export JSON Metadata" icon={<IconDownload24 />} onClick={()=>{toggle(); downloadMetadata(program.id)} }/>
-                  <MenuItem destructive label="Delete Program" icon={<IconDelete24/>} onClick={()=>{toggle(); deleteProgram(program.id)} }/>
+                  <MenuItem disabled={true} destructive label="Delete Program" icon={<IconDelete24/>} onClick={()=>{toggle(); deleteProgram(program.id)} }/>
                 </FlyoutMenu>
               </Popper>
           </Layer>

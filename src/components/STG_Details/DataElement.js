@@ -84,10 +84,10 @@ const DraggableDataElement = ({dataElement,index}) => {
                             <Layer onClick={toggle}>
                                 <Popper reference={ref} placement="bottom-end">
                                     <FlyoutMenu>
-                                        <MenuItem label="Edit This Data Element" icon={<EditIcon />} onClick={()=>{toggle(); /* Add function */} }/>
-                                        <MenuItem label="Add Data Element Above" icon={<UpIcon />} onClick={()=>{toggle(); /* Add function */} }/>
-                                        <MenuItem label="Add Data Element Below" icon={<DownIcon />} onClick={()=>{toggle(); } }/>
-                                        <MenuItem destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
+                                        <MenuItem disabled={true} label="Edit This Data Element" icon={<EditIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                                        <MenuItem disabled={true} label="Add Data Element Above" icon={<UpIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                                        <MenuItem disabled={true} label="Add Data Element Below" icon={<DownIcon />} onClick={()=>{toggle(); } }/>
+                                        <MenuItem disabled={true} destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
                                     </FlyoutMenu>
                                 </Popper>
                             </Layer>

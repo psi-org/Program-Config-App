@@ -4,7 +4,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 
-export default RowRadioButtonsGroup = ({label,items,handler}) => (
+const RowRadioButtonsGroup = ({label,items,handler,value=''}) => (
     <FormControl>
         <FormLabel id={'label-'+label.replace(' ','')}>{label}</FormLabel>
         <RadioGroup
@@ -12,8 +12,11 @@ export default RowRadioButtonsGroup = ({label,items,handler}) => (
             aria-labelledby={'label-'+label.replace(' ','')}
             name={label.replace(' ','')}
             onChange={handler}
+            value={value}
         >
-            {items.map(item => <FormControlLabel value={item.value} control={<Radio />} label={item.label} /> )}
+            {items.map((item,key) => <FormControlLabel key={key} value={item.value} control={<Radio />} label={item.label} /> )}
         </RadioGroup>
     </FormControl>
 )
+
+export default RowRadioButtonsGroup

@@ -105,10 +105,10 @@ const DraggableSection = ({ stageSection, index }) => {
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
                                         <FlyoutMenu>
-                                            <MenuItem label="Edit This Section" icon={<EditIcon />} onClick={()=>{toggle(); /* Add function */} }/>
-                                            <MenuItem label="Create New Section Above" icon={<UpIcon />} onClick={()=>{toggle(); /* Add function */} }/>
-                                            <MenuItem label="Create New Section Below" icon={<DownIcon />} onClick={()=>{toggle(); } }/>
-                                            <MenuItem destructive label="Delete This Section" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
+                                            <MenuItem disabled={true} label="Edit This Section" icon={<EditIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                                            <MenuItem disabled={true} label="Create New Section Above" icon={<UpIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                                            <MenuItem disabled={true} label="Create New Section Below" icon={<DownIcon />} onClick={()=>{toggle(); } }/>
+                                            <MenuItem disabled={true} destructive label="Delete This Section" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
                                         </FlyoutMenu>
                                     </Popper>
                                 </Layer>

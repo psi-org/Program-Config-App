@@ -404,7 +404,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
-                        { programStageDataElements &&  <DataElementForm de={programStageDataElements[0].dataElement} /> }
+                        { programStageDataElements &&  <DataElementForm de={programStageDataElements[5].dataElement} /> }
                         {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
                             <Removed importResults={importResults} index={0} key={"removedSec"} />
