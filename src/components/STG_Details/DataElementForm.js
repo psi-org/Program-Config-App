@@ -1,6 +1,6 @@
 //MATERIAL UI
 import { useDataQuery } from '@dhis2/app-runtime';
-import {TextField,Select,MenuItem,FormControl,InputLabel, FormControlLabel, Switch, Autocomplete} from '@mui/material';
+import {TextField,Select,MenuItem,FormControl,InputLabel, FormControlLabel, Switch, Autocomplete, Grid} from '@mui/material';
 import { useEffect,useState } from "react"
 import RowRadioButtonsGroup from './RowRadioButtonsGroup';
 
@@ -74,7 +74,10 @@ const DataElementForm = ({de}) => {
     // Handlers
     const elemTypeChange = (e) => {
         setStructure(e.target.value)
-        if(e.target.value === 'label') setValueType('LONG_TEXT')
+        if(e.target.value === 'label'){
+            setValueType('LONG_TEXT')
+            setOptionSet(null)
+        }
     }
 
     const valueTypeChange = (data) => setValueType(data.target.value)   // VALIDATIONS NEEDED (OPTION SET, ...)
@@ -108,25 +111,38 @@ const DataElementForm = ({de}) => {
             <h2 style={{marginLeft: '10px'}}>Data Element Configuration</h2>
         </div>
 
-        <RowRadioButtonsGroup label={"Structure"} items={elemTypes} handler={elemTypeChange} value={structure} />
+        <h3>Content Settings</h3>
 
-        <SelectOptions label="Value Type" items={valueTypes} value={optionSet?.valueType || valueType} disabled={structure==='label' || optionSet!=null} handler={valueTypeChange} />
+        <Grid container spacing={2} style={{alignItems:'center'}}>
+            <Grid item xs={5} style={{alignItems:'end'}} direction='column'>
+                <Grid item>
+                    <RowRadioButtonsGroup label={"Element Type"} items={elemTypes} handler={elemTypeChange} value={structure} />
+                </Grid>
+                <Grid item>
+                    <FormControlLabel control={<Switch checked={compulsory} onChange={compulsoryChange} />} label="Compulsory" />
+                    <FormControlLabel control={<Switch /* checked={compulsory} onChange={compulsoryChange} */ />} label="Display in Reports" />
+                </Grid>
+            </Grid>
+            <Grid item xs={5} style={{display: 'flex'}}>
+                <SelectOptions label="Value Type" styles={{ width: '40%' }} items={valueTypes} value={optionSet?.valueType || valueType} disabled={structure==='label' || optionSet!=null} handler={valueTypeChange} />
+                <p style={{display: 'flex', alignItems: 'center', margin: 'auto 20px'}}>or</p>
+                <Autocomplete
+                    autoComplete
+                    id="optionSetsSelect"
+                    disabled={structure==='label'}
+                    options={serverOptionSets?.results.optionSets.map(os => ({label:os.name, id:os.id, valueType: os.valueType}) ) || []}
+                    sx={{ width: '40%' }}
+                    renderInput={(params) => <TextField {...params} label="Option Set" />}
+                    value={optionSet}
+                    onChange={optionSetChange}
+                    getOptionLabel={(option)=>option.label}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                />
+            </Grid>
+        </Grid>
         
         <TextField id="formName" fullWidth margin="dense" label="Form Name" variant="standard" value={formName} onChange={formNameChange} />
-
-        <FormControlLabel control={<Switch checked={compulsory} onChange={compulsoryChange} />} label="Compulsory" />
-
-        <Autocomplete
-            autoComplete
-            id="optionSetsSelect"
-            options={serverOptionSets?.results.optionSets.map(os => ({label:os.name, id:os.id, valueType: os.valueType}) ) || []}
-            sx={{ width: 300 }}
-            renderInput={(params) => <TextField {...params} label="Option Set" />}
-            value={optionSet}
-            onChange={optionSetChange}
-            getOptionLabel={(option)=>option.label}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-        />
+        <TextField id="description" fullWidth margin="dense" label="Description" variant="standard" value={description} onChange={descriptionChange} />
 
         <Autocomplete
             autoComplete
@@ -140,15 +156,19 @@ const DataElementForm = ({de}) => {
             isOptionEqualToValue={(option, value) => option.id === value.id}
         />
 
-        <TextField id="description" fullWidth margin="dense" label="Description" variant="standard" value={description} onChange={descriptionChange} />
+        <div>
+            <h3>Scoring Settings</h3>
+            <div>
+                
+            </div>
+            <div style={{display: 'flex', alignItems: 'end'}}>
+                <FormControlLabel control={<Switch checked={critical} onChange={criticalChange} />} label="Critical Question" />
+                <TextField id="numerator" sx={{ width: '15%', marginRight: '1em'}} margin="dense" label="Numerator" variant='standard' value={numerator} onChange={numeratorChange} inputProps={{ type: 'number', min:'0' }} />
+                <TextField id="denominator" sx={{ width: '15%', marginRight: '1em' }} margin="dense" label="Denominator" variant='standard' value={denominator} onChange={denominatorChange} inputProps={{ type: 'number', min:'0' }} />
+                <TextField id="feedbackOrder" sx={{ width: '20%' }} margin="dense" label="Feedback Order (Compositive Indicator)" variant="standard" value={feedbackOrder} onChange={feedbackOrderChange} />
 
-        <FormControlLabel control={<Switch checked={critical} onChange={criticalChange} />} label="Critical Question" />      
-
-        <TextField id="numerator" sx={{ width: 300 }} margin="dense" label="Numerator" variant='standard' value={numerator} onChange={numeratorChange} inputProps={{ type: 'number', min:'0' }} />
-
-        <TextField id="denominator" sx={{ width: 300 }} margin="dense" label="Denominator" variant='standard' value={denominator} onChange={denominatorChange} inputProps={{ type: 'number', min:'0' }} />
-
-        <TextField id="feedbackOrder" sx={{ width: 300 }} margin="dense" label="Feedback Order (Compositive Indicator)" variant="standard" value={feedbackOrder} onChange={feedbackOrderChange} />
+            </div>
+        </div>
 
     </div>
     )
