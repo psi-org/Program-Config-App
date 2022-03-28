@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import ProgramNew from './ProgramNew'
 import download_svg from './../../images/i-download.svg';
 import upload_svg from './../../images/i-upload.svg';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 // ------------------
 import ProgramItem from "./ProgramItem";
@@ -97,7 +98,7 @@ const ProgramList = () => {
         <div className="cnt_p"><Chip>Home</Chip></div>
         <div className="c_srch"></div>
         <div className="c_btns">
-          <Button onClick={()=>setShowProgramForm(true)} disabled={showProgramForm}><IconAddCircle24></IconAddCircle24>   Add Program</Button>
+          <Button icon={<AddCircleOutlineIcon/>} onClick={()=>setShowProgramForm(true)} disabled={showProgramForm}>Add Program</Button>
           {exportProgramId &&
             <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId}/>
           }

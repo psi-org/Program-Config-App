@@ -1,6 +1,6 @@
 //MATERIAL UI
 import { useDataQuery } from '@dhis2/app-runtime';
-import {TextField,Select,MenuItem,FormControl,InputLabel, FormControlLabel, Switch, Autocomplete, Grid} from '@mui/material';
+import {TextField,Select,MenuItem,FormControl,InputLabel, FormControlLabel, Switch, Autocomplete, Grid, FormLabel, Button} from '@mui/material';
 import { useEffect,useState } from "react"
 import RowRadioButtonsGroup from './RowRadioButtonsGroup';
 
@@ -11,7 +11,11 @@ import DateIcon from '@mui/icons-material/CalendarToday';
 import TimeIcon from '@mui/icons-material/AccessTime';
 import FilterNoneIcon from '@mui/icons-material/FilterNone';
 
+import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
+import ColorLensIcon from '@mui/icons-material/ColorLens';
+
 import SelectOptions from './SelectOptions';
+import MarkDownEditor from './MarkDownEditor';
 
 
 const optionSetQuery = {
@@ -70,6 +74,7 @@ const DataElementForm = ({de}) => {
     const [numerator,setNumerator] = useState(metadata.scoreNum || '')
     const [denominator,setDenominator] = useState(metadata.scoreDen || '')
     const [feedbackOrder,setFeedbackOrder] = useState(metadata.feedbackOrder || '')
+    const [feedbackText, setFeedbackText] = React.useState(metadata.feedbackText || '');
 
     // Handlers
     const elemTypeChange = (e) => {
@@ -111,63 +116,77 @@ const DataElementForm = ({de}) => {
             <h2 style={{marginLeft: '10px'}}>Data Element Configuration</h2>
         </div>
 
-        <h3>Content Settings</h3>
+        <h3 style={{marginBottom: '0.5em'}}>DHIS2 Settings</h3>
 
         <Grid container spacing={2} style={{alignItems:'center'}}>
             <Grid item xs={5} style={{alignItems:'end'}} direction='column'>
                 <Grid item>
                     <RowRadioButtonsGroup label={"Element Type"} items={elemTypes} handler={elemTypeChange} value={structure} />
                 </Grid>
+                <FormLabel component="legend">Behavior in Current Stage</FormLabel>
                 <Grid item>
-                    <FormControlLabel control={<Switch checked={compulsory} onChange={compulsoryChange} />} label="Compulsory" />
-                    <FormControlLabel control={<Switch /* checked={compulsory} onChange={compulsoryChange} */ />} label="Display in Reports" />
+                    <FormControlLabel disabled={structure==='label'} control={<Switch checked={compulsory && structure!=='label'} onChange={compulsoryChange} />} label="Compulsory" />
+                    <FormControlLabel disabled={structure==='label'} control={<Switch /* checked={compulsory && structure!=='label'} onChange={compulsoryChange} */ />} label="Display in Reports" />
                 </Grid>
             </Grid>
-            <Grid item xs={5} style={{display: 'flex'}}>
-                <SelectOptions label="Value Type" styles={{ width: '40%' }} items={valueTypes} value={optionSet?.valueType || valueType} disabled={structure==='label' || optionSet!=null} handler={valueTypeChange} />
-                <p style={{display: 'flex', alignItems: 'center', margin: 'auto 20px'}}>or</p>
-                <Autocomplete
-                    autoComplete
-                    id="optionSetsSelect"
-                    disabled={structure==='label'}
-                    options={serverOptionSets?.results.optionSets.map(os => ({label:os.name, id:os.id, valueType: os.valueType}) ) || []}
-                    sx={{ width: '40%' }}
-                    renderInput={(params) => <TextField {...params} label="Option Set" />}
-                    value={optionSet}
-                    onChange={optionSetChange}
-                    getOptionLabel={(option)=>option.label}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                />
+            <Grid item xs={5} style={{display: 'flex', flexDirection: 'column'}}>
+                <FormLabel component="legend">Data Element Value Type</FormLabel>
+                <div style={{display: 'flex', width: '100%', marginTop: '0.5em'}}>
+                    <SelectOptions label="Value Type" styles={{ width: '40%' }} items={valueTypes} value={optionSet?.valueType || valueType} disabled={structure==='label' || optionSet!=null} handler={valueTypeChange} />
+                    <p style={{display: 'flex', alignItems: 'center', margin: 'auto 20px'}}>or</p>
+                    <Autocomplete
+                        autoComplete
+                        id="optionSetsSelect"
+                        disabled={structure==='label'}
+                        options={serverOptionSets?.results.optionSets.map(os => ({label:os.name, id:os.id, valueType: os.valueType}) ) || []}
+                        sx={{ width: '40%' }}
+                        renderInput={(params) => <TextField {...params} label="Option Set" />}
+                        value={optionSet}
+                        onChange={optionSetChange}
+                        getOptionLabel={(option)=>option.label}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                    />
+                </div>
             </Grid>
         </Grid>
-        
+
+        <FormLabel component="legend">Data Element Appearance</FormLabel>
         <TextField id="formName" fullWidth margin="dense" label="Form Name" variant="standard" value={formName} onChange={formNameChange} />
         <TextField id="description" fullWidth margin="dense" label="Description" variant="standard" value={description} onChange={descriptionChange} />
 
-        <Autocomplete
-            autoComplete
-            id="legendSetSelect"
-            options={serverLegendSets?.results.legendSets.map(ls => ({label:ls.name, id:ls.id}) ) || []}
-            sx={{ width: 300 }}
-            renderInput={(params) => <TextField {...params} label="Legend Set" />}
-            value={legendSet}
-            onChange={legendSetChange}
-            getOptionLabel={(option)=>option.label}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-        />
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '1em 0'}}>
+            <Autocomplete
+                autoComplete
+                id="legendSetSelect"
+                disabled={structure==='label'}
+                sx={{width: '35%'}}
+                options={serverLegendSets?.results.legendSets.map(ls => ({label:ls.name, id:ls.id}) ) || []}
+                renderInput={(params) => <TextField {...params} label="Legend Set" />}
+                value={legendSet}
+                onChange={legendSetChange}
+                getOptionLabel={(option)=>option.label}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+            />
+            <div>
+                <Button variant="outlined" size="large" startIcon={<InsertEmoticonIcon/>} style={{marginRight: '1em'}} >ADD ICON</Button>
+                <Button variant="outlined" size="large" startIcon={<ColorLensIcon/>} >SELECT COLOR</Button>
+            </div>
+        </div>
 
         <div>
-            <h3>Scoring Settings</h3>
-            <div>
-                
-            </div>
-            <div style={{display: 'flex', alignItems: 'end'}}>
-                <FormControlLabel control={<Switch checked={critical} onChange={criticalChange} />} label="Critical Question" />
-                <TextField id="numerator" sx={{ width: '15%', marginRight: '1em'}} margin="dense" label="Numerator" variant='standard' value={numerator} onChange={numeratorChange} inputProps={{ type: 'number', min:'0' }} />
-                <TextField id="denominator" sx={{ width: '15%', marginRight: '1em' }} margin="dense" label="Denominator" variant='standard' value={denominator} onChange={denominatorChange} inputProps={{ type: 'number', min:'0' }} />
-                <TextField id="feedbackOrder" sx={{ width: '20%' }} margin="dense" label="Feedback Order (Compositive Indicator)" variant="standard" value={feedbackOrder} onChange={feedbackOrderChange} />
+            <h3 style={{marginBottom: '0.5em'}}>HNQIS Settings</h3>
 
+            
+            <div style={{display: 'flex', alignItems: 'center'}}>
+                <FormControlLabel disabled={structure==='label'} control={<Switch checked={critical && structure!=='label'} onChange={criticalChange} />} label="Critical Question" />
+                <TextField disabled={structure==='label'} id="numerator" sx={{ minWidth: '2.5rem', width: '20%', marginRight: '1em'}} margin="dense" label="Numerator" variant='standard' value={structure!=='label'?numerator:''} onChange={numeratorChange} inputProps={{ type: 'number', min:'0' }} />
+                <TextField disabled={structure==='label'} id="denominator" sx={{ minWidth: '2.5rem', width: '20%', marginRight: '1em' }} margin="dense" label="Denominator" variant='standard' value={structure!=='label'?denominator:''} onChange={denominatorChange} inputProps={{ type: 'number', min:'0' }} />
+                <TextField id="feedbackOrder" sx={{ minWidth: '10rem', width: '20%' }} margin="dense" label="Feedback Order (Compositive Indicator)" variant="standard" value={feedbackOrder} onChange={feedbackOrderChange} />
             </div>
+
+            <FormLabel component="legend">Feedback Text</FormLabel>
+            <MarkDownEditor value={feedbackText} setValue={setFeedbackText} disabled={structure==='label'}/>
+            
         </div>
 
     </div>

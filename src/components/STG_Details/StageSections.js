@@ -26,6 +26,12 @@ import Errors from "./Errors";
 import ErrorReports from "./ErrorReports";
 import DataElementForm from "./DataElementForm";
 
+import CachedIcon from '@mui/icons-material/Cached';
+import PublishIcon from '@mui/icons-material/Publish';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ConstructionIcon from '@mui/icons-material/Construction';
+
 
 const createMutation = {
     resource: 'metadata',
@@ -301,13 +307,13 @@ const StageSections = ({ programStage, stageRefetch }) => {
                 <div className="c_srch"></div>
                 <div className="c_btns">
                 <ButtonStrip>
-                    <Button disabled={createMetadata.loading} onClick={() => commit()}>{saveStatus}</Button>
-                    <Button disabled={!savedAndValidated} primary onClick={() => run()}>Set up program</Button>
-                    <Button name="generator"
-                        loading={exportToExcel ? true : false} onClick={() => configuration_download(event)} disabled={exportToExcel}><img src={download_svg} /> {exportStatus}</Button>
-                    <Button name="importer"
-                        onClick={() => setImporterEnabled(true)}><img src={upload_svg} /> Import Template</Button>
-                    <Button name="Reload" icon={<IconSync24/>} onClick={()=> {window.location.reload()}}>Reload</Button>
+                    <Button icon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
+                    <Button icon={<ConstructionIcon/>} disabled={!savedAndValidated} primary onClick={() => run()}>Set up program</Button>
+                    <Button icon={<FileDownloadIcon/>} name="generator"
+                        loading={exportToExcel ? true : false} onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
+                    <Button icon={<PublishIcon/>} name="importer"
+                        onClick={() => setImporterEnabled(true)}>Import Template</Button>
+                    <Button name="Reload" icon={<CachedIcon/>} onClick={()=> {window.location.reload()}}>Reload</Button>
                 </ButtonStrip>
                 </div>
             </div>
