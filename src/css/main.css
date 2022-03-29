@@ -9,6 +9,13 @@
 .progressItem > p {
   margin-left: 0.5rem;
 }
+
+.dataElement_cont {
+  background-color: #b2dfdb;
+  padding: 8px 16px;
+  margin: 0px 8px;
+  border-radius: 0 0 4px 4px;
+}
 /* **************** */
 
 ::-webkit-scrollbar {

@@ -29,7 +29,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
 
-const DraggableSection = ({ stageSection, index }) => {
+const DraggableSection = ({ stageSection, stageDataElements, deToEdit, setDeToEdit, index }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -84,7 +84,7 @@ const DraggableSection = ({ stageSection, index }) => {
     var classNames = (stageSection.importStatus) ? ' import_' + stageSection.importStatus : '';
 
     return (
-        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined}>
+        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined || deToEdit!==''}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                     <div className={"ml_item" + classNames} style={{color:"#333333" , backgroundColor: "#b2dfdb", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
@@ -121,7 +121,7 @@ const DraggableSection = ({ stageSection, index }) => {
                             <div {...provided.droppableProps} ref={provided.innerRef} className={"section_cont "} >
                                 {
                                     stageSection.dataElements.map((de, i) => {
-                                        return <DraggableDataElement dataElement={de} index={i} key={de.id || i} />;
+                                        return <DraggableDataElement dataElement={de} stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)} deToEdit={deToEdit} setDeToEdit={setDeToEdit} index={i} key={de.id || i} />;
                                     })
                                 }
                                 {provided.placeholder}

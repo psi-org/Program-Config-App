@@ -16,6 +16,8 @@ import ColorLensIcon from '@mui/icons-material/ColorLens';
 
 import SelectOptions from './SelectOptions';
 import MarkDownEditor from './MarkDownEditor';
+import InfoBox from './../UIElements/InfoBox';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 const optionSetQuery = {
@@ -38,9 +40,12 @@ const legendSetsQuery = {
     }
 }
 
-const DataElementForm = ({de}) => {
+const DataElementForm = ({programStageDataElement,closeAction}) => {
 
-    console.log(de)
+    //console.log(programStageDataElement)
+
+    const de = programStageDataElement.dataElement
+    //console.log(de)
 
     // Data Query
     const { data: serverOptionSets} = useDataQuery(optionSetQuery);
@@ -64,8 +69,9 @@ const DataElementForm = ({de}) => {
     // States
     const [structure,setStructure] = useState(metadata.elemType)
     const [valueType,setValueType] = useState(de.valueType)
-    const [formName,setFormName] = useState(metadata.elemType === 'label' ? metadata.labelFormName : de.formName)
+    const [formName,setFormName] = useState((metadata.elemType === 'label' ? metadata.labelFormName : de.formName).replace(' [C]',''))
     const [compulsory,setCompulsory] = useState(metadata.isCompulsory==='Yes')  // metadata.isCompulsory : ['Yes','No']
+    const [displayInReports,setDisplayInReports] = useState(programStageDataElement.displayInReports || false)
     const [optionSet,setOptionSet] = useState(de.optionSet ? {label:de.optionSet.name, id:de.optionSet.id } : null)
     const [legendSet,setLegendSet] = useState(de.legendSet ? {label:de.legendSet.name, id:de.legendSet.id } : null)
     const [description,setDescription] = useState(de.description || '')
@@ -85,11 +91,15 @@ const DataElementForm = ({de}) => {
         }
     }
 
+    const closeEditForm = () => closeAction
+
     const valueTypeChange = (data) => setValueType(data.target.value)   // VALIDATIONS NEEDED (OPTION SET, ...)
 
     const formNameChange = (data) => setFormName(data.target.value)
 
     const compulsoryChange = (data) => setCompulsory(data.target.checked)
+
+    const displayInReportsChange = (data) => setDisplayInReports(data.target.checked)
 
     const optionSetChange = (event, value) => setOptionSet(value)
 
@@ -111,35 +121,76 @@ const DataElementForm = ({de}) => {
     return (
     <div className="section_cont" style={{display:'flex', flexDirection:'column', padding: '1.5em 1em'}}>
 
-        <div style={{display:'flex', flexDirection:'row', alignItems: 'center', marginBottom: '1em'}}>
-            <FilterNoneIcon/>
-            <h2 style={{marginLeft: '10px'}}>Data Element Configuration</h2>
+        <div style={{display:'flex', justifyContent: 'space-between', marginBottom: '1em', width: '100%'}}>           
+            <h2 style={{display:'flex', alignItems: 'center'}}><FilterNoneIcon style={{marginRight: '10px'}}/>Data Element Configuration</h2>
+            <div onClick={() => closeEditForm()} style={{cursor: 'pointer'}}>
+                <CloseIcon/>
+            </div>
         </div>
 
         <h3 style={{marginBottom: '0.5em'}}>DHIS2 Settings</h3>
 
         <Grid container spacing={2} style={{alignItems:'center'}}>
-            <Grid item xs={5} style={{alignItems:'end'}} direction='column'>
-                <Grid item>
+            <Grid item xs={7} style={{alignItems:'end'}} >
+                <Grid style={{display: 'flex'}} item>
                     <RowRadioButtonsGroup label={"Element Type"} items={elemTypes} handler={elemTypeChange} value={structure} />
+                    <InfoBox
+                        title='About Element Types' 
+                        message={
+                            <p>
+                                <strong>Question:</strong> Defines a question Data Element that can be answered in some way (text field, numeric field, option set, etc.).<br/><br/>
+                                <strong>Label:</strong> Defines a label Data Element, usually these are used to display instructions or help text. Choosing label will
+                                automatically select "Long Text" as Value Type and disable several fields in the configuration form.
+                            </p>
+                        }
+                        alignment='start'
+                    />
                 </Grid>
                 <FormLabel component="legend">Behavior in Current Stage</FormLabel>
-                <Grid item>
+                <Grid item style={{display: 'flex'}}>
                     <FormControlLabel disabled={structure==='label'} control={<Switch checked={compulsory && structure!=='label'} onChange={compulsoryChange} />} label="Compulsory" />
-                    <FormControlLabel disabled={structure==='label'} control={<Switch /* checked={compulsory && structure!=='label'} onChange={compulsoryChange} */ />} label="Display in Reports" />
+                    <InfoBox
+                        title='About Compulsory Data Elements' 
+                        message={
+                            <p>
+                                The value of this data element must be filled into data entry form before you can complete the event.
+                            </p>
+                        }
+                    />
+                    <FormControlLabel disabled={structure==='label'} control={<Switch checked={displayInReports} onChange={displayInReportsChange} />} label="Display in Reports" />
+                    <InfoBox
+                        title='About Data Elements That Display In Reports' 
+                        message={
+                            <p>
+                                Displays the value of this data element into the single event without registration data entry function.
+                            </p>
+                        }
+                    />
                 </Grid>
             </Grid>
-            <Grid item xs={5} style={{display: 'flex', flexDirection: 'column'}}>
-                <FormLabel component="legend">Data Element Value Type</FormLabel>
-                <div style={{display: 'flex', width: '100%', marginTop: '0.5em'}}>
-                    <SelectOptions label="Value Type" styles={{ width: '40%' }} items={valueTypes} value={optionSet?.valueType || valueType} disabled={structure==='label' || optionSet!=null} handler={valueTypeChange} />
-                    <p style={{display: 'flex', alignItems: 'center', margin: 'auto 20px'}}>or</p>
+            <Grid item xs={5} style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
+                <div style={{display: 'flex'}}>
+                    <FormLabel component="legend" style={{marginRight: '0.5em'}}>Data Element Value Type</FormLabel>
+                    <InfoBox
+                        title='About Value Type and Option Sets' 
+                        message={
+                            <p>
+                                The Value Type will define the type of data that the data element will record.
+                                <br/>If an Option Set is selected,
+                                the Value Type will be assigned automatically to match the Option Set.
+                            </p>
+                        }
+                    />
+                </div>
+                <div style={{display: 'flex', width: '100%', marginTop: '0.5em', justifyContent: 'end'}}>
+                    <SelectOptions label="Value Type" styles={{ width: '45%' }} items={valueTypes} value={optionSet?.valueType || valueType} disabled={structure==='label' || optionSet!=null} handler={valueTypeChange} />
+                    <p style={{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '10%'}}>or</p>
                     <Autocomplete
                         autoComplete
                         id="optionSetsSelect"
                         disabled={structure==='label'}
                         options={serverOptionSets?.results.optionSets.map(os => ({label:os.name, id:os.id, valueType: os.valueType}) ) || []}
-                        sx={{ width: '40%' }}
+                        sx={{ width: '45%' }}
                         renderInput={(params) => <TextField {...params} label="Option Set" />}
                         value={optionSet}
                         onChange={optionSetChange}
@@ -185,7 +236,9 @@ const DataElementForm = ({de}) => {
             </div>
 
             <FormLabel component="legend">Feedback Text</FormLabel>
-            <MarkDownEditor value={feedbackText} setValue={setFeedbackText} disabled={structure==='label'}/>
+            <div data-color-mode="light" style={structure==='label'?{opacity:'0.5'}:undefined}>
+                <MarkDownEditor value={feedbackText} setValue={setFeedbackText} disabled={structure==='label'}/>
+            </div>
             
         </div>
 

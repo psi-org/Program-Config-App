@@ -12,6 +12,7 @@ import { bold, italic, divider, unorderedListCommand, orderedListCommand, checke
 
 const MarkDownEditor = (props) => {
     return <MDEditor
+        fullscreen={false}
         value={!props.disabled?props.value:''}
         onChange={(val) => {
             if (!props.disabled) props.setValue(val);

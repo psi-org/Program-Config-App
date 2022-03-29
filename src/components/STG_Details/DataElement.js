@@ -1,4 +1,10 @@
+import {useEffect} from "react";
+import $ from 'jquery';
+
 import { Draggable } from "react-beautiful-dnd";
+
+import DataElementForm from "./DataElementForm";
+import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 
 // *** IMAGES ***
 import de_svg from './../../images/i-drag_black.svg';
@@ -27,11 +33,40 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     SCORE_DEN = "l7WdLDhE3xW",
     SCORE_NUM = "Zyr7rlDOJy8";
 
-const DraggableDataElement = ({dataElement,index}) => {
+const DraggableDataElement = ({dataElement, stageDE, deToEdit,setDeToEdit, index}) => {
+
+    /* useEffect(() => {
+        $('img.bsct_cta').off().on("click", function (e) {
+            if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
+                $(this).attr('src', contracted_bottom_svg);
+                $(this).parent().parent().css({
+                    'margin': '8px 8px 0px 8px',
+                    'border-radius': '4px 4px 0 0'
+                });
+                $(this).parent().parent().next().css({
+                    'display': 'block'
+                });
+            } else {
+                $(this).attr('src', expanded_bottom_svg);
+                $(this).parent().parent().css({
+                    'margin': '0x',
+                    'border-radius': '4px'
+                });
+                $(this).parent().parent().next().css({
+                    'display': 'none'
+                });
+            }
+        });
+        $('li').on("click", function (e) {
+            console.log(e)
+        })
+    }, []); */
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
+    const [confirmationStatus,setConfirmationStatus] = useState(false)
 
+    const enableConfirmationStatus = () => setConfirmationStatus(true)
     const toggle = () => setOpenMenu(!openMenu)
 
     const [showValidationMessage, setShowValidationMessage] = useState(false);
@@ -64,7 +99,7 @@ const DraggableDataElement = ({dataElement,index}) => {
     }
 
     return (
-    <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined}>
+    <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined || deToEdit!==''}>
         {(provided, snapshot) => (
             <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                 <div id={"de_"+dataElement.id} className={classNames} style={{color:"#333333" , backgroundColor: "#e0f2f1", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
@@ -84,7 +119,7 @@ const DraggableDataElement = ({dataElement,index}) => {
                             <Layer onClick={toggle}>
                                 <Popper reference={ref} placement="bottom-end">
                                     <FlyoutMenu>
-                                        <MenuItem disabled={true} label="Edit This Data Element" icon={<EditIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                                        <MenuItem disabled={false} label="Edit This Data Element" dataTest={"EDIT"} icon={<EditIcon />} onClick={()=>{ toggle(); setDeToEdit(dataElement.id) /* Add function */} }/>
                                         <MenuItem disabled={true} label="Add Data Element Above" icon={<UpIcon />} onClick={()=>{toggle(); /* Add function */} }/>
                                         <MenuItem disabled={true} label="Add Data Element Below" icon={<DownIcon />} onClick={()=>{toggle(); } }/>
                                         <MenuItem disabled={true} destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
@@ -92,10 +127,18 @@ const DraggableDataElement = ({dataElement,index}) => {
                                 </Popper>
                             </Layer>
                         }
+                        <AlertDialogSlide 
+                            open={confirmationStatus} 
+                            title={"Do you really want to close the editor?"} 
+                            content={"All unsaved changes will be lost"} 
+                            primaryText={"Close"} 
+                            secondaryText={"Cancel"} 
+                        />
                         {/*<a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
                     </div>
                 </div>
-                {showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }
+                { deToEdit=== dataElement.id &&  <DataElementForm programStageDataElement={stageDE} closeAction={enableConfirmationStatus} /> }
+                { showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }
             </div>
         )}
     </Draggable>

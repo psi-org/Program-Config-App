@@ -103,6 +103,8 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [ isValid, setIsValid ] = useState(true);
     const [ validationResults, setValidationResults] = useState(false);
 
+    const [ deToEdit, setDeToEdit ] = useState('')
+
     const [ uidPool, setUidPool ] = useState([]);
 
     useEffect(()=> { 
@@ -410,7 +412,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
-                        { programStageDataElements &&  <DataElementForm de={programStageDataElements[5].dataElement} /> }
+                        { programStageDataElements &&  <DataElementForm programStageDataElement={programStageDataElements[5]} /> }
                         {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
                             <Removed importResults={importResults} index={0} key={"removedSec"} />
@@ -430,7 +432,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
                                         sections.map((pss, idx) => {
-                                            return <DraggableSection stageSection={pss} index={idx} key={pss.id || idx} />
+                                            return <DraggableSection stageSection={pss} stageDataElements={programStageDataElements} deToEdit={deToEdit} setDeToEdit={setDeToEdit} index={idx} key={pss.id || idx} />
                                         })
                                     }
                                     {provided.placeholder}
