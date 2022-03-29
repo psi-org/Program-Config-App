@@ -13,31 +13,23 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function AlertDialogSlide(props) {
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
     return (
         <Dialog
             open={props.open}
             TransitionComponent={Transition}
             keepMounted
-            onClose={handleClose}
+            onClose={()=>props.actions.secondary()}
             aria-describedby="alert-dialog-slide-description"
         >
             <DialogTitle>{props.title}</DialogTitle>
             <DialogContent>
-            <DialogContentText id="alert-dialog-slide-description">
-                {props.content}
+            <DialogContentText id="alert-dialog-slide-description" alignItems={'center'} display={'flex'} justifyContent={'center'}>
+                {props.icon} {props.content}
             </DialogContentText>
             </DialogContent>
             <DialogActions>
-            <Button onClick={handleClose}>{props.primaryText}</Button>
-            <Button onClick={handleClose}>{props.secondaryText}</Button>
+            <Button onClick={()=>props.actions.secondary()} variant="outlined" color="error">{props.secondaryText}</Button>
+            <Button onClick={()=>props.actions.primary()} variant="contained" color="error">{props.primaryText}</Button>
             </DialogActions>
         </Dialog>
     );

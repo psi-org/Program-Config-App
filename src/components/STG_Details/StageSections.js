@@ -32,6 +32,9 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
 
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 const createMutation = {
     resource: 'metadata',
@@ -324,8 +327,15 @@ const StageSections = ({ programStage, stageRefetch }) => {
             {exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus}/>}
             {
                 createMetadata.loading &&
-                <ComponentCover translucent>
-                </ComponentCover>
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={open}
+                    onClick={handleClose}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
+                /* <ComponentCover translucent>
+                </ComponentCover> */
             }
 
             {createMetadata.error &&
@@ -412,7 +422,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
-                        { programStageDataElements &&  <DataElementForm programStageDataElement={programStageDataElements[5]} /> }
+                        {/* { programStageDataElements &&  <DataElementForm programStageDataElement={programStageDataElements[5]} /> } */}
                         {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
                             <Removed importResults={importResults} index={0} key={"removedSec"} />

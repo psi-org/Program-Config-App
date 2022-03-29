@@ -35,38 +35,10 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
 
 const DraggableDataElement = ({dataElement, stageDE, deToEdit,setDeToEdit, index}) => {
 
-    /* useEffect(() => {
-        $('img.bsct_cta').off().on("click", function (e) {
-            if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
-                $(this).attr('src', contracted_bottom_svg);
-                $(this).parent().parent().css({
-                    'margin': '8px 8px 0px 8px',
-                    'border-radius': '4px 4px 0 0'
-                });
-                $(this).parent().parent().next().css({
-                    'display': 'block'
-                });
-            } else {
-                $(this).attr('src', expanded_bottom_svg);
-                $(this).parent().parent().css({
-                    'margin': '0x',
-                    'border-radius': '4px'
-                });
-                $(this).parent().parent().next().css({
-                    'display': 'none'
-                });
-            }
-        });
-        $('li').on("click", function (e) {
-            console.log(e)
-        })
-    }, []); */
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
-    const [confirmationStatus,setConfirmationStatus] = useState(false)
 
-    const enableConfirmationStatus = () => setConfirmationStatus(true)
     const toggle = () => setOpenMenu(!openMenu)
 
     const [showValidationMessage, setShowValidationMessage] = useState(false);
@@ -127,17 +99,15 @@ const DraggableDataElement = ({dataElement, stageDE, deToEdit,setDeToEdit, index
                                 </Popper>
                             </Layer>
                         }
-                        <AlertDialogSlide 
-                            open={confirmationStatus} 
-                            title={"Do you really want to close the editor?"} 
-                            content={"All unsaved changes will be lost"} 
-                            primaryText={"Close"} 
-                            secondaryText={"Cancel"} 
-                        />
                         {/*<a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
                     </div>
                 </div>
-                { deToEdit=== dataElement.id &&  <DataElementForm programStageDataElement={stageDE} closeAction={enableConfirmationStatus} /> }
+                { deToEdit=== dataElement.id &&  
+                    <DataElementForm 
+                        programStageDataElement={stageDE}
+                        setDeToEdit={setDeToEdit}
+                    /> 
+                }
                 { showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }
             </div>
         )}

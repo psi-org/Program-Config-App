@@ -9,7 +9,7 @@ const InfoBox = (props) => {
 
     const [showModal, setShowModal] = useState(false)
 
-    return <div style={{display: 'flex', alignItems: 'center', margin: '0 1.5em 0 0', alignItems: (props.alignment || 'center')}}>
+    return <div style={{display: 'flex', alignItems: 'center', margin: (props.margin || '0 1.5em 0 0'), alignItems: (props.alignment || 'center')}}>
         <div onClick={()=>setShowModal(true)} style={{cursor: 'pointer', color: '#909090', display: 'flex'}}>
             <HelpIcon/>
         </div>

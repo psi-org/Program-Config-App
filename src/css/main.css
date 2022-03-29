@@ -11,10 +11,14 @@
 }
 
 .dataElement_cont {
-  background-color: #b2dfdb;
+  background-color: #FCFCFC;
   padding: 8px 16px;
-  margin: 0px 8px;
+  margin: -8px 8px 0px 8px;
   border-radius: 0 0 4px 4px;
+  padding: 1.5em 1em;
+  border-bottom: 1px solid #d5dde5;
+  border-left: 1px solid #d5dde5;
+  border-right: 1px solid #d5dde5;
 }
 /* **************** */
 
