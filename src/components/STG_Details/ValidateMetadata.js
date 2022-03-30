@@ -137,8 +137,10 @@ const ValidateMetadata = (props) => {
             
             //ADD FEEDBACK ERRORS TO DATA ELEMENTS
             importedSections.forEach((section) => {
+                delete section.errors
                 let section_errors = 0;
                 section.dataElements.forEach((dataElement) => {
+                    delete dataElement.errors
 
                     validateSections(dataElement);
                     if(dataElement.errors) questions.push(dataElement);
@@ -159,8 +161,9 @@ const ValidateMetadata = (props) => {
             });
 
             let score_errors = 0;
+            delete importedScore.errors
             importedScore.dataElements.forEach((dataElement) => {
-
+                delete dataElement.errors
                 validateScores(dataElement);
                 if (dataElement.errors) scores.push(dataElement);    
 

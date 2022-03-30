@@ -2,8 +2,13 @@ import { useState } from "react"
 
 import HelpIcon from '@mui/icons-material/Help';
 import InfoIcon from '@mui/icons-material/Info';
-import {Modal, ModalTitle, ModalContent, Button, ButtonStrip} from "@dhis2/ui";
-import styles from './../PRG_List/Program.module.css'
+
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const InfoBox = (props) => {
 
@@ -14,23 +19,26 @@ const InfoBox = (props) => {
             <HelpIcon/>
         </div>
         {showModal &&
-            <Modal position="middle" onClose={()=>setShowModal(false)}>
-                <ModalTitle>
+            <Dialog
+                open={showModal}
+                onClose={()=>setShowModal(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
                     <div style={{display: 'flex', alignItems: 'center'}}>
                         <InfoIcon style={{marginRight: '0.25em'}}/>{props.title}
                     </div>
-                </ModalTitle>
-                <ModalContent>
-                    <div className={styles.row}>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
                         {props.message}
-                    </div>
-                    <div className={styles.row}>
-                        <ButtonStrip end>
-                            <Button primary onClick={()=>setShowModal(false)}>Close</Button>
-                        </ButtonStrip>
-                    </div>
-                </ModalContent>
-            </Modal>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button primary onClick={()=>setShowModal(false)}>Close</Button>
+                </DialogActions>
+            </Dialog>
         }
     </div>
 }

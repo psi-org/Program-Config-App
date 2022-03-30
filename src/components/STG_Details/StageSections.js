@@ -34,6 +34,8 @@ import ConstructionIcon from '@mui/icons-material/Construction';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 
 const createMutation = {
@@ -107,6 +109,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [ validationResults, setValidationResults] = useState(false);
 
     const [ deToEdit, setDeToEdit ] = useState('')
+    const [ snackSuccess, setSnackSuccess ] = useState('')
 
     const [ uidPool, setUidPool ] = useState([]);
 
@@ -124,6 +127,21 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [programStageDataElements, setProgramStageDataElements] = useState(programStage.programStageDataElements);
     const [programMetadata,setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
     const [errorReports,setErrorReports] = useState(undefined)
+
+    const updateDEValues = (dataElementId,sectionId,stageDataElement) => {
+
+        let sectionIdx = sections.findIndex(s => s.id === sectionId)
+        let section_DE_idx = sections[sectionIdx].dataElements.findIndex(de => de.id === dataElementId)
+        let stage_DE_idx = programStageDataElements.findIndex(psde => psde.dataElement.id === dataElementId)
+
+        programStageDataElements[stage_DE_idx] = stageDataElement
+        sections[sectionIdx].dataElements[section_DE_idx] = stageDataElement.dataElement
+
+        setProgramStageDataElements(programStageDataElements)
+        setSections(sections)
+        setDeToEdit('')
+        setSnackSuccess('Data Element saved!')
+    }
 
     // Create Mutation
     let metadataDM = useDataMutation(createMutation);
@@ -148,6 +166,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const prvDQ = useDataQuery(queryPRV, { variables: { programId: programStage.program.id } });
 
     useEffect(()=>{
+        console.log(sections)
         let n = (sections.reduce((prev,acu)=> prev + acu.dataElements.length,0) + scoresSection.dataElements.length + criticalSection.dataElements.length) * 5;
         //No Sections , get minimum ids for core Program Rules
         if(n<50) n=50
@@ -326,16 +345,15 @@ const StageSections = ({ programStage, stageRefetch }) => {
             <div className="title">Sections for program stage {programStage.displayName}</div>
             {exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus}/>}
             {
-                createMetadata.loading &&
-                <Backdrop
+                createMetadata.loading && <ComponentCover translucent></ComponentCover>
+                /* <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                     open={open}
                     onClick={handleClose}
                 >
                     <CircularProgress color="inherit" />
-                </Backdrop>
-                /* <ComponentCover translucent>
-                </ComponentCover> */
+                </Backdrop> */
+                
             }
 
             {createMetadata.error &&
@@ -442,7 +460,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
                                         sections.map((pss, idx) => {
-                                            return <DraggableSection stageSection={pss} stageDataElements={programStageDataElements} deToEdit={deToEdit} setDeToEdit={setDeToEdit} index={idx} key={pss.id || idx} />
+                                            return <DraggableSection stageSection={pss} stageDataElements={programStageDataElements} deToEdit={deToEdit} setDeToEdit={setDeToEdit} updateDEValues={updateDEValues} index={idx} key={pss.id || idx} />
                                         })
                                     }
                                     {provided.placeholder}
@@ -455,6 +473,11 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     </div>
                 </div>
             </DragDropContext>
+            <Snackbar open={snackSuccess!=""} autoHideDuration={6000} onClose={()=>setSnackSuccess(false)}>
+                <Alert onClose={()=>setSnackSuccess(false)} severity="success" sx={{ width: '100%' }}>
+                    {snackSuccess}
+                </Alert>
+            </Snackbar>
             {
                 savingMetadata &&
                 <ValidateMetadata

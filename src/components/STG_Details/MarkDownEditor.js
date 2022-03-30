@@ -8,7 +8,7 @@ import MDEditor, {
 
 import rehypeSanitize from "rehype-sanitize";
 
-import { bold, italic, divider, unorderedListCommand, orderedListCommand, checkedListCommand, title, image, link } from '@uiw/react-md-editor/lib/commands';
+//import { bold, italic, divider, unorderedListCommand, orderedListCommand, checkedListCommand, title, image, link } from '@uiw/react-md-editor/lib/commands';
 
 const MarkDownEditor = (props) => {
     return <MDEditor
@@ -17,8 +17,7 @@ const MarkDownEditor = (props) => {
         onChange={(val) => {
             if (!props.disabled) props.setValue(val);
         }}
-        commands={[bold, italic, divider, title, unorderedListCommand, orderedListCommand, checkedListCommand, divider, image, link]}
-        height='100'
+        height='200'
         previewOptions={{
             rehypePlugins: [[rehypeSanitize]],
         }}

@@ -2,7 +2,7 @@ import { Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Button, Lin
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
 import { useState } from "react";
 
-const BUILD_VERSION = "1.2.0";
+const BUILD_VERSION = "1.3.0";
 
 const competencyClassAttribute = {
     "mandatory": false,

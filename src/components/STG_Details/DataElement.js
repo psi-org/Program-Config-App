@@ -33,7 +33,7 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     SCORE_DEN = "l7WdLDhE3xW",
     SCORE_NUM = "Zyr7rlDOJy8";
 
-const DraggableDataElement = ({dataElement, stageDE, deToEdit,setDeToEdit, index}) => {
+const DraggableDataElement = ({dataElement, stageDE, deToEdit,setDeToEdit,updateDEValues, section, index}) => {
 
 
     const [ref, setRef] = useState(undefined);
@@ -105,7 +105,9 @@ const DraggableDataElement = ({dataElement, stageDE, deToEdit,setDeToEdit, index
                 { deToEdit=== dataElement.id &&  
                     <DataElementForm 
                         programStageDataElement={stageDE}
+                        section={section}
                         setDeToEdit={setDeToEdit}
+                        save={updateDEValues}
                     /> 
                 }
                 { showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }

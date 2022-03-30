@@ -46,9 +46,7 @@ const legendSetsQuery = {
     }
 }
 
-const DataElementForm = ({programStageDataElement,dialogActions,setDeToEdit}) => {
-
-    //console.log(programStageDataElement)
+const DataElementForm = ({programStageDataElement,section,dialogActions,setDeToEdit,save}) => {
 
     const de = programStageDataElement.dataElement
     //console.log(de)
@@ -71,6 +69,8 @@ const DataElementForm = ({programStageDataElement,dialogActions,setDeToEdit}) =>
         { label:'Time', value:'TIME', icon:<TimeIcon/>},
     ]
     const metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || '{}')
+    
+    
 
     // States
     const [structure,setStructure] = useState(metadata.elemType)
@@ -85,8 +85,8 @@ const DataElementForm = ({programStageDataElement,dialogActions,setDeToEdit}) =>
     const [critical,setCritical] = useState(metadata.isCritical==='Yes') // metadata.isCritical : ['Yes','No']
     const [numerator,setNumerator] = useState(metadata.scoreNum || '')
     const [denominator,setDenominator] = useState(metadata.scoreDen || '')
-    const [feedbackOrder,setFeedbackOrder] = useState(metadata.feedbackOrder || '')
-    const [feedbackText, setFeedbackText] = React.useState(metadata.feedbackText || '');
+    const [feedbackOrder,setFeedbackOrder] = useState(de.attributeValues.find(att => att.attribute.id === 'LP171jpctBm')?.value || '')
+    const [feedbackText, setFeedbackText] = React.useState(de.attributeValues.find(att => att.attribute.id === 'yhKEe6BLEer')?.value || '');
 
     const [dialogStatus,setDialogStatus] = useState(false)
 
@@ -109,7 +109,10 @@ const DataElementForm = ({programStageDataElement,dialogActions,setDeToEdit}) =>
 
     const displayInReportsChange = (data) => setDisplayInReports(data.target.checked)
 
-    const optionSetChange = (event, value) => setOptionSet(value)
+    const optionSetChange = (event, value) => {
+        if(value) setValueType(value.valueType)
+        setOptionSet(value)
+    }
 
     const legendSetChange = (event, value) => setLegendSet(value)
 
@@ -123,7 +126,59 @@ const DataElementForm = ({programStageDataElement,dialogActions,setDeToEdit}) =>
 
     const feedbackOrderChange = data => setFeedbackOrder(data.target.value)
 
-    console.log(metadata)
+    const callSave = () => {
+
+        // Save new values in local variable de
+        let data = JSON.parse(JSON.stringify(de))
+        let attributeValues = []
+        let metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || '{}')
+
+        // Value Type
+        data.valueType = valueType
+        // Option Set
+        if(optionSet){
+            data.optionSetValue = true
+            data.optionSet = {id:optionSet.id, name:optionSet.label}
+        }else{
+            data.optionSetValue = false
+            delete data.optionSet
+        }
+        // Legend set
+        data.legendSet = legendSet ? {id:legendSet.id,name:legendSet.label} : undefined
+        data.legendSets = legendSet ? [{id:legendSet.id,name:legendSet.label}] : undefined
+        // Description
+        data.description = description
+        // Form Name
+        data.formName =  structure==='question' ?  formName : "   "
+
+
+        // METADATA
+        // Elem type
+        metadata.elemType = structure
+        metadata.isCompulsory = compulsory?"Yes":"No"
+        metadata.isCritical = critical?"Yes":"No"
+        if(numerator) metadata.scoreNum=numerator
+        if(denominator) metadata.scoreDen=denominator
+        if(structure==='label') metadata.labelFormName = formName
+
+        attributeValues.push({attribute:{id:'haUflNqP85K'},value:JSON.stringify(metadata)})
+
+        // FEEDBACK ORDER
+        if(feedbackOrder) attributeValues.push({attribute:{id:'LP171jpctBm'},value:feedbackOrder})
+        // FEEDBACK TEXT
+        if(feedbackText) attributeValues.push({attribute:{id:'yhKEe6BLEer'},value:feedbackText})
+
+        // PROGRAM STAGE DATA ELEMENT
+        let stageDataElement = JSON.parse(JSON.stringify(programStageDataElement))
+        stageDataElement.displayInReports = displayInReports
+        stageDataElement.dataElement = data
+        stageDataElement.dataElement.attributeValues = attributeValues
+
+        save(de.id,section,stageDataElement)
+        
+    }
+
+    
 
     
     return (
@@ -191,8 +246,10 @@ const DataElementForm = ({programStageDataElement,dialogActions,setDeToEdit}) =>
                     />
                 </div>
                 <div style={{display: 'flex', width: '100%', marginTop: '0.5em', justifyContent: 'end'}}>
-                    <SelectOptions label="Value Type" styles={{ width: '45%' }} items={valueTypes} value={optionSet?.valueType || valueType} disabled={structure==='label' || optionSet!=null} handler={valueTypeChange} />
+                    <SelectOptions label="Value Type" styles={{ width: '45%' }} items={valueTypes} value={valueType} disabled={structure==='label' || optionSet!=null} handler={valueTypeChange} />
+                    
                     <p style={{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '10%'}}>or</p>
+                    
                     <Autocomplete
                         autoComplete
                         id="optionSetsSelect"
@@ -304,8 +361,9 @@ const DataElementForm = ({programStageDataElement,dialogActions,setDeToEdit}) =>
                             This number will generate the feedback hierarchy in the app, while also grouping the scores to calculate the composite scores.<br/><br/>
                             <strong>There cannot exist gaps in the Compositive indicators!</strong> The existence of gaps will be validated through the Config App before Setting up the program.<br/><br/>
                             <strong>Keep in mind the following:</strong><br/><br/>
-                            - Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc.<br/><br/>
-                            - Feedback Order gaps will result in logic errors. Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.<br/><br/>
+                            - Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc.
+                            - Feedback Order gaps will result in logic errors.<br/>
+                            Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.<br/><br/>
                             - Questions are not required to be grouped together to belong to the same level of the compositive indicator, for example: <br/>
                             Having [ 1, 1.1, 1.2, 1.3, 2, 2.1, 2.2, 1.4 ] is a valid configuration as there are no gaps in the same level of the compositive indicator.
                         </p>
@@ -334,7 +392,7 @@ const DataElementForm = ({programStageDataElement,dialogActions,setDeToEdit}) =>
                 <Button variant="outlined" startIcon={<CancelIcon />} size="large" style={{marginRight: '1em'}} color="error" onClick={()=>setDialogStatus(true)}>
                 Cancel
                 </Button>
-                <Button variant="contained" startIcon={<SaveIcon />} size="large" color="success" disabled>
+                <Button variant="contained" startIcon={<SaveIcon />} size="large" color="success" onClick={()=>callSave()}>
                 Save
                 </Button>
             </div>

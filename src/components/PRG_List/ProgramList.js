@@ -11,14 +11,16 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ProgramItem from "./ProgramItem";
 import DependencyExport from "./DependencyExport";
 import DataProcessor from "../Excel/DataProcessor";
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 const queryProgramType = {
   results: {
-      resource: 'attributes',
-      params: {
-          fields: ['id'],
-          filter: ['code:eq:PROGRAM_TYPE']
-      }
+    resource: 'attributes',
+    params: {
+      fields: ['id'],
+      filter: ['code:eq:PROGRAM_TYPE']
+    }
   }
 };
 
@@ -29,9 +31,9 @@ const query = {
     params: ({ pageSize, page, pgrTypeAttrId }) => ({
       pageSize,
       page,
-      filter: "attributeValues.attribute.id:eq:"+pgrTypeAttrId,
+      filter: "attributeValues.attribute.id:eq:" + pgrTypeAttrId,
       filter: "attributeValues.value:eq:HNQIS2",
-      fields: ["id", "name", "displayName","programStages"],
+      fields: ["id", "name", "displayName", "programStages"],
     }),
   }
 };
@@ -43,10 +45,14 @@ const query = {
   }
 };*/
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const ProgramList = () => {
 
   // Export Program Metadata //
-  const [exportProgramId,setExportProgramId] = useState(undefined)
+  const [exportProgramId, setExportProgramId] = useState(undefined)
   /*const exportQuery = useDataQuery(queryProgramMetadata,{/* lazy:true, variables:{program:exportProgramId}});*/
 
   /*useEffect(()=>{
@@ -66,10 +72,16 @@ const ProgramList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [exportToExcel, setExportToExcel] = useState(false);
-  const [ exportStatus, setExportStatus] = useState("Download");
-  const [ showProgramForm, setShowProgramForm ] = useState(false);
+  const [exportStatus, setExportStatus] = useState("Download");
+  const [showProgramForm, setShowProgramForm] = useState(false);
+  const [notification, setNotification] = useState(undefined);
+  const [snackSeverity, setSnackSeverity] = useState(undefined);
 
-  const [competencyClassParam,setCompetencyClassParam] = useState(false);
+  useEffect(()=>{
+    if(notification) setSnackSeverity(notification.severity)
+  }, [notification])
+
+  const [competencyClassParam, setCompetencyClassParam] = useState(false);
 
   const prgTypeQuery = useDataQuery(queryProgramType);
   const prgTypeId = prgTypeQuery.data?.results.attributes[0].id;
@@ -91,16 +103,16 @@ const ProgramList = () => {
     setExportToExcel(true);
     setExportStatus("Generating Configuration File...")
   };
-  
+
   return (
     <div>
       <div className="sub_nav">
         <div className="cnt_p"><Chip>Home</Chip></div>
         <div className="c_srch"></div>
         <div className="c_btns">
-          <Button icon={<AddCircleOutlineIcon/>} onClick={()=>setShowProgramForm(true)} disabled={showProgramForm}>Add Program</Button>
+          <Button icon={<AddCircleOutlineIcon />} onClick={() => setShowProgramForm(true)} disabled={showProgramForm}>Add Program</Button>
           {exportProgramId &&
-            <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId}/>
+            <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId} />
           }
           {/*
             <Button loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> Download Template</Button>
@@ -109,13 +121,13 @@ const ProgramList = () => {
         </div>
       </div>
       <div className="wrapper">
-        {exportToExcel && <DataProcessor ps="null" isLoading={setExportToExcel} setStatus={setExportStatus}/>}
+        {exportToExcel && <DataProcessor ps="null" isLoading={setExportToExcel} setStatus={setExportStatus} />}
         <div className="title">List of programs</div>
         <div className="layout_prgms_stages">
           <div className="list-ml_item">
             {
               data.results.programs.map((program) => {
-                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} deleteProgram={deleteProgram}/>
+                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} deleteProgram={deleteProgram} />
               })
             }
           </div>
@@ -123,16 +135,27 @@ const ProgramList = () => {
       </div>
       <div className="wrapper" >
         <Pagination
-            page={data.results.pager.page}
-            pageSize={data.results.pager.pageSize}
-            pageCount={data.results.pager.pageCount}
-            total={data.results.pager.pageCount}
-            pageSizes={["5", "10", "15", "20", "25", "50", "100"]}
-            onPageSizeChange={(pageSize) => { setPageSize(pageSize); refetch({ pageSize, page: 1 }) }}
-            onPageChange={(page) => { setCurrentPage(page); refetch({ page, pageSize }) }}
-          />
+          page={data.results.pager.page}
+          pageSize={data.results.pager.pageSize}
+          pageCount={data.results.pager.pageCount}
+          total={data.results.pager.pageCount}
+          pageSizes={["5", "10", "15", "20", "25", "50", "100"]}
+          onPageSizeChange={(pageSize) => { setPageSize(pageSize); refetch({ pageSize, page: 1 }) }}
+          onPageChange={(page) => { setCurrentPage(page); refetch({ page, pageSize }) }}
+        />
       </div>
-      {showProgramForm && <ProgramNew setShowProgramForm={setShowProgramForm} programsRefetch={refetch}/>}
+      {showProgramForm && <ProgramNew setShowProgramForm={setShowProgramForm} programsRefetch={refetch} setNotification={setNotification} />}
+      
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={notification !== undefined}
+        key={'topcenter'}
+      >
+        <Alert onClose={() => setNotification(undefined)} severity={notification?.severity || snackSeverity} sx={{ width: '100%' }}>
+          {notification?.message}
+        </Alert>
+      </Snackbar>
+      
     </div>
   );
 };

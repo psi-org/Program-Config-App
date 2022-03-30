@@ -29,7 +29,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
 
-const DraggableSection = ({ stageSection, stageDataElements, deToEdit, setDeToEdit, index }) => {
+const DraggableSection = ({ stageSection, stageDataElements, deToEdit, setDeToEdit, updateDEValues, index }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -121,7 +121,7 @@ const DraggableSection = ({ stageSection, stageDataElements, deToEdit, setDeToEd
                             <div {...provided.droppableProps} ref={provided.innerRef} className={"section_cont "} >
                                 {
                                     stageSection.dataElements.map((de, i) => {
-                                        return <DraggableDataElement dataElement={de} stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)} deToEdit={deToEdit} setDeToEdit={setDeToEdit} index={i} key={de.id || i} />;
+                                        return <DraggableDataElement dataElement={de} stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)} deToEdit={deToEdit} setDeToEdit={setDeToEdit} updateDEValues={updateDEValues} section={stageSection.id} index={i} key={de.id || i} />;
                                     })
                                 }
                                 {provided.placeholder}
