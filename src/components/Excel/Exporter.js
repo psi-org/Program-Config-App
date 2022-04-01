@@ -712,9 +712,7 @@ const Exporter = (props) => {
           formulae: ['$A4=$L4'],
           style: conditionalError,
         }
-      ],
-      promptTitle: 'Parent Question Error',
-      prompt: "Parent Question cannot be itself."
+      ]
     });
   }
 
