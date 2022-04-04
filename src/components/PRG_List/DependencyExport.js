@@ -266,12 +266,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
               <p>You can now download the metadata related to the program by clicking "Download Now".</p>
               <p><strong>Program:</strong> <em>{programMetadata.programs[0].name}</em></p>
               <hr style={{margin:'8px 0'}}/>
-              <p><strong>Please consider the following:</strong></p>
-              <ul>
-                <li style={{marginLeft:'24px'}}> Legend Sets are not included in the file, please export those manually using the Import/Export app.</li>
-                <li style={{marginLeft:'24px'}}> All of the metadata is downloaded without any sharing settings. Please assign sharings once you import the metadata and assign Org Units to the program.</li>
-                <li style={{marginLeft:'24px'}}> Make sure that the basic HNQIS2 Metadata package has been imported in the target server.</li>
-              </ul>
+              <p>Please consider that all of the metadata is downloaded without any sharing settings. Remember to assign sharings once you import the metadata and assign Org Units to the program.</p>
               <ButtonStrip end>
                 {downloading &&
                   <CircularLoader small />

@@ -1,7 +1,7 @@
 const config = {
     type: 'app',
-    title: 'Program Config App',
-    short_name:"Program Config App",
+    title: 'Program Config App (1.3.0-Beta)',
+    short_name:"Program Config App (1.3.0-Beta)",
     entryPoints: {
         app: './src/App.js',
     },
