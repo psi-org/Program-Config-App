@@ -13,13 +13,11 @@ import {useEffect, useState} from 'react';
 
 // *** IMAGES ***
 import sec_svg from './../../images/i-drag_black.svg';
-import warning_svg from './../../images/i-warning.svg';
-import error_svg from './../../images/i-error.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 
-import {FlyoutMenu, MenuItem, Popper, Layer, colors,IconAdd16,IconDelete16,IconEdit16, Tag, Tooltip } from '@dhis2/ui';
+import {FlyoutMenu, MenuItem, Popper, Layer, Tag } from '@dhis2/ui';
 import BadgeWarnings from "./BadgeWarnings";
 import BadgeErrors from "./BadgeErrors";
 import ValidationMessages from "./ValidationMessages";

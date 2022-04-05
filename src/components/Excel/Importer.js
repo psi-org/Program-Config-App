@@ -1,9 +1,16 @@
 import { useState } from "react";
 import ExcelJS from "exceljs/dist/es5/exceljs.browser";
 import NoticesBox from "../UIElements/NoticesBox";
-import { ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Button, NoticeBox, Tag } from "@dhis2/ui";
+import { NoticeBox, Tag } from "@dhis2/ui";
 import { validWorksheets, validTemplateHeader } from "../../configs/TemplateConstants";
-import {readTemplateData} from '../STG_Details/importReader';
+import { readTemplateData } from '../STG_Details/importReader';
+
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
+import CustomMUIDialog from './../UIElements/CustomMUIDialog'
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 
 const Importer = (props) => {
@@ -12,10 +19,12 @@ const Importer = (props) => {
     const [executedTasks, setExecutedTasks] = useState([]);
     const [buttonDisabled, setButtonDisabled] = useState(false);
     const [isNotificationError, setNotificationError] = useState(false);
+    const [fileName, setFileName] = useState('No file selected...');
 
-    const [importSummary,setImportSummary] = useState(false);
+    const [importSummary, setImportSummary] = useState(false);
 
     const setFile = (files) => {
+        setFileName(files[0].name);
         setSelectedFile(files[0]);
     }
 
@@ -54,7 +63,7 @@ const Importer = (props) => {
                                     headers.shift();
                                     worksheetValidation(headers, function (status) {
                                         if (status) {
-                                            var task = { step:4, name: "Extracting data from XLSX", status: "success" };
+                                            var task = { step: 4, name: "Extracting data from XLSX", status: "success" };
                                             setCurrentTask(task.name);
                                             let templateData = [];
                                             let dataRow = 3;
@@ -64,7 +73,7 @@ const Importer = (props) => {
                                                     let rowVals = row.values;
                                                     validTemplateHeader.forEach((header, index) => {
                                                         /* dataRow[header] = (isObject(rowVals[index+1]) && rowVals[index+1].hasOwnProperty('result')) ? rowVals[index+1].result : rowVals[index+1]; */
-                                                        dataRow[header] = rowVals[index+1]
+                                                        dataRow[header] = rowVals[index + 1]
                                                     })
                                                     templateData.push(dataRow);
                                                 }
@@ -73,7 +82,7 @@ const Importer = (props) => {
                                             setCurrentTask(null);
 
                                             // Start import reading
-                                            let {importedSections,importedScores,importSummaryValues} = readTemplateData(templateData,props.previous,programDetails.dePrefix,mappingDetails.optionSets,mappingDetails.legendSets);
+                                            let { importedSections, importedScores, importSummaryValues } = readTemplateData(templateData, props.previous, programDetails.dePrefix, mappingDetails.optionSets, mappingDetails.legendSets);
 
                                             importSummaryValues.program = programDetails;
                                             importSummaryValues.mapping = mappingDetails;
@@ -137,10 +146,10 @@ const Importer = (props) => {
     const getOptionSets = (ws) => {
         let i = 3;
         let optionSets = [];
-        while(ws.getCell("I"+i).value !== null) {
+        while (ws.getCell("I" + i).value !== null) {
             let option = {};
-            option.id = ws.getCell("I"+i).value;
-            option.optionSet = ws.getCell("H"+i).value;
+            option.id = ws.getCell("I" + i).value;
+            option.optionSet = ws.getCell("H" + i).value;
             optionSets.push(option);
             i++;
         }
@@ -150,10 +159,10 @@ const Importer = (props) => {
     const getHealthAreas = (ws) => {
         let i = 3;
         let healthAreas = [];
-        while(ws.getCell("L"+i).value !== null) {
+        while (ws.getCell("L" + i).value !== null) {
             let healthArea = {};
-            healthArea.code = ws.getCell("L"+i).value;
-            healthArea.name = ws.getCell("M"+i).value;
+            healthArea.code = ws.getCell("L" + i).value;
+            healthArea.name = ws.getCell("M" + i).value;
             healthAreas.push(healthArea);
             i++;
         }
@@ -163,11 +172,10 @@ const Importer = (props) => {
     const getLegendSets = (ws) => {
         let i = 3;
         let legendSets = [];
-        while(ws.getCell("P"+i).value !== null)
-        {
+        while (ws.getCell("P" + i).value !== null) {
             let legend = {};
-            legend.id = ws.getCell("P"+i).value;
-            legend.legendSet = ws.getCell("O"+i).value;
+            legend.id = ws.getCell("P" + i).value;
+            legend.legendSet = ws.getCell("O" + i).value;
             legendSets.push(legend);
             i++;
         }
@@ -177,11 +185,10 @@ const Importer = (props) => {
     const getProgramsMap = (ws) => {
         let i = 3;
         let programs = [];
-        while(ws.getCell("R"+i).value !== null)
-        {
+        while (ws.getCell("R" + i).value !== null) {
             let program = {};
-            program.id = ws.getCell("S"+i).value;
-            program.name = ws.getCell("R"+i).value;
+            program.id = ws.getCell("S" + i).value;
+            program.name = ws.getCell("R" + i).value;
             programs.push(program);
             i++;
         }
@@ -236,50 +243,73 @@ const Importer = (props) => {
     }
 
     function isObject(val) {
-        if (val === null) { return false;}
-        return ( (typeof val === 'function') || (typeof val === 'object') );
+        if (val === null) { return false; }
+        return ((typeof val === 'function') || (typeof val === 'object'));
     }
 
-    return <Modal>
-        <ModalTitle>Select Configuration File</ModalTitle>
-        <ModalContent>
-            {(currentTask || executedTasks.length > 0) && <NoticesBox currentTask={currentTask} executedTasks={executedTasks} isError={isNotificationError} />}
-            <br />
-            {(importSummary) && 
+    return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
+        <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
+            Select Configuration File
+        </CustomMUIDialogTitle >
+        <DialogContent dividers style={{ padding: '1em 2em' }}>
+
+            {(currentTask || executedTasks.length > 0) && 
+                <>
+                    <NoticesBox currentTask={currentTask} executedTasks={executedTasks} isError={isNotificationError} />
+                    <br/>
+                </>
+            }
+            {(importSummary) &&
                 <NoticeBox title='Import Summary'>
-                    <div style={{display:'flex', alignContent:'center', width:'20rem'}}>
-                        <div style={{flexGrow:1}}><strong>Questions</strong></div>
-                        <div style={{flexGrow:1}}><Tag positive>{'New: '+importSummary.questions.new}</Tag></div>
-                        <div style={{flexGrow:1}}><Tag neutral>{'Updated: '+importSummary.questions.updated}</Tag></div>
-                        <div style={{flexGrow:1}}><Tag negative>{'Removed: '+importSummary.questions.removed}</Tag></div>
+                    <div style={{ display: 'flex', alignContent: 'center', width: '20rem' }}>
+                        <div style={{ flexGrow: 1 }}><strong>Questions</strong></div>
+                        <div style={{ flexGrow: 1 }}><Tag positive>{'New: ' + importSummary.questions.new}</Tag></div>
+                        <div style={{ flexGrow: 1 }}><Tag neutral>{'Updated: ' + importSummary.questions.updated}</Tag></div>
+                        <div style={{ flexGrow: 1 }}><Tag negative>{'Removed: ' + importSummary.questions.removed}</Tag></div>
                     </div>
-                    <br/>
-                    <div style={{display:'flex', alignContent:'center', width:'20rem'}}>
-                        <div style={{flexGrow:1}}><strong>Sections</strong></div>
-                        <div style={{flexGrow:1}}><Tag positive>{'New: ' +importSummary.sections.new}</Tag></div>
-                        <div style={{flexGrow:1}}><Tag neutral>{'Updated: '+importSummary.sections.updated}</Tag></div>
-                        <div style={{flexGrow:1}}><Tag negative>{'Removed: '+importSummary.sections.removed}</Tag></div>
+                    <br />
+                    <div style={{ display: 'flex', alignContent: 'center', width: '20rem' }}>
+                        <div style={{ flexGrow: 1 }}><strong>Sections</strong></div>
+                        <div style={{ flexGrow: 1 }}><Tag positive>{'New: ' + importSummary.sections.new}</Tag></div>
+                        <div style={{ flexGrow: 1 }}><Tag neutral>{'Updated: ' + importSummary.sections.updated}</Tag></div>
+                        <div style={{ flexGrow: 1 }}><Tag negative>{'Removed: ' + importSummary.sections.removed}</Tag></div>
                     </div>
-                    <br/>
-                    <div style={{display:'flex', alignContent:'center', width:'20rem'}}>
-                        <div style={{flexGrow:1}}><strong>Scores</strong></div>
-                        <div style={{flexGrow:1}}><Tag positive>{'New: '+importSummary.scores.new}</Tag></div>
-                        <div style={{flexGrow:1}}><Tag neutral>{'Updated: '+importSummary.scores.updated}</Tag></div>
-                        <div style={{flexGrow:1}}><Tag negative>{'Removed: '+importSummary.scores.removed}</Tag></div>
+                    <br />
+                    <div style={{ display: 'flex', alignContent: 'center', width: '20rem' }}>
+                        <div style={{ flexGrow: 1 }}><strong>Scores</strong></div>
+                        <div style={{ flexGrow: 1 }}><Tag positive>{'New: ' + importSummary.scores.new}</Tag></div>
+                        <div style={{ flexGrow: 1 }}><Tag neutral>{'Updated: ' + importSummary.scores.updated}</Tag></div>
+                        <div style={{ flexGrow: 1 }}><Tag negative>{'Removed: ' + importSummary.scores.removed}</Tag></div>
                     </div>
-                    
+
                 </NoticeBox>
             }
-            <br />
-            <input type="file" accept=".xlsx" onChange={(e) => setFile(e.target.files)} />
-        </ModalContent>
-        <ModalActions>
-            <ButtonStrip middle>
-                <Button disabled={buttonDisabled} primary onClick={() => startImportProcess()}>Import</Button>
-                <Button disabled={buttonDisabled} destructive onClick={() => hideForm()}>Close</Button>
-            </ButtonStrip>
-        </ModalActions>
-    </Modal>
+
+            {!importSummary &&
+                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <Button variant="contained" component="label" style={{width: '30%', maxWidth: '30%', minWidth: '30%'}}>
+                        Select File
+                        <input
+                            type="file"
+                            accept=".xlsx"
+                            hidden
+                            onChange={(e) => setFile(e.target.files)}
+                        />
+                    </Button>
+                    <span style={{width: '65%', maxWidth: '65%', minWidth: '65%', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}>{fileName}</span>
+                    {/*<input type="file" accept=".xlsx" onChange={(e) => setFile(e.target.files)} />*/}
+                </div>
+
+            }
+
+        </DialogContent>
+
+        <DialogActions style={{ padding: '1em' }}>
+            <Button color={!importSummary ? 'error' : 'primary'} variant={!importSummary ? 'text' : 'outlined'} disabled={buttonDisabled} onClick={() => hideForm()}>Close</Button>
+            {!importSummary && <Button variant='outlined' startIcon={<UploadFileIcon />} disabled={buttonDisabled} onClick={() => startImportProcess()}> Import </Button>}
+        </DialogActions>
+
+    </CustomMUIDialog>)
 }
 
 export default Importer;

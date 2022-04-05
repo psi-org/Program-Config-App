@@ -5,18 +5,12 @@ import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 //import styles from './Program.module.css'
 import { Program, PS_AssessmentStage, PS_ActionPlanStage, PSS_Default, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
 
-import { styled } from '@mui/material/styles';
-
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import PropTypes from 'prop-types';
+import CustomMUIDialog from './../UIElements/CustomMUIDialog'
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -66,44 +60,6 @@ const METADATA = "haUflNqP85K",
     COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe",
     COMPETENCY_CLASS = "NAaHST5ZDTE",
     BUILD_VERSION = "1.3.0";
-
-const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-    '& .MuiDialogContent-root': {
-        padding: theme.spacing(2),
-    },
-    '& .MuiDialogActions-root': {
-        padding: theme.spacing(1),
-    },
-}));
-
-const BootstrapDialogTitle = (props) => {
-    const { children, onClose, ...other } = props;
-
-    return (
-        <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
-            {children}
-            {onClose ? (
-                <IconButton
-                    aria-label="close"
-                    onClick={onClose}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        color: (theme) => theme.palette.grey[500],
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            ) : null}
-        </DialogTitle>
-    );
-};
-
-BootstrapDialogTitle.propTypes = {
-    children: PropTypes.node,
-    onClose: PropTypes.func.isRequired,
-};
 
 const ProgramNew = (props) => {
     // Create Mutation
@@ -295,10 +251,10 @@ const ProgramNew = (props) => {
     }
 
     return <>
-        <BootstrapDialog open={true} maxWidth='md' fullWidth={true} >
-            <BootstrapDialogTitle style={{ padding: '1em 2em' }} id="customized-dialog-title" onClose={() => hideForm()}>
+        <CustomMUIDialog open={true} maxWidth='md' fullWidth={true} >
+            <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
                 Create New Program
-            </BootstrapDialogTitle >
+            </CustomMUIDialogTitle >
             <DialogContent dividers style={{ padding: '1em 2em' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <FormControl sx={{ minWidth: '30%' }} error={sentForm && pgrTypePCA==''}>
@@ -382,7 +338,7 @@ const ProgramNew = (props) => {
                 <Button onClick={() => hideForm()} color="error" > Close </Button>
                 <Button onClick={() => submission()} variant='outlined' startIcon={<SendIcon />}> Submit </Button>
             </DialogActions>
-        </BootstrapDialog>
+        </CustomMUIDialog>
     </>
 }
 

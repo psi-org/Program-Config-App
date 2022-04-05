@@ -1,8 +1,5 @@
 // DHIS2 UI
-import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Modal, ModalTitle, ModalContent, ModalActions, Chip, IconSync24, IconCheckmarkCircle24, IconCross24 } from "@dhis2/ui";
-
-import download_svg from './../../images/i-download.svg';
-import upload_svg from './../../images/i-upload.svg';
+import { ButtonStrip, AlertBar, AlertStack, ComponentCover, CircularLoader, Chip, IconCheckmarkCircle24, IconCross24 } from "@dhis2/ui";
 
 // React Hooks
 import { useState, useEffect } from "react";
@@ -10,21 +7,17 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DraggableSection from "./Section";
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
 
-import { Progress } from 'react-sweet-progress';
 import "react-sweet-progress/lib/style.css";
 import Scores from "./Scores";
 import CriticalCalculations from "./CriticalCalculations";
 import DataProcessor from "../Excel/DataProcessor";
 import Importer from "../Excel/Importer";
 import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules } from "./Scripting";
-import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import SaveMetadata from "./SaveMetadata";
 import { Link } from "react-router-dom";
 import Removed from "./Removed";
 import ValidateMetadata from "./ValidateMetadata";
 import Errors from "./Errors";
 import ErrorReports from "./ErrorReports";
-import DataElementForm from "./DataElementForm";
 
 import CachedIcon from '@mui/icons-material/Cached';
 import PublishIcon from '@mui/icons-material/Publish';
@@ -32,10 +25,14 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
 
-import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
+import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
 
 const createMutation = {
@@ -101,34 +98,34 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [exportToExcel, setExportToExcel] = useState(false);
     //const { hasNotice, setHasNotice } = useState(false);
 
-    const [ exportStatus, setExportStatus] = useState("Download Template");
-    const [ importerEnabled, setImporterEnabled ] = useState(false);
-    const [ importResults, setImportResults] = useState(false);
-    const [ progressSteps,setProgressSteps ]= useState(0);
-    const [ isValid, setIsValid ] = useState(true);
-    const [ validationResults, setValidationResults] = useState(false);
+    const [exportStatus, setExportStatus] = useState("Download Template");
+    const [importerEnabled, setImporterEnabled] = useState(false);
+    const [importResults, setImportResults] = useState(false);
+    const [progressSteps, setProgressSteps] = useState(0);
+    const [isValid, setIsValid] = useState(true);
+    const [validationResults, setValidationResults] = useState(false);
 
-    const [ deToEdit, setDeToEdit ] = useState('')
-    const [ snackSuccess, setSnackSuccess ] = useState('')
+    const [deToEdit, setDeToEdit] = useState('')
+    const [snackSuccess, setSnackSuccess] = useState('')
 
-    const [ uidPool, setUidPool ] = useState([]);
+    const [uidPool, setUidPool] = useState([]);
 
-    useEffect(()=> { 
-        if(importerEnabled){
+    useEffect(() => {
+        if (importerEnabled) {
             setErrorReports(undefined)
             setValidationResults(false)
         }
-    },[importerEnabled])
+    }, [importerEnabled])
 
     // States
     const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations"));
     const [scoresSection, setScoresSection] = useState(programStage.programStageSections.find(s => s.name == "Scores"));
     const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"));
     const [programStageDataElements, setProgramStageDataElements] = useState(programStage.programStageDataElements);
-    const [programMetadata,setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
-    const [errorReports,setErrorReports] = useState(undefined)
+    const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
+    const [errorReports, setErrorReports] = useState(undefined)
 
-    const updateDEValues = (dataElementId,sectionId,stageDataElement) => {
+    const updateDEValues = (dataElementId, sectionId, stageDataElement) => {
 
         let sectionIdx = sections.findIndex(s => s.id === sectionId)
         let section_DE_idx = sections[sectionIdx].dataElements.findIndex(de => de.id === dataElementId)
@@ -165,18 +162,18 @@ const StageSections = ({ programStage, stageRefetch }) => {
     // Fetch Program Rule Variables from Program
     const prvDQ = useDataQuery(queryPRV, { variables: { programId: programStage.program.id } });
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(sections)
-        let n = (sections.reduce((prev,acu)=> prev + acu.dataElements.length,0) + scoresSection.dataElements.length + criticalSection.dataElements.length) * 5;
+        let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection.dataElements.length + criticalSection.dataElements.length) * 5;
         //No Sections , get minimum ids for core Program Rules
-        if(n<50) n=50
+        if (n < 50) n = 50
 
-        idsQuery.refetch({n}).then(data=>{
-            if(data){
+        idsQuery.refetch({ n }).then(data => {
+            if (data) {
                 setUidPool(data.results.codes)
             }
         })
-    },[sections]);
+    }, [sections]);
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
@@ -224,7 +221,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     const commit = () => {
-        if(createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
+        if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
         setSavingMetadata(true);
         return;
     };
@@ -273,9 +270,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
         // III. Build new metadata
         // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
         setProgressSteps(3);
-        
-        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId,programMetadata.useCompetencyClass);
-        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool,programMetadata.useCompetencyClass,programMetadata.healthArea); //useCompetencyClass
+
+        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
+        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
 
         const metadata = { programRuleVariables, programRules, programRuleActions };
 
@@ -290,12 +287,12 @@ const StageSections = ({ programStage, stageRefetch }) => {
         // V. Import new metadata
 
         deleteMetadata({ data: oldMetadata }).then((res) => {
-            if(res.status=='OK'){
+            if (res.status == 'OK') {
                 setProgressSteps(5);
 
                 createMetadata.mutate({ data: metadata }).then(response => {
-                    
-                    if(response.status=='OK'){
+
+                    if (response.status == 'OK') {
                         setSaveAndBuild('Completed');
                         setSavedAndValidated(false);
 
@@ -305,17 +302,17 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     }
                 });
             }
-            
+
         });
 
-        
+
 
     }
 
     const parseErrors = (e) => {
-        let data = e.typeReports.map(tr=>{
+        let data = e.typeReports.map(tr => {
             let type = tr.klass.split('.').pop()
-            return tr.objectReports.map(or =>  or.errorReports.map(er => ({type,uid:or.uid,errorCode:er.errorCode,message:er.message})))
+            return tr.objectReports.map(or => or.errorReports.map(er => ({ type, uid: or.uid, errorCode: er.errorCode, message: er.message })))
         })
         return data.flat().flat()
     }
@@ -324,26 +321,26 @@ const StageSections = ({ programStage, stageRefetch }) => {
         <div className="cont_stage">
             <div className="sub_nav">
                 <div className="cnt_p">
-                <Link to={'/'}><Chip>Home</Chip></Link>/
+                    <Link to={'/'}><Chip>Home</Chip></Link>/
                     <Link to={'/program/' + programStage.program.id}><Chip>Program: {programStage.program.name}</Chip></Link>/
                     <Chip>Stage: {programStage.displayName}</Chip>
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns">
-                <ButtonStrip>
-                    <Button icon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
-                    <Button icon={<ConstructionIcon/>} disabled={!savedAndValidated} primary onClick={() => run()}>Set up program</Button>
-                    <Button icon={<FileDownloadIcon/>} name="generator"
-                        loading={exportToExcel ? true : false} onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
-                    <Button icon={<PublishIcon/>} name="importer"
-                        onClick={() => setImporterEnabled(true)}>Import Template</Button>
-                    <Button name="Reload" icon={<CachedIcon/>} onClick={()=> {window.location.reload()}}>Reload</Button>
-                </ButtonStrip>
+                    <ButtonStrip>
+                        <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
+                        <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
+                        <Button color='inherit' variant='outlined' startIcon={!exportToExcel?<FileDownloadIcon />:<CircularLoader small />} name="generator"
+                            onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
+                        <Button color='inherit' variant='outlined' startIcon={<PublishIcon />} name="importer"
+                            onClick={() => setImporterEnabled(true)}>Import Template</Button>
+                        <Button color='inherit' name="Reload" variant='outlined' startIcon={<CachedIcon />} onClick={() => { window.location.reload() }}>Reload</Button>
+                    </ButtonStrip>
                 </div>
             </div>
-            {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{sections,setSections, scoresSection, setScoresSection}} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{programMetadata,setProgramMetadata}} />}
+            {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
             <div className="title">Sections for program stage {programStage.displayName}</div>
-            {exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus}/>}
+            {exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus} />}
             {
                 createMetadata.loading && <ComponentCover translucent></ComponentCover>
                 /* <Backdrop
@@ -353,7 +350,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                 >
                     <CircularProgress color="inherit" />
                 </Backdrop> */
-                
+
             }
 
             {createMetadata.error &&
@@ -380,46 +377,49 @@ const StageSections = ({ programStage, stageRefetch }) => {
                 </AlertStack>
             }
             {saveAndBuild &&
-                <Modal>
-                    <ModalTitle>SETTING UP PROGRAM</ModalTitle>
-                    <ModalContent>
+
+                <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
+                    <CustomMUIDialogTitle id="customized-dialog-title" onClose={false}>
+                        Setting Up Program
+                    </CustomMUIDialogTitle >
+                    <DialogContent dividers style={{ padding: '1em 2em' }}>
                         {(progressSteps > 0) &&
                             <div className="progressItem">
-                                {progressSteps===1 && <CircularLoader small/>}
-                                {progressSteps===1 && createMetadata?.data?.status=="ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps!==1 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                {progressSteps === 1 && <CircularLoader small />}
+                                {progressSteps === 1 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 1 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Checking scores</p>
                             </div>
                         }
                         {(progressSteps > 1) &&
                             <div className="progressItem">
-                                {progressSteps===2 && <CircularLoader small/>}
-                                {progressSteps===2 && createMetadata?.data?.status=="ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps!==2 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                {progressSteps === 2 && <CircularLoader small />}
+                                {progressSteps === 2 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 2 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Reading assesment's questions</p>
                             </div>
                         }
                         {(progressSteps > 2) &&
                             <div className="progressItem">
-                                {progressSteps===3 && <CircularLoader small/>}
-                                {progressSteps===3 && createMetadata?.data?.status==="ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps!==3 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                {progressSteps === 3 && <CircularLoader small />}
+                                {progressSteps === 3 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Building new metadata</p>
                             </div>
                         }
                         {(progressSteps > 3) &&
                             <div className="progressItem">
-                                {progressSteps===4 && createMetadata?.data?.status!=="ERROR" && <CircularLoader small/>}
-                                {progressSteps===4 && createMetadata?.data?.status==="ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps!==4 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                {progressSteps === 4 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps === 4 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 4 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Deleting old metadata</p>
                             </div>
                         }
                         {(progressSteps > 4) &&
                             <div className="progressItem">
-                                {progressSteps===5 && createMetadata?.data?.status!=="ERROR" && <CircularLoader small/>}
-                                {progressSteps===5 && createMetadata?.data?.status==="ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps!==5 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                {progressSteps === 5 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps === 5 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 5 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Importing new metadata</p>
                             </div>
                         }
@@ -429,13 +429,13 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 <p> Done!</p>
                             </div>
                         }
-                    </ModalContent>
-                    <ModalActions>
-                        <ButtonStrip>
-                            <Button disabled={(saveAndBuild != 'Completed') && (createMetadata?.data?.status !== 'ERROR')} onClick={() => { setSaveAndBuild(false); setProgressSteps(0); }}>{`Close`}</Button>
-                        </ButtonStrip>
-                    </ModalActions>
-                </Modal>
+                    </DialogContent>
+
+                    <DialogActions style={{ padding: '1em' }}>
+                        <Button variant='outlined' disabled={(saveAndBuild != 'Completed') && (createMetadata?.data?.status !== 'ERROR')} onClick={() => { setSaveAndBuild(false); setProgressSteps(0); }}> Done </Button>
+                    </DialogActions>
+
+                </CustomMUIDialog>
             }
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
@@ -447,13 +447,13 @@ const StageSections = ({ programStage, stageRefetch }) => {
                         }
                         {
                             validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0 || validationResults.feedbacks.length > 0) &&
-                            <Errors validationResults={validationResults} index={0} key={"validationSec"}/>
+                            <Errors validationResults={validationResults} index={0} key={"validationSec"} />
                         }
                         {
                             errorReports && <ErrorReports errors={errorReports} />
                         }
                         {
-                            createMetadata.data && createMetadata.data.status =='ERROR' && <ErrorReports errors={parseErrors(createMetadata.data)} />
+                            createMetadata.data && createMetadata.data.status == 'ERROR' && <ErrorReports errors={parseErrors(createMetadata.data)} />
                         }
                         <Droppable droppableId="dpb-sections" type="SECTION">
                             {(provided, snapshot) => (
@@ -469,36 +469,36 @@ const StageSections = ({ programStage, stageRefetch }) => {
                         </Droppable>
                         <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />
                         <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />
-                        
+
                     </div>
                 </div>
             </DragDropContext>
-            <Snackbar open={snackSuccess!=""} autoHideDuration={6000} onClose={()=>setSnackSuccess(false)}>
-                <Alert onClose={()=>setSnackSuccess(false)} severity="success" sx={{ width: '100%' }}>
+            <Snackbar open={snackSuccess != ""} autoHideDuration={6000} onClose={() => setSnackSuccess(false)}>
+                <Alert onClose={() => setSnackSuccess(false)} severity="success" sx={{ width: '100%' }}>
                     {snackSuccess}
                 </Alert>
             </Snackbar>
             {
                 savingMetadata &&
                 <ValidateMetadata
-                    newDEQty={importResults ? importResults.questions.new + importResults.scores.new + importResults.sections.new : 0} 
+                    newDEQty={importResults ? importResults.questions.new + importResults.scores.new + importResults.sections.new : 0}
                     programStage={programStage}
                     importedSections={sections}
                     importedScores={scoresSection}
                     criticalSection={criticalSection}
-                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems):[]}
+                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : []}
 
                     // createMetadata={createMetadata}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
-                    previous={{sections,setSections, scoresSection, setScoresSection}}
-                    setImportResults = {setImportResults}
-                    importResults = {importResults}
-                    setIsValid = {setIsValid}
-                    setValidationResults = {setValidationResults}
+                    previous={{ sections, setSections, scoresSection, setScoresSection }}
+                    setImportResults={setImportResults}
+                    importResults={importResults}
+                    setIsValid={setIsValid}
+                    setValidationResults={setValidationResults}
                     programMetadata={programMetadata}
                     setErrorReports={setErrorReports}
-                    />
+                />
             }
 
         </div>
