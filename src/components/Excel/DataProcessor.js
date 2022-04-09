@@ -6,6 +6,7 @@ import Exporter from "./Exporter";
 const optionSetQuery = {
     results: {
         resource: 'optionSets',
+        paging: false,
         params: {
             fields: ['id', 'name', 'options[name]'],
             filter: ['name:ilike:HNQIS - ']
@@ -16,6 +17,7 @@ const optionSetQuery = {
 const healthAreasQuery = {
     results: {
         resource: 'optionSets',
+        paging: false,
         params: {
             fields: ['name', 'options[id,code,name]'],
             filter: ['id:eq:y752HEwvCGi']
@@ -26,6 +28,7 @@ const healthAreasQuery = {
 const legendSetsQuery = {
     results: {
         resource: 'legendSets',
+        paging: false,
         params: {
             fields: ['id','name'],
             filter: ['name:ilike:HNQIS']
@@ -36,6 +39,7 @@ const legendSetsQuery = {
 const programsQuery = {
     results: {
         resource: 'programs',
+        paging: false,
         params: {
             fields: ['name', 'id']
         }
