@@ -326,7 +326,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     <Chip>Stage: {programStage.displayName}</Chip>
                 </div>
                 <div className="c_srch"></div>
-                <div className="c_btns">
+                <div className="c_btns" style={{color: '#444444'}}>
                     <ButtonStrip>
                         <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
                         <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
