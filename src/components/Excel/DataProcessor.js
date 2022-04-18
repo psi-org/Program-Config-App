@@ -7,6 +7,7 @@ const optionSetQuery = {
     results: {
         resource: 'optionSets',
         params: {
+            paging: false,
             fields: ['id', 'name', 'options[name]'],
             filter: ['name:ilike:HNQIS - ']
         }
@@ -17,6 +18,7 @@ const healthAreasQuery = {
     results: {
         resource: 'optionSets',
         params: {
+            paging: false,
             fields: ['name', 'options[id,code,name]'],
             filter: ['id:eq:y752HEwvCGi']
         }
@@ -27,6 +29,7 @@ const legendSetsQuery = {
     results: {
         resource: 'legendSets',
         params: {
+            paging: false,
             fields: ['id','name'],
             filter: ['name:ilike:HNQIS']
         }
@@ -37,6 +40,7 @@ const programsQuery = {
     results: {
         resource: 'programs',
         params: {
+            paging: false,
             fields: ['name', 'id']
         }
     }
@@ -184,7 +188,7 @@ const DataProcessor = (props) => {
 
     return (
         <>
-            {isDownloaded && exportFlag && <Exporter flag={exportFlag} setFlag={setExportFlag} Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
+            {isDownloaded && exportFlag && <Exporter programName={props.programName} flag={exportFlag} setFlag={setExportFlag} Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
         </>
     );
 }
