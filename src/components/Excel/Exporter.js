@@ -120,7 +120,7 @@ const Exporter = (props) => {
     fillBackgroundToRange(ws, "B12:B16", "9fc5e8");
     fillBackgroundToRange(ws, 'C12:C16', "cfe2f3");
 
-    ws.getCell("D12").value = {formula: "=VLOOKUP(C12, Mapping!R3:S300,2,FALSE)"};
+    ws.getCell("D12").value = {formula: "=VLOOKUP(C12, Mapping!R3:S1000,2,FALSE)"};
     //ws.getCell("D15").value = {formula: "=INDEX(Mapping!L1:L100;MATCH(Instructions!C15;Mapping!M1:M100;0))"};
     ws.getCell('C12').value = props.programName;
     ws.getCell('C13').value = props.programShortName;
