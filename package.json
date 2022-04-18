@@ -2,7 +2,7 @@
   "name": "programconfigapp",
   "short_name":"Program Config App",
   "author": "Fernando Gomez - Mario Lopez - Utsav Koju",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "",
   "license": "BSD-3-Clause",
   "private": true,

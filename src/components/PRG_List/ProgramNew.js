@@ -33,7 +33,7 @@ const metadataMutation = {
 const METADATA = "haUflNqP85K",
     COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe",
     COMPETENCY_CLASS = "NAaHST5ZDTE",
-    BUILD_VERSION = "1.2.0";
+    BUILD_VERSION = "1.2.1";
 
 const ProgramNew = (props) =>
 {
