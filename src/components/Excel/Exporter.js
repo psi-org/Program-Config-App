@@ -379,7 +379,7 @@ const Exporter = (props) => {
         rules: [
           {
             type: 'expression',
-            formulae: ['ISERROR(VLOOKUP(C12,Mapping!R3:R100,1,FALSE))'],
+            formulae: ['ISERROR(D12)'],
             style: conditionalError,
           }
         ]

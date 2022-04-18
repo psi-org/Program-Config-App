@@ -6,8 +6,8 @@ import Exporter from "./Exporter";
 const optionSetQuery = {
     results: {
         resource: 'optionSets',
-        paging: false,
         params: {
+            paging: false,
             fields: ['id', 'name', 'options[name]'],
             filter: ['name:ilike:HNQIS - ']
         }
@@ -17,8 +17,8 @@ const optionSetQuery = {
 const healthAreasQuery = {
     results: {
         resource: 'optionSets',
-        paging: false,
         params: {
+            paging: false,
             fields: ['name', 'options[id,code,name]'],
             filter: ['id:eq:y752HEwvCGi']
         }
@@ -28,8 +28,8 @@ const healthAreasQuery = {
 const legendSetsQuery = {
     results: {
         resource: 'legendSets',
-        paging: false,
         params: {
+            paging: false,
             fields: ['id','name'],
             filter: ['name:ilike:HNQIS']
         }
@@ -39,8 +39,8 @@ const legendSetsQuery = {
 const programsQuery = {
     results: {
         resource: 'programs',
-        paging: false,
         params: {
+            paging: false,
             fields: ['name', 'id']
         }
     }
@@ -187,7 +187,7 @@ const DataProcessor = (props) => {
 
     return (
         <>
-            {isDownloaded && exportFlag && <Exporter programName={props.programName} flag={exportFlag} setFlag={setExportFlag} Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
+            {isDownloaded && exportFlag && <Exporter programName={props.programName} flag={exportFlag} setFlag={setExportFlag} Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
         </>
     );
 }
