@@ -35,6 +35,7 @@ import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
 import SectionManager from './SectionManager'
+import DataElementManager from './DataElementManager'
 
 
 const createMutation = {
@@ -168,11 +169,15 @@ const StageSections = ({ programStage, stageRefetch }) => {
         }
     }
 
+    const [deToAdd,setDeToAdd] = useState([])
+    const [deManager,setDeManager] = useState(false)
+
     const DEActions = {
         deToEdit,
         setEdit : de => setDeToEdit(de),
         update : (de,section,stageDe) => updateDEValues(de,section,stageDe),
-        remove : (de,section) => removeDE(de,section)
+        remove : (de,section) => removeDE(de,section),
+        add : (index,section) => setDeManager({index,section})
     }
     // ***** END OF DATA ELEMENT ACTIONS ***** //
 
@@ -554,6 +559,17 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     sections={sections}
                     refreshSections={setSections} 
                     notify={pushNotification}
+                />
+            }
+            {deManager && 
+                <DataElementManager
+                    setDeManager={setDeManager}
+                    /* sectionIndex={editSectionIndex}
+                    newSectionIndex={newSectionIndex}
+                    setShowSectionForm={setShowSectionManager}
+                    sections={sections}
+                    refreshSections={setSections} 
+                    notify={pushNotification} */
                 />
             }
         </div>

@@ -15,7 +15,7 @@ const SECTION_NAME_MAX_LENGTH = 230
 const queryId = {
     results: {
         resource: 'system/id.json',
-        params: ({ n }) => ({ limit: 1 })
+        params: { limit: 1 }
     }
 };
 
