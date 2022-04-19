@@ -31,7 +31,8 @@ const optionSetQuery = {
         resource: 'optionSets',
         params: {
             fields: ['id', 'name', 'options[name]', 'valueType'],
-            filter: ['name:ilike:HNQIS - ']
+            filter: ['name:ilike:HNQIS - '],
+            pageSize: 2000
         }
     }
 };
@@ -41,15 +42,15 @@ const legendSetsQuery = {
         resource: 'legendSets',
         params: {
             fields: ['id','name'],
-            filter: ['name:ilike:HNQIS']
+            filter: ['name:ilike:HNQIS'],
+            pageSize: 2000
         }
     }
 }
 
-const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => {
+const DataElementForm = ({programStageDataElement,section,setDeToEdit,save,saveFlag=false,setSaveFlag=undefined}) => {
 
     const de = programStageDataElement.dataElement
-    //console.log(de)
 
     // Data Query
     const { data: serverOptionSets} = useDataQuery(optionSetQuery);
@@ -68,25 +69,25 @@ const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => 
         { label:'Date', value:'DATE', icon:<DateIcon/>},
         { label:'Time', value:'TIME', icon:<TimeIcon/>},
     ]
-    const metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || '{}')
+    const metadata = JSON.parse(de?.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || '{}')
     
     
 
     // States
-    const [structure,setStructure] = useState(metadata.elemType)
-    const [valueType,setValueType] = useState(de.valueType)
-    const [formName,setFormName] = useState((metadata.elemType === 'label' ? metadata.labelFormName : de.formName).replace(' [C]',''))
+    const [structure,setStructure] = useState(metadata.elemType || 'question')
+    const [valueType,setValueType] = useState(de?.valueType || '')
+    const [formName,setFormName] = useState((metadata.elemType === 'label' ? metadata.labelFormName : de?.formName)?.replace(' [C]','') || '')
     const [compulsory,setCompulsory] = useState(metadata.isCompulsory==='Yes')  // metadata.isCompulsory : ['Yes','No']
     const [displayInReports,setDisplayInReports] = useState(programStageDataElement.displayInReports || false)
-    const [optionSet,setOptionSet] = useState(de.optionSet ? {label:de.optionSet.name, id:de.optionSet.id } : null)
-    const [legendSet,setLegendSet] = useState(de.legendSet ? {label:de.legendSet.name, id:de.legendSet.id } : null)
-    const [description,setDescription] = useState(de.description || '')
+    const [optionSet,setOptionSet] = useState(de?.optionSet ? {label:de.optionSet.name, id:de.optionSet.id } : null)
+    const [legendSet,setLegendSet] = useState(de?.legendSet ? {label:de.legendSet.name, id:de.legendSet.id } : null)
+    const [description,setDescription] = useState(de?.description || '')
     
     const [critical,setCritical] = useState(metadata.isCritical==='Yes') // metadata.isCritical : ['Yes','No']
     const [numerator,setNumerator] = useState(metadata.scoreNum || '')
     const [denominator,setDenominator] = useState(metadata.scoreDen || '')
-    const [feedbackOrder,setFeedbackOrder] = useState(de.attributeValues.find(att => att.attribute.id === 'LP171jpctBm')?.value || '')
-    const [feedbackText, setFeedbackText] = React.useState(de.attributeValues.find(att => att.attribute.id === 'yhKEe6BLEer')?.value || '');
+    const [feedbackOrder,setFeedbackOrder] = useState(de?.attributeValues.find(att => att.attribute.id === 'LP171jpctBm')?.value || '')
+    const [feedbackText, setFeedbackText] = useState(de?.attributeValues.find(att => att.attribute.id === 'yhKEe6BLEer')?.value || '');
 
     const [dialogStatus,setDialogStatus] = useState(false)
 
@@ -126,12 +127,19 @@ const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => 
 
     const feedbackOrderChange = data => setFeedbackOrder(data.target.value)
 
+    const checkFormContent = () =>{
+        for (let index = 0; index < 100000000; index++) {
+            const element = index;
+        }
+        return true
+    }
+
     const callSave = () => {
 
         // Save new values in local variable de
         let data = JSON.parse(JSON.stringify(de))
         let attributeValues = []
-        let metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || '{}')
+        let metadata = JSON.parse(de?.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || '{}')
 
         // Value Type
         data.valueType = valueType
@@ -178,17 +186,27 @@ const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => 
         
     }
 
-    
-
+    //Handling create New Data Element
+    useEffect(()=>{
+        if(saveFlag && setSaveFlag){
+            if(checkFormContent()){
+                save({test:'funca'})
+            }
+            setSaveFlag(false)
+        }
+    },[saveFlag])
+    //End New DE
     
     return (
-    <div className="dataElement_cont">
+    <div className={de?"dataElement_cont":''}>
 
         <div style={{display:'flex', justifyContent: 'space-between', marginBottom: '1em', width: '100%'}}>           
             <h2 style={{display:'flex', alignItems: 'center'}}><FilterNoneIcon style={{marginRight: '10px'}}/>Data Element Configuration</h2>
-            <div onClick={() => closeEditForm()} style={{cursor: 'pointer'}}>
-                <CloseIcon/>
-            </div>
+            {de && 
+                <div onClick={() => closeEditForm()} style={{cursor: 'pointer'}}>
+                    <CloseIcon/>
+                </div>
+            }
         </div>
 
         <h3 style={{marginBottom: '0.5em'}}>DHIS2 Settings</h3>
@@ -246,7 +264,7 @@ const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => 
                     />
                 </div>
                 <div style={{display: 'flex', width: '100%', marginTop: '0.5em', justifyContent: 'end'}}>
-                    <SelectOptions label="Value Type" styles={{ width: '45%' }} items={valueTypes} value={valueType} disabled={structure==='label' || optionSet!=null} handler={valueTypeChange} />
+                    <SelectOptions label="Value Type" styles={{ width: '45%' }} useError={false} items={valueTypes} value={valueType} disabled={structure==='label' || optionSet!=null} handler={valueTypeChange} />
                     
                     <p style={{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '10%'}}>or</p>
                     
@@ -268,7 +286,7 @@ const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => 
 
         <FormLabel component="legend">Data Element Appearance</FormLabel>
         <div style={{display: 'flex'}}>
-            <TextField id="formName" fullWidth margin="dense" label="Form Name" variant="standard" value={formName} onChange={formNameChange} />
+            <TextField id="formName" autoComplete='off' fullWidth margin="dense" label="Form Name" variant="standard" value={formName} onChange={formNameChange} />
             <InfoBox
                 title="About the Form Name of a Data Element" 
                 message={
@@ -281,7 +299,7 @@ const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => 
             />
         </div>
         <div style={{display: 'flex'}}>
-            <TextField id="description" fullWidth margin="dense" label="Description" variant="standard" value={description} onChange={descriptionChange} />
+            <TextField id="description" autoComplete='off' fullWidth margin="dense" label="Description" variant="standard" value={description} onChange={descriptionChange} />
             <InfoBox
                 title="About the Description of a Data Element" 
                 message={
@@ -340,8 +358,8 @@ const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => 
                         </p>
                     }
                 />
-                <TextField disabled={structure==='label'} id="numerator" sx={{ minWidth: '2.5rem', width: '15%', marginRight: '1em'}} margin="dense" label="Numerator" variant='standard' value={structure!=='label'?numerator:''} onChange={numeratorChange} inputProps={{ type: 'number', min:'0' }} />
-                <TextField disabled={structure==='label'} id="denominator" sx={{ minWidth: '2.5rem', width: '15%' }} margin="dense" label="Denominator" variant='standard' value={structure!=='label'?denominator:''} onChange={denominatorChange} inputProps={{ type: 'number', min:'0' }} />
+                <TextField disabled={structure==='label'} autoComplete='off' id="numerator" sx={{ minWidth: '2.5rem', width: '15%', marginRight: '1em'}} margin="dense" label="Numerator" variant='standard' value={structure!=='label'?numerator:''} onChange={numeratorChange} inputProps={{ type: 'number', min:'0' }} />
+                <TextField disabled={structure==='label'} autoComplete='off' id="denominator" sx={{ minWidth: '2.5rem', width: '15%' }} margin="dense" label="Denominator" variant='standard' value={structure!=='label'?denominator:''} onChange={denominatorChange} inputProps={{ type: 'number', min:'0' }} />
                 <InfoBox
                     title="About the Numerator and Denominator" 
                     message={
@@ -352,7 +370,7 @@ const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => 
                     }
                     margin='0 1.5em 0 0.5em'
                 />
-                <TextField id="feedbackOrder" sx={{ minWidth: '10rem', width: '20%' }} margin="dense" label="Feedback Order (Compositive Indicator)" variant="standard" value={feedbackOrder} onChange={feedbackOrderChange} />
+                <TextField autoComplete='off' id="feedbackOrder" sx={{ minWidth: '10rem', width: '20%' }} margin="dense" label="Feedback Order (Compositive Indicator)" variant="standard" value={feedbackOrder} onChange={feedbackOrderChange} />
                 <InfoBox
                     title="About the Feedback Order" 
                     message={
@@ -388,14 +406,16 @@ const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => 
             <div data-color-mode="light" style={structure==='label'?{opacity:'0.5'}:undefined}>
                 <MarkDownEditor value={feedbackText} setValue={setFeedbackText} disabled={structure==='label'}/>
             </div>
-            <div style={{display:'flex', justifyContent:'end', marginTop:'1em'}}>
-                <Button variant="outlined" startIcon={<CancelIcon />} size="large" style={{marginRight: '1em'}} color="error" onClick={()=>setDialogStatus(true)}>
-                Cancel
-                </Button>
-                <Button variant="contained" startIcon={<SaveIcon />} size="large" color="success" onClick={()=>callSave()}>
-                Save
-                </Button>
-            </div>
+            {de && 
+                <div style={{display:'flex', justifyContent:'end', marginTop:'1em'}}>
+                    <Button variant="outlined" startIcon={<CancelIcon />} size="large" style={{marginRight: '1em'}} color="error" onClick={()=>setDialogStatus(true)}>
+                    Cancel
+                    </Button>
+                    <Button variant="contained" startIcon={<SaveIcon />} size="large" color="success" onClick={()=>callSave()}>
+                    Save
+                    </Button>
+                </div>
+            }
             
         </div>
         <AlertDialogSlide

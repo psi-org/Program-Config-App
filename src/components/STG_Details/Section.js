@@ -26,6 +26,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, handleSectionEdit }) => {
 
@@ -106,6 +107,7 @@ const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, h
                                             <MenuItem label="Edit This Section" icon={<EditIcon />} onClick={()=>{toggle(); handleSectionEdit(index, undefined) }}/>
                                             <MenuItem label="Create New Section Above" icon={<UpIcon />} onClick={()=>{toggle(); handleSectionEdit(undefined, index)} }/>
                                             <MenuItem label="Create New Section Below" icon={<DownIcon />} onClick={()=>{toggle(); handleSectionEdit(undefined, index+1)} }/>
+                                            <MenuItem label="Add Data Element(s)" icon={<AddCircleOutlineIcon />} onClick={()=>{toggle(); DEActions.add(stageSection.dataElements.length,stageSection.id)} }/>
                                             <MenuItem disabled={true} destructive label="Delete This Section" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
                                         </FlyoutMenu>
                                     </Popper>

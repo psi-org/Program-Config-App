@@ -75,6 +75,7 @@ const SectionManager = (props) => {
                     type="text"
                     fullWidth
                     variant="standard"
+                    autoComplete='off'
                     value={sectionName}
                     onChange={handleChangeSectionName}
                 />

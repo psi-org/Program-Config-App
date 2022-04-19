@@ -48,6 +48,7 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
 
     let classNames = '';
     
+    if(!dataElement.attributeValues) console.log(dataElement)
     let metadata = dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value;
     if(metadata) metadata=JSON.parse(metadata);
     let renderFormName = metadata?.labelFormName;
@@ -118,7 +119,7 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
                 </div>
             )}
         </Draggable>
-        <AlertDialogSlide
+        {!!deToRemove && <AlertDialogSlide
             open={!!deToRemove} 
             title={"Remove this data element from the assessment?"}
             icon={<WarningAmberIcon fontSize="large" color="warning"/>}
@@ -132,7 +133,7 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
                 primary: function(){ setDeToRemove(false); removeDataElement() },
                 secondary: function(){setDeToRemove(false);  }
             }} 
-        />
+        />}
         </>
     );
 };

@@ -169,7 +169,24 @@ const StageSections = ({ programStage, stageRefetch }) => {
         }
     }
 
-    const [deToAdd,setDeToAdd] = useState([])
+    const saveAdd = (params) => {
+        const psDEs = params.newDataElements.map(de => ({
+            displayInReports: false,
+            compulsory: false,
+            sortOrder: 1,
+            programStage: {
+                id: params.deRef.stage
+            },
+            dataElement : de
+        }))
+        console.log(params)
+        sections.find(s => s.id === params.deRef.section).dataElements.splice(params.deRef.index,0,...params.newDataElements)
+        let newProgramStageDataElements = programStageDataElements.concat(psDEs)
+
+        setSections(sections)
+        setProgramStageDataElements(newProgramStageDataElements)
+    }
+
     const [deManager,setDeManager] = useState(false)
 
     const DEActions = {
@@ -177,7 +194,12 @@ const StageSections = ({ programStage, stageRefetch }) => {
         setEdit : de => setDeToEdit(de),
         update : (de,section,stageDe) => updateDEValues(de,section,stageDe),
         remove : (de,section) => removeDE(de,section),
-        add : (index,section) => setDeManager({index,section})
+        add : (index,section) => setDeManager({
+            index,
+            section,
+            stage:programStage.id,
+            sectionName:sections.find(s=>s.id===section).displayName
+        })
     }
     // ***** END OF DATA ELEMENT ACTIONS ***** //
 
@@ -563,7 +585,10 @@ const StageSections = ({ programStage, stageRefetch }) => {
             }
             {deManager && 
                 <DataElementManager
+                    deRef={deManager}
                     setDeManager={setDeManager}
+                    programStageDataElements={programStageDataElements}
+                    saveAdd={saveAdd}
                     /* sectionIndex={editSectionIndex}
                     newSectionIndex={newSectionIndex}
                     setShowSectionForm={setShowSectionManager}

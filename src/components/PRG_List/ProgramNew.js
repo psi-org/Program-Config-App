@@ -61,6 +61,11 @@ const METADATA = "haUflNqP85K",
     COMPETENCY_CLASS = "NAaHST5ZDTE",
     BUILD_VERSION = "1.3.0";
 
+const MAX_PREFIX_LENGTH = 25, 
+    MAX_NAME_LENGTH = 250,
+    MIN_NAME_LENGTH = 2,
+    MAX_SHORT_NAME_LENGTH = 50;
+
 const ProgramNew = (props) => {
     // Create Mutation
     let metadataDM = useDataMutation(metadataMutation);
@@ -96,19 +101,30 @@ const ProgramNew = (props) => {
     const [programShortName, setProgramShortName] = useState('');
     const [sentForm, setSentForm] = useState(false);
 
+    //Validation Messages
+    const [pgrTypeHelperText, setPgrTypeHelperText] = useState(undefined);
+    const [prefixHelperText, setPrefixHelperText] = useState(undefined);
+    const [programNameHelperText, setProgramNameHelperText] = useState(undefined);
+    const [shortNameHelperText, setShortNameHelperText] = useState(undefined);
+    const [healthAreaHelperText, setHealthAreaHelperText] = useState(undefined);
+
     const handleChangePgrType = (event) => {
+        setPgrTypeHelperText(undefined)
         setPgrTypePCA(event.target.value);
     };
 
     const handleChangeDePrefix = (event) => {
+        setPrefixHelperText(undefined)
         setDePrefix(event.target.value);
     };
 
     const handleChangeProgramName = (event) => {
+        setProgramNameHelperText(undefined)
         setProgramName(event.target.value);
     };
 
     const handleChangeProgramShortName = (event) => {
+        setShortNameHelperText(undefined)
         setProgramShortName(event.target.value);
     };
 
@@ -116,7 +132,10 @@ const ProgramNew = (props) => {
         setUseCompetency(event.target.checked);
     };
 
-    const healthAreaChange = (event) => setHealthArea(event.target.value)
+    const healthAreaChange = (event) => {
+        setHealthAreaHelperText(undefined)
+        setHealthArea(event.target.value);
+    }
 
     let healthAreaOptions = [];
     if (haOptions) {
@@ -138,8 +157,54 @@ const ProgramNew = (props) => {
     }
 
     const formDataIsValid = () =>{
-        return programName!=='' && programShortName!=='' && pgrTypePCA!==''
-                && dePrefix!='' && ((pgrTypePCA==='hnqis' && healthArea!=='') || (pgrTypePCA==='tracker'));
+
+        let response = true;
+
+        if(pgrTypePCA===''){
+            response = false
+            setPgrTypeHelperText('This field is required')
+        }else{
+            setPgrTypeHelperText(undefined)
+        }
+
+        if(dePrefix===''){
+            response = false
+            setPrefixHelperText('This field is required')
+        }else if(dePrefix.length > MAX_PREFIX_LENGTH){
+            response = false
+            setPrefixHelperText(`This field cannot exceed ${MAX_PREFIX_LENGTH} characters`)
+        }else{
+            setPrefixHelperText(undefined)
+        }
+
+        if(programName===''){
+            response = false
+            setProgramNameHelperText('This field is required')
+        }else if(programName.length < MIN_NAME_LENGTH || programName.length > (MAX_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1) ){
+            response = false
+            setProgramNameHelperText(`This field must contain between ${MIN_NAME_LENGTH} and ${(MAX_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)} characters`)
+        }else{
+            setProgramNameHelperText(undefined)
+        }
+
+        if(programShortName===''){
+            response = false
+            setShortNameHelperText('This field is required')
+        }else if(programShortName.length > (MAX_SHORT_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)){
+            response = false
+            setShortNameHelperText(`This field cannot exceed ${(MAX_SHORT_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)} characters`)
+        }else{
+            setShortNameHelperText(undefined)
+        }
+
+        if(pgrTypePCA!=='tracker' && (pgrTypePCA==='hnqis' && healthArea==='')){
+            response = false
+            setHealthAreaHelperText('This field is required')
+        }else{
+            setHealthAreaHelperText(undefined)
+        }
+
+        return response;
     }
 
     function submission() {
@@ -197,9 +262,11 @@ const ProgramNew = (props) => {
 
             let metadata = {
                 programs: [prgrm],
-                //programStages: [assessmentStage, actionPlanStage],
+                programStages: [assessmentStage, actionPlanStage],
                 programStageSections: [defaultSection, criticalSteps, scores]
             }
+
+            console.log(metadata)
 
             metadataRequest.mutate({ data: metadata }).then(response => {
                 if (response.status != 'OK') {
@@ -257,7 +324,7 @@ const ProgramNew = (props) => {
             </CustomMUIDialogTitle >
             <DialogContent dividers style={{ padding: '1em 2em' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <FormControl sx={{ minWidth: '30%' }} error={sentForm && pgrTypePCA==''}>
+                    <FormControl sx={{ minWidth: '30%' }} error={pgrTypeHelperText!==undefined}>
                         <InputLabel id="label-prgType">Program Type</InputLabel>
                         <Select
                             labelId="label-prgType"
@@ -272,44 +339,47 @@ const ProgramNew = (props) => {
                             <MenuItem value={'tracker'} disabled>Tracker Program</MenuItem>
                             <MenuItem value={'hnqis'}>HNQIS</MenuItem>
                         </Select>
-                        <FormHelperText>{sentForm && pgrTypePCA=='' ? 'This field is required' : ''}</FormHelperText>
+                        <FormHelperText>{pgrTypeHelperText}</FormHelperText>
                     </FormControl>
                     <FormControl sx={{ minWidth: '65%' }}>
                         <TextField
-                            error={sentForm && dePrefix==''}
-                            helperText={sentForm && dePrefix=='' ? 'This field is required' : ''}
+                            error={prefixHelperText!==undefined}
+                            helperText={prefixHelperText}
                             margin="normal"
                             id="prefix"
                             label="Program Data Element Prefix"
                             type="text"
                             fullWidth
                             variant="standard"
+                            autoComplete='off'
                             value={dePrefix}
                             onChange={handleChangeDePrefix}
                         />
                     </FormControl>
                 </div>
                 <TextField
-                    error={sentForm && programName==''}
-                    helperText={sentForm && programName=='' ? 'This field is required' : ''}
+                    error={programNameHelperText!==undefined}
+                    helperText={programNameHelperText}
                     margin="normal"
                     id="name"
                     label="Program Name"
                     type="text"
                     fullWidth
                     variant="standard"
+                    autoComplete='off'
                     value={programName}
                     onChange={handleChangeProgramName}
                 />
                 <TextField
-                    error={sentForm && programShortName==''}
-                    helperText={sentForm && programShortName=='' ? 'This field is required' : ''}
+                    error={shortNameHelperText!==undefined}
+                    helperText={shortNameHelperText}
                     margin="normal"
                     id="shortName"
                     label="Program Short Name"
                     type="text"
                     fullWidth
                     variant="standard"
+                    autoComplete='off'
                     value={programShortName}
                     onChange={handleChangeProgramShortName}
                 />
@@ -322,8 +392,8 @@ const ProgramNew = (props) => {
                             label="Use Competency Class"
                         />
                         <SelectOptions
-                            useError={sentForm && healthArea==''}
-                            helperText={sentForm && healthArea=='' ? 'This field is required' : ''}
+                            useError={healthAreaHelperText!==undefined}
+                            helperText={healthAreaHelperText}
                             label={'Program Health Area'}
                             items={healthAreaOptions}
                             handler={healthAreaChange}
