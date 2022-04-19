@@ -19,17 +19,16 @@ export default function AlertDialogSlide(props) {
             TransitionComponent={Transition}
             keepMounted
             onClose={()=>props.actions.secondary()}
-            aria-describedby="alert-dialog-slide-description"
         >
             <DialogTitle>{props.title}</DialogTitle>
             <DialogContent>
-            <DialogContentText id="alert-dialog-slide-description" alignItems={'center'} display={'flex'} justifyContent={'center'}>
-                {props.icon} {props.content}
-            </DialogContentText>
+                {props.preContent}
+                <div style={{margin:'1em 0 0 0', display:'flex',alignItems:'center', justifyContent:'center'}}> {props.icon} {props.content} </div>
+                {props.postContent}
             </DialogContent>
             <DialogActions>
-            <Button onClick={()=>props.actions.secondary()} variant="outlined" color="error">{props.secondaryText}</Button>
-            <Button onClick={()=>props.actions.primary()} variant="contained" color="error">{props.primaryText}</Button>
+                <Button onClick={()=>props.actions.secondary()} variant="outlined" color="error">{props.secondaryText}</Button>
+                <Button onClick={()=>props.actions.primary()} variant="contained" color="error">{props.primaryText}</Button>
             </DialogActions>
         </Dialog>
     );

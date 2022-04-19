@@ -27,7 +27,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
 
-const DraggableSection = ({ stageSection, stageDataElements, deToEdit, setDeToEdit, updateDEValues, index }) => {
+const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, handleSectionEdit }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -82,7 +82,7 @@ const DraggableSection = ({ stageSection, stageDataElements, deToEdit, setDeToEd
     var classNames = (stageSection.importStatus) ? ' import_' + stageSection.importStatus : '';
 
     return (
-        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined || deToEdit!==''}>
+        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined || DEActions.deToEdit!==''}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                     <div className={"ml_item" + classNames} style={{color:"#333333" , backgroundColor: "#b2dfdb", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
@@ -103,9 +103,9 @@ const DraggableSection = ({ stageSection, stageDataElements, deToEdit, setDeToEd
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
                                         <FlyoutMenu>
-                                            <MenuItem disabled={true} label="Edit This Section" icon={<EditIcon />} onClick={()=>{toggle(); /* Add function */} }/>
-                                            <MenuItem disabled={true} label="Create New Section Above" icon={<UpIcon />} onClick={()=>{toggle(); /* Add function */} }/>
-                                            <MenuItem disabled={true} label="Create New Section Below" icon={<DownIcon />} onClick={()=>{toggle(); } }/>
+                                            <MenuItem label="Edit This Section" icon={<EditIcon />} onClick={()=>{toggle(); handleSectionEdit(index, undefined) }}/>
+                                            <MenuItem label="Create New Section Above" icon={<UpIcon />} onClick={()=>{toggle(); handleSectionEdit(undefined, index)} }/>
+                                            <MenuItem label="Create New Section Below" icon={<DownIcon />} onClick={()=>{toggle(); handleSectionEdit(undefined, index+1)} }/>
                                             <MenuItem disabled={true} destructive label="Delete This Section" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
                                         </FlyoutMenu>
                                     </Popper>
@@ -119,7 +119,7 @@ const DraggableSection = ({ stageSection, stageDataElements, deToEdit, setDeToEd
                             <div {...provided.droppableProps} ref={provided.innerRef} className={"section_cont "} >
                                 {
                                     stageSection.dataElements.map((de, i) => {
-                                        return <DraggableDataElement dataElement={de} stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)} deToEdit={deToEdit} setDeToEdit={setDeToEdit} updateDEValues={updateDEValues} section={stageSection.id} index={i} key={de.id || i} />;
+                                        return <DraggableDataElement dataElement={de} stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)} DEActions={DEActions} section={stageSection.id} index={i} key={de.id || i} />;
                                     })
                                 }
                                 {provided.placeholder}

@@ -46,7 +46,7 @@ const legendSetsQuery = {
     }
 }
 
-const DataElementForm = ({programStageDataElement,section,dialogActions,setDeToEdit,save}) => {
+const DataElementForm = ({programStageDataElement,section,setDeToEdit,save}) => {
 
     const de = programStageDataElement.dataElement
     //console.log(de)

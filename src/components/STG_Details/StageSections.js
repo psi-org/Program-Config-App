@@ -34,6 +34,8 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
+import SectionManager from './SectionManager'
+
 
 const createMutation = {
     resource: 'metadata',
@@ -105,8 +107,16 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [isValid, setIsValid] = useState(true);
     const [validationResults, setValidationResults] = useState(false);
 
+    const [editSectionIndex, setEditSectionIndex] = useState(undefined);
+    const [newSectionIndex, setNewSectionIndex] = useState(undefined);
+    const [showSectionManager, setShowSectionManager] = useState(false);
+
     const [deToEdit, setDeToEdit] = useState('')
-    const [snackSuccess, setSnackSuccess] = useState('')
+
+    //const [snackbarContent, setSnackbarContent] = useState('')
+
+    const [snackParams,setSnackParams] = useState(false)
+    const pushNotification = (content,severity="success") => setSnackParams({content,severity})
 
     const [uidPool, setUidPool] = useState([]);
 
@@ -118,6 +128,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     }, [importerEnabled])
 
     // States
+    const [removedElements, setRemovedElements] = useState([])
     const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations"));
     const [scoresSection, setScoresSection] = useState(programStage.programStageSections.find(s => s.name == "Scores"));
     const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"));
@@ -125,6 +136,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
     const [errorReports, setErrorReports] = useState(undefined)
 
+    // ***** DATA ELEMENT ACTIONS ***** //
     const updateDEValues = (dataElementId, sectionId, stageDataElement) => {
 
         let sectionIdx = sections.findIndex(s => s.id === sectionId)
@@ -137,8 +149,32 @@ const StageSections = ({ programStage, stageRefetch }) => {
         setProgramStageDataElements(programStageDataElements)
         setSections(sections)
         setDeToEdit('')
-        setSnackSuccess('Data Element saved!')
+        pushNotification(<span>Data Element edited! <strong>Remember to Validate and Save!</strong></span>)
     }
+
+    const removeDE = (id,section) => {
+        let psdeIdx = programStageDataElements.findIndex( psde =>  psde.dataElement.id === id )
+        let sectionIdx = sections.find(s => s.id === section)?.dataElements.findIndex(de => de.id === id)
+        
+        // CAUTION > REMOVE FROM PROGRAM STAGE DATA ELEMENTS, SECTION DATA ELEMENTS AND ADD TO REMOVED ITEMS
+        if(sectionIdx > -1 && psdeIdx > -1){
+            let removed = sections.find(s => s.id === section)?.dataElements[sectionIdx]
+            sections.find(s => s.id === section)?.dataElements.splice(sectionIdx,1)
+            programStageDataElements.splice(psdeIdx,1)
+            setRemovedElements(removedElements.push(removed))
+            setSections(sections)
+            setProgramStageDataElements(programStageDataElements)
+            pushNotification(<span>Data Element removed! <strong>Remember to Validate and Save!</strong></span>,"info")
+        }
+    }
+
+    const DEActions = {
+        deToEdit,
+        setEdit : de => setDeToEdit(de),
+        update : (de,section,stageDe) => updateDEValues(de,section,stageDe),
+        remove : (de,section) => removeDE(de,section)
+    }
+    // ***** END OF DATA ELEMENT ACTIONS ***** //
 
     // Create Mutation
     let metadataDM = useDataMutation(createMutation);
@@ -163,7 +199,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const prvDQ = useDataQuery(queryPRV, { variables: { programId: programStage.program.id } });
 
     useEffect(() => {
-        console.log(sections)
         let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection.dataElements.length + criticalSection.dataElements.length) * 5;
         //No Sections , get minimum ids for core Program Rules
         if (n < 50) n = 50
@@ -317,6 +352,12 @@ const StageSections = ({ programStage, stageRefetch }) => {
         return data.flat().flat()
     }
 
+    const handleSectionEdit = (section=undefined, newSection=undefined) =>{
+        setEditSectionIndex(section)
+        setNewSectionIndex(newSection)
+        setShowSectionManager(true)
+    }
+
     return (
         <div className="cont_stage">
             <div className="sub_nav">
@@ -460,7 +501,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
                                         sections.map((pss, idx) => {
-                                            return <DraggableSection stageSection={pss} stageDataElements={programStageDataElements} deToEdit={deToEdit} setDeToEdit={setDeToEdit} updateDEValues={updateDEValues} index={idx} key={pss.id || idx} />
+                                            return <DraggableSection stageSection={pss} stageDataElements={programStageDataElements} DEActions={DEActions} index={idx} key={pss.id || idx} handleSectionEdit={handleSectionEdit}/>
                                         })
                                     }
                                     {provided.placeholder}
@@ -473,9 +514,14 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     </div>
                 </div>
             </DragDropContext>
-            <Snackbar open={snackSuccess != ""} autoHideDuration={6000} onClose={() => setSnackSuccess(false)}>
-                <Alert onClose={() => setSnackSuccess(false)} severity="success" sx={{ width: '100%' }}>
-                    {snackSuccess}
+            <Snackbar 
+                anchorOrigin={{ vertical:'top', horizontal:'center' }}
+                open={!!snackParams}
+                autoHideDuration={6000} 
+                onClose={() => setSnackParams(false)}
+            >
+                <Alert onClose={() => setSnackParams(false)} severity={snackParams.severity} sx={{ width: '100%' }}>
+                    {snackParams.content}
                 </Alert>
             </Snackbar>
             {
@@ -500,7 +546,16 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     setErrorReports={setErrorReports}
                 />
             }
-
+            {showSectionManager && 
+                <SectionManager 
+                    sectionIndex={editSectionIndex}
+                    newSectionIndex={newSectionIndex}
+                    setShowSectionForm={setShowSectionManager}
+                    sections={sections}
+                    refreshSections={setSections} 
+                    notify={pushNotification}
+                />
+            }
         </div>
     )
 }

@@ -5,6 +5,7 @@ import { Draggable } from "react-beautiful-dnd";
 
 import DataElementForm from "./DataElementForm";
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 // *** IMAGES ***
 import de_svg from './../../images/i-drag_black.svg';
@@ -33,13 +34,15 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     SCORE_DEN = "l7WdLDhE3xW",
     SCORE_NUM = "Zyr7rlDOJy8";
 
-const DraggableDataElement = ({dataElement, stageDE, deToEdit,setDeToEdit,updateDEValues, section, index}) => {
-
+const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, section, index}) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
+    const [deToRemove,setDeToRemove] = useState(false)
 
     const toggle = () => setOpenMenu(!openMenu)
+
+    const removeDataElement = () => DEActions.remove(deToRemove.id,section)
 
     const [showValidationMessage, setShowValidationMessage] = useState(false);
 
@@ -71,49 +74,66 @@ const DraggableDataElement = ({dataElement, stageDE, deToEdit,setDeToEdit,update
     }
 
     return (
-    <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined || deToEdit!==''}>
-        {(provided, snapshot) => (
-            <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
-                <div id={"de_"+dataElement.id} className={classNames} style={{color:"#333333" , backgroundColor: "#e0f2f1", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
-                    <div className="ml_item-icon">
-                        <img className="ml_list-img" alt="de" src={de_svg} />
+        <>
+        <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined || DEActions.deToEdit!==''}>
+            {(provided, snapshot) => (
+                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
+                    <div id={"de_"+dataElement.id} className={classNames} style={{color:"#333333" , backgroundColor: "#e0f2f1", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
+                        <div className="ml_item-icon">
+                            <img className="ml_list-img" alt="de" src={de_svg} />
+                        </div>
+                        <div className="ml_item-title"> 
+                            {deImportStatus} { renderFormName || dataElement.formName}
+                        </div>
+                        <div className="ml_item-warning_error" onClick={()=>setShowValidationMessage(!showValidationMessage)}>
+                            {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length}/> }
+                            {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
+                        </div>
+                        <div className="ml_item-cta">
+                        <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>
+                            {openMenu &&
+                                <Layer onClick={toggle}>
+                                    <Popper reference={ref} placement="bottom-end">
+                                        <FlyoutMenu>
+                                            <MenuItem disabled={false} label="Edit This Data Element" dataTest={"EDIT"} icon={<EditIcon />} onClick={()=>{ toggle(); DEActions.setEdit(dataElement.id)} }/>
+                                            <MenuItem disabled={true} label="Add Data Element Above" icon={<UpIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                                            <MenuItem disabled={true} label="Add Data Element Below" icon={<DownIcon />} onClick={()=>{toggle(); } }/>
+                                            <MenuItem disabled={false} destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={()=>{toggle(); setDeToRemove(dataElement); } }/>
+                                        </FlyoutMenu>
+                                    </Popper>
+                                </Layer>
+                            }
+                            {/*<a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
+                        </div>
                     </div>
-                    <div className="ml_item-title"> 
-                        {deImportStatus} { renderFormName || dataElement.formName}
-                    </div>
-                    <div className="ml_item-warning_error" onClick={()=>setShowValidationMessage(!showValidationMessage)}>
-                        {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length}/> }
-                        {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
-                    </div>
-                    <div className="ml_item-cta">
-                    <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>
-                        {openMenu &&
-                            <Layer onClick={toggle}>
-                                <Popper reference={ref} placement="bottom-end">
-                                    <FlyoutMenu>
-                                        <MenuItem disabled={false} label="Edit This Data Element" dataTest={"EDIT"} icon={<EditIcon />} onClick={()=>{ toggle(); setDeToEdit(dataElement.id) /* Add function */} }/>
-                                        <MenuItem disabled={true} label="Add Data Element Above" icon={<UpIcon />} onClick={()=>{toggle(); /* Add function */} }/>
-                                        <MenuItem disabled={true} label="Add Data Element Below" icon={<DownIcon />} onClick={()=>{toggle(); } }/>
-                                        <MenuItem disabled={true} destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
-                                    </FlyoutMenu>
-                                </Popper>
-                            </Layer>
-                        }
-                        {/*<a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
-                    </div>
+                    { DEActions.deToEdit=== dataElement.id &&  
+                        <DataElementForm 
+                            programStageDataElement={stageDE}
+                            section={section}
+                            setDeToEdit={DEActions.setEdit}
+                            save={DEActions.update}
+                        /> 
+                    }
+                    { showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }
                 </div>
-                { deToEdit=== dataElement.id &&  
-                    <DataElementForm 
-                        programStageDataElement={stageDE}
-                        section={section}
-                        setDeToEdit={setDeToEdit}
-                        save={updateDEValues}
-                    /> 
-                }
-                { showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }
-            </div>
-        )}
-    </Draggable>
+            )}
+        </Draggable>
+        <AlertDialogSlide
+            open={!!deToRemove} 
+            title={"Remove this data element from the assessment?"}
+            icon={<WarningAmberIcon fontSize="large" color="warning"/>}
+            preContent={
+                <span>{deToRemove.name}</span>
+            }
+            content={"Warning: This action can't be undone"} 
+            primaryText={"Yes, remove it it"} 
+            secondaryText={"No, keep it"} 
+            actions={{
+                primary: function(){ setDeToRemove(false); removeDataElement() },
+                secondary: function(){setDeToRemove(false);  }
+            }} 
+        />
+        </>
     );
 };
 
