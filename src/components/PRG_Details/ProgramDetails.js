@@ -1,6 +1,8 @@
+import React, { useEffect } from 'react'
 import { useDataQuery } from "@dhis2/app-runtime";
 import { useSelector } from "react-redux";
 import { Chip, CircularLoader, NoticeBox } from '@dhis2/ui';
+import { useMatomo } from '@datapunt/matomo-tracker-react'
 
 // ------------------
 import { Link, useParams } from "react-router-dom";
@@ -22,8 +24,14 @@ const query = {
 };
 
 const ProgramDetails = () => {
-
     const { id } = useParams();
+    const { trackPageView, trackEvent } = useMatomo()
+    useEffect(() => {
+        trackPageView({
+            documentTitle: 'Program Details', // optional
+            href: '/program/'+id, // optional
+        })
+    }, [])
 
     if (id && id.length == 11) {
         const dispatch = useDispatch();

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { DataQuery } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import classes from './App.module.css'
@@ -27,6 +27,7 @@ import ProgramStage from './components/STG_Details/ProgramStage';
 import './css/main.css';
 
 const App = () => {
+
     return (
     <>
         <Provider store={store}>

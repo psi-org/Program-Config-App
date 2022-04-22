@@ -24,7 +24,7 @@ import Removed from "./Removed";
 import ValidateMetadata from "./ValidateMetadata";
 import Errors from "./Errors";
 import ErrorReports from "./ErrorReports";
-
+import { useMatomo } from '@datapunt/matomo-tracker-react'
 
 const createMutation = {
     resource: 'metadata',
@@ -70,6 +70,8 @@ const queryPRV = {
 };
 
 const StageSections = ({ programStage, stageRefetch }) => {
+
+    const { trackPageView, trackEvent } = useMatomo()
 
     // Globals
     const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
@@ -199,6 +201,8 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     const configuration_download = (e) => {
+        trackEvent({ category: 'Configuration', action: 'export' })
+
         e.preventDefault();
         setExportToExcel(true);
         setExportStatus("Generating Configuration File...")

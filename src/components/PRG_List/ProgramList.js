@@ -1,15 +1,16 @@
+import React, { useEffect } from 'react'
 import { useDataQuery } from "@dhis2/app-runtime";
 import { Button, Chip, CircularLoader, NoticeBox, Pagination, IconAddCircle24, Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Input, InputField, SwitchField } from "@dhis2/ui";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ProgramNew from './ProgramNew'
 import download_svg from './../../images/i-download.svg';
-import upload_svg from './../../images/i-upload.svg';
+import upload_svg from './../../images/i-upload.svg'
+import { useMatomo } from '@datapunt/matomo-tracker-react'
 
 // ------------------
 import ProgramItem from "./ProgramItem";
 import DataProcessor from "../Excel/DataProcessor";
-
 const query = {
   results: {
     resource: "programs",
@@ -25,6 +26,13 @@ const query = {
 };
 
 const ProgramList = () => {
+  const { trackPageView, trackEvent } = useMatomo()
+  useEffect(() => {
+    trackPageView({
+      documentTitle: 'Program List', // optional
+      href: '/', // optional
+    })
+  }, [])
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [exportToExcel, setExportToExcel] = useState(false);

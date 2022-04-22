@@ -1,4 +1,5 @@
 // *** Global State ***
+import React, { useEffect } from 'react'
 import { useDispatch } from "react-redux";
 import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
@@ -10,6 +11,7 @@ import {NoticeBox, CircularLoader} from "@dhis2/ui";
 import { Link, useParams } from "react-router-dom";
 import StageSections from "./StageSections";
 import { ajax } from "jquery";
+import { useMatomo } from '@datapunt/matomo-tracker-react'
 
 const query = {
     results: {
@@ -28,6 +30,14 @@ const query = {
 const ProgramStage = () => {
 
     const {id} = useParams();
+
+    const { trackPageView, trackEvent } = useMatomo()
+    useEffect(() => {
+        trackPageView({
+            documentTitle: 'Program Stage', // optional
+            href: '/programstage/'+id, // optional
+        })
+    }, [])
 
     if(id && id.length==11){
         const dispatch = useDispatch();
