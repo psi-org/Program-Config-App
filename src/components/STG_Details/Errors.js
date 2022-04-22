@@ -49,7 +49,7 @@ const Errors = (props) => {
                         <img className="ml_list-img" alt="sec" src={error_svg} />
                     </div>
                     <div className="ml_item-title">
-                        Validation Errors | <span>{props.validationResults.questions.length + props.validationResults.scores.length} data elements</span>
+                        Validation Errors | <span>{props.validationResults.questions.length + props.validationResults.scores.length + props.validationResults.feedbacks.reduce((acu,cur)=> acu+cur.instance.elements.length,0 )} data elements</span>
                     </div>
                     <div className="ml_item-warning_error "></div>
                     <div className="ml_item-cta">
@@ -68,7 +68,7 @@ const Errors = (props) => {
                                         <img src={error_svg} alt="error_dataElement" className="ml_list-img"/>
                                     </div>
                                     <div className="ml_item-title">
-                                        <div><strong>{labelFormName ? "[Label]" :"[Question]"} </strong>{labelFormName || question.formName}</div>
+                                        <div><strong>{labelFormName ? "[ Label ]" :"[ Question ]"} </strong>{labelFormName || question.formName}</div>
                                     </div>
                                     <div className="ml_item-warning_error" onClick={()=>showIssues([question])}>
                                         {question.warnings && question.warnings.length > 0 && <BadgeWarnings counts={question.warnings.length}/> }
@@ -87,11 +87,31 @@ const Errors = (props) => {
                                         <img src={error_svg} alt="error_dataElement" className="ml_list-img"/>
                                     </div>
                                     <div className="ml_item-title">
-                                        <div><strong>[Score] </strong>{score.formName}</div>
+                                        <div><strong>[ Score ] </strong>{score.formName}</div>
                                     </div>
                                     <div className="ml_item-warning_error" onClick={()=>showIssues([score])}>
                                         {score.warnings && score.warnings.length > 0 && <BadgeWarnings counts={score.warnings.length}/> }
                                         {score.errors && score.errors.length > 0 && <BadgeErrors counts={score.errors.length}/> }
+                                    </div>
+                                    
+                                </div>
+                            )
+                        })
+                    }
+                    {
+                        props.validationResults.feedbacks.map((error, i) => {
+                            return (
+                                <div id={"f_" + i} className={"ml_item"} key={i} >
+                                    <div className="ml_item-icon">
+                                        <img src={error_svg} alt="error_FeedbackOrder" className="ml_list-img"/>
+                                    </div>
+                                    <div className="ml_item-title">
+                                        <div><strong>[ Feedback Order {error.instance.feedbackOrder} ] </strong> {error.msg.text + ': ' + (!error.instance.expectedValues?error.instance.elements.join(', '):error.instance.expectedValues.join(' or '))+'.'}</div>
+                                        
+                                    </div>
+                                    <div className="ml_item-warning_error" >
+                                        {/* {score.warnings && score.warnings.length > 0 && <BadgeWarnings counts={score.warnings.length}/> }
+                                        {score.errors && score.errors.length > 0 && <BadgeErrors counts={score.errors.length}/> } */}
                                     </div>
                                     
                                 </div>

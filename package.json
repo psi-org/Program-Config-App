@@ -1,6 +1,6 @@
 {
   "name": "programconfigapp",
-  "short_name": "Program Config App",
+  "short_name":"Program Config App",
   "author": "Fernando Gomez - Mario Lopez - Utsav Koju",
   "version": "1.2.0",
   "description": "",
@@ -19,6 +19,11 @@
     "@datapunt/matomo-tracker-react": "^0.5.1",
     "@dhis2/app-runtime": "^3.4.3",
     "@dhis2/ui": "^8.2.0",
+    "@emotion/react": "^11.8.2",
+    "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.5.1",
+    "@mui/material": "^5.5.2",
+    "@uiw/react-md-editor": "^3.11.2",
     "exceljs": "^4.2.1",
     "file-saver": "^2.0.5",
     "jquery": "^3.6.0",
@@ -27,6 +32,7 @@
     "react-router-dom": "^5.3.0",
     "react-sweet-progress": "^1.1.2",
     "redux": "^4.1.1",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "rehype-sanitize": "^5.0.1"
   }
 }
