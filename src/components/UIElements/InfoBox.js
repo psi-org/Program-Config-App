@@ -31,9 +31,9 @@ const InfoBox = (props) => {
                     </div>
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
+                    <div class='info-box-content'>
                         {props.message}
-                    </DialogContentText>
+                    </div>
                 </DialogContent>
                 <DialogActions>
                     <Button primary onClick={()=>setShowModal(false)}>Close</Button>

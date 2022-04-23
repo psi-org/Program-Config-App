@@ -130,10 +130,11 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     // States
     const [removedElements, setRemovedElements] = useState([])
-    const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations"));
-    const [scoresSection, setScoresSection] = useState(programStage.programStageSections.find(s => s.name == "Scores"));
+    const originalProgramStageDataElements = programStage.programStageDataElements.reduce((acu,cur)=> acu.concat(cur),[])
+    const [sections, setSections] = useState([...programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations")]);
+    const [scoresSection, setScoresSection] = useState({...programStage.programStageSections.find(s => s.name == "Scores")});
     const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"));
-    const [programStageDataElements, setProgramStageDataElements] = useState(programStage.programStageDataElements);
+    const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
     const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
     const [errorReports, setErrorReports] = useState(undefined)
 
@@ -157,12 +158,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
         let psdeIdx = programStageDataElements.findIndex( psde =>  psde.dataElement.id === id )
         let sectionIdx = sections.find(s => s.id === section)?.dataElements.findIndex(de => de.id === id)
         
-        // CAUTION > REMOVE FROM PROGRAM STAGE DATA ELEMENTS, SECTION DATA ELEMENTS AND ADD TO REMOVED ITEMS
         if(sectionIdx > -1 && psdeIdx > -1){
-            let removed = sections.find(s => s.id === section)?.dataElements[sectionIdx]
             sections.find(s => s.id === section)?.dataElements.splice(sectionIdx,1)
             programStageDataElements.splice(psdeIdx,1)
-            setRemovedElements(removedElements.push(removed))
             setSections(sections)
             setProgramStageDataElements(programStageDataElements)
             pushNotification(<span>Data Element removed! <strong>Remember to Validate and Save!</strong></span>,"info")
@@ -170,21 +168,15 @@ const StageSections = ({ programStage, stageRefetch }) => {
     }
 
     const saveAdd = (params) => {
-        const psDEs = params.newDataElements.map(de => ({
-            displayInReports: false,
-            compulsory: false,
-            sortOrder: 1,
-            programStage: {
-                id: params.deRef.stage
-            },
-            dataElement : de
-        }))
-        console.log(params)
-        sections.find(s => s.id === params.deRef.section).dataElements.splice(params.deRef.index,0,...params.newDataElements)
-        let newProgramStageDataElements = programStageDataElements.concat(psDEs)
+        let dataElementObjects = params.newDataElements.map(psde => psde.dataElement)
+
+        sections.find(s => s.id === params.deRef.section).dataElements.splice(params.deRef.index,0,...dataElementObjects/* ...params.newDataElements */)
+        let newProgramStageDataElements = programStageDataElements.concat(params.newDataElements)
 
         setSections(sections)
         setProgramStageDataElements(newProgramStageDataElements)
+        setDeManager(false)
+        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : '' } added! <strong>Remember to Validate and Save!</strong></span>)
     }
 
     const [deManager,setDeManager] = useState(false)
@@ -284,6 +276,8 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     const commit = () => {
         if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
+        let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id))
+        setRemovedElements(removed)
         setSavingMetadata(true);
         return;
     };
@@ -559,7 +553,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     importedSections={sections}
                     importedScores={scoresSection}
                     criticalSection={criticalSection}
-                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : []}
+                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : removedElements /*[]*/}
 
                     // createMetadata={createMetadata}
                     setSavingMetadata={setSavingMetadata}
@@ -594,7 +588,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     setShowSectionForm={setShowSectionManager}
                     sections={sections}
                     refreshSections={setSections} 
-                    notify={pushNotification} */
+                     */
                 />
             }
         </div>

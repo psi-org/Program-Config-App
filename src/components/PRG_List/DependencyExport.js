@@ -37,6 +37,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
   const legends = legendsQuery.data?.results.legendSets;
 
   const prgExportQuery = useDataQuery(queryProgramMetadata);
+  const exportError = prgExportQuery.error?.stack;
   const programMetadata = prgExportQuery.data?.results;
 
   const [documentReady, setDocumentReady] = useState(false)
@@ -56,6 +57,8 @@ const DependencyExport = ({ program, setExportProgramId }) => {
     delete programMetadata.categoryOptionCombos;
 
     programMetadata.programs?.forEach(program => {
+
+      program.organisationUnits = []
 
       delete program.created;
       delete program.lastUpdated;
@@ -264,11 +267,18 @@ const DependencyExport = ({ program, setExportProgramId }) => {
           Download Metadata With Dependencies
         </CustomMUIDialogTitle >
         <DialogContent dividers style={{ padding: '1em 2em' }}>
-          {!documentReady &&
+          {!documentReady && !exportError &&
             <div style={{display: 'flex', alignItems: 'center'}}><CircularLoader small /><p>Exporting metadata and creating file...</p></div>
           }
 
-          {documentReady && cleanMetadata && legends &&
+          {exportError &&
+            <div style={{ lineHeight: '1.5em' }}>
+              <p style={{color: '#AA0000'}}><strong>Something went wrong!</strong></p>
+              <p>{exportError}</p>
+            </div>
+          }
+
+          {documentReady && cleanMetadata && legends && !exportError &&
             <div style={{ lineHeight: '1.5em' }}>
               <p><strong>Your file is ready!</strong></p>
               <p>You can now download the metadata related to the program by clicking "Download Now".</p>

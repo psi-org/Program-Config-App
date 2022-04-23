@@ -267,9 +267,9 @@ const ValidateMetadata = (props) => {
             if (feedbackOrderValidationSettings.enable) {
 
                 let feedbackData = getFeedbackData(sections)
-                console.log(feedbackData)
+                //console.log(feedbackData)
                 let duplicatedFeedbacks = groupBy(checkDuplicatedFeedbacks(feedbackData), 'feedbackOrder')
-                console.log(duplicatedFeedbacks)
+                //console.log(duplicatedFeedbacks)
 
                 if (feedbackOrderValidationSettings.checkDuplicated.enable) {
                     duplicatedFeedbacks.forEach(df => {

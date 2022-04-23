@@ -414,7 +414,6 @@
   font-weight: 700;
   color: #29C4A9;
 }
-
 .survay_panel {
   display: grid;
   grid-template-columns: 48px calc(100% - 96px) 48px;
@@ -796,6 +795,55 @@ code {
 
 .wrapper {
   padding: 8px 16px 0 16px;
+}
+
+.section-header{
+  color:#333333;
+  background-color: #b2dfdb;
+  border: 0.5px solid #D5DDE5;
+  border-radius: 4px;
+  transition: all 0.1s;
+}
+
+.section-header:hover{
+  background-color: #97dcd6;
+}
+
+.section-selected{
+  background-color: #84c9c3;
+  transition: all 0.2s;
+}
+
+.data-element-header{
+  color:#333333;
+  background-color: #e0f2f1;
+  border: 0.5px solid #D5DDE5;
+  border-radius: 4px;
+  transition: all 0.1s;
+}
+
+.data-element-header:hover{
+  background-color: #d3eceb;
+}
+.data-element-selected{
+  background-color: #b2cdcc;
+  transition: all 0.2s;
+}
+
+.flex-centered{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.info-box-content {
+  margin: 0;
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.00938em;
+  color: rgba(0, 0, 0, 0.6);
 }
 
 /*# sourceMappingURL=main.css.map */

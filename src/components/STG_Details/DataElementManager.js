@@ -25,19 +25,12 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from "@mui/material/InputAdornment";
 import Divider from '@mui/material/Divider';
 
-const queryId = {
-    results: {
-        resource: 'system/id.json',
-        params: { limit: 1 }
-    }
-};
-
 const dataElementsSearchQuery = {
     results: {
         resource: 'dataElements',
         params: ({ token, page }) => ({
             //fields: ['id,valueType,displayName,lastUpdated'],
-            fields: ['id,name,shortName,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName'],
+            fields: ['id,name,shortName,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName, lastUpdated'],
             filter: [`identifiable:token:${token}`, 'name:ne:default', 'domainType:eq:TRACKER'],
             page: page
         })
@@ -79,8 +72,6 @@ function a11yProps(index) {
 const DataElementManager = (props) => {
 
     const [newDataElements,setNewDataElements] = useState([])
-    const idsQuery = useDataQuery(queryId);
-    const newDeId = idsQuery.data?.results.codes[0];
     const [saveDeFlag, setSaveDeFlag] = useState(false);
 
     /* const [section, setSection] = useState(props.sections[props.sectionIndex] || {})
@@ -110,6 +101,22 @@ const DataElementManager = (props) => {
     const [rows, setRows] = useState([])
     const [totalRows, setTotalRows] = useState(0)
     const [selectionModel, setSelectionModel] = useState([])
+
+    const checkSelectedDE = (model) => {
+        setNewDataElements(
+            model.map(id => {
+                let deObject
+                deObject = newDataElements.find(de => de.id === id)
+                if(!deObject) deObject = rows.find(de => de.id===id)
+                return deObject
+            })
+        )
+    }
+
+    /* useEffect(()=>{
+        console.log(selectionModel)
+    },[selectionModel]) */
+
     const [loading, setLoading] = useState(false)
     const prevSelectionModel = useRef(selectionModel)
 
@@ -127,24 +134,43 @@ const DataElementManager = (props) => {
 
     const initSearch = (nextPage = 1) => {
         setPage(nextPage)
+        
         search({ token: filterValue, page: nextPage }).then(data => {
             if (data?.results?.dataElements) {
                 setRows(data.results.dataElements)
                 setTotalRows(data.results.pager.total)
-                setSelectionModel(prevSelectionModel.current)
+                setSelectionModel(prevSelectionModel.current)        
             }
         })
     }
 
     const handleNewDE = (dataElement) =>{
-        console.log(dataElement)
+        dataElement.programStage = {
+            id: props.deRef.stage
+        }
+        props.saveAdd({newDataElements:[dataElement],deRef:props.deRef})
+        
     }
 
     function submission() {
         if(tabValue === 1){ //New DE
             setSaveDeFlag(true)
         }else{ //Existing DEs
-            props.saveAdd({newDataElements,deRef:props.deRef})
+            let newDEObjects = newDataElements.map(de => ({
+                displayInReports: false,
+                compulsory: false,
+                sortOrder: 1,
+                programStage: {
+                    id: props.deRef.stage
+                },
+                dataElement : de
+            }))
+            props.saveAdd({
+                newDataElements: newDEObjects ,
+                deRef:props.deRef
+            })
+            setSelectionModel([])
+            setNewDataElements([])
         }
         /* setSentForm(true)
         if (formDataIsValid()) {
@@ -168,7 +194,7 @@ const DataElementManager = (props) => {
         <>
             <CustomMUIDialog open={true} maxWidth='xl' fullWidth={true} >
                 <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
-                    Add Data Element To Section ({props.deRef.sectionName})
+                    Add Data Element To Section [ {props.deRef.sectionName} ]
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={tabValue} onChange={handleTabChange} aria-label="de tabs" variant="fullWidth">
                             <Tab icon={<SearchIcon />} iconPosition="start" label="Select Existing Data Elements" {...a11yProps(1)} />
@@ -210,24 +236,23 @@ const DataElementManager = (props) => {
                                     columns={columns}
                                     pagination
                                     checkboxSelection
+                                    disableSelectionOnClick
                                     pageSize={50}
                                     rowsPerPageOptions={[50]}
                                     rowCount={totalRows}
                                     paginationMode="server"
                                     onPageChange={(newPage) => {
+                                        checkSelectedDE(selectionModel)    
                                         prevSelectionModel.current = selectionModel
                                         initSearch(newPage + 1)
                                     }}
                                     onSelectionModelChange={(newSelectionModel) => {
-                                        setNewDataElements(
-                                            newSelectionModel.map(id => {
-                                                let deObject
-                                                deObject = newDataElements.find(de => de.id === id)
-                                                if(!deObject) deObject = rows.find(de => de.id===id)
-                                                return deObject
-                                            })
-                                        )
+                                        console.log("model",newSelectionModel)
+                                        checkSelectedDE(newSelectionModel)
                                         setSelectionModel(newSelectionModel)
+                                        if(newSelectionModel.length > 0){
+                                            
+                                        }
                                     }}
                                     selectionModel={selectionModel}
                                     loading={loadingSearch}

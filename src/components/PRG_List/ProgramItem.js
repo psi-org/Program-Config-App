@@ -68,7 +68,7 @@ const ProgramItem = ({program, downloadMetadata, deleteProgram}) => {
           </Layer>
         }
 
-        <Link to={"/program/"+program.id}>
+        <Link to={"/program/"+program.id} style={{color: '#333333'}}>
           <div style={{display: 'flex', alignItems: 'center'}} onClick={()=> setProgram(program.id)}>
             <NavigateNextIcon/>
           </div>

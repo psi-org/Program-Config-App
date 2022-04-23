@@ -62,7 +62,7 @@ const METADATA = "haUflNqP85K",
     BUILD_VERSION = "1.3.0";
 
 const MAX_PREFIX_LENGTH = 25, 
-    MAX_NAME_LENGTH = 250,
+    MAX_NAME_LENGTH = 230,
     MIN_NAME_LENGTH = 2,
     MAX_SHORT_NAME_LENGTH = 50;
 
@@ -102,29 +102,36 @@ const ProgramNew = (props) => {
     const [sentForm, setSentForm] = useState(false);
 
     //Validation Messages
-    const [pgrTypeHelperText, setPgrTypeHelperText] = useState(undefined);
-    const [prefixHelperText, setPrefixHelperText] = useState(undefined);
-    const [programNameHelperText, setProgramNameHelperText] = useState(undefined);
-    const [shortNameHelperText, setShortNameHelperText] = useState(undefined);
-    const [healthAreaHelperText, setHealthAreaHelperText] = useState(undefined);
+    const [validationErrors, setValidationErrors] = useState(
+        {
+            pgrType:undefined,
+            prefix:undefined,
+            programName:undefined,
+            shortName:undefined,
+            healthArea:undefined
+        });
 
     const handleChangePgrType = (event) => {
-        setPgrTypeHelperText(undefined)
+        validationErrors.pgrType = undefined
+        setValidationErrors({...validationErrors})
         setPgrTypePCA(event.target.value);
     };
 
     const handleChangeDePrefix = (event) => {
-        setPrefixHelperText(undefined)
+        validationErrors.prefix = undefined
+        setValidationErrors({...validationErrors})
         setDePrefix(event.target.value);
     };
 
     const handleChangeProgramName = (event) => {
-        setProgramNameHelperText(undefined)
+        validationErrors.programName = undefined
+        setValidationErrors({...validationErrors})
         setProgramName(event.target.value);
     };
 
     const handleChangeProgramShortName = (event) => {
-        setShortNameHelperText(undefined)
+        validationErrors.shortName = undefined
+        setValidationErrors({...validationErrors})
         setProgramShortName(event.target.value);
     };
 
@@ -133,7 +140,8 @@ const ProgramNew = (props) => {
     };
 
     const healthAreaChange = (event) => {
-        setHealthAreaHelperText(undefined)
+        validationErrors.healthArea = undefined
+        setValidationErrors({...validationErrors})
         setHealthArea(event.target.value);
     }
 
@@ -162,47 +170,49 @@ const ProgramNew = (props) => {
 
         if(pgrTypePCA===''){
             response = false
-            setPgrTypeHelperText('This field is required')
+            validationErrors.pgrType = 'This field is required'
         }else{
-            setPgrTypeHelperText(undefined)
+            validationErrors.pgrType = undefined
         }
 
         if(dePrefix===''){
             response = false
-            setPrefixHelperText('This field is required')
+            validationErrors.prefix = 'This field is required'
         }else if(dePrefix.length > MAX_PREFIX_LENGTH){
             response = false
-            setPrefixHelperText(`This field cannot exceed ${MAX_PREFIX_LENGTH} characters`)
+            validationErrors.prefix = `This field cannot exceed ${MAX_PREFIX_LENGTH} characters`
         }else{
-            setPrefixHelperText(undefined)
+            validationErrors.prefix = undefined
         }
 
         if(programName===''){
             response = false
-            setProgramNameHelperText('This field is required')
+            validationErrors.programName = 'This field is required'
         }else if(programName.length < MIN_NAME_LENGTH || programName.length > (MAX_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1) ){
             response = false
-            setProgramNameHelperText(`This field must contain between ${MIN_NAME_LENGTH} and ${(MAX_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)} characters`)
+            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${(MAX_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)} characters`
         }else{
-            setProgramNameHelperText(undefined)
+            validationErrors.programName = undefined
         }
 
         if(programShortName===''){
             response = false
-            setShortNameHelperText('This field is required')
+            validationErrors.shortName = 'This field is required'
         }else if(programShortName.length > (MAX_SHORT_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)){
             response = false
-            setShortNameHelperText(`This field cannot exceed ${(MAX_SHORT_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)} characters`)
+            validationErrors.shortName = `This field cannot exceed ${(MAX_SHORT_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)} characters`
         }else{
-            setShortNameHelperText(undefined)
+            validationErrors.shortName = undefined
         }
 
         if(pgrTypePCA!=='tracker' && (pgrTypePCA==='hnqis' && healthArea==='')){
             response = false
-            setHealthAreaHelperText('This field is required')
+            validationErrors.healthArea = 'This field is required'
         }else{
-            setHealthAreaHelperText(undefined)
+            validationErrors.healthArea = undefined
         }
+
+        setValidationErrors({...validationErrors})
 
         return response;
     }
@@ -324,7 +334,7 @@ const ProgramNew = (props) => {
             </CustomMUIDialogTitle >
             <DialogContent dividers style={{ padding: '1em 2em' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <FormControl sx={{ minWidth: '30%' }} error={pgrTypeHelperText!==undefined}>
+                    <FormControl sx={{ minWidth: '30%' }} error={validationErrors.pgrType!==undefined}>
                         <InputLabel id="label-prgType">Program Type</InputLabel>
                         <Select
                             labelId="label-prgType"
@@ -339,12 +349,12 @@ const ProgramNew = (props) => {
                             <MenuItem value={'tracker'} disabled>Tracker Program</MenuItem>
                             <MenuItem value={'hnqis'}>HNQIS</MenuItem>
                         </Select>
-                        <FormHelperText>{pgrTypeHelperText}</FormHelperText>
+                        <FormHelperText>{validationErrors.pgrType}</FormHelperText>
                     </FormControl>
                     <FormControl sx={{ minWidth: '65%' }}>
                         <TextField
-                            error={prefixHelperText!==undefined}
-                            helperText={prefixHelperText}
+                            error={validationErrors.prefix!==undefined}
+                            helperText={validationErrors.prefix}
                             margin="normal"
                             id="prefix"
                             label="Program Data Element Prefix"
@@ -358,8 +368,8 @@ const ProgramNew = (props) => {
                     </FormControl>
                 </div>
                 <TextField
-                    error={programNameHelperText!==undefined}
-                    helperText={programNameHelperText}
+                    error={validationErrors.programName!==undefined}
+                    helperText={validationErrors.programName}
                     margin="normal"
                     id="name"
                     label="Program Name"
@@ -371,8 +381,8 @@ const ProgramNew = (props) => {
                     onChange={handleChangeProgramName}
                 />
                 <TextField
-                    error={shortNameHelperText!==undefined}
-                    helperText={shortNameHelperText}
+                    error={validationErrors.shortName!==undefined}
+                    helperText={validationErrors.shortName}
                     margin="normal"
                     id="shortName"
                     label="Program Short Name"
@@ -392,8 +402,8 @@ const ProgramNew = (props) => {
                             label="Use Competency Class"
                         />
                         <SelectOptions
-                            useError={healthAreaHelperText!==undefined}
-                            helperText={healthAreaHelperText}
+                            useError={validationErrors.healthArea!==undefined}
+                            helperText={validationErrors.healthArea}
                             label={'Program Health Area'}
                             items={healthAreaOptions}
                             handler={healthAreaChange}
