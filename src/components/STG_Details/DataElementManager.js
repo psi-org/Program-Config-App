@@ -72,35 +72,68 @@ function a11yProps(index) {
 const DataElementManager = (props) => {
 
     const [newDataElements,setNewDataElements] = useState([])
+    const [filterValue, setFilterValue] = useState('')
     const [saveDeFlag, setSaveDeFlag] = useState(false);
-
-    /* const [section, setSection] = useState(props.sections[props.sectionIndex] || {})
-    const [sectionName, setSectionName] = useState(section.name || '')
-    const [sentForm, setSentForm] = useState(false);
-
-     */
-
     const { data: dataElements, loading: loadingSearch, refetch: search } = useDataQuery(dataElementsSearchQuery, { lazy: true, variables: { token: undefined, page: undefined } });
+    
     const [tabValue, setTabValue] = useState(0);
-
-    const handleTabChange = (event, newValue) => {
-        setTabValue(newValue);
-    };
-
-    const handleChangeFilterValue = (event) => {
-        setFilterValue(event.target.value);
-    };
+    const handleTabChange = (event, newValue) => setTabValue(newValue)
+    const handleChangeFilterValue = (event) => setFilterValue(event.target.value);
 
     function hideForm() {
         props.setDeManager(false);
     }
 
-    const [filterValue, setFilterValue] = useState('')
+    const craftDate = (params) => {
+        let date = new Date(params.row.lastUpdated)
+        return date.toLocaleString()
+    }
 
-    const [page, setPage] = useState(1)
+    // DATA GRID //
+    const [loading, setLoading] = useState(false)
+    const [page, setPage] = useState(0)
+    const [pageChanged,setPageChanged] = useState(false)
     const [rows, setRows] = useState([])
     const [totalRows, setTotalRows] = useState(0)
+
     const [selectionModel, setSelectionModel] = useState([])
+    const prevSelectionModel = useRef(selectionModel)
+
+    const columns = [
+        { field: "id", hide: true },
+        { field: "displayName", headerName: "Name", flex: 7, editable: false },
+        { field: "valueType", headerName: "Value Type", flex: 1, editable: false },
+        { field: "lastUpdated", headerName: "Last Updated", flex: 2, editable: false, valueGetter: craftDate }
+    ]
+
+    const doSearch = () => {
+        search({ token: filterValue, page:page }).then(data => {
+            if (data?.results?.dataElements) {
+                setRows(data.results.dataElements)
+                setTotalRows(data.results.pager.total)    
+            }
+            setTimeout(() => {
+                setSelectionModel(prevSelectionModel.current)
+                
+            });
+        })
+    }
+
+    useEffect(()=>{
+        if(page<1) return
+        doSearch()
+    },[page])
+
+    useEffect(()=>{
+        if( page > 0 ){
+            if(pageChanged) setPageChanged(false)
+            else checkSelectedDE(selectionModel)
+        }
+    },[selectionModel])
+
+    useEffect(()=>{
+
+    },[newDataElements])
 
     const checkSelectedDE = (model) => {
         setNewDataElements(
@@ -112,37 +145,8 @@ const DataElementManager = (props) => {
             })
         )
     }
+    // END DATA GRID //
 
-    /* useEffect(()=>{
-        console.log(selectionModel)
-    },[selectionModel]) */
-
-    const [loading, setLoading] = useState(false)
-    const prevSelectionModel = useRef(selectionModel)
-
-    const craftDate = (params) => {
-        let date = new Date(params.row.lastUpdated)
-        return date.toLocaleString()
-    }
-
-    const columns = [
-        { field: "id", hide: true },
-        { field: "displayName", headerName: "Name", flex: 7, editable: false },
-        { field: "valueType", headerName: "Value Type", flex: 1, editable: false },
-        { field: "lastUpdated", headerName: "Last Updated", flex: 2, editable: false, valueGetter: craftDate }
-    ]
-
-    const initSearch = (nextPage = 1) => {
-        setPage(nextPage)
-        
-        search({ token: filterValue, page: nextPage }).then(data => {
-            if (data?.results?.dataElements) {
-                setRows(data.results.dataElements)
-                setTotalRows(data.results.pager.total)
-                setSelectionModel(prevSelectionModel.current)        
-            }
-        })
-    }
 
     const handleNewDE = (dataElement) =>{
         dataElement.programStage = {
@@ -172,22 +176,6 @@ const DataElementManager = (props) => {
             setSelectionModel([])
             setNewDataElements([])
         }
-        /* setSentForm(true)
-        if (formDataIsValid()) {
-            section.name = sectionName
-            section.displayName = sectionName
-            if(props.sectionIndex!==undefined){
-                props.sections[props.sectionIndex] = section
-            }else if(props.newSectionIndex!==undefined){
-                section.dataElements = []
-                section.id = sectionId
-                props.sections.splice(props.newSectionIndex, 0, section);
-            }
-            console.log(props.sections)
-            props.refreshSections(props.sections)
-            props.notify(<span>Section {props.newSectionIndex!==undefined?'created':'edited'}! <strong>Remember to Validate and Save!</strong></span>)
-            hideForm()
-        } */
     }
 
     return (
@@ -218,11 +206,17 @@ const DataElementManager = (props) => {
                                     variant="outlined"
                                     value={filterValue}
                                     onChange={handleChangeFilterValue}
+                                    onKeyPress={event => {
+                                        if (event.key === 'Enter' && filterValue!=='') {
+                                            if(page===1) doSearch()
+                                            else setPage(1)
+                                        }
+                                    }}
                                     autoComplete='off'
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position='end'>
-                                                <Button onClick={() => initSearch()} startIcon={<SearchIcon />} variant='contained' color='primary'>
+                                                <Button onClick={() => setPage(1)} startIcon={<SearchIcon />} variant='contained' color='primary'>
                                                     Search
                                                 </Button>
                                             </InputAdornment>
@@ -232,6 +226,7 @@ const DataElementManager = (props) => {
                             </div>
                             <div style={{ height: 400, width: '100%' }}>
                                 <DataGrid
+                                    page={page >= 1 ? page-1 : page}
                                     rows={rows}
                                     columns={columns}
                                     pagination
@@ -242,17 +237,12 @@ const DataElementManager = (props) => {
                                     rowCount={totalRows}
                                     paginationMode="server"
                                     onPageChange={(newPage) => {
-                                        checkSelectedDE(selectionModel)    
+                                        setPageChanged(true)
                                         prevSelectionModel.current = selectionModel
-                                        initSearch(newPage + 1)
+                                        setPage(newPage+1)
                                     }}
                                     onSelectionModelChange={(newSelectionModel) => {
-                                        console.log("model",newSelectionModel)
-                                        checkSelectedDE(newSelectionModel)
                                         setSelectionModel(newSelectionModel)
-                                        if(newSelectionModel.length > 0){
-                                            
-                                        }
                                     }}
                                     selectionModel={selectionModel}
                                     loading={loadingSearch}
@@ -287,51 +277,4 @@ const DataElementManager = (props) => {
     )
 }
 
-
 export default DataElementManager;
-
-/**
- * {
-    "id": "j5opfj5JoOK",
-
-
-    "displayInReports": false,
-    "compulsory": false,
-    "sortOrder": 1,
-    "programStage": {
-        "id": "WbN5QwSKusT"
-    },
-    
-    "dataElement": {
-        "code": "SO HNQIS2 FP__S13Q1",
-        "name": "SO HNQIS2 FP__S13Q1_Ensures correct vial and dosage; expiration date is not passed",
-        "id": "YdQ3U6rWO6C",
-        "shortName": "SO HNQIS2 FP__S13Q1_Ensures correct vial and dosag",
-        "aggregationType": "SUM",
-        "domainType": "TRACKER",
-        "displayName": "SO HNQIS2 FP__S13Q1_Ensures correct vial and dosage; expiration date is not passed",
-        "formName": "Ensures correct vial and dosage; expiration date is not passed",
-        "valueType": "NUMBER",
-        "optionSetValue": true,
-        "optionSet": {
-            "name": "HNQIS - Yes1No0",
-            "id": "v6QYyj8ihWn"
-        },
-        "attributeValues": [
-            {
-                "value": "{\"isCompulsory\":\"No\",\"isCritical\":\"No\",\"elemType\":\"question\",\"varName\":\"_S13Q1\",\"scoreNum\":1,\"scoreDen\":1,\"parentQuestion\":\"P3h2eI0Sqd2\",\"parentValue\":1}",
-                "attribute": {
-                    "id": "haUflNqP85K"
-                }
-            },
-            {
-                "value": "12.1",
-                "attribute": {
-                    "id": "LP171jpctBm"
-                }
-            }
-        ],
-        "legendSets": []
-    }
-}
- */

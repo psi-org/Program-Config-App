@@ -37,7 +37,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
   const legends = legendsQuery.data?.results.legendSets;
 
   const prgExportQuery = useDataQuery(queryProgramMetadata);
-  const exportError = prgExportQuery.error?.stack;
+  const exportError = prgExportQuery.error?.details;
   const programMetadata = prgExportQuery.data?.results;
 
   const [documentReady, setDocumentReady] = useState(false)
@@ -274,7 +274,8 @@ const DependencyExport = ({ program, setExportProgramId }) => {
           {exportError &&
             <div style={{ lineHeight: '1.5em' }}>
               <p style={{color: '#AA0000'}}><strong>Something went wrong!</strong></p>
-              <p>{exportError}</p>
+              <p>{exportError?.httpStatus+" - Status "+exportError?.httpStatusCode}</p>
+              <p>{exportError?.message}</p>
             </div>
           }
 

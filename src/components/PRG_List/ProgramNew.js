@@ -20,6 +20,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import SelectOptions from './../STG_Details/SelectOptions'
 import FormHelperText from '@mui/material/FormHelperText';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 //const { Form, Field } = ReactFinalForm
 
@@ -215,13 +216,19 @@ const ProgramNew = (props) => {
         setValidationErrors({...validationErrors})
 
         return response;
-    }
+    }    
 
     function submission() {
         setSentForm(true)
         props.setNotification(undefined)
         //let prgTypeId = 'yB5tFAAN7bI';
-        if (!metadataRequest.called && formDataIsValid()) {
+        let dataIsValid = formDataIsValid()
+        if (!dataIsValid){
+            setSentForm(false)
+            return
+        }
+        if (!metadataRequest.called && dataIsValid) {
+
             let prgrm = Program;
 
             prgrm.name = programName;
@@ -276,17 +283,15 @@ const ProgramNew = (props) => {
                 programStageSections: [defaultSection, criticalSteps, scores]
             }
 
-            console.log(metadata)
-
             metadataRequest.mutate({ data: metadata }).then(response => {
                 if (response.status != 'OK') {
                     props.setNotification({
                         message: response.typeReports[0].objectReports[0].errorReports.map(er => er.message).join(' | '),
                         severity: 'error'
-                    })
+                    });
                     props.setShowProgramForm(false);
                 }else{
-                    props.setNotification({message: `Program ${prgrm.name} created successfully`, severity: 'success'})
+                    props.setNotification({message: `Program ${prgrm.name} created successfully`, severity: 'success'});
                     props.setShowProgramForm(false);
                     props.programsRefetch();
                 }
@@ -416,7 +421,14 @@ const ProgramNew = (props) => {
             </DialogContent>
             <DialogActions style={{ padding: '1em' }}>
                 <Button onClick={() => hideForm()} color="error" > Close </Button>
-                <Button onClick={() => submission()} variant='outlined' startIcon={<SendIcon />}> Submit </Button>
+                <LoadingButton 
+                    onClick={() => submission()}
+                    loading={sentForm}
+                    variant='outlined'
+                    loadingPosition="start"
+                    startIcon={<SendIcon />} >
+                    Submit
+                </LoadingButton>
             </DialogActions>
         </CustomMUIDialog>
     </>

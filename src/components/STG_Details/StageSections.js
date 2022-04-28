@@ -24,6 +24,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
@@ -36,7 +37,6 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
-
 
 const createMutation = {
     resource: 'metadata',
@@ -116,8 +116,8 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     //const [snackbarContent, setSnackbarContent] = useState('')
 
-    const [snackParams,setSnackParams] = useState(false)
-    const pushNotification = (content,severity="success") => setSnackParams({content,severity})
+    const [snackParams, setSnackParams] = useState(false)
+    const pushNotification = (content, severity = "success") => setSnackParams({ content, severity })
 
     const [uidPool, setUidPool] = useState([]);
 
@@ -130,9 +130,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     // States
     const [removedElements, setRemovedElements] = useState([])
-    const originalProgramStageDataElements = programStage.programStageDataElements.reduce((acu,cur)=> acu.concat(cur),[])
+    const originalProgramStageDataElements = programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), [])
     const [sections, setSections] = useState([...programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations")]);
-    const [scoresSection, setScoresSection] = useState({...programStage.programStageSections.find(s => s.name == "Scores")});
+    const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => s.name == "Scores") });
     const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"));
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
     const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
@@ -154,46 +154,70 @@ const StageSections = ({ programStage, stageRefetch }) => {
         pushNotification(<span>Data Element edited! <strong>Remember to Validate and Save!</strong></span>)
     }
 
-    const removeDE = (id,section) => {
-        let psdeIdx = programStageDataElements.findIndex( psde =>  psde.dataElement.id === id )
+    const removeDE = (id, section) => {
+        let psdeIdx = programStageDataElements.findIndex(psde => psde.dataElement.id === id)
         let sectionIdx = sections.find(s => s.id === section)?.dataElements.findIndex(de => de.id === id)
-        
-        if(sectionIdx > -1 && psdeIdx > -1){
-            sections.find(s => s.id === section)?.dataElements.splice(sectionIdx,1)
-            programStageDataElements.splice(psdeIdx,1)
+
+        if (sectionIdx > -1 && psdeIdx > -1) {
+            sections.find(s => s.id === section)?.dataElements.splice(sectionIdx, 1)
+            programStageDataElements.splice(psdeIdx, 1)
             setSections(sections)
             setProgramStageDataElements(programStageDataElements)
-            pushNotification(<span>Data Element removed! <strong>Remember to Validate and Save!</strong></span>,"info")
+            pushNotification(<span>Data Element removed! <strong>Remember to Validate and Save!</strong></span>, "info")
         }
     }
 
     const saveAdd = (params) => {
         let dataElementObjects = params.newDataElements.map(psde => psde.dataElement)
 
-        sections.find(s => s.id === params.deRef.section).dataElements.splice(params.deRef.index,0,...dataElementObjects/* ...params.newDataElements */)
+        sections.find(s => s.id === params.deRef.section).dataElements.splice(params.deRef.index, 0, ...dataElementObjects/* ...params.newDataElements */)
         let newProgramStageDataElements = programStageDataElements.concat(params.newDataElements)
 
         setSections(sections)
         setProgramStageDataElements(newProgramStageDataElements)
         setDeManager(false)
-        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : '' } added! <strong>Remember to Validate and Save!</strong></span>)
+        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to Validate and Save!</strong></span>)
     }
 
-    const [deManager,setDeManager] = useState(false)
+    const [deManager, setDeManager] = useState(false)
 
     const DEActions = {
         deToEdit,
-        setEdit : de => setDeToEdit(de),
-        update : (de,section,stageDe) => updateDEValues(de,section,stageDe),
-        remove : (de,section) => removeDE(de,section),
-        add : (index,section) => setDeManager({
+        setEdit: de => setDeToEdit(de),
+        update: (de, section, stageDe) => updateDEValues(de, section, stageDe),
+        remove: (de, section) => removeDE(de, section),
+        add: (index, section) => setDeManager({
             index,
             section,
-            stage:programStage.id,
-            sectionName:sections.find(s=>s.id===section).displayName
+            stage: programStage.id,
+            sectionName: sections.find(s => s.id === section).displayName
         })
     }
     // ***** END OF DATA ELEMENT ACTIONS ***** //
+
+    // ***** SECTIONS ACTIONS ***** //
+    const handleSectionEdit = (section = undefined, newSection = undefined) => {
+        setEditSectionIndex(section)
+        setNewSectionIndex(newSection)
+        setShowSectionManager(true)
+    }
+
+    const removeSection = section => {
+        let idx = sections.findIndex(s => s.id === section.id)
+        let newPSDEs = programStageDataElements.filter(psde => !section.dataElements.find(de => de.id === psde.dataElement.id))
+        setProgramStageDataElements(newPSDEs)
+        sections.splice(idx, 1)
+        setSections(sections)
+        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to Validate and Save!</strong></span>, "info")
+    }
+
+    const SectionActions = {
+        append : () => handleSectionEdit(undefined,sections.length),
+        handleSectionEdit: (section = undefined, newSection = undefined) => handleSectionEdit(section, newSection),
+        remove: id => removeSection(id)
+    }
+
+    // ***** END OF SECTIONS ACTIONS ***** //
 
     // Create Mutation
     let metadataDM = useDataMutation(createMutation);
@@ -276,7 +300,8 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     const commit = () => {
         if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
-        let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id))
+        let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
+        console.log(removed)
         setRemovedElements(removed)
         setSavingMetadata(true);
         return;
@@ -373,22 +398,16 @@ const StageSections = ({ programStage, stageRefetch }) => {
         return data.flat().flat()
     }
 
-    const handleSectionEdit = (section=undefined, newSection=undefined) =>{
-        setEditSectionIndex(section)
-        setNewSectionIndex(newSection)
-        setShowSectionManager(true)
-    }
-
     return (
         <div className="cont_stage">
-            <div className="sub_nav">
+            <div className="sub_nav align-items-center">
                 <div className="cnt_p">
                     <Link to={'/'}><Chip>Home</Chip></Link>/
                     <Link to={'/program/' + programStage.program.id}><Chip>Program: {programStage.program.name}</Chip></Link>/
                     <Chip>Stage: {programStage.displayName}</Chip>
                 </div>
                 <div className="c_srch"></div>
-                <div className="c_btns" style={{color: '#444444'}}>
+                <div className="c_btns" style={{ color: '#444444' }}>
                     <ButtonStrip>
                         <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
                         <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
@@ -502,6 +521,11 @@ const StageSections = ({ programStage, stageRefetch }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
+                        {sections.length === 0 && 
+                            <Button startIcon={<AddBoxIcon/>} variant='contained' style={{margin: '8px'}} onClick={SectionActions.append}>
+                                Add New Section
+                            </Button>
+                        }
                         {/* { programStageDataElements &&  <DataElementForm programStageDataElement={programStageDataElements[5]} /> } */}
                         {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
@@ -522,7 +546,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
                                         sections.map((pss, idx) => {
-                                            return <DraggableSection stageSection={pss} stageDataElements={programStageDataElements} DEActions={DEActions} index={idx} key={pss.id || idx} handleSectionEdit={handleSectionEdit}/>
+                                            return <DraggableSection stageSection={pss} stageDataElements={programStageDataElements} DEActions={DEActions} index={idx} key={pss.id || idx} SectionActions={SectionActions} /* handleSectionEdit={handleSectionEdit} */ />
                                         })
                                     }
                                     {provided.placeholder}
@@ -535,10 +559,10 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     </div>
                 </div>
             </DragDropContext>
-            <Snackbar 
-                anchorOrigin={{ vertical:'top', horizontal:'center' }}
+            <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 open={!!snackParams}
-                autoHideDuration={6000} 
+                autoHideDuration={6000}
                 onClose={() => setSnackParams(false)}
             >
                 <Alert onClose={() => setSnackParams(false)} severity={snackParams.severity} sx={{ width: '100%' }}>
@@ -567,28 +591,28 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     setErrorReports={setErrorReports}
                 />
             }
-            {showSectionManager && 
-                <SectionManager 
+            {showSectionManager &&
+                <SectionManager
                     sectionIndex={editSectionIndex}
                     newSectionIndex={newSectionIndex}
                     setShowSectionForm={setShowSectionManager}
                     sections={sections}
-                    refreshSections={setSections} 
+                    refreshSections={setSections}
                     notify={pushNotification}
                 />
             }
-            {deManager && 
+            {deManager &&
                 <DataElementManager
                     deRef={deManager}
                     setDeManager={setDeManager}
                     programStageDataElements={programStageDataElements}
                     saveAdd={saveAdd}
-                    /* sectionIndex={editSectionIndex}
-                    newSectionIndex={newSectionIndex}
-                    setShowSectionForm={setShowSectionManager}
-                    sections={sections}
-                    refreshSections={setSections} 
-                     */
+                /* sectionIndex={editSectionIndex}
+                newSectionIndex={newSectionIndex}
+                setShowSectionForm={setShowSectionManager}
+                sections={sections}
+                refreshSections={setSections} 
+                 */
                 />
             }
         </div>

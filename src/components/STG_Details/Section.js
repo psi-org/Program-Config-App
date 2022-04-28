@@ -28,12 +28,15 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AlertDialogSlide from "../UIElements/AlertDialogSlide";
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
-const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, handleSectionEdit }) => {
+const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, SectionActions/* , handleSectionEdit */ }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
+    const [sectionToRemove,setSectionToRemove] = useState(undefined)
 
     const toggle = () => setOpenMenu(!openMenu)
 
@@ -105,11 +108,11 @@ const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, h
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
                                         <FlyoutMenu>
-                                            <MenuItem label="Edit This Section" icon={<EditIcon />} onClick={()=>{toggle(); handleSectionEdit(index, undefined) }}/>
-                                            <MenuItem label="Create New Section Above" icon={<UpIcon />} onClick={()=>{toggle(); handleSectionEdit(undefined, index)} }/>
-                                            <MenuItem label="Create New Section Below" icon={<DownIcon />} onClick={()=>{toggle(); handleSectionEdit(undefined, index+1)} }/>
+                                            <MenuItem label="Edit This Section" icon={<EditIcon />} onClick={()=>{toggle(); SectionActions.handleSectionEdit(index, undefined) }}/>
+                                            <MenuItem label="Create New Section Above" icon={<UpIcon />} onClick={()=>{toggle(); SectionActions.handleSectionEdit(undefined, index)} }/>
+                                            <MenuItem label="Create New Section Below" icon={<DownIcon />} onClick={()=>{toggle(); SectionActions.handleSectionEdit(undefined, index+1)} }/>
                                             <MenuItem label="Add Data Element(s)" icon={<AddCircleOutlineIcon />} onClick={()=>{toggle(); DEActions.add(stageSection.dataElements.length,stageSection.id)} }/>
-                                            <MenuItem disabled={true} destructive label="Delete This Section" icon={<DeleteIcon />} onClick={()=>{toggle(); } }/>
+                                            <MenuItem destructive label="Delete This Section" icon={<DeleteIcon />} onClick={()=>{toggle(); setSectionToRemove(stageSection) } }/>
                                         </FlyoutMenu>
                                     </Popper>
                                 </Layer>
@@ -130,6 +133,24 @@ const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, h
                         )}
                     </Droppable>
                     {showValidationMessage && <ValidationMessages dataElements={stageSection.dataElements} showValidationMessage={setShowValidationMessage} /> }
+                    {!!sectionToRemove && <AlertDialogSlide
+                        open={!!sectionToRemove} 
+                        title={"Remove this section from the assessment?"}
+                        icon={<WarningAmberIcon fontSize="large" color="warning"/>}
+                        preContent={
+                            <div>
+                                <p style={{marginBottom:'1.5em'}}><strong>CAUTION:</strong> All Data Elements associated to this Section will also be removed from the Stage. Make sure you move the Data Elements you want to keep into another section before deleting the current one.</p>
+                                <span><strong>Section to remove: </strong>{sectionToRemove.name}</span>
+                            </div>
+                        }
+                        content={"Warning: This action can't be undone"} 
+                        primaryText={"Yes, remove it"} 
+                        secondaryText={"No, keep it"} 
+                        actions={{
+                            primary: function(){ setSectionToRemove(undefined); SectionActions.remove(sectionToRemove) },
+                            secondary: function(){setSectionToRemove(undefined);  }
+                        }} 
+                    />}
                 </div>
             )}
         </Draggable>

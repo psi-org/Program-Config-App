@@ -127,7 +127,7 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
                 <span>{deToRemove.name}</span>
             }
             content={"Warning: This action can't be undone"} 
-            primaryText={"Yes, remove it it"} 
+            primaryText={"Yes, remove it"} 
             secondaryText={"No, keep it"} 
             actions={{
                 primary: function(){ setDeToRemove(false); removeDataElement() },
