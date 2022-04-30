@@ -135,11 +135,11 @@ const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, S
                     {showValidationMessage && <ValidationMessages dataElements={stageSection.dataElements} showValidationMessage={setShowValidationMessage} /> }
                     {!!sectionToRemove && <AlertDialogSlide
                         open={!!sectionToRemove} 
-                        title={"Remove this section from the assessment?"}
+                        title={"Remove this Section from the Stage?"}
                         icon={<WarningAmberIcon fontSize="large" color="warning"/>}
                         preContent={
                             <div>
-                                <p style={{marginBottom:'1.5em'}}><strong>CAUTION:</strong> All Data Elements associated to this Section will also be removed from the Stage. Make sure you move the Data Elements you want to keep into another section before deleting the current one.</p>
+                                <p style={{marginBottom:'1.5em'}}><strong>CAUTION:</strong> All Data Elements associated to this Section will also be removed from the Stage. Make sure you move the Data Elements you want to keep into another Section before deleting the current one.</p>
                                 <span><strong>Section to remove: </strong>{sectionToRemove.name}</span>
                             </div>
                         }

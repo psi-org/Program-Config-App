@@ -620,12 +620,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     setDeManager={setDeManager}
                     programStageDataElements={programStageDataElements}
                     saveAdd={saveAdd}
-                /* sectionIndex={editSectionIndex}
-                newSectionIndex={newSectionIndex}
-                setShowSectionForm={setShowSectionManager}
-                sections={sections}
-                refreshSections={setSections} 
-                 */
                 />
             }
         </div>

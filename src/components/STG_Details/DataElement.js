@@ -122,7 +122,7 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
         </Draggable>
         {!!deToRemove && <AlertDialogSlide
             open={!!deToRemove} 
-            title={"Remove this data element from the assessment?"}
+            title={"Remove this Data Element from the Stage?"}
             icon={<WarningAmberIcon fontSize="large" color="warning"/>}
             preContent={
                 <span>{deToRemove.name}</span>
