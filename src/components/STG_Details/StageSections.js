@@ -130,13 +130,26 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     // States
     const [removedElements, setRemovedElements] = useState([])
-    const originalProgramStageDataElements = programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), [])
+    const [originalProgramStageDataElements,setOriginalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
     const [sections, setSections] = useState([...programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations")]);
     const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => s.name == "Scores") });
     const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"));
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
     const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
     const [errorReports, setErrorReports] = useState(undefined)
+
+    // REFETCH STAGE
+    const refetchProgramStage = (params={}) =>{
+        stageRefetch({variables : {programStage:programStage.id}}).then(data => {
+            let programStage = data.results
+            setOriginalProgramStageDataElements(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
+            setSections([...programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations")])
+            setScoresSection({ ...programStage.programStageSections.find(s => s.name == "Scores") })
+            setCriticalSection(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"))
+            setProgramStageDataElements([...programStage.programStageDataElements])
+            setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"))
+        })
+    }
 
     // ***** DATA ELEMENT ACTIONS ***** //
     const updateDEValues = (dataElementId, sectionId, stageDataElement) => {
@@ -301,7 +314,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const commit = () => {
         if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
         let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
-        console.log(removed)
         setRemovedElements(removed)
         setSavingMetadata(true);
         return;
@@ -420,7 +432,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                 </div>
             </div>
             {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
-            <div className="title">Sections for program stage {programStage.displayName}</div>
+            <div className="title">Sections for Program Stage {programStage.displayName}</div>
             {exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus} />}
             {
                 createMetadata.loading && <ComponentCover translucent></ComponentCover>
@@ -460,7 +472,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
             {saveAndBuild &&
 
                 <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
-                    <CustomMUIDialogTitle id="customized-dialog-title" onClose={false}>
+                    <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>{}}>
                         Setting Up Program
                     </CustomMUIDialogTitle >
                     <DialogContent dividers style={{ padding: '1em 2em' }}>
@@ -589,6 +601,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     setValidationResults={setValidationResults}
                     programMetadata={programMetadata}
                     setErrorReports={setErrorReports}
+                    refetchProgramStage={refetchProgramStage}
                 />
             }
             {showSectionManager &&

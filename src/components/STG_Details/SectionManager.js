@@ -62,7 +62,7 @@ const SectionManager = (props) => {
     return (
         <CustomMUIDialog open={true} maxWidth='md' fullWidth={true} >
             <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
-                {props.sectionIndex?'Modify Existing Section':'Create New Section'}
+                {section.name?'Modify Existing Section':'Create New Section'}
             </CustomMUIDialogTitle >
             <DialogContent dividers style={{ padding: '1em 2em' }}>
                 

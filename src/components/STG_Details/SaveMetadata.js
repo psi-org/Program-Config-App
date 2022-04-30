@@ -75,7 +75,7 @@ const parseErrors = (e) => {
     return data.flat().flat()
 }
 
-const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports }) => {
+const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, refetchProgramStage }) => {
 
     const [completed, setCompleted] = useState(false);
     const [errorStatus, setErrorStatus] = useState(false);
@@ -391,7 +391,7 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
         </DialogContent>
 
         <DialogActions style={{ padding: '1em' }}>
-            <Button variant='outlined' disabled={!completed} onClick={()=>setSavingMetadata(false)}> Done </Button>
+            <Button variant='outlined' disabled={!completed} onClick={()=>{setSavingMetadata(false); /* refetchProgramStage() */}}> Done </Button>
         </DialogActions>
 
     </CustomMUIDialog>)

@@ -23,6 +23,7 @@ import {useState} from "react";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 
 import EditIcon from '@mui/icons-material/Edit';
+import EditOffIcon from '@mui/icons-material/EditOff';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
@@ -96,7 +97,7 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
                                         <FlyoutMenu>
-                                            <MenuItem label="Edit This Data Element" dataTest={"EDIT"} icon={<EditIcon />} onClick={()=>{ toggle(); DEActions.setEdit(dataElement.id)} }/>
+                                            <MenuItem disabled={!stageDE} label={stageDE?"Edit This Data Element":"(Reload to Enable Edit)"} dataTest={"EDIT"} icon={stageDE?<EditIcon />:<EditOffIcon/>} onClick={()=>{ toggle(); DEActions.setEdit(dataElement.id)} }/>
                                             <MenuItem disabled={false} label="Add Data Element Above" icon={<UpIcon />} onClick={()=>{toggle(); DEActions.add(index,section)} }/>
                                             <MenuItem disabled={false} label="Add Data Element Below" icon={<DownIcon />} onClick={()=>{toggle(); DEActions.add(index+1,section)} }/>
                                             <MenuItem disabled={false} destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={()=>{toggle(); setDeToRemove(dataElement); } }/>

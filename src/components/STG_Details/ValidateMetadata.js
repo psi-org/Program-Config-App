@@ -462,6 +462,7 @@ const ValidateMetadata = (props) => {
                     programMetadata={props.programMetadata}
                     setImportResults={props.setImportResults}
                     setErrorReports={props.setErrorReports}
+                    refetchProgramStage={props.refetchProgramStage}
                 />
             }
         </DialogActions>
