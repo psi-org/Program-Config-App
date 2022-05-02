@@ -20,10 +20,9 @@ import DataElementForm from "./DataElementForm";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SearchIcon from '@mui/icons-material/Search';
 
-import { borderTop, height } from '@mui/system';
-import IconButton from '@mui/material/IconButton';
 import InputAdornment from "@mui/material/InputAdornment";
-import Divider from '@mui/material/Divider';
+import AlertDialogSlide from '../UIElements/AlertDialogSlide';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 const dataElementsSearchQuery = {
     results: {
@@ -79,6 +78,8 @@ const DataElementManager = (props) => {
     const [tabValue, setTabValue] = useState(0);
     const handleTabChange = (event, newValue) => setTabValue(newValue)
     const handleChangeFilterValue = (event) => setFilterValue(event.target.value);
+
+    const [dialogStatus, setDialogStatus] = useState(false)
 
     function hideForm() {
         props.setDeManager(false);
@@ -181,7 +182,7 @@ const DataElementManager = (props) => {
     return (
         <>
             <CustomMUIDialog open={true} maxWidth='xl' fullWidth={true} >
-                <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
+                <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => tabValue==0?hideForm(): setDialogStatus(true)}>
                     Add Data Element To Section [ {props.deRef.sectionName} ]
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={tabValue} onChange={handleTabChange} aria-label="de tabs" variant="fullWidth">
@@ -277,7 +278,19 @@ const DataElementManager = (props) => {
 
                 </DialogContent>
                 <DialogActions style={{ margin:'0 1em', padding: '1em 0', borderTop: '1px solid', borderColor: 'rgba(0, 0, 0, 0.12)'}}>
-                    <Button onClick={() => hideForm()} color="error" > Close </Button>
+                    <Button onClick={() => tabValue==0?hideForm(): setDialogStatus(true)} color="error"> Close </Button>
+                    <AlertDialogSlide
+                        open={dialogStatus}
+                        title={"Do you really want to close the form?"}
+                        icon={<WarningAmberIcon fontSize="large" color="warning" />}
+                        content={"Warning: All unsaved changes will be discarded"}
+                        primaryText={"Yes, close it"}
+                        secondaryText={"No, keep me here"}
+                        actions={{
+                            primary: function () { setDialogStatus(false); hideForm() },
+                            secondary: function () { setDialogStatus(false); }
+                        }}
+                    />
                     <Button disabled={tabValue==0 && newDataElements.length < 1} onClick={() => submission()} variant='contained' color="success" startIcon={<AddCircleOutlineIcon />}> {tabValue===0?'Add Selected Data Element(s)':'Create and Add Data Element'}</Button>
                 </DialogActions>
             </CustomMUIDialog>
