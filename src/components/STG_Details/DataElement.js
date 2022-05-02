@@ -98,8 +98,8 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
                                     <Popper reference={ref} placement="bottom-end">
                                         <FlyoutMenu>
                                             <MenuItem disabled={!stageDE} label={stageDE?"Edit This Data Element":"(Reload to Enable Edit)"} dataTest={"EDIT"} icon={stageDE?<EditIcon />:<EditOffIcon/>} onClick={()=>{ toggle(); DEActions.setEdit(dataElement.id)} }/>
-                                            <MenuItem disabled={false} label="Add Data Element Above" icon={<UpIcon />} onClick={()=>{toggle(); DEActions.add(index,section)} }/>
-                                            <MenuItem disabled={false} label="Add Data Element Below" icon={<DownIcon />} onClick={()=>{toggle(); DEActions.add(index+1,section)} }/>
+                                            <MenuItem disabled={false} label="Add Data Element(s) Above" icon={<UpIcon />} onClick={()=>{toggle(); DEActions.add(index,section)} }/>
+                                            <MenuItem disabled={false} label="Add Data Element(s) Below" icon={<DownIcon />} onClick={()=>{toggle(); DEActions.add(index+1,section)} }/>
                                             <MenuItem disabled={false} destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={()=>{toggle(); setDeToRemove(dataElement); } }/>
                                         </FlyoutMenu>
                                     </Popper>

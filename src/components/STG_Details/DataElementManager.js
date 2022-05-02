@@ -216,7 +216,15 @@ const DataElementManager = (props) => {
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position='end'>
-                                                <Button onClick={() => setPage(1)} startIcon={<SearchIcon />} variant='contained' color='primary'>
+                                                <Button onClick={() => {
+                                                    if (filterValue!=='') {
+                                                        if(page===1) doSearch()
+                                                        else setPage(1)
+                                                    }
+                                                }} 
+                                                startIcon={<SearchIcon />} 
+                                                variant='contained'
+                                                color='primary'>
                                                     Search
                                                 </Button>
                                             </InputAdornment>
