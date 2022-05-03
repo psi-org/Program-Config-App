@@ -229,7 +229,7 @@ const ProgramNew = (props) => {
         }
         if (!metadataRequest.called && dataIsValid) {
 
-            let prgrm = Program;
+            let prgrm = JSON.parse(JSON.stringify(Program));
 
             prgrm.name = programName;
             prgrm.shortName = programShortName;
@@ -244,7 +244,7 @@ const ProgramNew = (props) => {
             prgrm.programStages.push({ id: assessmentId });
             prgrm.programStages.push({ id: actionPlanId });
 
-            let assessmentStage = PS_AssessmentStage;
+            let assessmentStage = JSON.parse(JSON.stringify(PS_AssessmentStage));
             assessmentStage.id = assessmentId;
             assessmentStage.name = dePrefix + '_' + assessmentStage.name;
             assessmentStage.programStageSections.push({ id: defaultSectionId });
@@ -252,22 +252,22 @@ const ProgramNew = (props) => {
             assessmentStage.programStageSections.push({ id: scoresSectionId });
             assessmentStage.program.id = programId;
 
-            let actionPlanStage = PS_ActionPlanStage;
+            let actionPlanStage = JSON.parse(JSON.stringify(PS_ActionPlanStage));
             actionPlanStage.id = actionPlanId;
             actionPlanStage.name = dePrefix + '_' + actionPlanStage.name;
             actionPlanStage.program.id = programId;
 
-            let defaultSection = PSS_Default;
+            let defaultSection = JSON.parse(JSON.stringify(PSS_Default));
             defaultSection.id = defaultSectionId;
             defaultSection.programStage.id = assessmentId;
             //defaultSection.name = defaultSection.name
 
-            let criticalSteps = PSS_CriticalSteps;
+            let criticalSteps = JSON.parse(JSON.stringify(PSS_CriticalSteps));
             criticalSteps.id = stepsSectionId;
             criticalSteps.programStage.id = assessmentId;
             //criticalSteps.name = criticalSteps.name
 
-            let scores = PSS_Scores;
+            let scores = JSON.parse(JSON.stringify(PSS_Scores));
             scores.id = scoresSectionId;
             scores.name = scores.name;
             scores.programStage.id = assessmentId;
