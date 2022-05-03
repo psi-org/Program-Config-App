@@ -14,7 +14,7 @@ const METADATA = "haUflNqP85K",
     CRITICAL_QUESTION = "NPwvdTt0Naj",
     FEEDBACK_ORDER = 'LP171jpctBm';
 
-const MAX_FORM_NAME_LENGTH = 220;
+const MAX_FORM_NAME_LENGTH = 200;
 const MIN_FORM_NAME_LENGTH = 2;
 
 const ValidateMetadata = (props) => {

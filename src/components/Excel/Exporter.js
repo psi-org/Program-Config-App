@@ -27,7 +27,7 @@ import {
 } from "../../configs/ExcelUtils";
 import {ReleaseNotes} from "../../configs/ReleaseNotes";
 
-const MAX_FORM_NAME_LENGTH = 220;
+const MAX_FORM_NAME_LENGTH = 200;
 const MIN_FORM_NAME_LENGTH = 2;
 
 const Exporter = (props) => {
