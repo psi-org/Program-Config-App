@@ -27,36 +27,36 @@ const ValidateMetadata = (props) => {
     const validationSettings = {
         programDetails: {
             enable: true,
-            checkHasFormName: { enable: true, title: "Form name defined for element", errorMsg: { code: "EXW100", text: "A form name was not defined for the specified element." } },
-            checkFormNameLength: { enable: true, title: "Form name length for element", errorMsg: { code: "EXW112", text: `Given form name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).` } },
+            checkHasFormName: { enable: true, title: "Form name not defined for element", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
+            checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).` } },
             //Disabled validation EXW103
-            structureMatchesValue: { enable: false, title: "Label should be LONG_TEXT", errorMsg: { code: "EXW103", text: "The expected value type for the label Data Element is LONG_TEXT." } },
-            hasFeedbackOrder: { enable: true, title: "Verifies Feedback orders", errorMsg: { code: "EXW107", text: "The specified question has numerator and denominator assigned but does not contribute to any score." } },
-            hasVarName: { enable: true, title: "Verifies Parent Name field", errorMsg: { code: "EXW110", text: "The specified question does not have a valid parent name." } },
-            hasBothNumeratorDenominator: { enable: true, title: "Numerator and Denominator exists", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (numerator or denominator)" } },
-            validAggregationType: { enable: true, title: "Valid Aggregation TYpe", errorMsg: { code: "EW104", text: "The expected aggregation operator for the label Data Element is NONE" } },
-            validAggregationQuestion: { enable: true, title: "Valid Aggregation Type", errorMsg: { code: "EW105", text: "The Data Element aggregation operator was not defined correctly. (SUM or AVERAGE for numeric types and NONE for text inputs)" } },
-            isNumeratorNumeric: { enable: true, title: "Score is Numeric", errorMsg: { code: "EXW105", text: "The specified question numerator is not numeric" } },
-            isDenominatorNumeric: { enable: true, title: "Score is Numeric", errorMsg: { code: "EXW108", text: "The specified question numerator is not numeric" } },
-            hasParentQuestionNAnswerValue: { enable: true, title: "Complete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the parent logic." } }
+            structureMatchesValue: { enable: false, title: "Label should be LONG_TEXT", errorMsg: { code: "EXW103", text: "The expected Value Type for the label Data Element is LONG_TEXT." } },
+            hasFeedbackOrder: { enable: true, title: "Missing Feedback Order", errorMsg: { code: "EXW107", text: "The specified question has Numerator and Denominator assigned but does not contribute to any score." } },
+            hasVarName: { enable: true, title: "Parent Name not valid", errorMsg: { code: "EXW110", text: "The specified question does not have a valid Parent Name." } },
+            hasBothNumeratorDenominator: { enable: true, title: "Numerator or Denominator missing", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (Numerator or Denominator)" } },
+            validAggregationType: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW104", text: "The expected Aggregation Operator for the label Data Element is NONE" } },
+            validAggregationQuestion: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW105", text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for numeric types and NONE for text inputs)" } },
+            isNumeratorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW105", text: "The specified question Numerator is not numeric" } },
+            isDenominatorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW108", text: "The specified question Denominator is not numeric" } },
+            hasParentQuestionNAnswerValue: { enable: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } }
         },
         scores: {
             enable: true,
-            checkHasFormName: { enable: true, title: "Form name defined for element", errorMsg: { code: "EXW100", text: "A form name was not defined for the specified element." } },
-            checkFormNameLength: { enable: true, title: "Form name length for element", errorMsg: { code: "EXW112", text: `Given form name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).` } },
+            checkHasFormName: { enable: true, title: "Form name not defined for element", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
+            checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).` } },
             //Disabled validation EXW102
-            structureMatchesValue: { enable: false, title: "Score should be NUMBER", errorMsg: { code: "EXW102", text: "The expected value type for the score Data Element is NUMBER." } },
-            hasScoreFeedbackOrder: { enable: true, title: "Verifies Feedback orders for score Data Elements", errorMsg: { code: "EXW111", text: "The specified score Data Element lacks Feedback Order." } },
-            hasBothNumeratorDenominator: { enable: true, title: "Numerator and Denominator exists", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (numerator or denominator)" } },
-            validAggregationType: { enable: true, title: "Valid Aggregation Type", errorMsg: { code: "EW103", text: "The expected aggregation operator for the score Data Element is AVERAGE" } }
+            structureMatchesValue: { enable: false, title: "Score should be NUMBER", errorMsg: { code: "EXW102", text: "The expected Value Type for the score Data Element is NUMBER." } },
+            hasScoreFeedbackOrder: { enable: true, title: "Missing Feedback Order", errorMsg: { code: "EXW111", text: "The specified score Data Element lacks Feedback Order." } },
+            hasBothNumeratorDenominator: { enable: true, title: "Numerator or Denominator missing", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (Numerator or Denominator)" } },
+            validAggregationType: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW103", text: "The expected Aggregation Operator for the score Data Element is AVERAGE" } }
         },
         feedbackOrder: {
             enable: true,
-            checkGaps: { enable: true, title: "Verifies Feedback orders gaps in Data Elements", errorMsg: { code: "EW106", text: "A feedback Order Gap was found, was expecting one of the following values" } },
-            checkDuplicated: { enable: true, title: "Verifies unique Feedback orders in Data Elements", errorMsg: { code: "EW107", text: "The specified Feedback Order is shared by the Data Elements with the following codes" } },
+            checkGaps: { enable: true, title: "Feedback Order gap found", errorMsg: { code: "EW106", text: "A Feedback Order Gap was found, was expecting one of the following values" } },
+            checkDuplicated: { enable: true, title: "Duplicated Feedback Order found", errorMsg: { code: "EW107", text: "The specified Feedback Order is shared by the Data Elements with the following codes" } },
             //Error Equivalents for Data Elements
-            duplicatedFO: { enable: true, title: "Verifies unique Feedback orders in Data Elements", errorMsg: { code: "EW107", text: "The specified Data Element contains a duplicated Feedback Order." } },
-            gapFO: { enable: true, title: "Verifies Feedback orders gaps in Data Elements", errorMsg: { code: "EW106", text: "The specified Data Element generates a gap in the Feedback Order sequence." } }
+            duplicatedFO: { enable: true, title: "Duplicated Feedback Order found", errorMsg: { code: "EW107", text: "The specified Data Element contains a duplicated Feedback Order." } },
+            gapFO: { enable: true, title: "Feedback Order gap found", errorMsg: { code: "EW106", text: "The specified Data Element generates a gap in the Feedback Order sequence." } }
         }
     }
 
