@@ -36,7 +36,7 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
-
+import { useMatomo } from '@datapunt/matomo-tracker-react'
 
 const createMutation = {
     resource: 'metadata',
@@ -82,7 +82,8 @@ const queryPRV = {
 };
 
 const StageSections = ({ programStage, stageRefetch }) => {
-
+    const { trackPageView, trackEvent, pushInstruction } = useMatomo();
+    const consent = sessionStorage.getItem("analyticsConsent");
     // Globals
     const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
         FEEDBACK_TEXT = "yhKEe6BLEer",
@@ -284,6 +285,12 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     const configuration_download = (e) => {
         e.preventDefault();
+        if (consent)
+        {
+            trackEvent({category:'Stage Section', action:'Click', name:'Configuration Download'});
+            pushInstruction('setDownloadClasses', 'downloading_configuration_file');
+            pushInstruction('trackGoal', 1, 'Configuration DOwnloaded');
+        }
         setExportToExcel(true);
         setExportStatus("Generating Configuration File...")
     };
@@ -392,11 +399,11 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     <ButtonStrip>
                         <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
                         <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
-                        <Button color='inherit' variant='outlined' startIcon={!exportToExcel?<FileDownloadIcon />:<CircularLoader small />} name="generator"
+                        <Button color='inherit' variant='outlined' className='matomo_download' startIcon={!exportToExcel?<FileDownloadIcon />:<CircularLoader small />} name="generator"
                             onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
                         <Button color='inherit' variant='outlined' startIcon={<PublishIcon />} name="importer"
-                            onClick={() => setImporterEnabled(true)}>Import Template</Button>
-                        <Button color='inherit' name="Reload" variant='outlined' startIcon={<CachedIcon />} onClick={() => { window.location.reload() }}>Reload</Button>
+                            onClick={() => { setImporterEnabled(true); trackEvent({category: 'Stage Section', action: 'click',name: 'Import Configuration'})} }>Import Template</Button>
+                        <Button color='inherit' name="Reload" variant='outlined' startIcon={<CachedIcon />} onClick={() => { window.location.reload(); trackEvent({category: 'Stage Section', action: 'click', name: 'Reload'}) }}>Reload</Button>
                     </ButtonStrip>
                 </div>
             </div>

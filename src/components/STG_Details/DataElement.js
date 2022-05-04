@@ -26,6 +26,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
+import { useMatomo } from '@datapunt/matomo-tracker-react'
 
 const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     FEEDBACK_TEXT = "yhKEe6BLEer",
@@ -35,7 +36,8 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     SCORE_NUM = "Zyr7rlDOJy8";
 
 const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, section, index}) => {
-
+    const { trackPageView, trackEvent, pushInstruction } = useMatomo();
+    const consent = sessionStorage.getItem("analyticsConsent");
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
     const [deToRemove,setDeToRemove] = useState(false)
@@ -96,10 +98,10 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
                                         <FlyoutMenu>
-                                            <MenuItem label="Edit This Data Element" dataTest={"EDIT"} icon={<EditIcon />} onClick={()=>{ toggle(); DEActions.setEdit(dataElement.id)} }/>
-                                            <MenuItem disabled={false} label="Add Data Element Above" icon={<UpIcon />} onClick={()=>{toggle(); DEActions.add(index,section)} }/>
-                                            <MenuItem disabled={false} label="Add Data Element Below" icon={<DownIcon />} onClick={()=>{toggle(); DEActions.add(index+1,section)} }/>
-                                            <MenuItem disabled={false} destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={()=>{toggle(); setDeToRemove(dataElement); } }/>
+                                            <MenuItem label="Edit This Data Element" dataTest={"EDIT"} icon={<EditIcon />} onClick={()=>{ toggle(); DEActions.setEdit(dataElement.id); (consent) ? trackEvent({category: 'Data Element', action: 'Edit', name: dataElement.id}): ''} }/>
+                                            <MenuItem disabled={false} label="Add Data Element Above" icon={<UpIcon />} onClick={()=>{toggle(); DEActions.add(index,section); if(consent) trackEvent({category: 'Data Element', action: 'Add Above', name: dataElement.id})} }/>
+                                            <MenuItem disabled={false} label="Add Data Element Below" icon={<DownIcon />} onClick={()=>{toggle(); DEActions.add(index+1,section); if(consent) trackEvent({category:'Data Element', action:'Add Below', name:dataElement.id})} }/>
+                                            <MenuItem disabled={false} destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={()=>{toggle(); setDeToRemove(dataElement); if(consent) trackEvent({category:'Data Element', action: 'Remove', name:dataElement.id})} }/>
                                         </FlyoutMenu>
                                     </Popper>
                                 </Layer>

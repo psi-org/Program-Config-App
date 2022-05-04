@@ -16,6 +16,7 @@ import {Provider} from 'react-redux';
  * Routing
  */
 import { BrowserRouter, HashRouter, Link, Redirect, Route, Switch } from "react-router-dom";
+import { useMatomo } from "@datapunt/matomo-tracker-react";
 
 /**
  * COMPONENTS
@@ -30,6 +31,13 @@ import ProgramStage from './components/STG_Details/ProgramStage';
 import './css/main.css';
 
 const App = () => {
+    const { trackPageView } = useMatomo();
+
+    useEffect(() => {
+        trackPageView();
+
+        // eslint-disable-next-line
+    }, []);
     return (
     <>
         <Provider store={store}>
