@@ -3,8 +3,15 @@ import { useDispatch } from "react-redux";
 import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
 
+//UI Elements
+import {FlyoutMenu, MenuItem, Popper, Layer} from "@dhis2/ui";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DownloadIcon from '@mui/icons-material/Download';
+
 // *** Routing ***
 import { Link } from "react-router-dom";
+import { useRef, useState } from "react";
 
 // *** IMAGES ***
 import prg_svg from './../../images/i-program_black.svg';
@@ -12,10 +19,15 @@ import warning_svg from './../../images/i-warning.svg';
 import error_svg from './../../images/i-error.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expand_left_svg from './../../images/i-expand-left_black.svg';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
-const ProgramItem = ({program}) => {
+const ProgramItem = ({program, downloadMetadata, deleteProgram}) => {
+  const [ref, setRef] = useState(undefined);
+  const [open, setOpen] = useState(false)
+
+  const toggle = () => setOpen(!open)
 
   const dispatch = useDispatch();
   const { setProgram } = bindActionCreators(actionCreators, dispatch);
@@ -43,10 +55,24 @@ const ProgramItem = ({program}) => {
         */}
       </div>
       <div className="ml_item-cta">
-        <Link to={"/program/"+program.id}>
-          <img className="bsct_cta" alt="exp" src={expand_left_svg} onClick={()=> setProgram(program.id)}/>
+        <img src={move_vert_svg} id={'menu'+program.id} alt="menu" onClick={()=>{setRef(document.getElementById('menu'+program.id)); toggle()}} style={{cursor:'pointer'}}/>
+        {open &&
+          <Layer onClick={toggle}>
+            <Popper reference={ref} placement="bottom-end">
+                <FlyoutMenu>
+                  <MenuItem disabled={true} label="Edit Program" icon={<EditIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                  <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={()=>{toggle(); downloadMetadata(program.id)} }/>
+                  <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon/>} onClick={()=>{toggle(); deleteProgram(program.id)} }/>
+                </FlyoutMenu>
+              </Popper>
+          </Layer>
+        }
+
+        <Link to={"/program/"+program.id} style={{color: '#333333'}}>
+          <div style={{display: 'flex', alignItems: 'center'}} onClick={()=> setProgram(program.id)}>
+            <NavigateNextIcon/>
+          </div>
         </Link>
-        { /* Kebab menu icon : <img src={move_vert_svg} alt="menu"  />*/}
       </div>
     </div>
   );

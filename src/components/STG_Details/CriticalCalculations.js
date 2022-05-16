@@ -50,7 +50,6 @@ const CriticalCalculations = ({ stageSection, index }) => {
                 <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div></div>
                 <div className="ml_item-warning_error "></div>
                 <div className="ml_item-cta">
-                <img src={move_vert_svg} alt="menu" />
                     <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                 </div>
             </div>

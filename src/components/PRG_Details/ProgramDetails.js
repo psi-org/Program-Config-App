@@ -61,7 +61,7 @@ const ProgramDetails = () => {
                 <div className="c_btns"></div>
             </div>
             <div className="wrapper">
-                <div className="title">Program stages for {data.results.displayName}</div>
+                <div className="title">Program Stages for Program {data.results.displayName}</div>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
                         {

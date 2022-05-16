@@ -1,8 +1,13 @@
-import { Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Button, LinearLoader, CircularLoader, Card, Box, NoticeBox, Tag } from "@dhis2/ui";
+import { CircularLoader, NoticeBox, Tag } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
 import { useState } from "react";
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
+import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
-const BUILD_VERSION = "1.2.1";
+const BUILD_VERSION = "1.3.0";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -23,16 +28,16 @@ const competencyClassAttribute = {
 const queryId = {
     results: {
         resource: 'system/id.json',
-        params: ({n}) => ({ limit: n })
+        params: ({ n }) => ({ limit: n })
     }
 };
 
 const queryProgram = {
     results: {
         resource: 'programs',
-        id: ({id}) => id,
-        params:{
-            fields:["id","name","shortName","publicAccess","ignoreOverdueEvents","skipOffline","enrollmentDateLabel","onlyEnrollOnce","maxTeiCountToReturn","selectIncidentDatesInFuture","selectEnrollmentDatesInFuture","registration","useFirstStageDuringRegistration","completeEventsExpiryDays","withoutRegistration","minAttributesRequiredToSearch","displayFrontPageList","programType","accessLevel","displayIncidentDate","expiryDays","style","trackedEntityType","programIndicators","translations","userGroupAccesses","attributeValues","userAccesses","programRuleVariables","programTrackedEntityAttributes[id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute,programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccesses]","organisationUnits","programSections","programStages","user"]
+        id: ({ id }) => id,
+        params: {
+            fields: ["id", "name", "shortName", "publicAccess", "ignoreOverdueEvents", "skipOffline", "enrollmentDateLabel", "onlyEnrollOnce", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "selectEnrollmentDatesInFuture", "registration", "useFirstStageDuringRegistration", "completeEventsExpiryDays", "withoutRegistration", "minAttributesRequiredToSearch", "displayFrontPageList", "programType", "accessLevel", "displayIncidentDate", "expiryDays", "style", "trackedEntityType", "programIndicators", "translations", "userGroupAccesses", "attributeValues", "userAccesses", "programRuleVariables", "programTrackedEntityAttributes[id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute,programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccesses]", "organisationUnits", "programSections", "programStages", "user"]
         }
     }
 };
@@ -58,32 +63,32 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
     SCORE_NUM = "Zyr7rlDOJy8",
     COMPETENCY_CLASS = "NAaHST5ZDTE";
 
-const getParentUid=(parentName,dataElements)=>{
+const getParentUid = (parentName, dataElements) => {
     return dataElements.find(de => de.parentName == parentName)?.id
 };
 
 const parseErrors = (e) => {
-    let data = e.typeReports.map(tr=>{
+    let data = e.typeReports.map(tr => {
         let type = tr.klass.split('.').pop()
-        return tr.objectReports.map(or =>  or.errorReports.map(er => ({type,uid:or.uid,errorCode:er.errorCode,message:er.message})))
+        return tr.objectReports.map(or => or.errorReports.map(er => ({ type, uid: or.uid, errorCode: er.errorCode, message: er.message })))
     })
     return data.flat().flat()
 }
 
-const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,criticalSection,setSavingMetadata,setSavedAndValidated,removedItems,programMetadata,setImportResults,setErrorReports}) => {
+const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, refetchProgramStage }) => {
 
     const [completed, setCompleted] = useState(false);
-    const [errorStatus,setErrorStatus] = useState(false);
-    const [successStatus,setSuccessStatus] = useState(false);
-    const [typeReports,setTypeReports] = useState({});
+    const [errorStatus, setErrorStatus] = useState(false);
+    const [successStatus, setSuccessStatus] = useState(false);
+    const [typeReports, setTypeReports] = useState({});
 
     // Create Mutation
-    let metadataDM= useDataMutation(metadataMutation);
+    let metadataDM = useDataMutation(metadataMutation);
     const metadataRequest = {
-        mutate : metadataDM[0],
-        loading : metadataDM[1].loading,
-        error : metadataDM[1].error,
-        data : metadataDM[1].data,
+        mutate: metadataDM[0],
+        loading: metadataDM[1].loading,
+        error: metadataDM[1].error,
+        data: metadataDM[1].data,
         called: metadataDM[1].called
     };
 
@@ -95,46 +100,46 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
         data : programDM[1].data,
         called: programDM[1].called
     }; */
-    
+
     // Get Program payload
-    const programQuery = useDataQuery(queryProgram, { variables: {id: programStage.program.id }});
+    const programQuery = useDataQuery(queryProgram, { variables: { id: programStage.program.id } });
     let programPayload = programQuery.data?.results;
 
     // Get Ids for new Data Elements
-    const idsQuery = useDataQuery(queryId, { variables: {n: newDEQty+5 }});
+    const idsQuery = useDataQuery(queryId, { variables: { n: newDEQty + 5 } });
     const uidPool = idsQuery.data?.results.codes;
 
-    if(uidPool && programPayload && !completed && !metadataRequest.called /* && !programRequest.called */){
+    if (uidPool && programPayload && !completed && !metadataRequest.called /* && !programRequest.called */) {
 
         let new_dataElements = [];
         let new_programStageDataElements = [];
-        
-        criticalSection.dataElements.forEach((de,i)=>{
+
+        criticalSection.dataElements.forEach((de, i) => {
             new_programStageDataElements.push(
                 {
                     compulsory: false,
-                    sortOrder: i+1,
+                    sortOrder: i + 1,
                     dataElement: { id: de.id }
                 }
             )
         });
-    
+
         /**
          * Delete importStatus: section & Data Elements
          * Prepare new data elements (payloads)
          * Get program stage data elements for each question
          */
-        importedSections.forEach((section,secIdx) =>{
+        importedSections.forEach((section, secIdx) => {
 
-            if(section.importStatus == 'new') section.id = uidPool.shift();
+            if (section.importStatus == 'new') section.id = uidPool.shift();
 
-            section.dataElements.forEach((dataElement,deIdx) => {
+            section.dataElements.forEach((dataElement, deIdx) => {
 
                 let DE_metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
 
-                let newVarName = `_S${secIdx+1}Q${deIdx+1}`;
+                let newVarName = `_S${secIdx + 1}Q${deIdx + 1}`;
                 let newCode = `${programMetadata.dePrefix}_${newVarName}`;
-                 // Name max: 230
+                // Name max: 230
                 // CODE_FORMNAME
                 // REST : 230 - CODE.LENGTH - FIXED
                 // FORMNAME.SLICE(0,REST)
@@ -142,32 +147,33 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                 const FIXED_VALUES = 5;
                 const formNameMaxLength = 230 - newCode.length - FIXED_VALUES;
 
-                let formName = DE_metadata.elemType=='label' ? DE_metadata.labelFormName : dataElement.formName;
-                
-                if (formName.slice(-4)==' [C]') formName = formName.substring(0,formName.length-4);
-                
-                if (DE_metadata.isCritical=='Yes') formName+=' [C]'
+                let formName = DE_metadata.elemType == 'label' ? DE_metadata.labelFormName : dataElement.formName;
 
-                let name = (newCode + '_' + formName).slice(0,formNameMaxLength)
-                let shortName = (newCode + '_' + formName).slice(0,50)
+                formName = formName.replaceAll(' [C]', '');
+                //if (formName.slice(-4)==' [C]') formName = formName.substring(0,formName.length-4);
+
+                if (DE_metadata.isCritical == 'Yes') formName += ' [C]'
+
+                let name = (newCode + '_' + formName).slice(0, formNameMaxLength)
+                let shortName = (newCode + '_' + formName).slice(0, 50)
 
                 DE_metadata.varName = newVarName;
-                
+
                 dataElement.name = name
                 dataElement.shortName = shortName
                 dataElement.code = newCode
-                DE_metadata.elemType=='label' ? DE_metadata.labelFormName=formName : dataElement.formName=formName;
-                
+                DE_metadata.elemType == 'label' ? DE_metadata.labelFormName = formName : dataElement.formName = formName;
+
                 // Check if new DE
-                if(dataElement.importStatus=='new'){
+                if (dataElement.importStatus == 'new') {
                     dataElement.id = uidPool.shift();
                     //new_dataElements.push(dataElement);
                 }
                 delete dataElement.importStatus;
                 new_programStageDataElements.push({
-                    compulsory: (DE_metadata.isCompulsory=='Yes' && !DE_metadata.parentQuestion), // True: mandatory is Yes and has no parents.
+                    compulsory: (DE_metadata.isCompulsory == 'Yes' && !DE_metadata.parentQuestion), // True: mandatory is Yes and has no parents.
                     //programStage: { id : programStage.id},
-                    sortOrder: deIdx+1,
+                    sortOrder: deIdx + 1,
                     dataElement: { id: dataElement.id }
                 });
 
@@ -175,18 +181,18 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                 //return dataElement;
             });
 
-            
+
             delete section.importStatus;
-            section.sortOrder = secIdx+1;
+            section.sortOrder = secIdx + 1;
             //return section
         });
 
         // Map parent name with data element uid
         let importedDataElements = importedSections.map(sec => sec.dataElements).flat();
-        importedSections.map(section =>{
+        importedSections.map(section => {
             section.dataElements.map(de => {
                 let attributeValues = de.attributeValues;
-                if(de.parentQuestion){
+                if (de.parentQuestion) {
 
                     let metadataIndex = de.attributeValues.findIndex(att => att.attribute.id == METADATA);
 
@@ -195,7 +201,7 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                     let parentId = importedDataElements.find(ide => ide.parentName == de.parentQuestion)?.id;
                     metadata.parentQuestion = parentId;
                     //console.log(metadata);
-                    
+
                     attributeValues[metadataIndex].value = JSON.stringify(metadata);
                 }
 
@@ -206,7 +212,7 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
         });
 
         new_dataElements = new_dataElements.concat(
-            importedSections.map(is => is.dataElements.map(de =>{
+            importedSections.map(is => is.dataElements.map(de => {
                 delete de.parentQuestion
                 delete de.parentName
                 return de
@@ -217,10 +223,10 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
          * Edit imported scores
          * Prepare new scores data elements payload
          */
-        importedScores.dataElements.forEach((score,scoreIdx) =>{
+        importedScores.dataElements.forEach((score, scoreIdx) => {
 
             // Check if new DE
-            if(score.importStatus=='new'){
+            if (score.importStatus == 'new') {
                 score.id = uidPool.shift();
                 //new_dataElements.push(score);
             }
@@ -230,7 +236,7 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                 //name:score.name,
                 compulsory: false,
                 //programStage: programStage.id,
-                sortOrder: scoreIdx+1,
+                sortOrder: scoreIdx + 1,
                 dataElement: { id: score.id }
             });
 
@@ -248,8 +254,8 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
          */
 
         importedScores.sortOrder = importedSections.length + 2;
-        
-        
+
+
 
         /**
          * Update Items with suffix [X] to ensure no Update conflicts
@@ -257,58 +263,58 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
         //let suffix = `${String(+ new Date()).slice(-7)}[X]`;
         let removed = removedItems.map(de => {
             let suffix = `${String(+ new Date()).slice(-7)}[X]`;
-            de.name = de.name.slice(0,220)+suffix;
-            de.shortName = de.id+' '+suffix;
+            de.name = de.name.slice(0, 220) + suffix;
+            de.shortName = de.id + ' ' + suffix;
             delete de.code;
             return de
         });
         let toUpdateDE = JSON.parse(JSON.stringify(new_dataElements));
         let tempUpdate = toUpdateDE.map(de => {
             let suffix = `${String(+ new Date()).slice(-7)}[X]`;
-            de.name = de.name.slice(0,220)+suffix;
-            de.shortName = de.id+' '+suffix;
+            de.name = de.name.slice(0, 220) + suffix;
+            de.shortName = de.id + ' ' + suffix;
             delete de.code;
             return de
         });
 
         let tempMetadata = {
-            dataElements : removed.concat(tempUpdate)
+            dataElements: removed.concat(tempUpdate)
         };
 
         /**
          * Replace sections and Data Elements on program stage
          */
 
-        programStage.programStageSections = [].concat(importedSections,importedScores,criticalSection);
+        programStage.programStageSections = [].concat(importedSections, importedScores, criticalSection);
         programStage.programStageDataElements = new_programStageDataElements;
 
-        
+
         /**
          * PROGRAM UPDATE ==> trackedEntityAttributes, attributeValues[metadata]
          */
         // ATTRIBUTE VALUES
         let programMetadataIdx = programPayload.attributeValues.findIndex(att => att.attribute.id === METADATA);
         let new_programMetadata = JSON.parse(programPayload.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
-        
+
         new_programMetadata.dePrefix = programMetadata.dePrefix;
         new_programMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
         new_programMetadata.healthArea = programMetadata.healthArea;
         new_programMetadata.buildVersion = BUILD_VERSION;
 
         programPayload.attributeValues[programMetadataIdx] = {
-            attribute : { id: METADATA },
-            value : JSON.stringify(new_programMetadata)
+            attribute: { id: METADATA },
+            value: JSON.stringify(new_programMetadata)
         };
 
         // PROGRAM TRACKED ENTITY ATTRIBUTES
         let currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === "ulU9KKgSLYe");
-        if(new_programMetadata.useCompetencyClass=="Yes" && !currentCompetencyAttribute){
+        if (new_programMetadata.useCompetencyClass == "Yes" && !currentCompetencyAttribute) {
             competencyClassAttribute.program.id = programPayload.id;
             programPayload.programTrackedEntityAttributes.push(competencyClassAttribute);
-            criticalSection.dataElements.push({id: COMPETENCY_CLASS})
-        }else if(new_programMetadata.useCompetencyClass=="No"){
+            criticalSection.dataElements.push({ id: COMPETENCY_CLASS })
+        } else if (new_programMetadata.useCompetencyClass == "No") {
             programPayload.programTrackedEntityAttributes = programPayload.programTrackedEntityAttributes.filter(att => att.trackedEntityAttribute.id != "ulU9KKgSLYe");
-            criticalSection.dataElements = criticalSection.dataElements.filter(de=>de.id != COMPETENCY_CLASS);
+            criticalSection.dataElements = criticalSection.dataElements.filter(de => de.id != COMPETENCY_CLASS);
         }
 
         // ========================================================== //
@@ -331,17 +337,17 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
          * CALL METADATA REQUESTS - POST DHIS2
          */
 
-        metadataRequest.mutate({data:tempMetadata}).then(response =>{
-            if(response.status!='OK'){
+        metadataRequest.mutate({ data: tempMetadata }).then(response => {
+            if (response.status != 'OK') {
                 gotResponseError(response);
                 return;
             }
             metadataRequest.mutate({ data: metadata }).then(response => {
-                if(response.status!='OK'){
+                if (response.status != 'OK') {
                     gotResponseError(response);
                     return;
                 }
-                
+
                 setCompleted(true);
                 setSuccessStatus(true);
                 setSavedAndValidated(true);
@@ -350,9 +356,12 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
         });
     }
 
-    return <Modal>
-        <ModalTitle>Save assesment</ModalTitle>
-        <ModalContent>
+    return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
+        <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>setSavingMetadata(false)}>
+            Save Assessment
+        </CustomMUIDialogTitle >
+        <DialogContent dividers style={{ padding: '1em 2em' }}>
+
             <NoticeBox title="Saving content" error={errorStatus}>
                 {!completed && <CircularLoader small />}
                 {
@@ -378,15 +387,14 @@ const SaveMetadata = ({newDEQty,programStage,importedSections,importedScores,cri
                     </div>
                 }
             </NoticeBox>
-        </ModalContent>
-        <ModalActions>
-            <ButtonStrip middle>
-                {/*<Button disabled={!completed} primary onClick={()=>window.location.reload(false)}>Reload</Button>*/}
-                <Button disabled={!completed} onClick={()=>setSavingMetadata(false)}>Close</Button>
-            </ButtonStrip>
-        </ModalActions>
-    </Modal>
 
+        </DialogContent>
+
+        <DialogActions style={{ padding: '1em' }}>
+            <Button variant='outlined' disabled={!completed} onClick={()=>{setSavingMetadata(false); /* refetchProgramStage() */}}> Done </Button>
+        </DialogActions>
+
+    </CustomMUIDialog>)
 };
 
 

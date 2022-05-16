@@ -12,6 +12,7 @@ import warning_svg from './../../images/i-warning.svg';
 import error_svg from './../../images/i-error.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expand_left_svg from './../../images/i-expand-left_black.svg';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 const StageItem = ({stage}) => {
 
@@ -40,8 +41,10 @@ const StageItem = ({stage}) => {
         */}
       </div>
       <div className="ml_item-cta">
-        <Link to={ stage.programStageSections.length > 0 ? "/programStage/"+stage.id : "#"}>
-          <img className="bsct_cta" alt="exp" src={expand_left_svg} onClick={()=> setProgramStage(stage.id)}/>
+        <Link to={ stage.programStageSections.length > 0 ? "/programStage/"+stage.id : "#"} style={{color: '#333333'}}>
+          <div style={{display: 'flex', alignItems: 'center'}} onClick={()=> setProgramStage(stage.id)}>
+            <NavigateNextIcon/>
+          </div>
         </Link>
         {/* Kebab menu icon <img src={move_vert_svg} alt="menu"  />*/}
       </div>

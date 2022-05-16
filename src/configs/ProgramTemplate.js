@@ -17,10 +17,6 @@ const Program = {
         {
             "attribute": {"id": "haUflNqP85K"},
             "value": "{\"buildVersion\":\"1.1\",\"useCompetencyClass\":\"Yes\",\"dePrefix\":\"programDEPrefix\"}"
-        },
-        {
-            "value": "HNQIS2",
-            "attribute": {"id": "yB5tFAAN7bI"}
         }
     ],
     "programTrackedEntityAttributes": [

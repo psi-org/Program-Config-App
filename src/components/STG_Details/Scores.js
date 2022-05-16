@@ -15,12 +15,14 @@ import BadgeWarnings from "./BadgeWarnings";
 import BadgeErrors from "./BadgeErrors";
 import ValidationMessages from "./ValidationMessages";
 
+import LaunchIcon from '@mui/icons-material/Launch';
+
 const FEEDBACK_ORDER = "LP171jpctBm";
 
 const Scores = ({ stageSection, index }) => {
     const [showValidationMessage, setShowValidationMessage] = useState(false);
     const [ errors, setErrors ] = useState([]);
-    useEffect(() => {
+    /* useEffect(() => {
         $('img.bsct_cta').off().on("click", function (e) {
             if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
                 $(this).attr('src', contracted_bottom_svg);
@@ -42,7 +44,7 @@ const Scores = ({ stageSection, index }) => {
                 });
             }
         });
-    }, []);
+    }, []); */
 
     const showIssues = function(dataElements) {
         setShowValidationMessage(true);
@@ -86,7 +88,9 @@ const Scores = ({ stageSection, index }) => {
                                     {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
                                 </div>
                                 <div className="ml_item-cta">
-                                    <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>
+                                    <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id} style={{textDecoration:'none',color:'black'}}>
+                                        <LaunchIcon/>{/* <img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /> */}
+                                    </a>
                                 </div>
                             </div>
                         )

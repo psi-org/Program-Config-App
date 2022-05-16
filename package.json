@@ -1,8 +1,8 @@
 {
   "name": "programconfigapp",
-  "short_name":"Program Config App",
+  "short_name": "Program Config App",
   "author": "Fernando Gomez - Mario Lopez - Utsav Koju",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "",
   "license": "BSD-3-Clause",
   "private": true,
@@ -13,11 +13,22 @@
     "deploy": "d2-app-scripts deploy"
   },
   "devDependencies": {
-    "@dhis2/cli-app-scripts": "^8.3.2"
+    "@dhis2/cli-app-scripts": "^8.3.2",
+    "react-error-overlay": "6.0.9"
+  },
+  "resolutions": {
+    "react-scripts/**/react-error-overlay": "6.0.9"
   },
   "dependencies": {
     "@dhis2/app-runtime": "^3.2.9",
     "@dhis2/ui": "^7.2.0",
+    "@emotion/react": "^11.8.2",
+    "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.5.1",
+    "@mui/lab": "^5.0.0-alpha.79",
+    "@mui/material": "^5.5.2",
+    "@mui/x-data-grid": "^5.9.0",
+    "@uiw/react-md-editor": "^3.11.2",
     "exceljs": "^4.2.1",
     "file-saver": "^2.0.5",
     "jquery": "^3.6.0",
@@ -26,6 +37,7 @@
     "react-router-dom": "^5.3.0",
     "react-sweet-progress": "^1.1.2",
     "redux": "^4.1.1",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "rehype-sanitize": "^5.0.1"
   }
 }
