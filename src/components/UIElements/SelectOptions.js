@@ -4,7 +4,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 
 const SelectOptions = ({label,items,value,disabled=false,useError=true, handler,styles={}, defaultOption='None', helperText=''}) => (
     
-    <FormControl variant="standard" style={styles} margin="dense" error={useError && !value} disabled={disabled}>
+    <FormControl variant="standard" style={styles} margin="normal" error={useError && !value} disabled={disabled}>
         <InputLabel id={"select_"+label}>{label}</InputLabel>
         <Select labelId={"select_"+label} id={"id_"+label} value={value} onChange={handler} label={label}>
             <MenuItem value=""> <em>{defaultOption}</em> </MenuItem>

@@ -6,8 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-
-const BUILD_VERSION = "1.3.0";
+import { BUILD_VERSION, METADATA, COMPETENCY_CLASS } from "../../configs/Constants";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -55,14 +54,6 @@ const metadataMutation = {
     data: ({ data }) => data
 }; */
 
-const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
-    FEEDBACK_TEXT = "yhKEe6BLEer",
-    CRITICAL_QUESTION = "NPwvdTt0Naj",
-    METADATA = "haUflNqP85K",
-    SCORE_DEN = "l7WdLDhE3xW",
-    SCORE_NUM = "Zyr7rlDOJy8",
-    COMPETENCY_CLASS = "NAaHST5ZDTE";
-
 const getParentUid = (parentName, dataElements) => {
     return dataElements.find(de => de.parentName == parentName)?.id
 };
@@ -92,15 +83,6 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
         called: metadataDM[1].called
     };
 
-    /* let programDM = useDataMutation(programMutation,{variables:{programId:programStage.program.id}});
-    const programRequest = {
-        mutate : programDM[0],
-        loading : programDM[1].loading,
-        error : programDM[1].error,
-        data : programDM[1].data,
-        called: programDM[1].called
-    }; */
-
     // Get Program payload
     const programQuery = useDataQuery(queryProgram, { variables: { id: programStage.program.id } });
     let programPayload = programQuery.data?.results;
@@ -129,7 +111,7 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
          * Prepare new data elements (payloads)
          * Get program stage data elements for each question
          */
-        importedSections.forEach((section, secIdx) => {
+        importedSections.forEach((section, secIdx) => { //v1.4.0 WORK
 
             if (section.importStatus == 'new') section.id = uidPool.shift();
 

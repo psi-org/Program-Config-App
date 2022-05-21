@@ -41,7 +41,7 @@ const StageItem = ({stage}) => {
         */}
       </div>
       <div className="ml_item-cta">
-        <Link to={ stage.programStageSections.length > 0 ? "/programStage/"+stage.id : "#"} style={{color: '#333333'}}>
+        <Link to={"/programStage/"+stage.id} style={{color: '#333333'}}>
           <div style={{display: 'flex', alignItems: 'center'}} onClick={()=> setProgramStage(stage.id)}>
             <NavigateNextIcon/>
           </div>

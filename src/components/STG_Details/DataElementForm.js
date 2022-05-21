@@ -2,6 +2,7 @@
 import { useDataQuery } from '@dhis2/app-runtime';
 import { TextField, Select, MenuItem, FormControl, InputLabel, FormControlLabel, Switch, Autocomplete, Grid, FormLabel, Button } from '@mui/material';
 import { useEffect, useState } from "react"
+import { MAX_DATA_ELEMENT_NAME_LENGTH, MIN_NAME_LENGTH } from '../../configs/Constants';
 import RowRadioButtonsGroup from './RowRadioButtonsGroup';
 
 import PercentIcon from '@mui/icons-material/Percent';
@@ -20,7 +21,7 @@ import ColorLensIcon from '@mui/icons-material/ColorLens';
 import InfoIcon from '@mui/icons-material/Info';
 import CloseIcon from '@mui/icons-material/Close';
 
-import SelectOptions from './SelectOptions';
+import SelectOptions from '../UIElements/SelectOptions';
 import MarkDownEditor from './MarkDownEditor';
 import InfoBox from './../UIElements/InfoBox';
 
@@ -62,8 +63,6 @@ const queryId = {
         params: { limit: 1 }
     }
 };
-
-const MAX_NAME_LENGTH = 200, MIN_NAME_LENGTH = 2;
 
 const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined }) => {
 
@@ -260,9 +259,9 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
         if (formName === '') {
             response = false
             validationErrors.formName = 'This field is required'
-        } else if (formName.length < MIN_NAME_LENGTH || formName.length > MAX_NAME_LENGTH) {
+        } else if (formName.length < MIN_NAME_LENGTH || formName.length > MAX_DATA_ELEMENT_NAME_LENGTH) {
             response = false
-            validationErrors.formName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_NAME_LENGTH} characters`
+            validationErrors.formName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters`
         } else {
             validationErrors.formName = undefined
         }
@@ -455,7 +454,7 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
             <Grid container spacing={2} style={{ alignItems: 'center' }}>
                 <Grid item xs={7} style={{ alignItems: 'end' }} >
                     <Grid style={{ display: 'flex' }} item>
-                        <RowRadioButtonsGroup label={"Element Type"} items={elemTypes} handler={elemTypeChange} value={structure} />
+                        <RowRadioButtonsGroup label={"HNQIS Element Type"} items={elemTypes} handler={elemTypeChange} value={structure} />
                         <InfoBox
                             title='About Element Types'
                             message={

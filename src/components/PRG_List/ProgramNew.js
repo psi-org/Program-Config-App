@@ -1,11 +1,14 @@
 import React from 'react';
 import { useState } from "react";
-//import { Modal, ModalTitle, ModalContent, ReactFinalForm, InputFieldFF, SwitchFieldFF, SingleSelectFieldFF, hasValue, InputField, ButtonStrip } from "@dhis2/ui";
+import { Transfer } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 //import styles from './Program.module.css'
 import { Program, PS_AssessmentStage, PS_ActionPlanStage, PSS_Default, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
 
+import { METADATA,COMPETENCY_ATTRIBUTE,COMPETENCY_CLASS,BUILD_VERSION,MAX_PREFIX_LENGTH,MAX_PROGRAM_NAME_LENGTH,MIN_NAME_LENGTH,MAX_SHORT_NAME_LENGTH } from './../../configs/Constants';
+
 import Button from '@mui/material/Button';
+import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -18,9 +21,10 @@ import Select from '@mui/material/Select';
 import SendIcon from '@mui/icons-material/Send';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import SelectOptions from './../STG_Details/SelectOptions'
+import SelectOptions from '../UIElements/SelectOptions';
 import FormHelperText from '@mui/material/FormHelperText';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { FormLabel } from '@mui/material';
 
 //const { Form, Field } = ReactFinalForm
 
@@ -51,21 +55,103 @@ const queryProgramType = {
     }
 };
 
+const queryTEType = {
+    results: {
+        resource: 'trackedEntityTypes',
+        params: {
+            fields: ['id', 'name'],
+        }
+    }
+};
+
+const queryTEAttributes = {
+    results: {
+        resource: 'trackedEntityAttributes',
+        params: {
+            fields: ['id','name', 'valueType'],
+            paging: false
+        }
+    }
+};
+
+const queryCatCombos = {
+    results: {
+        resource: 'categoryCombos',
+        params: {
+            fields: ['id','name'],
+            filter: ['dataDimensionType:eq:ATTRIBUTE'],
+            paging: false
+        }
+    }
+};
+
 const metadataMutation = {
     resource: 'metadata',
     type: 'create',
     data: ({ data }) => data
 };
 
-const METADATA = "haUflNqP85K",
-    COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe",
-    COMPETENCY_CLASS = "NAaHST5ZDTE",
-    BUILD_VERSION = "1.3.0";
-
-const MAX_PREFIX_LENGTH = 25, 
-    MAX_NAME_LENGTH = 230,
-    MIN_NAME_LENGTH = 2,
-    MAX_SHORT_NAME_LENGTH = 50;
+const hnqisProgramConfigs = {
+    "trackedEntityType": { "id": "oNwpeWkfoWc" },
+    "attributeValues": [
+        {
+            "attribute": { "id": "haUflNqP85K" },
+            "value": "{\"buildVersion\":\"1.1\",\"useCompetencyClass\":\"Yes\",\"dePrefix\":\"programDEPrefix\"}"
+        }
+    ],
+    "programTrackedEntityAttributes": [
+        {
+            "trackedEntityAttribute": { "id": "Xe5hUu6KkUT" },
+            "mandatory": false,
+            "valueType": "TEXT",
+            "searchable": false,
+            "displayInList": true,
+            "sortOrder": 1
+        },
+        {
+            "trackedEntityAttribute": { "id": "nHg1hGgtJwm" },
+            "mandatory": false,
+            "valueType": "TEXT",
+            "searchable": false,
+            "displayInList": true,
+            "sortOrder": 2
+        },
+        {
+            "trackedEntityAttribute": { "id": "UlUYUyZJ6o9" },
+            "mandatory": false,
+            "valueType": "DATE",
+            "searchable": true,
+            "displayInList": true,
+            "sortOrder": 3
+        },
+        {
+            "trackedEntityAttribute": { "id": "NQdpdST0Gcx" },
+            "mandatory": false,
+            "valueType": "TEXT",
+            "searchable": false,
+            "displayInList": true,
+            "sortOrder": 4
+        },
+        {
+            "trackedEntityAttribute": { "id": "ulU9KKgSLYe" },
+            "mandatory": false,
+            "valueType": "TEXT",
+            "searchable": false,
+            "displayInList": false,
+            "sortOrder": 5
+        }
+    ],
+    "userGroupAccesses": [
+        {
+            "access": "rwrw----",
+            "id": "TOLEUuY7woR"
+        },
+        {
+            "access": "r-rw----",
+            "id": "QiJXeqMmXXQ"
+        }
+    ]
+}
 
 const ProgramNew = (props) => {
     // Create Mutation
@@ -87,6 +173,12 @@ const ProgramNew = (props) => {
     const idsQuery = useDataQuery(queryId);
     const uidPool = idsQuery.data?.results.codes;
 
+    const teTypeQuery = useDataQuery(queryTEType);
+    const trackedEntityTypes = teTypeQuery.data?.results.trackedEntityTypes;
+
+    const { data: trackedEntityAttributes, refetch: findTEAttributes } = useDataQuery(queryTEAttributes, { lazy: true });
+    const { data: categoryCombos, refetch: findCategoryCombos } = useDataQuery(queryCatCombos, { lazy: true });
+
     const [programId, setProgramId] = useState(undefined);
     const [assessmentId, setAssessmentId] = useState(undefined);
     const [actionPlanId, setActionPlanId] = useState(undefined);
@@ -95,46 +187,75 @@ const ProgramNew = (props) => {
     const [scoresSectionId, setScoresSectionId] = useState(undefined);
 
     const [pgrTypePCA, setPgrTypePCA] = useState('');
+    const [programTET, setProgramTET] = useState('');
     const [useCompetency, setUseCompetency] = useState(false);
     const [healthArea, setHealthArea] = useState('');
     const [dePrefix, setDePrefix] = useState('');
     const [programName, setProgramName] = useState('');
     const [programShortName, setProgramShortName] = useState('');
     const [sentForm, setSentForm] = useState(false);
+    const [programTEAs, setProgramTEAs] = useState({available: [], selected: []})
+    const [programCategoryCombos, setProgramCategoryCombos] = useState([{ name: 'Select an option', id: '' }])
+    const [categoryCombo,setCategoryCombo] = useState('')
 
     //Validation Messages
     const [validationErrors, setValidationErrors] = useState(
         {
-            pgrType:undefined,
-            prefix:undefined,
-            programName:undefined,
-            shortName:undefined,
-            healthArea:undefined
+            pgrType: undefined,
+            prefix: undefined,
+            programName: undefined,
+            shortName: undefined,
+            programTET: undefined,
+            healthArea: undefined
         });
 
     const handleChangePgrType = (event) => {
         validationErrors.pgrType = undefined
-        setValidationErrors({...validationErrors})
-        setPgrTypePCA(event.target.value);
+        validationErrors.programTET = undefined
+        validationErrors.healthArea = undefined
+        setValidationErrors({ ...validationErrors })
+        let value = event.target.value
+        setPgrTypePCA(value);
+        if (value === 'hnqis') {
+            let hnqisTET = trackedEntityTypes.find(tet => tet.id === "oNwpeWkfoWc")
+            setProgramTET({ label: hnqisTET.name, id: hnqisTET.id })
+        } else {
+            setProgramTET('')
+            if (value === 'tracker'){
+                fetchTrackerMetadata()
+            }
+        }
     };
 
     const handleChangeDePrefix = (event) => {
         validationErrors.prefix = undefined
-        setValidationErrors({...validationErrors})
+        setValidationErrors({ ...validationErrors })
         setDePrefix(event.target.value);
     };
 
     const handleChangeProgramName = (event) => {
         validationErrors.programName = undefined
-        setValidationErrors({...validationErrors})
+        setValidationErrors({ ...validationErrors })
         setProgramName(event.target.value);
     };
 
     const handleChangeProgramShortName = (event) => {
         validationErrors.shortName = undefined
-        setValidationErrors({...validationErrors})
+        setValidationErrors({ ...validationErrors })
         setProgramShortName(event.target.value);
     };
+
+    const programTETChange = (event, value) => {
+        if (value) {
+            validationErrors.programTET = undefined
+            setValidationErrors({ ...validationErrors })
+        }
+        setProgramTET(value || '')
+    }
+
+    const categoryComboChange = (event,value) => {
+        setCategoryCombo(value || '');
+    }
 
     const handleChangeComp = (event) => {
         setUseCompetency(event.target.checked);
@@ -142,17 +263,24 @@ const ProgramNew = (props) => {
 
     const healthAreaChange = (event) => {
         validationErrors.healthArea = undefined
-        setValidationErrors({...validationErrors})
+        setValidationErrors({ ...validationErrors })
         setHealthArea(event.target.value);
     }
 
+    const handleChangeTEAs = (res) => {
+        programTEAs.selected = res.selected
+        setProgramTEAs(JSON.parse(JSON.stringify(programTEAs)))
+    }
+
     let healthAreaOptions = [];
+
     if (haOptions) {
         healthAreaOptions = healthAreaOptions.concat(haOptions.map(op => {
             return { label: op.name, value: op.code }
         }));
     }
-    if (uidPool && uidPool.length===6) {
+
+    if (uidPool && uidPool.length === 6) {
         setProgramId(uidPool.shift());
         setAssessmentId(uidPool.shift());
         setActionPlanId(uidPool.shift());
@@ -165,122 +293,171 @@ const ProgramNew = (props) => {
         props.setShowProgramForm(false);
     }
 
-    const formDataIsValid = () =>{
+    const formDataIsValid = () => {
 
         let response = true;
 
-        if(pgrTypePCA===''){
+        if (pgrTypePCA === '') {
             response = false
             validationErrors.pgrType = 'This field is required'
-        }else{
+        } else {
             validationErrors.pgrType = undefined
         }
 
-        if(dePrefix===''){
+        if (dePrefix === '') {
             response = false
             validationErrors.prefix = 'This field is required'
-        }else if(dePrefix.length > MAX_PREFIX_LENGTH){
+        } else if (dePrefix.length > MAX_PREFIX_LENGTH) {
             response = false
             validationErrors.prefix = `This field cannot exceed ${MAX_PREFIX_LENGTH} characters`
-        }else{
+        } else {
             validationErrors.prefix = undefined
         }
 
-        if(programName===''){
+        if (programName === '') {
             response = false
             validationErrors.programName = 'This field is required'
-        }else if(programName.length < MIN_NAME_LENGTH || programName.length > (MAX_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1) ){
+        } else if (programName.length < MIN_NAME_LENGTH || programName.length > (MAX_PROGRAM_NAME_LENGTH - (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1)) {
             response = false
-            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${(MAX_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)} characters`
-        }else{
+            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${(MAX_PROGRAM_NAME_LENGTH - (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1)} characters`
+        } else {
             validationErrors.programName = undefined
         }
 
-        if(programShortName===''){
+        if (programShortName === '') {
             response = false
             validationErrors.shortName = 'This field is required'
-        }else if(programShortName.length > (MAX_SHORT_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)){
+        } else if (programShortName.length > (MAX_SHORT_NAME_LENGTH - (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1)) {
             response = false
-            validationErrors.shortName = `This field cannot exceed ${(MAX_SHORT_NAME_LENGTH-(dePrefix?dePrefix.length:MAX_PREFIX_LENGTH)-1)} characters`
-        }else{
+            validationErrors.shortName = `This field cannot exceed ${(MAX_SHORT_NAME_LENGTH - (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1)} characters`
+        } else {
             validationErrors.shortName = undefined
         }
 
-        if(pgrTypePCA!=='tracker' && (pgrTypePCA==='hnqis' && healthArea==='')){
+        if (programTET === '') {
+            response = false
+            validationErrors.programTET = 'This field is required'
+        } else {
+            validationErrors.programTET = undefined
+        }
+
+        if (pgrTypePCA !== 'tracker' && (pgrTypePCA === 'hnqis' && healthArea === '')) {
             response = false
             validationErrors.healthArea = 'This field is required'
-        }else{
+        } else {
             validationErrors.healthArea = undefined
         }
 
-        setValidationErrors({...validationErrors})
+        setValidationErrors({ ...validationErrors })
 
         return response;
-    }    
+    }
+
+    const fetchTrackerMetadata = () => {
+        findTEAttributes().then(data => {
+            if (data?.results?.trackedEntityAttributes) {
+                programTEAs.available = data.results.trackedEntityAttributes
+                setProgramTEAs({...programTEAs})
+            }
+        })
+
+        findCategoryCombos().then(ccdata => {
+            if (ccdata?.results?.categoryCombos) setProgramCategoryCombos(ccdata.results.categoryCombos)
+        })
+    }
 
     function submission() {
         setSentForm(true)
         props.setNotification(undefined)
         //let prgTypeId = 'yB5tFAAN7bI';
         let dataIsValid = formDataIsValid()
-        if (!dataIsValid){
+        if (!dataIsValid) {
             setSentForm(false)
             return
         }
         if (!metadataRequest.called && dataIsValid) {
 
             let prgrm = JSON.parse(JSON.stringify(Program));
+            let programStages = undefined;
+            let programStageSections = undefined;
 
             prgrm.name = programName;
             prgrm.shortName = programShortName;
             prgrm.id = programId;
 
-            prgrm.attributeValues.push({
-                "value": "HNQIS2",
-                "attribute": { "id": prgTypeId }
-            });
+            if (pgrTypePCA === 'hnqis') {
+                //HNQIS2 Programs
+                Object.assign(prgrm, hnqisProgramConfigs)
+                prgrm.attributeValues.push({
+                    "value": "HNQIS2",
+                    "attribute": { "id": prgTypeId }
+                });
+                prgrm.programStages.push({ id: assessmentId });
+                prgrm.programStages.push({ id: actionPlanId });
 
-            createOrUpdateMetaData(prgrm.attributeValues);
-            prgrm.programStages.push({ id: assessmentId });
-            prgrm.programStages.push({ id: actionPlanId });
+                let assessmentStage = JSON.parse(JSON.stringify(PS_AssessmentStage));
+                assessmentStage.id = assessmentId;
+                assessmentStage.name = dePrefix + '_' + assessmentStage.name;
+                assessmentStage.programStageSections.push({ id: defaultSectionId });
+                assessmentStage.programStageSections.push({ id: stepsSectionId });
+                assessmentStage.programStageSections.push({ id: scoresSectionId });
+                assessmentStage.program.id = programId;
 
-            let assessmentStage = JSON.parse(JSON.stringify(PS_AssessmentStage));
-            assessmentStage.id = assessmentId;
-            assessmentStage.name = dePrefix + '_' + assessmentStage.name;
-            assessmentStage.programStageSections.push({ id: defaultSectionId });
-            assessmentStage.programStageSections.push({ id: stepsSectionId });
-            assessmentStage.programStageSections.push({ id: scoresSectionId });
-            assessmentStage.program.id = programId;
+                let actionPlanStage = JSON.parse(JSON.stringify(PS_ActionPlanStage));
+                actionPlanStage.id = actionPlanId;
+                actionPlanStage.name = dePrefix + '_' + actionPlanStage.name;
+                actionPlanStage.program.id = programId;
 
-            let actionPlanStage = JSON.parse(JSON.stringify(PS_ActionPlanStage));
-            actionPlanStage.id = actionPlanId;
-            actionPlanStage.name = dePrefix + '_' + actionPlanStage.name;
-            actionPlanStage.program.id = programId;
+                let defaultSection = JSON.parse(JSON.stringify(PSS_Default));
+                defaultSection.id = defaultSectionId;
+                defaultSection.programStage.id = assessmentId;
+                //defaultSection.name = defaultSection.name
 
-            let defaultSection = JSON.parse(JSON.stringify(PSS_Default));
-            defaultSection.id = defaultSectionId;
-            defaultSection.programStage.id = assessmentId;
-            //defaultSection.name = defaultSection.name
+                let criticalSteps = JSON.parse(JSON.stringify(PSS_CriticalSteps));
+                criticalSteps.id = stepsSectionId;
+                criticalSteps.programStage.id = assessmentId;
+                //criticalSteps.name = criticalSteps.name
 
-            let criticalSteps = JSON.parse(JSON.stringify(PSS_CriticalSteps));
-            criticalSteps.id = stepsSectionId;
-            criticalSteps.programStage.id = assessmentId;
-            //criticalSteps.name = criticalSteps.name
+                let scores = JSON.parse(JSON.stringify(PSS_Scores));
+                scores.id = scoresSectionId;
+                scores.name = scores.name;
+                scores.programStage.id = assessmentId;
 
-            let scores = JSON.parse(JSON.stringify(PSS_Scores));
-            scores.id = scoresSectionId;
-            scores.name = scores.name;
-            scores.programStage.id = assessmentId;
+                if (!useCompetency) {
+                    removeCompetencyAttribute(prgrm.programTrackedEntityAttributes);
+                    removeCompetencyClass(criticalSteps.dataElements);
+                }
 
-            if (!useCompetency) {
-                removeCompetencyAttribute(prgrm.programTrackedEntityAttributes);
-                removeCompetencyClass(criticalSteps.dataElements);
+                createOrUpdateMetaData(prgrm.attributeValues);
+
+                programStages = [assessmentStage, actionPlanStage]
+                programStageSections = [defaultSection, criticalSteps, scores]
+
+            } else {
+                //Tracker Programs
+                prgrm.trackedEntityType = { "id": programTET.id }
+                prgrm.programTrackedEntityAttributes = []
+                prgrm.attributeValues = []
+                if(categoryCombo!=='') prgrm.categoryCombo = { id: categoryCombo.id }
+                programTEAs.selected.forEach((selectedTEA, index) => {
+                    let newTEA = programTEAs.available.find(tea => tea.id === selectedTEA )
+                    prgrm.programTrackedEntityAttributes.push({
+                        trackedEntityAttribute: { id: newTEA.id },
+                        mandatory: false,
+                        valueType: newTEA.valueType,
+                        searchable: false,
+                        displayInList: true,
+                        sortOrder: (index+1)
+                    })
+                })
+
+                createOrUpdateMetaData(prgrm.attributeValues);
             }
 
             let metadata = {
                 programs: [prgrm],
-                programStages: [assessmentStage, actionPlanStage],
-                programStageSections: [defaultSection, criticalSteps, scores]
+                programStages,
+                programStageSections
             }
 
             metadataRequest.mutate({ data: metadata }).then(response => {
@@ -290,8 +467,8 @@ const ProgramNew = (props) => {
                         severity: 'error'
                     });
                     props.setShowProgramForm(false);
-                }else{
-                    props.setNotification({message: `Program ${prgrm.name} created successfully`, severity: 'success'});
+                } else {
+                    props.setNotification({ message: `Program ${prgrm.name} created successfully`, severity: 'success' });
                     props.setShowProgramForm(false);
                     props.programsRefetch();
                 }
@@ -305,14 +482,20 @@ const ProgramNew = (props) => {
 
             let metaData_value = JSON.parse(metaDataArray[0].value);
             metaData_value.buildVersion = BUILD_VERSION;
-            metaData_value.useCompetencyClass = useCompetency ? 'Yes' : 'No';
+            if (pgrTypePCA==='hnqis'){
+                metaData_value.useCompetencyClass = useCompetency ? 'Yes' : 'No';
+                metaData_value.healthArea = healthArea;
+            }
             metaData_value.dePrefix = dePrefix;
-            metaData_value.healthArea = healthArea;
             metaDataArray[0].value = JSON.stringify(metaData_value);
         }
         else {
             let attr = { id: METADATA };
-            let val = { buildVersion: BUILD_VERSION, useCompetencyClass: useCompetency, dePrefix: dePrefix, healthArea: healthArea };
+            let val = { buildVersion: BUILD_VERSION, dePrefix: dePrefix };
+            if (pgrTypePCA==='hnqis'){
+                val.useCompetencyClass = useCompetency
+                val.healthArea = healthArea
+            }
             let attributeValue = { attribute: attr, value: JSON.stringify(val) }
             attributeValues.push(attributeValue);
         }
@@ -339,7 +522,7 @@ const ProgramNew = (props) => {
             </CustomMUIDialogTitle >
             <DialogContent dividers style={{ padding: '1em 2em' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <FormControl sx={{ minWidth: '30%' }} error={validationErrors.pgrType!==undefined}>
+                    <FormControl sx={{ minWidth: '30%' }} error={validationErrors.pgrType !== undefined}>
                         <InputLabel id="label-prgType">Program Type</InputLabel>
                         <Select
                             labelId="label-prgType"
@@ -351,18 +534,18 @@ const ProgramNew = (props) => {
                             <MenuItem value="">
                                 <em>None</em>
                             </MenuItem>
-                            <MenuItem value={'tracker'} disabled>Tracker Program</MenuItem>
-                            <MenuItem value={'hnqis'}>HNQIS</MenuItem>
+                            <MenuItem value={'tracker'}>Tracker Program</MenuItem>
+                            <MenuItem value={'hnqis'}>HNQIS 2.0</MenuItem>
                         </Select>
                         <FormHelperText>{validationErrors.pgrType}</FormHelperText>
                     </FormControl>
                     <FormControl sx={{ minWidth: '65%' }}>
                         <TextField
-                            error={validationErrors.prefix!==undefined}
+                            error={validationErrors.prefix !== undefined}
                             helperText={validationErrors.prefix}
                             margin="normal"
                             id="prefix"
-                            label="Program Data Element Prefix"
+                            label="Program Data Element Prefix (*)"
                             type="text"
                             fullWidth
                             variant="standard"
@@ -373,11 +556,11 @@ const ProgramNew = (props) => {
                     </FormControl>
                 </div>
                 <TextField
-                    error={validationErrors.programName!==undefined}
+                    error={validationErrors.programName !== undefined}
                     helperText={validationErrors.programName}
                     margin="normal"
                     id="name"
-                    label="Program Name"
+                    label="Program Name (*)"
                     type="text"
                     fullWidth
                     variant="standard"
@@ -385,19 +568,39 @@ const ProgramNew = (props) => {
                     value={programName}
                     onChange={handleChangeProgramName}
                 />
-                <TextField
-                    error={validationErrors.shortName!==undefined}
-                    helperText={validationErrors.shortName}
-                    margin="normal"
-                    id="shortName"
-                    label="Program Short Name"
-                    type="text"
-                    fullWidth
-                    variant="standard"
-                    autoComplete='off'
-                    value={programShortName}
-                    onChange={handleChangeProgramShortName}
-                />
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <TextField
+                        error={validationErrors.shortName !== undefined}
+                        helperText={validationErrors.shortName}
+                        margin="normal"
+                        id="shortName"
+                        label="Program Short Name (*)"
+                        type="text"
+                        sx={{ width: '48%' }}
+                        variant="standard"
+                        autoComplete='off'
+                        value={programShortName}
+                        onChange={handleChangeProgramShortName}
+                    />
+                    <Autocomplete
+                        id="tetSelect"
+                        disabled={pgrTypePCA !== 'tracker'}
+                        options={trackedEntityTypes?.map(tet => ({ label: tet.name, id: tet.id })) || [{ label: '', id: '' }]}
+                        sx={{ width: '48%' }}
+                        renderInput={(params) => <TextField 
+                            {...params}
+                            error={validationErrors.programTET !== undefined}
+                            label="Tracked Entity Type (*)"
+                            margin='normal'
+                            variant="standard"
+                            helperText={validationErrors.programTET}/>}
+                        value={programTET}
+                        onChange={programTETChange}
+                        getOptionLabel={(option) => (option.label || '')}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        defaultValue={''}
+                    />
+                </div>
                 {pgrTypePCA === 'hnqis' &&
                     <FormControl margin="normal" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
                         <FormControlLabel
@@ -407,9 +610,9 @@ const ProgramNew = (props) => {
                             label="Use Competency Class"
                         />
                         <SelectOptions
-                            useError={validationErrors.healthArea!==undefined}
+                            useError={validationErrors.healthArea !== undefined}
                             helperText={validationErrors.healthArea}
-                            label={'Program Health Area'}
+                            label={'Program Health Area (*)'}
                             items={healthAreaOptions}
                             handler={healthAreaChange}
                             styles={{ width: '70%' }}
@@ -418,10 +621,49 @@ const ProgramNew = (props) => {
                         />
                     </FormControl>
                 }
+                {pgrTypePCA === 'tracker' &&
+                    <>
+                        <FormControl sx={{ minWidth: '100%' }} error={validationErrors.categoryCombo !== undefined}>
+                            <Autocomplete
+                                id="ccSelect"
+                                disabled={pgrTypePCA !== 'tracker'}
+                                options={programCategoryCombos?.map(pcc => ({ label: pcc.name, id: pcc.id })) }
+                                sx={{ width: '100%' }}
+                                renderInput={(params) => <TextField 
+                                    {...params}
+                                    error={validationErrors.categoryCombo !== undefined}
+                                    label="Category Combination"
+                                    variant="standard"
+                                    margin="normal"
+                                    helperText={validationErrors.categoryCombo} />
+                                }
+                                value={categoryCombo}
+                                onChange={categoryComboChange}
+                                getOptionLabel={(option) => (option.label || '')}
+                                isOptionEqualToValue={(option, value) => option.id === value.id}
+                                defaultValue={'default'}
+                            />
+                        </FormControl>
+                        <div style={{marginTop: '1.5em'}}>
+                            <FormLabel style={{display: 'inline-block', marginBottom: '8px'}}>Program Tracked Entity Attributes</FormLabel>
+                            <Transfer
+                                filterable
+                                onChange={handleChangeTEAs}
+                                options={programTEAs.available.map(tea => ({
+                                    label: tea.name,
+                                    value: tea.id
+                                }))}
+                                selected={programTEAs.selected}
+                                optionsWidth = '48%'
+                                selectedWidth = '48%'
+                            />
+                        </div>
+                    </>
+                }
             </DialogContent>
             <DialogActions style={{ padding: '1em' }}>
                 <Button onClick={() => hideForm()} color="error" > Close </Button>
-                <LoadingButton 
+                <LoadingButton
                     onClick={() => submission()}
                     loading={sentForm}
                     variant='outlined'
