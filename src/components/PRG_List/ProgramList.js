@@ -10,6 +10,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 // ------------------
 import ProgramItem from "./ProgramItem";
 import DependencyExport from "./DependencyExport";
+import SharingScreen from "../Sharing/SharingScreen";
 import DataProcessor from "../Excel/DataProcessor";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -53,6 +54,7 @@ const ProgramList = () => {
 
   // Export Program Metadata //
   const [exportProgramId, setExportProgramId] = useState(undefined)
+  const [ sharingProgramId, setSharingProgramId] = useState(undefined)
   /*const exportQuery = useDataQuery(queryProgramMetadata,{/* lazy:true, variables:{program:exportProgramId}});*/
 
   /*useEffect(()=>{
@@ -90,6 +92,10 @@ const ProgramList = () => {
     setExportProgramId(program)
   }
 
+  const shareProgram = (program) => {
+    setSharingProgramId(program)
+  }
+
   const deleteProgram = (program) => {
 
   }
@@ -114,6 +120,10 @@ const ProgramList = () => {
           {exportProgramId &&
             <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId} />
           }
+          {
+            sharingProgramId &&
+            <SharingScreen element = "program" id={sharingProgramId} setSharingProgramId={setSharingProgramId}/>
+          }
           {/*
             <Button loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> Download Template</Button>
             <Button disabled={true}><img src={upload_svg} /> Import Template</Button>
@@ -127,7 +137,7 @@ const ProgramList = () => {
           <div className="list-ml_item">
             {
               data.results.programs.map((program) => {
-                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} deleteProgram={deleteProgram} />
+                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} shareProgram={shareProgram} deleteProgram={deleteProgram} />
               })
             }
           </div>

@@ -6,6 +6,7 @@ import actionCreators from "../../state/action-creators";
 //UI Elements
 import {FlyoutMenu, MenuItem, Popper, Layer} from "@dhis2/ui";
 import EditIcon from '@mui/icons-material/Edit';
+import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 
@@ -23,7 +24,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
-const ProgramItem = ({program, downloadMetadata, deleteProgram}) => {
+const ProgramItem = ({program, downloadMetadata, shareProgram, deleteProgram}) => {
   const [ref, setRef] = useState(undefined);
   const [open, setOpen] = useState(false)
 
@@ -61,6 +62,7 @@ const ProgramItem = ({program, downloadMetadata, deleteProgram}) => {
             <Popper reference={ref} placement="bottom-end">
                 <FlyoutMenu>
                   <MenuItem disabled={true} label="Edit Program" icon={<EditIcon />} onClick={()=>{toggle(); /* Add function */} }/>
+                  <MenuItem label="Sharing Settings" icon={<ShareIcon/>} onClick={()=>{toggle(); shareProgram(program.id)}}/>
                   <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={()=>{toggle(); downloadMetadata(program.id)} }/>
                   <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon/>} onClick={()=>{toggle(); deleteProgram(program.id)} }/>
                 </FlyoutMenu>
