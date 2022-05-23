@@ -1,7 +1,3 @@
-import { useDataQuery } from "@dhis2/app-runtime";
-
-import {FlyoutMenu, MenuItem, MenuSectionHeader, Popper, Layer} from "@dhis2/ui";
-
 import {useState} from "react";
 import SharingOptions from "./SharingOptions";
 
@@ -13,7 +9,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Close';
 import BlockIcon from '@mui/icons-material/Block';
 import ViewIcon from '@mui/icons-material/Visibility';
-import DoneIcon from '@mui/icons-material/Done';
 
 const SharingItem = ({ type, element, permission, updatePermission, deleteUserPermission }) => {
     let permissionArray = (!permission) ? Array(6).fill("-") : permission.split("");
@@ -22,11 +17,11 @@ const SharingItem = ({ type, element, permission, updatePermission, deleteUserPe
     const toggle = () => setOpen(!open);
 
     const currentState = () => {
-        return (permissionArray[1] === "w") ? <EditIcon/> : (permissionArray[0] === "r" && permissionArray[1] != "w") ? <ViewIcon/> : <BlockIcon/>
+        return (permissionArray[1] === "w") ? <EditIcon/> : (permissionArray[0] === "r" && permissionArray[1] !== "w") ? <ViewIcon/> : <BlockIcon/>
     }
 
     const getPermissionInformation = () => {
-        return (permissionArray[1] === "w") ? "Can find, view and edit" : (permissionArray[0] === "r" && permissionArray[1] != "w") ? "Can find and view" : "No access";
+        return (permissionArray[1] === "w") ? "Can find, view and edit" : (permissionArray[0] === "r" && permissionArray[1] !== "w") ? "Can find and view" : "No access";
     }
 
     const updateUnGPermission = (segment, permsn) => {
@@ -44,7 +39,7 @@ const SharingItem = ({ type, element, permission, updatePermission, deleteUserPe
     }
 
     return (
-        <div>
+        <div id={element.id}>
             <hr style={{ marginTop: -1, height: 1, border:"none", backgroundColor: "#bdbdbd"}}/>
             <div style={{ fontWeight: 400, display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingTop: "4px", paddingBottom: "4px", paddingRight: "8px", paddingLeft: "8px"}}>
                 { (type === 'publicAccess') ? <ApartmentIcon/> : (type === 'externalAccess') ? <ExternalIcon/> : (type === 'userGroupAccesses') ? <PeopleIcon/> : <PersonIcon/> }
@@ -55,7 +50,7 @@ const SharingItem = ({ type, element, permission, updatePermission, deleteUserPe
                 <div id={'menu'+element.id} style={{ paddingLeft: "12px", paddingRight: "6px"}} onClick={()=>{setRef(document.getElementById('menu'+element.id)); toggle(); }}>
                     { currentState() }
                 </div>
-                {open && <SharingOptions permission={permissionArray} reference={ref} updatePermission={updateUnGPermission} toggle={toggle}/> }
+                {open && <SharingOptions permission={permissionArray} reference={ref} setEntityPermission={updateUnGPermission} toggle={toggle}/> }
                 <div style={{ paddingLeft: "6px", paddingRight: "12px"}} onClick={() => deleteUserPermission(type, element.id)}>
                     <DeleteIcon/>
                 </div>
