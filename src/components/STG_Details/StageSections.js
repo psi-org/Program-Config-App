@@ -301,7 +301,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const commit = () => {
         if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
         let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
-        console.log(removed)
         setRemovedElements(removed)
         setSavingMetadata(true);
         return;
