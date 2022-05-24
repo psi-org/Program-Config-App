@@ -5,17 +5,11 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import SaveIcon from '@mui/icons-material/Save';
+import { METADATA, FEEDBACK_ORDER, MAX_FORM_NAME_LENGTH, MIN_FORM_NAME_LENGTH } from "../../configs/Constants";
 
 
 import { useEffect, useState } from "react";
 import SaveMetadata from "./SaveMetadata";
-
-const METADATA = "haUflNqP85K",
-    CRITICAL_QUESTION = "NPwvdTt0Naj",
-    FEEDBACK_ORDER = 'LP171jpctBm';
-
-const MAX_FORM_NAME_LENGTH = 200;
-const MIN_FORM_NAME_LENGTH = 2;
 
 const ValidateMetadata = (props) => {
     let validationResults = {};
@@ -60,7 +54,7 @@ const ValidateMetadata = (props) => {
         }
     }
 
-    const checkDuplicatedFeedbacks = (scores) => scores.filter(score => scores.find(match => match.feedbackOrder === score.feedbackOrder && match.code !== score.code));
+    const checkDuplicatedFeedbacks = props.hnqisMode?(scores) => scores.filter(score => scores.find(match => match.feedbackOrder === score.feedbackOrder && match.code !== score.code)):[];
 
     const groupBy = (data, key) => {
         return data.reduce((acu, cur) => {
@@ -130,7 +124,7 @@ const ValidateMetadata = (props) => {
         const importedScore = props.importedScores;
         let errorCounts = 0;
 
-        if (verifyProgramDetail(props.importResults)) {
+        if ( verifyProgramDetail(props.importResults)) {
             let questions = [];
             let scores = [];
 
@@ -138,12 +132,14 @@ const ValidateMetadata = (props) => {
             validationResults.scores = scores;
 
             // CHECK FEEDBACK DATA
-            let { feedbacksErrors, feedbacksWarnings } = validateFeedbacks(importedSections.concat(importedScore))
-            errorCounts += feedbacksErrors.length
-            validationResults.feedbacks = feedbacksErrors;
+            if (props.hnqisMode) {
+                let { feedbacksErrors, feedbacksWarnings } = validateFeedbacks(importedSections.concat(importedScore))
+                errorCounts += feedbacksErrors.length
+                validationResults.feedbacks = feedbacksErrors;
+            }
 
             //ADD FEEDBACK ERRORS TO DATA ELEMENTS
-            importedSections.forEach((section) => {
+            if (props.hnqisMode) importedSections.forEach((section) => {
                 delete section.errors
                 let section_errors = 0;
                 section.dataElements.forEach((dataElement) => {
@@ -169,7 +165,7 @@ const ValidateMetadata = (props) => {
 
             let score_errors = 0;
             delete importedScore.errors
-            importedScore.dataElements.forEach((dataElement) => {
+            if (props.hnqisMode) importedScore.dataElements.forEach((dataElement) => {
                 delete dataElement.errors
                 validateScores(dataElement);
                 if (dataElement.errors) scores.push(dataElement);
@@ -193,8 +189,7 @@ const ValidateMetadata = (props) => {
             if (errorCounts === 0) {
                 setValid(true);
                 props.setValidationResults(false);
-            }
-            else {
+            } else {
                 setValidationMessage("Some Validation Errors occurred. Please check / fix the issues before proceeding.");
                 props.setSavingMetadata(false);
                 props.setValidationResults(validationResults);
@@ -382,11 +377,6 @@ const ValidateMetadata = (props) => {
             return (jsonData.length > 0) ? JSON.parse(jsonData[0].value) : '';
         }
 
-        function getHNQISCriticalValue(dataElement) {
-            let criticalData = dataElement.attributeValues.filter(attributeValue => attributeValue.attribute.id === CRITICAL_QUESTION);
-            return (criticalData.length > 0) ? criticalData[0].value : '';
-        }
-
         function getFeedbackOrder(dataElement) {
             let feedbackOrder = dataElement.attributeValues.filter(attributeValue => attributeValue.attribute.id === FEEDBACK_ORDER);
             return (feedbackOrder.length > 0) ? feedbackOrder[0].value : '';
@@ -451,6 +441,7 @@ const ValidateMetadata = (props) => {
             <Button variant='outlined' startIcon={<SaveIcon />} disabled={!valid} onClick={()=>setSave(true)}> Save </Button>
             {save &&
                 <SaveMetadata
+                    hnqisMode={props.hnqisMode}
                     newDEQty={props.newDEQty}
                     programStage={props.programStage}
                     importedSections={props.importedSections}

@@ -47,13 +47,6 @@ const metadataMutation = {
     data: ({ data }) => data
 };
 
-/* const programMutation = {
-    resource: 'programs',
-    type: 'update',
-    id : ({programId})=>programId,
-    data: ({ data }) => data
-}; */
-
 const getParentUid = (parentName, dataElements) => {
     return dataElements.find(de => de.parentName == parentName)?.id
 };
@@ -66,7 +59,7 @@ const parseErrors = (e) => {
     return data.flat().flat()
 }
 
-const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, refetchProgramStage }) => {
+const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, refetchProgramStage }) => {
 
     const [completed, setCompleted] = useState(false);
     const [errorStatus, setErrorStatus] = useState(false);
@@ -96,7 +89,7 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
         let new_dataElements = [];
         let new_programStageDataElements = [];
 
-        criticalSection.dataElements.forEach((de, i) => {
+        if (hnqisMode) criticalSection.dataElements.forEach((de, i) => {
             new_programStageDataElements.push(
                 {
                     compulsory: false,
@@ -119,7 +112,7 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
 
                 let DE_metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
 
-                let newVarName = `_S${secIdx + 1}Q${deIdx + 1}`;
+                let newVarName = hnqisMode?`_S${secIdx + 1}Q${deIdx + 1}`:`_S${secIdx + 1}E${deIdx + 1}`;
                 let newCode = `${programMetadata.dePrefix}_${newVarName}`;
                 // Name max: 230
                 // CODE_FORMNAME
@@ -128,13 +121,17 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
 
                 const FIXED_VALUES = 5;
                 const formNameMaxLength = 230 - newCode.length - FIXED_VALUES;
+                let formName = ""
+                if (hnqisMode) {
+                    formName = DE_metadata.elemType == 'label' ? DE_metadata.labelFormName : dataElement.formName;
 
-                let formName = DE_metadata.elemType == 'label' ? DE_metadata.labelFormName : dataElement.formName;
-
-                formName = formName.replaceAll(' [C]', '');
-                //if (formName.slice(-4)==' [C]') formName = formName.substring(0,formName.length-4);
-
-                if (DE_metadata.isCritical == 'Yes') formName += ' [C]'
+                    formName = formName.replaceAll(' [C]', '');
+                    if (DE_metadata.isCritical == 'Yes') formName += ' [C]'
+                    DE_metadata.elemType == 'label' ? DE_metadata.labelFormName = formName : dataElement.formName = formName;
+                }else{
+                    formName = dataElement.formName;
+                }
+                
 
                 let name = (newCode + '_' + formName).slice(0, formNameMaxLength)
                 let shortName = (newCode + '_' + formName).slice(0, 50)
@@ -144,7 +141,6 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
                 dataElement.name = name
                 dataElement.shortName = shortName
                 dataElement.code = newCode
-                DE_metadata.elemType == 'label' ? DE_metadata.labelFormName = formName : dataElement.formName = formName;
 
                 // Check if new DE
                 if (dataElement.importStatus == 'new') {
@@ -205,39 +201,40 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
          * Edit imported scores
          * Prepare new scores data elements payload
          */
-        importedScores.dataElements.forEach((score, scoreIdx) => {
+        if (hnqisMode) {
+            importedScores.dataElements.forEach((score, scoreIdx) => {
 
-            // Check if new DE
-            if (score.importStatus == 'new') {
-                score.id = uidPool.shift();
-                //new_dataElements.push(score);
-            }
+                // Check if new DE
+                if (score.importStatus == 'new') {
+                    score.id = uidPool.shift();
+                    //new_dataElements.push(score);
+                }
 
-            delete score.importStatus;
-            new_programStageDataElements.push({
-                //name:score.name,
-                compulsory: false,
-                //programStage: programStage.id,
-                sortOrder: scoreIdx + 1,
-                dataElement: { id: score.id }
+                delete score.importStatus;
+                new_programStageDataElements.push({
+                    //name:score.name,
+                    compulsory: false,
+                    //programStage: programStage.id,
+                    sortOrder: scoreIdx + 1,
+                    dataElement: { id: score.id }
+                });
+
+                new_dataElements.push(score);
             });
 
-            new_dataElements.push(score);
-        });
+            /**
+             * Set new critical scores section : order
+             */
 
-        /**
-         * Set new critical scores section : order
-         */
+            criticalSection.sortOrder = importedSections.length + 1;
 
-        criticalSection.sortOrder = importedSections.length + 1;
+            /**
+             * Set new scores section : order
+             */
 
-        /**
-         * Set new scores section : order
-         */
+            importedScores.sortOrder = importedSections.length + 2;
 
-        importedScores.sortOrder = importedSections.length + 2;
-
-
+        }
 
         /**
          * Update Items with suffix [X] to ensure no Update conflicts
@@ -267,7 +264,7 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
          * Replace sections and Data Elements on program stage
          */
 
-        programStage.programStageSections = [].concat(importedSections, importedScores, criticalSection);
+        programStage.programStageSections = [].concat(importedSections, hnqisMode?importedScores:[], hnqisMode?criticalSection:[]);
         programStage.programStageDataElements = new_programStageDataElements;
 
 
@@ -277,10 +274,11 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
         // ATTRIBUTE VALUES
         let programMetadataIdx = programPayload.attributeValues.findIndex(att => att.attribute.id === METADATA);
         let new_programMetadata = JSON.parse(programPayload.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
-
-        new_programMetadata.dePrefix = programMetadata.dePrefix;
-        new_programMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
-        new_programMetadata.healthArea = programMetadata.healthArea;
+        if(hnqisMode){
+            new_programMetadata.dePrefix = programMetadata.dePrefix;
+            new_programMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
+            new_programMetadata.healthArea = programMetadata.healthArea;
+        }
         new_programMetadata.buildVersion = BUILD_VERSION;
 
         programPayload.attributeValues[programMetadataIdx] = {
@@ -290,11 +288,11 @@ const SaveMetadata = ({ newDEQty, programStage, importedSections, importedScores
 
         // PROGRAM TRACKED ENTITY ATTRIBUTES
         let currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === "ulU9KKgSLYe");
-        if (new_programMetadata.useCompetencyClass == "Yes" && !currentCompetencyAttribute) {
+        if (hnqisMode && new_programMetadata.useCompetencyClass == "Yes" && !currentCompetencyAttribute) {
             competencyClassAttribute.program.id = programPayload.id;
             programPayload.programTrackedEntityAttributes.push(competencyClassAttribute);
             criticalSection.dataElements.push({ id: COMPETENCY_CLASS })
-        } else if (new_programMetadata.useCompetencyClass == "No") {
+        } else if (hnqisMode && new_programMetadata.useCompetencyClass == "No") {
             programPayload.programTrackedEntityAttributes = programPayload.programTrackedEntityAttributes.filter(att => att.trackedEntityAttribute.id != "ulU9KKgSLYe");
             criticalSection.dataElements = criticalSection.dataElements.filter(de => de.id != COMPETENCY_CLASS);
         }

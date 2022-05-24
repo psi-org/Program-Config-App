@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DraggableSection from "./Section";
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
+import { FEEDBACK_ORDER, METADATA } from "../../configs/Constants";
 
 import "react-sweet-progress/lib/style.css";
 import Scores from "./Scores";
@@ -81,16 +82,9 @@ const queryPRV = {
     }
 };
 
-const StageSections = ({ programStage, stageRefetch }) => {
+const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
 
     // Globals
-    const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
-        FEEDBACK_TEXT = "yhKEe6BLEer",
-        CRITICAL_QUESTION = "NPwvdTt0Naj",
-        METADATA = "haUflNqP85K",
-        SCORE_DEN = "l7WdLDhE3xW",
-        SCORE_NUM = "Zyr7rlDOJy8";
-
     const programId = programStage.program.id;
 
     // Flags
@@ -131,11 +125,11 @@ const StageSections = ({ programStage, stageRefetch }) => {
     // States
     const [removedElements, setRemovedElements] = useState([])
     const [originalProgramStageDataElements,setOriginalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
-    const [sections, setSections] = useState([...programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations")]);
-    const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => s.name == "Scores") });
-    const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"));
+    const [sections, setSections] = useState([...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]);
+    const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
+    const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations"));
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
-    const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
+    const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"));
     const [errorReports, setErrorReports] = useState(undefined)
 
     // REFETCH STAGE
@@ -143,11 +137,11 @@ const StageSections = ({ programStage, stageRefetch }) => {
         stageRefetch({variables : {programStage:programStage.id}}).then(data => {
             let programStage = data.results
             setOriginalProgramStageDataElements(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
-            setSections([...programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations")])
-            setScoresSection({ ...programStage.programStageSections.find(s => s.name == "Scores") })
-            setCriticalSection(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"))
+            setSections([...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)])
+            setScoresSection({ ...programStage.programStageSections.find(s =>  hnqisMode && s.name === "Scores") })
+            setCriticalSection(programStage.programStageSections.find(s =>  hnqisMode && s.name === "Critical Steps Calculations"))
             setProgramStageDataElements([...programStage.programStageDataElements])
-            setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"))
+            setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"))
         })
     }
 
@@ -255,7 +249,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const prvDQ = useDataQuery(queryPRV, { variables: { programId: programStage.program.id } });
 
     useEffect(() => {
-        let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection.dataElements.length + criticalSection.dataElements.length) * 5;
+        let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection?.dataElements?.length + criticalSection?.dataElements?.length) * 5;
         //No Sections , get minimum ids for core Program Rules
         if (n < 50) n = 50
 
@@ -422,18 +416,22 @@ const StageSections = ({ programStage, stageRefetch }) => {
                 <div className="c_btns" style={{ color: '#444444' }}>
                     <ButtonStrip>
                         <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
-                        <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
-                        <Button color='inherit' variant='outlined' startIcon={!exportToExcel?<FileDownloadIcon />:<CircularLoader small />} name="generator"
-                            onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
-                        <Button color='inherit' variant='outlined' startIcon={<PublishIcon />} name="importer"
-                            onClick={() => setImporterEnabled(true)}>Import Template</Button>
+                        {hnqisMode &&
+                            <>
+                                <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
+                                <Button color='inherit' variant='outlined' startIcon={!exportToExcel?<FileDownloadIcon />:<CircularLoader small />} name="generator"
+                                    onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
+                                <Button color='inherit' variant='outlined' startIcon={<PublishIcon />} name="importer"
+                                    onClick={() => setImporterEnabled(true)}>Import Template</Button>
+                            </>
+                        }
                         <Button color='inherit' name="Reload" variant='outlined' startIcon={<CachedIcon />} onClick={() => { window.location.reload() }}>Reload</Button>
                     </ButtonStrip>
                 </div>
             </div>
-            {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
+            {hnqisMode && importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
             <div className="title">Sections for Program Stage {programStage.displayName}</div>
-            {exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus} />}
+            {hnqisMode && exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus} />}
             {
                 createMetadata.loading && <ComponentCover translucent></ComponentCover>
                 /* <Backdrop
@@ -469,7 +467,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     </AlertBar>
                 </AlertStack>
             }
-            {saveAndBuild &&
+            {hnqisMode && saveAndBuild &&
 
                 <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
                     <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>{}}>
@@ -565,8 +563,8 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 </div>
                             )}
                         </Droppable>
-                        <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />
-                        <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />
+                        {hnqisMode && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />}
+                        {hnqisMode && <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />}
 
                     </div>
                 </div>
@@ -584,6 +582,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
             {
                 savingMetadata &&
                 <ValidateMetadata
+                    hnqisMode={hnqisMode}
                     newDEQty={importResults ? importResults.questions.new + importResults.scores.new + importResults.sections.new : 0}
                     programStage={programStage}
                     importedSections={sections}

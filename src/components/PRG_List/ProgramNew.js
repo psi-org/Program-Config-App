@@ -397,7 +397,7 @@ const ProgramNew = (props) => {
 
                 let assessmentStage = JSON.parse(JSON.stringify(PS_AssessmentStage));
                 assessmentStage.id = assessmentId;
-                assessmentStage.name = dePrefix + '_' + assessmentStage.name;
+                assessmentStage.name = assessmentStage.name;
                 assessmentStage.programStageSections.push({ id: defaultSectionId });
                 assessmentStage.programStageSections.push({ id: stepsSectionId });
                 assessmentStage.programStageSections.push({ id: scoresSectionId });
@@ -405,7 +405,7 @@ const ProgramNew = (props) => {
 
                 let actionPlanStage = JSON.parse(JSON.stringify(PS_ActionPlanStage));
                 actionPlanStage.id = actionPlanId;
-                actionPlanStage.name = dePrefix + '_' + actionPlanStage.name;
+                actionPlanStage.name = actionPlanStage.name;
                 actionPlanStage.program.id = programId;
 
                 let defaultSection = JSON.parse(JSON.stringify(PSS_Default));
