@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
-const BUILD_VERSION = "1.3.0";
+const BUILD_VERSION = "1.3.1";
 
 const competencyClassAttribute = {
     "mandatory": false,
