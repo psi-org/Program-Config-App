@@ -110,7 +110,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
 
             section.dataElements.forEach((dataElement, deIdx) => {
 
-                let DE_metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
+                let DE_metadata = JSON.parse(dataElement.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
 
                 let newVarName = hnqisMode?`_S${secIdx + 1}Q${deIdx + 1}`:`_S${secIdx + 1}E${deIdx + 1}`;
                 let newCode = `${programMetadata.dePrefix}_${newVarName}`;
@@ -154,8 +154,14 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
                     sortOrder: deIdx + 1,
                     dataElement: { id: dataElement.id }
                 });
-
-                dataElement.attributeValues.find(att => att.attribute.id == METADATA).value = JSON.stringify(DE_metadata)
+                let pcaMetadataIndex = dataElement.attributeValues.findIndex(att => att.attribute.id == METADATA)
+                if(pcaMetadataIndex > -1) dataElement.attributeValues[pcaMetadataIndex].value = JSON.stringify(DE_metadata)
+                else dataElement.attributeValues.push({
+                    value: JSON.stringify(DE_metadata),
+                    attribute: {
+                        id: METADATA
+                    }
+                })
                 //return dataElement;
             });
 
@@ -338,7 +344,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
 
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>setSavingMetadata(false)}>
-            Save Assessment
+            {hnqisMode?'Save Assessment':'Save Stage'}
         </CustomMUIDialogTitle >
         <DialogContent dividers style={{ padding: '1em 2em' }}>
 
@@ -348,7 +354,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
                     successStatus && 
                     (
                     <div>
-                        <p><strong>Process completed! "Set up program" button is now enabled</strong></p>
+                        <p><strong>Process completed! {hnqisMode && '"Set up program" button is now enabled'}</strong></p>
                         {typeReports.length>0 && typeReports.map(tr => {
                             <div> {tr.klass} | <Tag>{"Created: "+tr.stats.created}</Tag>
                             <Tag>{"Deleted :" + tr.stats.deleted}</Tag>

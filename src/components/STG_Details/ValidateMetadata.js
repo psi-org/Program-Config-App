@@ -425,15 +425,16 @@ const ValidateMetadata = (props) => {
 
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>props.setSavingMetadata(false)}>
-            Assessment Validation
+            {props.hnqisMode?'Assessment Validation':'Save changes into the server?'}
         </CustomMUIDialogTitle >
         <DialogContent dividers style={{ padding: '1em 2em' }}>
-
-            <NoticeBox error = {!valid} title={processed ? "Sections and Scores Validated": "Validating Sections and Scores"}>
-                {!processed && <CircularLoader small/> }
-                {validationMessage}
-            </NoticeBox>
-            
+            {props.hnqisMode &&
+                <NoticeBox error = {!valid} title={processed ? "Sections and Scores Validated": "Validating Sections and Scores"}>
+                    {!processed && <CircularLoader small/> }
+                    {validationMessage}
+                </NoticeBox>
+            }
+            {!props.hnqisMode && 'This action cannot be undone'}
         </DialogContent>
 
         <DialogActions style={{ padding: '1em' }}>

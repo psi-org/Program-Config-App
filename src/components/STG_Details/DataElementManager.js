@@ -272,6 +272,7 @@ const DataElementManager = (props) => {
                                 save={handleNewDE}
                                 saveFlag={saveDeFlag}
                                 setSaveFlag={setSaveDeFlag}
+                                hnqisMode={props.hnqisMode}
                             />
                         </TabPanel>
                     </Box>

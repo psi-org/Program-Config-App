@@ -6,6 +6,7 @@ import { Draggable } from "react-beautiful-dnd";
 import DataElementForm from "./DataElementForm";
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { METADATA } from "../../configs/Constants";
 
 // *** IMAGES ***
 import de_svg from './../../images/i-drag_black.svg';
@@ -28,14 +29,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
 
-const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
-    FEEDBACK_TEXT = "yhKEe6BLEer",
-    CRITICAL_QUESTION = "NPwvdTt0Naj",
-    METADATA = "haUflNqP85K",
-    SCORE_DEN = "l7WdLDhE3xW",
-    SCORE_NUM = "Zyr7rlDOJy8";
-
-const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, section, index}) => {
+const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode}) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -114,6 +108,7 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
                             section={section}
                             setDeToEdit={DEActions.setEdit}
                             save={DEActions.update}
+                            hnqisMode={hnqisMode}
                         /> 
                     }
                     { showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }

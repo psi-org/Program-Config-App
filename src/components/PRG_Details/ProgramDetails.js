@@ -21,7 +21,8 @@ const query = {
         resource: 'programs',
         id: ({ program }) => program,
         params: {
-            fields: ['id', 'displayName', 'programType', 'code', 'programStages[id,name,displayName,programStageSections]']
+            /* fields: ['id', 'displayName', 'programType', 'code', 'programStages[id,name,displayName,programStageSections]'] */
+            fields: ['id', 'displayName', 'programType', 'code', 'programStages[id,name,displayName,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements']
         }
     },
 };
@@ -92,7 +93,7 @@ const ProgramDetails = () => {
                         {
                             data.results.programStages.map((programStage) => {
                                 return (
-                                    <StageItem stage={programStage} key={programStage.id} />
+                                    <StageItem stage={programStage} key={programStage.id} setNotification={setNotification} stagesRefetch={refetch} />
                                 )
                             })
                         }

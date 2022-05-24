@@ -53,24 +53,24 @@ const ProgramNew = (props) => {
     };
 
     const idsQuery = useDataQuery(queryId);
-    const stageUid = idsQuery.data?.results.codes[0];
+    const stageUid = props.data?.id || idsQuery.data?.results.codes[0];
 
     const [programId, setProgramId] = useState(props.programId);
     const [sentForm, setSentForm] = useState(false);
 
-    const [stageName, setStageName] = useState('');
-    const [scheduledDaysStart, setScheduledDaysStart] = useState('');
+    const [stageName, setStageName] = useState(props.data?.name || '');
+    const [scheduledDaysStart, setScheduledDaysStart] = useState(props.data?.minDaysFromStart ?? '');
 
-    const [description, setDescription] = useState('');
-    const [repeatable, setRepeatable] = useState(false);
-    const [periodType, setPeriodType] = useState('');
-    const [displayGenerateEventBox, setDisplayGenerateEventBox] = useState(true);
-    const [autoGenerate, setAutogenerate] = useState(true);
-    const [openFormAfterEnroll, setOpenFormAfterEnroll] = useState(false);
-    const [reportDateToUse, setReportDateToUse] = useState('');
-    const [askCompleteProgram, setAskCompleteProgram] = useState(false);
-    const [askCreateEvent, setAskCreateEvent] = useState(false);
-    const [featureType, setFeatureType] = useState('');
+    const [description, setDescription] = useState(props.data?.description || '');
+    const [repeatable, setRepeatable] = useState(props.data?.repeatable ?? false);
+    const [periodType, setPeriodType] = useState(props.data?.periodType || '');
+    const [displayGenerateEventBox, setDisplayGenerateEventBox] = useState(props.data?.displayGenerateEventBox ?? true);
+    const [autoGenerate, setAutogenerate] = useState(props.data?.autoGenerateEvent ?? true);
+    const [openFormAfterEnroll, setOpenFormAfterEnroll] = useState(props.data?.openAfterEnrollment ?? false);
+    const [reportDateToUse, setReportDateToUse] = useState(props.data?.reportDateToUse || '');
+    const [askCompleteProgram, setAskCompleteProgram] = useState(props.data?.remindCompleted ?? false);
+    const [askCreateEvent, setAskCreateEvent] = useState(props.data?.allowGenerateNextVisit ?? false);
+    const [featureType, setFeatureType] = useState(props.data?.featureType || '');
 
     //Validation Messages
     const [validationErrors, setValidationErrors] = useState(
@@ -89,7 +89,7 @@ const ProgramNew = (props) => {
     const handleChangeScheduledDaysStart = (event) => {
         validationErrors.scheduledDaysStart = undefined
         setValidationErrors({ ...validationErrors })
-        setScheduledDaysStart(event.target.value);
+        setScheduledDaysStart(parseInt(event.target.value) || 0);
     };
 
     const handleChangeDescription = (event) => {
@@ -182,7 +182,7 @@ const ProgramNew = (props) => {
 
             let stage = JSON.parse(JSON.stringify(PS_Generic))
             console.log(stage)
-            stage.id = stageUid
+            stage.id = props.data?.id ?? stageUid
             stage.name = stageName
             if (description) stage.description = description
             stage.program.id = programId
@@ -196,6 +196,13 @@ const ProgramNew = (props) => {
             stage.remindCompleted = askCompleteProgram
             stage.allowGenerateNextVisit = askCreateEvent
             if (featureType) stage.featureType = featureType
+
+            /* KEEP EXISTING VALUES FOR: */
+            if(props.data?.attributeValues) stage.attributeValues = props.data.attributeValues
+            if(props.data?.programStageSections) stage.programStageSections = props.data.programStageSections
+            if(props.data?.programStageDataElements) stage.programStageDataElements = props.data.programStageDataElements
+            if(props.data?.publicAccess) stage.publicAccess = props.data.publicAccess
+            if(props.data?.notificationTemplates) stage.notificationTemplates = props.data.notificationTemplates
 
             createOrUpdateMetaData(stage.attributeValues)
 
@@ -211,7 +218,7 @@ const ProgramNew = (props) => {
                     });
                     props.setShowStageForm(false);
                 } else {
-                    props.setNotification({ message: `Program Stage ${stage.name} created successfully`, severity: 'success' });
+                    props.setNotification({ message: `Program Stage '${stage.name}' ${props.data?.id?'updated':'created'} successfully`, severity: 'success' });
                     props.setShowStageForm(false);
                     props.stagesRefetch();
                 }

@@ -88,7 +88,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     const programId = programStage.program.id;
 
     // Flags
-    const [saveStatus, setSaveStatus] = useState('Validate');
+    const [saveStatus, setSaveStatus] = useState(!hnqisMode?'Save Changes':'Validate');
     const [saveAndBuild, setSaveAndBuild] = useState(false);
     const [savingMetadata, setSavingMetadata] = useState(false);
     const [savedAndValidated, setSavedAndValidated] = useState(false)
@@ -282,7 +282,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                     result.source.index,
                     result.destination.index
                 );
-                setSaveStatus('Validate & Save');
+                setSaveStatus(!hnqisMode?'Save Changes':'Validate & Save');
                 break;
             case 'DATA_ELEMENT':
                 if (result.source.droppableId == result.destination.droppableId) {
@@ -298,7 +298,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                     let element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
                     newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
                 }
-                setSaveStatus('Validate & Save');
+                setSaveStatus(!hnqisMode?'Save Changes':'Validate & Save');
                 break;
             default:
         }
@@ -619,6 +619,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                     setDeManager={setDeManager}
                     programStageDataElements={programStageDataElements}
                     saveAdd={saveAdd}
+                    hnqisMode={hnqisMode}
                 />
             }
         </div>

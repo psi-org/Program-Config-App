@@ -7,6 +7,11 @@ import download_svg from './../../images/i-download.svg';
 import upload_svg from './../../images/i-upload.svg';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
+import TextField from '@mui/material/TextField';
+import InputAdornment from "@mui/material/InputAdornment";
+
+import SearchIcon from '@mui/icons-material/Search';
+
 // ------------------
 import ProgramItem from "./ProgramItem";
 import DependencyExport from "./DependencyExport";
@@ -29,12 +34,18 @@ const query = {
     results: {
         resource: "programs",
         paging: false,
-        params: ({ pageSize, page, pgrTypeAttrId }) => ({
-            pageSize,
-            page,
-            fields: ["id", "name", "displayName", "programStages", "attributeValues"],
-            filter: ['withoutRegistration:eq:false']
-        })
+        params: ({ token, pageSize, page, pgrTypeAttrId }) => {
+            let paramsObject = {
+                pageSize,
+                page,
+                fields: ["id", "name", "displayName", "programStages", "attributeValues"],
+                filter: ['withoutRegistration:eq:false']
+            }
+
+            if(token!=="") paramsObject.filter.push(`identifiable:token:${token}`)
+
+            return paramsObject
+        }
     }
 };
 
@@ -70,6 +81,8 @@ const ProgramList = () => {
     const [notification, setNotification] = useState(undefined);
     const [snackSeverity, setSnackSeverity] = useState(undefined);
 
+    const [filterValue,setFilterValue] = useState('')
+
     useEffect(() => {
         if (notification) setSnackSeverity(notification.severity)
     }, [notification])
@@ -87,7 +100,7 @@ const ProgramList = () => {
 
     }
 
-    const { loading, error, data, refetch } = useDataQuery(query, { variables: { pageSize, page: currentPage, prgTypeId } });
+    const { loading, error, data, refetch } = useDataQuery(query, { variables: { token:filterValue, pageSize, page: currentPage, prgTypeId } });
 
     if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
     if (loading) return <CircularLoader />
@@ -96,6 +109,11 @@ const ProgramList = () => {
         setExportToExcel(true);
         setExportStatus("Generating Configuration File...")
     };
+
+    const doSearch = () => {
+        setCurrentPage(1)
+        refetch({ token:filterValue, page:1, pageSize })
+    }
 
     return (
         <div>
@@ -114,15 +132,48 @@ const ProgramList = () => {
                     {exportProgramId &&
                         <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId} />
                     }
-                    {/*
-            <Button loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> Download Template</Button>
-            <Button disabled={true}><img src={upload_svg} /> Import Template</Button>
-          */}
                 </div>
             </div>
             <div className="wrapper">
                 {exportToExcel && <DataProcessor ps="null" isLoading={setExportToExcel} setStatus={setExportStatus} />}
                 <div className="title">List of programs</div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <TextField
+                        margin="normal"
+                        id="name"
+                        label="Filter Programs by Name, Short Name, Code..."
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+                        value={filterValue}
+                        onChange={(event)=>setFilterValue(event.target.value)}
+                        onKeyPress={event => {
+                            if (event.key === 'Enter' /* && filterValue!=='' */) {
+                                /* if(currentPage===1)  */doSearch()
+                                /* else setCurrentPage(1) */
+                            }
+                        }}
+                        autoComplete='off'
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position='end'>
+                                    <MuiButton onClick={() => {
+                                        doSearch()
+                                        /* if (filterValue!=='') {
+                                            if(currentPage===1) doSearch()
+                                            else setCurrentPage(1)
+                                        } */
+                                    }} 
+                                    startIcon={<SearchIcon />} 
+                                    variant='contained'
+                                    color='primary'>
+                                        Search
+                                    </MuiButton>
+                                </InputAdornment>
+                            )
+                        }}
+                    />
+                </div>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
                         {
