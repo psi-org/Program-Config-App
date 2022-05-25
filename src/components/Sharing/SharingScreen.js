@@ -1,14 +1,24 @@
 import { useDataMutation, useDataQuery} from "@dhis2/app-runtime";
-import {CircularLoader, Modal, ModalContent, ModalTitle, NoticeBox, ModalActions, ButtonStrip, Button} from "@dhis2/ui";
+import {CircularLoader, Modal, ModalContent, ModalTitle, NoticeBox, ModalActions, ButtonStrip} from "@dhis2/ui";
 import SharingItem from './SharingItem';
 import { DeepCopy } from '../../configs/Utils';
 
 import EditIcon from '@mui/icons-material/Edit';
-import {useState} from "react";
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Button from '@mui/material/Button';
+import {useRef, useState} from "react";
 import Suggestions from "./Suggestions";
 import SharingOptions from "./SharingOptions";
 import ViewIcon from "@mui/icons-material/Visibility";
 import BlockIcon from "@mui/icons-material/Block";
+import CloseIcon from '@mui/icons-material/Close';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Grow from '@mui/material/Grow';
+import Paper from '@mui/material/Paper';
+import Popper from '@mui/material/Popper';
+import MenuItem from '@mui/material/MenuItem';
+import MenuList from '@mui/material/MenuList';
 
 const sharingQuery = {
     results: {
@@ -37,30 +47,47 @@ const entitiesQuery = {
     }
 }
 
-const updateSharingMutation = {
-    resource: 'sharing',
+const metadataMutation = {
+    resource: 'metadata',
     type: 'update',
-    params: ({ element, id, data }) => ({
-        id,
-        type: element,
-        data: data
-    }),
+    data: ({data}) => data
 };
 
+const btnOptions = ['Apply to Current Level', 'Apply to Intermediate Level', 'Apply to lowest level'];
+
 const SharingScreen = ({ element, id, setSharingProgramId }) => {
+
+    const programMetadata = {
+        results: {
+            resource: 'programs/' + id + '/metadata.json'
+        }
+    }
+
     const [search, setSearch] = useState(undefined);
     const [usrGrp, setUsrGrp] = useState(undefined);
-    const [open, setOpen] = useState(undefined);
+    const [optionOpen, setOptionOpen] = useState(undefined);
     const [usrPermission, setUsrPermission] = useState('r-r-----');
     const [entityType, setEntityType] = useState(undefined);
     const [entity, setEntity] = useState({});
+    const [open, setOpen] = useState(false);
+    const anchorRef = useRef(null);
+    const [selectedIndex, setSelectedIndex] = useState(2);
 
     const {loading, error, data, refetch} = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
     const {loading: entityLoading, data: entities} = useDataQuery(entitiesQuery);
-    const updateSharingSettings = useDataMutation(updateSharingMutation)[0];
+    const {loading: metadataLoading, data: prgMetaData} = useDataQuery(programMetadata);
+    const metadataDM = useDataMutation(metadataMutation);
+    const metadataRequest = {
+        mutate: metadataDM[0],
+        loading: metadataDM[1].loading,
+        data: metadataDM[1].data
+    }
+    // const updateSharingSettings = useDataMutation(updateSharingMutation)[0];
 
-    let payload, usersNGroups;
-    const toggle = () => setOpen(!open);
+
+
+    let payload, usersNGroups, metadata;
+    const toggle = () => setOptionOpen(!optionOpen);
 
     if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
     if (loading) return <CircularLoader />
@@ -71,6 +98,11 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
         {
             usersNGroups = availableUserGroups();
         }
+    }
+
+    if (!metadataLoading)
+    {
+        metadata = prgMetaData.results;
     }
 
     const hideForm = () => {
@@ -108,6 +140,28 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
         return (usrPermission[1] === "w") ? <EditIcon/> : (usrPermission[0] === "r" && usrPermission[1] !== "w") ? <ViewIcon/> : <BlockIcon/>
     }
 
+    const handleClick = () => {
+        apply(selectedIndex);
+    };
+
+    const handleMenuItemClick = (event, index) => {
+        setSelectedIndex(index);
+        setOpen(false);
+        apply(index);
+    };
+
+    const handleToggle = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleClose = (event) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+            return;
+        }
+
+        setOpen(false);
+    };
+
     function availableUserGroups() {
         let obj = payload.object;
         let e = DeepCopy(entities);
@@ -121,25 +175,26 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     }
 
     const deleteUserPermission = (type, id) => {
+        let p = payload;
         switch (type) {
             case 'publicAccess':
-                payload.meta.allowPublicAccess = false;
-                payload.object.publicAccess = "--------";
+                p.meta.allowPublicAccess = false;
+                p.object.publicAccess = "--------";
                 break;
             case 'userAccesses':
-                var userIndex = payload.object.userAccesses.findIndex(user => { return user.id === id});
-                payload.object.userAccesses.splice(userIndex, 1);
+                var userIndex = p.object.userAccesses.findIndex(user => { return user.id === id});
+                p.object.userAccesses.splice(userIndex, 1);
                 break;
             case 'userGroupAccesses':
-                var userGroupIndex = payload.object.userGroupAccesses.findIndex(userGroup => { return userGroup.id === id});
-                payload.object.userGroupAccesses.splice(userGroupIndex, 1);
+                var userGroupIndex = p.object.userGroupAccesses.findIndex(userGroup => { return userGroup.id === id});
+                p.object.userGroupAccesses.splice(userGroupIndex, 1);
                 break;
             default:
                 break;
         }
-        console.log("Payload: ", payload);
-        // data.refetch();
-        // run(payload);
+        payload = p;
+        usersNGroups = availableUserGroups();
+        setUsrGrp(undefined);
     }
 
     const updateUserPermission = (type, id, permission) => {
@@ -159,16 +214,59 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
             default:
                 break;
         }
-        // data.refetch();
-        // run(payload);
+        usersNGroups = availableUserGroups();
+        setUsrGrp(undefined);
     }
 
-    const apply = () => {
-        updateSharingSettings({id: id, element: element, data: payload}).then((res) => {
-           if (res.status === 'OK')
-           {
-               data.refetch();
-           }
+    const apply = (level) => {
+        let elementsArray = ["programs"];
+        switch (level) {
+            case 2:
+                elementsArray.push("dataElements");
+            case 1:
+                elementsArray.push("programStages");
+                break;
+            default:
+                break;
+        }
+        elementsArray.forEach((elements) => {
+           applySharing(elements);
+        });
+        console.log("PrgMetaData: ", metadata);
+        metadataRequest.mutate({data: metadata})
+            .then(response => {
+                console.log("Response: ", response);
+                if(response.status !== 'OK') {
+                    console.error("Something went wrong");
+                } else {
+                    console.log("Success saving data");
+                }
+            });
+        console.log("DONe: ");
+    }
+
+    const applySharing = (elements) => {
+        metadata[elements].forEach((element) => {
+            payload.object.userAccesses.forEach((user) => {
+                if (element.sharing.users.hasOwnProperty(user.id))
+                {
+                    element.sharing.users[user.id].access = user.access;
+                }
+                else
+                {
+                    element.sharing.users[user.id] = {id: user.id, access: user.access}
+                }
+            })
+            payload.object.userGroupAccesses.forEach((userGroup) => {
+                if (element.sharing.userGroups.hasOwnProperty(userGroup.id))
+                {
+                    element.sharing.userGroups[userGroup.id].access = userGroup.access;
+                }
+                else
+                {
+                    element.sharing.userGroups[userGroup.id] = {id: userGroup.id, access: userGroup.access}
+                }
+            })
         });
     }
 
@@ -205,21 +303,62 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                             <div id={'newPermission'} style={{ paddingLeft: "6px", paddingRight: "6px", paddingTop: "6px"}} onClick={()=>{toggle(); }}>
                                 { userPermissionState() }
                             </div>
-                            { open && <SharingOptions permission={usrPermission.split("")} reference={document.getElementById('newPermission')} setEntityPermission={setEntityPermission} toggle={toggle}/> }
+                            { optionOpen && <SharingOptions permission={usrPermission.split("")} reference={document.getElementById('newPermission')} setEntityPermission={setEntityPermission} toggle={toggle}/> }
                             <div>
-                                <Button onClick={() => assignRole()}>Assign</Button>
+                                <Button onClick={() => assignRole()} variant="outlined">Assign</Button>
                             </div>
                         </div>
                     </div>
                 </ModalContent>
                 <ModalActions>
                     <ButtonStrip end>
-                        <Button onClick={()=>hideForm()} destructive>
-                            Close
-                        </Button>
-                        <Button onClick={()=>apply()} primary>
-                            Apply
-                        </Button>
+                        <Button onClick={()=>hideForm()} variant="outlined" startIcon={<CloseIcon />}>Close</Button>
+                        <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
+                            <Button onClick={handleClick}>{btnOptions[selectedIndex]}</Button>
+                            <Button
+                                size="small"
+                                aria-controls={open ? 'split-button-menu' : undefined}
+                                aria-expanded={open ? 'true' : undefined}
+                                aria-label="select merge strategy"
+                                aria-haspopup="menu"
+                                onClick={handleToggle}
+                            >
+                                <ArrowDropDownIcon />
+                            </Button>
+                        </ButtonGroup>
+                        <Popper
+                            open={open}
+                            anchorEl={anchorRef.current}
+                            role={undefined}
+                            transition
+                            disablePortal
+                        >
+                            {({ TransitionProps, placement }) => (
+                                <Grow
+                                    {...TransitionProps}
+                                    style={{
+                                        transformOrigin:
+                                            placement === 'bottom' ? 'center top' : 'center bottom',
+                                    }}
+                                >
+                                    <Paper>
+                                        <ClickAwayListener onClickAway={handleClose}>
+                                            <MenuList id="split-button-menu" autoFocusItem>
+                                                {btnOptions.map((option, index) => (
+                                                    <MenuItem
+                                                        key={option}
+                                                        selected={index === selectedIndex}
+                                                        onClick={(event) => handleMenuItemClick(event, index)}
+                                                    >
+                                                        {option}
+                                                    </MenuItem>
+                                                ))}
+                                            </MenuList>
+                                        </ClickAwayListener>
+                                    </Paper>
+                                </Grow>
+                            )}
+                        </Popper>
                     </ButtonStrip>
                 </ModalActions>
             </Modal>

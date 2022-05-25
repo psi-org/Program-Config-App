@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState } from "react";
 import SharingOptions from "./SharingOptions";
 
 import ApartmentIcon from '@mui/icons-material/Apartment';
@@ -11,7 +11,7 @@ import BlockIcon from '@mui/icons-material/Block';
 import ViewIcon from '@mui/icons-material/Visibility';
 
 const SharingItem = ({ type, element, permission, updatePermission, deleteUserPermission }) => {
-    let permissionArray = (!permission) ? Array(6).fill("-") : permission.split("");
+    const [permissionArray, setPermssionArray] = useState((!permission) ? Array(6).fill("-") : permission.split(""));
     const [ref, setRef] = useState(undefined);
     const [open, setOpen] = useState(undefined);
     const toggle = () => setOpen(!open);
@@ -25,17 +25,19 @@ const SharingItem = ({ type, element, permission, updatePermission, deleteUserPe
     }
 
     const updateUnGPermission = (segment, permsn) => {
+        let pArray = permissionArray;
         if (segment === 1)
         {
-            permissionArray[0] = permsn[0];
-            permissionArray[1] = permsn[1];
+            pArray[0] = permsn[0];
+            pArray[1] = permsn[1];
         }
         else if(segment === 2)
         {
-            permissionArray[2] = permsn[0];
-            permissionArray[3] = permsn[1];
+            pArray[2] = permsn[0];
+            pArray[3] = permsn[1];
         }
-        updatePermission(type, element.id, permissionArray.join(''));
+        setPermssionArray(pArray);
+        updatePermission(type, element.id, pArray.join(''));
     }
 
     return (
@@ -47,11 +49,11 @@ const SharingItem = ({ type, element, permission, updatePermission, deleteUserPe
                     <div style={{ color: 'rgba(0, 0, 0, 0.6)', fontWeight: 400}}>{ element.displayName }</div>
                     <div style={{ color: 'rgba(129, 129, 129)', paddingTop: "4px" }}>{getPermissionInformation()}</div>
                 </div>
-                <div id={'menu'+element.id} style={{ paddingLeft: "12px", paddingRight: "6px"}} onClick={()=>{setRef(document.getElementById('menu'+element.id)); toggle(); }}>
+                <div id={'menu'+element.id} style={{ paddingLeft: "12px", paddingRight: "6px", cursor: "pointer"}} onClick={()=>{setRef(document.getElementById('menu'+element.id)); toggle(); }}>
                     { currentState() }
                 </div>
                 {open && <SharingOptions permission={permissionArray} reference={ref} setEntityPermission={updateUnGPermission} toggle={toggle}/> }
-                <div style={{ paddingLeft: "6px", paddingRight: "12px"}} onClick={() => deleteUserPermission(type, element.id)}>
+                <div style={{ paddingLeft: "6px", paddingRight: "12px", cursor: "pointer"}} onClick={() => deleteUserPermission(type, element.id)}>
                     <DeleteIcon/>
                 </div>
             </div>

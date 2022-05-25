@@ -45,6 +45,8 @@ export function DeepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
+export function ShallowCopy(obj) { return {...obj} }
+
 function characterPos(chr) {
   return chr.charCodeAt(0);
 }
