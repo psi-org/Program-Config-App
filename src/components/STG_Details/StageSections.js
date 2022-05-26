@@ -239,7 +239,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     const deleteMetadata = useDataMutation(deleteMetadataMutation)[0];
 
     // Get Ids
-    const idsQuery = useDataQuery(queryIds, { variables: { n: programStage.programStageDataElements.length * 5 } });
+    const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: programStage.programStageDataElements.length * 5 } });
     //setUidPool(idsQuery.data?.results.codes);
 
     // Fetch Program Rules from Program
@@ -251,7 +251,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     useEffect(() => {
         let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection?.dataElements?.length + criticalSection?.dataElements?.length) * 5;
         //No Sections , get minimum ids for core Program Rules
-        if (n < 50) n = 50
+        if (isNaN(n) || n < 50) n = 50
 
         idsQuery.refetch({ n }).then(data => {
             if (data) {
@@ -391,8 +391,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             }
 
         });
-
-
 
     }
 
@@ -536,7 +534,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                                 Add New Section
                             </Button>
                         }
-                        {/* { programStageDataElements &&  <DataElementForm programStageDataElement={programStageDataElements[5]} /> } */}
                         {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
                             <Removed importResults={importResults} index={0} key={"removedSec"} />
@@ -556,7 +553,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
                                         sections.map((pss, idx) => {
-                                            return <DraggableSection stageSection={pss} stageDataElements={programStageDataElements} DEActions={DEActions} index={idx} key={pss.id || idx} SectionActions={SectionActions} /* handleSectionEdit={handleSectionEdit} */ />
+                                            return <DraggableSection program={programStage.program.id} stageSection={pss} stageDataElements={programStageDataElements} DEActions={DEActions} index={idx} key={pss.id || idx} SectionActions={SectionActions} hnqisMode={hnqisMode} />
                                         })
                                     }
                                     {provided.placeholder}
@@ -615,6 +612,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             }
             {deManager &&
                 <DataElementManager
+                    program={programStage.program.id}
                     deRef={deManager}
                     setDeManager={setDeManager}
                     programStageDataElements={programStageDataElements}

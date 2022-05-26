@@ -2,24 +2,22 @@
 import { useDataQuery } from '@dhis2/app-runtime';
 import { TextField, Select, MenuItem, FormControl, InputLabel, FormControlLabel, Switch, Autocomplete, Grid, FormLabel, Button } from '@mui/material';
 import { useEffect, useState } from "react"
-import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH } from '../../configs/Constants';
+import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES, AGG_TYPES } from '../../configs/Constants';
 import RowRadioButtonsGroup from './RowRadioButtonsGroup';
+import IconPicker from '../UIElements/IconPicker';
+import ColorPicker from '../UIElements/ColorPicker';
+import tinycolor from 'tinycolor2';
 
-import PercentIcon from '@mui/icons-material/Percent';
-import TextIcon from '@mui/icons-material/TextFields';
-import NumberIcon from '@mui/icons-material/Numbers';
-import DateIcon from '@mui/icons-material/CalendarToday';
-import TimeIcon from '@mui/icons-material/AccessTime';
 import FilterNoneIcon from '@mui/icons-material/FilterNone';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
-
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-
-import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
-import ColorLensIcon from '@mui/icons-material/ColorLens';
 import InfoIcon from '@mui/icons-material/Info';
 import CloseIcon from '@mui/icons-material/Close';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 
 import SelectOptions from '../UIElements/SelectOptions';
 import MarkDownEditor from './MarkDownEditor';
@@ -27,13 +25,9 @@ import InfoBox from './../UIElements/InfoBox';
 
 import AlertDialogSlide from '../UIElements/AlertDialogSlide';
 
-import RemoveIcon from '@mui/icons-material/Remove';
-import AddIcon from '@mui/icons-material/Add';
-import FunctionsIcon from '@mui/icons-material/Functions';
-import BlockIcon from '@mui/icons-material/Block';
-import TimelineIcon from '@mui/icons-material/Timeline';
-import SsidChartIcon from '@mui/icons-material/SsidChart';
+import ProgramRulesList from './../UIElements/ProgramRulesList'
 
+import { ChromePicker } from 'react-color';
 
 const optionSetQuery = {
     results: {
@@ -62,7 +56,7 @@ const queryId = {
     }
 };
 
-const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisMode }) => {
+const DataElementForm = ({ program, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisMode }) => {
 
     const de = programStageDataElement.dataElement
 
@@ -70,33 +64,22 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
     const newDeId = idQuery.data?.results.codes[0];
 
     // Data Query
-    const { data: serverOptionSets } = useDataQuery(optionSetQuery);
-    const { data: serverLegendSets } = useDataQuery(legendSetsQuery);
+    const { data: initOptionSets, refetch: refreshOptionSets } = useDataQuery(optionSetQuery);
+    const [serverOptionSets, setServerOptionSets] = useState(undefined)
+    const { data: initLegendSets, refetch: refreshLegendSets } = useDataQuery(legendSetsQuery);
+    const [serverLegendSets, setServerLegendSets] = useState(undefined)
+    /* const { data: programRuleVariables } = useDataQuery(programRuleVariableQuery, {variables: { program, dataElement: de?.id } });
+    const programRuleVariable = programRuleVariables?.results?.programRuleVariables?.at(0) */
 
-    // Constants
-    const elemTypes = [{ label: 'Question', value: 'question' }, { label: 'Label', value: 'label' }]
-    const valueTypes = [
-        { label: 'Number', value: 'NUMBER', icon: <NumberIcon /> },
-        { label: 'Integer', value: 'INTEGER', icon: <NumberIcon /> },
-        { label: 'Positive Integer', value: 'INTEGER_POSITIVE', icon: <NumberIcon /> },
-        { label: 'Zero or Positive Integer', value: 'INTEGER_ZERO_OR_POSITIVE', icon: <NumberIcon /> },
-        { label: 'Text', value: 'TEXT', icon: <TextIcon /> },
-        { label: 'Long Text', value: 'LONG_TEXT', icon: <TextIcon /> },
-        { label: 'Percentage', value: 'PERCENTAGE', icon: <PercentIcon /> },
-        { label: 'Date', value: 'DATE', icon: <DateIcon /> },
-        { label: 'Time', value: 'TIME', icon: <TimeIcon /> },
-    ]
-    const aggTypes = [
-        { value: 'NONE', label: 'None', icon: <BlockIcon /> },
-        { value: 'SUM', label: 'Sum', icon: <FunctionsIcon /> },
-        { value: 'AVERAGE', label: 'Average', icon: <TimelineIcon /> },
-        { value: 'AVERAGE_SUM_ORG_UNIT', label: 'Average/Sum in org unit hierarchy', icon: <TimelineIcon /> },
-        { value: 'COUNT', label: 'Count', icon: <NumberIcon /> },
-        { value: 'STDDEV', label: 'Standard deviation', icon: <SsidChartIcon /> },
-        { value: 'VARIANCE', label: 'Variance', icon: <SsidChartIcon /> },
-        { value: 'MIN', label: 'Min', icon: <RemoveIcon /> },
-        { value: 'MAX', label: 'Max', icon: <AddIcon /> }
-    ]
+    useEffect(() => {
+        if(initOptionSets) setServerOptionSets(initOptionSets)
+    }, [initOptionSets])
+
+    useEffect(() => {
+        if(initLegendSets) setServerLegendSets(initLegendSets)
+    }, [initLegendSets])
+    
+
     const metadata = JSON.parse(de?.attributeValues.find(att => att.attribute.id === METADATA)?.value || '{}')
 
     // States
@@ -104,11 +87,14 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
     const [valueType, setValueType] = useState(de?.valueType || '')
     const [aggType, setAggType] = useState(de?.aggregationType || 'NONE')
     const [formName, setFormName] = useState((metadata.elemType === 'label' ? metadata.labelFormName : de?.formName)?.replace(' [C]', '') || '')
-    const [compulsory, setCompulsory] = useState(metadata.isCompulsory === 'Yes')  // metadata.isCompulsory : ['Yes','No']
-    const [displayInReports, setDisplayInReports] = useState(programStageDataElement.displayInReports || false)
+    const [compulsory, setCompulsory] = useState(hnqisMode? metadata.isCompulsory === 'Yes' : programStageDataElement.compulsory)  // metadata.isCompulsory : ['Yes','No']
+    const [displayInReports, setDisplayInReports] = useState(programStageDataElement.displayInReports ?? false)
     const [optionSet, setOptionSet] = useState(de?.optionSet ? { label: de.optionSet.name, id: de.optionSet.id } : null)
     const [legendSet, setLegendSet] = useState(de?.legendSet ? { label: de.legendSet.name, id: de.legendSet.id } : null)
     const [description, setDescription] = useState(de?.description || '')
+
+    const [deIcon,setDeIcon] = useState(de?.style?.icon ?? "")
+    const [deColor,setDeColor] = useState(de?.style?.color)
 
     const [critical, setCritical] = useState(metadata.isCritical === 'Yes') // metadata.isCritical : ['Yes','No']
     const [numerator, setNumerator] = useState(metadata.scoreNum || '')
@@ -293,12 +279,30 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
         return response;
     }
 
+    const reloadOptionSets = () =>{
+        refreshOptionSets().then(data => {
+            setServerOptionSets(data)
+        })
+    }
+
+    const reloadLegendSets = () =>{
+        refreshLegendSets().then(data => {
+            setServerLegendSets(data)
+        })
+    }
+
     const callSave = () => {
 
         // Save new values in local variable de
         let data = JSON.parse(JSON.stringify(de))
         let attributeValues = []
-        let metadata = JSON.parse(de?.attributeValues.find(att => att.attribute.id === METADATA)?.value || '{}')
+        let metadata = JSON.parse(de?.attributeValues?.find(att => att.attribute.id === METADATA)?.value || '{}')
+
+        data.style = {}
+        if(deIcon) data.style.icon = deIcon
+        if(deColor) data.style.color = deColor
+
+        data.displayInReports = displayInReports
 
         // Value Type
         data.valueType = valueType
@@ -445,13 +449,13 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
     //End New DE
 
     const aggTypeContent = [
-        <div style={{ display: 'flex', width: '100%', marginTop: '0.5em' }}>
+        <div style={{ display: 'flex', width: '100%', marginTop: '0.5em' }} key='select'>
             <SelectOptions
                 label="Aggregation Type (*)"
                 styles={{ width: '100%' }}
                 useError={validationErrors.aggType !== undefined}
                 helperText={validationErrors.aggType}
-                items={aggTypes}
+                items={AGG_TYPES}
                 value={aggType}
                 disabled={hnqisMode}
                 handler={aggTypeChange}
@@ -473,10 +477,15 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
     return (
         <div className={de ? "dataElement_cont" : ''}>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1em', width: '100%' }}>
-                {!de && <h2 style={{ display: 'flex', alignItems: 'center' }}>
-                    <FilterNoneIcon style={{ marginRight: '10px' }} />Data Element Configuration
-                </h2>}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1em', width: '100%' }}>
+                
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {!de && <h2 style={{ display: 'flex', alignItems: 'center', marginBottom: '1em' }}>
+                        <FilterNoneIcon style={{ marginRight: '10px' }} />Data Element Configuration
+                    </h2>}
+                    <h3>DHIS2 Settings</h3>
+                </div>
+
                 {de &&
                     <div onClick={() => closeEditForm()} style={{ cursor: 'pointer' }}>
                         <CloseIcon />
@@ -484,15 +493,13 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
                 }
             </div>
 
-            <h3 style={{ marginBottom: '0.5em' }}>DHIS2 Settings</h3>
-
             <Grid container spacing={2} style={{ alignItems: 'center' }}>
-                <Grid item xs={7} style={{ alignItems: 'end' }} >
+                <Grid item xs={6} style={{ alignItems: 'end' }} >
                     {hnqisMode &&
                         <Grid style={{ display: 'flex' }} item>
                             <RowRadioButtonsGroup
                                 label={"HNQIS Element Type"}
-                                items={elemTypes}
+                                items={ELEM_TYPES}
                                 handler={elemTypeChange}
                                 value={structure}
                             />
@@ -539,7 +546,7 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
                         />
                     </Grid>
                 </Grid>
-                <Grid item xs={5} style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                <Grid item xs={6} style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                     <div style={{ display: 'flex' }}>
                         <FormLabel component="legend" style={{ marginRight: '0.5em' }}>Data Element Value Type</FormLabel>
                         <InfoBox
@@ -556,10 +563,10 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
                     <div style={{ display: 'flex', width: '100%', marginTop: '0.5em', justifyContent: 'end', alignItems: 'center' }}>
                         <SelectOptions
                             label="Value Type (*)"
-                            styles={{ width: '45%' }}
+                            styles={{ width: '40%' }}
                             useError={validationErrors.valueType !== undefined}
                             helperText={validationErrors.valueType}
-                            items={valueTypes}
+                            items={VALUE_TYPES}
                             value={valueType}
                             disabled={structure === 'label' || optionSet != null}
                             handler={valueTypeChange} />
@@ -574,13 +581,23 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
                                     ({ label: os.name, id: os.id, valueType: os.valueType })
                                 ) || []
                             }
-                            sx={{ width: '45%' }}
+                            sx={{ width: '45%', marginRight: '0.5em' }}
                             renderInput={(params) => <TextField {...params} label="Option Set" />}
                             value={optionSet}
                             onChange={optionSetChange}
                             getOptionLabel={(option) => (option.label || '')}
                             isOptionEqualToValue={(option, value) => option.id === value.id}
                         />
+                        <Tooltip title="Create New Option Set" placement="top">
+                            <IconButton onClick={()=>{}} target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/otherSection/optionSet/add"}>
+                                <AddCircleOutlineIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Reload Option Sets" placement="top">
+                            <IconButton onClick={()=> reloadOptionSets()} >
+                                <RefreshIcon />
+                            </IconButton>
+                        </Tooltip>
                     </div>
                     {hnqisMode && aggTypeContent}
                 </Grid>
@@ -595,7 +612,7 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
                         id="formName"
                         autoComplete='off'
                         fullWidth
-                        margin="dense"
+                        margin="normal"
                         label="Form Name (*)"
                         variant="standard"
                         value={formName}
@@ -618,7 +635,7 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
                     id="description"
                     autoComplete='off'
                     fullWidth
-                    margin="dense"
+                    margin="normal"
                     label="Description"
                     variant="standard"
                     value={description}
@@ -636,12 +653,12 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
                 />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '1em 0' }}>
-                <div style={{ display: 'flex', width: '35%' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '2em 0 1em' }}>
+                <div style={{ display: 'flex', width: '30%' }}>
                     <Autocomplete
                         id="legendSetSelect"
                         disabled={structure === 'label'}
-                        sx={{ width: '100%' }}
+                        sx={{ minWidth: '100%', marginRight: '0.5em' }}
                         options={serverLegendSets?.results.legendSets.filter(ls => !hnqisMode || ls.name.includes("HNQIS")).map(ls => ({ label: ls.name, id: ls.id }))/* .concat({label: 'None', id: ''}) */ || [/* {label: 'None', id: ''} */]}
                         renderInput={(params) => <TextField {...params} label="Legend Set" />}
                         value={legendSet}
@@ -649,6 +666,16 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
                         getOptionLabel={(option) => (option.label || '')}
                         isOptionEqualToValue={(option, value) => option.id === value.id}
                     />
+                    <Tooltip title="Create New Legend Set" placement="top">
+                            <IconButton style={{margin: 'auto'}} onClick={()=>{}} target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/otherSection/legendSet/add"}>
+                                <AddCircleOutlineIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Reload Legend Sets" placement="top">
+                            <IconButton style={{margin: 'auto'}} onClick={()=> reloadLegendSets()} >
+                                <RefreshIcon />
+                            </IconButton>
+                        </Tooltip>
                     <InfoBox
                         title="About the Legend Set of a Data Element"
                         message={
@@ -660,22 +687,24 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
                         margin='0 0 0 0.5em'
                     />
                 </div>
-                <div>
-                    <Button
-                        variant="outlined"
-                        size="large"
-                        startIcon={<InsertEmoticonIcon />}
-                        style={{ marginRight: '1em' }}
-                        disabled>
-                        ADD ICON
-                    </Button>
-                    <Button variant="outlined" size="large" startIcon={<ColorLensIcon />} disabled >SELECT COLOR</Button>
+                <div style={{display:'flex', alignItems:'center'}}>
+                    <div><IconPicker parentIcon={deIcon} setParentIcon={setDeIcon} /></div>
+                    <div><ColorPicker parentColor={deColor} setParentColor={setDeColor} /></div>
+                    {(deIcon || deColor) && 
+                        <div style={{backgroundColor:deColor, width:'5em', height:'5em', minWidth:'5em', minHeight:'5em', border: '1px solid #DDD', marginLeft:'0.5em', borderRadius:'10%'}}>
+                            {deIcon && <img 
+                                src={`${(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)}/api/icons/${deIcon}/icon.svg`}
+                                style={{width: '100%', height: 'auto', borderRadius:'10%', zIndex:'999', filter: `brightness(0) invert(${deColor && tinycolor(deColor).isDark()?1:0})`}}
+                            />}
+                            {!deIcon && <p></p>}
+                        </div>
+                    }
                 </div>
             </div>
             
             <div>
                 {hnqisMode && <>
-                    <h3 style={{ marginBottom: '0.5em' }}>HNQIS Settings</h3>
+                    <h3 style={{ marginBottom: '0.5em', marginTop: '2em' }}>HNQIS Settings</h3>
 
 
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -790,6 +819,8 @@ const DataElementForm = ({ programStageDataElement, section, setDeToEdit, save, 
                         <MarkDownEditor value={feedbackText} setValue={setFeedbackText} disabled={structure === 'label'} />
                     </div>
                 </>}
+                {/* PROGRAM RULE ACTIONS */}
+                {de && <ProgramRulesList program={program} dataElement={de?.id || newDeId} /> }
                 {de &&
                     <div style={{ display: 'flex', justifyContent: 'end', marginTop: '1em' }}>
                         <Button

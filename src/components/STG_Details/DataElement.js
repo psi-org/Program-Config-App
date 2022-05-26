@@ -29,7 +29,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
 
-const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode}) => {
+const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode}) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -104,6 +104,7 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
                     </div>
                     { DEActions.deToEdit=== dataElement.id &&  
                         <DataElementForm 
+                            program={program}
                             programStageDataElement={stageDE}
                             section={section}
                             setDeToEdit={DEActions.setEdit}

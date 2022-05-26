@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-import { BUILD_VERSION, METADATA, COMPETENCY_CLASS } from "../../configs/Constants";
+import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE } from "../../configs/Constants";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -16,7 +16,7 @@ const competencyClassAttribute = {
     "valueType": "TEXT",
     "sortOrder": 5,
     "program": { "id": null },
-    "trackedEntityAttribute": { "id": "ulU9KKgSLYe" },
+    "trackedEntityAttribute": { "id": COMPETENCY_ATTRIBUTE },
     "userGroupAccesses": [],
     "attributeValues": [],
     "programTrackedEntityAttributeGroups": [],
@@ -113,7 +113,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
                 let DE_metadata = JSON.parse(dataElement.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
 
                 let newVarName = hnqisMode?`_S${secIdx + 1}Q${deIdx + 1}`:`_S${secIdx + 1}E${deIdx + 1}`;
-                let newCode = `${programMetadata.dePrefix}_${newVarName}`;
+                let newCode = `${programMetadata.dePrefix || section.id}_${newVarName}`;
                 // Name max: 230
                 // CODE_FORMNAME
                 // REST : 230 - CODE.LENGTH - FIXED
@@ -150,10 +150,15 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
                 delete dataElement.importStatus;
                 new_programStageDataElements.push({
                     compulsory: (DE_metadata.isCompulsory == 'Yes' && !DE_metadata.parentQuestion), // True: mandatory is Yes and has no parents.
-                    //programStage: { id : programStage.id},
+                    displayInReports: dataElement.displayInReports,
                     sortOrder: deIdx + 1,
                     dataElement: { id: dataElement.id }
                 });
+                delete dataElement.displayInReports;
+
+                if(!hnqisMode) ['isCritical','elemType','labelFormName','varName','parentQuestion','parentValue'].forEach(key => delete DE_metadata[key])
+                
+
                 let pcaMetadataIndex = dataElement.attributeValues.findIndex(att => att.attribute.id == METADATA)
                 if(pcaMetadataIndex > -1) dataElement.attributeValues[pcaMetadataIndex].value = JSON.stringify(DE_metadata)
                 else dataElement.attributeValues.push({
@@ -280,8 +285,8 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
         // ATTRIBUTE VALUES
         let programMetadataIdx = programPayload.attributeValues.findIndex(att => att.attribute.id === METADATA);
         let new_programMetadata = JSON.parse(programPayload.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
+        new_programMetadata.dePrefix = programMetadata.dePrefix;
         if(hnqisMode){
-            new_programMetadata.dePrefix = programMetadata.dePrefix;
             new_programMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
             new_programMetadata.healthArea = programMetadata.healthArea;
         }
@@ -293,13 +298,13 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
         };
 
         // PROGRAM TRACKED ENTITY ATTRIBUTES
-        let currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === "ulU9KKgSLYe");
+        let currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE);
         if (hnqisMode && new_programMetadata.useCompetencyClass == "Yes" && !currentCompetencyAttribute) {
             competencyClassAttribute.program.id = programPayload.id;
             programPayload.programTrackedEntityAttributes.push(competencyClassAttribute);
             criticalSection.dataElements.push({ id: COMPETENCY_CLASS })
         } else if (hnqisMode && new_programMetadata.useCompetencyClass == "No") {
-            programPayload.programTrackedEntityAttributes = programPayload.programTrackedEntityAttributes.filter(att => att.trackedEntityAttribute.id != "ulU9KKgSLYe");
+            programPayload.programTrackedEntityAttributes = programPayload.programTrackedEntityAttributes.filter(att => att.trackedEntityAttribute.id != COMPETENCY_ATTRIBUTE);
             criticalSection.dataElements = criticalSection.dataElements.filter(de => de.id != COMPETENCY_CLASS);
         }
 

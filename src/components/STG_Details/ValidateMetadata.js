@@ -5,7 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import SaveIcon from '@mui/icons-material/Save';
-import { METADATA, FEEDBACK_ORDER, MAX_FORM_NAME_LENGTH, MIN_FORM_NAME_LENGTH } from "../../configs/Constants";
+import { METADATA, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "../../configs/Constants";
 
 
 import { useEffect, useState } from "react";
@@ -22,7 +22,7 @@ const ValidateMetadata = (props) => {
         programDetails: {
             enable: true,
             checkHasFormName: { enable: true, title: "Form name not defined for element", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
-            checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).` } },
+            checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).` } },
             //Disabled validation EXW103
             structureMatchesValue: { enable: false, title: "Label should be LONG_TEXT", errorMsg: { code: "EXW103", text: "The expected Value Type for the label Data Element is LONG_TEXT." } },
             hasFeedbackOrder: { enable: true, title: "Missing Feedback Order", errorMsg: { code: "EXW107", text: "The specified question has Numerator and Denominator assigned but does not contribute to any score." } },
@@ -37,7 +37,7 @@ const ValidateMetadata = (props) => {
         scores: {
             enable: true,
             checkHasFormName: { enable: true, title: "Form name not defined for element", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
-            checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).` } },
+            checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).` } },
             //Disabled validation EXW102
             structureMatchesValue: { enable: false, title: "Score should be NUMBER", errorMsg: { code: "EXW102", text: "The expected Value Type for the score Data Element is NUMBER." } },
             hasScoreFeedbackOrder: { enable: true, title: "Missing Feedback Order", errorMsg: { code: "EXW111", text: "The specified score Data Element lacks Feedback Order." } },
@@ -131,9 +131,14 @@ const ValidateMetadata = (props) => {
             validationResults.questions = questions;
             validationResults.scores = scores;
 
+            let feedbacksErrors, feedbacksWarnings
+
             // CHECK FEEDBACK DATA
             if (props.hnqisMode) {
-                let { feedbacksErrors, feedbacksWarnings } = validateFeedbacks(importedSections.concat(importedScore))
+                let validateResults = validateFeedbacks(importedSections.concat(importedScore))
+                feedbacksErrors = validateResults.feedbacksErrors
+                feedbacksWarnings = validateResults.feedbacksWarnings
+                //let { feedbacksErrors, feedbacksWarnings } = validateFeedbacks(importedSections.concat(importedScore))
                 errorCounts += feedbacksErrors.length
                 validationResults.feedbacks = feedbacksErrors;
             }
@@ -328,7 +333,7 @@ const ValidateMetadata = (props) => {
 
         function checkFormNameLength(metaData, dataElement) {
             if (metaData.elem !== "") {
-                return (dataElement.formName.length <= MAX_FORM_NAME_LENGTH && dataElement.formName.length >= MIN_FORM_NAME_LENGTH)
+                return (dataElement.formName.length <= MAX_DATA_ELEMENT_NAME_LENGTH && dataElement.formName.length >= MIN_DATA_ELEMENT_NAME_LENGTH)
             }
             return true;
         }
