@@ -31,7 +31,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
-const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, SectionActions/* , handleSectionEdit */ }) => {
+const DraggableSection = ({program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode/* , handleSectionEdit */ }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -125,7 +125,15 @@ const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, S
                             <div {...provided.droppableProps} ref={provided.innerRef} className={"section_cont "} >
                                 {
                                     stageSection.dataElements.map((de, i) => {
-                                        return <DraggableDataElement dataElement={de} stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)} DEActions={DEActions} section={stageSection.id} index={i} key={de.id || i} />;
+                                        return <DraggableDataElement
+                                            program={program}
+                                            dataElement={de}
+                                            stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)}
+                                            DEActions={DEActions}
+                                            section={stageSection.id}
+                                            index={i}
+                                            key={de.id || i}
+                                            hnqisMode={hnqisMode}/>;
                                     })
                                 }
                                 {provided.placeholder}

@@ -266,12 +266,14 @@ const DataElementManager = (props) => {
                         </TabPanel>
                         <TabPanel value={tabValue} index={1}>
                             <DataElementForm
+                                program={props.program}
                                 programStageDataElement={{}}
                                 section={{}}
                                 setDeToEdit={undefined}
                                 save={handleNewDE}
                                 saveFlag={saveDeFlag}
                                 setSaveFlag={setSaveDeFlag}
+                                hnqisMode={props.hnqisMode}
                             />
                         </TabPanel>
                     </Box>

@@ -4,7 +4,7 @@ import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
 
 //UI Elements
-import {FlyoutMenu, MenuItem, Popper, Layer} from "@dhis2/ui";
+import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import EditIcon from '@mui/icons-material/Edit';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -24,14 +24,22 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
-const ProgramItem = ({program, downloadMetadata, shareProgram, deleteProgram}) => {
-  const [ref, setRef] = useState(undefined);
-  const [open, setOpen] = useState(false)
+const ProgramItem = ({ program, downloadMetadata, shareProgram, deleteProgram, prgTypeId }) => {
+    const [ref, setRef] = useState(undefined);
+    const [open, setOpen] = useState(false)
 
-  const toggle = () => setOpen(!open)
+    const toggle = () => setOpen(!open)
 
-  const dispatch = useDispatch();
-  const { setProgram } = bindActionCreators(actionCreators, dispatch);
+    const dispatch = useDispatch();
+    const { setProgram } = bindActionCreators(actionCreators, dispatch);
+    const programType = program.attributeValues.find(av => av.attribute.id === prgTypeId)?.value || "Tracker";
+    const typeTag = {
+        "HNQIS2": { color: "#03a9f4", text: "HNQIS 2.0" },
+        "HNQIS": { color: "#03a9f4", text: "HNQIS 1.X" },
+        "RDQA": { color: "#00b0b5", text: "RDQA PRG" },
+        "EDS": { color: "#607d8b", text: "EDS" },
+        "Tracker": { color: "#2c6693", text: "TRACKER" }
+    }
 
   return (
     <div className="ml_item" style={{color:"#333333" , backgroundColor: "#F8F8F8", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
@@ -70,14 +78,14 @@ const ProgramItem = ({program, downloadMetadata, shareProgram, deleteProgram}) =
           </Layer>
         }
 
-        <Link to={"/program/"+program.id} style={{color: '#333333'}}>
-          <div style={{display: 'flex', alignItems: 'center'}} onClick={()=> setProgram(program.id)}>
-            <NavigateNextIcon/>
-          </div>
-        </Link>
-      </div>
-    </div>
-  );
+                <Link to={"/program/" + program.id} style={{ color: '#333333' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setProgram(program.id)}>
+                        <NavigateNextIcon />
+                    </div>
+                </Link>
+            </div>
+        </div>
+    );
 }
 
 export default ProgramItem;
