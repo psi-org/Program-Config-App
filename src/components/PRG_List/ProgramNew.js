@@ -25,6 +25,7 @@ import SelectOptions from '../UIElements/SelectOptions';
 import FormHelperText from '@mui/material/FormHelperText';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { FormLabel } from '@mui/material';
+import StyleManager from '../UIElements/StyleManager';
 
 //const { Form, Field } = ReactFinalForm
 
@@ -186,6 +187,8 @@ const ProgramNew = (props) => {
     const [stepsSectionId, setStepsSectionId] = useState(undefined);
     const [scoresSectionId, setScoresSectionId] = useState(undefined);
 
+    const [programIcon,setProgramIcon] = useState("")
+    const [programColor,setProgramColor] = useState(undefined)
     const [pgrTypePCA, setPgrTypePCA] = useState('');
     const [programTET, setProgramTET] = useState('');
     const [useCompetency, setUseCompetency] = useState(false);
@@ -384,6 +387,10 @@ const ProgramNew = (props) => {
             prgrm.name = programName;
             prgrm.shortName = programShortName;
             prgrm.id = programId;
+
+            prgrm.style = {}
+            if(programIcon) prgrm.style.icon = programIcon
+            if(programColor) prgrm.style.color = programColor
 
             if (pgrTypePCA === 'hnqis') {
                 //HNQIS2 Programs
@@ -601,8 +608,15 @@ const ProgramNew = (props) => {
                         defaultValue={''}
                     />
                 </div>
+                <StyleManager
+                    icon={programIcon}
+                    setIcon={setProgramIcon}
+                    color={programColor}
+                    setColor={setProgramColor}
+                    style={{display:'flex', alignItems:'center', justifyContent: 'end', width: '100%', minHeight: '5em', marginTop: '1em'}}
+                />
                 {pgrTypePCA === 'hnqis' &&
-                    <FormControl margin="normal" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
+                    <FormControl margin="dense" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
                         <FormControlLabel
                             control={
                                 <Switch checked={useCompetency} onChange={handleChangeComp} name="competency" />
@@ -634,7 +648,7 @@ const ProgramNew = (props) => {
                                     error={validationErrors.categoryCombo !== undefined}
                                     label="Category Combination"
                                     variant="standard"
-                                    margin="normal"
+                                    margin="dense"
                                     helperText={validationErrors.categoryCombo} />
                                 }
                                 value={categoryCombo}

@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { DataQuery } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import classes from './App.module.css'
+import { useDataQuery } from "@dhis2/app-runtime";
 
 /**
  * STORE [w/Redux]
@@ -29,7 +30,17 @@ import ProgramStage from './components/STG_Details/ProgramStage';
  */
 import './css/main.css';
 
+const queryServerInfo = {
+    results: {
+        resource: 'system/info',
+    }
+};
+
 const App = () => {
+    const serverInfoQuery = useDataQuery(queryServerInfo);
+    const serverInfo = serverInfoQuery.data?.results;
+    if(serverInfo) window.localStorage.SERVER_VERSION = serverInfo.version
+
     return (
     <>
         <Provider store={store}>

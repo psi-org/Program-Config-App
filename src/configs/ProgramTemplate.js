@@ -8,10 +8,7 @@ const Program = {
     "enrollmentDateLabel": "Enrollment date",
     "registration": true,
     "displayFrontPageList": true,
-    "style": {
-        "color": "#3949ab",
-        "icon": "child_program_outline"
-    },
+    "style": {},
     "programStages": []
 }
 

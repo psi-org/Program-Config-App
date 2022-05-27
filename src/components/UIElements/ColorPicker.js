@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import {Button } from '@mui/material';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import FormatColorResetIcon from '@mui/icons-material/FormatColorReset';
