@@ -58,7 +58,6 @@ const DataProcessor = (props) => {
     {
         programName = programStage.program.name;
         programShortName = programStage.program.shortName;
-        //console.log("PS: ", programStage);
         programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
         programPrefix = programMetadata?.dePrefix || programStage.program.id;
         programHealthArea = programMetadata?.healthArea || "FP";
@@ -111,7 +110,6 @@ const DataProcessor = (props) => {
     }
 
     const initialize = () => {
-        //console.log("Loading : ", "Data Processor");
         if(typeof programStage.program !== "undefined") compile_report();
         setTimeout(function() {
             setIsDownloaded(true);
