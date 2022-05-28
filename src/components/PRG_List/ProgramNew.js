@@ -60,7 +60,7 @@ const metadataMutation = {
 const METADATA = "haUflNqP85K",
     COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe",
     COMPETENCY_CLASS = "NAaHST5ZDTE",
-    BUILD_VERSION = "1.3.1";
+    BUILD_VERSION = "1.3.2";
 
 const MAX_PREFIX_LENGTH = 25, 
     MAX_NAME_LENGTH = 230,
