@@ -593,7 +593,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
                 name,
                 description:'_Scripted',
                 program: { id: programId },
-                condition: `#{${parentCode}}!=${answer}`,
+                condition: `#{${parentCode}}!=${["0","1"].includes(String(answer)) ? answer : `"${answer}"` }`,
                 programRuleActions: []
             };
 
@@ -606,7 +606,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
                 name: mfm_name,
                 description:'_Scripted',
                 program: { id: programId },
-                condition: `#{${parentCode}}==${answer}`,
+                condition: `#{${parentCode}}==${["0","1"].includes(String(answer)) ? answer : `"${answer}"` }`,
                 programRuleActions: []
             };
 
@@ -669,7 +669,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
             pr.condition = `'true'`;
         } else {
             pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
-            pr.condition = `#{${hsRule.parent}}==${hsRule.condition}`;
+            pr.condition = `#{${hsRule.parent}}==${["0","1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition}"` }`;
         }
 
         hsRule.actions.forEach(action => {
@@ -806,7 +806,7 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
             }
 
             // Get parents hide/show logic
-            if (metadata.parentQuestion && metadata.parentValue) {
+            if (metadata.parentQuestion!==undefined && metadata.parentValue!==undefined) {
                 let parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
                 let parentValue = String(metadata.parentValue);
 

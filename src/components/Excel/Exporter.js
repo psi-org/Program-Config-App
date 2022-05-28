@@ -34,7 +34,6 @@ const Exporter = (props) => {
 
   const password = template_password;
   const initialize = () => {
-      console.log("Load: ", "Exporter");
       generate();
   };
 
@@ -127,7 +126,7 @@ const Exporter = (props) => {
     ws.getCell('C13').value = props.programShortName;
     ws.getCell('C14').value = props.useCompetencyClass;
     ws.getCell('C15').value = props.programPrefix;
-    let healthAreaFound = props.healthAreaData.find(ha => ha["Code"] == props.programHealthArea);
+    let healthAreaFound = props.healthAreaData.find(ha => ha["code"] == props.programHealthArea);
     ws.getCell('C16').value = healthAreaFound ? healthAreaFound["Health Area"] : "Family Planning";
     
     
