@@ -1,6 +1,5 @@
 import React from 'react';
 import { useState } from "react";
-import { Transfer } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 import { PERIOD_TYPES, FEATURE_TYPES, METADATA, MAX_STAGE_NAME_LENGTH, BUILD_VERSION, MIN_DESCRIPTION_LENGTH, REPORT_DATE_TO_USE } from '../../configs/Constants';
 //import styles from './Program.module.css'
@@ -14,17 +13,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import SendIcon from '@mui/icons-material/Send';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 import SelectOptions from '../UIElements/SelectOptions';
-import FormHelperText from '@mui/material/FormHelperText';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { FormLabel } from '@mui/material';
 
 //const { Form, Field } = ReactFinalForm
 
@@ -41,7 +33,7 @@ const metadataMutation = {
     data: ({ data }) => data
 };
 
-const ProgramNew = (props) => {
+const StageNew = (props) => {
     // Create Mutation
     let metadataDM = useDataMutation(metadataMutation);
     const metadataRequest = {
@@ -377,4 +369,4 @@ const ProgramNew = (props) => {
     </>
 }
 
-export default ProgramNew;
+export default StageNew;

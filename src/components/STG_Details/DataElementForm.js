@@ -4,9 +4,6 @@ import { TextField, Select, MenuItem, FormControl, InputLabel, FormControlLabel,
 import { useEffect, useState } from "react"
 import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES, AGG_TYPES } from '../../configs/Constants';
 import RowRadioButtonsGroup from './RowRadioButtonsGroup';
-import IconPicker from '../UIElements/IconPicker';
-import ColorPicker from '../UIElements/ColorPicker';
-import tinycolor from 'tinycolor2';
 
 import FilterNoneIcon from '@mui/icons-material/FilterNone';
 import SaveIcon from '@mui/icons-material/Save';
@@ -26,6 +23,8 @@ import InfoBox from './../UIElements/InfoBox';
 import AlertDialogSlide from '../UIElements/AlertDialogSlide';
 
 import ProgramRulesList from './../UIElements/ProgramRulesList'
+
+import StyleManager from '../UIElements/StyleManager';
 
 import { ChromePicker } from 'react-color';
 
@@ -687,19 +686,13 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                         margin='0 0 0 0.5em'
                     />
                 </div>
-                <div style={{display:'flex', alignItems:'center'}}>
-                    <div><IconPicker parentIcon={deIcon} setParentIcon={setDeIcon} /></div>
-                    <div><ColorPicker parentColor={deColor} setParentColor={setDeColor} /></div>
-                    {(deIcon || deColor) && 
-                        <div style={{backgroundColor:deColor, width:'5em', height:'5em', minWidth:'5em', minHeight:'5em', border: '1px solid #DDD', marginLeft:'0.5em', borderRadius:'10%'}}>
-                            {deIcon && <img 
-                                src={`${(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)}/api/icons/${deIcon}/icon.svg`}
-                                style={{width: '100%', height: 'auto', borderRadius:'10%', zIndex:'999', filter: `brightness(0) invert(${deColor && tinycolor(deColor).isDark()?1:0})`}}
-                            />}
-                            {!deIcon && <p></p>}
-                        </div>
-                    }
-                </div>
+                <StyleManager
+                    icon={deIcon}
+                    setIcon={setDeIcon}
+                    color={deColor}
+                    setColor={setDeColor}
+                    style={{display:'flex', alignItems:'center'}}
+                />
             </div>
             
             <div>
