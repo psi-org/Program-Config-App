@@ -584,16 +584,19 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
     Object.keys(hideShowGroup).forEach(parentCode => {
         Object.keys(hideShowGroup[parentCode]).forEach(answer => {
 
+            let conditionValue
             // SHOW/HIDE WHEN....IS...
             let programRuleUid = uidPool.shift();
             let name = `PR - Show/Hide - Show when ${parentCode} is ${answer}`;
+
+            conditionValue = ["0","1"].includes(String(answer)) ? answer : `"${answer}"`
 
             const pr = {
                 id: programRuleUid,
                 name,
                 description:'_Scripted',
                 program: { id: programId },
-                condition: `#{${parentCode}}!=${["0","1"].includes(String(answer)) ? answer : `"${answer}"` }`,
+                condition: `!d2:hasValue(#{${parentCode}}) || (#{${parentCode}}!=${conditionValue})`,
                 programRuleActions: []
             };
 
@@ -606,7 +609,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
                 name: mfm_name,
                 description:'_Scripted',
                 program: { id: programId },
-                condition: `#{${parentCode}}==${["0","1"].includes(String(answer)) ? answer : `"${answer}"` }`,
+                condition: `d2:hasValue(#{${parentCode}}) && (#{${parentCode}}==${conditionValue})`,
                 programRuleActions: []
             };
 
@@ -669,7 +672,8 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
             pr.condition = `'true'`;
         } else {
             pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
-            pr.condition = `#{${hsRule.parent}}==${["0","1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition}"` }`;
+            let conditionValue = ["0","1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition}"`
+            pr.condition = `d2:hasValue(#{${hsRule.parent}}) && (#{${hsRule.parent}}==${conditionValue})`;
         }
 
         hsRule.actions.forEach(action => {
