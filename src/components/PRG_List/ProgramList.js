@@ -1,7 +1,5 @@
 import { useDataQuery } from "@dhis2/app-runtime";
 import { Chip, CircularLoader, NoticeBox, Pagination } from "@dhis2/ui";
-import { Button, Chip, CircularLoader, NoticeBox, Pagination, IconAddCircle24, Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Input, InputField, SwitchField } from "@dhis2/ui";
-import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ProgramNew from './ProgramNew'
 
@@ -15,7 +13,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import ProgramItem from "./ProgramItem";
 import DependencyExport from "./DependencyExport";
 import SharingScreen from "../Sharing/SharingScreen";
-import DataProcessor from "../Excel/DataProcessor";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiButton from '@mui/material/Button';
@@ -56,8 +53,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const ProgramList = () => {
 
     // Export Program Metadata //
-    const [exportProgramId, setExportProgramId] = useState(undefined);
-    const [ sharingProgramId, setSharingProgramId] = useState(undefined)
+    const [exportProgramId, setExportProgramId] = useState(undefined)
+    const [ sharingProgramId, setSharingProgramId] = useState(undefined);
 
     // *********************** //
 
@@ -115,7 +112,7 @@ const ProgramList = () => {
                         Add Program
                     </MuiButton>
                     {exportProgramId &&
-                        <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId} />
+                    <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId} />
                     }
                     {
                         sharingProgramId &&
@@ -136,7 +133,7 @@ const ProgramList = () => {
                         onChange={(event) => setFilterValue(event.target.value)}
                         onKeyPress={event => {
                             if (event.key === 'Enter' /* && filterValue!=='' */) {
-                                    /* if(currentPage===1)  */doSearch()
+                                /* if(currentPage===1)  */doSearch()
                                 /* else setCurrentPage(1) */
                             }
                         }}
@@ -152,9 +149,9 @@ const ProgramList = () => {
                                             else setCurrentPage(1)
                                         } */
                                     }}
-                                        startIcon={<SearchIcon />}
-                                        variant='contained'
-                                        color='primary'>
+                                               startIcon={<SearchIcon />}
+                                               variant='contained'
+                                               color='primary'>
                                         Search
                                     </MuiButton>
                                 </InputAdornment>
@@ -168,7 +165,7 @@ const ProgramList = () => {
                     <div className="list-ml_item">
                         {
                             data.results.programs.map((program) => {
-                                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} deleteProgram={deleteProgram} prgTypeId={prgTypeId} serverVersion={window.localStorage.SERVER_VERSION ?? "2.35"} />
+                                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} shareProgram={shareProgram} deleteProgram={deleteProgram} prgTypeId={prgTypeId} serverVersion={window.localStorage.SERVER_VERSION ?? "2.35"} />
                             })
                         }
                     </div>

@@ -58,7 +58,7 @@ const metadataMutation = {
     data: ({data}) => data
 };
 
-const btnOptions = ['Apply to Current Level', 'Apply to Intermediate Level', 'Apply to lowest level'];
+const btnOptions = ['Apply Only to Program', 'Apply to Program & Program Stages', 'Apply to Program, Program Stages & Data Elements'];
 
 const SharingScreen = ({ element, id, setSharingProgramId }) => {
 
@@ -75,9 +75,9 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     const [entityType, setEntityType] = useState(undefined);
     const [entity, setEntity] = useState({});
     const [open, setOpen] = useState(false);
+    const [importStatus, setImportStatus] = useState({});
     const anchorRef = useRef(null);
-    const statusRef = useRef(null);
-    const [selectedIndex, setSelectedIndex] = useState(2);
+    const [ selectedIndex, setSelectedIndex ] = useState(2);
     const [ content, setContent ] = useState('form');
     const [ overwrite, setOverwrite ] = useState(true);
     const [ deleted, setDeleted ] = useState([]);
@@ -109,7 +109,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
         }
     }
 
-    if (!metadataLoading)
+    if (!metadataLoading && prgMetaData)
     {
         metadata = prgMetaData.results;
     }
@@ -248,12 +248,15 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
         });
         metadataRequest.mutate({data: metadata})
             .then(response => {
-                setContent('status');
-                let stats = response?.stats;
-                statusRef.current.textContent = `<h4>Sharing Stats</h4><br/><hr/><ul><li>Created: ${stats.created}</li><li>Updated: ${stats.updated}</li><li>Deleted: ${stats.deleted}</li><li>Ignored: ${stats.ignored}</li><li>Total: ${stats.total}</li></ul>`;
+                // statusRef.current.textContent = `{<h4>Sharing Stats</h4><br/><hr/><ul><li>Created: ${stats.created}</li><li>Updated: ${stats.updated}</li><li>Deleted: ${stats.deleted}</li><li>Ignored: ${stats.ignored}</li><li>Total: ${stats.total}</li></ul>}`;
                 if(response.status !== 'OK') {
+                    setContent('status');
                     console.error("Something went wrong");
                 } else {
+                    setContent('status');
+                    let stats = response?.stats;
+                    setImportStatus(stats);
+                    console.log("Status: ", importStatus);
                     console.log("Success saving data");
                 }
             });
@@ -293,7 +296,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
 
     return (
         <>
-            <Modal onClose={hideForm}>
+            <Modal onClose={hideForm} style={{ maxWidth: "800px", minWidth: "600px"}}>
                 <ModalTitle>Sharing settings</ModalTitle>
                 <ModalContent>
                     { content === 'loading' && <Box sx={{display: 'inline-flex'}}><CircularProgress/></Box> }
@@ -332,17 +335,25 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                         </div>
                         </div>
                         </div>
+                        {(selectedIndex === 1 || selectedIndex === 2) &&
+                        <FormGroup style={{ marginTop: "5px" }}>
+                            <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox} inputProps={{'aria-label': 'controlled'}}/>} label={"Overwrite Existing Behavior Behavior"}/>
+                        </FormGroup>
+                        }
                     </div>
                     }
-                    { content === 'status' && <div ref={statusRef}></div> }
+                    { content === 'status' &&
+                        <div>
+                            <b>Import Status</b><hr/>
+                            <p>Created: {importStatus.created}</p>
+                            <p>Updated: {importStatus.updated}</p>
+                            <p>Deleted: {importStatus.deleted}</p>
+                            <p>Ignored: {importStatus.ignored}</p>
+                            <p>Total: {importStatus.total}</p>
+                        </div> }
                 </ModalContent>
                 {content === 'form' &&
                 <ModalActions>
-                    <FormGroup style={{marginTop: "5px", marginRight: "25px"}}>
-                        <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox}
-                                                             inputProps={{'aria-label': 'controlled'}}/>}
-                                          label={"Overwrite Behavior"}/>
-                    </FormGroup>
                     <ButtonStrip end>
                         {/*<Button onClick={()=>hideForm()} variant="outlined" startIcon={<CloseIcon />}>Close</Button>*/}
                         <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
