@@ -589,7 +589,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
             let programRuleUid = uidPool.shift();
             let name = `PR - Show/Hide - Show when ${parentCode} is ${answer}`;
 
-            conditionValue = ["0","1"].includes(String(answer)) ? answer : `"${answer}"`
+            conditionValue = ["0","1"].includes(String(answer)) ? answer : `"${answer.replaceAll("'","")}"`
 
             const pr = {
                 id: programRuleUid,
@@ -672,7 +672,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
             pr.condition = `'true'`;
         } else {
             pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
-            let conditionValue = ["0","1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition}"`
+            let conditionValue = ["0","1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'","")}"`
             pr.condition = `d2:hasValue(#{${hsRule.parent}}) && (#{${hsRule.parent}}==${conditionValue})`;
         }
 
