@@ -6,12 +6,13 @@ import actionCreators from "../../state/action-creators";
 //UI Elements
 import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import EditIcon from '@mui/icons-material/Edit';
+import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 
 // *** Routing ***
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 // *** IMAGES ***
 import move_vert_svg from './../../images/i-more_vert_black.svg';
@@ -23,7 +24,7 @@ import { SHARINGS_LIMIT_VERSION } from "../../configs/Constants";
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
-const ProgramItem = ({ program, downloadMetadata, deleteProgram, prgTypeId, serverVersion }) => {
+const ProgramItem = ({ program, downloadMetadata, shareProgram, deleteProgram, prgTypeId, serverVersion }) => {
     const [ref, setRef] = useState(undefined);
     const [open, setOpen] = useState(false)
 
@@ -45,7 +46,7 @@ const ProgramItem = ({ program, downloadMetadata, deleteProgram, prgTypeId, serv
             <div className="ml_list-icon"> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
                 <div className="ml_item-desc" style={{ width: '3.2em' }}>
                     <div style={{backgroundColor:(program.style?.color || '#2c6693'), width:'3em', height:'3em', minWidth:'3em', minHeight:'3em', border: '1px solid #DDD', borderRadius:'10%', padding: '0'}}>
-                        <img 
+                        <img
                             src={`${(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)}/api/icons/${program.style?.icon || 'dhis2_logo_positive'}/icon.svg`}
                             style={{width: '100%', height: 'auto', borderRadius:'10%', zIndex:'999', filter: `brightness(0) invert(${tinycolor(program.style?.color || '#2c6693').isDark()?1:0})`, objectFit: 'cover'}}
                         />
@@ -68,6 +69,7 @@ const ProgramItem = ({ program, downloadMetadata, deleteProgram, prgTypeId, serv
                         <Popper reference={ref} placement="bottom-end">
                             <FlyoutMenu>
                                 <MenuItem label="Edit Program" icon={<EditIcon />} onClick={() => { toggle(); /* Add function */ }} />
+                                <MenuItem label="Sharing Settings" icon={<ShareIcon/>} onClick={()=>{toggle(); shareProgram(program.id)}}/>
                                 <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={() => { toggle(); downloadMetadata(program.id) }} />
                                 <MenuItem disabled={/*!versionIsValid(serverVersion, SHARINGS_LIMIT_VERSION)*/ true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
                             </FlyoutMenu>

@@ -12,6 +12,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import ProgramItem from "./ProgramItem";
 import DependencyExport from "./DependencyExport";
+import SharingScreen from "../Sharing/SharingScreen";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiButton from '@mui/material/Button';
@@ -53,6 +54,7 @@ const ProgramList = () => {
 
     // Export Program Metadata //
     const [exportProgramId, setExportProgramId] = useState(undefined)
+    const [ sharingProgramId, setSharingProgramId] = useState(undefined);
 
     // *********************** //
 
@@ -75,6 +77,10 @@ const ProgramList = () => {
 
     const downloadMetadata = (program) => {
         setExportProgramId(program)
+    }
+
+    const shareProgram = (program) => {
+        setSharingProgramId(program)
     }
 
     const deleteProgram = (program) => {
@@ -106,7 +112,11 @@ const ProgramList = () => {
                         Add Program
                     </MuiButton>
                     {exportProgramId &&
-                        <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId} />
+                    <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId} />
+                    }
+                    {
+                        sharingProgramId &&
+                        <SharingScreen element="program" id={sharingProgramId} setSharingProgramId={setSharingProgramId}/>
                     }
                 </div>
             </div>
@@ -123,7 +133,7 @@ const ProgramList = () => {
                         onChange={(event) => setFilterValue(event.target.value)}
                         onKeyPress={event => {
                             if (event.key === 'Enter' /* && filterValue!=='' */) {
-                                    /* if(currentPage===1)  */doSearch()
+                                /* if(currentPage===1)  */doSearch()
                                 /* else setCurrentPage(1) */
                             }
                         }}
@@ -139,9 +149,9 @@ const ProgramList = () => {
                                             else setCurrentPage(1)
                                         } */
                                     }}
-                                        startIcon={<SearchIcon />}
-                                        variant='contained'
-                                        color='primary'>
+                                               startIcon={<SearchIcon />}
+                                               variant='contained'
+                                               color='primary'>
                                         Search
                                     </MuiButton>
                                 </InputAdornment>
@@ -155,7 +165,7 @@ const ProgramList = () => {
                     <div className="list-ml_item">
                         {
                             data.results.programs.map((program) => {
-                                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} deleteProgram={deleteProgram} prgTypeId={prgTypeId} serverVersion={window.localStorage.SERVER_VERSION ?? "2.35"} />
+                                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} shareProgram={shareProgram} deleteProgram={deleteProgram} prgTypeId={prgTypeId} serverVersion={window.localStorage.SERVER_VERSION ?? "2.35"} />
                             })
                         }
                     </div>

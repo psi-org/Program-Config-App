@@ -2,7 +2,6 @@ export function splitPosition(position) {
   return position.split(/(\d+)/);
 }
 export function number2Character(numb) {
-  let aPlace = 0;
   let zPlace = 25;
   let quo = 0;
 
@@ -11,7 +10,7 @@ export function number2Character(numb) {
     numb = numb % 26;
   }
 
-  return (quo != 0 ? String.fromCharCode(64 + quo) : '') + String.fromCharCode(65 + numb);
+  return (quo !== 0 ? String.fromCharCode(64 + quo) : '') + String.fromCharCode(65 + numb);
 }
 export function character2Number(rangeString) {
   let pos = 0;
@@ -41,6 +40,12 @@ export function arrayObjectToStringConverter(arrayOfObj, key) {
   });
   return final.slice(0, -1);
 }
+
+export function DeepCopy(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+export function ShallowCopy(obj) { return {...obj} }
 
 function characterPos(chr) {
   return chr.charCodeAt(0);
