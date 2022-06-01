@@ -162,6 +162,7 @@ const DataElementManager = (props) => {
             setSaveDeFlag(true)
         }else{ //Existing DEs
             let newDEObjects = newDataElements.map(de => ({
+                type:'added',
                 displayInReports: false,
                 compulsory: false,
                 sortOrder: 1,

@@ -132,6 +132,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"));
     const [errorReports, setErrorReports] = useState(undefined)
 
+    const [addedSection,setAddedSection] = useState()
+
     // REFETCH STAGE
     const refetchProgramStage = (params={}) =>{
         stageRefetch({variables : {programStage:programStage.id}}).then(data => {
@@ -175,7 +177,11 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     }
 
     const saveAdd = (params) => {
+
         let dataElementObjects = params.newDataElements.map(psde => psde.dataElement)
+        let sectionIndex = sections.findIndex(s => s.id === params.deRef.section)
+        let toBeAdded = params.newDataElements.map(de => ({id:de.dataElement.id,mode:de.type}))
+        params.newDataElements.forEach(de => delete de.type)
 
         sections.find(s => s.id === params.deRef.section).dataElements.splice(params.deRef.index, 0, ...dataElementObjects/* ...params.newDataElements */)
         let newProgramStageDataElements = programStageDataElements.concat(params.newDataElements)
@@ -184,6 +190,11 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         setProgramStageDataElements(newProgramStageDataElements)
         setDeManager(false)
         pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to Validate and Save!</strong></span>)
+        setAddedSection({
+            index:sectionIndex,
+            mode:'Updated',
+            dataElements: toBeAdded
+        })
     }
 
     const [deManager, setDeManager] = useState(false)
@@ -553,7 +564,17 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
                                         sections.map((pss, idx) => {
-                                            return <DraggableSection program={programStage.program.id} stageSection={pss} stageDataElements={programStageDataElements} DEActions={DEActions} index={idx} key={pss.id || idx} SectionActions={SectionActions} hnqisMode={hnqisMode} />
+                                            return <DraggableSection 
+                                                program={programStage.program.id} 
+                                                stageSection={pss} 
+                                                editStatus={addedSection?.index === idx && addedSection } 
+                                                stageDataElements={programStageDataElements} 
+                                                DEActions={DEActions} 
+                                                index={idx} 
+                                                key={pss.id || idx} 
+                                                SectionActions={SectionActions} 
+                                                hnqisMode={hnqisMode} 
+                                            />
                                         })
                                     }
                                     {provided.placeholder}
@@ -608,6 +629,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                     sections={sections}
                     refreshSections={setSections}
                     notify={pushNotification}
+                    setAddedSection={setAddedSection}
                 />
             }
             {deManager &&

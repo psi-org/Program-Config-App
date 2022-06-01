@@ -37,6 +37,11 @@ const ProgramDetails = () => {
     const [showStageForm, setShowStageForm] = useState(false);
     const [notification, setNotification] = useState(undefined);
     const [snackSeverity, setSnackSeverity] = useState(undefined);
+    const [newStage,setNewStage] = useState()
+
+    useEffect(()=>{
+        console.log(newStage)
+    },[newStage])
 
     useEffect(() => {
         if (notification) setSnackSeverity(notification.severity)
@@ -93,7 +98,7 @@ const ProgramDetails = () => {
                         {
                             data.results.programStages.map((programStage) => {
                                 return (
-                                    <StageItem stage={programStage} key={programStage.id} setNotification={setNotification} stagesRefetch={refetch} />
+                                    <StageItem stage={programStage} key={programStage.id} setNotification={setNotification} stagesRefetch={refetch} setNewStage={setNewStage} editStatus={newStage?.stage===programStage.id && newStage?.mode }/>
                                 )
                             })
                         }
@@ -102,7 +107,7 @@ const ProgramDetails = () => {
                         }
                     </div>
                 </div>
-                {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName}/>}
+                {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName} setNewStage={setNewStage}/>}
                 <Snackbar
                     anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                     open={notification !== undefined}

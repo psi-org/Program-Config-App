@@ -5,6 +5,9 @@ const config = {
     entryPoints: {
         app: './src/App.js',
     },
+    minDHIS2Version:'2.36',
+    maxDHIS2Version:'2.38',
+    dataStoreNamespace:'programconfigapp'
 }
 
 module.exports = config

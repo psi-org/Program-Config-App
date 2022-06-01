@@ -1,11 +1,11 @@
 import React from 'react';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Transfer } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 //import styles from './Program.module.css'
 import { Program, PS_AssessmentStage, PS_ActionPlanStage, PSS_Default, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
 
-import { METADATA,COMPETENCY_ATTRIBUTE,COMPETENCY_CLASS,BUILD_VERSION,MAX_PREFIX_LENGTH,MAX_PROGRAM_NAME_LENGTH,MIN_NAME_LENGTH,MAX_SHORT_NAME_LENGTH } from './../../configs/Constants';
+import { METADATA, COMPETENCY_ATTRIBUTE, COMPETENCY_CLASS, BUILD_VERSION, MAX_PREFIX_LENGTH, MAX_PROGRAM_NAME_LENGTH, MIN_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from './../../configs/Constants';
 
 import Button from '@mui/material/Button';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -26,6 +26,8 @@ import FormHelperText from '@mui/material/FormHelperText';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { FormLabel } from '@mui/material';
 import StyleManager from '../UIElements/StyleManager';
+import { DeepCopy } from '../../configs/Utils';
+import { VolunteerActivismOutlined } from '@mui/icons-material';
 
 //const { Form, Field } = ReactFinalForm
 
@@ -69,7 +71,7 @@ const queryTEAttributes = {
     results: {
         resource: 'trackedEntityAttributes',
         params: {
-            fields: ['id','name', 'valueType'],
+            fields: ['id', 'name', 'valueType'],
             paging: false
         }
     }
@@ -79,7 +81,7 @@ const queryCatCombos = {
     results: {
         resource: 'categoryCombos',
         params: {
-            fields: ['id','name'],
+            fields: ['id', 'name'],
             filter: ['dataDimensionType:eq:ATTRIBUTE'],
             paging: false
         }
@@ -180,26 +182,26 @@ const ProgramNew = (props) => {
     const { data: trackedEntityAttributes, refetch: findTEAttributes } = useDataQuery(queryTEAttributes, { lazy: true });
     const { data: categoryCombos, refetch: findCategoryCombos } = useDataQuery(queryCatCombos, { lazy: true });
 
-    const [programId, setProgramId] = useState(undefined);
+    const [programId, setProgramId] = useState(props.data?.id);
     const [assessmentId, setAssessmentId] = useState(undefined);
     const [actionPlanId, setActionPlanId] = useState(undefined);
     const [defaultSectionId, setDefaultSectionId] = useState(undefined);
     const [stepsSectionId, setStepsSectionId] = useState(undefined);
     const [scoresSectionId, setScoresSectionId] = useState(undefined);
 
-    const [programIcon,setProgramIcon] = useState("")
-    const [programColor,setProgramColor] = useState(undefined)
-    const [pgrTypePCA, setPgrTypePCA] = useState('');
-    const [programTET, setProgramTET] = useState('');
-    const [useCompetency, setUseCompetency] = useState(false);
-    const [healthArea, setHealthArea] = useState('');
-    const [dePrefix, setDePrefix] = useState('');
-    const [programName, setProgramName] = useState('');
-    const [programShortName, setProgramShortName] = useState('');
+    const [programIcon, setProgramIcon] = useState(props.data?.style?.icon || '')
+    const [programColor, setProgramColor] = useState(props.data?.style?.color)
+    const [pgrTypePCA, setPgrTypePCA] = useState(props.programType || '');
+    const [programTET, setProgramTET] = useState(props.data ? { label: props.data.trackedEntityType.name, id: props.data.trackedEntityType.id } : '');
+    const [useCompetency, setUseCompetency] = useState(props.pcaMetadata?.useCompetencyClass === 'Yes');
+    const [healthArea, setHealthArea] = useState(props.pcaMetadata?.healthArea || '');
+    const [dePrefix, setDePrefix] = useState(props.pcaMetadata?.dePrefix || '');
+    const [programName, setProgramName] = useState(props.data?.name || '');
+    const [programShortName, setProgramShortName] = useState(props.data?.shortName || '');
     const [sentForm, setSentForm] = useState(false);
-    const [programTEAs, setProgramTEAs] = useState({available: [], selected: []})
+    const [programTEAs, setProgramTEAs] = useState({ available: [], selected: [] })
     const [programCategoryCombos, setProgramCategoryCombos] = useState([{ name: 'Select an option', id: '' }])
-    const [categoryCombo,setCategoryCombo] = useState('')
+    const [categoryCombo, setCategoryCombo] = useState(props.data ? { label: props.data.categoryCombo.name, id: props.data.categoryCombo.id } : '')
 
     //Validation Messages
     const [validationErrors, setValidationErrors] = useState(
@@ -224,7 +226,7 @@ const ProgramNew = (props) => {
             setProgramTET({ label: hnqisTET.name, id: hnqisTET.id })
         } else {
             setProgramTET('')
-            if (value === 'tracker'){
+            if (value === 'tracker') {
                 fetchTrackerMetadata()
             }
         }
@@ -256,7 +258,7 @@ const ProgramNew = (props) => {
         setProgramTET(value || '')
     }
 
-    const categoryComboChange = (event,value) => {
+    const categoryComboChange = (event, value) => {
         setCategoryCombo(value || '');
     }
 
@@ -272,7 +274,8 @@ const ProgramNew = (props) => {
 
     const handleChangeTEAs = (res) => {
         programTEAs.selected = res.selected
-        setProgramTEAs(JSON.parse(JSON.stringify(programTEAs)))
+        console.log(programTEAs)
+        setProgramTEAs(DeepCopy(programTEAs))
     }
 
     let healthAreaOptions = [];
@@ -283,7 +286,7 @@ const ProgramNew = (props) => {
         }));
     }
 
-    if (uidPool && uidPool.length === 6) {
+    if (uidPool && uidPool.length === 6 && !props.data) {
         setProgramId(uidPool.shift());
         setAssessmentId(uidPool.shift());
         setActionPlanId(uidPool.shift());
@@ -360,7 +363,8 @@ const ProgramNew = (props) => {
         findTEAttributes().then(data => {
             if (data?.results?.trackedEntityAttributes) {
                 programTEAs.available = data.results.trackedEntityAttributes
-                setProgramTEAs({...programTEAs})
+                programTEAs.selected = props.data?.programTrackedEntityAttributes?.map(tea => tea.trackedEntityAttribute.id) || []
+                setProgramTEAs({ ...programTEAs })
             }
         })
 
@@ -368,6 +372,13 @@ const ProgramNew = (props) => {
             if (ccdata?.results?.categoryCombos) setProgramCategoryCombos(ccdata.results.categoryCombos)
         })
     }
+
+    useEffect(() => {
+        if (props.programType === 'tracker') {
+            fetchTrackerMetadata()
+        }
+    }, [])
+
 
     function submission() {
         setSentForm(true)
@@ -380,7 +391,7 @@ const ProgramNew = (props) => {
         }
         if (!metadataRequest.called && dataIsValid) {
 
-            let prgrm = JSON.parse(JSON.stringify(Program));
+            let prgrm = DeepCopy(props.data) || DeepCopy(Program);
             let programStages = undefined;
             let programStageSections = undefined;
 
@@ -389,83 +400,116 @@ const ProgramNew = (props) => {
             prgrm.id = programId;
 
             prgrm.style = {}
-            if(programIcon) prgrm.style.icon = programIcon
-            if(programColor) prgrm.style.color = programColor
+            if (programIcon) prgrm.style.icon = programIcon
+            if (programColor) prgrm.style.color = programColor
 
             if (pgrTypePCA === 'hnqis') {
                 //HNQIS2 Programs
-                Object.assign(prgrm, hnqisProgramConfigs)
-                prgrm.attributeValues.push({
-                    "value": "HNQIS2",
-                    "attribute": { "id": prgTypeId }
-                });
-                prgrm.programStages.push({ id: assessmentId });
-                prgrm.programStages.push({ id: actionPlanId });
+                let criticalSteps = undefined;
 
-                let assessmentStage = JSON.parse(JSON.stringify(PS_AssessmentStage));
-                assessmentStage.id = assessmentId;
-                assessmentStage.name = assessmentStage.name;
-                assessmentStage.programStageSections.push({ id: defaultSectionId });
-                assessmentStage.programStageSections.push({ id: stepsSectionId });
-                assessmentStage.programStageSections.push({ id: scoresSectionId });
-                assessmentStage.program.id = programId;
+                if (!props.data) {
+                    Object.assign(prgrm, hnqisProgramConfigs)
+                    prgrm.attributeValues.push({
+                        "value": "HNQIS2",
+                        "attribute": { "id": prgTypeId }
+                    });
+                    prgrm.programStages.push({ id: assessmentId });
+                    prgrm.programStages.push({ id: actionPlanId });
 
-                let actionPlanStage = JSON.parse(JSON.stringify(PS_ActionPlanStage));
-                actionPlanStage.id = actionPlanId;
-                actionPlanStage.name = actionPlanStage.name;
-                actionPlanStage.program.id = programId;
+                    let assessmentStage = DeepCopy(PS_AssessmentStage);
+                    assessmentStage.id = assessmentId;
+                    assessmentStage.name = assessmentStage.name;
+                    assessmentStage.programStageSections.push({ id: defaultSectionId });
+                    assessmentStage.programStageSections.push({ id: stepsSectionId });
+                    assessmentStage.programStageSections.push({ id: scoresSectionId });
+                    assessmentStage.program.id = programId;
 
-                let defaultSection = JSON.parse(JSON.stringify(PSS_Default));
-                defaultSection.id = defaultSectionId;
-                defaultSection.programStage.id = assessmentId;
-                //defaultSection.name = defaultSection.name
+                    let actionPlanStage = DeepCopy(PS_ActionPlanStage);
+                    actionPlanStage.id = actionPlanId;
+                    actionPlanStage.name = actionPlanStage.name;
+                    actionPlanStage.program.id = programId;
 
-                let criticalSteps = JSON.parse(JSON.stringify(PSS_CriticalSteps));
-                criticalSteps.id = stepsSectionId;
-                criticalSteps.programStage.id = assessmentId;
-                //criticalSteps.name = criticalSteps.name
+                    let defaultSection = DeepCopy(PSS_Default);
+                    defaultSection.id = defaultSectionId;
+                    defaultSection.programStage.id = assessmentId;
+                    //defaultSection.name = defaultSection.name
 
-                let scores = JSON.parse(JSON.stringify(PSS_Scores));
-                scores.id = scoresSectionId;
-                scores.name = scores.name;
-                scores.programStage.id = assessmentId;
+                    criticalSteps = DeepCopy(PSS_CriticalSteps);
+                    criticalSteps.id = stepsSectionId;
+                    criticalSteps.programStage.id = assessmentId;
+                    //criticalSteps.name = criticalSteps.name
+
+                    let scores = DeepCopy(PSS_Scores);
+                    scores.id = scoresSectionId;
+                    scores.name = scores.name;
+                    scores.programStage.id = assessmentId;
+                }
 
                 if (!useCompetency) {
                     removeCompetencyAttribute(prgrm.programTrackedEntityAttributes);
+                    //Fix required here v
+                    if (props.data) {
+                        criticalSteps = prgrm.programStages.map(pStage => pStage.programStageSections
+                        ).flat().find(section =>
+                            section.dataElements.find(de => de.id === "VqBfZjZhKkU")
+                        )
+                    }
+
+                    prgrm.programStages = prgrm.programStages.map(ps => ({id:ps.id}))
+
                     removeCompetencyClass(criticalSteps.dataElements);
+                }else if (useCompetency && props.data) {
+                    criticalSteps = prgrm.programStages.map(pStage => pStage.programStageSections
+                    ).flat().find(section =>
+                        section.dataElements.find(de => de.id === "VqBfZjZhKkU")
+                    )
+                    criticalSteps.dataElements = [
+                        {id: "VqBfZjZhKkU"},
+                        {id: "pzWDtDUorBt"},
+                        {id: "NAaHST5ZDTE"}
+                    ]
                 }
 
                 createOrUpdateMetaData(prgrm.attributeValues);
 
-                programStages = [assessmentStage, actionPlanStage]
-                programStageSections = [defaultSection, criticalSteps, scores]
+                if (!props.data) {
+                    programStages = [assessmentStage, actionPlanStage]
+                    programStageSections = [defaultSection, criticalSteps, scores]
+                } else {
+                    programStageSections = criticalSteps?[criticalSteps]:undefined
+                }
 
             } else {
                 //Tracker Programs
                 prgrm.trackedEntityType = { "id": programTET.id }
                 prgrm.programTrackedEntityAttributes = []
                 prgrm.attributeValues = []
-                if(categoryCombo!=='') prgrm.categoryCombo = { id: categoryCombo.id }
+                prgrm.categoryCombo = categoryCombo !== '' ? { id: categoryCombo.id } : undefined
                 programTEAs.selected.forEach((selectedTEA, index) => {
-                    let newTEA = programTEAs.available.find(tea => tea.id === selectedTEA )
+                    let newTEA = programTEAs.available.find(tea => tea.id === selectedTEA)
                     prgrm.programTrackedEntityAttributes.push({
                         trackedEntityAttribute: { id: newTEA.id },
                         mandatory: false,
                         valueType: newTEA.valueType,
                         searchable: false,
                         displayInList: true,
-                        sortOrder: (index+1)
+                        sortOrder: (index + 1)
                     })
                 })
 
                 createOrUpdateMetaData(prgrm.attributeValues);
             }
 
-            let metadata = {
-                programs: [prgrm],
-                programStages,
-                programStageSections
-            }
+            // If editing only send program
+            let metadata = props.data
+                ? {
+                    programs: [prgrm],
+                    programStageSections: programStageSections
+                } : {
+                    programs: [prgrm],
+                    programStages,
+                    programStageSections
+                }
 
             metadataRequest.mutate({ data: metadata }).then(response => {
                 if (response.status != 'OK') {
@@ -475,9 +519,10 @@ const ProgramNew = (props) => {
                     });
                     props.setShowProgramForm(false);
                 } else {
-                    props.setNotification({ message: `Program ${prgrm.name} created successfully`, severity: 'success' });
+                    props.setNotification({ message: `Program ${prgrm.name} ${!props.data ? 'created' : 'updated'} successfully`, severity: 'success' });
                     props.setShowProgramForm(false);
                     props.programsRefetch();
+                    props.doSearch(prgrm.name);
                 }
             })
         }
@@ -489,7 +534,7 @@ const ProgramNew = (props) => {
 
             let metaData_value = JSON.parse(metaDataArray[0].value);
             metaData_value.buildVersion = BUILD_VERSION;
-            if (pgrTypePCA==='hnqis'){
+            if (pgrTypePCA === 'hnqis') {
                 metaData_value.useCompetencyClass = useCompetency ? 'Yes' : 'No';
                 metaData_value.healthArea = healthArea;
             }
@@ -499,7 +544,7 @@ const ProgramNew = (props) => {
         else {
             let attr = { id: METADATA };
             let val = { buildVersion: BUILD_VERSION, dePrefix: dePrefix };
-            if (pgrTypePCA==='hnqis'){
+            if (pgrTypePCA === 'hnqis') {
                 val.useCompetencyClass = useCompetency
                 val.healthArea = healthArea
             }
@@ -535,6 +580,7 @@ const ProgramNew = (props) => {
                             labelId="label-prgType"
                             id="prgTypePCA"
                             value={pgrTypePCA}
+                            disabled={props.programType !== undefined}
                             onChange={handleChangePgrType}
                             label="Config App Mode"
                         >
@@ -594,13 +640,13 @@ const ProgramNew = (props) => {
                         disabled={pgrTypePCA !== 'tracker'}
                         options={trackedEntityTypes?.map(tet => ({ label: tet.name, id: tet.id })) || [{ label: '', id: '' }]}
                         sx={{ width: '48%' }}
-                        renderInput={(params) => <TextField 
+                        renderInput={(params) => <TextField
                             {...params}
                             error={validationErrors.programTET !== undefined}
                             label="Tracked Entity Type (*)"
                             margin='normal'
                             variant="standard"
-                            helperText={validationErrors.programTET}/>}
+                            helperText={validationErrors.programTET} />}
                         value={programTET}
                         onChange={programTETChange}
                         getOptionLabel={(option) => (option.label || '')}
@@ -613,7 +659,7 @@ const ProgramNew = (props) => {
                     setIcon={setProgramIcon}
                     color={programColor}
                     setColor={setProgramColor}
-                    style={{display:'flex', alignItems:'center', justifyContent: 'end', width: '100%', minHeight: '5em', marginTop: '1em'}}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'end', width: '100%', minHeight: '5em', marginTop: '1em' }}
                 />
                 {pgrTypePCA === 'hnqis' &&
                     <FormControl margin="dense" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
@@ -641,9 +687,9 @@ const ProgramNew = (props) => {
                             <Autocomplete
                                 id="ccSelect"
                                 disabled={pgrTypePCA !== 'tracker'}
-                                options={programCategoryCombos?.map(pcc => ({ label: pcc.name, id: pcc.id })) }
+                                options={programCategoryCombos?.map(pcc => ({ label: pcc.name, id: pcc.id }))}
                                 sx={{ width: '100%' }}
-                                renderInput={(params) => <TextField 
+                                renderInput={(params) => <TextField
                                     {...params}
                                     error={validationErrors.categoryCombo !== undefined}
                                     label="Category Combination"
@@ -658,8 +704,8 @@ const ProgramNew = (props) => {
                                 defaultValue={'default'}
                             />
                         </FormControl>
-                        <div style={{marginTop: '1.5em'}}>
-                            <FormLabel style={{display: 'inline-block', marginBottom: '8px'}}>Program Tracked Entity Attributes</FormLabel>
+                        <div style={{ marginTop: '1.5em' }}>
+                            <FormLabel style={{ display: 'inline-block', marginBottom: '8px' }}>Program Tracked Entity Attributes</FormLabel>
                             <Transfer
                                 filterable
                                 onChange={handleChangeTEAs}
@@ -668,8 +714,8 @@ const ProgramNew = (props) => {
                                     value: tea.id
                                 }))}
                                 selected={programTEAs.selected}
-                                optionsWidth = '48%'
-                                selectedWidth = '48%'
+                                optionsWidth='48%'
+                                selectedWidth='48%'
                             />
                         </div>
                     </>

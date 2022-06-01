@@ -11,7 +11,13 @@ import DateIcon from '@mui/icons-material/CalendarToday';
 import TimeIcon from '@mui/icons-material/AccessTime';
 
 const BUILD_VERSION = "1.4.0"
-const SHARINGS_LIMIT_VERSION = "2.36"
+const BUILD_DATE = "May 31st, 2022"
+const MIN_VERSION = "2.36.0"
+const MAX_VERSION = "2.38.0"
+
+const PCA_METADATA_VERSION = "1.0.0"
+
+const NAMESPACE = "programconfigapp"
 
 const PERIOD_TYPES = [
     {label: "Daily", value: "Daily"},
@@ -95,12 +101,16 @@ export {
     FEATURE_TYPES,
     REPORT_DATE_TO_USE,
     METADATA,
+    NAMESPACE,
+    PCA_METADATA_VERSION,
     COMPETENCY_ATTRIBUTE,
     COMPETENCY_CLASS,
     FEEDBACK_ORDER,
     FEEDBACK_TEXT,
     BUILD_VERSION,
-    SHARINGS_LIMIT_VERSION,
+    BUILD_DATE,
+    MIN_VERSION,
+    MAX_VERSION,
     MAX_PREFIX_LENGTH,
     MAX_PROGRAM_NAME_LENGTH,
     MAX_STAGE_NAME_LENGTH,

@@ -1,10 +1,10 @@
-import { useDataMutation, useDataQuery} from "@dhis2/app-runtime";
-import {CircularLoader, Modal, ModalContent, ModalTitle, NoticeBox, ModalActions, ButtonStrip} from "@dhis2/ui";
+import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
+import { CircularLoader, Modal, ModalContent, ModalTitle, NoticeBox, ModalActions, ButtonStrip, CenteredContent } from "@dhis2/ui";
 import SharingItem from './SharingItem';
 import { DeepCopy } from '../../configs/Utils';
 
 import EditIcon from '@mui/icons-material/Edit';
-import {useRef, useState} from "react";
+import { useRef, useState } from "react";
 import Suggestions from "./Suggestions";
 import SharingOptions from "./SharingOptions";
 import ViewIcon from "@mui/icons-material/Visibility";
@@ -12,6 +12,8 @@ import BlockIcon from "@mui/icons-material/Block";
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+import IconButton from "@mui/material/IconButton";
+
 import {
     CircularProgress,
     Box,
@@ -55,7 +57,7 @@ const entitiesQuery = {
 const metadataMutation = {
     resource: 'metadata',
     type: 'create',
-    data: ({data}) => data
+    data: ({ data }) => data
 };
 
 const btnOptions = ['Apply Only to Program', 'Apply to Program & Program Stages', 'Apply to Program, Program Stages & Data Elements'];
@@ -77,14 +79,14 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     const [open, setOpen] = useState(false);
     const [importStatus, setImportStatus] = useState({});
     const anchorRef = useRef(null);
-    const [ selectedIndex, setSelectedIndex ] = useState(2);
-    const [ content, setContent ] = useState('form');
-    const [ overwrite, setOverwrite ] = useState(true);
-    const [ deleted, setDeleted ] = useState([]);
+    const [selectedIndex, setSelectedIndex] = useState(2);
+    const [content, setContent] = useState('form');
+    const [overwrite, setOverwrite] = useState(true);
+    const [deleted, setDeleted] = useState([]);
 
-    const {loading, error, data, refetch} = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
-    const {loading: entityLoading, data: entities} = useDataQuery(entitiesQuery);
-    const {loading: metadataLoading, data: prgMetaData} = useDataQuery(programMetadata);
+    const { loading, error, data, refetch } = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
+    const { loading: entityLoading, data: entities } = useDataQuery(entitiesQuery);
+    const { loading: metadataLoading, data: prgMetaData } = useDataQuery(programMetadata);
     const metadataDM = useDataMutation(metadataMutation);
     const metadataRequest = {
         mutate: metadataDM[0],
@@ -100,17 +102,14 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
 
     if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
     if (loading) return <CircularLoader />
-    if ( !loading )
-    {
+    if (!loading) {
         payload = data.results;
-        if (!entityLoading)
-        {
+        if (!entityLoading) {
             usersNGroups = availableUserGroups();
         }
     }
 
-    if (!metadataLoading && prgMetaData)
-    {
+    if (!metadataLoading && prgMetaData) {
         metadata = prgMetaData.results;
     }
 
@@ -127,13 +126,13 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
         setUsrGrp(ent.displayName);
         setEntityType(type);
 
-        let e = {...ent};
+        let e = { ...ent };
         e.access = usrPermission;
         setEntity(e);
     }
 
     const setEntityPermission = (permission) => {
-        let e = {...entity};
+        let e = { ...entity };
         setUsrPermission(permission);
         e.access = permission;
         setEntity(e);
@@ -146,7 +145,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     }
 
     const userPermissionState = () => {
-        return (usrPermission[1] === "w") ? <EditIcon/> : (usrPermission[0] === "r" && usrPermission[1] !== "w") ? <ViewIcon/> : <BlockIcon/>
+        return (<IconButton color='inherit' style={{marginRight: '1em'}}>{(usrPermission[1] === "w") ? <EditIcon /> : (usrPermission[0] === "r" && usrPermission[1] !== "w") ? <ViewIcon /> : <BlockIcon />}</IconButton>)
     }
 
     const handleClick = () => {
@@ -178,11 +177,11 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     function availableUserGroups() {
         let obj = payload.object;
         let e = DeepCopy(entities);
-        obj.userAccesses.forEach((ua)=> {
-            e.userData.users.splice(e.userData.users.findIndex(u => { return u.id === ua.id}), 1);
+        obj.userAccesses.forEach((ua) => {
+            e.userData.users.splice(e.userData.users.findIndex(u => { return u.id === ua.id }), 1);
         });
         obj.userGroupAccesses.forEach((uga) => {
-            e.userGroupData.userGroups.splice(e.userGroupData.userGroups.findIndex(ug=> { return ug.id === uga.id}), 1);
+            e.userGroupData.userGroups.splice(e.userGroupData.userGroups.findIndex(ug => { return ug.id === uga.id }), 1);
         })
         return e;
     }
@@ -194,15 +193,15 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                 data.results.object.publicAccess = "--------";
                 break;
             case 'userAccesses':
-                var userIndex = data.results.object.userAccesses.findIndex(user => { return user.id === id});
+                var userIndex = data.results.object.userAccesses.findIndex(user => { return user.id === id });
                 data.results.object.userAccesses.splice(userIndex, 1);
-                setDeleted(deleted=>[...deleted, {id: id, type: "users"}]);
+                setDeleted(deleted => [...deleted, { id: id, type: "users" }]);
                 // setDeleted(deleted => deleted.userAccesses.push(id));
                 break;
             case 'userGroupAccesses':
-                var userGroupIndex = data.results.object.userGroupAccesses.findIndex(userGroup => { return userGroup.id === id});
+                var userGroupIndex = data.results.object.userGroupAccesses.findIndex(userGroup => { return userGroup.id === id });
                 data.results.object.userGroupAccesses.splice(userGroupIndex, 1);
-                setDeleted(deleted=>[...deleted, {id: id, type: "userGroups"}]);
+                setDeleted(deleted => [...deleted, { id: id, type: "userGroups" }]);
                 // setDeleted(deleted => deleted.userGroupAccesses.push(id));
                 break;
             default:
@@ -217,11 +216,11 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                 payload.object.publicAccess = permission;
                 break;
             case 'userAccesses':
-                var userIndex = payload.object.userAccesses.findIndex(user => { return user.id === id});
+                var userIndex = payload.object.userAccesses.findIndex(user => { return user.id === id });
                 payload.object.userAccesses[userIndex].access = permission;
                 break;
             case 'userGroupAccesses':
-                var userGroupIndex = payload.object.userGroupAccesses.findIndex(userGroup => { return userGroup.id === id});
+                var userGroupIndex = payload.object.userGroupAccesses.findIndex(userGroup => { return userGroup.id === id });
                 payload.object.userGroupAccesses[userGroupIndex].access = permission;
                 break;
             default:
@@ -244,12 +243,12 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                 break;
         }
         elementsArray.forEach((elements) => {
-           applySharing(elements);
+            applySharing(elements);
         });
-        metadataRequest.mutate({data: metadata})
+        metadataRequest.mutate({ data: metadata })
             .then(response => {
                 // statusRef.current.textContent = `{<h4>Sharing Stats</h4><br/><hr/><ul><li>Created: ${stats.created}</li><li>Updated: ${stats.updated}</li><li>Deleted: ${stats.deleted}</li><li>Ignored: ${stats.ignored}</li><li>Total: ${stats.total}</li></ul>}`;
-                if(response.status !== 'OK') {
+                if (response.status !== 'OK') {
                     setContent('status');
                     console.error("Something went wrong");
                 } else {
@@ -266,144 +265,139 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
         metadata[elements].forEach((element) => {
             element.sharing.public = payload.object.publicAccess;
             payload.object.userAccesses.forEach((user) => {
-                if (element.sharing.users.hasOwnProperty(user.id) && overwrite)
-                {
+                if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
                     element.sharing.users[user.id].access = user.access;
                 }
-                else
-                {
-                    element.sharing.users[user.id] = {id: user.id, access: user.access}
+                else {
+                    element.sharing.users[user.id] = { id: user.id, access: user.access }
                 }
             })
             payload.object.userGroupAccesses.forEach((userGroup) => {
-                if (element.sharing.userGroups.hasOwnProperty(userGroup.id) && overwrite)
-                {
+                if (element.sharing.userGroups.hasOwnProperty(userGroup.id) && overwrite) {
                     element.sharing.userGroups[userGroup.id].access = userGroup.access;
                 }
-                else
-                {
-                    element.sharing.userGroups[userGroup.id] = {id: userGroup.id, access: userGroup.access}
+                else {
+                    element.sharing.userGroups[userGroup.id] = { id: userGroup.id, access: userGroup.access }
                 }
             })
             deleted.forEach(del => {
-               if (element.sharing[del.type].hasOwnProperty(del.id))
-               {
-                   delete element.sharing[del.type][del.id];
-               }
+                if (element.sharing[del.type].hasOwnProperty(del.id)) {
+                    delete element.sharing[del.type][del.id];
+                }
             });
         });
     }
 
     return (
         <>
-            <Modal onClose={hideForm} style={{ maxWidth: "800px", minWidth: "600px"}}>
+            <Modal onClose={hideForm} style={{ maxWidth: "800px", minWidth: "600px" }}>
                 <ModalTitle>Sharing settings</ModalTitle>
                 <ModalContent>
-                    { content === 'loading' && <Box sx={{display: 'inline-flex'}}><CircularProgress/></Box> }
-                    { content === 'form' && <div>
-                    <h2 style={{fontSize: 24, fontWeight: 300, margin: 0}}>{data.results?.object.displayName}</h2>
+                    {content === 'loading' && <Box sx={{ display: 'inline-flex' }}><CircularProgress /></Box>}
+                    {content === 'form' && <div>
+                        <h2 style={{ fontSize: 24, fontWeight: 300, margin: 0 }}>{data.results?.object.displayName}</h2>
                         <div>Created by: {data.results?.object.user.name}</div>
-                        <div style={{boxSizing: "border-box", fontSize: 14, paddingLeft: 16, marginTop: 30, color: 'rgba(0, 0, 0, 0.54)', lineHeight: "48px"}}>Who has access</div>
-                        <hr style={{marginTop: -1, height: 1, border:"none", backgroundColor: "#bdbdbd"}}/>
-                        <div style={{height: "240px", overflowY: "scroll"}}>
-                            <SharingItem key={"publicAccess"} type={"publicAccess"} element={{id: "publicAccess", displayName: "Public Access"}} permission={data.results?.object.publicAccess} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission}/>
+                        <div style={{ boxSizing: "border-box", fontSize: 14, paddingLeft: 16, marginTop: 30, color: 'rgba(0, 0, 0, 0.54)', lineHeight: "48px" }}>Who has access</div>
+                        <hr style={{ marginTop: -1, height: 1, border: "none", backgroundColor: "#bdbdbd" }} />
+                        <div style={{ height: "240px", overflowY: "scroll" }}>
+                            <SharingItem key={"publicAccess"} type={"publicAccess"} element={{ id: "publicAccess", displayName: "Public Access" }} permission={data.results?.object.publicAccess} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission} />
                             {/*<SharingItem key={"externalAccess"} type={"externalAccess"} element={{id: "externalAccess", displayName: "External Access"}} permission={data.results?.object.externalAccess} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission}/>*/}
                             {
-                                data.results?.object.userAccesses.map(function(userAccess) {
-                                return <SharingItem key={userAccess.id} type={"userAccesses"} element={{id: userAccess.id, displayName: userAccess.displayName}} permission={userAccess.access} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission}/>
-                            })
+                                data.results?.object.userAccesses.map(function (userAccess) {
+                                    return <SharingItem key={userAccess.id} type={"userAccesses"} element={{ id: userAccess.id, displayName: userAccess.displayName }} permission={userAccess.access} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission} />
+                                })
                             }
                             {
-                                data.results?.object.userGroupAccesses.map(function(userGroupAccess) {
-                                return <SharingItem key={userGroupAccess.id} type={"userGroupAccesses"} element={{id: userGroupAccess.id, displayName: userGroupAccess.displayName}} permission={userGroupAccess.access} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission}/>
-                            })
+                                data.results?.object.userGroupAccesses.map(function (userGroupAccess) {
+                                    return <SharingItem key={userGroupAccess.id} type={"userGroupAccesses"} element={{ id: userGroupAccess.id, displayName: userGroupAccess.displayName }} permission={userGroupAccess.access} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission} />
+                                })
                             }
                         </div>
-                        <div style={{fontWeight: 400, padding: "16px", backgroundColor: 'rgb(245,245,245)', display: "flex", flexDirection: 'column', justifyContent: "center"}}>
-                            <div style={{color: 'rgb(129, 129, 129)', paddingBottom: "8px"}}>Add users and user groups</div>
-                            <div style={{display: "flex", flexDirection: "row", flex: "1 1 0"}}>
-                            <div style={{display: "inline-block", position: "relative", width: "100%", backgroundColor: "white", boxShadow: 'rgb(204,204,204) 2px 2px 2px', padding: "0px 16px", marginRight: "16px"}}>
-                            <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={(e) => loadSuggestions(e.target.value)} value={usrGrp || ""} style={{appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%"}} placeholder={"Enter Names"}/>
-                        </div>
-                    {search && <Suggestions usersNGroups={JSON.parse(JSON.stringify(usersNGroups))} keyword={search} setSearch={setSearch} addEntity={addEntity}/>}
-                        <div id={'newPermission'} style={{paddingLeft: "6px", paddingRight: "6px", paddingTop: "6px"}} onClick={()=>{toggle();}}>
-                    {userPermissionState()}
-                        </div>
-                    {optionOpen && <SharingOptions permission={usrPermission.split("")} reference={document.getElementById('newPermission')} setEntityPermission={setEntityPermission} toggle={toggle}/>}
-                        <div>
-                        <Button onClick={() => assignRole()} variant="outlined">Assign</Button>
-                        </div>
-                        </div>
+                        <div style={{ fontWeight: 400, padding: "16px", backgroundColor: 'rgb(245,245,245)', display: "flex", flexDirection: 'column', justifyContent: "center" }}>
+                            <div style={{ color: 'rgb(129, 129, 129)', paddingBottom: "8px" }}>Add users and user groups</div>
+                            <div style={{ display: "flex", flexDirection: "row", alignItems: 'center', flex: "1 1 0"}}>
+                                <div style={{ display: "inline-block", position: "relative", width: "100%", backgroundColor: "white", boxShadow: 'rgb(204,204,204) 2px 2px 2px', padding: "0 16px", marginRight: "16px", height: '3em' }}>
+                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={(e) => loadSuggestions(e.target.value)} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} />
+                                </div>
+                                {search && <Suggestions usersNGroups={JSON.parse(JSON.stringify(usersNGroups))} keyword={search} setSearch={setSearch} addEntity={addEntity} />}
+                                <div id={'newPermission'} style={{ padding: "auto" }} onClick={() => { toggle(); }}>
+                                    {userPermissionState()}
+                                </div>
+                                {optionOpen && <SharingOptions permission={usrPermission.split("")} reference={document.getElementById('newPermission')} setEntityPermission={setEntityPermission} toggle={toggle} />}
+
+                                <Button onClick={() => assignRole()} variant="outlined">Assign</Button>
+
+                            </div>
                         </div>
                         {(selectedIndex === 1 || selectedIndex === 2) &&
-                        <FormGroup style={{ marginTop: "5px" }}>
-                            <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox} inputProps={{'aria-label': 'controlled'}}/>} label={"Overwrite Existing Behavior Behavior"}/>
-                        </FormGroup>
+                            <FormGroup style={{ marginTop: "5px" }}>
+                                <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox} inputProps={{ 'aria-label': 'controlled' }} />} label={"Overwrite Existing Behavior"} />
+                            </FormGroup>
                         }
                     </div>
                     }
-                    { content === 'status' &&
+                    {content === 'status' &&
                         <div>
-                            <b>Import Status</b><hr/>
+                            <b>Import Status</b><hr />
                             <p>Created: {importStatus.created}</p>
                             <p>Updated: {importStatus.updated}</p>
                             <p>Deleted: {importStatus.deleted}</p>
                             <p>Ignored: {importStatus.ignored}</p>
                             <p>Total: {importStatus.total}</p>
-                        </div> }
+                        </div>}
                 </ModalContent>
                 {content === 'form' &&
-                <ModalActions>
-                    <ButtonStrip end>
-                        {/*<Button onClick={()=>hideForm()} variant="outlined" startIcon={<CloseIcon />}>Close</Button>*/}
-                        <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
-                            <Button onClick={handleClick}>{btnOptions[selectedIndex]}</Button>
-                            <Button
-                                size="small"
-                                aria-controls={open ? 'split-button-menu' : undefined}
-                                aria-expanded={open ? 'true' : undefined}
-                                aria-label="select merge strategy"
-                                aria-haspopup="menu"
-                                onClick={handleToggle}
-                            >
-                                <ArrowDropDownIcon/>
-                            </Button>
-                        </ButtonGroup>
-                        <Popper
-                            open={open}
-                            anchorEl={anchorRef.current}
-                            role={undefined}
-                            transition
-                            disablePortal
-                        >
-                            {({TransitionProps, placement}) => (
-                                <Grow
-                                    {...TransitionProps}
-                                    style={{
-                                        transformOrigin:
-                                            placement === 'bottom' ? 'center top' : 'center bottom',
-                                    }}
+                    <ModalActions>
+                        <ButtonStrip end>
+                            {/*<Button onClick={()=>hideForm()} variant="outlined" startIcon={<CloseIcon />}>Close</Button>*/}
+                            <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
+                                <Button onClick={handleClick}>{btnOptions[selectedIndex]}</Button>
+                                <Button
+                                    size="small"
+                                    aria-controls={open ? 'split-button-menu' : undefined}
+                                    aria-expanded={open ? 'true' : undefined}
+                                    aria-label="select merge strategy"
+                                    aria-haspopup="menu"
+                                    onClick={handleToggle}
                                 >
-                                    <Paper>
-                                        <ClickAwayListener onClickAway={handleClose}>
-                                            <MenuList id="split-button-menu" autoFocusItem>
-                                                {btnOptions.map((option, index) => (
-                                                    <MenuItem
-                                                        key={option}
-                                                        selected={index === selectedIndex}
-                                                        onClick={(event) => handleMenuItemClick(event, index)}
-                                                    >
-                                                        {option}
-                                                    </MenuItem>
-                                                ))}
-                                            </MenuList>
-                                        </ClickAwayListener>
-                                    </Paper>
-                                </Grow>
-                            )}
-                        </Popper>
-                    </ButtonStrip>
-                </ModalActions>
+                                    <ArrowDropDownIcon />
+                                </Button>
+                            </ButtonGroup>
+                            <Popper
+                                open={open}
+                                anchorEl={anchorRef.current}
+                                role={undefined}
+                                transition
+                                disablePortal
+                            >
+                                {({ TransitionProps, placement }) => (
+                                    <Grow
+                                        {...TransitionProps}
+                                        style={{
+                                            transformOrigin:
+                                                placement === 'bottom' ? 'center top' : 'center bottom',
+                                        }}
+                                    >
+                                        <Paper>
+                                            <ClickAwayListener onClickAway={handleClose}>
+                                                <MenuList id="split-button-menu" autoFocusItem>
+                                                    {btnOptions.map((option, index) => (
+                                                        <MenuItem
+                                                            key={option}
+                                                            selected={index === selectedIndex}
+                                                            onClick={(event) => handleMenuItemClick(event, index)}
+                                                        >
+                                                            {option}
+                                                        </MenuItem>
+                                                    ))}
+                                                </MenuList>
+                                            </ClickAwayListener>
+                                        </Paper>
+                                    </Grow>
+                                )}
+                            </Popper>
+                        </ButtonStrip>
+                    </ModalActions>
                 }
             </Modal>
         </>

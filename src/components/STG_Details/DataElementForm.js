@@ -46,7 +46,17 @@ const legendSetsQuery = {
             pageSize: 2000
         }
     }
-}
+};
+
+const programRuleVariableQuery = {
+    results: {
+        resource: 'programRuleVariables',
+        params: ({program,dataElement}) => ({
+            fields: ['id', 'name'],
+            filter: [`program.id:eq:${program}`,`dataElement.id:eq:${dataElement ?? ''}`],
+        })    
+    }
+};
 
 const queryId = {
     results: {
@@ -67,8 +77,9 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
     const [serverOptionSets, setServerOptionSets] = useState(undefined)
     const { data: initLegendSets, refetch: refreshLegendSets } = useDataQuery(legendSetsQuery);
     const [serverLegendSets, setServerLegendSets] = useState(undefined)
-    /* const { data: programRuleVariables } = useDataQuery(programRuleVariableQuery, {variables: { program, dataElement: de?.id } });
-    const programRuleVariable = programRuleVariables?.results?.programRuleVariables?.at(0) */
+    const { data: programRuleVariables } = useDataQuery(programRuleVariableQuery, {variables: { program, dataElement: de?.id ?? "X" } });
+    const programRuleVariable = programRuleVariables?.results?.programRuleVariables?.at(0) 
+    
 
     useEffect(() => {
         if(initOptionSets) setServerOptionSets(initOptionSets)
@@ -421,6 +432,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                 }
 
                 let newCreatedDe = {
+                    type:'created',
                     displayInReports: displayInReports,
                     compulsory: compulsory,
                     dataElement: {
@@ -588,7 +600,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                             isOptionEqualToValue={(option, value) => option.id === value.id}
                         />
                         <Tooltip title="Create New Option Set" placement="top">
-                            <IconButton onClick={()=>{}} target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/otherSection/optionSet/add"}>
+                            <IconButton onClick={()=>{}} target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/otherSection/optionSet/add"}>
                                 <AddCircleOutlineIcon />
                             </IconButton>
                         </Tooltip>
@@ -666,7 +678,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                         isOptionEqualToValue={(option, value) => option.id === value.id}
                     />
                     <Tooltip title="Create New Legend Set" placement="top">
-                            <IconButton style={{margin: 'auto'}} onClick={()=>{}} target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/otherSection/legendSet/add"}>
+                            <IconButton style={{margin: 'auto'}} onClick={()=>{}} target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/otherSection/legendSet/add"}>
                                 <AddCircleOutlineIcon />
                             </IconButton>
                         </Tooltip>
@@ -813,7 +825,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                     </div>
                 </>}
                 {/* PROGRAM RULE ACTIONS */}
-                {de && <ProgramRulesList program={program} dataElement={de?.id || newDeId} /> }
+                {de && programRuleVariables?.results?.programRuleVariables && programRuleVariable && <ProgramRulesList program={program} dataElement={de?.id || newDeId} variable={programRuleVariable.name} variables={programRuleVariables?.results?.programRuleVariables} /> }
                 {de &&
                     <div style={{ display: 'flex', justifyContent: 'end', marginTop: '1em' }}>
                         <Button

@@ -31,7 +31,9 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
-const DraggableSection = ({program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode/* , handleSectionEdit */ }) => {
+import Chip from '@mui/material/Chip';
+
+const DraggableSection = ({program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -95,7 +97,8 @@ const DraggableSection = ({program, stageSection, stageDataElements, DEActions, 
                             <img className="ml_list-img" alt="sec" src={sec_svg} />
                         </div>
                         <div className="ml_item-title">
-                            {sectionImportStatus} {stageSection.displayName} 
+                            <div>{sectionImportStatus} {stageSection.displayName} </div>
+                            <div>{editStatus && <Chip label={editStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{marginLeft:'1em'}} /> }</div>
                         </div>
                         <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div> {sectionImportSummary}</div>
                         <div className="ml_item-warning_error " onClick={()=>setShowValidationMessage(!showValidationMessage)}>
@@ -133,7 +136,9 @@ const DraggableSection = ({program, stageSection, stageDataElements, DEActions, 
                                             section={stageSection.id}
                                             index={i}
                                             key={de.id || i}
-                                            hnqisMode={hnqisMode}/>;
+                                            hnqisMode={hnqisMode}
+                                            deStatus={editStatus?.dataElements?.find(dataElement => dataElement.id === de.id)}
+                                        />;
                                     })
                                 }
                                 {provided.placeholder}

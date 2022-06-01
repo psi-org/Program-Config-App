@@ -213,6 +213,7 @@ const StageNew = (props) => {
                     props.setNotification({ message: `Program Stage '${stage.name}' ${props.data?.id?'updated':'created'} successfully`, severity: 'success' });
                     props.setShowStageForm(false);
                     props.stagesRefetch();
+                    props.setNewStage({stage:stage.id, mode:props.data?.id?'updated':'created'})
                 }
             })
         }
