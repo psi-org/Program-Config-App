@@ -1,3 +1,4 @@
+import {useState} from "react"
 import { useDataQuery } from '@dhis2/app-runtime';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -18,7 +19,14 @@ import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
 
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
 
+/**
+ * PROGRAM RULE ACTIONS ACTING OVER CURRENT DATA ELEMENT
+ */
 const queryActions = {
     results: {
         resource: 'programRuleActions',
@@ -31,7 +39,7 @@ const queryActions = {
     }
 }
 
-const queryRules = {
+/* const queryRules = {
     results: {
         resource: 'programRules',
         params: ({program,variable}) => (
@@ -41,14 +49,17 @@ const queryRules = {
             pageSize: 1000
         })
     }
-}
+} */
 
-const queryRules2 = {
+/**
+ * PROGRAM RULES TRIGGERED BY THE CURRENT DATA ELEMENT
+ */
+const queryRules = {
     results: {
         resource: 'programRules',
         params: ({program,prVars}) => (
         {
-            filter: /* [`program.id:eq:${program}`].concat( */prVars.map(v => `condition:ilike:${v.name}`),
+            filter: prVars.map(v => `condition:ilike:${v.name}`),
             fields: ['id,name,program,condition,programRuleActions[programRuleActionType,data,content,dataElement[id,name],programRule[id,name,condition]]'],
             paging: false,
             rootJunction: 'OR'
@@ -56,7 +67,7 @@ const queryRules2 = {
     }
 }
 
-const formatAction = (action,i) =>{
+const formatAction = (action,i,self) =>{
     const ListItemStyle = { minHeight:'5em' }
 
     switch(action.programRuleActionType){
@@ -68,7 +79,8 @@ const formatAction = (action,i) =>{
                     </Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                    primary={<span><strong>Assign value: </strong><i>{action.data}</i> <br/><strong>To: </strong>{action.dataElement.name} <code>[{action.dataElement.id}]</code></span>}
+                    primary={
+                    <span><strong>Assign value: </strong><i>{action.data}</i> <br/><strong>To: </strong>{action.dataElement.name} <code>[{action.dataElement.id}]</code></span>}
                 />
             </ListItem>
 
@@ -107,7 +119,7 @@ const formatAction = (action,i) =>{
                 <ListItemText
                     primary={
                         <div style={{display:'flex',flexDirection:'column'}}>
-                            <span><strong>Show an error {action.programRuleActionType==='ERRORONCOMPLETE' && 'on "Complete Form"'} next to the field</strong></span>
+                            <span><strong>Show an error {action.programRuleActionType==='ERRORONCOMPLETE' && 'on "Complete Form"'} next to the field</strong> {action.dataElement.name} <code>[{action.dataElement.id}]</code></span>
                             {action.content && <span><strong>Static Text: </strong><i>{action.content}</i></span> }
                             {action.data && <span><strong>Expression to evaluate and show after static text: </strong><i>{action.data}</i></span>}
                         </div>
@@ -126,7 +138,7 @@ const formatAction = (action,i) =>{
                 <ListItemText
                     primary={
                         <div style={{display:'flex',flexDirection:'column'}}>
-                            <span><strong>Show a warning {action.programRuleActionType==='WARNINGONCOMPLETE' && 'on "Complete Form"'} next to the field</strong></span>
+                            <span><strong>Show a warning {action.programRuleActionType==='WARNINGONCOMPLETE' && 'on "Complete Form"'} next to the field</strong> {action.dataElement.name} <code>[{action.dataElement.id}]</code></span>
                             {action.content && <span><strong>Static Text: </strong><i>{action.content}</i></span> }
                             {action.data && <span><strong>Expression to evaluate and show after static text: </strong><i>{action.data}</i></span>}
                         </div>
@@ -136,91 +148,83 @@ const formatAction = (action,i) =>{
     }
 }
 
+const ProgramRulesGroup = (title,programRules,self=false) => {
+
+    const totalProgramRuleActions = programRules.reduce((total,rule) => total + rule.actions.length,0)
+
+    return (
+        <Accordion style={{marginTop:'1em'}}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon sx={{color:'#FFF'}} />} sx={{backgroundColor:'#2c6693', color:'#FFF'}}>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <RuleIcon color='inherit' style={{marginRight: '0.5em'}}/>
+                    <span style={{verticalAlign: 'center'}}>{title} ( Total  Rules: {programRules.length} , Total Actions: {totalProgramRuleActions} )</span>
+                </div>
+            </AccordionSummary>
+            <AccordionDetails>
+                {
+                    programRules.map((rule,i) => (
+                        <Accordion style={{marginTop:'1em'}} key={i} disabled={rule.actions.length === 0}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{backgroundColor:'#ebe9e9'}}>
+                                <div style={{ width:"100%", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gridTemplateRrows: "1fr"}}>
+                                    <div style={{ gridArea:"1", display:'flex', flexDirection:'column'}}>
+                                        <h4>{rule.name}</h4>
+                                        <span style={{marginTop:'1em'}}><strong>Condition: </strong><code>{rule.condition}</code></span>
+                                    </div>
+                                    <div style={{ gridArea:"1", textAlign:"center"}}>
+                                        <span style={{marginTop:'1em'}}><strong>Actions: </strong><code>{rule.actions.length}</code></span>
+                                    </div>
+                                </div>
+                                
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <List dense={true}>
+                                    {rule.actions.map((action,index)=>formatAction(action,index,self))}
+                                </List>
+                            </AccordionDetails>
+                        </Accordion>
+                    ))
+                }
+            </AccordionDetails>
+        </Accordion>
+    )
+}
+
 /**
  * props: program (program UID), dataElement (data element UID)
  */
 const ProgramRulesList = props => {
 
-    const { data: programRulesTrig } = useDataQuery(queryRules2, {variables: { program:props.program, prVars:props.variables } });
-    let programRulesTriggered = programRulesTrig?.results?.programRules?.filter(pr => pr.programRuleActions.length > 0 && (pr.program.id === props.program)).map(pr => ({
-        name:pr.name, 
-        actions: pr.programRuleActions//.filter(pra => pra.dataElement?.id === props.dataElement)
+    const [tab,setTab] = useState(0)
+
+    const { data: programRulesTrig } = useDataQuery(queryRules, {variables: { program:props.program, prVars:props.variables } });
+    let programRulesTriggered = programRulesTrig?.results?.programRules.filter(pr => pr.program.id === props.program).map(pr => ({
+        id: pr.id,
+        name: pr.name,
+        condition: pr.condition,
+        actions: pr.programRuleActions
     }))
 
     const { data: programRuleActions } = useDataQuery(queryActions, {variables: { program:props.program, dataElement:props.dataElement } });
-    let programRules = programRuleActions?.results?.programRuleActions?.reduce((acu,cur)=>{
-        if(acu[cur.programRule.name]) acu[cur.programRule.name].push(cur)
-        else acu[cur.programRule.name] = [cur]
-        return acu
-    },{})
-    if(programRules) programRules = Object.keys(programRules).map(rule => ({name:rule,actions:programRules[rule]}))
-
-    /* const { data: programRulesData } = useDataQuery(queryRules, {variables: { program:props.program, variable:props.variable } });
-    let programRulesTriggered = programRulesData?.results?.programRules?.map(pr => ({
-            name:pr.name, 
-            actions: pr.programRuleActions//.filter(pra => pra.dataElement?.id === props.dataElement)
-        })
-    ).filter(pr => pr.actions.length > 0) */
+    let programRulesActing = Object.values(
+        programRuleActions?.results?.programRuleActions?.reduce((rules,action) => {
+            if(!rules[action.programRule.id]) rules[action.programRule.id] = {id: action.programRule.id, name:action.programRule.name, condition: action.programRule.condition, actions: [action] }
+            else rules[action.programRule.id].actions.push(action)
+            return rules
+        },{}) ?? {}
+    )
 
     return (
-        <>
-            <Accordion style={{marginTop:'1em'}}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{color:'#FFF'}} />} sx={{backgroundColor:'#2c6693', color:'#FFF'}}>
-                    <div style={{display: 'flex', alignItems: 'center'}}>
-                        <RuleIcon color='inherit' style={{marginRight: '0.5em'}}/>
-                        <span style={{verticalAlign: 'center'}}>Program Rules that affects this data element (Total: {programRules?.reduce((acu,cur) => acu + cur.actions?.length,0)})</span>
-                    </div>
-                </AccordionSummary>
-                <AccordionDetails>
-                    {
-                        Array.isArray(programRules) &&  programRules.map((rule,i) => (
-                            <Accordion style={{marginTop:'1em'}} key={i}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{backgroundColor:'#ebe9e9'}}>
-                                    <div style={{display:'flex', flexDirection:'column'}}>
-                                        <h4>{rule.name}</h4>
-                                        <span style={{marginTop:'1em'}}><strong>Condition: </strong><code>{rule.actions.at(0).programRule.condition}</code></span>
-                                    </div>
-
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    
-                                    <List dense={true}>
-                                        {rule.actions.map(formatAction)}
-                                    </List>
-                                </AccordionDetails>
-                            </Accordion>
-                        ))
-                    }
-                </AccordionDetails>
-            </Accordion>
-            <Accordion style={{marginTop:'1em'}}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{color:'#FFF'}} />} sx={{backgroundColor:'#2c6693', color:'#FFF'}}>
-                    <div style={{display: 'flex', alignItems: 'center'}}>
-                        <RuleIcon color='inherit' style={{marginRight: '0.5em'}}/>
-                        <span style={{verticalAlign: 'center'}}>Program Rules triggered by the data element (Total: {programRulesTriggered?.reduce((acu,cur) => acu + cur.actions?.length,0)})</span>
-                    </div>
-                </AccordionSummary>
-                <AccordionDetails>
-                    {
-                        Array.isArray(programRulesTriggered) &&  programRulesTriggered.map((rule,i) => (
-                            <Accordion style={{marginTop:'1em'}} key={i}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{backgroundColor:'#ebe9e9'}}>
-                                    <div style={{display:'flex', flexDirection:'column'}}>
-                                        <h4>{rule.name} (Total: {rule.actions?.length})</h4>
-                                        <span style={{marginTop:'1em'}}><strong>Condition: </strong><code>{rule.actions.at(0).programRule.condition}</code></span>
-                                    </div>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <List dense={true}>
-                                        {rule.actions.map(formatAction)}
-                                    </List>
-                                </AccordionDetails>
-                            </Accordion>
-                        ))
-                    }
-                </AccordionDetails>
-            </Accordion>
-        </>
+        <Box sx={{ width: '100%', marginTop:"1em", bgcolor: '#eeeeee', padding:"1em" }}>
+            <Tabs centered
+                value={tab}
+                onChange={(prev,current)=>setTab(current)}
+            >
+                <Tab icon={<RuleIcon />} iconPosition="start" label="Program Rules triggered by this Data Element" />
+                <Tab icon={<RuleIcon />} iconPosition="start" label="Program Rules acting over this Data Element" />
+            </Tabs>
+            {programRulesTriggered && tab===0 && ProgramRulesGroup("Program Rules triggered by this Data Element",programRulesTriggered)}
+            {programRulesActing && tab===1 && ProgramRulesGroup("Program Rules acting over this Data Element",programRulesActing,true)}
+        </Box>
     )
 
 }
