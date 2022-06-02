@@ -317,6 +317,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     };
 
     const commit = () => {
+        setAddedSection(undefined)
         if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
         let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
         setRemovedElements(removed)
@@ -582,7 +583,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                             )}
                         </Droppable>
                         {hnqisMode && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />}
-                        {hnqisMode && <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />}
+                        {hnqisMode && <Scores stageSection={scoresSection} index={0} key={scoresSection.id} program={programId}/>}
 
                     </div>
                 </div>

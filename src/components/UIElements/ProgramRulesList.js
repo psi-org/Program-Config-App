@@ -1,4 +1,4 @@
-import {useState} from "react"
+import {useState,useEffect} from "react"
 import { useDataQuery } from '@dhis2/app-runtime';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -67,6 +67,21 @@ const queryRules = {
     }
 }
 
+/**
+ * PROGRAM RULE FOR CURRENT SCORE
+ */
+ const scoreActions = {
+    results: {
+        resource: 'programRuleActions',
+        params: ({program,compositiveIndicator}) => (
+        {
+            filter: [`programRule.program.id:eq:${program}`,`content:like:_CV_CS${compositiveIndicator}`],
+            fields: ['programRuleActionType,data,content,dataElement[id,name],programRule[id,name,condition]'],
+            pageSize: 1000
+        })
+    }
+}
+
 const formatAction = (action,i,self) =>{
     const ListItemStyle = { minHeight:'5em' }
 
@@ -79,8 +94,9 @@ const formatAction = (action,i,self) =>{
                     </Avatar>
                 </ListItemAvatar>
                 <ListItemText
+                    style={{overflowWrap:'break-word'}}
                     primary={
-                    <span><strong>Assign value: </strong><i>{action.data}</i> <br/><strong>To: </strong>{action.dataElement.name} <code>[{action.dataElement.id}]</code></span>}
+                    <span><strong>Assign value: </strong><i>{action.data}</i> <br/><strong>To: </strong>{action.dataElement?.name ?? action.content} <code>[{action.dataElement?.id ?? ''}]</code></span>}
                 />
             </ListItem>
 
@@ -165,12 +181,12 @@ const ProgramRulesGroup = (title,programRules,self=false) => {
                     programRules.map((rule,i) => (
                         <Accordion style={{marginTop:'1em'}} key={i} disabled={rule.actions.length === 0}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{backgroundColor:'#ebe9e9'}}>
-                                <div style={{ width:"100%", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gridTemplateRrows: "1fr"}}>
-                                    <div style={{ gridArea:"1", display:'flex', flexDirection:'column'}}>
+                                <div style={{ width:"100%", display: "grid", gridTemplateColumns: "2fr 1fr", gridTemplateRrows: "1fr"}}>
+                                    <div style={{  display:'flex', flexDirection:'column'}}>
                                         <h4>{rule.name}</h4>
                                         <span style={{marginTop:'1em'}}><strong>Condition: </strong><code>{rule.condition}</code></span>
                                     </div>
-                                    <div style={{ gridArea:"1", textAlign:"center"}}>
+                                    <div style={{  textAlign:"center"}}>
                                         <span style={{marginTop:'1em'}}><strong>Actions: </strong><code>{rule.actions.length}</code></span>
                                     </div>
                                 </div>
@@ -196,7 +212,7 @@ const ProgramRulesList = props => {
 
     const [tab,setTab] = useState(0)
 
-    const { data: programRulesTrig } = useDataQuery(queryRules, {variables: { program:props.program, prVars:props.variables } });
+    const { data: programRulesTrig, refetch: refetchProgramRulesTrig } = useDataQuery(queryRules, {lazy:true, variables: { program:props.program, prVars:props.variables } });
     let programRulesTriggered = programRulesTrig?.results?.programRules.filter(pr => pr.program.id === props.program).map(pr => ({
         id: pr.id,
         name: pr.name,
@@ -213,17 +229,41 @@ const ProgramRulesList = props => {
         },{}) ?? {}
     )
 
+    const { data: scoreRuleActions, refetch: refetchScoreActions } = useDataQuery(scoreActions, {lazy: true, variables: { program:props.program, compositiveIndicator:props.compositiveIndicator } });
+    let programRulesScore = Object.values(
+        scoreRuleActions?.results?.programRuleActions?.reduce((rules,action) => {
+            if(!rules[action.programRule.id]) rules[action.programRule.id] = {id: action.programRule.id, name:action.programRule.name, condition: action.programRule.condition, actions: [action] }
+            else rules[action.programRule.id].actions.push(action)
+            return rules
+        },{}) ?? {}
+    )
+
+    useEffect(()=>{
+        // Get ProgramRulesTrig
+        if(!props.compositiveIndicator) refetchProgramRulesTrig({variables: { program:props.program, prVars:props.variables }})
+
+        // Get Score Program Rules
+        if(props.compositiveIndicator) refetchScoreActions({variables: { program:props.program, compositiveIndicator:props.compositiveIndicator }})
+    },[])
+
+    useEffect(()=>{
+        //console.log(tab)
+    },[tab])
+
     return (
         <Box sx={{ width: '100%', marginTop:"1em", bgcolor: '#eeeeee', padding:"1em" }}>
             <Tabs centered
                 value={tab}
                 onChange={(prev,current)=>setTab(current)}
             >
-                <Tab icon={<RuleIcon />} iconPosition="start" label="Program Rules triggered by this Data Element" />
                 <Tab icon={<RuleIcon />} iconPosition="start" label="Program Rules acting over this Data Element" />
+                {!props.compositiveIndicator && <Tab icon={<RuleIcon />} iconPosition="start" label="Program Rules triggered by this Data Element" />}
+                {props.compositiveIndicator && <Tab icon={<RuleIcon />} iconPosition="start" label="Score Program Rule" />}
             </Tabs>
-            {programRulesTriggered && tab===0 && ProgramRulesGroup("Program Rules triggered by this Data Element",programRulesTriggered)}
-            {programRulesActing && tab===1 && ProgramRulesGroup("Program Rules acting over this Data Element",programRulesActing,true)}
+            {programRulesActing && tab===0 && ProgramRulesGroup("Program Rules acting over this Data Element",programRulesActing,true)}
+            {!props.compositiveIndicator && programRulesTriggered && tab===1 && ProgramRulesGroup("Program Rules triggered by this Data Element",programRulesTriggered)}
+            {props.compositiveIndicator && programRulesScore && tab===1 && ProgramRulesGroup("Score Program Rule",programRulesScore)}
+            
         </Box>
     )
 
