@@ -44,7 +44,7 @@ const query = {
 const queryId = {
     results: {
         resource: 'system/id.json',
-        params: ({ n }) => ({ limit: 6 })
+        params: { limit: 6 }
     }
 };
 
@@ -63,6 +63,7 @@ const queryTEType = {
         resource: 'trackedEntityTypes',
         params: {
             fields: ['id', 'name'],
+            paging: false
         }
     }
 };
@@ -85,6 +86,16 @@ const queryCatCombos = {
             filter: ['dataDimensionType:eq:ATTRIBUTE'],
             paging: false
         }
+    }
+};
+
+const queryAvailablePrefix = {
+    results: {
+        resource: 'programs',
+        params: ({ dePrefix, program }) => ({
+            fields: ['id'],
+            filter: [`attributeValues.value:like:"dePrefix":"${dePrefix}"`, `name:!eq:${program}`]
+        })
     }
 };
 
@@ -181,6 +192,7 @@ const ProgramNew = (props) => {
 
     const { data: trackedEntityAttributes, refetch: findTEAttributes } = useDataQuery(queryTEAttributes, { lazy: true });
     const { data: categoryCombos, refetch: findCategoryCombos } = useDataQuery(queryCatCombos, { lazy: true });
+    const { data: existingPrefixes, refetch: checkForExistingPrefix } = useDataQuery(queryAvailablePrefix, { lazy: true, variables: { dePrefix: undefined, program:undefined } });
 
     const [programId, setProgramId] = useState(props.data?.id);
     const [assessmentId, setAssessmentId] = useState(undefined);
@@ -389,143 +401,156 @@ const ProgramNew = (props) => {
             setSentForm(false)
             return
         }
-        if (!metadataRequest.called && dataIsValid) {
 
-            let prgrm = DeepCopy(props.data) || DeepCopy(Program);
-            let programStages = undefined;
-            let programStageSections = undefined;
+        //Validating available prefix
+        checkForExistingPrefix({dePrefix, program: (props.data?.name || ' ')}).then(data => {
+            console.log(data)
+            if(data.results?.programs.length>0){
+                validationErrors.prefix = `The specified Data Element Prefix is already in use`
+                setValidationErrors({ ...validationErrors })
+                setSentForm(false)
+                return
+            }
 
-            prgrm.name = programName;
-            prgrm.shortName = programShortName;
-            prgrm.id = programId;
+            if (!metadataRequest.called && dataIsValid) {
 
-            prgrm.style = {}
-            if (programIcon) prgrm.style.icon = programIcon
-            if (programColor) prgrm.style.color = programColor
-
-            if (pgrTypePCA === 'hnqis') {
-                //HNQIS2 Programs
-                let criticalSteps = undefined;
-
-                if (!props.data) {
-                    Object.assign(prgrm, hnqisProgramConfigs)
-                    prgrm.attributeValues.push({
-                        "value": "HNQIS2",
-                        "attribute": { "id": prgTypeId }
-                    });
-                    prgrm.programStages.push({ id: assessmentId });
-                    prgrm.programStages.push({ id: actionPlanId });
-
-                    let assessmentStage = DeepCopy(PS_AssessmentStage);
-                    assessmentStage.id = assessmentId;
-                    assessmentStage.name = assessmentStage.name;
-                    assessmentStage.programStageSections.push({ id: defaultSectionId });
-                    assessmentStage.programStageSections.push({ id: stepsSectionId });
-                    assessmentStage.programStageSections.push({ id: scoresSectionId });
-                    assessmentStage.program.id = programId;
-
-                    let actionPlanStage = DeepCopy(PS_ActionPlanStage);
-                    actionPlanStage.id = actionPlanId;
-                    actionPlanStage.name = actionPlanStage.name;
-                    actionPlanStage.program.id = programId;
-
-                    let defaultSection = DeepCopy(PSS_Default);
-                    defaultSection.id = defaultSectionId;
-                    defaultSection.programStage.id = assessmentId;
-                    //defaultSection.name = defaultSection.name
-
-                    criticalSteps = DeepCopy(PSS_CriticalSteps);
-                    criticalSteps.id = stepsSectionId;
-                    criticalSteps.programStage.id = assessmentId;
-                    //criticalSteps.name = criticalSteps.name
-
-                    let scores = DeepCopy(PSS_Scores);
-                    scores.id = scoresSectionId;
-                    scores.name = scores.name;
-                    scores.programStage.id = assessmentId;
-                }
-
-                if (!useCompetency) {
-                    removeCompetencyAttribute(prgrm.programTrackedEntityAttributes);
-                    //Fix required here v
-                    if (props.data) {
+                let prgrm = props.data?DeepCopy(props.data):DeepCopy(Program);
+                let programStages = undefined;
+                let programStageSections = undefined;
+    
+                prgrm.name = programName;
+                prgrm.shortName = programShortName;
+                prgrm.id = programId;
+    
+                prgrm.style = {}
+                if (programIcon) prgrm.style.icon = programIcon
+                if (programColor) prgrm.style.color = programColor
+    
+                if (pgrTypePCA === 'hnqis') {
+                    //HNQIS2 Programs
+                    let criticalSteps = undefined;
+    
+                    if (!props.data) {
+                        Object.assign(prgrm, hnqisProgramConfigs)
+                        prgrm.attributeValues.push({
+                            "value": "HNQIS2",
+                            "attribute": { "id": prgTypeId }
+                        });
+                        prgrm.programStages.push({ id: assessmentId });
+                        prgrm.programStages.push({ id: actionPlanId });
+    
+                        let assessmentStage = DeepCopy(PS_AssessmentStage);
+                        assessmentStage.id = assessmentId;
+                        assessmentStage.name = assessmentStage.name;
+                        assessmentStage.programStageSections.push({ id: defaultSectionId });
+                        assessmentStage.programStageSections.push({ id: stepsSectionId });
+                        assessmentStage.programStageSections.push({ id: scoresSectionId });
+                        assessmentStage.program.id = programId;
+    
+                        let actionPlanStage = DeepCopy(PS_ActionPlanStage);
+                        actionPlanStage.id = actionPlanId;
+                        actionPlanStage.name = actionPlanStage.name;
+                        actionPlanStage.program.id = programId;
+    
+                        let defaultSection = DeepCopy(PSS_Default);
+                        defaultSection.id = defaultSectionId;
+                        defaultSection.programStage.id = assessmentId;
+                        //defaultSection.name = defaultSection.name
+    
+                        criticalSteps = DeepCopy(PSS_CriticalSteps);
+                        criticalSteps.id = stepsSectionId;
+                        criticalSteps.programStage.id = assessmentId;
+                        //criticalSteps.name = criticalSteps.name
+    
+                        let scores = DeepCopy(PSS_Scores);
+                        scores.id = scoresSectionId;
+                        scores.name = scores.name;
+                        scores.programStage.id = assessmentId;
+                    }
+    
+                    if (!useCompetency) {
+                        removeCompetencyAttribute(prgrm.programTrackedEntityAttributes);
+                        //Fix required here v
+                        if (props.data) {
+                            criticalSteps = prgrm.programStages.map(pStage => pStage.programStageSections
+                            ).flat().find(section =>
+                                section.dataElements.find(de => de.id === "VqBfZjZhKkU")
+                            )
+                        }
+    
+                        prgrm.programStages = prgrm.programStages.map(ps => ({id:ps.id}))
+    
+                        removeCompetencyClass(criticalSteps.dataElements);
+                    }else if (useCompetency && props.data) {
                         criticalSteps = prgrm.programStages.map(pStage => pStage.programStageSections
                         ).flat().find(section =>
                             section.dataElements.find(de => de.id === "VqBfZjZhKkU")
                         )
+                        criticalSteps.dataElements = [
+                            {id: "VqBfZjZhKkU"},
+                            {id: "pzWDtDUorBt"},
+                            {id: "NAaHST5ZDTE"}
+                        ]
                     }
-
-                    prgrm.programStages = prgrm.programStages.map(ps => ({id:ps.id}))
-
-                    removeCompetencyClass(criticalSteps.dataElements);
-                }else if (useCompetency && props.data) {
-                    criticalSteps = prgrm.programStages.map(pStage => pStage.programStageSections
-                    ).flat().find(section =>
-                        section.dataElements.find(de => de.id === "VqBfZjZhKkU")
-                    )
-                    criticalSteps.dataElements = [
-                        {id: "VqBfZjZhKkU"},
-                        {id: "pzWDtDUorBt"},
-                        {id: "NAaHST5ZDTE"}
-                    ]
-                }
-
-                createOrUpdateMetaData(prgrm.attributeValues);
-
-                if (!props.data) {
-                    programStages = [assessmentStage, actionPlanStage]
-                    programStageSections = [defaultSection, criticalSteps, scores]
+    
+                    createOrUpdateMetaData(prgrm.attributeValues);
+    
+                    if (!props.data) {
+                        programStages = [assessmentStage, actionPlanStage]
+                        programStageSections = [defaultSection, criticalSteps, scores]
+                    } else {
+                        programStageSections = criticalSteps?[criticalSteps]:undefined
+                    }
+    
                 } else {
-                    programStageSections = criticalSteps?[criticalSteps]:undefined
-                }
-
-            } else {
-                //Tracker Programs
-                prgrm.trackedEntityType = { "id": programTET.id }
-                prgrm.programTrackedEntityAttributes = []
-                prgrm.attributeValues = []
-                prgrm.categoryCombo = categoryCombo !== '' ? { id: categoryCombo.id } : undefined
-                programTEAs.selected.forEach((selectedTEA, index) => {
-                    let newTEA = programTEAs.available.find(tea => tea.id === selectedTEA)
-                    prgrm.programTrackedEntityAttributes.push({
-                        trackedEntityAttribute: { id: newTEA.id },
-                        mandatory: false,
-                        valueType: newTEA.valueType,
-                        searchable: false,
-                        displayInList: true,
-                        sortOrder: (index + 1)
+                    //Tracker Programs
+                    prgrm.trackedEntityType = { "id": programTET.id }
+                    prgrm.programTrackedEntityAttributes = []
+                    prgrm.attributeValues = []
+                    prgrm.categoryCombo = categoryCombo !== '' ? { id: categoryCombo.id } : undefined
+                    programTEAs.selected.forEach((selectedTEA, index) => {
+                        let newTEA = programTEAs.available.find(tea => tea.id === selectedTEA)
+                        prgrm.programTrackedEntityAttributes.push({
+                            trackedEntityAttribute: { id: newTEA.id },
+                            mandatory: false,
+                            valueType: newTEA.valueType,
+                            searchable: false,
+                            displayInList: true,
+                            sortOrder: (index + 1)
+                        })
                     })
+    
+                    createOrUpdateMetaData(prgrm.attributeValues);
+                }
+    
+                // If editing only send program
+                let metadata = props.data
+                    ? {
+                        programs: [prgrm],
+                        programStageSections: programStageSections
+                    } : {
+                        programs: [prgrm],
+                        programStages,
+                        programStageSections
+                    }
+    
+                metadataRequest.mutate({ data: metadata }).then(response => {
+                    if (response.status != 'OK') {
+                        props.setNotification({
+                            message: response.typeReports[0].objectReports[0].errorReports.map(er => er.message).join(' | '),
+                            severity: 'error'
+                        });
+                        props.setShowProgramForm(false);
+                    } else {
+                        props.setNotification({ message: `Program ${prgrm.name} ${!props.data ? 'created' : 'updated'} successfully`, severity: 'success' });
+                        props.setShowProgramForm(false);
+                        props.programsRefetch();
+                        props.doSearch(prgrm.name);
+                    }
                 })
-
-                createOrUpdateMetaData(prgrm.attributeValues);
             }
 
-            // If editing only send program
-            let metadata = props.data
-                ? {
-                    programs: [prgrm],
-                    programStageSections: programStageSections
-                } : {
-                    programs: [prgrm],
-                    programStages,
-                    programStageSections
-                }
-
-            metadataRequest.mutate({ data: metadata }).then(response => {
-                if (response.status != 'OK') {
-                    props.setNotification({
-                        message: response.typeReports[0].objectReports[0].errorReports.map(er => er.message).join(' | '),
-                        severity: 'error'
-                    });
-                    props.setShowProgramForm(false);
-                } else {
-                    props.setNotification({ message: `Program ${prgrm.name} ${!props.data ? 'created' : 'updated'} successfully`, severity: 'success' });
-                    props.setShowProgramForm(false);
-                    props.programsRefetch();
-                    props.doSearch(prgrm.name);
-                }
-            })
-        }
+        })
     }
 
     function createOrUpdateMetaData(attributeValues) {

@@ -3,7 +3,7 @@ import React from 'react'
 
 import classes from './App.module.css'
 import { useDataQuery } from "@dhis2/app-runtime";
-import { MIN_VERSION, MAX_VERSION } from './configs/Constants';
+import { MIN_VERSION, MAX_VERSION, PCA_ATTRIBUTES, PCA_OPTIONS, PCA_USER_ROLES, PCA_OPTION_SETS } from './configs/Constants';
 import { versionIsValid } from './configs/Utils';
 
 /**
@@ -60,10 +60,10 @@ const App = () => {
     const versionValid = serverInfo?versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION):true
 
     const pcaReady = availableMetadata?
-        availableMetadata.attributes.length >= 2 &&
-        availableMetadata.optionSets.length >= 1 &&
-        availableMetadata.userRoles.length >= 1 &&
-        availableMetadata.options.length >= 4
+        availableMetadata.attributes.filter(att => PCA_ATTRIBUTES.includes(att.id)).length >= PCA_ATTRIBUTES.length &&
+        availableMetadata.optionSets.filter(os => PCA_OPTION_SETS.includes(os.id)).length >= PCA_OPTION_SETS.length &&
+        availableMetadata.userRoles.filter(role => PCA_USER_ROLES.includes(role.id)).length >= PCA_USER_ROLES.length &&
+        availableMetadata.options.filter(opt => PCA_OPTIONS.includes(opt.id)).length >= PCA_OPTIONS.length
         : undefined;
     
     const errorPage = !versionValid

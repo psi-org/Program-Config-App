@@ -4,7 +4,7 @@ import { useDataMutation } from '@dhis2/app-runtime'
 import { useState } from "react";
 import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 import metadataPackage from './pcaMetadataPackage.json'
-import {NAMESPACE,PCA_METADATA_VERSION} from '../../configs/Constants'
+import {NAMESPACE,PCA_METADATA_VERSION,DATASTORE_PCA_METADATA} from '../../configs/Constants'
 
 const metadataMutation = {
     resource: 'metadata',
@@ -13,7 +13,7 @@ const metadataMutation = {
 };
 
 const dataStoreMutation = {
-    resource: `dataStore/${NAMESPACE}/pcaMetadata?encrypt=true`,
+    resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}?encrypt=true`,
     type: 'create',
     data: ({ data }) => data
 };
@@ -43,7 +43,6 @@ const MetadataErrorPage = () => {
             } else {
                 //Success
                 let dsData = {
-                    user:'',
                     version:PCA_METADATA_VERSION,
                     date: new Date()
                 }

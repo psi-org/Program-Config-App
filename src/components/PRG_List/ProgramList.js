@@ -24,6 +24,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 
 import About from "./About";
+import H2Metadata from "./H2Metadata";
 
 
 const queryProgramType = {
@@ -77,7 +78,9 @@ const ProgramList = () => {
 
     const [settingsMenu,setSettingsMenu] = useState(false)
     const [ref, setRef] = useState();
+
     const [aboutModal,setAboutModal] = useState(false);
+    const [H2Modal,setH2Modal] = useState(false);
 
     useEffect(() => {
         if (notification) setSnackSeverity(notification.severity)
@@ -131,7 +134,7 @@ const ProgramList = () => {
                             <Popper reference={ref} placement="bottom-end">
                                 <FlyoutMenu>
                                     <MenuItem label="About PCA" icon={<InfoIcon />} onClick={() => { setSettingsMenu(false); setAboutModal(true); }} />
-                                    <MenuItem label="Install HNQIS2 Metadata" icon={<InstallDesktopIcon />} onClick={()=>{ setSettingsMenu(false); }}/>
+                                    <MenuItem label="HNQIS2 Status" icon={<InstallDesktopIcon />} onClick={()=>{ setSettingsMenu(false); setH2Modal(true) ;}}/>
                                 </FlyoutMenu>
                             </Popper>
                         </Layer>
@@ -220,7 +223,9 @@ const ProgramList = () => {
                     {notification?.message}
                 </Alert>
             </Snackbar>
+
             {aboutModal && <About aboutModal={aboutModal} setAboutModal={setAboutModal} /> }
+            {H2Modal && <H2Metadata H2Modal={H2Modal} setH2Modal={setH2Modal} /> }
         </div>
     );
 };

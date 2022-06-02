@@ -16,8 +16,18 @@ const MIN_VERSION = "2.36.0"
 const MAX_VERSION = "2.38.0"
 
 const PCA_METADATA_VERSION = "1.0.0"
+const H2_METADATA_VERSION = "1.0.0"
+
+const PCA_ATTRIBUTES = ["yB5tFAAN7bI","haUflNqP85K"]
+const PCA_OPTION_SETS = ["TOcCuCN2CLm"]
+const PCA_OPTIONS = ["Ip3IqzzqgLN","Jz4YKD15lnK","QR0HHcQri91","v9XPATv6G3N"]
+const PCA_USER_ROLES = ["QbYqOgwk5fJ"]
+
+const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'numeric',minute:'numeric',second:'numeric',hour12:false }
 
 const NAMESPACE = "programconfigapp"
+const DATASTORE_PCA_METADATA = "PCAMetadata"
+const DATASTORE_H2_METADATA = "H2Metadata"
 
 const PERIOD_TYPES = [
     {label: "Daily", value: "Daily"},
@@ -102,7 +112,14 @@ export {
     REPORT_DATE_TO_USE,
     METADATA,
     NAMESPACE,
+    DATASTORE_PCA_METADATA,
+    DATASTORE_H2_METADATA,
     PCA_METADATA_VERSION,
+    PCA_ATTRIBUTES,
+    PCA_OPTION_SETS,
+    PCA_OPTIONS,
+    PCA_USER_ROLES,
+    H2_METADATA_VERSION,
     COMPETENCY_ATTRIBUTE,
     COMPETENCY_CLASS,
     FEEDBACK_ORDER,
@@ -122,5 +139,6 @@ export {
     MAX_SHORT_NAME_LENGTH,
     ELEM_TYPES,
     VALUE_TYPES,
-    AGG_TYPES
+    AGG_TYPES,
+    DATE_FORMAT_OPTIONS
 }
