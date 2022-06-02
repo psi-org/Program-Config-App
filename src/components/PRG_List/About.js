@@ -4,7 +4,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
-import LogoUrl from "./../../images/dhis2-app-icon.png"
+import LogoUrl from "./../../images/PCA-logo.png"
 
 const queryPCAMetadata = {
     results: {
@@ -28,7 +28,7 @@ const About = (props) => {
             <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => props.setAboutModal(false)}>
                 About <strong><em>Program Config App</em></strong>
             </CustomMUIDialogTitle >
-            <DialogContent dividers style={{padding: '1em 2em', display: 'flex', gap: '1em' }}>
+            <DialogContent dividers style={{padding: '1em 2em', display: 'grid', gridTemplateColumns: '3fr 2fr' }}>
                 <div style={{width:"80%", display: 'flex', flexDirection:'column', gap: '1em' }}>
                     <div><strong>Version</strong> : {BUILD_VERSION}</div>
                     <div><strong>Build date</strong> : {BUILD_DATE}</div>
@@ -65,7 +65,7 @@ const About = (props) => {
                     </div>
                 </div>
                 <div style={{display:'flex', alignItems:'center', justifyContent:'center'}}>
-                    <img src={LogoUrl} alt="Logo" />
+                    <img src={LogoUrl} alt="Logo" style={{maxWidth:'100%'}}/>
                 </div>
             </DialogContent>
             <DialogActions style={{ padding: '1em' }}></DialogActions>
