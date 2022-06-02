@@ -60,10 +60,10 @@ const App = () => {
     const versionValid = serverInfo?versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION):true
 
     const pcaReady = availableMetadata?
-        availableMetadata.attributes.filter(att => PCA_ATTRIBUTES.includes(att.id)).length >= PCA_ATTRIBUTES.length &&
-        availableMetadata.optionSets.filter(os => PCA_OPTION_SETS.includes(os.id)).length >= PCA_OPTION_SETS.length &&
-        availableMetadata.userRoles.filter(role => PCA_USER_ROLES.includes(role.id)).length >= PCA_USER_ROLES.length &&
-        availableMetadata.options.filter(opt => PCA_OPTIONS.includes(opt.id)).length >= PCA_OPTIONS.length
+        availableMetadata.attributes?.filter(att => PCA_ATTRIBUTES.includes(att.id)).length >= PCA_ATTRIBUTES.length &&
+        availableMetadata.optionSets?.filter(os => PCA_OPTION_SETS.includes(os.id)).length >= PCA_OPTION_SETS.length &&
+        availableMetadata.userRoles?.filter(role => PCA_USER_ROLES.includes(role.id)).length >= PCA_USER_ROLES.length &&
+        availableMetadata.options?.filter(opt => PCA_OPTIONS.includes(opt.id)).length >= PCA_OPTIONS.length
         : undefined;
     
     const errorPage = !versionValid

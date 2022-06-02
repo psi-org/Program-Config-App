@@ -1,6 +1,6 @@
 import LoadingButton from "@mui/lab/LoadingButton";
 import { NoticeBox } from "@dhis2/ui";
-import { useDataMutation } from '@dhis2/app-runtime'
+import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 import { useState } from "react";
 import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 import metadataPackage from './pcaMetadataPackage.json'
@@ -12,9 +12,21 @@ const metadataMutation = {
     data: ({ data }) => data
 };
 
+const queryDataStore = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}`
+    }
+};
+
 const dataStoreMutation = {
     resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}?encrypt=true`,
     type: 'create',
+    data: ({ data }) => data
+};
+
+const dataStoreMutationUpdate = {
+    resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}?encrypt=true`,
+    type: 'update',
     data: ({ data }) => data
 };
 
@@ -29,7 +41,11 @@ const MetadataErrorPage = () => {
         called: metadataDM[1].called
     };
 
-    const [sendToDataStore] = useDataMutation(dataStoreMutation)
+    const { data: pcaMetadataData } = useDataQuery(queryDataStore);
+
+    const [dataStoreCreate] = useDataMutation(dataStoreMutation)
+    const [dataStoreUpdate] = useDataMutation(dataStoreMutationUpdate)
+    
 
 
     const [error, setError] = useState(false)
@@ -46,6 +62,7 @@ const MetadataErrorPage = () => {
                     version:PCA_METADATA_VERSION,
                     date: new Date()
                 }
+                let sendToDataStore = !pcaMetadataData?.results ? dataStoreCreate : dataStoreUpdate
                 sendToDataStore({data:dsData}).then(res => {
                     if(res.status!= 'OK') setError(res)
                     else window.location.reload()
