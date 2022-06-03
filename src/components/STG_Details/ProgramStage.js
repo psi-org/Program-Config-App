@@ -27,6 +27,8 @@ const query = {
 
 const ProgramStage = () => {
 
+    const h2Ready = localStorage.getItem('h2Ready') === 'true'
+
     const {id} = useParams();
 
     if(id && id.length==11){
@@ -59,7 +61,17 @@ const ProgramStage = () => {
         return <span><CircularLoader /></span> 
     }
 
-    return <StageSections programStage={data.results} stageRefetch={refetch} hnqisMode={!!data.results.program.attributeValues.find(av=>av.value==="HNQIS2")}/>
+    const hnqisMode = !!data.results.program.attributeValues.find(av=>av.value==="HNQIS2")
+
+    if(hnqisMode && !h2Ready) return (
+        <div style={{margin:'2em'}}>
+            <NoticeBox title="H2 Metadata is missing or out of date" error>
+                <span>First go to <Link to="/">Home Screen</Link> and Install the latest H2 Metadata to continue</span>
+            </NoticeBox>
+        </div>
+    )
+
+    return <StageSections programStage={data.results} stageRefetch={refetch} hnqisMode={hnqisMode}/>
     
 }
 

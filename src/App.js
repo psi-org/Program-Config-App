@@ -3,7 +3,7 @@ import React from 'react'
 
 import classes from './App.module.css'
 import { useDataQuery } from "@dhis2/app-runtime";
-import { MIN_VERSION, MAX_VERSION, PCA_ATTRIBUTES, PCA_OPTIONS, PCA_USER_ROLES, PCA_OPTION_SETS } from './configs/Constants';
+import { MIN_VERSION, MAX_VERSION, PCA_ATTRIBUTES, PCA_OPTIONS, PCA_USER_ROLES, PCA_OPTION_SETS, H2_REQUIRED } from './configs/Constants';
 import { versionIsValid } from './configs/Utils';
 
 /**
@@ -48,12 +48,25 @@ const queryAvailableMetadata = {
     }
 };
 
+const queryH2AvailableMetadata = {
+    results : {
+        resource: 'metadata',
+        params:{
+            fields:['id'],
+            filter:[`id:in:[${Object.values(H2_REQUIRED).flat().join(',')}]`]
+        }
+    }
+}
+
 const App = () => {
+
     const serverInfoQuery = useDataQuery(queryServerInfo);
     const serverInfo = serverInfoQuery.data?.results;
 
     const availableMetadataQuery = useDataQuery(queryAvailableMetadata);
     const availableMetadata = availableMetadataQuery.data?.results;
+
+    const {data : availableH2Metadata} = useDataQuery(queryH2AvailableMetadata);
 
     if(serverInfo) window.localStorage.SERVER_VERSION = serverInfo.version
 
@@ -65,6 +78,13 @@ const App = () => {
         availableMetadata.userRoles?.filter(role => PCA_USER_ROLES.includes(role.id)).length >= PCA_USER_ROLES.length &&
         availableMetadata.options?.filter(opt => PCA_OPTIONS.includes(opt.id)).length >= PCA_OPTIONS.length
         : undefined;
+
+    const h2Ready = availableH2Metadata?.results && 
+        Object.keys(H2_REQUIRED).reduce((available,element) => 
+            available && (availableH2Metadata?.results[element]?.filter(opt => H2_REQUIRED[element].includes(opt.id)).length >= H2_REQUIRED[element].length
+        ) , true )
+    localStorage.setItem('h2Ready',String(h2Ready))
+    
     
     const errorPage = !versionValid
         ?VersionErrorPage

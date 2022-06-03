@@ -22,7 +22,7 @@ const query = {
         id: ({ program }) => program,
         params: {
             /* fields: ['id', 'displayName', 'programType', 'code', 'programStages[id,name,displayName,programStageSections]'] */
-            fields: ['id', 'displayName', 'programType', 'code', 'programStages[id,name,displayName,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements']
+            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues','programStages[id,name,displayName,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements']
         }
     },
 };
@@ -32,6 +32,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const ProgramDetails = () => {
+
+    const h2Ready = localStorage.getItem('h2Ready') === 'true'
 
     const { id } = useParams();
     const [showStageForm, setShowStageForm] = useState(false);
@@ -71,6 +73,16 @@ const ProgramDetails = () => {
         )
     }
     if (loading) { return <span><CircularLoader /></span> }
+
+    const hnqisMode = !!data.results.attributeValues.find(av=>av.value==="HNQIS2")
+
+    if(hnqisMode && !h2Ready) return (
+        <div style={{margin:'2em'}}>
+            <NoticeBox title="H2 Metadata is missing or out of date" error>
+                <span>First go to <Link to="/">Home Screen</Link> and Install the latest H2 Metadata to continue</span>
+            </NoticeBox>
+        </div>
+    )
 
     return (
         <div>

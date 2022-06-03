@@ -23,6 +23,14 @@ const PCA_OPTION_SETS = ["TOcCuCN2CLm"]
 const PCA_OPTIONS = ["Ip3IqzzqgLN","Jz4YKD15lnK","QR0HHcQri91","v9XPATv6G3N"]
 const PCA_USER_ROLES = ["QbYqOgwk5fJ"]
 
+const H2_REQUIRED = {
+    dataElements : ["NAaHST5ZDTE","VqBfZjZhKkU","pzWDtDUorBt","F0Qcr8ANr7t","DIoqtxbSJIL","nswci5V4j0d"],
+    optionSets : ["NDfZ129owtz","y752HEwvCGi"],
+    options : ["BNjofUBvlJ8","Ox6VQNmvuS3","SzQKvyTKPEw","NPw1hV4degm","lztu61LKSII","McXRLIwjDh7","xTJOcijWyaD","UgcqvJVJ9f0","aYWZXNhvXQw","C9L7MCPeHr5","c8qOHzSbhWM","imVa2DiLgrJ","r8UqKmXwXqa","RHreLvo1UWn","hX7DJdCN9Ou","xaBeYsM2hFH","jdVVvtwuJ7Y","e10afvAkkPR","OqRNLt5Nbub","MstdLcCaYZW","Jhn703YNPa1"],
+    trackedEntityTypes : ["oNwpeWkfoWc"],
+    attributes : ["LP171jpctBm","yhKEe6BLEer"]
+}
+
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'numeric',minute:'numeric',second:'numeric',hour12:false }
 
 const NAMESPACE = "programconfigapp"
@@ -140,5 +148,6 @@ export {
     ELEM_TYPES,
     VALUE_TYPES,
     AGG_TYPES,
-    DATE_FORMAT_OPTIONS
+    DATE_FORMAT_OPTIONS,
+    H2_REQUIRED
 }
