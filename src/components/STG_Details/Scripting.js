@@ -584,16 +584,19 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
     Object.keys(hideShowGroup).forEach(parentCode => {
         Object.keys(hideShowGroup[parentCode]).forEach(answer => {
 
+            let conditionValue
             // SHOW/HIDE WHEN....IS...
             let programRuleUid = uidPool.shift();
             let name = `PR - Show/Hide - Show when ${parentCode} is ${answer}`;
+
+            conditionValue = ["0","1"].includes(String(answer)) ? answer : `"${answer.replaceAll("'","")}"`
 
             const pr = {
                 id: programRuleUid,
                 name,
                 description:'_Scripted',
                 program: { id: programId },
-                condition: `#{${parentCode}}!=${answer}`,
+                condition: `!d2:hasValue(#{${parentCode}}) || (#{${parentCode}}!=${conditionValue})`,
                 programRuleActions: []
             };
 
@@ -606,7 +609,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
                 name: mfm_name,
                 description:'_Scripted',
                 program: { id: programId },
-                condition: `#{${parentCode}}==${answer}`,
+                condition: `d2:hasValue(#{${parentCode}}) && (#{${parentCode}}==${conditionValue})`,
                 programRuleActions: []
             };
 
@@ -669,7 +672,8 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
             pr.condition = `'true'`;
         } else {
             pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
-            pr.condition = `#{${hsRule.parent}}==${hsRule.condition}`;
+            let conditionValue = ["0","1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'","")}"`
+            pr.condition = `d2:hasValue(#{${hsRule.parent}}) && (#{${hsRule.parent}}==${conditionValue})`;
         }
 
         hsRule.actions.forEach(action => {
@@ -806,7 +810,7 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
             }
 
             // Get parents hide/show logic
-            if (metadata.parentQuestion && metadata.parentValue) {
+            if (metadata.parentQuestion!==undefined && metadata.parentValue!==undefined) {
                 let parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
                 let parentValue = String(metadata.parentValue);
 
