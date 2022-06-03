@@ -28,6 +28,9 @@ import { FormLabel } from '@mui/material';
 import StyleManager from '../UIElements/StyleManager';
 import { DeepCopy } from '../../configs/Utils';
 import { VolunteerActivismOutlined } from '@mui/icons-material';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import Tooltip from '@mui/material/Tooltip';
+
 
 //const { Form, Field } = ReactFinalForm
 
@@ -155,19 +158,13 @@ const hnqisProgramConfigs = {
             "sortOrder": 5
         }
     ],
-    "userGroupAccesses": [
-        {
-            "access": "rwrw----",
-            "id": "TOLEUuY7woR"
-        },
-        {
-            "access": "r-rw----",
-            "id": "QiJXeqMmXXQ"
-        }
-    ]
+    "userGroupAccesses": []
 }
 
 const ProgramNew = (props) => {
+
+    const h2Ready = localStorage.getItem('h2Ready') === 'true'
+
     // Create Mutation
     let metadataDM = useDataMutation(metadataMutation);
     const metadataRequest = {
@@ -611,7 +608,7 @@ const ProgramNew = (props) => {
                                 <em>None</em>
                             </MenuItem>
                             <MenuItem value={'tracker'}>Tracker Program</MenuItem>
-                            <MenuItem value={'hnqis'}>HNQIS 2.0</MenuItem>
+                            <MenuItem disabled={!h2Ready} value={'hnqis'}>HNQIS 2.0 {!h2Ready && <span style={{display:'flex', alignItems: 'center', marginLeft:'8px'}}>[Unavailable] <RemoveCircleOutlineIcon/></span>}</MenuItem>
                         </Select>
                         <FormHelperText>{validationErrors.pgrType}</FormHelperText>
                     </FormControl>

@@ -242,6 +242,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
             default:
                 break;
         }
+        console.log(elementsArray)
         elementsArray.forEach((elements) => {
             applySharing(elements);
         });

@@ -4,7 +4,7 @@ const Program = {
     "shortName": "programShortName",
     "programType": "WITH_REGISTRATION",
     "skipOffline": false,
-    "publicAccess": "--------",
+    "publicAccess": "rwrw----",
     "enrollmentDateLabel": "Enrollment date",
     "registration": true,
     "displayFrontPageList": true,
@@ -36,7 +36,7 @@ const PS_AssessmentStage = {
     "program": {"id": "programId"},
     "programStageDataElements": [],
     "programStageSections": [],
-    "publicAccess": "--------",
+    "publicAccess": "rwrw----",
     "remindCompleted": true,
     "repeatable": false,
     "reportDateToUse": "enrollmentDate",
@@ -45,16 +45,7 @@ const PS_AssessmentStage = {
         "color": "#ffff00",
         "icon": "clinical_fe_outline"
     },
-    "userGroupAccesses": [
-        {
-            "access": "rwrw----",
-            "id": "TOLEUuY7woR"
-        },
-        {
-            "access": "r-rw----",
-            "id": "QiJXeqMmXXQ"
-        }
-    ]
+    "userGroupAccesses": []
 }
 
 const PS_ActionPlanStage = {
@@ -88,21 +79,12 @@ const PS_ActionPlanStage = {
         }
     ],
     "programStageSections": [],
-    "publicAccess": "--------",
+    "publicAccess": "rwrw----",
     "remindCompleted": false,
     "repeatable": true,
     "sortOrder": 2,
     "style": {"color": "#00b0ff"},
-    "userGroupAccesses": [
-        {
-            "access": "rwrw----",
-            "id": "TOLEUuY7woR"
-        },
-        {
-            "access": "r-rw----",
-            "id": "QiJXeqMmXXQ"
-        }
-    ]
+    "userGroupAccesses": []
 }
 
 const PSS_Default = {

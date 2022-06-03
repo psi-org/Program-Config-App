@@ -21,8 +21,7 @@ const query = {
         resource: 'programs',
         id: ({ program }) => program,
         params: {
-            /* fields: ['id', 'displayName', 'programType', 'code', 'programStages[id,name,displayName,programStageSections]'] */
-            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues','programStages[id,name,displayName,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements']
+            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues','programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements']
         }
     },
 };
@@ -78,7 +77,7 @@ const ProgramDetails = () => {
 
     if(hnqisMode && !h2Ready) return (
         <div style={{margin:'2em'}}>
-            <NoticeBox title="H2 Metadata is missing or out of date" error>
+            <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
                 <span>First go to <Link to="/">Home Screen</Link> and Install the latest H2 Metadata to continue</span>
             </NoticeBox>
         </div>
@@ -110,7 +109,14 @@ const ProgramDetails = () => {
                         {
                             data.results.programStages.map((programStage) => {
                                 return (
-                                    <StageItem stage={programStage} key={programStage.id} setNotification={setNotification} stagesRefetch={refetch} setNewStage={setNewStage} editStatus={newStage?.stage===programStage.id && newStage?.mode }/>
+                                    <StageItem
+                                        stage={programStage}
+                                        key={programStage.id}
+                                        setNotification={setNotification}
+                                        stagesRefetch={refetch}
+                                        setNewStage={setNewStage}
+                                        editStatus={newStage?.stage===programStage.id && newStage?.mode }
+                                    />
                                 )
                             })
                         }

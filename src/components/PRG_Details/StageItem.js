@@ -22,7 +22,6 @@ import Chip from '@mui/material/Chip';
 import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DownloadIcon from '@mui/icons-material/Download';
 
 const StageItem = ({stage,setNotification,stagesRefetch,setNewStage,editStatus}) => {
 
@@ -58,7 +57,7 @@ const StageItem = ({stage,setNotification,stagesRefetch,setNewStage,editStatus})
               <Popper reference={ref} placement="bottom-end">
                   <FlyoutMenu>
                       <MenuItem label="Edit Program Stage" icon={<EditIcon />} onClick={() => { toggle(); editStage(stage); }} />
-                      {/* <MenuItem disabled={true} destructive label="Delete Program Stage" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} /> */}
+                      <MenuItem disabled={true} destructive label="Delete Program Stage" icon={<DeleteIcon />} onClick={() => { toggle(); /* Add function */}} />
                   </FlyoutMenu>
               </Popper>
           </Layer>

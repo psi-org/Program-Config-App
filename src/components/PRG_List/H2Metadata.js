@@ -64,6 +64,7 @@ const H2Metadata = (props) => {
                     if(res.status!= 'OK') setError(res)
                     else {
                         setSuccess(true)
+                        localStorage.setItem('h2Ready',String(true))
                         hnqis2MetadataRefetch()
                     }
                 })
