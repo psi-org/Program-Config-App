@@ -52,7 +52,6 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         if(type=='label') data[importMap.valueType] = 'LONG_TEXT';
         
         code = programPrefix + '_' + data[importMap.parentName]?.result;
-        //console.log(data[importMap.parentName]);
         switch(data[importMap.valueType]){
             case 'TEXT':
             case 'LONG_TEXT':
@@ -238,8 +237,6 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
     );
     importSummaryValues.scores.removed = removedScores.length;
     importSummaryValues.scores.removedItems = removedScores;
-
-    //console.log(importSummaryValues);
 
     return {importedSections,importedScores,importSummaryValues};
 

@@ -33,7 +33,6 @@ const Scores = ({ stageSection, program, index }) => {
     const [scoreRules,setScoreRules] = useState(false)
 
     useEffect(()=>{
-        console.log(scoreRules)
     },[scoreRules])
 
     const showIssues = function(dataElements) {

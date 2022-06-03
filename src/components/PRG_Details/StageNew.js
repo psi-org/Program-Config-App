@@ -173,7 +173,6 @@ const StageNew = (props) => {
         if (!metadataRequest.called && dataIsValid) {
 
             let stage = JSON.parse(JSON.stringify(PS_Generic))
-            console.log(stage)
             stage.id = props.data?.id ?? stageUid
             stage.name = stageName
             if (description) stage.description = description

@@ -189,7 +189,6 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
 
                     let parentId = importedDataElements.find(ide => ide.parentName == de.parentQuestion)?.id;
                     metadata.parentQuestion = parentId;
-                    //console.log(metadata);
 
                     attributeValues[metadataIndex].value = JSON.stringify(metadata);
                 }

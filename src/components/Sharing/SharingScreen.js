@@ -226,7 +226,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
             default:
                 break;
         }
-        console.log("type ", type, " id ", id, " permission: ", permission);
+        
         usersNGroups = availableUserGroups();
     }
 
@@ -250,13 +250,11 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                 // statusRef.current.textContent = `{<h4>Sharing Stats</h4><br/><hr/><ul><li>Created: ${stats.created}</li><li>Updated: ${stats.updated}</li><li>Deleted: ${stats.deleted}</li><li>Ignored: ${stats.ignored}</li><li>Total: ${stats.total}</li></ul>}`;
                 if (response.status !== 'OK') {
                     setContent('status');
-                    console.error("Something went wrong");
+                    
                 } else {
                     setContent('status');
                     let stats = response?.stats;
                     setImportStatus(stats);
-                    console.log("Status: ", importStatus);
-                    console.log("Success saving data");
                 }
             });
     }

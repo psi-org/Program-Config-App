@@ -45,7 +45,6 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
 
     let classNames = '';
     
-    if(!dataElement.attributeValues) console.log(dataElement)
     let metadata = dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value;
     if(metadata) metadata=JSON.parse(metadata);
     let renderFormName = metadata?.labelFormName;

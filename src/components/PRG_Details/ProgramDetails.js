@@ -40,7 +40,7 @@ const ProgramDetails = () => {
     const [newStage,setNewStage] = useState()
 
     useEffect(()=>{
-        console.log(newStage)
+        
     },[newStage])
 
     useEffect(() => {

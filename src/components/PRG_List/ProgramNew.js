@@ -286,7 +286,6 @@ const ProgramNew = (props) => {
 
     const handleChangeTEAs = (res) => {
         programTEAs.selected = res.selected
-        console.log(programTEAs)
         setProgramTEAs(DeepCopy(programTEAs))
     }
 
@@ -404,7 +403,6 @@ const ProgramNew = (props) => {
 
         //Validating available prefix
         checkForExistingPrefix({dePrefix, program: (props.data?.name || ' ')}).then(data => {
-            console.log(data)
             if(data.results?.programs.length>0){
                 validationErrors.prefix = `The specified Data Element Prefix is already in use`
                 setValidationErrors({ ...validationErrors })

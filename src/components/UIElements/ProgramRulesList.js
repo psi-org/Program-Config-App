@@ -247,7 +247,7 @@ const ProgramRulesList = props => {
     },[])
 
     useEffect(()=>{
-        //console.log(tab)
+        
     },[tab])
 
     return (
