@@ -21,8 +21,7 @@ const query = {
         resource: 'programs',
         id: ({ program }) => program,
         params: {
-            /* fields: ['id', 'displayName', 'programType', 'code', 'programStages[id,name,displayName,programStageSections]'] */
-            fields: ['id', 'displayName', 'programType', 'code', 'programStages[id,name,displayName,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements']
+            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues','programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements']
         }
     },
 };
@@ -33,10 +32,17 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const ProgramDetails = () => {
 
+    const h2Ready = localStorage.getItem('h2Ready') === 'true'
+
     const { id } = useParams();
     const [showStageForm, setShowStageForm] = useState(false);
     const [notification, setNotification] = useState(undefined);
     const [snackSeverity, setSnackSeverity] = useState(undefined);
+    const [newStage,setNewStage] = useState()
+
+    useEffect(()=>{
+        
+    },[newStage])
 
     useEffect(() => {
         if (notification) setSnackSeverity(notification.severity)
@@ -67,6 +73,16 @@ const ProgramDetails = () => {
     }
     if (loading) { return <span><CircularLoader /></span> }
 
+    const hnqisMode = !!data.results.attributeValues.find(av=>av.value==="HNQIS2")
+
+    if(hnqisMode && !h2Ready) return (
+        <div style={{margin:'2em'}}>
+            <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
+                <span>First go to <Link to="/">Home Screen</Link> and Install the latest H2 Metadata to continue</span>
+            </NoticeBox>
+        </div>
+    )
+
     return (
         <div>
             <div className="sub_nav">
@@ -93,7 +109,14 @@ const ProgramDetails = () => {
                         {
                             data.results.programStages.map((programStage) => {
                                 return (
-                                    <StageItem stage={programStage} key={programStage.id} setNotification={setNotification} stagesRefetch={refetch} />
+                                    <StageItem
+                                        stage={programStage}
+                                        key={programStage.id}
+                                        setNotification={setNotification}
+                                        stagesRefetch={refetch}
+                                        setNewStage={setNewStage}
+                                        editStatus={newStage?.stage===programStage.id && newStage?.mode }
+                                    />
                                 )
                             })
                         }
@@ -102,7 +125,7 @@ const ProgramDetails = () => {
                         }
                     </div>
                 </div>
-                {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName}/>}
+                {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName} setNewStage={setNewStage}/>}
                 <Snackbar
                     anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                     open={notification !== undefined}

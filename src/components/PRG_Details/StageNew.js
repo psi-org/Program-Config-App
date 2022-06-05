@@ -173,7 +173,6 @@ const StageNew = (props) => {
         if (!metadataRequest.called && dataIsValid) {
 
             let stage = JSON.parse(JSON.stringify(PS_Generic))
-            console.log(stage)
             stage.id = props.data?.id ?? stageUid
             stage.name = stageName
             if (description) stage.description = description
@@ -213,6 +212,7 @@ const StageNew = (props) => {
                     props.setNotification({ message: `Program Stage '${stage.name}' ${props.data?.id?'updated':'created'} successfully`, severity: 'success' });
                     props.setShowStageForm(false);
                     props.stagesRefetch();
+                    props.setNewStage({stage:stage.id, mode:props.data?.id?'updated':'created'})
                 }
             })
         }

@@ -52,7 +52,6 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         if(type=='label') data[importMap.valueType] = 'LONG_TEXT';
         
         code = programPrefix + '_' + data[importMap.parentName]?.result;
-        //console.log(data[importMap.parentName]);
         switch(data[importMap.valueType]){
             case 'TEXT':
             case 'LONG_TEXT':
@@ -88,25 +87,25 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         parentName: data[importMap.parentName]?.result
     };
 
-    if(data[importMap.optionSet] && data[importMap.optionSet] != ""){
+    if(data[importMap.optionSet] && data[importMap.optionSet] !== ""){
         parsedDE.optionSet = { id: getOptionSetId(data[importMap.optionSet],optionSets) };
         parsedDE.optionSetValue = true
     }
-    if(data[importMap.legend] && data[importMap.legend] != ""){
+    if(data[importMap.legend] && data[importMap.legend] !== ""){
         parsedDE.legendSet = { id: getLegendSetId(data[importMap.legend],legendSets) };
         parsedDE.legendSets = [
             { id: getLegendSetId(data[importMap.legend],legendSets) }
         ];
     }
 
-    if (data[importMap.feedbackOrder] && data[importMap.feedbackOrder] != "") parsedDE.attributeValues.push(
+    if (data[importMap.feedbackOrder] && data[importMap.feedbackOrder] !== "") parsedDE.attributeValues.push(
         { 
             attribute: { id : FEEDBACK_ORDER },
             value: String(data[importMap.feedbackOrder])
         }
     );
 
-    if (data[importMap.feedbackOrder] && data[importMap.feedbackText] != "") parsedDE.attributeValues.push(
+    if (data[importMap.feedbackOrder] && data[importMap.feedbackText] !== "") parsedDE.attributeValues.push(
         { 
             attribute:{ id : FEEDBACK_TEXT },
             value: data[importMap.feedbackText] 
@@ -119,14 +118,14 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         elemType : type,
         varName : data[importMap.parentName]?.result
     };
-    if (data[importMap.scoreNum] != "") metadata.scoreNum = data[importMap.scoreNum];
-    if (data[importMap.scoreDen] != "") metadata.scoreDen = data[importMap.scoreDen];
+    if (data[importMap.scoreNum] !== "") metadata.scoreNum = data[importMap.scoreNum];
+    if (data[importMap.scoreDen] !== "") metadata.scoreDen = data[importMap.scoreDen];
 
-    if (data[importMap.parentQuestion]!=""){
+    if (data[importMap.parentQuestion]!==""){
         metadata.parentQuestion = data[importMap.parentQuestion];
         parsedDE.parentQuestion = data[importMap.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
     }
-    if (data[importMap.parentValue]!="") metadata.parentValue = data[importMap.parentValue];
+    if (data[importMap.parentValue]!=="") metadata.parentValue = data[importMap.parentValue];
     
     
 
@@ -238,8 +237,6 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
     );
     importSummaryValues.scores.removed = removedScores.length;
     importSummaryValues.scores.removedItems = removedScores;
-
-    //console.log(importSummaryValues);
 
     return {importedSections,importedScores,importSummaryValues};
 

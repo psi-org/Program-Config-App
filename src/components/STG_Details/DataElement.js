@@ -29,7 +29,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
 
-const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode}) => {
+import Chip from '@mui/material/Chip';
+
+const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode, deStatus}) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -43,7 +45,6 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
 
     let classNames = '';
     
-    if(!dataElement.attributeValues) console.log(dataElement)
     let metadata = dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value;
     if(metadata) metadata=JSON.parse(metadata);
     let renderFormName = metadata?.labelFormName;
@@ -86,7 +87,8 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
                             {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
                         </div>
                         <div className="ml_item-cta">
-                        <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>
+                            {deStatus && <Chip label={deStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{marginLeft:'1em'}} />}
+                            <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>
                             {openMenu &&
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
@@ -99,7 +101,7 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
                                     </Popper>
                                 </Layer>
                             }
-                            {/*<a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
+                            {/*<a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
                         </div>
                     </div>
                     { DEActions.deToEdit=== dataElement.id &&  

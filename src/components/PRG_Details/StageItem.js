@@ -17,12 +17,13 @@ import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expand_left_svg from './../../images/i-expand-left_black.svg';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
+import Chip from '@mui/material/Chip';
+
 import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DownloadIcon from '@mui/icons-material/Download';
 
-const StageItem = ({stage,setNotification,stagesRefetch}) => {
+const StageItem = ({stage,setNotification,stagesRefetch,setNewStage,editStatus}) => {
 
   const dispatch = useDispatch();
   const { setProgramStage } = bindActionCreators(actionCreators, dispatch);
@@ -33,7 +34,6 @@ const StageItem = ({stage,setNotification,stagesRefetch}) => {
   const toggle = () => setOpen(!open)
 
   const editStage = stage => {
-    console.log(stage)
     setShowStageForm(true)
   }
   return (
@@ -42,9 +42,12 @@ const StageItem = ({stage,setNotification,stagesRefetch}) => {
         <img className="ml_list-img" alt="prg" src={stg_svg} />
       </div>
       <div className="ml_item-title">
-        {stage.displayName}
+        <div>{stage.displayName}</div>
+        {editStatus && <Chip label={editStatus.toUpperCase()} color="success" className="blink-opacity-2" style={{marginLeft:'1em'}} /> }
       </div>
-      <div className="ml_item-desc"><div>{stage.programStageSections.length} program stages sections</div></div>
+      <div className="ml_item-desc">
+        <div>{stage.programStageSections.length} program stages sections</div>
+      </div>
       <div className="ml_item-warning_error ">
       </div>
       <div className="ml_item-cta">
@@ -54,7 +57,7 @@ const StageItem = ({stage,setNotification,stagesRefetch}) => {
               <Popper reference={ref} placement="bottom-end">
                   <FlyoutMenu>
                       <MenuItem label="Edit Program Stage" icon={<EditIcon />} onClick={() => { toggle(); editStage(stage); }} />
-                      {/* <MenuItem disabled={true} destructive label="Delete Program Stage" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} /> */}
+                      <MenuItem disabled={true} destructive label="Delete Program Stage" icon={<DeleteIcon />} onClick={() => { toggle(); /* Add function */}} />
                   </FlyoutMenu>
               </Popper>
           </Layer>
@@ -64,7 +67,17 @@ const StageItem = ({stage,setNotification,stagesRefetch}) => {
             <NavigateNextIcon/>
           </div>
         </Link>
-        {showStageForm &&  <StageNew programId={stage.program.id} setShowStageForm={setShowStageForm} setNotification={setNotification} stagesRefetch={stagesRefetch} programName={stage.program.name} data={stage}/> }
+        { 
+          showStageForm &&  
+          <StageNew 
+            programId={stage.program.id} 
+            setShowStageForm={setShowStageForm} 
+            setNotification={setNotification} 
+            stagesRefetch={stagesRefetch} 
+            programName={stage.program.name} 
+            data={stage} 
+            setNewStage={setNewStage} /> 
+        }
       </div>
     </div>
   );

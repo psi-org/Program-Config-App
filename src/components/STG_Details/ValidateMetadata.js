@@ -267,9 +267,7 @@ const ValidateMetadata = (props) => {
             if (feedbackOrderValidationSettings.enable) {
 
                 let feedbackData = getFeedbackData(sections)
-                //console.log(feedbackData)
                 let duplicatedFeedbacks = groupBy(checkDuplicatedFeedbacks(feedbackData), 'feedbackOrder')
-                //console.log(duplicatedFeedbacks)
 
                 if (feedbackOrderValidationSettings.checkDuplicated.enable) {
                     duplicatedFeedbacks.forEach(df => {
@@ -293,7 +291,6 @@ const ValidateMetadata = (props) => {
                         }
 
                         let result = compareFeddbackAandB(current.levels, next.levels)
-                        //console.log(current.val+' vs '+next.val+(!result?'':' <<<<<< Feedback Order Gap Found'))
                         if (result) {
                             let errorIndex = result.expectedIndex
                             let expected = []
@@ -333,7 +330,7 @@ const ValidateMetadata = (props) => {
 
         function checkFormNameLength(metaData, dataElement) {
             if (metaData.elem !== "") {
-                return (dataElement.formName.length <= MAX_DATA_ELEMENT_NAME_LENGTH && dataElement.formName.length >= MIN_DATA_ELEMENT_NAME_LENGTH)
+                return (dataElement.formName.length <= (MAX_DATA_ELEMENT_NAME_LENGTH+5) && dataElement.formName.length >= MIN_DATA_ELEMENT_NAME_LENGTH)
             }
             return true;
         }

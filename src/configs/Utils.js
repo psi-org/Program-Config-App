@@ -104,7 +104,20 @@ function versionCompare(v1, v2, options) {
   return 0;
 }
 
-export function versionIsValid(serverVersion, limit){
-  console.log(serverVersion, limit)
-  return versionCompare(serverVersion, limit) >= 0;
+export function versionIsValid(serverVersion, limitMin, limitMax){
+  return versionCompare(serverVersion, limitMin) >= 0 && versionCompare(serverVersion, limitMax) <= 0;
+}
+
+export function parseErrors(response){ 
+  return response.typeReports.reduce((reports,typeReport)=>
+      reports.concat(
+        typeReport.objectReports.map(objectReport => 
+          objectReport.errorReports.map(err => 
+            `<p>${err.message}</p>`
+          )
+        )
+      ),[]
+    )
+    .flat()
+    .join("") 
 }

@@ -18,6 +18,16 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiButton from '@mui/material/Button';
 
+import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
+import IconButton from '@mui/material/IconButton';
+import SettingsIcon from '@mui/icons-material/Settings';
+import InfoIcon from '@mui/icons-material/Info';
+import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
+
+import About from "./About";
+import H2Metadata from "./H2Metadata";
+
+
 const queryProgramType = {
     results: {
         resource: 'attributes',
@@ -36,7 +46,7 @@ const query = {
             let paramsObject = {
                 pageSize,
                 page,
-                fields: ["id", "name", "shortName", "displayName", "ignoreOverdueEvents", "skipOffline", "enrollmentDateLabel", "onlyEnrollOnce", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "selectEnrollmentDatesInFuture", "useFirstStageDuringRegistration", "completeEventsExpiryDays", "minAttributesRequiredToSearch", "displayFrontPageList", "programType", "accessLevel", "displayIncidentDate", "expiryDays", "style", "trackedEntityType", "translations", "attributeValues", "programTrackedEntityAttributes", "notificationTemplates", "organisationUnits", "programSections", "programStages"],
+                fields: ["code", "id", "name", "shortName", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "relatedProgram", "categoryCombo[id,name]", "trackedEntityType[id,name]", "style", "programTrackedEntityAttributes", "notificationTemplates", "translations", "organisationUnits", "programSections", "attributeValues", "programStages[id,name,programStageSections[*]]"],
                 filter: ['withoutRegistration:eq:false']
             }
 
@@ -80,8 +90,8 @@ const ProgramList = () => {
 
     // Export Program Metadata //
     const [exportProgramId, setExportProgramId] = useState(undefined)
-    const [ sharingProgramId, setSharingProgramId] = useState(undefined);
-    const [ orgUnitProgramId, setOrgUnitProgramId] = useState(undefined);
+    const [sharingProgramId, setSharingProgramId] = useState(undefined);
+    const [orgUnitProgramId, setOrgUnitProgramId] = useState(undefined);
 
     // *********************** //
 
@@ -93,11 +103,15 @@ const ProgramList = () => {
 
     const [filterValue, setFilterValue] = useState('')
 
+    const [settingsMenu,setSettingsMenu] = useState(false)
+    const [ref, setRef] = useState();
+
+    const [aboutModal,setAboutModal] = useState(false);
+    const [H2Modal,setH2Modal] = useState(false);
+
     useEffect(() => {
         if (notification) setSnackSeverity(notification.severity)
     }, [notification])
-
-    const [competencyClassParam, setCompetencyClassParam] = useState(false);
 
     const prgTypeQuery = useDataQuery(queryProgramType);
     const orgUnitMetaData = useDataQuery(orgUnitsQuery);
@@ -124,9 +138,10 @@ const ProgramList = () => {
     if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
     if (loading) return <CircularLoader />
 
-    const doSearch = () => {
+    const doSearch = (filter) => {
+        if (filter) setFilterValue(filter)
         setCurrentPage(1)
-        refetch({ token: filterValue, page: 1, pageSize })
+        refetch({ token: filter ?? filterValue, page: 1, pageSize })
     }
 
     return (
@@ -143,12 +158,25 @@ const ProgramList = () => {
                         disabled={showProgramForm}>
                         Add Program
                     </MuiButton>
+                    <IconButton color="inherit" onClick={()=>{setRef(document.getElementById('settingsMenu')); setSettingsMenu(!settingsMenu);}} id={'settingsMenu'}>
+                        <SettingsIcon/>
+                    </IconButton>
+                    {settingsMenu &&
+                        <Layer onClick={()=>setSettingsMenu(!settingsMenu)}>
+                            <Popper reference={ref} placement="bottom-end">
+                                <FlyoutMenu>
+                                    <MenuItem label="About PCA" icon={<InfoIcon />} onClick={() => { setSettingsMenu(false); setAboutModal(true); }} />
+                                    <MenuItem label="HNQIS2 Status" icon={<InstallDesktopIcon />} onClick={()=>{ setSettingsMenu(false); setH2Modal(true) ;}}/>
+                                </FlyoutMenu>
+                            </Popper>
+                        </Layer>
+                    }
                     {exportProgramId &&
-                    <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId} />
+                        <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId} />
                     }
                     {
                         sharingProgramId &&
-                        <SharingScreen element="program" id={sharingProgramId} setSharingProgramId={setSharingProgramId}/>
+                        <SharingScreen element="program" id={sharingProgramId} setSharingProgramId={setSharingProgramId} />
                     }
                     {
                         orgUnitProgramId &&
@@ -156,7 +184,7 @@ const ProgramList = () => {
                     }
                 </div>
             </div>
-            <div style={{margin: '0px 16px 8px'}}>
+            <div style={{ margin: '0px 16px 8px' }}>
                 <div className="title">List of programs</div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <TextField
@@ -168,26 +196,18 @@ const ProgramList = () => {
                         value={filterValue}
                         onChange={(event) => setFilterValue(event.target.value)}
                         onKeyPress={event => {
-                            if (event.key === 'Enter' /* && filterValue!=='' */) {
-                                /* if(currentPage===1)  */doSearch()
-                                /* else setCurrentPage(1) */
-                            }
+                            if (event.key === 'Enter') { doSearch() }
                         }}
-                        sx={{width: '100%'}}
+                        sx={{ width: '100%' }}
                         autoComplete='off'
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position='end'>
-                                    <MuiButton onClick={() => {
-                                        doSearch()
-                                        /* if (filterValue!=='') {
-                                            if(currentPage===1) doSearch()
-                                            else setCurrentPage(1)
-                                        } */
-                                    }}
-                                               startIcon={<SearchIcon />}
-                                               variant='contained'
-                                               color='primary'>
+                                    <MuiButton
+                                        onClick={() => {doSearch() }}
+                                        startIcon={<SearchIcon />}
+                                        variant='contained'
+                                        color='primary'>
                                         Search
                                     </MuiButton>
                                 </InputAdornment>
@@ -201,7 +221,18 @@ const ProgramList = () => {
                     <div className="list-ml_item">
                         {
                             data.results.programs.map((program) => {
-                                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} shareProgram={shareProgram} assignOrgUnit={assignOrgUnit} deleteProgram={deleteProgram} prgTypeId={prgTypeId} serverVersion={window.localStorage.SERVER_VERSION ?? "2.35"} />
+                                return <ProgramItem
+                                    program={program}
+                                    key={program.id}
+                                    downloadMetadata={downloadMetadata}
+                                    shareProgram={shareProgram}
+                                    assignOrgUnit={assignOrgUnit}
+                                    deleteProgram={deleteProgram}
+                                    prgTypeId={prgTypeId}
+                                    refetch={refetch}
+                                    setNotification={setNotification}
+                                    doSearch={doSearch}
+                                />
                             })
                         }
                     </div>
@@ -218,7 +249,7 @@ const ProgramList = () => {
                     onPageChange={(page) => { setCurrentPage(page); refetch({ page, pageSize }) }}
                 />
             </div>
-            {showProgramForm && <ProgramNew setShowProgramForm={setShowProgramForm} programsRefetch={refetch} setNotification={setNotification} />}
+            {showProgramForm && <ProgramNew setShowProgramForm={setShowProgramForm} programsRefetch={refetch} setNotification={setNotification} doSearch={doSearch} />}
 
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
@@ -230,6 +261,8 @@ const ProgramList = () => {
                 </Alert>
             </Snackbar>
 
+            {aboutModal && <About aboutModal={aboutModal} setAboutModal={setAboutModal} /> }
+            {H2Modal && <H2Metadata H2Modal={H2Modal} setH2Modal={setH2Modal} /> }
         </div>
     );
 };

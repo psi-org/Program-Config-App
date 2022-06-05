@@ -13,21 +13,21 @@ import PublicIcon from '@mui/icons-material/Public';
 
 // *** Routing ***
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 // *** IMAGES ***
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import tinycolor from 'tinycolor2';
-
-import { versionIsValid } from "../../configs/Utils";
-import { SHARINGS_LIMIT_VERSION } from "../../configs/Constants";
+import ProgramNew from "./ProgramNew";
+import { METADATA } from "../../configs/Constants";
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
-const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, deleteProgram, prgTypeId, serverVersion }) => {
+const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, deleteProgram, prgTypeId, refetch, setNotification, doSearch }) => {
     const [ref, setRef] = useState(undefined);
     const [open, setOpen] = useState(false)
+    const [showProgramForm, setShowProgramForm] = useState(false);
 
     const toggle = () => setOpen(!open)
 
@@ -43,9 +43,9 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, d
     }
 
     return (
-        <div className="ml_item" style={{ color: "#333333", backgroundColor: "#F8F8F8", border: "0.5px solid #D5DDE5", borderRadius: "4px" }}>
+        <div className="ml_item" style={{ color: "#333333", backgroundColor: "#F8F8F8", border: "0.5px solid #D5DDE5", borderRadius: "4px", padding: '5px' }}>
             <div className="ml_list-icon"> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
-                <div className="ml_item-desc" style={{ width: '3.2em' }}>
+                <div className="ml_item-desc" style={{ width: '3.2em'}}>
                     <div style={{backgroundColor:(program.style?.color || '#2c6693'), width:'3em', height:'3em', minWidth:'3em', minHeight:'3em', border: '1px solid #DDD', borderRadius:'10%', padding: '0'}}>
                         <img
                             src={`${(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)}/api/icons/${program.style?.icon || 'dhis2_logo_positive'}/icon.svg`}
@@ -55,7 +55,7 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, d
                 </div>
             </div>
             <div className="ml_item-title">
-                {program.displayName}
+                {program.name}
             </div>
             <div className="ml_item-desc">
                 <div style={{ backgroundColor: typeTag[programType].color, width: '85px', display: 'flex', justifyContent: 'center' }}>
@@ -69,16 +69,26 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, d
                     <Layer onClick={toggle}>
                         <Popper reference={ref} placement="bottom-end">
                             <FlyoutMenu>
-                                <MenuItem label="Edit Program" icon={<EditIcon />} onClick={() => { toggle(); /* Add function */ }} />
+                                <MenuItem label="Edit Program" icon={<EditIcon />} onClick={() => { toggle(); setShowProgramForm(true) }} />
                                 <MenuItem label="Sharing Settings" icon={<ShareIcon/>} onClick={()=>{toggle(); shareProgram(program.id)}}/>
                                 <MenuItem label={"Assign Organisation Unit"} icon={<PublicIcon/>} onClick={()=>{ toggle(); assignOrgUnit(program.id)}}/>
                                 <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={() => { toggle(); downloadMetadata(program.id) }} />
-                                <MenuItem disabled={/*!versionIsValid(serverVersion, SHARINGS_LIMIT_VERSION)*/ true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
+                                <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
                             </FlyoutMenu>
                         </Popper>
                     </Layer>
                 }
-
+                {showProgramForm &&
+                    <ProgramNew
+                        setShowProgramForm={setShowProgramForm}
+                        programsRefetch={refetch}
+                        setNotification={setNotification}
+                        doSearch={doSearch}
+                        data={program}
+                        programType={programType==='HNQIS2'?'hnqis':'tracker'}
+                        pcaMetadata={JSON.parse(program.attributeValues.find(av => av.attribute.id === METADATA)?.value || '{}')}
+                    />
+                }
                 <Link to={"/program/" + program.id} style={{ color: '#333333' }}>
                     <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setProgram(program.id)}>
                         <NavigateNextIcon />
