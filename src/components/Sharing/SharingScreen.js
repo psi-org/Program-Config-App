@@ -9,7 +9,6 @@ import Suggestions from "./Suggestions";
 import SharingOptions from "./SharingOptions";
 import ViewIcon from "@mui/icons-material/Visibility";
 import BlockIcon from "@mui/icons-material/Block";
-import CloseIcon from '@mui/icons-material/Close';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import {
@@ -82,7 +81,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     const [ overwrite, setOverwrite ] = useState(true);
     const [ deleted, setDeleted ] = useState([]);
 
-    const {loading, error, data, refetch} = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
+    const {loading, error, data} = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
     const {loading: entityLoading, data: entities} = useDataQuery(entitiesQuery);
     const {loading: metadataLoading, data: prgMetaData} = useDataQuery(programMetadata);
     const metadataDM = useDataMutation(metadataMutation);
@@ -296,7 +295,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
 
     return (
         <>
-            <Modal onClose={hideForm} style={{ maxWidth: "800px", minWidth: "600px"}}>
+            <Modal onClose={hideForm}>
                 <ModalTitle>Sharing settings</ModalTitle>
                 <ModalContent>
                     { content === 'loading' && <Box sx={{display: 'inline-flex'}}><CircularProgress/></Box> }

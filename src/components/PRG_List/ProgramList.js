@@ -13,6 +13,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ProgramItem from "./ProgramItem";
 import DependencyExport from "./DependencyExport";
 import SharingScreen from "../Sharing/SharingScreen";
+import OunitScreen from "../Org_Units/OunitScreen";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiButton from '@mui/material/Button';
@@ -46,6 +47,31 @@ const query = {
     }
 };
 
+const orgUnitsQuery = {
+    userOrgUnits: {
+        resource: 'me',
+        params: {
+            fields: ['organisationUnits[id, path]']
+        }
+    },
+    orgUnitGroups: {
+        resource: 'organisationUnitGroups',
+        params: {
+            paging: false,
+            fields: ['id','displayName'],
+            order: 'displayName'
+        }
+    },
+    orgUnitLevels: {
+        resource: 'organisationUnitLevels',
+        params: {
+            paging: false,
+            fields: ['id','level','displayName'],
+            order: 'level'
+        }
+    }
+}
+
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -55,6 +81,7 @@ const ProgramList = () => {
     // Export Program Metadata //
     const [exportProgramId, setExportProgramId] = useState(undefined)
     const [ sharingProgramId, setSharingProgramId] = useState(undefined);
+    const [ orgUnitProgramId, setOrgUnitProgramId] = useState(undefined);
 
     // *********************** //
 
@@ -73,6 +100,7 @@ const ProgramList = () => {
     const [competencyClassParam, setCompetencyClassParam] = useState(false);
 
     const prgTypeQuery = useDataQuery(queryProgramType);
+    const orgUnitMetaData = useDataQuery(orgUnitsQuery);
     const prgTypeId = prgTypeQuery.data?.results.attributes[0].id;
 
     const downloadMetadata = (program) => {
@@ -81,6 +109,10 @@ const ProgramList = () => {
 
     const shareProgram = (program) => {
         setSharingProgramId(program)
+    }
+
+    const assignOrgUnit = (program) => {
+        setOrgUnitProgramId(program)
     }
 
     const deleteProgram = (program) => {
@@ -117,6 +149,10 @@ const ProgramList = () => {
                     {
                         sharingProgramId &&
                         <SharingScreen element="program" id={sharingProgramId} setSharingProgramId={setSharingProgramId}/>
+                    }
+                    {
+                        orgUnitProgramId &&
+                            <OunitScreen id={orgUnitProgramId} orgUnitMetaData={orgUnitMetaData.data}  setOrgUnitProgramId={setOrgUnitProgramId}/>
                     }
                 </div>
             </div>
@@ -165,7 +201,7 @@ const ProgramList = () => {
                     <div className="list-ml_item">
                         {
                             data.results.programs.map((program) => {
-                                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} shareProgram={shareProgram} deleteProgram={deleteProgram} prgTypeId={prgTypeId} serverVersion={window.localStorage.SERVER_VERSION ?? "2.35"} />
+                                return <ProgramItem program={program} key={program.id} downloadMetadata={downloadMetadata} shareProgram={shareProgram} assignOrgUnit={assignOrgUnit} deleteProgram={deleteProgram} prgTypeId={prgTypeId} serverVersion={window.localStorage.SERVER_VERSION ?? "2.35"} />
                             })
                         }
                     </div>

@@ -9,10 +9,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
+import PublicIcon from '@mui/icons-material/Public';
 
 // *** Routing ***
 import { Link } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 // *** IMAGES ***
 import move_vert_svg from './../../images/i-more_vert_black.svg';
@@ -24,7 +25,7 @@ import { SHARINGS_LIMIT_VERSION } from "../../configs/Constants";
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
-const ProgramItem = ({ program, downloadMetadata, shareProgram, deleteProgram, prgTypeId, serverVersion }) => {
+const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, deleteProgram, prgTypeId, serverVersion }) => {
     const [ref, setRef] = useState(undefined);
     const [open, setOpen] = useState(false)
 
@@ -70,6 +71,7 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, deleteProgram, p
                             <FlyoutMenu>
                                 <MenuItem label="Edit Program" icon={<EditIcon />} onClick={() => { toggle(); /* Add function */ }} />
                                 <MenuItem label="Sharing Settings" icon={<ShareIcon/>} onClick={()=>{toggle(); shareProgram(program.id)}}/>
+                                <MenuItem label={"Assign Organisation Unit"} icon={<PublicIcon/>} onClick={()=>{ toggle(); assignOrgUnit(program.id)}}/>
                                 <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={() => { toggle(); downloadMetadata(program.id) }} />
                                 <MenuItem disabled={/*!versionIsValid(serverVersion, SHARINGS_LIMIT_VERSION)*/ true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
                             </FlyoutMenu>
