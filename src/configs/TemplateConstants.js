@@ -19,7 +19,10 @@ export const middleCenter = {
   horizontal: 'center'
 };
 export const conditionalError = {fill: {type: 'pattern', pattern: 'solid', bgColor: {argb: 'dc3545'}}};
+export const conditionalDisable = {fill: {type: 'pattern', pattern: 'solid', bgColor: {argb: 'b2bec3'}}};
 export const sectionHighlighting = {fill: {type: 'pattern', pattern: 'solid', bgColor: {argb: 'f8c291'}}};
+export const questionHighlighting = {fill: {type: 'pattern', pattern: 'solid', bgColor: {argb: 'ffffff'}}};
+export const labelHighlighting = {fill: {type: 'pattern', pattern: 'solid', bgColor: {argb: 'c6e0b4'}}};
 export const valueType = ['NUMBER', 'INTEGER', 'INTEGER_POSITIVE', 'INTEGER_ZERO_OR_POSITIVE', 'TEXT', 'LONG_TEXT', 'PERCENTAGE', 'DATE', 'TIME'];
 export const renderType = ['DEFAULT', 'DROPDOWN', 'VERTICAL_RADIOBUTTONS', 'HORIZONTAL_RADIOBUTTONS', 'VERTICAL_CHECKBOXES', 'HORIZONTAL_CHECKBOXES', 'VALUE'];
 export const aggOperator = ['NONE', 'SUM', 'AVERAGE', 'COUNT'];

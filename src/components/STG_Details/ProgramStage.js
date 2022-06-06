@@ -18,14 +18,16 @@ const query = {
         params: {
             fields:[
                 'id','name','allowGenerateNextVisit','publicAccess','reportDateToUse','formType','generatedByEnrollmentDate','displayFormName','sortOrder','hideDueDate','enableUserAssignment','minDaysFromStart','favorite','executionDateLabel','preGenerateUID','displayName','externalAccess','openAfterEnrollment','repeatable','remindCompleted','displayGenerateEventBox','validationStrategy','autoGenerateEvent','blockEntryForm','program[id,name,shortName,attributeValues]','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
-                'programStageDataElements[id,name,compulsory,programStage,dataElement[id,name,shortName,code,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],attributeValues,displayName],sortOrder]',
-                'programStageSections[id,name,displayName,sortOrder,dataElements[id,name,shortName,code,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],attributeValues,displayName]]',
+                'programStageDataElements[id,name,compulsory,displayInReports,programStage,dataElement[id,name,shortName,style,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName],sortOrder]',
+                'programStageSections[id,name,displayName,sortOrder,dataElements[id,name,shortName,style,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName]]'
             ]
         }
     }
 };
 
 const ProgramStage = () => {
+
+    const h2Ready = localStorage.getItem('h2Ready') === 'true'
 
     const {id} = useParams();
 
@@ -59,7 +61,17 @@ const ProgramStage = () => {
         return <span><CircularLoader /></span> 
     }
 
-    return <StageSections programStage={data.results} stageRefetch={refetch}/>
+    const hnqisMode = !!data.results.program.attributeValues.find(av=>av.value==="HNQIS2")
+
+    if(hnqisMode && !h2Ready) return (
+        <div style={{margin:'2em'}}>
+            <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
+                <span>First go to <Link to="/">Home Screen</Link> and Install the latest H2 Metadata to continue</span>
+            </NoticeBox>
+        </div>
+    )
+
+    return <StageSections programStage={data.results} stageRefetch={refetch} hnqisMode={hnqisMode}/>
     
 }
 

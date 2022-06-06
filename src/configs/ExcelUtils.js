@@ -78,6 +78,20 @@ export function fillBackgroundToRange(sheet, range, backgroundColor) {
   }
 }
 
+export function defineName(sheet, range, rangeName)
+{
+  let rangeParts = range.split(":");
+  let start = splitPosition(rangeParts[0]);
+  let end = splitPosition(rangeParts[1]);
+  for (let i = parseInt(start[1]); i <= parseInt(end[1]); i++) {
+    for (let j = character2Number(start[0]); j <= character2Number(end[0]); j++) {
+      const colChar = number2Character(j);
+      const cellAxis = colChar + i.toString();
+      sheet.getCell(cellAxis).name = rangeName;
+    }
+  }
+}
+
 export function applyStyleToRange(sheet, range, userStyle)
 {
   let rangeParts = range.split(":");

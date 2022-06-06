@@ -18,7 +18,7 @@ const Errors = (props) => {
             if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
                 $(this).attr('src', contracted_bottom_svg);
                 $(this).parent().parent().css({
-                    'margin': '0px',
+                    'margin': '8px 8px 0px 8px',
                     'border-radius': '4px 4px 0 0'
                 });
                 $(this).parent().parent().next().css({
@@ -27,7 +27,7 @@ const Errors = (props) => {
             } else {
                 $(this).attr('src', expanded_bottom_svg);
                 $(this).parent().parent().css({
-                    'margin': '0 0 8px',
+                    'margin': '0x',
                     'border-radius': '4px'
                 });
                 $(this).parent().parent().next().css({
@@ -44,60 +44,83 @@ const Errors = (props) => {
 
     return  (
                 <>
-                    <div className="ml_item" style={{ color: "#333333", backgroundColor: "#ff7675" }}>
-                        <div className="ml_item-icon_secondary">
-                            <img className="ml_list-img" alt="sec" src={error_svg} />
-                        </div>
-                        <div className="ml_item-title">
-                            Validation Errors | <span>{props.validationResults.questions.length + props.validationResults.scores.length} data elements</span>
-                        </div>
-                        <div className="ml_item-warning_error "></div>
-                        <div className="ml_item-cta">
-                            <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
-                            <img src={move_vert_svg} alt="menu" />
-                        </div>
+                <div className="ml_item" style={{color:"#333333" , backgroundColor: "#ff7675", border: "0.5px solid #ff7675", borderRadius: "4px"}}>
+                    <div className="ml_list-icon_secondary">
+                        <img className="ml_list-img" alt="sec" src={error_svg} />
                     </div>
-                    <div className="section_cont" style={{backgroundColor:"#fab1a0"}}>
-                        {
-                            props.validationResults.questions.map((question, i) => {
-                                let classNames = "ml_item";
-                                return (
-                                    <div id={"de_"+question.id} className={classNames} key={i} style={{backgroundColor:"#ffdad1"}}>
-                                        <div className="ml_item-icon">
-                                            <img src={error_svg} alt="error_dataElement" className="ml_list-img"/>
-                                        </div>
-                                        <div className="ml_item-title">
-                                            <div><strong>Question: </strong>{question.formName}</div>
-                                        </div>
-                                        <div className="ml_item-cta ml_item-warning_error" onClick={()=>showIssues([question])}>
-                                            {question.warnings && question.warnings.length > 0 && <BadgeWarnings counts={question.warnings.length}/> }
-                                            {question.errors && question.errors.length > 0 && <BadgeErrors counts={question.errors.length}/> }
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
-                        {
-                            props.validationResults.scores.map((score, i) => {
-                                let classNames = "ml_item";
-                                return (
-                                    <div id={"de_"+score.id} className={classNames} key={i} style={{backgroundColor:"#ffdad1"}}>
-                                        <div className="ml_item-icon">
-                                            <img src={error_svg} alt="error_dataElement" className="ml_list-img"/>
-                                        </div>
-                                        <div className="ml_item-title">
-                                            <div><strong>Score: </strong>{score.formName}</div>
-                                        </div>
-                                        <div className="ml_item-cta ml_item-warning_error" onClick={()=>showIssues([score])}>
-                                            {score.warnings && score.warnings.length > 0 && <BadgeWarnings counts={score.warnings.length}/> }
-                                            {score.errors && score.errors.length > 0 && <BadgeErrors counts={score.errors.length}/> }
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
+                    <div className="ml_item-title">
+                        Validation Errors | <span>{props.validationResults.questions.length + props.validationResults.scores.length + props.validationResults.feedbacks.reduce((acu,cur)=> acu+cur.instance.elements.length,0 )} data elements</span>
                     </div>
-                    {showValidationMessage && <ValidationMessages dataElements={errors} showValidationMessage={setShowValidationMessage} /> }
+                    <div className="ml_item-warning_error "></div>
+                    <div className="ml_item-cta">
+                        <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
+                        {/*<img src={move_vert_svg} alt="menu" />*/}
+                    </div>
+                </div>
+                <div className="section_cont" style={{backgroundColor:"#ffdad1"}}>
+                    {
+                        props.validationResults.questions.map((question, i) => {
+                            let deMetadata = JSON.parse(question.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
+                            let labelFormName = deMetadata.labelFormName;
+                            return (
+                                <div id={"de_" + question.id} className={"ml_item"} key={i} >
+                                    <div className="ml_item-icon">
+                                        <img src={error_svg} alt="error_dataElement" className="ml_list-img"/>
+                                    </div>
+                                    <div className="ml_item-title">
+                                        <div><strong>{labelFormName ? "[ Label ]" :"[ Question ]"} </strong>{labelFormName || question.formName}</div>
+                                    </div>
+                                    <div className="ml_item-warning_error" onClick={()=>showIssues([question])}>
+                                        {question.warnings && question.warnings.length > 0 && <BadgeWarnings counts={question.warnings.length}/> }
+                                        {question.errors && question.errors.length > 0 && <BadgeErrors counts={question.errors.length}/> }
+                                    </div>
+                                    
+                                </div>
+                            )
+                        })
+                    }
+                    {
+                        props.validationResults.scores.map((score, i) => {
+                            return (
+                                <div id={"de_" + score.id} className={"ml_item"} key={i} >
+                                    <div className="ml_item-icon">
+                                        <img src={error_svg} alt="error_dataElement" className="ml_list-img"/>
+                                    </div>
+                                    <div className="ml_item-title">
+                                        <div><strong>[ Score ] </strong>{score.formName}</div>
+                                    </div>
+                                    <div className="ml_item-warning_error" onClick={()=>showIssues([score])}>
+                                        {score.warnings && score.warnings.length > 0 && <BadgeWarnings counts={score.warnings.length}/> }
+                                        {score.errors && score.errors.length > 0 && <BadgeErrors counts={score.errors.length}/> }
+                                    </div>
+                                    
+                                </div>
+                            )
+                        })
+                    }
+                    {
+                        props.validationResults.feedbacks.map((error, i) => {
+                            return (
+                                <div id={"f_" + i} className={"ml_item"} key={i} >
+                                    <div className="ml_item-icon">
+                                        <img src={error_svg} alt="error_FeedbackOrder" className="ml_list-img"/>
+                                    </div>
+                                    <div className="ml_item-title">
+                                        <div><strong>[ Feedback Order {error.instance.feedbackOrder} ] </strong> {error.msg.text + ': ' + (!error.instance.expectedValues?error.instance.elements.join(', '):error.instance.expectedValues.join(' or '))+'.'}</div>
+                                        
+                                    </div>
+                                    <div className="ml_item-warning_error" >
+                                        {/* {score.warnings && score.warnings.length > 0 && <BadgeWarnings counts={score.warnings.length}/> }
+                                        {score.errors && score.errors.length > 0 && <BadgeErrors counts={score.errors.length}/> } */}
+                                    </div>
+                                    
+                                </div>
+                            )
+                        })
+                    }
+                    
+                </div>
+                {showValidationMessage && <ValidationMessages dataElements={errors} showValidationMessage={setShowValidationMessage} /> }
                 </>
             )
 }

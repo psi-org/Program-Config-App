@@ -15,32 +15,25 @@ import BadgeWarnings from "./BadgeWarnings";
 import BadgeErrors from "./BadgeErrors";
 import ValidationMessages from "./ValidationMessages";
 
-const Scores = ({ stageSection, index }) => {
+import LaunchIcon from '@mui/icons-material/Launch';
+import RuleIcon from '@mui/icons-material/Rule';
+import { Button, IconButton } from '@mui/material';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import CustomMUIDialog from './../UIElements/CustomMUIDialog'
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
+import ProgramRulesList from '../UIElements/ProgramRulesList';
+
+
+const FEEDBACK_ORDER = "LP171jpctBm";
+
+const Scores = ({ stageSection, program, index }) => {
     const [showValidationMessage, setShowValidationMessage] = useState(false);
     const [ errors, setErrors ] = useState([]);
-    useEffect(() => {
-        $('img.bsct_cta').off().on("click", function (e) {
-            if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
-                $(this).attr('src', contracted_bottom_svg);
-                $(this).parent().parent().css({
-                    'margin': '0px',
-                    'border-radius': '4px 4px 0 0'
-                });
-                $(this).parent().parent().next().css({
-                    'display': 'block'
-                });
-            } else {
-                $(this).attr('src', expanded_bottom_svg);
-                $(this).parent().parent().css({
-                    'margin': '0 0 8px',
-                    'border-radius': '4px'
-                });
-                $(this).parent().parent().next().css({
-                    'display': 'none'
-                });
-            }
-        });
-    }, []);
+    const [scoreRules,setScoreRules] = useState(false)
+
+    useEffect(()=>{
+    },[scoreRules])
 
     const showIssues = function(dataElements) {
         setShowValidationMessage(true);
@@ -58,8 +51,8 @@ const Scores = ({ stageSection, index }) => {
                 </div>
                 <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div></div>
                 <div className="ml_item-warning_error " onClick={()=>showIssues(stageSection.dataElements)}>
-                  {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
-                  {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
+                    {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
+                    {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                 </div>
                 <div className="ml_item-cta">
                     <img src={move_vert_svg} alt="menu" />
@@ -70,27 +63,52 @@ const Scores = ({ stageSection, index }) => {
                 {
                     stageSection.dataElements.map((dataElement, i) => {
                         let classNames = "ml_item" + ((dataElement.importStatus) ? ' import_' + dataElement.importStatus : '');
+                        let compositiveIndicator = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
                         return (
                             <div id={"de_" + dataElement.id} className={classNames} key={i}>
                                 <div className="ml_item-icon">
                                     <img className="ml_list-img" alt="de" src={scores_svg} />
                                 </div>
                                 <div className="ml_item-title">
-                                    {dataElement.formName}
+                                    {`[ ${compositiveIndicator} ] ${dataElement.formName}`}
                                 </div>
                                 <div className="ml_item-warning_error" onClick={()=>showIssues([dataElement])}>
                                     {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length}/> }
                                     {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
                                 </div>
                                 <div className="ml_item-cta">
-                                    <a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id}><img className="bsct_cta" alt="exp" src={contracted_bottom_svg} /></a>
+                                    <IconButton aria-label="Rules" color="success" onClick={()=>setScoreRules(dataElement)}>
+                                        <RuleIcon />
+                                    </IconButton>
+                                    <a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id} style={{textDecoration:'none',color:'black'}}>
+                                        <IconButton>
+                                            <LaunchIcon/>
+                                        </IconButton>
+                                    </a>
                                 </div>
                             </div>
                         )
-                        //return <DraggableDataElement dataElement={de} index={i} key={de.id} />;
                     })
                 }
                 {showValidationMessage && <ValidationMessages dataElements={errors} showValidationMessage={setShowValidationMessage} /> }
+                {scoreRules && (
+                    <CustomMUIDialog open={!!scoreRules} maxWidth='md' fullWidth={true} onClose={()=>setScoreRules(false)}>
+                        <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => setScoreRules(false)}>
+                            <strong><em>Related Program Rules</em></strong>
+                        </CustomMUIDialogTitle >
+                        <DialogContent dividers style={{ padding: '1em 2em', display:'flex', flexDirection:'column', gap:'1em' }}>
+                            <div style={{display:'flex', flexDirection:'column', gap:'1.5em'}}>
+                                <h3>Score: {`[${scoreRules.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value}] ${scoreRules.formName}`}</h3>
+                                <div>
+                                    <ProgramRulesList program={program} dataElement={scoreRules.id} variables={[]} compositiveIndicator={scoreRules.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value} />
+                                </div>
+                            </div>
+                        </DialogContent>
+                        <DialogActions style={{ padding: '1em' }}>
+                            <Button color={'error'} variant={'outlined'} onClick={() => setScoreRules(false)}>Close</Button>
+                        </DialogActions>
+                    </CustomMUIDialog>
+                )}
             </div>
         </div>
     );

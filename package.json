@@ -1,10 +1,11 @@
 {
   "name": "programconfigapp",
-  "short_name":"Program Config App",
+  "title": "Program Config App",
+  "short_name": "Program Config App",
   "author": "Fernando Gomez - Mario Lopez - Utsav Koju",
-  "version": "1.0.0-r.c.1",
-  "description": "",
-  "license": "BSD-3-Clause",
+  "version": "1.4.0",
+  "description":"Tracker Programs management tool",
+  "license": "CC-BY-4.0",
   "private": true,
   "scripts": {
     "build": "d2-app-scripts build",
@@ -14,19 +15,32 @@
   },
   "devDependencies": {
     "@dhis2/cli-app-scripts": "^8.3.2",
-    "react-scripts": "^0.8.4"
+    "react-error-overlay": "6.0.9"
+  },
+  "resolutions": {
+    "react-scripts/**/react-error-overlay": "6.0.9"
   },
   "dependencies": {
-    "@dhis2/app-runtime": "^3.2.0",
+    "@dhis2/app-runtime": "^3.2.9",
     "@dhis2/ui": "^7.2.0",
+    "@emotion/react": "^11.8.2",
+    "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.5.1",
+    "@mui/lab": "^5.0.0-alpha.79",
+    "@mui/material": "^5.5.2",
+    "@mui/x-data-grid": "^5.9.0",
+    "@uiw/react-md-editor": "^3.11.2",
     "exceljs": "^4.2.1",
     "file-saver": "^2.0.5",
     "jquery": "^3.6.0",
     "react-beautiful-dnd": "^13.1.0",
+    "react-color": "2.17.3",
     "react-redux": "^7.2.5",
     "react-router-dom": "^5.3.0",
     "react-sweet-progress": "^1.1.2",
     "redux": "^4.1.1",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "rehype-sanitize": "^5.0.1",
+    "tinycolor2": "^1.4.2"
   }
 }

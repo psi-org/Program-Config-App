@@ -1,28 +1,44 @@
 // DHIS2 UI
-import { Button, ButtonStrip, AlertBar, AlertStack, ComponentCover, CenteredContent, CircularLoader, Modal, ModalTitle, ModalContent, ModalActions, Chip, IconSync24 } from "@dhis2/ui";
-
-import download_svg from './../../images/i-download.svg';
-import upload_svg from './../../images/i-upload.svg';
+import { ButtonStrip, AlertBar, AlertStack, ComponentCover, CircularLoader, Chip, IconCheckmarkCircle24, IconCross24 } from "@dhis2/ui";
 
 // React Hooks
 import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DraggableSection from "./Section";
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
+import { FEEDBACK_ORDER, METADATA } from "../../configs/Constants";
 
-import { Progress } from 'react-sweet-progress';
 import "react-sweet-progress/lib/style.css";
 import Scores from "./Scores";
 import CriticalCalculations from "./CriticalCalculations";
 import DataProcessor from "../Excel/DataProcessor";
 import Importer from "../Excel/Importer";
 import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules } from "./Scripting";
-import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import SaveMetadata from "./SaveMetadata";
 import { Link } from "react-router-dom";
 import Removed from "./Removed";
 import ValidateMetadata from "./ValidateMetadata";
 import Errors from "./Errors";
+import ErrorReports from "./ErrorReports";
+
+import CachedIcon from '@mui/icons-material/Cached';
+import PublishIcon from '@mui/icons-material/Publish';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ConstructionIcon from '@mui/icons-material/Construction';
+import AddBoxIcon from '@mui/icons-material/AddBox';
+
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
+import CustomMUIDialog from './../UIElements/CustomMUIDialog'
+
+import SectionManager from './SectionManager'
+import DataElementManager from './DataElementManager'
+import { DeepCopy } from "../../configs/Utils";
 
 const createMutation = {
     resource: 'metadata',
@@ -67,42 +83,166 @@ const queryPRV = {
     }
 };
 
-const StageSections = ({ programStage, stageRefetch }) => {
+const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
 
     // Globals
-    const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
-        FEEDBACK_TEXT = "yhKEe6BLEer",
-        CRITICAL_QUESTION = "NPwvdTt0Naj",
-        METADATA = "haUflNqP85K",
-        SCORE_DEN = "l7WdLDhE3xW",
-        SCORE_NUM = "Zyr7rlDOJy8";
-
     const programId = programStage.program.id;
 
     // Flags
-    const [saveStatus, setSaveStatus] = useState('Validate');
+    const [saveStatus, setSaveStatus] = useState(hnqisMode?'Validate':'Save Changes');
     const [saveAndBuild, setSaveAndBuild] = useState(false);
     const [savingMetadata, setSavingMetadata] = useState(false);
     const [savedAndValidated, setSavedAndValidated] = useState(false)
     const [exportToExcel, setExportToExcel] = useState(false);
     //const { hasNotice, setHasNotice } = useState(false);
 
-    const [ exportStatus, setExportStatus] = useState("Download Template");
-    const [ importerEnabled, setImporterEnabled ] = useState(false);
-    const [ importResults, setImportResults] = useState(false);
-    const [ progressSteps,setProgressSteps ]= useState(0);
-    const [ isValid, setIsValid ] = useState(true);
-    const [ validationResults, setValidationResults] = useState(false);
+    const [exportStatus, setExportStatus] = useState("Download Template");
+    const [importerEnabled, setImporterEnabled] = useState(false);
+    const [importResults, setImportResults] = useState(false);
+    const [progressSteps, setProgressSteps] = useState(0);
+    const [isValid, setIsValid] = useState(true);
+    const [validationResults, setValidationResults] = useState(false);
 
+    const [editSectionIndex, setEditSectionIndex] = useState(undefined);
+    const [newSectionIndex, setNewSectionIndex] = useState(undefined);
+    const [showSectionManager, setShowSectionManager] = useState(false);
+
+    const [deToEdit, setDeToEdit] = useState('')
+
+    //const [snackbarContent, setSnackbarContent] = useState('')
+
+    const [snackParams, setSnackParams] = useState(false)
+    const pushNotification = (content, severity = "success") => setSnackParams({ content, severity })
+
+    const [uidPool, setUidPool] = useState([]);
+
+    useEffect(() => {
+        if (importerEnabled) {
+            setErrorReports(undefined)
+            setValidationResults(false)
+        }
+    }, [importerEnabled])
 
     // States
-    const [sections, setSections] = useState(programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations"));
-    const [scoresSection, setScoresSection] = useState(programStage.programStageSections.find(s => s.name == "Scores"));
-    const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"));
-    const [programStageDataElements, setProgramStageDataElements] = useState(programStage.programStageDataElements);
-    const [programMetadata,setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
+    const [removedElements, setRemovedElements] = useState([])
+    const [originalProgramStageDataElements,setOriginalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
+    const [sections, setSections] = useState(programStage.formType==="SECTION"
+        ?[...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
+        :[{name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement))}]
+    );
+    const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
+    const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations"));
+    const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
+    const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"));
+    const [errorReports, setErrorReports] = useState(undefined)
 
-    //console.info(sections);
+    const [addedSection,setAddedSection] = useState()
+
+    // REFETCH STAGE
+    const refetchProgramStage = (params={}) =>{
+        stageRefetch({variables : {programStage:programStage.id}}).then(data => {
+            let programStage = data.results
+            setOriginalProgramStageDataElements(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
+            setSections(programStage.formType==="SECTION"
+                ?[...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
+                :[{name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement))}]
+            )
+            setScoresSection({ ...programStage.programStageSections.find(s =>  hnqisMode && programStage.formType==="SECTION" && s.name === "Scores") })
+            setCriticalSection(programStage.programStageSections.find(s =>  hnqisMode && programStage.formType==="SECTION" && s.name === "Critical Steps Calculations"))
+            setProgramStageDataElements([...programStage.programStageDataElements])
+            setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"))
+        })
+    }
+
+    // ***** DATA ELEMENT ACTIONS ***** //
+    const updateDEValues = (dataElementId, sectionId, stageDataElement) => {
+
+        let sectionIdx = sections.findIndex(s => s.id === sectionId)
+        let section_DE_idx = sections[sectionIdx].dataElements.findIndex(de => de.id === dataElementId)
+        let stage_DE_idx = programStageDataElements.findIndex(psde => psde.dataElement.id === dataElementId)
+
+        programStageDataElements[stage_DE_idx] = stageDataElement
+        sections[sectionIdx].dataElements[section_DE_idx] = stageDataElement.dataElement
+
+        setProgramStageDataElements(programStageDataElements)
+        setSections(sections)
+        setDeToEdit('')
+        pushNotification(<span>Data Element edited! <strong>Remember to Validate and Save!</strong></span>)
+    }
+
+    const removeDE = (id, section) => {
+        let psdeIdx = programStageDataElements.findIndex(psde => psde.dataElement.id === id)
+        let sectionIdx = sections.find(s => s.id === section)?.dataElements.findIndex(de => de.id === id)
+
+        if (sectionIdx > -1 && psdeIdx > -1) {
+            sections.find(s => s.id === section)?.dataElements.splice(sectionIdx, 1)
+            programStageDataElements.splice(psdeIdx, 1)
+            setSections(sections)
+            setProgramStageDataElements(programStageDataElements)
+            pushNotification(<span>Data Element removed! <strong>Remember to Validate and Save!</strong></span>, "info")
+        }
+    }
+
+    const saveAdd = (params) => {
+
+        let dataElementObjects = params.newDataElements.map(psde => psde.dataElement)
+        let sectionIndex = sections.findIndex(s => s.id === params.deRef.section)
+        let toBeAdded = params.newDataElements.map(de => ({id:de.dataElement.id,mode:de.type}))
+        params.newDataElements.forEach(de => delete de.type)
+
+        sections.find(s => s.id === params.deRef.section).dataElements.splice(params.deRef.index, 0, ...dataElementObjects/* ...params.newDataElements */)
+        let newProgramStageDataElements = programStageDataElements.concat(params.newDataElements)
+
+        setSections(sections)
+        setProgramStageDataElements(newProgramStageDataElements)
+        setDeManager(false)
+        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to Validate and Save!</strong></span>)
+        setAddedSection({
+            index:sectionIndex,
+            mode:'Updated',
+            dataElements: toBeAdded
+        })
+    }
+
+    const [deManager, setDeManager] = useState(false)
+
+    const DEActions = {
+        deToEdit,
+        setEdit: de => setDeToEdit(de),
+        update: (de, section, stageDe) => updateDEValues(de, section, stageDe),
+        remove: (de, section) => removeDE(de, section),
+        add: (index, section) => setDeManager({
+            index,
+            section,
+            stage: programStage.id,
+            sectionName: sections.find(s => s.id === section).displayName
+        })
+    }
+    // ***** END OF DATA ELEMENT ACTIONS ***** //
+
+    // ***** SECTIONS ACTIONS ***** //
+    const handleSectionEdit = (section = undefined, newSection = undefined) => {
+        setEditSectionIndex(section)
+        setNewSectionIndex(newSection)
+        setShowSectionManager(true)
+    }
+
+    const removeSection = section => {
+        let idx = sections.findIndex(s => s.id === section.id)
+        let newPSDEs = programStageDataElements.filter(psde => !section.dataElements.find(de => de.id === psde.dataElement.id))
+        setProgramStageDataElements(newPSDEs)
+        sections.splice(idx, 1)
+        setSections(sections)
+        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to Validate and Save!</strong></span>, "info")
+    }
+
+    const SectionActions = {
+        append : () => handleSectionEdit(undefined,sections.length),
+        handleSectionEdit: (section = undefined, newSection = undefined) => handleSectionEdit(section, newSection),
+        remove: id => removeSection(id)
+    }
+
+    // ***** END OF SECTIONS ACTIONS ***** //
 
     // Create Mutation
     let metadataDM = useDataMutation(createMutation);
@@ -117,14 +257,26 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const deleteMetadata = useDataMutation(deleteMetadataMutation)[0];
 
     // Get Ids
-    const idsQuery = useDataQuery(queryIds, { variables: { n: programStage.programStageDataElements.length * 5 } });
-    const uidPool = idsQuery.data?.results.codes;
+    const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: programStage.programStageDataElements.length * 5 } });
+    //setUidPool(idsQuery.data?.results.codes);
 
     // Fetch Program Rules from Program
     const prDQ = useDataQuery(queryPR, { variables: { programId: programStage.program.id } });
 
     // Fetch Program Rule Variables from Program
     const prvDQ = useDataQuery(queryPRV, { variables: { programId: programStage.program.id } });
+
+    useEffect(() => {
+        let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection?.dataElements?.length + criticalSection?.dataElements?.length) * 5;
+        //No Sections , get minimum ids for core Program Rules
+        if (isNaN(n) || n < 50) n = 50
+
+        idsQuery.refetch({ n }).then(data => {
+            if (data) {
+                setUidPool(data.results.codes)
+            }
+        })
+    }, [sections]);
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
@@ -148,7 +300,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     result.source.index,
                     result.destination.index
                 );
-                setSaveStatus('Save & Validate');
+                setSaveStatus(hnqisMode?'Validate & Save':'Save Changes');
                 break;
             case 'DATA_ELEMENT':
                 if (result.source.droppableId == result.destination.droppableId) {
@@ -164,7 +316,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     let element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
                     newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
                 }
-                setSaveStatus('Save & Validate');
+                setSaveStatus(hnqisMode?'Validate & Save':'Save Changes');
                 break;
             default:
         }
@@ -172,63 +324,16 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     const commit = () => {
-
+        setAddedSection(undefined)
+        if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
+        let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
+        setRemovedElements(removed)
         setSavingMetadata(true);
         return;
-
-        // Program Stage Data Elements
-        var newDataElements = [];
-
-        // Program Stage Sections
-        var newSections = JSON.parse(JSON.stringify(sections)).map((section, sectionIdx) => {
-            //Set new order for each section
-            section.sortOrder = ++sectionIdx;
-            section.dataElements = section.dataElements.map((de, deIdx) => {
-                //Get new order for DE
-                let newDe = programStage.programStageDataElements.find(stageDE => stageDE.dataElement.id == de.id);
-                newDe.sortOrder = ++deIdx;
-                newDataElements.push(newDe);
-                return de;
-            });
-            return section;
-        });
-
-        // Critical Steps Calculation
-        criticalSection.sortOrder = newSections.length + 1;
-        criticalSection.dataElements.forEach((de, i) => {
-            let newDe = programStage.programStageDataElements.find(stageDE => stageDE.dataElement.id == de.id);
-            if (newDe) {
-                newDe.sortOrder = ++i;
-                newDataElements.push(newDe);
-            }
-        });
-        newSections.push(criticalSection);
-
-        // Scores
-        scoresSection.sortOrder = newSections.length + 2;
-        scoresSection.dataElements.forEach((de, i) => {
-            let newDe = programStage.programStageDataElements.find(stageDE => stageDE.dataElement.id == de.id);
-            if (newDe) {
-                newDe.sortOrder = ++i;
-                newDataElements.push(newDe);
-            }
-        });
-        newSections.push(scoresSection);
-
-        const metadata = {
-            programStages: [programStage],
-            programStageSections: programStage.programStageSections,
-            programStageDataElements: programStage.programStageDataElements
-        };
-
-        createMetadata.mutate({ data: metadata }).then(response => {
-            //console.info(response);
-            stageRefetch();
-            setSaveStatus(true);
-        });
     };
 
-    const configuration_download = () => {
+    const configuration_download = (e) => {
+        e.preventDefault();
         setExportToExcel(true);
         setExportStatus("Generating Configuration File...")
     };
@@ -238,7 +343,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     const run = () => {
-
         if (!savedAndValidated) return;
 
         // Set flag to enable/disable actions (buttons)
@@ -272,9 +376,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
         // III. Build new metadata
         // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
         setProgressSteps(3);
-        
-        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId,programMetadata.useCompetencyClass);
-        const { programRules, programRuleActions } = buildProgramRules(sections, programId, compositeScores, scoresMapping, uidPool,programMetadata.useCompetencyClass,programMetadata.healthArea); //useCompetencyClass
+
+        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
+        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
 
         const metadata = { programRuleVariables, programRules, programRuleActions };
 
@@ -289,50 +393,74 @@ const StageSections = ({ programStage, stageRefetch }) => {
         // V. Import new metadata
 
         deleteMetadata({ data: oldMetadata }).then((res) => {
-            setProgressSteps(5);
+            if (res.status == 'OK') {
+                setProgressSteps(5);
 
-            createMetadata.mutate({ data: metadata }).then(response => {
-                //console.log(response);
-                setSaveAndBuild('Completed');
-                setSavedAndValidated(false);
+                createMetadata.mutate({ data: metadata }).then(response => {
 
-                prDQ.refetch();
-                prvDQ.refetch();
-            });
+                    if (response.status == 'OK') {
+                        setSaveAndBuild('Completed');
+                        setSavedAndValidated(false);
+
+                        prDQ.refetch();
+                        prvDQ.refetch();
+                        setProgressSteps(6);
+                    }
+                });
+            }
+
         });
 
     }
 
+    const parseErrors = (e) => {
+        let data = e.typeReports.map(tr => {
+            let type = tr.klass.split('.').pop()
+            return tr.objectReports.map(or => or.errorReports.map(er => ({ type, uid: or.uid, errorCode: er.errorCode, message: er.message })))
+        })
+        return data.flat().flat()
+    }
+
     return (
         <div className="cont_stage">
-            <div className="sub_nav">
+            <div className="sub_nav align-items-center">
                 <div className="cnt_p">
-                <Link to={'/'}><Chip>Home</Chip></Link>/
+                    <Link to={'/'}><Chip>Home</Chip></Link>/
                     <Link to={'/program/' + programStage.program.id}><Chip>Program: {programStage.program.name}</Chip></Link>/
                     <Chip>Stage: {programStage.displayName}</Chip>
                 </div>
                 <div className="c_srch"></div>
-                <div className="c_btns">
-                <ButtonStrip>
-                    <Button disabled={createMetadata.loading} onClick={() => commit()}>{saveStatus}</Button>
-                    <Button disabled={!savedAndValidated} primary onClick={() => run()}>Set up program</Button>
-                    <Button name="generator"
-                        loading={exportToExcel ? true : false} onClick={() => configuration_download()} disabled={exportToExcel}><img src={download_svg} /> {exportStatus}</Button>
-                    <Button name="importer"
-                        onClick={() => setImporterEnabled(true)}><img src={upload_svg} /> Import Template</Button>
-                    <Button name="Reload" icon={<IconSync24/>} onClick={()=> {window.location.reload()}}>Reload</Button>
-                </ButtonStrip>
+                <div className="c_btns" style={{ color: '#444444' }}>
+                    <ButtonStrip>
+                        {programStage.formType==="SECTION" &&
+                            <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
+                        }
+                        {hnqisMode && programStage.formType==="SECTION" &&
+                            <>
+                                <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
+                                <Button color='inherit' variant='outlined' startIcon={!exportToExcel?<FileDownloadIcon />:<CircularLoader small />} name="generator"
+                                    onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
+                                <Button color='inherit' variant='outlined' startIcon={<PublishIcon />} name="importer"
+                                    onClick={() => setImporterEnabled(true)}>Import Template</Button>
+                            </>
+                        }
+                        <Button color='inherit' name="Reload" variant='outlined' startIcon={<CachedIcon />} onClick={() => { window.location.reload() }}>Reload</Button>
+                    </ButtonStrip>
                 </div>
             </div>
-            <div className="title">Sections for program stage {programStage.displayName}</div>
-            {exportToExcel && <DataProcessor ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus}/>}
+            {hnqisMode && importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
+            <div className="title">Sections for Program Stage {programStage.displayName}</div>
+            {hnqisMode && exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus} />}
             {
-                createMetadata.loading &&
-                <ComponentCover translucent>
-                    <CenteredContent>
-                        <CircularLoader large />
-                    </CenteredContent>
-                </ComponentCover>
+                createMetadata.loading && <ComponentCover translucent></ComponentCover>
+                /* <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={open}
+                    onClick={handleClose}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop> */
+
             }
 
             {createMetadata.error &&
@@ -351,111 +479,179 @@ const StageSections = ({ programStage, stageRefetch }) => {
                 </AlertStack>
             }
 
-            {createMetadata.data && (!createMetadata.data.status || createMetadata.data.status == "ERROR") &&
+            {createMetadata.data && (createMetadata.data.status == "ERROR") &&
                 <AlertStack>
                     <AlertBar critical>
-                        {"Process ended with error in the following objects: " + createMetadata.data.typeReports.map(tr => tr.klass.split('.').at(-1)).join(', ') + "."}
+                        {"Process ended with error. Please check Errors Summary section for more details."}
                     </AlertBar>
                 </AlertStack>
             }
-            {saveAndBuild &&
-                <Modal>
-                    <ModalTitle>SETTING UP PROGRAM</ModalTitle>
-                    <ModalContent>
+            {hnqisMode && saveAndBuild &&
+
+                <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
+                    <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>{}}>
+                        Setting Up Program
+                    </CustomMUIDialogTitle >
+                    <DialogContent dividers style={{ padding: '1em 2em' }}>
                         {(progressSteps > 0) &&
                             <div className="progressItem">
-                                <img src={contracted_bottom_svg} /><p>Checking scores</p>
+                                {progressSteps === 1 && <CircularLoader small />}
+                                {progressSteps === 1 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 1 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Checking scores</p>
                             </div>
                         }
                         {(progressSteps > 1) &&
                             <div className="progressItem">
-                                <img src={contracted_bottom_svg} /><p>Reading assesment's questions</p>
+                                {progressSteps === 2 && <CircularLoader small />}
+                                {progressSteps === 2 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 2 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Reading assesment's questions</p>
                             </div>
                         }
                         {(progressSteps > 2) &&
                             <div className="progressItem">
-                                <img src={contracted_bottom_svg} /><p>Building new metadata</p>
+                                {progressSteps === 3 && <CircularLoader small />}
+                                {progressSteps === 3 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Building new metadata</p>
                             </div>
                         }
                         {(progressSteps > 3) &&
                             <div className="progressItem">
-                                <img src={contracted_bottom_svg} /><p>Deleting old metadata</p>
+                                {progressSteps === 4 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps === 4 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 4 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Deleting old metadata</p>
                             </div>
                         }
                         {(progressSteps > 4) &&
                             <div className="progressItem">
-                                <img src={contracted_bottom_svg} /><p>Importing new metadata</p>
+                                {progressSteps === 5 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps === 5 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 5 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Importing new metadata</p>
                             </div>
                         }
-                        {
-                        /*
-                        <div>
-                            <span>Deleting old Program Rules</span>
-                            <Progress percent={progressPR} status="" theme={(progressPR < 100) ? progressTheme("❌") : progressTheme("✅")} />
-                        </div>
-                        <div>
-                            <span>Deleting old Program Variables</span>
-                            <Progress percent={progressPRV} status="" theme={(progressPRV < 100) ? progressTheme("❌") : progressTheme("✅")} />
-                        </div>
-                        */}
-                    </ModalContent>
-                    <ModalActions>
-                        <ButtonStrip>
-                            <Button disabled={saveAndBuild != 'Completed'} onClick={() => { setSaveAndBuild(false); setProgressSteps(0); }}>Close</Button>
-                        </ButtonStrip>
-                    </ModalActions>
-                </Modal>
+                        {(progressSteps > 5) &&
+                            <div className="progressItem">
+                                <IconCheckmarkCircle24 color={'#00b894'} />
+                                <p> Done!</p>
+                            </div>
+                        }
+                    </DialogContent>
+
+                    <DialogActions style={{ padding: '1em' }}>
+                        <Button variant='outlined' disabled={(saveAndBuild != 'Completed') && (createMetadata?.data?.status !== 'ERROR')} onClick={() => { setSaveAndBuild(false); setProgressSteps(0); }}> Done </Button>
+                    </DialogActions>
+
+                </CustomMUIDialog>
             }
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
+                        {sections.length === 0 && 
+                            <Button startIcon={<AddBoxIcon/>} variant='contained' style={{margin: '8px'}} onClick={SectionActions.append}>
+                                Add New Section
+                            </Button>
+                        }
                         {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
                             <Removed importResults={importResults} index={0} key={"removedSec"} />
                         }
                         {
-                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0) &&
-                            <Errors validationResults={validationResults} index={0} key={"validationSec"}/>
+                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0 || validationResults.feedbacks.length > 0) &&
+                            <Errors validationResults={validationResults} index={0} key={"validationSec"} />
+                        }
+                        {
+                            errorReports && <ErrorReports errors={errorReports} />
+                        }
+                        {
+                            createMetadata.data && createMetadata.data.status == 'ERROR' && <ErrorReports errors={parseErrors(createMetadata.data)} />
                         }
                         <Droppable droppableId="dpb-sections" type="SECTION">
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
                                         sections.map((pss, idx) => {
-                                            return <DraggableSection stageSection={pss} index={idx} key={pss.id || idx} />
+                                            return <DraggableSection 
+                                                program={programStage.program.id} 
+                                                stageSection={pss} 
+                                                editStatus={addedSection?.index === idx && addedSection } 
+                                                stageDataElements={programStageDataElements} 
+                                                DEActions={DEActions} 
+                                                index={idx} 
+                                                key={pss.id || idx} 
+                                                SectionActions={SectionActions} 
+                                                hnqisMode={hnqisMode} 
+                                            />
                                         })
                                     }
                                     {provided.placeholder}
                                 </div>
                             )}
                         </Droppable>
-                        <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />
-                        <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />
+                        {hnqisMode && programStage.formType==="SECTION" && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />}
+                        {hnqisMode && programStage.formType==="SECTION" && <Scores stageSection={scoresSection} index={0} key={scoresSection.id} program={programId}/>}
+
                     </div>
                 </div>
             </DragDropContext>
-            {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{sections,setSections, scoresSection, setScoresSection}} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{programMetadata,setProgramMetadata}} />}
+            <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                open={!!snackParams}
+                autoHideDuration={6000}
+                onClose={() => setSnackParams(false)}
+            >
+                <Alert onClose={() => setSnackParams(false)} severity={snackParams.severity} sx={{ width: '100%' }}>
+                    {snackParams.content}
+                </Alert>
+            </Snackbar>
             {
                 savingMetadata &&
                 <ValidateMetadata
-                    newDEQty={importResults ? importResults.questions.new + importResults.scores.new + importResults.sections.new : 0} 
+                    hnqisMode={hnqisMode}
+                    newDEQty={importResults ? importResults.questions.new + importResults.scores.new + importResults.sections.new : 0}
                     programStage={programStage}
                     importedSections={sections}
                     importedScores={scoresSection}
                     criticalSection={criticalSection}
-                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems):[]}
+                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : removedElements /*[]*/}
 
                     // createMetadata={createMetadata}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
-                    previous={{sections,setSections, scoresSection, setScoresSection}}
-                    importResults = {importResults}
-                    setIsValid = {setIsValid}
-                    setValidationResults = {setValidationResults}
+                    previous={{ sections, setSections, scoresSection, setScoresSection }}
+                    setImportResults={setImportResults}
+                    importResults={importResults}
+                    setIsValid={setIsValid}
+                    setValidationResults={setValidationResults}
                     programMetadata={programMetadata}
-                    />
+                    setErrorReports={setErrorReports}
+                    refetchProgramStage={refetchProgramStage}
+                />
             }
-
+            {showSectionManager &&
+                <SectionManager
+                    sectionIndex={editSectionIndex}
+                    newSectionIndex={newSectionIndex}
+                    setShowSectionForm={setShowSectionManager}
+                    sections={sections}
+                    refreshSections={setSections}
+                    notify={pushNotification}
+                    setAddedSection={setAddedSection}
+                />
+            }
+            {deManager &&
+                <DataElementManager
+                    program={programStage.program.id}
+                    deRef={deManager}
+                    setDeManager={setDeManager}
+                    programStageDataElements={programStageDataElements}
+                    saveAdd={saveAdd}
+                    hnqisMode={hnqisMode}
+                />
+            }
         </div>
     )
 }

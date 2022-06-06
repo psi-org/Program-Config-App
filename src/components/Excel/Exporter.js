@@ -1,4 +1,4 @@
-import React from 'react';
+import {React,useEffect} from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import { saveAs } from 'file-saver';
 import {
@@ -11,7 +11,10 @@ import {
   structureValidator,
   yesNoValidator,
   conditionalError,
-  sectionHighlighting
+  conditionalDisable,
+  sectionHighlighting,
+  questionHighlighting,
+  labelHighlighting
 } from "../../configs/TemplateConstants";
 import {
   fillBackgroundToRange,
@@ -19,13 +22,17 @@ import {
   applyBorderToRange,
   dataValidation,
   printObjectArray,
-  applyStyleToRange
+  applyStyleToRange,
+  defineName
 } from "../../configs/ExcelUtils";
 import {ReleaseNotes} from "../../configs/ReleaseNotes";
 
-const Exporter = (props) => {
-  const password = template_password;
+const MAX_FORM_NAME_LENGTH = 200;
+const MIN_FORM_NAME_LENGTH = 2;
 
+const Exporter = (props) => {
+
+  const password = template_password;
   const initialize = () => {
       generate();
   };
@@ -59,9 +66,9 @@ const Exporter = (props) => {
     workbook.views = [{
       activeTab: activeTabNumber
     }];
+    addMapping(mappingWS);
     addInstructions(instructionWS);
     addConfigurations(templateWS);
-    addMapping(mappingWS);
     addReleaseNotes(realeaseNotesWS);
     hideColumns(templateWS);
     addProtection(templateWS);
@@ -90,7 +97,7 @@ const Exporter = (props) => {
     ws.getCell("B12").value = "Program Name";
     ws.getCell("B13").value = "Program Short Name";
     ws.getCell("B14").value = "Use 'Competency Class'";
-    ws.getCell("B15").value = "DE Prefix";
+    ws.getCell("B15").value = "Program DE Prefix";
     ws.getCell("B16").value = "Health Area";
 
     ws.mergeCells('F11:H11');
@@ -98,8 +105,8 @@ const Exporter = (props) => {
     ws.getCell("F11").style = {font: {bold: true}};
     fillBackgroundToRange(ws, "F11:H11", "bfbfbf");
     ws.getCell("F12").value = "Program Name: The name that will be assigned to the checklist.";
-    ws.getCell("F13").value = "Use 'Competency Class': This will determine if competency classes will be included in the program";
-    ws.getCell("F14").value = "DE Prefix: A prefix that will be added to every Data Element in DHIS2, this is used to filter information."
+    ws.getCell("F13").value = "Use 'Competency Class': This will determine if competency classes will be included in the program.";
+    ws.getCell("F14").value = "DE Prefix: A prefix that will be added to every Data Element in DHIS2, make sure that it is unique."
     ws.getCell("F15").value = "Health Area: The Health Area where the checklist will be assigned, used for filtering.";
     fillBackgroundToRange(ws, "F12:H15", "f2f2f2");
 
@@ -113,13 +120,13 @@ const Exporter = (props) => {
     fillBackgroundToRange(ws, "B12:B16", "9fc5e8");
     fillBackgroundToRange(ws, 'C12:C16', "cfe2f3");
 
-    ws.getCell("D12").value = {formula: "=VLOOKUP(C12, Mapping!R3:S300,2,FALSE)"};
+    ws.getCell("D12").value = {formula: "=VLOOKUP(C12, Program_Data,2,FALSE)"};
     //ws.getCell("D15").value = {formula: "=INDEX(Mapping!L1:L100;MATCH(Instructions!C15;Mapping!M1:M100;0))"};
     ws.getCell('C12').value = props.programName;
     ws.getCell('C13').value = props.programShortName;
     ws.getCell('C14').value = props.useCompetencyClass;
     ws.getCell('C15').value = props.programPrefix;
-    let healthAreaFound = props.healthAreaData.find(ha => ha["Code"] == props.programHealthArea);
+    let healthAreaFound = props.healthAreaData.find(ha => ha["code"] == props.programHealthArea);
     ws.getCell('C16').value = healthAreaFound ? healthAreaFound["Health Area"] : "Family Planning";
     
     
@@ -163,7 +170,7 @@ const Exporter = (props) => {
     ws.getCell("B29").alignment = {vertical: "middle"};
     ws.mergeCells('C29:F29');
     ws.getCell('C29').alignment = {wrapText: true};
-    ws.getRow("30").height = 48;
+    ws.getRow("29").height = 48;
     ws.getCell("C29").value = `[Question Only] \n Scores are divided in critical and non-critical, this is mostly used for the "competency classification" but can also be used in other types of classification in analytics as well. A critical step will count for the critical score. Select "Yes" if you want to define a critical question.`;
 
     ws.getCell('B30').value = "Compulsory";
@@ -259,7 +266,7 @@ const Exporter = (props) => {
     ws.getCell("B40").alignment = {vertical: "middle"};
     ws.mergeCells("C40:F40");
     ws.getCell('C40').alignment = {wrapText: true};
-    ws.getRow("40").height = 32;
+    ws.getRow("40").height = 16;
     ws.getCell("C40").value = `Enter the help text that will display to the supervisor during data entry. This text will appear as an ( i ) icon in the data entry form.`;
 
     ws.getCell("B42").value = `Every row in the "Template" tab starting from row 3 will generate the necessary components for the program when this file gets imported to the server. `;
@@ -326,9 +333,9 @@ const Exporter = (props) => {
     ws.getCell("E57").value = "Cell will be highlighted RED if corresponding Structure is present but form name is missing";
     ws.getCell("E57").alignment = {wrapText: true};
 
-    ws.getCell("C58").value = "Value Type";
+    ws.getCell("C58").value = "Feedback Order";
     ws.getCell("D58").value = "Conditional Validation";
-    ws.getCell("E58").value = "If the Structure is label then Value type should be LONG_TEXT; or if the Structure is Score Value type should be Number otherwise the cell will be highlighted";
+    ws.getCell("E58").value = "If the Structure is score then a compositive indicator should be provided";
     ws.getCell("E58").alignment = {wrapText: true};
 
     ws.getCell("C59").value = "Feedback Order";
@@ -372,7 +379,7 @@ const Exporter = (props) => {
         rules: [
           {
             type: 'expression',
-            formulae: ['ISERROR(VLOOKUP(C12,Mapping!R3:R100,1,FALSE))'],
+            formulae: ['ISERROR(D12)'],
             style: conditionalError,
           }
         ]
@@ -409,7 +416,7 @@ const Exporter = (props) => {
       showErrorMessage: true,
       error: 'Please select the valid option from the List',
       errorTitle: 'Invalid option',
-      formulae: ['Mapping!$M$3:$M$43']
+      formulae: ['Health_Area_Option']
     });
   }
 
@@ -457,7 +464,8 @@ const Exporter = (props) => {
     }, {
       header: "Compositive Indicator (Feedback Order)",
       key: "compositive_indicator",
-      width: 22
+      width: 22,
+      style: { numFmt: '@' }
     }, {
       header: "Parent question",
       key: "parent_question",
@@ -498,14 +506,14 @@ const Exporter = (props) => {
       parent_name: `Indentifier to use as reference in the "Parent question" column`,
       structure: `Defines what is being configured in the row`,
       form_name: `Text that will be displayed in the form during the assessment`,
-      critical_step: "A critical step will count for the critical score",
+      isCritical: "A critical step will count for the critical score",
       isCompulsory: "A compulsory question must be answered to complete an assessment",
       value_type: `Determines the type of input if there's no Option Set selected`,
       optionSet: `Select the option set that provides available answers for this question (forces Value Type)`,
       legend: "Select the legend that will be applied to the question",
       score_numerator: "Numerator for scores calculation",
       score_denominator: "Denominator for scores calculation",
-      compositive_indicator: "This number will generate the feedback tree in the app, accepted values are:1, 1.1, 1.1.1, 1.1.2, 1.1..., 1.2, etc.  [See more]",
+      compositive_indicator: "This number will generate the feedback tree in the app, accepted values are:1, 1.1, 1.1.1, 1.1.2, 1.1..., 1.2, etc.",
       parent_question: "Select the Parent Name of the question that will act as parent",
       answer_value: `Specify the value that will trigger the "show" rule of the question`,
       feedback_text: `Text that will be displayed in the Feedback app for each question`,
@@ -551,17 +559,17 @@ const Exporter = (props) => {
     dataValidation(ws, "F3:F3000", {
       type: 'list',
       allowBlank: true,
-      formulae: ['Mapping!$B$3:$B$11']
+      formulae: ['Value_Type']
     });
     dataValidation(ws, "G3:G3000", {
       type: 'list',
       allowBlank: true,
-      formulae: ['Mapping!$H$3:$H$60']
+      formulae: ['Option_Sets_option']
     });
     dataValidation(ws, "H3:H3000", {
       type: 'list',
       allowBlank: true,
-      formulae: ['Mapping!$O$3:$O$9']
+      formulae: ['Legend_Set_Option']
     });
     dataValidation(ws, "I3:J3000", {
       type: "decimal",
@@ -582,6 +590,18 @@ const Exporter = (props) => {
 
   const addConditionalFormatting = (ws) => {
     ws.addConditionalFormatting({
+      ref: 'A3:A3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['AND(ISBLANK($A3),OR($B3="question",$B3="label"))'],
+          style: conditionalError,
+        }
+      ],
+      promptTitle: 'Parent name not defined',
+      prompt: 'A parent name was not defined for the specified element.'
+    });
+    ws.addConditionalFormatting({
       ref: 'C3:C3000',
       rules: [
         {
@@ -593,35 +613,50 @@ const Exporter = (props) => {
       promptTitle: 'Form name not defined',
       prompt: 'A form name was not defined for the specified element.'
     });
-    //conditional formatting for structure=label and Value type <> LONG TEXT
+    //conditional formatting for form name out of range
+    ws.addConditionalFormatting({
+      ref: 'C3:C3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: [`AND(NOT(ISBLANK($B3)),OR(LEN($C3)<${MIN_FORM_NAME_LENGTH},LEN($C3)>${MAX_FORM_NAME_LENGTH}))`],
+          style: conditionalError,
+        }
+      ],
+      promptTitle: 'Form name is too long',
+      prompt: `Given form name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`
+    });
+    //conditional formatting for structure=label
     ws.addConditionalFormatting({
       ref:'F3:F3000',
       rules: [
         {
           type: 'expression',
-          formulae: ['AND($B3="label", $F3<>"LONG_TEXT")'],
-          style: conditionalError
+          formulae: ['$B3="label"'],
+          style: conditionalDisable
         }
       ]
     });
-    //conditional formatting for structure=scores and valuetype=NUMBER
+    //conditional formatting for structure=scores
     ws.addConditionalFormatting({
       ref:'F3:F3000',
       rules: [
         {
           type: 'expression',
-          formulae: ['AND($B3="score", $F3<>"NUMBER")'],
-          style: conditionalError
+          formulae: ['$B3="score"'],
+          style: conditionalDisable
         }
       ]
     });
+    //conditional formatting for structure=scores and compositive indicator is empty
+    //or
     //conditional formatting checking Feedback order if either score (numerator or denominator is available)
     ws.addConditionalFormatting({
       ref:'K3:K3000',
       rules:[
         {
           type: 'expression',
-          formulae: ['AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3))'],
+          formulae: ['OR(AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3)), AND($B3="score", ISBLANK($K3)))'],
           style: conditionalError
         }
       ]
@@ -655,9 +690,29 @@ const Exporter = (props) => {
           type: 'expression',
           formulae: ['$B3 = "Section"'],
           style: sectionHighlighting
+        },
+        {
+          type: 'expression',
+          formulae: ['$B3 = "question"'],
+          style: questionHighlighting
+        },
+        {
+          type: 'expression',
+          formulae: ['$B3 = "label"'],
+          style: labelHighlighting
         }
       ]
-    })
+    });
+    ws.addConditionalFormatting({
+      ref: 'L4:L3000',
+      rules: [
+        {
+          type: 'expression',
+          formulae: ['$A4=$L4'],
+          style: conditionalError,
+        }
+      ]
+    });
   }
 
   const populateConfiguration = async ws => {
@@ -665,10 +720,14 @@ const Exporter = (props) => {
     if(props.Configures.length > 0) {
       props.Configures.forEach((configure) => {
         ws.getRow(dataRow).values = configure;
-        ws.getCell("A" + dataRow).value = {formula: '_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section","",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1)))'};
+        ws.getCell("A" + dataRow).value = {formula: '_xlfn.IF(OR(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section",ISBLANK(INDIRECT(_xlfn.CONCAT("B",ROW())))),"",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1)))'};
         if (configure.structure === "Section") {
           fillBackgroundToRange(ws, "A" + dataRow + ":R" + dataRow, "f8c291")
         }
+        if (configure.structure === "label") {
+          fillBackgroundToRange(ws, "A" + dataRow + ":R" + dataRow, "c6e0b4")
+        }
+        
         dataRow = dataRow + 1;
       });
       applyBorderToRange(ws, 0, 3, 14, dataRow - 1);
@@ -683,6 +742,16 @@ const Exporter = (props) => {
     printObjectArray(ws, props.healthAreaData, "L2", "d5a6bd")
     printObjectArray(ws, props.legendSetData, "O2", "9fc5e8");
     printObjectArray(ws, props.programData, "R2", "9fc5e8");
+    defineName(ws, "B3:B100", "Value_Type");
+    defineName(ws, "D3:D100", "Render_Type");
+    defineName(ws, "F3:F100", "Agg_Operator");
+    defineName(ws, "H2:J100", "Option_Sets_Data");
+    defineName(ws, "H3:H100", "Option_Sets_option");
+    defineName(ws, "L2:M100", "Health_Area_Data");
+    defineName(ws, "M3:M100", "Health_Area_Option");
+    defineName(ws, "O2:P100", "Legend_Set_Data");
+    defineName(ws, "O3:O100", "Legend_Set_Option");
+    defineName(ws, "R2:S100", "Program_Data");
     await ws.protect(password);
   };
 
@@ -722,7 +791,7 @@ const Exporter = (props) => {
   };
 
   const addProtection = async ws => {
-    for (let i = 3; i <= 500; i++) {
+    for (let i = 3; i <= 3000; i++) {
       ws.getRow(i).protection = {
         locked: false
       };
@@ -740,15 +809,30 @@ const Exporter = (props) => {
     });
   }
 
+  const formatDate = (date) => {
+    let d = date.split('.')[0].split('T')
+    let dateYMD = d[0]
+    let dateHMS = d[1].split(":")
+    return `${dateYMD} [${dateHMS[0]}h ${dateHMS[1]}m]`
+  }
+
   const writeWorkbook = async wb => {
     const buf = await wb.xlsx.writeBuffer();
-    saveAs(new Blob([buf]), `HNQIS Config_${new Date()}.xlsx`);
+    saveAs(new Blob([buf]), `${props.programName} - ${formatDate(new Date().toISOString())}.xlsx`);
 
-    props.setStatus("Download");
+    props.setStatus("Download Template");
     props.isLoading(false);
   };
-
-  initialize(); // return <>initialize()</>;
+  /* if(props.flag){
+    initialize(); // return <>initialize()</>;
+  } */
+  
+  useEffect(()=>{
+    if(props.flag){
+      initialize()
+      props.setFlag(!props.flag)
+    }
+  },[])
 
   return null;
 };

@@ -1,0 +1,1102 @@
+{
+    "options": [
+        {
+            "code": "No",
+            "name": "No",
+            "id": "diysnzLKv1e",
+            "sortOrder": 2,
+            "optionSet": {"id": "l1r9RVxwvjh"},
+            "translations": []
+        },
+        {
+            "code": "Yes",
+            "name": "Yes",
+            "id": "h6UeK7BO92j",
+            "sortOrder": 1,
+            "optionSet": {"id": "l1r9RVxwvjh"},
+            "translations": []
+        },
+        {
+            "code": "1",
+            "name": "Yes",
+            "id": "IYJvvyCDyO5",
+            "sortOrder": 1,
+            "optionSet": {"id": "DfyWt0mZIhj"},
+            "translations": []
+        },
+        {
+            "code": "0.5",
+            "name": "Partial",
+            "id": "TJnqFStXuck",
+            "sortOrder": 2,
+            "optionSet": {"id": "DfyWt0mZIhj"},
+            "translations": []
+        },
+        {
+            "code": "0",
+            "name": "No",
+            "id": "BP3p9vx47VX",
+            "sortOrder": 3,
+            "optionSet": {"id": "DfyWt0mZIhj"},
+            "translations": []
+        },
+        {
+            "code": "0.5",
+            "name": "70 - 89%",
+            "id": "lSsLcMHBsni",
+            "sortOrder": 2,
+            "optionSet": {"id": "QIrsLh0hpBy"},
+            "translations": []
+        },
+        {
+            "code": "1",
+            "name": "90 - 100%",
+            "id": "RXJzIBTWoMz",
+            "sortOrder": 1,
+            "optionSet": {"id": "QIrsLh0hpBy"},
+            "translations": []
+        },
+        {
+            "code": "0",
+            "name": "<70%",
+            "id": "YmTiJ0mfVou",
+            "sortOrder": 3,
+            "optionSet": {"id": "QIrsLh0hpBy"},
+            "translations": []
+        },
+        {
+            "code": "CC",
+            "name": "Cervical Cancer",
+            "id": "McXRLIwjDh7",
+            "sortOrder": 6,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "CBRM",
+            "name": "Client Based Record Management",
+            "id": "lztu61LKSII",
+            "sortOrder": 4,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "improvement",
+            "name": "Competent but needs improvement",
+            "id": "Ox6VQNmvuS3",
+            "sortOrder": 4,
+            "optionSet": {"id": "NDfZ129owtz"},
+            "translations": []
+        },
+        {
+            "code": "competent",
+            "name": "Competent",
+            "id": "BNjofUBvlJ8",
+            "sortOrder": 2,
+            "optionSet": {"id": "NDfZ129owtz"},
+            "translations": []
+        },
+        {
+            "code": "FP CFC",
+            "name": "Family Planning Counseling",
+            "id": "UgcqvJVJ9f0",
+            "sortOrder": 10,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "FP LPM",
+            "name": "Family Planning Long Acting Methods",
+            "id": "aYWZXNhvXQw",
+            "sortOrder": 12,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "FP SAM",
+            "name": "Family Planning Short Acting Method",
+            "id": "C9L7MCPeHr5",
+            "sortOrder": 14,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "FP",
+            "name": "Family Planning",
+            "id": "xTJOcijWyaD",
+            "sortOrder": 8,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "Female",
+            "name": "Female",
+            "id": "NYfcPZmWsv0",
+            "sortOrder": 1,
+            "optionSet": {"id": "Y7Gx2bSacYK"},
+            "translations": []
+        },
+        {
+            "code": "HIV",
+            "name": "Human Inmunodeficiency Virus",
+            "id": "c8qOHzSbhWM",
+            "sortOrder": 16,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "HT",
+            "name": "Hypertension",
+            "id": "imVa2DiLgrJ",
+            "sortOrder": 18,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "IMCI",
+            "name": "Integrated Management of Childhood Illness",
+            "id": "r8UqKmXwXqa",
+            "sortOrder": 20,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "MAL",
+            "name": "Malaria",
+            "id": "RHreLvo1UWn",
+            "sortOrder": 22,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "Male",
+            "name": "Male",
+            "id": "MjhfHQVkHHn",
+            "sortOrder": 2,
+            "optionSet": {"id": "Y7Gx2bSacYK"},
+            "translations": []
+        },
+        {
+            "code": "MNH",
+            "name": "Maternal and Newborn Health",
+            "id": "hX7DJdCN9Ou",
+            "sortOrder": 24,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "NBRes",
+            "name": "Newborn Resuscitation",
+            "id": "xaBeYsM2hFH",
+            "sortOrder": 26,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "1",
+            "name": "No",
+            "id": "AMCMDap5FR6",
+            "sortOrder": 4,
+            "optionSet": {"id": "z4FEFQRtjhM"},
+            "translations": []
+        },
+        {
+            "code": "0",
+            "name": "No",
+            "id": "mWUrJ69gb1b",
+            "sortOrder": 2,
+            "optionSet": {"id": "v6QYyj8ihWn"},
+            "translations": []
+        },
+        {
+            "code": "notcompetent",
+            "name": "Not Competent",
+            "id": "SzQKvyTKPEw",
+            "sortOrder": 6,
+            "optionSet": {"id": "NDfZ129owtz"},
+            "translations": []
+        },
+        {
+            "code": "Parasite_uL",
+            "name": "Parasite/uL",
+            "id": "lq3XPUAzuT4",
+            "sortOrder": 2,
+            "optionSet": {"id": "ZAKGedaQaiU"},
+            "translations": []
+        },
+        {
+            "code": "Plus_system",
+            "name": "Plus system",
+            "id": "rYTszFfGaVj",
+            "sortOrder": 1,
+            "optionSet": {"id": "ZAKGedaQaiU"},
+            "translations": []
+        },
+        {
+            "code": "PAC",
+            "name": "Post Abortion Care",
+            "id": "NPw1hV4degm",
+            "sortOrder": 2,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "SafAb",
+            "name": "Safe Abortion",
+            "id": "jdVVvtwuJ7Y",
+            "sortOrder": 28,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "STI",
+            "name": "Sexually Transmitted Infections",
+            "id": "e10afvAkkPR",
+            "sortOrder": 30,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "TB",
+            "name": "Tuberculosis",
+            "id": "OqRNLt5Nbub",
+            "sortOrder": 32,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "WEA",
+            "name": "Work Environment Assessment",
+            "id": "MstdLcCaYZW",
+            "sortOrder": 34,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "code": "0",
+            "name": "Yes",
+            "id": "RkmOTEsXYPS",
+            "sortOrder": 3,
+            "optionSet": {"id": "z4FEFQRtjhM"},
+            "translations": []
+        },
+        {
+            "code": "1",
+            "name": "Yes",
+            "id": "WuIjp1ZkvuQ",
+            "sortOrder": 1,
+            "optionSet": {"id": "v6QYyj8ihWn"},
+            "translations": []
+        },
+        {
+            "code": "HNQIS",
+            "name": "HNQIS",
+            "id": "Ip3IqzzqgLN",
+            "sortOrder": 1,
+            "optionSet": {"id": "TOcCuCN2CLm"},
+            "translations": []
+        },
+        {
+            "code": "HNQIS2",
+            "name": "HNQIS 2.0",
+            "id": "Jz4YKD15lnK",
+            "sortOrder": 2,
+            "optionSet": {"id": "TOcCuCN2CLm"},
+            "translations": []
+        },
+        {
+            "code": "EDS",
+            "name": "EDS",
+            "id": "v9XPATv6G3N",
+            "sortOrder": 4,
+            "optionSet": {"id": "TOcCuCN2CLm"},
+            "translations": []
+        },
+        {
+            "code": "RDQA",
+            "name": "RDQA",
+            "id": "QR0HHcQri91",
+            "sortOrder": 3,
+            "optionSet": {"id": "TOcCuCN2CLm"},
+            "translations": []
+        }
+    ],
+    "optionSets": [
+        {
+            "name": "HNQIS2 - Critical Question",
+            "id": "l1r9RVxwvjh",
+            "version": 2,
+            "valueType": "TEXT",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "h6UeK7BO92j"},
+                {"id": "diysnzLKv1e"}
+            ]
+        },
+        {
+            "name": "HNQIS - Yes1No0",
+            "id": "v6QYyj8ihWn",
+            "version": 5,
+            "valueType": "INTEGER",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "WuIjp1ZkvuQ"},
+                {"id": "mWUrJ69gb1b"}
+            ]
+        },
+        {
+            "name": "HNQIS - Yes1Partial0.5No0",
+            "id": "DfyWt0mZIhj",
+            "version": 3,
+            "valueType": "NUMBER",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "IYJvvyCDyO5"},
+                {"id": "TJnqFStXuck"},
+                {"id": "BP3p9vx47VX"}
+            ]
+        },
+        {
+            "name": "HNQIS Competency",
+            "id": "NDfZ129owtz",
+            "version": 4,
+            "valueType": "TEXT",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "BNjofUBvlJ8"},
+                {"id": "Ox6VQNmvuS3"},
+                {"id": "SzQKvyTKPEw"}
+            ]
+        },
+        {
+            "name": "HNQIS - Percentage M&E (option 4)",
+            "id": "QIrsLh0hpBy",
+            "version": 8,
+            "valueType": "NUMBER",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "RXJzIBTWoMz"},
+                {"id": "lSsLcMHBsni"},
+                {"id": "YmTiJ0mfVou"}
+            ]
+        },
+        {
+            "code": "Parasite Counting",
+            "name": "HNQIS - Parasite Counting",
+            "id": "ZAKGedaQaiU",
+            "version": 2,
+            "valueType": "TEXT",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "rYTszFfGaVj"},
+                {"id": "lq3XPUAzuT4"}
+            ]
+        },
+        {
+            "code": "SexHNQIS",
+            "name": "HNQIS - Sex",
+            "id": "Y7Gx2bSacYK",
+            "version": 3,
+            "valueType": "TEXT",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "NYfcPZmWsv0"},
+                {"id": "MjhfHQVkHHn"}
+            ]
+        },
+        {
+            "name": "HNQIS Health Areas",
+            "id": "y752HEwvCGi",
+            "version": 18,
+            "valueType": "TEXT",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "NPw1hV4degm"},
+                {"id": "lztu61LKSII"},
+                {"id": "McXRLIwjDh7"},
+                {"id": "xTJOcijWyaD"},
+                {"id": "UgcqvJVJ9f0"},
+                {"id": "aYWZXNhvXQw"},
+                {"id": "C9L7MCPeHr5"},
+                {"id": "c8qOHzSbhWM"},
+                {"id": "imVa2DiLgrJ"},
+                {"id": "r8UqKmXwXqa"},
+                {"id": "RHreLvo1UWn"},
+                {"id": "hX7DJdCN9Ou"},
+                {"id": "xaBeYsM2hFH"},
+                {"id": "jdVVvtwuJ7Y"},
+                {"id": "e10afvAkkPR"},
+                {"id": "OqRNLt5Nbub"},
+                {"id": "MstdLcCaYZW"}
+            ]
+        },
+        {
+            "name": "HNQIS - Yes0No1",
+            "id": "z4FEFQRtjhM",
+            "version": 2,
+            "valueType": "INTEGER",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "RkmOTEsXYPS"},
+                {"id": "AMCMDap5FR6"}
+            ]
+        },
+        {
+            "name": "DB - Program Type",
+            "id": "TOcCuCN2CLm",
+            "version": 7,
+            "valueType": "TEXT",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "Ip3IqzzqgLN"},
+                {"id": "Jz4YKD15lnK"},
+                {"id": "QR0HHcQri91"},
+                {"id": "v9XPATv6G3N"}
+            ]
+        }
+    ],
+    "dataElements": [
+        {
+            "code": "HNQIS2 - Competency Class",
+            "id": "NAaHST5ZDTE",
+            "name": "HNQIS2 - Competency Class",
+            "shortName": "HNQIS2 - Competency Class",
+            "aggregationType": "NONE",
+            "domainType": "TRACKER",
+            "valueType": "TEXT",
+            "formName": "Competency Class",
+            "zeroIsSignificant": false,
+            "optionSet": {"id": "NDfZ129owtz"},
+            "translations": [],
+            "attributeValues": [],
+            "legendSets": [],
+            "aggregationLevels": []
+        },
+        {
+            "code": "HNQIS2 - Critical Steps",
+            "id": "VqBfZjZhKkU",
+            "name": "HNQIS2 - Critical Steps",
+            "shortName": "HNQIS2 - Critical Steps",
+            "aggregationType": "COUNT",
+            "domainType": "TRACKER",
+            "valueType": "NUMBER",
+            "formName": "Critical Steps",
+            "zeroIsSignificant": false,
+            "translations": [],
+            "attributeValues": [],
+            "legendSets": [],
+            "aggregationLevels": []
+        },
+        {
+            "code": "HNQIS2 - Non-critical Steps",
+            "id": "pzWDtDUorBt",
+            "name": "HNQIS2 - Non-critical Steps",
+            "shortName": "HNQIS2 - Non-critical Steps",
+            "aggregationType": "COUNT",
+            "domainType": "TRACKER",
+            "valueType": "NUMBER",
+            "formName": "Non-critical Steps",
+            "zeroIsSignificant": false,
+            "translations": [],
+            "attributeValues": [],
+            "legendSets": [],
+            "aggregationLevels": []
+        },
+        {
+            "code": "HNQIS2 -AP-ACTION",
+            "id": "F0Qcr8ANr7t",
+            "name": "HNQIS2 -AP-ACTION",
+            "shortName": "HNQIS2 -AP-ACTION",
+            "aggregationType": "NONE",
+            "domainType": "TRACKER",
+            "valueType": "LONG_TEXT",
+            "formName": "Action Agreed",
+            "zeroIsSignificant": false,
+            "style": {"color": "#e3f2fd"},
+            "translations": [],
+            "attributeValues": [],
+            "legendSets": [],
+            "aggregationLevels": []
+        },
+        {
+            "code": "HNQIS2 -AP-DUE_DATE",
+            "id": "DIoqtxbSJIL",
+            "name": "HNQIS2 -AP-DUE_DATE",
+            "shortName": "HNQIS2 -AP-DUE_DATE",
+            "aggregationType": "NONE",
+            "domainType": "TRACKER",
+            "description": "Due Date",
+            "valueType": "DATE",
+            "formName": "Due Date",
+            "zeroIsSignificant": false,
+            "style": {"color": "#64b5f6"},
+            "translations": [],
+            "attributeValues": [],
+            "legendSets": [],
+            "aggregationLevels": []
+        },
+        {
+            "code": "HNQIS2 -AP-RESPONSIBLE",
+            "id": "nswci5V4j0d",
+            "name": "HNQIS2 -AP-RESPONSIBLE",
+            "shortName": "HNQIS2 -AP-RESPONSIBLE",
+            "aggregationType": "NONE",
+            "domainType": "TRACKER",
+            "description": "Responible",
+            "valueType": "TEXT",
+            "formName": "Responsible",
+            "zeroIsSignificant": false,
+            "style": {"color": "#64b5f6"},
+            "translations": [],
+            "attributeValues": [],
+            "legendSets": [],
+            "aggregationLevels": []
+        }
+    ],
+    "trackedEntityAttributes": [
+        {
+            "id": "Xe5hUu6KkUT",
+            "name": "HNQIS - Health Area",
+            "shortName": "HNQIS - Health Area",
+            "aggregationType": "NONE",
+            "displayInListNoProgram": false,
+            "pattern": "",
+            "skipSynchronization": false,
+            "generated": false,
+            "displayOnVisitSchedule": false,
+            "valueType": "TEXT",
+            "formName": "Health Area",
+            "orgunitScope": false,
+            "confidential": false,
+            "unique": false,
+            "inherit": false,
+            "optionSet": {"id": "y752HEwvCGi"},
+            "translations": []
+        },
+        {
+            "id": "NQdpdST0Gcx",
+            "name": "HNQIS - Global Score",
+            "shortName": "HNQIS - Global Score",
+            "aggregationType": "NONE",
+            "displayInListNoProgram": false,
+            "pattern": "",
+            "skipSynchronization": false,
+            "generated": false,
+            "displayOnVisitSchedule": false,
+            "valueType": "NUMBER",
+            "formName": "Global Score",
+            "orgunitScope": false,
+            "confidential": false,
+            "unique": false,
+            "inherit": false,
+            "translations": []
+        },
+        {
+            "id": "nHg1hGgtJwm",
+            "name": "HNQIS - Organization Unit",
+            "shortName": "HNQIS - Org Unit",
+            "aggregationType": "NONE",
+            "displayInListNoProgram": false,
+            "pattern": "",
+            "skipSynchronization": false,
+            "generated": false,
+            "displayOnVisitSchedule": false,
+            "valueType": "TEXT",
+            "formName": "Organization Unit",
+            "orgunitScope": false,
+            "confidential": false,
+            "unique": false,
+            "inherit": false,
+            "translations": []
+        },
+        {
+            "id": "UlUYUyZJ6o9",
+            "name": "HNQIS - Assessment Date",
+            "shortName": "HNQIS - Assessment Date",
+            "aggregationType": "NONE",
+            "displayInListNoProgram": false,
+            "pattern": "",
+            "skipSynchronization": false,
+            "generated": false,
+            "displayOnVisitSchedule": false,
+            "valueType": "DATE",
+            "formName": "Assessment Date",
+            "orgunitScope": false,
+            "confidential": false,
+            "unique": false,
+            "inherit": false,
+            "translations": [
+                {
+                    "property": "NAME",
+                    "locale": "es",
+                    "value": "HNQIS - Fecha de evaluación"
+                }
+            ]
+        },
+        {
+            "id": "ulU9KKgSLYe",
+            "name": "HNQIS - Competency Class",
+            "shortName": "HNQIS - Competency Class",
+            "aggregationType": "NONE",
+            "displayInListNoProgram": false,
+            "pattern": "",
+            "skipSynchronization": false,
+            "generated": false,
+            "displayOnVisitSchedule": false,
+            "valueType": "TEXT",
+            "formName": "Competency Class",
+            "orgunitScope": false,
+            "confidential": false,
+            "unique": false,
+            "inherit": false,
+            "optionSet": {"id": "NDfZ129owtz"},
+            "translations": []
+        }
+    ],
+    "trackedEntityTypes": [
+        {
+            "id": "oNwpeWkfoWc",
+            "name": "Assessment HNQIS",
+            "publicAccess": "rwrw----",
+            "externalAccess": false,
+            "allowAuditLog": false,
+            "featureType": "NONE",
+            "minAttributesRequiredToSearch": 1,
+            "displayFormName": "Assessment HNQIS",
+            "maxTeiCountToReturn": 0,
+            "favorite": false,
+            "access": {
+                "read": true,
+                "update": true,
+                "externalize": true,
+                "delete": true,
+                "write": true,
+                "manage": true,
+                "data": {
+                    "read": true,
+                    "write": true
+                }
+            },
+            "favorites": [],
+            "trackedEntityTypeAttributes": [
+                {
+                    "id": "vGFwmLmGHW0",
+                    "name": "Assessment HNQIS HNQIS - Health Area",
+                    "externalAccess": false,
+                    "valueType": "TEXT",
+                    "searchable": true,
+                    "displayInList": true,
+                    "favorite": false,
+                    "access": {
+                        "read": true,
+                        "update": true,
+                        "externalize": true,
+                        "delete": true,
+                        "write": true,
+                        "manage": true
+                    },
+                    "trackedEntityAttribute": {"id": "Xe5hUu6KkUT"},
+                    "trackedEntityType": {"id": "oNwpeWkfoWc"}
+                },
+                {
+                    "id": "cFUMKkLJeXw",
+                    "name": "Assessment HNQIS HNQIS - Organization Unit",
+                    "externalAccess": false,
+                    "valueType": "TEXT",
+                    "searchable": false,
+                    "displayInList": true,
+                    "favorite": false,
+                    "access": {
+                        "read": true,
+                        "update": true,
+                        "externalize": true,
+                        "delete": true,
+                        "write": true,
+                        "manage": true
+                    },
+                    "trackedEntityAttribute": {"id": "nHg1hGgtJwm"},
+                    "trackedEntityType": {"id": "oNwpeWkfoWc"}
+                },
+                {
+                    "id": "h84d50fy91s",
+                    "name": "Assessment HNQIS HNQIS - Assessment Date",
+                    "externalAccess": false,
+                    "valueType": "DATE",
+                    "searchable": true,
+                    "displayInList": true,
+                    "favorite": false,
+                    "access": {
+                        "read": true,
+                        "update": true,
+                        "externalize": true,
+                        "delete": true,
+                        "write": true,
+                        "manage": true
+                    },
+                    "trackedEntityAttribute": {"id": "UlUYUyZJ6o9"},
+                    "trackedEntityType": {"id": "oNwpeWkfoWc"}
+                },
+                {
+                    "id": "B9oWR52xFT5",
+                    "name": "Assessment HNQIS HNQIS - Competency Class",
+                    "externalAccess": false,
+                    "valueType": "TEXT",
+                    "searchable": false,
+                    "displayInList": true,
+                    "favorite": false,
+                    "access": {
+                        "read": true,
+                        "update": true,
+                        "externalize": true,
+                        "delete": true,
+                        "write": true,
+                        "manage": true
+                    },
+                    "trackedEntityAttribute": {"id": "ulU9KKgSLYe"},
+                    "trackedEntityType": {"id": "oNwpeWkfoWc"}
+                },
+                {
+                    "id": "MWI76z3SUQM",
+                    "name": "Assessment HNQIS HNQIS - Global Score",
+                    "externalAccess": false,
+                    "valueType": "TEXT",
+                    "searchable": false,
+                    "displayInList": true,
+                    "favorite": false,
+                    "access": {
+                        "read": true,
+                        "update": true,
+                        "externalize": true,
+                        "delete": true,
+                        "write": true,
+                        "manage": true
+                    },
+                    "trackedEntityAttribute": {"id": "NQdpdST0Gcx"},
+                    "trackedEntityType": {"id": "oNwpeWkfoWc"}
+                }
+            ],
+            "translations": [],
+            "attributeValues": [],
+            "userAccesses": []
+        }
+    ],
+    "attributes": [
+        {
+            "id": "yB5tFAAN7bI",
+            "name": "PRG Program Type",
+            "code": "PROGRAM_TYPE",
+            "indicatorAttribute": false,
+            "indicatorGroupAttribute": false,
+            "userGroupAttribute": false,
+            "dataElementAttribute": false,
+            "constantAttribute": false,
+            "valueType": "TEXT",
+            "categoryOptionAttribute": false,
+            "optionSetAttribute": false,
+            "sqlViewAttribute": false,
+            "legendSetAttribute": false,
+            "trackedEntityAttributeAttribute": false,
+            "organisationUnitAttribute": false,
+            "dataSetAttribute": false,
+            "documentAttribute": false,
+            "unique": false,
+            "validationRuleGroupAttribute": false,
+            "dataElementGroupAttribute": false,
+            "sectionAttribute": false,
+            "trackedEntityTypeAttribute": false,
+            "userAttribute": false,
+            "mandatory": false,
+            "categoryOptionGroupAttribute": false,
+            "programStageAttribute": false,
+            "programAttribute": true,
+            "categoryAttribute": false,
+            "categoryOptionComboAttribute": false,
+            "categoryOptionGroupSetAttribute": false,
+            "validationRuleAttribute": false,
+            "programIndicatorAttribute": false,
+            "organisationUnitGroupAttribute": false,
+            "dataElementGroupSetAttribute": false,
+            "organisationUnitGroupSetAttribute": false,
+            "optionAttribute": false,
+            "optionSet": {"id": "TOcCuCN2CLm"}
+        },
+        {
+            "id": "haUflNqP85K",
+            "name": "HNQIS2 Metadata",
+            "shortName": "HNQIS2 Metadata",
+            "code": "HNQIS2 Metadata",
+            "indicatorAttribute": false,
+            "indicatorGroupAttribute": false,
+            "userGroupAttribute": false,
+            "dataElementAttribute": true,
+            "constantAttribute": false,
+            "valueType": "LONG_TEXT",
+            "categoryOptionAttribute": false,
+            "optionSetAttribute": false,
+            "sqlViewAttribute": false,
+            "legendSetAttribute": false,
+            "trackedEntityAttributeAttribute": false,
+            "organisationUnitAttribute": false,
+            "dataSetAttribute": false,
+            "documentAttribute": false,
+            "unique": false,
+            "validationRuleGroupAttribute": false,
+            "dataElementGroupAttribute": false,
+            "sectionAttribute": false,
+            "trackedEntityTypeAttribute": false,
+            "userAttribute": false,
+            "mandatory": false,
+            "categoryOptionGroupAttribute": false,
+            "programStageAttribute": false,
+            "programAttribute": true,
+            "categoryAttribute": false,
+            "categoryOptionComboAttribute": false,
+            "categoryOptionGroupSetAttribute": false,
+            "validationRuleAttribute": false,
+            "programIndicatorAttribute": false,
+            "organisationUnitGroupAttribute": false,
+            "dataElementGroupSetAttribute": false,
+            "organisationUnitGroupSetAttribute": false,
+            "optionAttribute": false
+        },
+        {
+            "id": "LP171jpctBm",
+            "name": "FeedbackOrder",
+            "shortName": "FeedbackOrder",
+            "code": "FeedbackOrder",
+            "indicatorAttribute": false,
+            "indicatorGroupAttribute": false,
+            "userGroupAttribute": false,
+            "dataElementAttribute": true,
+            "constantAttribute": false,
+            "valueType": "TEXT",
+            "categoryOptionAttribute": false,
+            "optionSetAttribute": false,
+            "sqlViewAttribute": false,
+            "legendSetAttribute": false,
+            "trackedEntityAttributeAttribute": false,
+            "organisationUnitAttribute": false,
+            "dataSetAttribute": false,
+            "documentAttribute": false,
+            "unique": false,
+            "validationRuleGroupAttribute": false,
+            "dataElementGroupAttribute": false,
+            "sectionAttribute": false,
+            "trackedEntityTypeAttribute": false,
+            "userAttribute": false,
+            "mandatory": false,
+            "categoryOptionGroupAttribute": false,
+            "programStageAttribute": false,
+            "programAttribute": false,
+            "categoryAttribute": false,
+            "categoryOptionComboAttribute": false,
+            "categoryOptionGroupSetAttribute": false,
+            "validationRuleAttribute": false,
+            "programIndicatorAttribute": false,
+            "organisationUnitGroupAttribute": false,
+            "dataElementGroupSetAttribute": false,
+            "organisationUnitGroupSetAttribute": false,
+            "optionAttribute": false
+        },
+        {
+            "id": "yhKEe6BLEer",
+            "name": "FeedbackText",
+            "shortName": "FeedbackText",
+            "code": "FeedbackText",
+            "indicatorAttribute": false,
+            "indicatorGroupAttribute": false,
+            "userGroupAttribute": false,
+            "dataElementAttribute": true,
+            "constantAttribute": false,
+            "valueType": "LONG_TEXT",
+            "categoryOptionAttribute": false,
+            "optionSetAttribute": false,
+            "sqlViewAttribute": false,
+            "legendSetAttribute": false,
+            "trackedEntityAttributeAttribute": false,
+            "organisationUnitAttribute": false,
+            "dataSetAttribute": false,
+            "documentAttribute": false,
+            "unique": false,
+            "validationRuleGroupAttribute": false,
+            "dataElementGroupAttribute": false,
+            "sectionAttribute": false,
+            "trackedEntityTypeAttribute": false,
+            "userAttribute": false,
+            "mandatory": false,
+            "categoryOptionGroupAttribute": false,
+            "programStageAttribute": false,
+            "programAttribute": false,
+            "categoryAttribute": false,
+            "categoryOptionComboAttribute": false,
+            "categoryOptionGroupSetAttribute": false,
+            "validationRuleAttribute": false,
+            "programIndicatorAttribute": false,
+            "organisationUnitGroupAttribute": false,
+            "dataElementGroupSetAttribute": false,
+            "organisationUnitGroupSetAttribute": false,
+            "optionAttribute": false
+        }
+    ],
+    "legendSets": [
+        {
+            "name": "HNQIS - YesNo",
+            "id": "RXxPYFwtgf4",
+            "legends": [
+                {
+                    "id": "hN8Or3Zmi84",
+                    "name": "Fail_FAIL",
+                    "endValue": 0.5,
+                    "color": "#F69E9E",
+                    "displayName": "Fail_FAIL",
+                    "startValue": -12,
+                    "access": {
+                        "read": true,
+                        "update": true,
+                        "externalize": true,
+                        "delete": true,
+                        "write": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "id": "hk1wEH55DQZ",
+                    "name": "Pass",
+                    "endValue": 10,
+                    "color": "#8EBE76",
+                    "displayName": "Pass",
+                    "startValue": 0.5,
+                    "access": {
+                        "read": true,
+                        "update": true,
+                        "externalize": true,
+                        "delete": true,
+                        "write": true,
+                        "manage": true
+                    }
+                }
+            ]
+        },
+        {
+            "name": "HNQIS - YesPartialNo",
+            "id": "kqQjtHIc7II",
+            "legends": [
+                {
+                    "id": "AbYVOhKZgB6",
+                    "name": "No_FAIL",
+                    "endValue": 0.4,
+                    "color": "#F69E9E",
+                    "displayName": "No_FAIL",
+                    "startValue": -1000,
+                    "access": {
+                        "read": true,
+                        "update": true,
+                        "externalize": true,
+                        "delete": true,
+                        "write": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "id": "ANIlxg0ZzF0",
+                    "name": "Partial_FAIL",
+                    "endValue": 0.6,
+                    "color": "#FFA500",
+                    "displayName": "Partial_FAIL",
+                    "startValue": 0.4,
+                    "access": {
+                        "read": true,
+                        "update": true,
+                        "externalize": true,
+                        "delete": true,
+                        "write": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "id": "JG7Vm7DDTgG",
+                    "name": "Yes",
+                    "endValue": 10,
+                    "color": "#8EBE76",
+                    "displayName": "Yes",
+                    "startValue": 0.6,
+                    "access": {
+                        "read": true,
+                        "update": true,
+                        "externalize": true,
+                        "delete": true,
+                        "write": true,
+                        "manage": true
+                    }
+                }
+            ]
+        }
+    ],
+    "userGroups": [
+        {
+            "code": "HNQIS2 - Admins",
+            "name": "HNQIS2 - Admins",
+            "id": "TOLEUuY7woR",
+            "publicAccess": "rw------",
+            "externalAccess": false,
+            "favorite": false,
+            "access": {
+                "read": true,
+                "update": true,
+                "externalize": true,
+                "delete": true,
+                "write": true,
+                "manage": true
+            }
+        },
+        {
+            "code": "HNQIS2 - Users",
+            "name": "HNQIS2 - Users",
+            "id": "QiJXeqMmXXQ",
+            "publicAccess": "rw------",
+            "externalAccess": false,
+            "favorite": false,
+            "access": {
+                "read": true,
+                "update": true,
+                "externalize": true,
+                "delete": true,
+                "write": true,
+                "manage": true
+            }
+        }
+    ],
+    "userRoles": [
+        {
+            "name": "_App - Program Config App",
+            "id": "QbYqOgwk5fJ",
+            "displayName": "_App - Program Config App",
+            "publicAccess": "rw------",
+            "description": "HNQIS2 Config App",
+            "authorities": [
+                "F_SECTION_ADD",
+                "M_programconfigapp",
+                "F_PROGRAM_PUBLIC_ADD",
+                "M_dhis-web-maintenance",
+                "F_DATAELEMENT_PUBLIC_ADD",
+                "M_dhis-web-dashboard",
+                "F_PROGRAM_RULE_MANAGEMENT",
+                "F_PROGRAM_RULE_DELETE",
+                "F_PROGRAM_RULE_ADD",
+                "M_dhis-web-cache-cleaner",
+                "M_dhis-web-tracker-capture",
+                "F_PROGRAMSTAGE_ADD"
+            ]
+        }
+    ]
+}

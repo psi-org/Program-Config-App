@@ -7,6 +7,7 @@ const optionSetQuery = {
     results: {
         resource: 'optionSets',
         params: {
+            paging: false,
             fields: ['id', 'name', 'options[name]'],
             filter: ['name:ilike:HNQIS - ']
         }
@@ -17,9 +18,9 @@ const healthAreasQuery = {
     results: {
         resource: 'optionSets',
         params: {
+            paging: false,
             fields: ['name', 'options[id,code,name]'],
             filter: ['id:eq:y752HEwvCGi']
-            //filter: ['name:ilike:Health area']
         }
     }
 };
@@ -28,6 +29,7 @@ const legendSetsQuery = {
     results: {
         resource: 'legendSets',
         params: {
+            paging: false,
             fields: ['id','name'],
             filter: ['name:ilike:HNQIS']
         }
@@ -38,6 +40,7 @@ const programsQuery = {
     results: {
         resource: 'programs',
         params: {
+            paging: false,
             fields: ['name', 'id']
         }
     }
@@ -55,7 +58,6 @@ const DataProcessor = (props) => {
     {
         programName = programStage.program.name;
         programShortName = programStage.program.shortName;
-        console.log("PS: ", programStage);
         programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
         programPrefix = programMetadata?.dePrefix || programStage.program.id;
         programHealthArea = programMetadata?.healthArea || "FP";
@@ -63,6 +65,7 @@ const DataProcessor = (props) => {
     }
 
     const [ isDownloaded, setIsDownloaded] = useState(false);
+    const [ exportFlag, setExportFlag] = useState(true);
     const { data: data} = useDataQuery(optionSetQuery);
     const { data: haData } = useDataQuery(healthAreasQuery);
     const { data: lsData } = useDataQuery(legendSetsQuery);
@@ -74,9 +77,40 @@ const DataProcessor = (props) => {
     let legendSetData = [];
     let programData = [];
 
+    let optionPool = data?.results.optionSets;
+    if (optionPool)
+    {
+        optionData = optionPool.map(op=>{
+            return {"Option Sets": op.name, UID: op.id, Options: arrayObjectToStringConverter(op.options, "name")}
+        })
+    }
+
+    let haPools = haData?.results.optionSets[0].options;
+    if (haPools)
+    {
+        healthAreaData = haPools.map(hp=>{
+            return {code: hp.code, "Health Area": hp.name}
+        });
+    }
+
+    let legendPool = lsData?.results.legendSets;
+    if (legendPool)
+    {
+        legendSetData = legendPool.map(lp => {
+            return {"Legend Set": lp.name, UID: lp.id}
+        });
+    }
+
+    let prgPool = progData?.results.programs;
+    if (prgPool)
+    {
+        programData = prgPool.map(pp=>{
+            return {Program: pp.name, UID: pp.id}
+        });
+    }
+
     const initialize = () => {
         if(typeof programStage.program !== "undefined") compile_report();
-        getOptionSets();
         setTimeout(function() {
             setIsDownloaded(true);
         }, 2000);
@@ -86,7 +120,12 @@ const DataProcessor = (props) => {
         let program_stage_id = programStage.id;
 
         programStage.programStageSections.forEach((programSection) => {
+            let criticalStepsDataElements = ['NAaHST5ZDTE','VqBfZjZhKkU','pzWDtDUorBt'];
+
             let program_section_id = programSection.id;
+
+            // Skip 'Critical Steps Calculations' Section
+            if(programSection.dataElements.find(de => criticalStepsDataElements.includes(de.id))) return;
 
             let row = {};
             row.structure = "Section";
@@ -97,8 +136,9 @@ const DataProcessor = (props) => {
 
             programSection.dataElements.forEach((dataElement) => {
                 let row = {};
-                row.form_name = dataElement.formName;
-                row.value_type = dataElement.valueType;
+
+                row.form_name = dataElement.formName.replaceAll(' [C]','');
+                row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : '';
                 row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
                 row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
                 row.description = dataElement.description;
@@ -106,9 +146,6 @@ const DataProcessor = (props) => {
                 row.program_stage_id = program_stage_id;
                 row.program_section_id = program_section_id;
                 row.data_element_id = dataElement.id;
-
-                //let critical = dataElement.attributeValues.filter(av => av.attribute.id === "NPwvdTt0Naj");
-                //row.critical = (critical.length > 0) ? critical[0].value : '';
 
                 let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === "haUflNqP85K");
                 let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
@@ -119,8 +156,8 @@ const DataProcessor = (props) => {
                 row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
                 row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion) : '';
                 row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : '';
-                row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined') ? metaData.isCompulsory: '';
-                row.isCritical = (typeof metaData.isCritical !== 'undefined') ? metaData.isCritical: '';
+                row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: '';
+                row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: '';
 
                 let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === "LP171jpctBm");
                 row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : '';
@@ -145,72 +182,11 @@ const DataProcessor = (props) => {
         return deMetadata.varName;
     }
 
-    const getOptionSets = () => {
-        if(typeof data !== 'undefined') {
-            let optionSets = data.results.optionSets;
-            optionSets.forEach((optionSet) => {
-                let options = arrayObjectToStringConverter(optionSet.options, "name");
-                let data = {
-                    "Option Sets": optionSet.name,
-                    "UID": optionSet.id,
-                    "Options": options
-                };
-                optionData.push(data);
-            })
-            getHealthAreas();
-        }
-    }
-
-    const getHealthAreas = () => {
-        if(typeof haData !== 'undefined') {
-            const healthAreas = haData.results.optionSets;
-            healthAreas.forEach((ha) => {
-                ha.options.forEach((option) => {
-                    let data = {
-                        "Code": option.code,//option.id,
-                        "Health Area": option.name
-                    };
-                    healthAreaData.push(data);
-                });
-            });
-            getLegendSet();
-        }
-    }
-
-    const getLegendSet = () => {
-        if(typeof lsData !== 'undefined')
-        {
-            let legendSets = lsData.results.legendSets;
-            legendSets.forEach((legendSet) => {
-                let data = {
-                    "Legend Set" : legendSet.name,
-                    "UID" : legendSet.id
-                };
-                legendSetData.push(data);
-            })
-            getProgramData();
-        }
-    }
-
-    const getProgramData = () => {
-        if(typeof progData !== 'undefined')
-        {
-            let ps = progData.results.programs;
-            ps.forEach((program) => {
-                let data = {
-                    "Program": program.name,
-                    "UID": program.id
-                };
-                programData.push(data);
-            });
-        }
-    }
-
     initialize();
 
     return (
         <>
-            {isDownloaded && <Exporter Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programName={programName} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
+            {isDownloaded && exportFlag && <Exporter programName={props.programName} flag={exportFlag} setFlag={setExportFlag} Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
         </>
     );
 }
