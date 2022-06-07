@@ -33,11 +33,12 @@ const ouGroupQuery = {
 const searchOrgUnitQuery = {
     results: {
         resource: 'organisationUnits',
-        params: {
-            fields: ['id', 'displayName','path','children::isNotEmpty'],
-            withinUserHierarchy: true,
-            paging: false
-        }
+        params: ({filterString}) => ({
+            pageSize: 100,
+            fields: ['id','path','displayName','children::isNotEmpty'],
+            filter: [`displayName:ilike:${filterString}`],
+            withinUserHierarchy: true
+        })
     }
 
 }
@@ -75,7 +76,7 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
 
     const oUnits = useDataQuery(ouQuery, {variables: {id: id, level:level}});
     const oUnitsByGroups = useDataQuery(ouGroupQuery, {variables: {id: id, groupId: groupId}});
-    const searchOunits = useDataQuery(searchOrgUnitQuery);
+    const searchOunits = useDataQuery(searchOrgUnitQuery, {variables: {filterString: filterString}});
     const {loading: metadataLoading, data: prgMetaData} = useDataQuery(programMetadata);
     const {loading: poLoading, data: prgOrgUnitData} = useDataQuery(programOrgUnitsQuery, {variables: {id: id}});
     const metadataDM = useDataMutation(metadataMutation);
@@ -115,17 +116,17 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
         }
         setHasChanges(true);
     };
-
+    //TODO: Organisation Units filter not 100% working. Missing search by Code, shortName
     const organisationUnitFilterHandler = (event) => {
         if (event.target.value.length > 0)
         {
             let filterString = document.getElementById("filterOrgUnitName").value;
-            searchOunits.refetch().then(orgUnits => {
-                if (typeof orgUnits.results !== "undefined") {
-                    console.log("INput: ", filterString);
-                    const rootOrgUnits = orgUnits.results.organisationUnits.filter(ou=>(new RegExp(`${filterString}`)).test(ou.displayName)).map(ou=> ou.id);
-                    setOrgUnitTreeRoot([...rootOrgUnits]);
-                    console.log("rootOrgUnits: ", rootOrgUnits);
+            searchOunits.refetch({filterString: filterString}).then(data => {
+                if (typeof data.results !== "undefined") {
+                    setOrgUnitTreeRoot([]);
+                    setOrgUnitTreeRoot([...data.results?.organisationUnits.map(ou => ou.id)]);
+                    // const rootOrgUnits = orgUnits.results.organisationUnits.filter(ou=>(new RegExp(`${filterString}`)).test(ou.displayName)).map(ou=> ou.id);
+                    // setOrgUnitTreeRoot([...rootOrgUnits]);;
                 }
             });
         }
