@@ -84,7 +84,6 @@ const queryPRV = {
 };
 
 const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
-
     // Globals
     const programId = programStage.program.id;
 
@@ -109,8 +108,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
 
     const [deToEdit, setDeToEdit] = useState('')
 
-    //const [snackbarContent, setSnackbarContent] = useState('')
-
     const [snackParams, setSnackParams] = useState(false)
     const pushNotification = (content, severity = "success") => setSnackParams({ content, severity })
 
@@ -131,12 +128,21 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         :[{name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement))}]
     );
     const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
-    const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations"));
+    const [criticalSection, setCriticalSection] = useState({...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations")});
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
     const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"));
     const [errorReports, setErrorReports] = useState(undefined)
 
     const [addedSection,setAddedSection] = useState()
+
+    useEffect(()=>{
+        console.log(programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations"))
+        return (()=>{
+            console.log("DEATTACH")
+            setCriticalSection(undefined)
+        })
+    },[])
+
 
     // REFETCH STAGE
     const refetchProgramStage = (params={}) =>{
@@ -148,7 +154,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                 :[{name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement))}]
             )
             setScoresSection({ ...programStage.programStageSections.find(s =>  hnqisMode && programStage.formType==="SECTION" && s.name === "Scores") })
-            setCriticalSection(programStage.programStageSections.find(s =>  hnqisMode && programStage.formType==="SECTION" && s.name === "Critical Steps Calculations"))
+            setCriticalSection({...programStage.programStageSections.find(s =>  hnqisMode && programStage.formType==="SECTION" && s.name === "Critical Steps Calculations")})
             setProgramStageDataElements([...programStage.programStageDataElements])
             setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"))
         })

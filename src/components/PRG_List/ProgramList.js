@@ -134,7 +134,7 @@ const ProgramList = () => {
                             <Popper reference={ref} placement="bottom-end">
                                 <FlyoutMenu>
                                     <MenuItem label="About PCA" icon={<InfoIcon />} onClick={() => { setSettingsMenu(false); setAboutModal(true); }} />
-                                    <MenuItem label="HNQIS2 Status" icon={<InstallDesktopIcon />} onClick={()=>{ setSettingsMenu(false); setH2Modal(true) ;}}/>
+                                    <MenuItem label="HNQIS 2.0 Status" icon={<InstallDesktopIcon />} onClick={()=>{ setSettingsMenu(false); setH2Modal(true) ;}}/>
                                 </FlyoutMenu>
                             </Popper>
                         </Layer>

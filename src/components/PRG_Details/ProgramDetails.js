@@ -78,7 +78,7 @@ const ProgramDetails = () => {
     if(hnqisMode && !h2Ready) return (
         <div style={{margin:'2em'}}>
             <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
-                <span>First go to <Link to="/">Home Screen</Link> and Install the latest H2 Metadata to continue</span>
+                <span>First go to <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue</span>
             </NoticeBox>
         </div>
     )
