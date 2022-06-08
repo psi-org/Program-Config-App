@@ -247,7 +247,6 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
            applySharing(payloadMetadata[meta]);
         });
 
-        console.log(payloadMetadata);
         metadataRequest.mutate({ data: payloadMetadata })
             .then(response => {
                 if (response.status !== 'OK') {
