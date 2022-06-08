@@ -232,23 +232,23 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
 
     const apply = (level) => {
         setContent('loading');
-        let elementsArray = ["programs"];
+        let payloadMetadata = {};
+        payloadMetadata.programs = metadata.programs;
         switch (level) {
             case 2:
-                elementsArray.push("dataElements");
+                payloadMetadata.dataElements = metadata.dataElements;
             case 1:
-                elementsArray.push("programStages");
+                payloadMetadata.programStages = metadata.programStages;
                 break;
             default:
                 break;
         }
-        console.log(elementsArray)
-        elementsArray.forEach((elements) => {
-            applySharing(elements);
+        Object.keys(payloadMetadata).forEach(meta => {
+           applySharing(payloadMetadata[meta]);
         });
-        metadataRequest.mutate({ data: metadata })
+
+        metadataRequest.mutate({ data: payloadMetadata })
             .then(response => {
-                // statusRef.current.textContent = `{<h4>Sharing Stats</h4><br/><hr/><ul><li>Created: ${stats.created}</li><li>Updated: ${stats.updated}</li><li>Deleted: ${stats.deleted}</li><li>Ignored: ${stats.ignored}</li><li>Total: ${stats.total}</li></ul>}`;
                 if (response.status !== 'OK') {
                     setContent('status');
                     
@@ -261,7 +261,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     }
 
     const applySharing = (elements) => {
-        metadata[elements]?.forEach((element) => {
+        elements.forEach((element) => {
             element.sharing.public = payload.object.publicAccess;
             payload.object.userAccesses.forEach((user) => {
                 if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
