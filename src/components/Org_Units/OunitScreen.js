@@ -227,7 +227,7 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
                             <div style={{ marginTop: "10px"}}> { selectedOrgUnits.length } Organisation units selected </div>
                             {!poLoading &&
                                 <div style={{ minHeight: "300px", maxHeight: "450px", minWidth: "300px", maxWidth: "480px", overflow: "auto", border: "1px solid rgb(189, 189, 189)", borderRadius: "3px", padding: "4px", margin: "4px 0px", display: "inline-block", verticalAlign: "top"}}>
-                                    <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpaneded={orgUnitPathSelected}/>
+                                    <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ selectedOrgUnits }/>
                                 </div>
                             }
                             <div style={{width: "400px", background: "white", marginLeft: "1rem", marginTop: "1rem", display: "inline-block"}}>
