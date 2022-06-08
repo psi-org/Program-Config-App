@@ -216,7 +216,7 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
                 <DialogContent dividers style={{ padding: '1em 2em'}}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ position: "relative", minWidth: "850px"}}>
-                            <TextField id={"filterOrgUnitName"} label={"Filtering Organisation unit by Name"} onChange={organisationUnitFilterHandler} variant={"standard"} ref={filterRef} style={{ width: "100%"}}/>
+                            <TextField id={"filterOrgUnitName"} label={"Filtering Organisation unit by Name"} /*onChange={organisationUnitFilterHandler}*/ variant={"standard"} ref={filterRef} style={{ width: "100%"}}/>
                             <div style={{ marginTop: "10px"}}> { selectedOrgUnits.length } Organisation units selected </div>
                             {!poLoading &&
                                 <div style={{ minHeight: "300px", maxHeight: "450px", minWidth: "300px", maxWidth: "480px", overflow: "auto", border: "1px solid rgb(189, 189, 189)", borderRadius: "3px", padding: "4px", margin: "4px 0px", display: "inline-block", verticalAlign: "top"}}>
