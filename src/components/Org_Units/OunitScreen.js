@@ -3,7 +3,7 @@ import { OrganisationUnitTree } from "@dhis2/ui";
 import {useState, useEffect, useRef} from "react";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
-import { DialogActions, DialogContent, FormControl, InputLabel, TextField, Select, ButtonGroup, Button, MenuItem } from "@mui/material";
+import { DialogActions, DialogContent, FormControl, InputLabel, TextField, Select, ButtonGroup, Button, MenuItem, Box, CircularProgress } from "@mui/material";
 
 const ouQuery = {
     results: {
@@ -70,6 +70,8 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
     const [ orgUnitLevel, setOrgUnitLevel ] = useState(undefined);
     const [ orgUnitGroup, setOrgUnitGroup ] = useState('');
     const [ hasChanges, setHasChanges ] = useState(false);
+    const [ content, setContent ] = useState('form');
+    const [ importStatus, setImportStatus ] = useState({});
     const [ selectedOrgUnits, setSelectedOrgUnits ] = useState([]);
     const [ orgUnitPathSelected, setOrgUnitPathSelected ] = useState([]);
     const [ orgUnitTreeRoot, setOrgUnitTreeRoot ] = useState(orgUnitMetaData.userOrgUnits?.organisationUnits.map(ou => ou.id));
@@ -187,6 +189,7 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
     }
 
     const orgUnitAssignmentHandler = () => {
+        setContent('loading');
         if (!metadataLoading)
         {
             let metadata = {};
@@ -198,10 +201,12 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
                     console.log("Response: ", response);
                     if(response.status !== 'OK')
                     {
-                        console.log("Somethign went wrong");
+                        setContent('status');
                     }
                     else {
-                        console.log("Success");
+                        setContent('status');
+                        let stats = response?.stats;
+                        setImportStatus(stats);
                     }
                 })
         }
@@ -214,6 +219,8 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
             <CustomMUIDialog open={true} maxWidth="md" fullWidth={true}>
                 <CustomMUIDialogTitle onClose={hideFormHandler} id={"orgUnit_assignemnt_dialog_title"}>Assign Organisation Unit</CustomMUIDialogTitle>
                 <DialogContent dividers style={{ padding: '1em 2em'}}>
+                    {content === 'loading' && <Box sx={{ display: 'inline-flex' }}><CircularProgress /></Box>}
+                    {content === 'form' &&
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ position: "relative", minWidth: "850px"}}>
                             <TextField id={"filterOrgUnitName"} label={"Filtering Organisation unit by Name"} /*onChange={organisationUnitFilterHandler}*/ variant={"standard"} ref={filterRef} style={{ width: "100%"}}/>
@@ -263,6 +270,16 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
                             </div>
                         </div>
                     </div>
+                    }
+                    {content === 'status' &&
+                    <div>
+                        <b>Import Status</b><hr />
+                        <p>Created: {importStatus.created}</p>
+                        <p>Updated: {importStatus.updated}</p>
+                        <p>Deleted: {importStatus.deleted}</p>
+                        <p>Ignored: {importStatus.ignored}</p>
+                        <p>Total: {importStatus.total}</p>
+                    </div>}
                 </DialogContent>
                 <DialogActions style={{ padding: '1em'}}>
                     <Button onClick={hideFormHandler} color={"error"}>Close</Button>
