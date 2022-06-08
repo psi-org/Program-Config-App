@@ -92,14 +92,16 @@ const ProgramDetails = () => {
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns">
-                    <MuiButton
-                        variant="outlined"
-                        color='inherit'
-                        startIcon={<AddCircleOutlineIcon />}
-                        onClick={() => setShowStageForm(true)}
-                        disabled={showStageForm}>
-                        Add Program Stage
-                    </MuiButton>
+                    {!hnqisMode &&
+                        <MuiButton
+                            variant="outlined"
+                            color='inherit'
+                            startIcon={<AddCircleOutlineIcon />}
+                            onClick={() => setShowStageForm(true)}
+                            disabled={showStageForm}>
+                            Add Program Stage
+                        </MuiButton>
+                    }
                 </div>
             </div>
             <div className="wrapper">

@@ -180,7 +180,7 @@ const ProgramList = () => {
                     }
                     {
                         orgUnitProgramId &&
-                            <OunitScreen id={orgUnitProgramId} orgUnitMetaData={orgUnitMetaData.data}  setOrgUnitProgramId={setOrgUnitProgramId}/>
+                            <OunitScreen id={orgUnitProgramId} orgUnitMetaData={orgUnitMetaData.data}  setOrgUnitProgramId={setOrgUnitProgramId} setNotification={setNotification}/>
                     }
                 </div>
             </div>

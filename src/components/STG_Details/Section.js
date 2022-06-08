@@ -33,7 +33,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 import Chip from '@mui/material/Chip';
 
-const DraggableSection = ({program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus }) => {
+const DraggableSection = ({program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -89,7 +89,7 @@ const DraggableSection = ({program, stageSection, stageDataElements, DEActions, 
     var classNames = (stageSection.importStatus) ? ' import_' + stageSection.importStatus : '';
 
     return (
-        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined || DEActions.deToEdit!==''}>
+        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined || DEActions.deToEdit!=='' || !isSectionMode}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                     <div className={"ml_item section-header" + (openMenu?' section-selected':'') + classNames}>
@@ -106,7 +106,7 @@ const DraggableSection = ({program, stageSection, stageDataElements, DEActions, 
                             {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                         </div>
                         <div className="ml_item-cta">
-                            <img src={move_vert_svg} alt="menu" id={'menu'+stageSection.id} onClick={()=>{setRef(document.getElementById('menu'+stageSection.id)); toggle()}} style={{cursor:'pointer'}}/>
+                            {isSectionMode && <img src={move_vert_svg} alt="menu" id={'menu'+stageSection.id} onClick={()=>{setRef(document.getElementById('menu'+stageSection.id)); toggle()}} style={{cursor:'pointer'}}/>}
                             {openMenu &&
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
@@ -138,6 +138,7 @@ const DraggableSection = ({program, stageSection, stageDataElements, DEActions, 
                                             key={de.id || i}
                                             hnqisMode={hnqisMode}
                                             deStatus={editStatus?.dataElements?.find(dataElement => dataElement.id === de.id)}
+                                            isSectionMode={isSectionMode}
                                         />;
                                     })
                                 }

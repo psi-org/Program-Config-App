@@ -52,7 +52,7 @@ const SectionManager = (props) => {
                 props.sections.splice(props.newSectionIndex, 0, section);
             }
             props.refreshSections(props.sections)
-            props.notify(<span>Section {props.newSectionIndex!==undefined?'created':'edited'}! <strong>Remember to Validate and Save!</strong></span>)
+            props.notify(<span>Section {props.newSectionIndex!==undefined?'created':'edited'}! <strong>Remember to {props.hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>)
             props.setAddedSection({index:props.sectionIndex ?? props.newSectionIndex ,mode:props.newSectionIndex!==undefined?'created':'edited',dataElements:[]})
             hideForm()
         }

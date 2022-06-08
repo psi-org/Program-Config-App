@@ -261,7 +261,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     }
 
     const applySharing = (elements) => {
-        elements.forEach((element) => {
+        elements?.forEach((element) => {
             element.sharing.public = payload.object.publicAccess;
             payload.object.userAccesses.forEach((user) => {
                 if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
