@@ -78,7 +78,7 @@ const ProgramDetails = () => {
     if(hnqisMode && !h2Ready) return (
         <div style={{margin:'2em'}}>
             <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
-                <span>First go to <Link to="/">Home Screen</Link> and Install the latest H2 Metadata to continue</span>
+                <span>First go to <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue</span>
             </NoticeBox>
         </div>
     )
@@ -92,14 +92,16 @@ const ProgramDetails = () => {
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns">
-                    <MuiButton
-                        variant="outlined"
-                        color='inherit'
-                        startIcon={<AddCircleOutlineIcon />}
-                        onClick={() => setShowStageForm(true)}
-                        disabled={showStageForm}>
-                        Add Program Stage
-                    </MuiButton>
+                    {!hnqisMode &&
+                        <MuiButton
+                            variant="outlined"
+                            color='inherit'
+                            startIcon={<AddCircleOutlineIcon />}
+                            onClick={() => setShowStageForm(true)}
+                            disabled={showStageForm}>
+                            Add Program Stage
+                        </MuiButton>
+                    }
                 </div>
             </div>
             <div className="wrapper">

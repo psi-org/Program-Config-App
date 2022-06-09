@@ -14,30 +14,6 @@ import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg'
 
 const CriticalCalculations = ({ stageSection, index }) => {
 
-    useEffect(() => {
-        $('img.bsct_cta').off().on("click", function (e) {
-            if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
-                $(this).attr('src', contracted_bottom_svg);
-                $(this).parent().parent().css({
-                    'margin': '8px 8px 0px 8px',
-                    'border-radius': '4px 4px 0 0'
-                });
-                $(this).parent().parent().next().css({
-                    'display': 'block'
-                });
-            } else {
-                $(this).attr('src', expanded_bottom_svg);
-                $(this).parent().parent().css({
-                    'margin': '0x',
-                    'border-radius': '4px'
-                });
-                $(this).parent().parent().next().css({
-                    'display': 'none'
-                });
-            }
-        });
-    }, []);
-
     return (
         <>
             <div className="ml_item" style={{color:"#333333" , backgroundColor: "#b2dfdb", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>

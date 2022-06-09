@@ -113,11 +113,26 @@ export function parseErrors(response){
       reports.concat(
         typeReport.objectReports.map(objectReport => 
           objectReport.errorReports.map(err => 
-            `<p>${err.message}</p>`
+            (<p>{err.message}</p>)
           )
         )
       ),[]
     )
     .flat()
-    .join("") 
+}
+
+export function parseErrorsUL(response){ 
+  return <ul>{
+    response.typeReports.reduce((reports,typeReport)=>
+      reports.concat(
+        typeReport.objectReports.map(objectReport => 
+          objectReport.errorReports.map(err => 
+            (<li>{err.message}</li>)
+          )
+        )
+      ),[]
+    )
+    .flat()
+  }
+  </ul>
 }

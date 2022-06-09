@@ -84,9 +84,9 @@ const queryPRV = {
 };
 
 const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
-
     // Globals
     const programId = programStage.program.id;
+    const [isSectionMode,setIsSectionMode] = useState(programStage.formType==="SECTION" || programStage.programStageDataElements.length === 0)
 
     // Flags
     const [saveStatus, setSaveStatus] = useState(hnqisMode?'Validate':'Save Changes');
@@ -109,8 +109,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
 
     const [deToEdit, setDeToEdit] = useState('')
 
-    //const [snackbarContent, setSnackbarContent] = useState('')
-
     const [snackParams, setSnackParams] = useState(false)
     const pushNotification = (content, severity = "success") => setSnackParams({ content, severity })
 
@@ -126,29 +124,38 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     // States
     const [removedElements, setRemovedElements] = useState([])
     const [originalProgramStageDataElements,setOriginalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
-    const [sections, setSections] = useState(programStage.formType==="SECTION"
+    const [sections, setSections] = useState((isSectionMode)
         ?[...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
         :[{name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement))}]
     );
     const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
-    const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations"));
+    const [criticalSection, setCriticalSection] = useState({...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations")});
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
     const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"));
     const [errorReports, setErrorReports] = useState(undefined)
 
     const [addedSection,setAddedSection] = useState()
 
+    useEffect(()=>{
+        //console.log(programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations"))
+        return (()=>{
+            console.log("DEATTACH")
+            setCriticalSection(undefined)
+        })
+    },[])
+
+
     // REFETCH STAGE
     const refetchProgramStage = (params={}) =>{
         stageRefetch({variables : {programStage:programStage.id}}).then(data => {
             let programStage = data.results
             setOriginalProgramStageDataElements(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
-            setSections(programStage.formType==="SECTION"
+            setSections((isSectionMode)
                 ?[...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
                 :[{name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement))}]
             )
-            setScoresSection({ ...programStage.programStageSections.find(s =>  hnqisMode && programStage.formType==="SECTION" && s.name === "Scores") })
-            setCriticalSection(programStage.programStageSections.find(s =>  hnqisMode && programStage.formType==="SECTION" && s.name === "Critical Steps Calculations"))
+            setScoresSection({ ...programStage.programStageSections.find(s =>  hnqisMode && (isSectionMode) && s.name === "Scores") })
+            setCriticalSection({...programStage.programStageSections.find(s =>  hnqisMode && (isSectionMode) && s.name === "Critical Steps Calculations")})
             setProgramStageDataElements([...programStage.programStageDataElements])
             setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"))
         })
@@ -167,7 +174,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         setProgramStageDataElements(programStageDataElements)
         setSections(sections)
         setDeToEdit('')
-        pushNotification(<span>Data Element edited! <strong>Remember to Validate and Save!</strong></span>)
+        pushNotification(<span>Data Element edited! <strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>)
     }
 
     const removeDE = (id, section) => {
@@ -179,7 +186,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             programStageDataElements.splice(psdeIdx, 1)
             setSections(sections)
             setProgramStageDataElements(programStageDataElements)
-            pushNotification(<span>Data Element removed! <strong>Remember to Validate and Save!</strong></span>, "info")
+            pushNotification(<span>Data Element removed! <strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>, "info")
         }
     }
 
@@ -196,7 +203,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         setSections(sections)
         setProgramStageDataElements(newProgramStageDataElements)
         setDeManager(false)
-        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to Validate and Save!</strong></span>)
+        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>)
         setAddedSection({
             index:sectionIndex,
             mode:'Updated',
@@ -233,7 +240,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         setProgramStageDataElements(newPSDEs)
         sections.splice(idx, 1)
         setSections(sections)
-        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to Validate and Save!</strong></span>, "info")
+        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>, "info")
     }
 
     const SectionActions = {
@@ -432,10 +439,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                 <div className="c_srch"></div>
                 <div className="c_btns" style={{ color: '#444444' }}>
                     <ButtonStrip>
-                        {programStage.formType==="SECTION" &&
+                        {(isSectionMode) &&
                             <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
                         }
-                        {hnqisMode && programStage.formType==="SECTION" &&
+                        {hnqisMode && (isSectionMode) &&
                             <>
                                 <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
                                 <Button color='inherit' variant='outlined' startIcon={!exportToExcel?<FileDownloadIcon />:<CircularLoader small />} name="generator"
@@ -569,7 +576,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                         {
                             createMetadata.data && createMetadata.data.status == 'ERROR' && <ErrorReports errors={parseErrors(createMetadata.data)} />
                         }
-                        <Droppable droppableId="dpb-sections" type="SECTION">
+                        <Droppable droppableId="dpb-sections" type="SECTION" isDra>
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
@@ -583,7 +590,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                                                 index={idx} 
                                                 key={pss.id || idx} 
                                                 SectionActions={SectionActions} 
-                                                hnqisMode={hnqisMode} 
+                                                hnqisMode={hnqisMode}
+                                                isSectionMode={isSectionMode} 
                                             />
                                         })
                                     }
@@ -591,8 +599,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                                 </div>
                             )}
                         </Droppable>
-                        {hnqisMode && programStage.formType==="SECTION" && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />}
-                        {hnqisMode && programStage.formType==="SECTION" && <Scores stageSection={scoresSection} index={0} key={scoresSection.id} program={programId}/>}
+                        {hnqisMode && (isSectionMode) && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />}
+                        {hnqisMode && (isSectionMode) && <Scores stageSection={scoresSection} index={0} key={scoresSection.id} program={programId}/>}
 
                     </div>
                 </div>
@@ -640,6 +648,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                     refreshSections={setSections}
                     notify={pushNotification}
                     setAddedSection={setAddedSection}
+                    hnqisMode={hnqisMode}
                 />
             }
             {deManager &&

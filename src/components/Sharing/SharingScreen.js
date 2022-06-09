@@ -84,7 +84,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     const [overwrite, setOverwrite] = useState(true);
     const [deleted, setDeleted] = useState([]);
 
-    const { loading, error, data, refetch } = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
+    const { loading, error, data } = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
     const { loading: entityLoading, data: entities } = useDataQuery(entitiesQuery);
     const { loading: metadataLoading, data: prgMetaData } = useDataQuery(programMetadata);
     const metadataDM = useDataMutation(metadataMutation);
@@ -226,7 +226,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
             default:
                 break;
         }
-        
+
         usersNGroups = availableUserGroups();
     }
 
@@ -251,7 +251,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
             .then(response => {
                 if (response.status !== 'OK') {
                     setContent('status');
-                    
+
                 } else {
                     setContent('status');
                     let stats = response?.stats;
@@ -261,7 +261,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     }
 
     const applySharing = (elements) => {
-        elements.forEach((element) => {
+        elements?.forEach((element) => {
             element.sharing.public = payload.object.publicAccess;
             payload.object.userAccesses.forEach((user) => {
                 if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
@@ -289,7 +289,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
 
     return (
         <>
-            <Modal onClose={hideForm} style={{ maxWidth: "800px", minWidth: "600px" }}>
+            <Modal onClose={hideForm}>
                 <ModalTitle>Sharing settings</ModalTitle>
                 <ModalContent>
                     {content === 'loading' && <Box sx={{ display: 'inline-flex' }}><CircularProgress /></Box>}

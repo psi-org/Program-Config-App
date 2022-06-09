@@ -31,7 +31,7 @@ const About = (props) => {
             <DialogContent dividers style={{padding: '1em 2em', display: 'grid', gridTemplateColumns: '3fr 2fr' }}>
                 <div style={{width:"80%", display: 'flex', flexDirection:'column', gap: '1em' }}>
                     <div><strong>Version</strong> : {BUILD_VERSION}</div>
-                    <div><strong>Build date</strong> : {BUILD_DATE}</div>
+                    <div><strong>Version Build date</strong> : {BUILD_DATE}</div>
                     <div><strong>DHIS2 Server version</strong> : {localStorage.getItem('SERVER_VERSION')}</div>
                     <div>
                         <span><strong>Program Config App metadata</strong> {!pcaMetadata?.results && <span style={{ color: 'red' }}>Not Found</span>}</span>
@@ -49,7 +49,7 @@ const About = (props) => {
                         )}
                     </div>
                     <div>
-                        <span><strong>HNQIS2 Metadata</strong> {!hnqis2Metadata?.results && <span style={{ color: 'red' }}>Not Found</span>}</span>
+                        <span><strong>HNQIS 2.0 Metadata</strong> {!hnqis2Metadata?.results && <span style={{ color: 'red' }}>Not Found</span>}</span>
                         {hnqis2Metadata?.results && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1em', margin: '0.5em 0 0 1em' }}>
                                 <div>

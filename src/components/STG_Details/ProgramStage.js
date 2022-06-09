@@ -1,4 +1,7 @@
 // *** Global State ***
+
+import {useEffect} from "react"
+
 import { useDispatch } from "react-redux";
 import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
@@ -10,6 +13,8 @@ import {NoticeBox, CircularLoader} from "@dhis2/ui";
 import { Link, useParams } from "react-router-dom";
 import StageSections from "./StageSections";
 import { ajax } from "jquery";
+
+import {DeepCopy} from "../../configs/Utils"
 
 const query = {
     results: {
@@ -37,7 +42,7 @@ const ProgramStage = () => {
         setProgramStage(id);
     }
     
-    const programStage = useSelector(state => state.programStage);
+    const programStage = id ?? useSelector(state => state.programStage);
 
     if(!programStage){
         return (
@@ -47,7 +52,11 @@ const ProgramStage = () => {
         )
     }
 
-    const { loading, error, data, refetch } = useDataQuery(query, {variables : {programStage}});
+    const { loading, error, data, refetch } = useDataQuery(query, {lazy:true, variables : {programStage}});
+
+    useEffect(()=>{
+        refetch()
+    },[])
 
     if (error) {
         return (
@@ -57,21 +66,29 @@ const ProgramStage = () => {
         )
     }
 
-    if (loading) {
-        return <span><CircularLoader /></span> 
+    /* if (loading) {
+        
+    } */
+
+    if(data){
+        const hnqisMode = !!data.results.program.attributeValues.find(av=>av.value==="HNQIS2")
+
+        if(hnqisMode && !h2Ready) return (
+            <div style={{margin:'2em'}}>
+                <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
+                    <span>First go to <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue</span>
+                </NoticeBox>
+            </div>
+        )
+
+        let programStageData = DeepCopy({...data.results})
+        /* console.log({programStageData}) */
+
+        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisMode={hnqisMode}/>
     }
 
-    const hnqisMode = !!data.results.program.attributeValues.find(av=>av.value==="HNQIS2")
-
-    if(hnqisMode && !h2Ready) return (
-        <div style={{margin:'2em'}}>
-            <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
-                <span>First go to <Link to="/">Home Screen</Link> and Install the latest H2 Metadata to continue</span>
-            </NoticeBox>
-        </div>
-    )
-
-    return <StageSections programStage={data.results} stageRefetch={refetch} hnqisMode={hnqisMode}/>
+    return <span><CircularLoader /></span> 
+    
     
 }
 
