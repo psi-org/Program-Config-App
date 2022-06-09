@@ -70,7 +70,7 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, d
                         <Popper reference={ref} placement="bottom-end">
                             <FlyoutMenu>
                                 <MenuItem label="Edit Program" icon={<EditIcon />} onClick={() => { toggle(); setShowProgramForm(true) }} />
-                                <MenuItem label="Sharing Settings" icon={<ShareIcon/>} onClick={()=>{toggle(); shareProgram(program.id)}}/>
+                                {program.access.update && <MenuItem label="Sharing Settings" icon={<ShareIcon/>} onClick={()=>{toggle(); shareProgram(program.id)}}/>}
                                 <MenuItem label={"Assign Organisation Units"} icon={<PublicIcon/>} onClick={()=>{ toggle(); assignOrgUnit(program.id)}}/>
                                 <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={() => { toggle(); downloadMetadata(program.id) }} />
                                 <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />

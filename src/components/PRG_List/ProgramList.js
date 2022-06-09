@@ -46,7 +46,7 @@ const query = {
             let paramsObject = {
                 pageSize,
                 page,
-                fields: ["code", "id", "name", "shortName", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "relatedProgram", "categoryCombo[id,name]", "trackedEntityType[id,name]", "style", "programTrackedEntityAttributes", "notificationTemplates", "translations", "organisationUnits", "programSections", "attributeValues", "programStages[id,name,programStageSections[*]]"],
+                fields: ["code", "id", "name", "shortName", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "relatedProgram", "categoryCombo[id,name]", "trackedEntityType[id,name]", "style", "programTrackedEntityAttributes", "notificationTemplates", "translations", "organisationUnits", "programSections", "attributeValues", "programStages[id,name,programStageSections[*]]", "access"],
                 filter: ['withoutRegistration:eq:false']
             }
 
