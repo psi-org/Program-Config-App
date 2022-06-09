@@ -590,19 +590,19 @@ const ProgramNew = (props) => {
     return <>
         <CustomMUIDialog open={true} maxWidth='md' fullWidth={true} >
             <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
-                Create New Program
+                {props.data?('Edit Program '+props.data.name):'Create New Program'}
             </CustomMUIDialogTitle >
             <DialogContent dividers style={{ padding: '1em 2em' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <FormControl sx={{ minWidth: '30%' }} error={validationErrors.pgrType !== undefined}>
-                        <InputLabel id="label-prgType">Program Type</InputLabel>
+                        <InputLabel id="label-prgType">Program Type (*)</InputLabel>
                         <Select
                             labelId="label-prgType"
                             id="prgTypePCA"
                             value={pgrTypePCA}
                             disabled={props.programType !== undefined}
                             onChange={handleChangePgrType}
-                            label="Config App Mode"
+                            label="Program Type (*)"
                         >
                             <MenuItem value="">
                                 <em>None</em>

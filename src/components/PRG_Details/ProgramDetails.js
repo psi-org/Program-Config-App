@@ -118,6 +118,7 @@ const ProgramDetails = () => {
                                         stagesRefetch={refetch}
                                         setNewStage={setNewStage}
                                         editStatus={newStage?.stage===programStage.id && newStage?.mode }
+                                        hnqisMode={hnqisMode}
                                     />
                                 )
                             })

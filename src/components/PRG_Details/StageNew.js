@@ -182,7 +182,7 @@ const StageNew = (props) => {
             stage.periodType = periodType
             stage.displayGenerateEventBox = displayGenerateEventBox
             stage.autoGenerateEvent = autoGenerate
-            stage.openAfterEnrollment = openFormAfterEnroll
+            if (openFormAfterEnroll) stage.openAfterEnrollment = openFormAfterEnroll
             if (openFormAfterEnroll) stage.reportDateToUse = reportDateToUse
             stage.remindCompleted = askCompleteProgram
             stage.allowGenerateNextVisit = askCreateEvent
@@ -237,7 +237,7 @@ const StageNew = (props) => {
     return <>
         <CustomMUIDialog open={true} maxWidth='md' fullWidth={true} >
             <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
-                Create New Program Stage in {props.programName}
+                {props.data?('Edit Program Stage '+props.data.name):('Create New Program Stage in Program '+props.programName)}
             </CustomMUIDialogTitle >
             <DialogContent dividers style={{ padding: '1em 2em' }}>
                 <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
