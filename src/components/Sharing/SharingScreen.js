@@ -13,6 +13,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import IconButton from "@mui/material/IconButton";
+import Alert from '@mui/material/Alert';
 
 import {
     CircularProgress,
@@ -93,11 +94,11 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
         loading: metadataDM[1].loading,
         data: metadataDM[1].data
     }
-    // const updateSharingSettings = useDataMutation(updateSharingMutation)[0];
 
 
 
     let payload, usersNGroups, metadata;
+    let restricted = false;
     const toggle = () => setOptionOpen(!optionOpen);
 
     if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
@@ -106,6 +107,8 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
         payload = data.results;
         if (!entityLoading && !entityErrors) {
             usersNGroups = availableUserGroups();
+        } else if (entityErrors) {
+            restricted = true;
         }
     }
 
@@ -177,12 +180,18 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     function availableUserGroups() {
         let obj = payload.object;
         let e = DeepCopy(entities);
-        obj.userAccesses.forEach((ua) => {
-            e.userData.users.splice(e.userData.users.findIndex(u => { return u.id === ua.id }), 1);
-        });
-        obj.userGroupAccesses.forEach((uga) => {
-            e.userGroupData.userGroups.splice(e.userGroupData.userGroups.findIndex(ug => { return ug.id === uga.id }), 1);
-        })
+        if (e !== null) {
+            obj.userAccesses.forEach((ua) => {
+                e.userData.users.splice(e.userData.users.findIndex(u => {
+                    return u.id === ua.id
+                }), 1);
+            });
+            obj.userGroupAccesses.forEach((uga) => {
+                e.userGroupData.userGroups.splice(e.userGroupData.userGroups.findIndex(ug => {
+                    return ug.id === uga.id
+                }), 1);
+            })
+        }
         return e;
     }
 
@@ -249,14 +258,8 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
 
         metadataRequest.mutate({ data: payloadMetadata })
             .then(response => {
-                if (response.status !== 'OK') {
-                    setContent('status');
-
-                } else {
-                    setContent('status');
-                    let stats = response?.stats;
-                    setImportStatus(stats);
-                }
+                setContent('status');
+                setImportStatus(response?.stats);
             });
     }
 
@@ -296,6 +299,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                     {content === 'form' && <div>
                         <h2 style={{ fontSize: 24, fontWeight: 300, margin: 0 }}>{data.results?.object.displayName}</h2>
                         <div>Created by: {data.results?.object.user.name}</div>
+                        {restricted && <Alert severity="error" style={{ marginTop: "10px"}}>Limited Access: Some required permissions are missing.</Alert>}
                         <div style={{ boxSizing: "border-box", fontSize: 14, paddingLeft: 16, marginTop: 30, color: 'rgba(0, 0, 0, 0.54)', lineHeight: "48px" }}>Who has access</div>
                         <hr style={{ marginTop: -1, height: 1, border: "none", backgroundColor: "#bdbdbd" }} />
                         <div style={{ height: "240px", overflowY: "scroll" }}>
@@ -316,7 +320,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                             <div style={{ color: 'rgb(129, 129, 129)', paddingBottom: "8px" }}>Add users and user groups</div>
                             <div style={{ display: "flex", flexDirection: "row", alignItems: 'center', flex: "1 1 0"}}>
                                 <div style={{ display: "inline-block", position: "relative", width: "100%", backgroundColor: "white", boxShadow: 'rgb(204,204,204) 2px 2px 2px', padding: "0 16px", marginRight: "16px", height: '3em' }}>
-                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={(e) => loadSuggestions(e.target.value)} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} disabled={entityErrors} />
+                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={(e) => loadSuggestions(e.target.value)} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} disabled={restricted} />
                                 </div>
                                 {search && <Suggestions usersNGroups={JSON.parse(JSON.stringify(usersNGroups))} keyword={search} setSearch={setSearch} addEntity={addEntity} />}
                                 <div id={'newPermission'} style={{ padding: "auto" }} onClick={() => { toggle(); }}>
@@ -324,7 +328,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                                 </div>
                                 {optionOpen && <SharingOptions permission={usrPermission.split("")} reference={document.getElementById('newPermission')} setEntityPermission={setEntityPermission} toggle={toggle} />}
 
-                                <Button onClick={() => assignRole()} variant="outlined" disabled={entityErrors}>Assign</Button>
+                                <Button onClick={() => assignRole()} variant="outlined" disabled={restricted}>Assign</Button>
                             </div>
                         </div>
                         {(selectedIndex === 1 || selectedIndex === 2) &&
