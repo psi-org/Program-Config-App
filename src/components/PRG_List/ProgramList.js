@@ -46,7 +46,7 @@ const query = {
             let paramsObject = {
                 pageSize,
                 page,
-                fields: ["code", "id", "name", "shortName", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "relatedProgram", "categoryCombo[id,name]", "trackedEntityType[id,name]", "style", "programTrackedEntityAttributes", "notificationTemplates", "translations", "organisationUnits", "programSections", "attributeValues", "programStages[id,name,programStageSections[*]]"],
+                fields: ["code", "id", "name", "shortName", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "relatedProgram", "categoryCombo[id,name]", "trackedEntityType[id,name]", "style", "programTrackedEntityAttributes", "notificationTemplates", "translations", "organisationUnits", "programSections", "attributeValues", "programStages[id,name,programStageSections[*]]", "access"],
                 filter: ['withoutRegistration:eq:false']
             }
 
@@ -166,7 +166,7 @@ const ProgramList = () => {
                             <Popper reference={ref} placement="bottom-end">
                                 <FlyoutMenu>
                                     <MenuItem label="About PCA" icon={<InfoIcon />} onClick={() => { setSettingsMenu(false); setAboutModal(true); }} />
-                                    <MenuItem label="HNQIS2 Status" icon={<InstallDesktopIcon />} onClick={()=>{ setSettingsMenu(false); setH2Modal(true) ;}}/>
+                                    <MenuItem label="HNQIS 2.0 Status" icon={<InstallDesktopIcon />} onClick={()=>{ setSettingsMenu(false); setH2Modal(true) ;}}/>
                                 </FlyoutMenu>
                             </Popper>
                         </Layer>
@@ -180,7 +180,7 @@ const ProgramList = () => {
                     }
                     {
                         orgUnitProgramId &&
-                            <OunitScreen id={orgUnitProgramId} orgUnitMetaData={orgUnitMetaData.data}  setOrgUnitProgramId={setOrgUnitProgramId}/>
+                            <OunitScreen id={orgUnitProgramId} orgUnitMetaData={orgUnitMetaData.data}  setOrgUnitProgramId={setOrgUnitProgramId} setNotification={setNotification}/>
                     }
                 </div>
             </div>

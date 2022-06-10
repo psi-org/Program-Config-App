@@ -85,7 +85,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     const [deleted, setDeleted] = useState([]);
 
     const { loading, error, data } = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
-    const { loading: entityLoading, data: entities } = useDataQuery(entitiesQuery);
+    const { loading: entityLoading, data: entities, error: entityErrors } = useDataQuery(entitiesQuery);
     const { loading: metadataLoading, data: prgMetaData } = useDataQuery(programMetadata);
     const metadataDM = useDataMutation(metadataMutation);
     const metadataRequest = {
@@ -104,7 +104,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     if (loading) return <CircularLoader />
     if (!loading) {
         payload = data.results;
-        if (!entityLoading) {
+        if (!entityLoading && !entityErrors) {
             usersNGroups = availableUserGroups();
         }
     }
@@ -232,22 +232,23 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
 
     const apply = (level) => {
         setContent('loading');
-        let elementsArray = ["programs"];
+        let payloadMetadata = {};
+        payloadMetadata.programs = metadata.programs;
         switch (level) {
             case 2:
-                elementsArray.push("dataElements");
+                payloadMetadata.dataElements = metadata.dataElements;
             case 1:
-                elementsArray.push("programStages");
+                payloadMetadata.programStages = metadata.programStages;
                 break;
             default:
                 break;
         }
-        elementsArray.forEach((elements) => {
-            applySharing(elements);
+        Object.keys(payloadMetadata).forEach(meta => {
+           applySharing(payloadMetadata[meta]);
         });
-        metadataRequest.mutate({ data: metadata })
+
+        metadataRequest.mutate({ data: payloadMetadata })
             .then(response => {
-                // statusRef.current.textContent = `{<h4>Sharing Stats</h4><br/><hr/><ul><li>Created: ${stats.created}</li><li>Updated: ${stats.updated}</li><li>Deleted: ${stats.deleted}</li><li>Ignored: ${stats.ignored}</li><li>Total: ${stats.total}</li></ul>}`;
                 if (response.status !== 'OK') {
                     setContent('status');
 
@@ -260,7 +261,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
     }
 
     const applySharing = (elements) => {
-        metadata[elements]?.forEach((element) => {
+        elements?.forEach((element) => {
             element.sharing.public = payload.object.publicAccess;
             payload.object.userAccesses.forEach((user) => {
                 if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
@@ -315,7 +316,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                             <div style={{ color: 'rgb(129, 129, 129)', paddingBottom: "8px" }}>Add users and user groups</div>
                             <div style={{ display: "flex", flexDirection: "row", alignItems: 'center', flex: "1 1 0"}}>
                                 <div style={{ display: "inline-block", position: "relative", width: "100%", backgroundColor: "white", boxShadow: 'rgb(204,204,204) 2px 2px 2px', padding: "0 16px", marginRight: "16px", height: '3em' }}>
-                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={(e) => loadSuggestions(e.target.value)} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} />
+                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={(e) => loadSuggestions(e.target.value)} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} disabled={entityErrors} />
                                 </div>
                                 {search && <Suggestions usersNGroups={JSON.parse(JSON.stringify(usersNGroups))} keyword={search} setSearch={setSearch} addEntity={addEntity} />}
                                 <div id={'newPermission'} style={{ padding: "auto" }} onClick={() => { toggle(); }}>
@@ -323,8 +324,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                                 </div>
                                 {optionOpen && <SharingOptions permission={usrPermission.split("")} reference={document.getElementById('newPermission')} setEntityPermission={setEntityPermission} toggle={toggle} />}
 
-                                <Button onClick={() => assignRole()} variant="outlined">Assign</Button>
-
+                                <Button onClick={() => assignRole()} variant="outlined" disabled={entityErrors}>Assign</Button>
                             </div>
                         </div>
                         {(selectedIndex === 1 || selectedIndex === 2) &&

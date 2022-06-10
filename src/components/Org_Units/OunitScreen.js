@@ -59,7 +59,7 @@ const programOrgUnitsQuery = {
     },
 };
 
-const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
+const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId, setNotification}) => {
     const programMetadata = {
         results: {
             resource: 'programs/' + id + '/metadata.json'
@@ -205,8 +205,13 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
                     }
                     else {
                         setContent('status');
-                        let stats = response?.stats;
-                        setImportStatus(stats);
+                        /* let stats = response?.stats;
+                        setImportStatus(stats); */
+                        setNotification({ 
+                            message: `Organisation Units assigned successfully! (Total: ${selectedOrgUnits.length})`, 
+                            severity: 'success' 
+                        })
+                        hideFormHandler()
                     }
                 })
         }
@@ -217,7 +222,7 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId}) => {
     return (
         <>
             <CustomMUIDialog open={true} maxWidth="md" fullWidth={true}>
-                <CustomMUIDialogTitle onClose={hideFormHandler} id={"orgUnit_assignemnt_dialog_title"}>Assign Organisation Unit</CustomMUIDialogTitle>
+                <CustomMUIDialogTitle onClose={hideFormHandler} id={"orgUnit_assignemnt_dialog_title"}>Assign Organisation Units</CustomMUIDialogTitle>
                 <DialogContent dividers style={{ padding: '1em 2em'}}>
                     {content === 'loading' && <Box sx={{ display: 'inline-flex' }}><CircularProgress /></Box>}
                     {content === 'form' &&

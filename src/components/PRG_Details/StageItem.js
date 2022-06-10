@@ -23,7 +23,7 @@ import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const StageItem = ({stage,setNotification,stagesRefetch,setNewStage,editStatus}) => {
+const StageItem = ({stage,setNotification,stagesRefetch,setNewStage,editStatus,hnqisMode}) => {
 
   const dispatch = useDispatch();
   const { setProgramStage } = bindActionCreators(actionCreators, dispatch);
@@ -51,8 +51,10 @@ const StageItem = ({stage,setNotification,stagesRefetch,setNewStage,editStatus})
       <div className="ml_item-warning_error ">
       </div>
       <div className="ml_item-cta">
-        <img src={move_vert_svg} id={'menu' + stage.id} alt="menu" onClick={() => { setRef(document.getElementById('menu' + stage.id)); toggle() }} style={{ cursor: 'pointer' }} />
-        {open &&
+        {!hnqisMode &&
+          <img src={move_vert_svg} id={'menu' + stage.id} alt="menu" onClick={() => { setRef(document.getElementById('menu' + stage.id)); toggle() }} style={{ cursor: 'pointer' }} />
+        }
+        {open && !hnqisMode &&
           <Layer onClick={toggle}>
               <Popper reference={ref} placement="bottom-end">
                   <FlyoutMenu>
