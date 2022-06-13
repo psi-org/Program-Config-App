@@ -4,7 +4,7 @@ import SharingItem from './SharingItem';
 import { DeepCopy } from '../../configs/Utils';
 
 import EditIcon from '@mui/icons-material/Edit';
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Suggestions from "./Suggestions";
 import SharingOptions from "./SharingOptions";
 import ViewIcon from "@mui/icons-material/Visibility";
@@ -63,7 +63,7 @@ const metadataMutation = {
 
 const btnOptions = ['Apply Only to Program', 'Apply to Program & Program Stages', 'Apply to Program, Program Stages & Data Elements'];
 
-const SharingScreen = ({ element, id, setSharingProgramId }) => {
+const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
 
     const programMetadata = {
         results: {
@@ -95,25 +95,32 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
         data: metadataDM[1].data
     }
 
+    let payload, usersNGroups, metadata, restricted;
+    let errorStates = [];
 
+    if(readOnly)
+        errorStates.push(["You don't have access to update this program"]);
 
-    let payload, usersNGroups, metadata;
-    let restricted = false;
-    const toggle = () => setOptionOpen(!optionOpen);
-
-    if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
-    if (loading) return <CircularLoader />
     if (!loading) {
         payload = data.results;
         if (!entityLoading && !entityErrors) {
             usersNGroups = availableUserGroups();
         } else if (entityErrors) {
             restricted = true;
+            errorStates.push(["You don't have access to Users List"]);
         }
     }
 
+
+    const toggle = () => setOptionOpen(!optionOpen);
+
+    if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
+    if (loading) return <CircularLoader />
+
+
     if (!metadataLoading && prgMetaData) {
         metadata = prgMetaData.results;
+        console.log("Metadata: ", metadata);
     }
 
     const hideForm = () => {
@@ -299,7 +306,13 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                     {content === 'form' && <div>
                         <h2 style={{ fontSize: 24, fontWeight: 300, margin: 0 }}>{data.results?.object.displayName}</h2>
                         <div>Created by: {data.results?.object.user.name}</div>
-                        {restricted && <Alert severity="error" style={{ marginTop: "10px"}}>Limited Access: Some required permissions are missing.</Alert>}
+                        {restricted && <Alert severity="error" style={{ marginTop: "10px"}}>Limited Access:
+                            <ul>
+                                {errorStates.map((es, index) => {
+                                    return <li key={index}>{es}</li>
+                                })}
+                            </ul>
+                        </Alert>}
                         <div style={{ boxSizing: "border-box", fontSize: 14, paddingLeft: 16, marginTop: 30, color: 'rgba(0, 0, 0, 0.54)', lineHeight: "48px" }}>Who has access</div>
                         <hr style={{ marginTop: -1, height: 1, border: "none", backgroundColor: "#bdbdbd" }} />
                         <div style={{ height: "240px", overflowY: "scroll" }}>
@@ -353,7 +366,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                         <ButtonStrip end>
                             {/*<Button onClick={()=>hideForm()} variant="outlined" startIcon={<CloseIcon />}>Close</Button>*/}
                             <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
-                                <Button onClick={handleClick}>{btnOptions[selectedIndex]}</Button>
+                                <Button onClick={handleClick} disabled={readOnly}>{btnOptions[selectedIndex]}</Button>
                                 <Button
                                     size="small"
                                     aria-controls={open ? 'split-button-menu' : undefined}
@@ -361,6 +374,7 @@ const SharingScreen = ({ element, id, setSharingProgramId }) => {
                                     aria-label="select merge strategy"
                                     aria-haspopup="menu"
                                     onClick={handleToggle}
+                                    disabled={readOnly}
                                 >
                                     <ArrowDropDownIcon />
                                 </Button>
