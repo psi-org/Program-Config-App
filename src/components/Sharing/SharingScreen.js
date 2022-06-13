@@ -55,6 +55,17 @@ const entitiesQuery = {
     }
 }
 
+const psDataElementAccess = {
+    des: {
+        resource: 'programs',
+        id: ({id}) => id,
+        params: {
+            paging: false,
+            fields: ['programStages[programStageDataElements[dataElement[id,name,access]]]']
+        }
+    }
+}
+
 const metadataMutation = {
     resource: 'metadata',
     type: 'create',
@@ -84,10 +95,13 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
     const [content, setContent] = useState('form');
     const [overwrite, setOverwrite] = useState(true);
     const [deleted, setDeleted] = useState([]);
+    const [ restrictions, setRestrictions ] = useState([]);
+    const [ restrictedDEs, setRestrictedDEs] = useState([]);
 
     const { loading, error, data } = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
     const { loading: entityLoading, data: entities, error: entityErrors } = useDataQuery(entitiesQuery);
     const { loading: metadataLoading, data: prgMetaData } = useDataQuery(programMetadata);
+    const { loading: prgDELoading, data: prgDEData } = useDataQuery(psDataElementAccess, {variables: {id: id}});
     const metadataDM = useDataMutation(metadataMutation);
     const metadataRequest = {
         mutate: metadataDM[0],
@@ -95,21 +109,50 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
         data: metadataDM[1].data
     }
 
-    let payload, usersNGroups, metadata, restricted;
+    let payload, usersNGroups, metadata;
+    let userAccessRestricted = false;
     let errorStates = [];
+    const exclusionDataElements = ["NAaHST5ZDTE", "VqBfZjZhKkU", "pzWDtDUorBt" , "F0Qcr8ANr7t", "DIoqtxbSJIL", "nswci5V4j0d"]; //Excluding HNQIS2 specific data elements from sharing update
 
-    if(readOnly)
-        errorStates.push(["You don't have access to update this program"]);
+    useEffect(()=> {
+        if(readOnly) {
+            setRestrictions(prev => [...prev, "You don't have access to update this program"]);
+        }
+    }, [readOnly])
 
     if (!loading) {
         payload = data.results;
         if (!entityLoading && !entityErrors) {
             usersNGroups = availableUserGroups();
-        } else if (entityErrors) {
-            restricted = true;
-            errorStates.push(["You don't have access to Users List"]);
+        } else if(entityErrors) {
+            userAccessRestricted = true;
         }
     }
+
+    useEffect(() => {
+        if (!entityLoading && entityErrors) {
+            setRestrictions(prev => [...prev, "You don't have access to Users List"]);
+        }
+    }, [entityLoading, entityErrors])
+
+    useEffect(()=> {
+        if (!prgDELoading && prgDEData) {
+            const prgStages = prgDEData.des?.programStages;
+            let restrictedDataElements = [];
+            prgStages.forEach(ps => {
+                ps.programStageDataElements.forEach(de => {
+                    if (!de.dataElement.access.update && !exclusionDataElements.includes(de.dataElement.id)) {
+                        restrictedDataElements.push({"id": de.dataElement.id, "name": de.dataElement.name});
+                    }
+                });
+            });
+            if (restrictedDataElements.length > 0) {
+                setSelectedIndex(1);
+                setRestrictions(prev => [...prev, "You don't have update access to Data Elements Listed below"]);
+                setRestrictedDEs(restrictedDataElements);
+            }
+        }
+    }, [prgDEData])
 
 
     const toggle = () => setOptionOpen(!optionOpen);
@@ -120,8 +163,8 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
 
     if (!metadataLoading && prgMetaData) {
         metadata = prgMetaData.results;
-        console.log("Metadata: ", metadata);
     }
+
 
     const hideForm = () => {
         setSharingProgramId(undefined)
@@ -306,12 +349,17 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
                     {content === 'form' && <div>
                         <h2 style={{ fontSize: 24, fontWeight: 300, margin: 0 }}>{data.results?.object.displayName}</h2>
                         <div>Created by: {data.results?.object.user.name}</div>
-                        {restricted && <Alert severity="error" style={{ marginTop: "10px"}}>Limited Access:
+                        {restrictions.length > 0 && <Alert severity="error" style={{ marginTop: "10px", maxHeight: "100px", overflow: 'auto'}}>Limited Access:
                             <ul>
-                                {errorStates.map((es, index) => {
-                                    return <li key={index}>{es}</li>
+                                {restrictions.map((restriction, index) => {
+                                    return <li key={index}>{restriction}</li>
                                 })}
                             </ul>
+                            {restrictedDEs.length > 0 && <ul style={{ marginLeft: "25px"}}>
+                                {restrictedDEs.map((de, index) => {
+                                    return <li key={index}>{de.name}</li>
+                                })}
+                            </ul> }
                         </Alert>}
                         <div style={{ boxSizing: "border-box", fontSize: 14, paddingLeft: 16, marginTop: 30, color: 'rgba(0, 0, 0, 0.54)', lineHeight: "48px" }}>Who has access</div>
                         <hr style={{ marginTop: -1, height: 1, border: "none", backgroundColor: "#bdbdbd" }} />
@@ -333,7 +381,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
                             <div style={{ color: 'rgb(129, 129, 129)', paddingBottom: "8px" }}>Add users and user groups</div>
                             <div style={{ display: "flex", flexDirection: "row", alignItems: 'center', flex: "1 1 0"}}>
                                 <div style={{ display: "inline-block", position: "relative", width: "100%", backgroundColor: "white", boxShadow: 'rgb(204,204,204) 2px 2px 2px', padding: "0 16px", marginRight: "16px", height: '3em' }}>
-                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={(e) => loadSuggestions(e.target.value)} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} disabled={restricted} />
+                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={(e) => loadSuggestions(e.target.value)} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} disabled={userAccessRestricted} />
                                 </div>
                                 {search && <Suggestions usersNGroups={JSON.parse(JSON.stringify(usersNGroups))} keyword={search} setSearch={setSearch} addEntity={addEntity} />}
                                 <div id={'newPermission'} style={{ padding: "auto" }} onClick={() => { toggle(); }}>
@@ -341,7 +389,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
                                 </div>
                                 {optionOpen && <SharingOptions permission={usrPermission.split("")} reference={document.getElementById('newPermission')} setEntityPermission={setEntityPermission} toggle={toggle} />}
 
-                                <Button onClick={() => assignRole()} variant="outlined" disabled={restricted}>Assign</Button>
+                                <Button onClick={() => assignRole()} variant="outlined" disabled={userAccessRestricted}>Assign</Button>
                             </div>
                         </div>
                         {(selectedIndex === 1 || selectedIndex === 2) &&
@@ -402,6 +450,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
                                                             key={option}
                                                             selected={index === selectedIndex}
                                                             onClick={(event) => handleMenuItemClick(event, index)}
+                                                            disabled={index === 2 && restrictedDEs.length > 0}
                                                         >
                                                             {option}
                                                         </MenuItem>
