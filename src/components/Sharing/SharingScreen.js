@@ -315,28 +315,28 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
 
     const applySharing = (elements) => {
         elements?.forEach((element) => {
-            element.sharing.public = payload.object.publicAccess;
-            payload.object.userAccesses.forEach((user) => {
-                if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
-                    element.sharing.users[user.id].access = user.access;
-                }
-                else {
-                    element.sharing.users[user.id] = { id: user.id, access: user.access }
-                }
-            })
-            payload.object.userGroupAccesses.forEach((userGroup) => {
-                if (element.sharing.userGroups.hasOwnProperty(userGroup.id) && overwrite) {
-                    element.sharing.userGroups[userGroup.id].access = userGroup.access;
-                }
-                else {
-                    element.sharing.userGroups[userGroup.id] = { id: userGroup.id, access: userGroup.access }
-                }
-            })
-            deleted.forEach(del => {
-                if (element.sharing[del.type].hasOwnProperty(del.id)) {
-                    delete element.sharing[del.type][del.id];
-                }
-            });
+            if (!exclusionDataElements.includes(element.id)) {
+                element.sharing.public = payload.object.publicAccess;
+                payload.object.userAccesses.forEach((user) => {
+                    if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
+                        element.sharing.users[user.id].access = user.access;
+                    } else {
+                        element.sharing.users[user.id] = {id: user.id, access: user.access}
+                    }
+                })
+                payload.object.userGroupAccesses.forEach((userGroup) => {
+                    if (element.sharing.userGroups.hasOwnProperty(userGroup.id) && overwrite) {
+                        element.sharing.userGroups[userGroup.id].access = userGroup.access;
+                    } else {
+                        element.sharing.userGroups[userGroup.id] = {id: userGroup.id, access: userGroup.access}
+                    }
+                })
+                deleted.forEach(del => {
+                    if (element.sharing[del.type].hasOwnProperty(del.id)) {
+                        delete element.sharing[del.type][del.id];
+                    }
+                });
+            }
         });
     }
 
