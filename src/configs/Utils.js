@@ -42,7 +42,7 @@ export function arrayObjectToStringConverter(arrayOfObj, key) {
 }
 
 export function DeepCopy(obj) {
-  return JSON.parse(JSON.stringify(obj));
+  return (typeof obj !== "undefined" ) ? JSON.parse(JSON.stringify(obj)) : null;
 }
 
 export function ShallowCopy(obj) { return {...obj} }
