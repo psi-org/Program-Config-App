@@ -163,6 +163,8 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
 
     if (!metadataLoading && prgMetaData) {
         metadata = prgMetaData.results;
+        let psde = metadata.programStages.map(ps => ps.programStageDataElements.map(psde => psde.dataElement.id)).flat()
+        metadata.dataElements = metadata.dataElements.filter(de => psde.includes(de.id))
     }
 
 
