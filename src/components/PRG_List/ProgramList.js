@@ -91,6 +91,7 @@ const ProgramList = () => {
     // Export Program Metadata //
     const [exportProgramId, setExportProgramId] = useState(undefined)
     const [sharingProgramId, setSharingProgramId] = useState(undefined);
+    const [readOnlyPermission, setReadOnlyPermission] = useState(false);
     const [orgUnitProgramId, setOrgUnitProgramId] = useState(undefined);
 
     // *********************** //
@@ -122,6 +123,8 @@ const ProgramList = () => {
     }
 
     const shareProgram = (program) => {
+        let prg = data.results.programs.filter(p => { return p.id === program});
+        setReadOnlyPermission(!prg[0].access.update);
         setSharingProgramId(program)
     }
 
@@ -176,7 +179,7 @@ const ProgramList = () => {
                     }
                     {
                         sharingProgramId &&
-                        <SharingScreen element="program" id={sharingProgramId} setSharingProgramId={setSharingProgramId} />
+                        <SharingScreen element="program" id={sharingProgramId} setSharingProgramId={setSharingProgramId} readOnly={readOnlyPermission}/>
                     }
                     {
                         orgUnitProgramId &&
