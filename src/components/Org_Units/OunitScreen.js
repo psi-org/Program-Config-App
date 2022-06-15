@@ -5,6 +5,31 @@ import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
 import { DialogActions, DialogContent, FormControl, InputLabel, TextField, Select, ButtonGroup, Button, MenuItem, Box, CircularProgress } from "@mui/material";
 
+const orgUnitsQuery = {
+    userOrgUnits: {
+        resource: 'me',
+        params: {
+            fields: ['organisationUnits[id, path]']
+        }
+    },
+    orgUnitGroups: {
+        resource: 'organisationUnitGroups',
+        params: {
+            paging: false,
+            fields: ['id','displayName'],
+            order: 'displayName'
+        }
+    },
+    orgUnitLevels: {
+        resource: 'organisationUnitLevels',
+        params: {
+            paging: false,
+            fields: ['id','level','displayName'],
+            order: 'level'
+        }
+    }
+}
+
 const ouQuery = {
     results: {
         resource: 'organisationUnits',
@@ -59,7 +84,7 @@ const programOrgUnitsQuery = {
     },
 };
 
-const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId, setNotification}) => {
+const OunitScreen = ({id, setOrgUnitProgramId, setNotification}) => {
     const programMetadata = {
         results: {
             resource: 'programs/' + id + '/metadata.json'
@@ -74,19 +99,24 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId, setNotification}
     const [ importStatus, setImportStatus ] = useState({});
     const [ selectedOrgUnits, setSelectedOrgUnits ] = useState([]);
     const [ orgUnitPathSelected, setOrgUnitPathSelected ] = useState([]);
-    const [ orgUnitTreeRoot, setOrgUnitTreeRoot ] = useState(orgUnitMetaData.userOrgUnits?.organisationUnits.map(ou => ou.id));
+    const [ orgUnitTreeRoot, setOrgUnitTreeRoot ] = useState([]);
 
+    const {loading: ouMetadataLoading, data: ouMetadata} = useDataQuery(orgUnitsQuery);
     const oUnits = useDataQuery(ouQuery, {variables: {id: id, level:level}});
     const oUnitsByGroups = useDataQuery(ouGroupQuery, {variables: {id: id, groupId: groupId}});
     const searchOunits = useDataQuery(searchOrgUnitQuery, {variables: {filterString: filterString}});
     const {loading: metadataLoading, data: prgMetaData} = useDataQuery(programMetadata);
     const {loading: poLoading, data: prgOrgUnitData} = useDataQuery(programOrgUnitsQuery, {variables: {id: id}});
     const metadataDM = useDataMutation(metadataMutation);
-    const metadataRequest = {
-        mutate: metadataDM[0],
-        loading: metadataDM[1].loading,
-        data: metadataDM[1].data
-    }
+
+    let userOrgUnits;
+
+    useEffect(() => {
+        if (!ouMetadataLoading) {
+            setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
+        }
+    }, [ouMetadata]);
+
     useEffect(()=> {
         if (!poLoading)
         {
@@ -95,8 +125,16 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId, setNotification}
         }
     }, [prgOrgUnitData])
 
+    if (!ouMetadataLoading)
+    {
+        userOrgUnits = ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id);
+    }
 
-    let userOrgUnits = orgUnitMetaData.userOrgUnits?.organisationUnits.map(ou => ou.id);
+    const metadataRequest = {
+        mutate: metadataDM[0],
+        loading: metadataDM[1].loading,
+        data: metadataDM[1].data
+    }
 
     const hideFormHandler = () => {
         setOrgUnitProgramId(undefined)
@@ -232,7 +270,7 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId, setNotification}
                             <div style={{ marginTop: "10px"}}> { selectedOrgUnits.length } Organisation units selected </div>
                             {!poLoading &&
                                 <div style={{ minHeight: "300px", maxHeight: "450px", minWidth: "300px", maxWidth: "480px", overflow: "auto", border: "1px solid rgb(189, 189, 189)", borderRadius: "3px", padding: "4px", margin: "4px 0px", display: "inline-block", verticalAlign: "top"}}>
-                                    <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpaneded={orgUnitPathSelected}/>
+                                    <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ selectedOrgUnits }/>
                                 </div>
                             }
                             <div style={{width: "400px", background: "white", marginLeft: "1rem", marginTop: "1rem", display: "inline-block"}}>
@@ -242,8 +280,8 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId, setNotification}
                                         <InputLabel id={"organisation-unit-level-label"}>Organisation Unit Level</InputLabel>
                                         <Select labelId={"orgUnitLevelId"} label={"Organisation Unit Level"} onChange={(event) => setOrgUnitLevel(event.target.value)}>
                                             <MenuItem value={undefined} key={undefined}>None</MenuItem>
-                                            {
-                                                orgUnitMetaData.orgUnitLevels?.organisationUnitLevels.map(function(ouLevel){
+                                            {!ouMetadataLoading &&
+                                                ouMetadata.orgUnitLevels?.organisationUnitLevels.map(function(ouLevel){
                                                     return <MenuItem value={ouLevel.level} key={ouLevel.id}><em>{ouLevel.displayName}</em></MenuItem>
                                                 })
                                             }
@@ -259,8 +297,8 @@ const OunitScreen = ({id, orgUnitMetaData, setOrgUnitProgramId, setNotification}
                                         <InputLabel id={"organisation-unit-Group-label"}>Organisation Unit Group</InputLabel>
                                         <Select labelId={"orgUnitGroupId"} label={"Organisation Unit Group"} onChange={(event) => setOrgUnitGroup(event.target.value)}>
                                             <MenuItem value={undefined} key={undefined}>None</MenuItem>
-                                            {
-                                                orgUnitMetaData.orgUnitGroups?.organisationUnitGroups.map(function(ouGroup){
+                                            { !ouMetadataLoading &&
+                                                ouMetadata.orgUnitGroups?.organisationUnitGroups.map(function(ouGroup){
                                                     return <MenuItem value={ouGroup.id} key={ouGroup.id}><em>{ouGroup.displayName}</em></MenuItem>
                                                 })
                                             }
