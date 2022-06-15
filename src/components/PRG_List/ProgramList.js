@@ -57,31 +57,6 @@ const query = {
     }
 };
 
-const orgUnitsQuery = {
-    userOrgUnits: {
-        resource: 'me',
-        params: {
-            fields: ['organisationUnits[id, path]']
-        }
-    },
-    orgUnitGroups: {
-        resource: 'organisationUnitGroups',
-        params: {
-            paging: false,
-            fields: ['id','displayName'],
-            order: 'displayName'
-        }
-    },
-    orgUnitLevels: {
-        resource: 'organisationUnitLevels',
-        params: {
-            paging: false,
-            fields: ['id','level','displayName'],
-            order: 'level'
-        }
-    }
-}
-
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -115,7 +90,6 @@ const ProgramList = () => {
     }, [notification])
 
     const prgTypeQuery = useDataQuery(queryProgramType);
-    const orgUnitMetaData = useDataQuery(orgUnitsQuery);
     const prgTypeId = prgTypeQuery.data?.results.attributes[0].id;
 
     const downloadMetadata = (program) => {
@@ -183,7 +157,7 @@ const ProgramList = () => {
                     }
                     {
                         orgUnitProgramId &&
-                            <OunitScreen id={orgUnitProgramId} orgUnitMetaData={orgUnitMetaData.data}  setOrgUnitProgramId={setOrgUnitProgramId} setNotification={setNotification}/>
+                            <OunitScreen id={orgUnitProgramId} setOrgUnitProgramId={setOrgUnitProgramId} setNotification={setNotification}/>
                     }
                 </div>
             </div>
