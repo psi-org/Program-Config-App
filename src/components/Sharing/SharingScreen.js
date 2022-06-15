@@ -1,7 +1,7 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { CircularLoader, Modal, ModalContent, ModalTitle, NoticeBox, ModalActions, ButtonStrip, CenteredContent } from "@dhis2/ui";
 import SharingItem from './SharingItem';
-import { DeepCopy } from '../../configs/Utils';
+import { DeepCopy, parseErrors } from '../../configs/Utils';
 
 import EditIcon from '@mui/icons-material/Edit';
 import { useRef, useState, useEffect } from "react";
@@ -74,7 +74,7 @@ const metadataMutation = {
 
 const btnOptions = ['Apply Only to Program', 'Apply to Program & Program Stages', 'Apply to Program, Program Stages & Data Elements'];
 
-const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
+const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotification }) => {
 
     const programMetadata = {
         results: {
@@ -163,8 +163,8 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
 
     if (!metadataLoading && prgMetaData) {
         metadata = prgMetaData.results;
-        let psde = metadata.programStages.map(ps => ps.programStageDataElements.map(psde => psde.dataElement.id)).flat()
-        metadata.dataElements = metadata.dataElements.filter(de => psde.includes(de.id))
+        let psde = metadata.programStages?.map(ps => ps.programStageDataElements.map(psde => psde.dataElement.id))?.flat()
+        metadata.dataElements = metadata.dataElements?.filter(de => psde.includes(de.id))
     }
 
 
@@ -310,8 +310,21 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
 
         metadataRequest.mutate({ data: payloadMetadata })
             .then(response => {
-                setContent('status');
-                setImportStatus(response?.stats);
+                console.log(response)
+                if(response?.status === "OK"){
+                    setNotification({ 
+                        message: `Chages to the Sharing Settings applied successfully`, 
+                        severity: 'success' 
+                    })
+                }else{
+                    setNotification({ 
+                        message: parseErrors(response), 
+                        severity: 'error' 
+                    })
+                }
+                hideForm()
+                //setContent('status');
+                //setImportStatus(response?.stats);
             });
     }
 
