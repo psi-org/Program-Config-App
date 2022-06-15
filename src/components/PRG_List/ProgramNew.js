@@ -423,7 +423,12 @@ const ProgramNew = (props) => {
     
                 if (pgrTypePCA === 'hnqis') {
                     //HNQIS2 Programs
+                    let assessmentStage = undefined;
+                    let actionPlanStage = undefined;
+
                     let criticalSteps = undefined;
+                    let defaultSection = undefined;
+                    let scores = undefined;
     
                     if (!props.data) {
                         Object.assign(prgrm, hnqisProgramConfigs)
@@ -434,7 +439,7 @@ const ProgramNew = (props) => {
                         prgrm.programStages.push({ id: assessmentId });
                         prgrm.programStages.push({ id: actionPlanId });
     
-                        let assessmentStage = DeepCopy(PS_AssessmentStage);
+                        assessmentStage = DeepCopy(PS_AssessmentStage);
                         assessmentStage.id = assessmentId;
                         assessmentStage.name = assessmentStage.name;
                         assessmentStage.programStageSections.push({ id: defaultSectionId });
@@ -442,12 +447,12 @@ const ProgramNew = (props) => {
                         assessmentStage.programStageSections.push({ id: scoresSectionId });
                         assessmentStage.program.id = programId;
     
-                        let actionPlanStage = DeepCopy(PS_ActionPlanStage);
+                        actionPlanStage = DeepCopy(PS_ActionPlanStage);
                         actionPlanStage.id = actionPlanId;
                         actionPlanStage.name = actionPlanStage.name;
                         actionPlanStage.program.id = programId;
     
-                        let defaultSection = DeepCopy(PSS_Default);
+                        defaultSection = DeepCopy(PSS_Default);
                         defaultSection.id = defaultSectionId;
                         defaultSection.programStage.id = assessmentId;
                         //defaultSection.name = defaultSection.name
@@ -457,7 +462,7 @@ const ProgramNew = (props) => {
                         criticalSteps.programStage.id = assessmentId;
                         //criticalSteps.name = criticalSteps.name
     
-                        let scores = DeepCopy(PSS_Scores);
+                        scores = DeepCopy(PSS_Scores);
                         scores.id = scoresSectionId;
                         scores.name = scores.name;
                         scores.programStage.id = assessmentId;
