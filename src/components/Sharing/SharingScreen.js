@@ -309,8 +309,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
         });
 
         metadataRequest.mutate({ data: payloadMetadata })
-            .then(response => {
-                console.log(response)
+            .then(response => { 
                 if(response?.status === "OK"){
                     setNotification({ 
                         message: `Chages to the Sharing Settings applied successfully`, 
@@ -323,8 +322,6 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
                     })
                 }
                 hideForm()
-                //setContent('status');
-                //setImportStatus(response?.stats);
             });
     }
 

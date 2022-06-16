@@ -137,9 +137,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     const [addedSection,setAddedSection] = useState()
 
     useEffect(()=>{
-        //console.log(programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations"))
         return (()=>{
-            console.log("DEATTACH")
             setCriticalSection(undefined)
         })
     },[])
@@ -333,7 +331,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     const commit = () => {
         setAddedSection(undefined)
         if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
-        console.log({originalProgramStageDataElements,programStageDataElements})
         let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
         setRemovedElements(removed)
         setSavingMetadata(true);

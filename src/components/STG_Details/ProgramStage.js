@@ -82,7 +82,6 @@ const ProgramStage = () => {
         )
 
         let programStageData = DeepCopy({...data.results})
-        /* console.log({programStageData}) */
 
         return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisMode={hnqisMode}/>
     }

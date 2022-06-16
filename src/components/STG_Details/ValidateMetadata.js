@@ -32,7 +32,8 @@ const ValidateMetadata = (props) => {
             validAggregationQuestion: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW105", text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for numeric types and NONE for text inputs)" } },
             isNumeratorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW105", text: "The specified question Numerator is not numeric" } },
             isDenominatorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW108", text: "The specified question Denominator is not numeric" } },
-            hasParentQuestionNAnswerValue: { enable: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } }
+            hasParentQuestionNAnswerValue: { enable: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } },
+            matchesScore: { enable: true, title: "Score container not found", errorMsg: { code: "EXW110", text: "The specified question has been assigned to a score that is not defined." } }
         },
         scores: {
             enable: true,
@@ -239,6 +240,7 @@ const ValidateMetadata = (props) => {
                 if (programDetailsValidationSettings.isNumeratorNumeric.enable && !isNumeric(metaData, "scoreNum")) errors.push(programDetailsValidationSettings.isNumeratorNumeric.errorMsg);
                 if (programDetailsValidationSettings.isDenominatorNumeric.enable && !isNumeric(metaData, "scoreDen")) errors.push(programDetailsValidationSettings.isDenominatorNumeric.errorMsg);
                 if (programDetailsValidationSettings.hasParentQuestionNAnswerValue.enable && !hasBothParentQuestionNAnswerValue(metaData)) errors.push(programDetailsValidationSettings.hasParentQuestionNAnswerValue.errorMsg);
+                if (programDetailsValidationSettings.matchesScore.enable && !questionMatchesScore(dataElement)) errors.push(programDetailsValidationSettings.matchesScore.errorMsg);
                 if (errors.length > 0) dataElement.errors = errors;
             }
         }
@@ -372,6 +374,15 @@ const ValidateMetadata = (props) => {
             if (hasAttributeValue(metaData, "parentQuestion")) return hasAttributeValue(metaData, "parentValue");
             else if (hasAttributeValue(metaData, "parentValue")) return false;
             return true;
+        }
+
+        function questionMatchesScore(dataElement){
+            let feedbackOrder = dataElement.attributeValues.find(attributeValue => attributeValue.attribute.id === FEEDBACK_ORDER)?.value;
+            if(!feedbackOrder) return true
+
+            feedbackOrder = feedbackOrder.split('.').slice(0,-1).join('.')
+            let compositeScores = props.importedScores.dataElements.map(score => score.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value);
+            return compositeScores.includes(feedbackOrder)
         }
 
         function getHNQISMetadata(dataElement) {
