@@ -43,7 +43,7 @@ const entitiesQuery = {
         resource: 'users',
         params: {
             paging: false,
-            fields: ['id', 'name', 'displayName']
+            fields: ['id', 'name', 'displayName', 'userCredentials[username]']
         }
     },
     userGroupData: {

@@ -2,7 +2,7 @@ import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 
 const Suggestions = ({ usersNGroups, keyword, setSearch, addEntity }) => {
     const regex = new RegExp(keyword.trim().toLowerCase());
-    let users = usersNGroups.userData.users?.filter(function(user) { return String(user.displayName.toLowerCase()).match(regex)});
+    let users = usersNGroups.userData.users?.filter(function(user) { return String(user.displayName.toLowerCase()).match(regex) || String(user.userCredentials.username.toLowerCase()).match(regex)});
     let userGroups = usersNGroups.userGroupData.userGroups?.filter(function(userGroup) { return String(userGroup.displayName.toLowerCase()).match(regex)});
 
     const selectUserOrGroup = (type, entity) => {
