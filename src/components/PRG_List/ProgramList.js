@@ -15,6 +15,7 @@ import DependencyExport from "./DependencyExport";
 import SharingScreen from "../Sharing/SharingScreen";
 import OunitScreen from "../Org_Units/OunitScreen";
 import BackupScreen from "../PRG_List/BackupScreen";
+import RestoreScreen from "../PRG_List/RestoreScreen";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiButton from '@mui/material/Button';
@@ -172,7 +173,11 @@ const ProgramList = () => {
                     }
                     {
                         backupProgramId &&
-                            <BackupScreen id={backupProgramId} setBackupProgramId={setBackupProgramId} setNotification={setNotification}/>
+                            <BackupScreen program={backupProgramId} setBackupProgramId={setBackupProgramId} setNotification={setNotification}/>
+                    }
+                    {
+                        restoreProgramId &&
+                            <RestoreScreen program={restoreProgramId} setRestoreProgramId={setRestoreProgramId} setNotification={setNotification}/>
                     }
                 </div>
             </div>

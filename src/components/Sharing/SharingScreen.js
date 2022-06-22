@@ -357,7 +357,8 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
                                     return <li key={index}>{restriction}</li>
                                 })}
                             </ul>
-                            {restrictedDEs.length > 0 && <ul style={{ marginLeft: "25px"}}>
+                            {restrictedDEs.length > 0 &&
+                            <ul style={{ marginLeft: "25px"}}>
                                 {restrictedDEs.map((de, index) => {
                                     return <li key={index}>{de.name}</li>
                                 })}

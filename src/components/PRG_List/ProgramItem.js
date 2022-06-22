@@ -75,8 +75,8 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                                 <MenuItem label="Sharing Settings" icon={<ShareIcon/>} onClick={()=>{toggle(); shareProgram(program.id)}}/>
                                 <MenuItem label={"Assign Organisation Units"} icon={<PublicIcon/>} onClick={()=>{ toggle(); assignOrgUnit(program.id)}}/>
                                 <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={() => { toggle(); downloadMetadata(program.id) }} />
-                                <MenuItem label="Backup Program" icon={<BackupIcon/>} onClick={() => { toggle(); backupProgram(program.id) }} />
-                                <MenuItem label="Restore Program" icon={<RestoreIcon/>} onClick={() => { toggle(); restoreProgram(program.id) }} />
+                                <MenuItem label="Backup Program" icon={<BackupIcon/>} onClick={() => { toggle(); backupProgram(program) }} />
+                                <MenuItem label="Restore Program" icon={<RestoreIcon/>} onClick={() => { toggle(); restoreProgram(program) }} />
                                 <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
                             </FlyoutMenu>
                         </Popper>

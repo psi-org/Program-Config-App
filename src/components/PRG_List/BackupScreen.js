@@ -6,32 +6,54 @@ import { DialogActions, DialogContent, FormControl, InputLabel, TextField, Selec
 import { NAMESPACE } from "../../configs/Constants";
 
 const BackupScreen = (props) => {
-
     const programMetadata = {
         results: {
-            resource: `programs/${props.id}/metadata.json`
+            resource: `programs/${props.program.id}/metadata.json`
         }
     }
 
     const queryDataStore = {
         results: {
-            resource: `dataStore/programconfigapp/${props.id}`
+            resource: `dataStore/${NAMESPACE}/${props.program.id}`
         }
     };
 
     const dsCreateMutation = {
-        resource: `dataStore/${NAMESPACE}/${props.id}`,
+        resource: `dataStore/${NAMESPACE}/${props.program.id}`,
         type: 'create',
         data: ({data}) => data
     };
 
     const dsUpdateMutation = {
-        resource: `dataStore/${NAMESPACE}/${props.id}`,
+        resource: `dataStore/${NAMESPACE}/${props.program.id}`,
         type: 'update',
         data: ({data}) => data
     };
 
+    const pad2Digits = num => {
+        return num.toString().padStart(2, '0');
+    }
+
+    const formatDate = (date, dateSplit, hourSplit) => {
+        return (
+            [
+                date.getFullYear(),
+                pad2Digits(date.getMonth() + 1),
+                pad2Digits(date.getDate()),
+            ].join(dateSplit) +
+            ' ' +
+            [
+                pad2Digits(date.getHours()),
+                pad2Digits(date.getMinutes()),
+                pad2Digits(date.getSeconds()),
+            ].join(hourSplit)
+        );
+    }
+
     const [validationError, setValidationError] = useState(false);
+    const [programName, setProgramName] = useState(props.program.name+'_'+  formatDate(new Date(), "_", "_"));
+    const [programVersion, setProgramVersion] = useState(props.program.version);
+    const [processing, setProcessing] = useState(false);
     let nameInput = useRef();
     let versionInput = useRef();
     let commentInput = useRef();
@@ -69,8 +91,8 @@ const BackupScreen = (props) => {
     };
 
     const programBackupHandler = () => {
-        const dt = new Date();
-        const timestamp = dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + 'T' +dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds();
+        setProcessing(true);
+        const timestamp = formatDate(new Date(), "-", ":");
         if(nameInput.current.value.trim() === "")
         {
             setValidationError(true);
@@ -78,6 +100,7 @@ const BackupScreen = (props) => {
         }
         setValidationError(false);
         let backup = {
+            "id" : new Date().valueOf(),
             "name": nameInput.current.value,
             "backup_date":timestamp,
             "version": versionInput.current.value,
@@ -88,6 +111,7 @@ const BackupScreen = (props) => {
         let backupToDatastore = !dsData?.results ? dsCreateRequest : dsUpdateRequest
         backupToDatastore.mutate({data: dsBackups})
             .then(response=>{
+                setProcessing(false);
                 hideFormHandler();
                 if(response.status != 'OK') {
                     props.setNotification({
@@ -106,13 +130,13 @@ const BackupScreen = (props) => {
 
     return  <>
             <CustomMUIDialog open={true} maxWidth="md" fullWidth={true}>
-                { loadingMetadata && <Box sx={{ display: 'inline-flex', margin: "50px", display: 'flex' }}><CircularProgress /></Box>}
-                {!loadingMetadata &&
+                { (loadingMetadata || processing) && <Box sx={{ display: 'inline-flex', margin: "50px", display: 'flex' }}><CircularProgress /></Box>}
+                {!(loadingMetadata || processing) &&
                 <>
-                    <CustomMUIDialogTitle onClose={hideFormHandler} id={"orgUnit_assignemnt_dialog_title"}>Backup
+                    <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_backup_dialog_title"}>Backup
                         Program ({metaData.results?.programs[0].name})</CustomMUIDialogTitle>
                     <DialogContent dividers style={{padding: '1em 2em'}}>
-                        <TextField margin="normal" id="name" label="Backup Name (*)" type="text" fullWidth variant="standard" autoComplete="off" inputRef={nameInput} helperText={ validationError ? "Please provide a name" : " "} error={validationError} />
+                        <TextField margin="normal" id="name" label="Backup Name (*)" type="text" value={programName} onChange={e => setProgramName(e.target.value)} fullWidth variant="standard" autoComplete="off" inputRef={nameInput} helperText={ validationError ? "Please provide a name" : " "} error={validationError} />
                         <TextField
                             margin="normal"
                             id="version"
@@ -122,6 +146,8 @@ const BackupScreen = (props) => {
                             variant="standard"
                             autoComplete="off"
                             inputRef={versionInput}
+                            value={programVersion}
+                            onChange={e => setProgramVersion(e.target.value)}
                             />
                         <TextField
                             id="comments"

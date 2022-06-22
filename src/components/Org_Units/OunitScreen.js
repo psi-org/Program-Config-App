@@ -233,7 +233,6 @@ const OunitScreen = ({id, setOrgUnitProgramId, setNotification}) => {
             let metadata = {};
             metadata.programs = prgMetaData.results?.programs;
             metadata.programs[0].organisationUnits = selectedOrgUnits.map((ounit) => { return { id: ounit }});
-            console.log("program: ", metadata.program);
             metadataRequest.mutate({data: metadata})
                 .then(response=>{
                     console.log("Response: ", response);
@@ -243,8 +242,6 @@ const OunitScreen = ({id, setOrgUnitProgramId, setNotification}) => {
                     }
                     else {
                         setContent('status');
-                        /* let stats = response?.stats;
-                        setImportStatus(stats); */
                         setNotification({ 
                             message: `Organisation Units assigned successfully! (Total: ${selectedOrgUnits.length})`, 
                             severity: 'success' 
