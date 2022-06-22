@@ -43,7 +43,7 @@ const queryAvailableMetadata = {
         resource: 'metadata',
         params: {
             fields: ['id'],
-            filter: ['id:in:[TOcCuCN2CLm,Ip3IqzzqgLN,Jz4YKD15lnK,QR0HHcQri91,v9XPATv6G3N,yB5tFAAN7bI,haUflNqP85K,QbYqOgwk5fJ]']
+            filter: ['id:in:[TOcCuCN2CLm,Ip3IqzzqgLN,Jz4YKD15lnK,QR0HHcQri91,v9XPATv6G3N,yB5tFAAN7bI,haUflNqP85K,QbYqOgwk5fJ,JDmJ4ADTaDq]']
         }
     }
 };

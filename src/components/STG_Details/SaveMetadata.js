@@ -257,7 +257,6 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
             delete de.code;
             return de
         });
-        console.log({removedItems,removed})
         let toUpdateDE = JSON.parse(JSON.stringify(new_dataElements));
         let tempUpdate = toUpdateDE.map(de => {
             let suffix = `${String(+ new Date()).slice(-7)}[X]`;

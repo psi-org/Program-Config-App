@@ -5,7 +5,9 @@
             "name": "HNQIS",
             "id": "Ip3IqzzqgLN",
             "sortOrder": 1,
-            "optionSet": {"id": "TOcCuCN2CLm"},
+            "optionSet": {
+                "id": "TOcCuCN2CLm"
+            },
             "translations": []
         },
         {
@@ -13,7 +15,9 @@
             "name": "HNQIS 2.0",
             "id": "Jz4YKD15lnK",
             "sortOrder": 2,
-            "optionSet": {"id": "TOcCuCN2CLm"},
+            "optionSet": {
+                "id": "TOcCuCN2CLm"
+            },
             "translations": []
         },
         {
@@ -21,7 +25,9 @@
             "name": "RDQA",
             "id": "QR0HHcQri91",
             "sortOrder": 3,
-            "optionSet": {"id": "TOcCuCN2CLm"},
+            "optionSet": {
+                "id": "TOcCuCN2CLm"
+            },
             "translations": []
         },
         {
@@ -29,7 +35,9 @@
             "name": "EDS",
             "id": "v9XPATv6G3N",
             "sortOrder": 4,
-            "optionSet": {"id": "TOcCuCN2CLm"},
+            "optionSet": {
+                "id": "TOcCuCN2CLm"
+            },
             "translations": []
         }
     ],
@@ -42,10 +50,18 @@
             "attributeValues": [],
             "translations": [],
             "options": [
-                {"id": "Ip3IqzzqgLN"},
-                {"id": "Jz4YKD15lnK"},
-                {"id": "QR0HHcQri91"},
-                {"id": "v9XPATv6G3N"}
+                {
+                    "id": "Ip3IqzzqgLN"
+                },
+                {
+                    "id": "Jz4YKD15lnK"
+                },
+                {
+                    "id": "QR0HHcQri91"
+                },
+                {
+                    "id": "v9XPATv6G3N"
+                }
             ]
         }
     ],
@@ -153,6 +169,16 @@
                 "F_SECTION_DELETE",
                 "F_PROGRAMSTAGE_ADD",
                 "F_PROGRAM_DELETE"
+            ]
+        },
+        {
+            "name": "PCA - Users Sharing Management",
+            "id": "JDmJ4ADTaDq",
+            "displayName": "PCA - Users Sharing Management",
+            "publicAccess": "rw------",
+            "description": "Users view authorities for the Sharing Settings in the Program Config App",
+            "authorities": [
+                "F_USER_VIEW"
             ]
         }
     ]

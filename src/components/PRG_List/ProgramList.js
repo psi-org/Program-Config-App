@@ -165,7 +165,7 @@ const ProgramList = () => {
                     }
                     {
                         sharingProgramId &&
-                        <SharingScreen element="program" id={sharingProgramId} setSharingProgramId={setSharingProgramId} readOnly={readOnlyPermission}/>
+                        <SharingScreen element="program" id={sharingProgramId} setSharingProgramId={setSharingProgramId} readOnly={readOnlyPermission} setNotification={setNotification}/>
                     }
                     {
                         orgUnitProgramId &&

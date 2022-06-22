@@ -61,12 +61,14 @@ const DependencyExport = ({ program, setExportProgramId }) => {
       program.organisationUnits = []
 
       delete program.created;
+      delete program.createdBy;
       delete program.lastUpdated;
       delete program.lastUpdatedBy;
       delete program.categoryCombo;
 
       program.programTrackedEntityAttributes?.forEach(tea => {
         delete tea.created;
+        delete tea.createdBy;
         delete tea.lastUpdated;
         delete tea.access;
       });
@@ -88,6 +90,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
     programMetadata.programStages?.forEach(stage => {
 
       delete stage.created;
+      delete stage.createdBy;
       delete stage.lastUpdated;
       delete stage.lastUpdatedBy;
 
@@ -106,6 +109,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     programMetadata.attributes?.forEach(att => {
       delete att.created;
+      delete att.createdBy;
       delete att.lastUpdated;
       delete att.lastUpdatedBy;
     });
@@ -123,6 +127,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     programMetadata.dataElements?.forEach(de => {
       delete de.created;
+      delete de.createdBy;
       delete de.lastUpdated;
       delete de.lastUpdatedBy;
       delete de.categoryCombo;
@@ -131,11 +136,13 @@ const DependencyExport = ({ program, setExportProgramId }) => {
     programMetadata.trackedEntityTypes?.forEach(tet => {
 
       delete tet.created;
+      delete tet.createdBy;
       delete tet.lastUpdated;
       delete tet.lastUpdatedBy;
 
       tet.trackedEntityTypeAttributes?.forEach(tea => {
         delete tea.created;
+        delete tea.createdBy;
         delete tea.lastUpdated;
         delete tea.access;
       });
@@ -144,6 +151,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     programMetadata.trackedEntityAttributes?.forEach(tea => {
       delete tea.created;
+      delete tea.createdBy;
       delete tea.lastUpdated;
       delete tea.lastUpdatedBy;
     });
@@ -161,6 +169,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     programMetadata.optionSets?.forEach(optionSet => {
       delete optionSet.created;
+      delete optionSet.createdBy;
       delete optionSet.lastUpdated;
       delete optionSet.lastUpdatedBy;
     });

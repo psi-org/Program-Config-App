@@ -21,7 +21,7 @@ const H2_METADATA_VERSION = "1.0.0"
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI","haUflNqP85K"]
 const PCA_OPTION_SETS = ["TOcCuCN2CLm"]
 const PCA_OPTIONS = ["Ip3IqzzqgLN","Jz4YKD15lnK","QR0HHcQri91","v9XPATv6G3N"]
-const PCA_USER_ROLES = ["QbYqOgwk5fJ"]
+const PCA_USER_ROLES = ["QbYqOgwk5fJ", "JDmJ4ADTaDq"]
 
 const H2_REQUIRED = {
     dataElements : ["NAaHST5ZDTE","VqBfZjZhKkU","pzWDtDUorBt","F0Qcr8ANr7t","DIoqtxbSJIL","nswci5V4j0d"],

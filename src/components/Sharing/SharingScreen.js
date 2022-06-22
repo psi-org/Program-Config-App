@@ -1,7 +1,7 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { CircularLoader, Modal, ModalContent, ModalTitle, NoticeBox, ModalActions, ButtonStrip, CenteredContent } from "@dhis2/ui";
 import SharingItem from './SharingItem';
-import { DeepCopy } from '../../configs/Utils';
+import { DeepCopy, parseErrors } from '../../configs/Utils';
 
 import EditIcon from '@mui/icons-material/Edit';
 import { useRef, useState, useEffect } from "react";
@@ -43,7 +43,7 @@ const entitiesQuery = {
         resource: 'users',
         params: {
             paging: false,
-            fields: ['id', 'name', 'displayName']
+            fields: ['id', 'name', 'displayName', 'userCredentials[username]']
         }
     },
     userGroupData: {
@@ -74,7 +74,7 @@ const metadataMutation = {
 
 const btnOptions = ['Apply Only to Program', 'Apply to Program & Program Stages', 'Apply to Program, Program Stages & Data Elements'];
 
-const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
+const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotification }) => {
 
     const programMetadata = {
         results: {
@@ -163,8 +163,8 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
 
     if (!metadataLoading && prgMetaData) {
         metadata = prgMetaData.results;
-        let psde = metadata.programStages.map(ps => ps.programStageDataElements.map(psde => psde.dataElement.id)).flat()
-        metadata.dataElements = metadata.dataElements.filter(de => psde.includes(de.id))
+        let psde = metadata.programStages?.map(ps => ps.programStageDataElements.map(psde => psde.dataElement.id))?.flat()
+        metadata.dataElements = metadata.dataElements?.filter(de => psde.includes(de.id))
     }
 
 
@@ -201,6 +201,10 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
 
     const userPermissionState = () => {
         return (<IconButton color='inherit' style={{marginRight: '1em'}}>{(usrPermission[1] === "w") ? <EditIcon /> : (usrPermission[0] === "r" && usrPermission[1] !== "w") ? <ViewIcon /> : <BlockIcon />}</IconButton>)
+    }
+
+    const handleSuggestions = (e) => {
+        loadSuggestions(e.target.value)
     }
 
     const handleClick = () => {
@@ -309,9 +313,19 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
         });
 
         metadataRequest.mutate({ data: payloadMetadata })
-            .then(response => {
-                setContent('status');
-                setImportStatus(response?.stats);
+            .then(response => { 
+                if(response?.status === "OK"){
+                    setNotification({ 
+                        message: `Chages to the Sharing Settings applied successfully`, 
+                        severity: 'success' 
+                    })
+                }else{
+                    setNotification({ 
+                        message: parseErrors(response), 
+                        severity: 'error' 
+                    })
+                }
+                hideForm()
             });
     }
 
@@ -383,10 +397,25 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly }) => {
                         <div style={{ fontWeight: 400, padding: "16px", backgroundColor: 'rgb(245,245,245)', display: "flex", flexDirection: 'column', justifyContent: "center" }}>
                             <div style={{ color: 'rgb(129, 129, 129)', paddingBottom: "8px" }}>Add users and user groups</div>
                             <div style={{ display: "flex", flexDirection: "row", alignItems: 'center', flex: "1 1 0"}}>
+                                
+                                
+
+
+
                                 <div style={{ display: "inline-block", position: "relative", width: "100%", backgroundColor: "white", boxShadow: 'rgb(204,204,204) 2px 2px 2px', padding: "0 16px", marginRight: "16px", height: '3em' }}>
-                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={(e) => loadSuggestions(e.target.value)} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} disabled={userAccessRestricted} />
+                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={handleSuggestions} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} disabled={userAccessRestricted} />
                                 </div>
-                                {search && <Suggestions usersNGroups={JSON.parse(JSON.stringify(usersNGroups))} keyword={search} setSearch={setSearch} addEntity={addEntity} />}
+
+                                {search && 
+                                    <Suggestions
+                                        usersNGroups={DeepCopy(usersNGroups)}
+                                        keyword={search}
+                                        setSearch={setSearch}
+                                        addEntity={addEntity}
+                                        posRef={document.getElementById("userNGroup")}
+                                    />
+                                }
+                                
                                 <div id={'newPermission'} style={{ padding: "auto" }} onClick={() => { toggle(); }}>
                                     {userPermissionState()}
                                 </div>

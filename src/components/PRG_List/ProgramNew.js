@@ -178,8 +178,16 @@ const ProgramNew = (props) => {
     const prgTypeQuery = useDataQuery(queryProgramType);
     const prgTypeId = prgTypeQuery.data?.results.attributes[0].id;
 
-    const haQuery = useDataQuery(query);
-    const haOptions = haQuery.data?.results.optionSets[0].options;
+    const { data: haQuery, refetch: findHealthAreas } = useDataQuery(query, { lazy: true });
+
+
+
+    const [haOptions, setHaOptions] = useState();
+
+
+
+
+
 
     const idsQuery = useDataQuery(queryId);
     const uidPool = idsQuery.data?.results.codes;
@@ -233,6 +241,11 @@ const ProgramNew = (props) => {
         if (value === 'hnqis') {
             let hnqisTET = trackedEntityTypes.find(tet => tet.id === "oNwpeWkfoWc")
             setProgramTET({ label: hnqisTET.name, id: hnqisTET.id })
+            findHealthAreas().then(data => {
+                if (data?.results?.optionSets[0].options) {
+                    setHaOptions(data?.results?.optionSets[0].options)
+                }
+            })
         } else {
             setProgramTET('')
             if (value === 'tracker') {
@@ -423,7 +436,12 @@ const ProgramNew = (props) => {
     
                 if (pgrTypePCA === 'hnqis') {
                     //HNQIS2 Programs
+                    let assessmentStage = undefined;
+                    let actionPlanStage = undefined;
+
                     let criticalSteps = undefined;
+                    let defaultSection = undefined;
+                    let scores = undefined;
     
                     if (!props.data) {
                         Object.assign(prgrm, hnqisProgramConfigs)
@@ -434,7 +452,7 @@ const ProgramNew = (props) => {
                         prgrm.programStages.push({ id: assessmentId });
                         prgrm.programStages.push({ id: actionPlanId });
     
-                        let assessmentStage = DeepCopy(PS_AssessmentStage);
+                        assessmentStage = DeepCopy(PS_AssessmentStage);
                         assessmentStage.id = assessmentId;
                         assessmentStage.name = assessmentStage.name;
                         assessmentStage.programStageSections.push({ id: defaultSectionId });
@@ -442,12 +460,12 @@ const ProgramNew = (props) => {
                         assessmentStage.programStageSections.push({ id: scoresSectionId });
                         assessmentStage.program.id = programId;
     
-                        let actionPlanStage = DeepCopy(PS_ActionPlanStage);
+                        actionPlanStage = DeepCopy(PS_ActionPlanStage);
                         actionPlanStage.id = actionPlanId;
                         actionPlanStage.name = actionPlanStage.name;
                         actionPlanStage.program.id = programId;
     
-                        let defaultSection = DeepCopy(PSS_Default);
+                        defaultSection = DeepCopy(PSS_Default);
                         defaultSection.id = defaultSectionId;
                         defaultSection.programStage.id = assessmentId;
                         //defaultSection.name = defaultSection.name
@@ -457,7 +475,7 @@ const ProgramNew = (props) => {
                         criticalSteps.programStage.id = assessmentId;
                         //criticalSteps.name = criticalSteps.name
     
-                        let scores = DeepCopy(PSS_Scores);
+                        scores = DeepCopy(PSS_Scores);
                         scores.id = scoresSectionId;
                         scores.name = scores.name;
                         scores.programStage.id = assessmentId;

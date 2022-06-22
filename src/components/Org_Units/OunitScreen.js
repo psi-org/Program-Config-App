@@ -235,7 +235,6 @@ const OunitScreen = ({id, setOrgUnitProgramId, setNotification}) => {
             metadata.programs[0].organisationUnits = selectedOrgUnits.map((ounit) => { return { id: ounit }});
             metadataRequest.mutate({data: metadata})
                 .then(response=>{
-                    console.log("Response: ", response);
                     if(response.status !== 'OK')
                     {
                         setContent('status');

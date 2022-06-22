@@ -109,7 +109,9 @@ const ProgramDetails = () => {
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
                         {
-                            data.results.programStages.map((programStage) => {
+                            data.results.programStages.sort((stageA, stageB) => 
+                                (stageA.name > stageB.name)? 1 : ((stageA.name < stageB.name)? -1 : 0)
+                            ).map((programStage) => {
                                 return (
                                     <StageItem
                                         stage={programStage}
