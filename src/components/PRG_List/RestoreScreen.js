@@ -57,7 +57,7 @@ const RestoreScreen = (props) => {
                                     </>
                                 }
                                 {dataStore && restoreBackup &&
-                                    <RestoreOptions backup={restoreBackup} hideFormHandler={hideFormHandler}/>
+                                    <RestoreOptions backup={restoreBackup} setRestoreProgramId={props.setRestoreProgramId} setNotification={props.setNotification}/>
                                 }
                         </>
                     }
