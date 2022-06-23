@@ -61,7 +61,7 @@ const searchOrgUnitQuery = {
         params: ({filterString}) => ({
             pageSize: 100,
             fields: ['id','path','displayName','children::isNotEmpty'],
-            filter: [`displayName:ilike:${filterString}`],
+            filter: [`identifiable:token:${filterString}`],
             withinUserHierarchy: true
         })
     }
@@ -100,14 +100,17 @@ const OunitScreen = ({id, setOrgUnitProgramId, setNotification}) => {
     const [ selectedOrgUnits, setSelectedOrgUnits ] = useState([]);
     const [ orgUnitPathSelected, setOrgUnitPathSelected ] = useState([]);
     const [ orgUnitTreeRoot, setOrgUnitTreeRoot ] = useState([]);
+    const [ initiallyExpanded, setInitiallyExpanded] = useState([]);
+    const [ complete, setComplete ] = useState(false);
 
     const {loading: ouMetadataLoading, data: ouMetadata} = useDataQuery(orgUnitsQuery);
     const oUnits = useDataQuery(ouQuery, {variables: {id: id, level:level}});
     const oUnitsByGroups = useDataQuery(ouGroupQuery, {variables: {id: id, groupId: groupId}});
-    const searchOunits = useDataQuery(searchOrgUnitQuery, {variables: {filterString: filterString}});
+    const {loading:searchLoading, data:searchOunits, refetch: searchRefetch} = useDataQuery(searchOrgUnitQuery, {variables: {filterString: filterString}});
     const {loading: metadataLoading, data: prgMetaData} = useDataQuery(programMetadata);
     const {loading: poLoading, data: prgOrgUnitData} = useDataQuery(programOrgUnitsQuery, {variables: {id: id}});
     const metadataDM = useDataMutation(metadataMutation);
+    const [filter, setFilter] = useState([]);
 
     let userOrgUnits;
 
@@ -121,7 +124,9 @@ const OunitScreen = ({id, setOrgUnitProgramId, setNotification}) => {
         if (!poLoading)
         {
             setSelectedOrgUnits([...prgOrgUnitData.results?.organisationUnits.map(ou => ou.id)]);
+            setInitiallyExpanded([...prgOrgUnitData.results?.organisationUnits.map(ou => ou.path)]);
             setOrgUnitPathSelected([...prgOrgUnitData.results?.organisationUnits.map(ou => ou.path)]);
+            setComplete(true);
         }
     }, [prgOrgUnitData])
 
@@ -161,12 +166,11 @@ const OunitScreen = ({id, setOrgUnitProgramId, setNotification}) => {
         if (event.target.value.length > 0)
         {
             let filterString = document.getElementById("filterOrgUnitName").value;
-            searchOunits.refetch({filterString: filterString}).then(data => {
+            searchRefetch({filterString: filterString}).then(data => {
                 if (typeof data.results !== "undefined") {
-                    setOrgUnitTreeRoot([]);
-                    setOrgUnitTreeRoot([...data.results?.organisationUnits.map(ou => ou.id)]);
-                    // const rootOrgUnits = orgUnits.results.organisationUnits.filter(ou=>(new RegExp(`${filterString}`)).test(ou.displayName)).map(ou=> ou.id);
-                    // setOrgUnitTreeRoot([...rootOrgUnits]);;
+                    let ouPaths = [...data.results?.organisationUnits.map(ou => ou.path)];
+                    setInitiallyExpanded(ouPaths);
+                    setFilter(ouPaths);
                 }
             });
         }
@@ -266,11 +270,11 @@ const OunitScreen = ({id, setOrgUnitProgramId, setNotification}) => {
                     {content === 'form' &&
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ position: "relative", minWidth: "850px"}}>
-                            <TextField id={"filterOrgUnitName"} label={"Filtering Organisation unit by Name"} /*onChange={organisationUnitFilterHandler}*/ variant={"standard"} ref={filterRef} style={{ width: "100%"}}/>
+                            <TextField id={"filterOrgUnitName"} label={"Search Organisation Unit by name, code or id"} onChange={organisationUnitFilterHandler} variant={"standard"} ref={filterRef} style={{ width: "100%"}}/>
                             <div style={{ marginTop: "10px"}}> { selectedOrgUnits.length } Organisation units selected </div>
-                            {!poLoading &&
+                            {!poLoading && complete &&
                                 <div style={{ minHeight: "300px", maxHeight: "450px", minWidth: "300px", maxWidth: "480px", overflow: "auto", border: "1px solid rgb(189, 189, 189)", borderRadius: "3px", padding: "4px", margin: "4px 0px", display: "inline-block", verticalAlign: "top"}}>
-                                    <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ selectedOrgUnits }/>
+                                    <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } filter={filter} initiallyExpanded={ initiallyExpanded }/>
                                 </div>
                             }
                             <div style={{width: "400px", background: "white", marginLeft: "1rem", marginTop: "1rem", display: "inline-block"}}>
