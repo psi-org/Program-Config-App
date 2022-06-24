@@ -72,14 +72,13 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
 
     const parsedDE = {
         id: data[importMap.dataElementId] || undefined,
-        name: code + '_' + data[importMap.formName].slice(0,formNameMaxLength),
-        shortName: (code + '_' + data[importMap.formName]).slice(0,50),
+        name: code + '_' + data[importMap.formName]?.slice(0,formNameMaxLength),
+        shortName: (code + '_' + data[importMap.formName])?.slice(0,50),
         code,
         description: data[importMap.description],
         formName: type=='label'?
                     '     ':
-                    (
-                        data[importMap.formName] + (data[importMap.isCritical]=='Yes'?' [C]':'')),
+                    data[importMap.formName]?(data[importMap.formName] + (data[importMap.isCritical]=='Yes'?' [C]':'')):'',
         domainType: 'TRACKER',
         valueType: data[importMap.valueType],
         aggregationType: aggType,

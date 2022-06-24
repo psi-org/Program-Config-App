@@ -309,7 +309,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
                 break;
         }
         Object.keys(payloadMetadata).forEach(meta => {
-           applySharing(payloadMetadata[meta]);
+            applySharing(payloadMetadata[meta],meta);
         });
 
         metadataRequest.mutate({ data: payloadMetadata })
@@ -329,22 +329,22 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
             });
     }
 
-    const applySharing = (elements) => {
+    const applySharing = (elements, meta) => {
         elements?.forEach((element) => {
             if (!exclusionDataElements.includes(element.id)) {
-                element.sharing.public = payload.object.publicAccess;
+                element.sharing.public = meta==='dataElements'?(payload.object.publicAccess.substring(0,2)+'------'):payload.object.publicAccess;
                 payload.object.userAccesses.forEach((user) => {
                     if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
-                        element.sharing.users[user.id].access = user.access;
+                        element.sharing.users[user.id].access = meta==='dataElements'?(user.access.substring(0,2)+'------'):user.access;
                     } else {
-                        element.sharing.users[user.id] = {id: user.id, access: user.access}
+                        element.sharing.users[user.id] = {id: user.id, access: meta==='dataElements'?(user.access.substring(0,2)+'------'):user.access}
                     }
                 })
                 payload.object.userGroupAccesses.forEach((userGroup) => {
                     if (element.sharing.userGroups.hasOwnProperty(userGroup.id) && overwrite) {
-                        element.sharing.userGroups[userGroup.id].access = userGroup.access;
+                        element.sharing.userGroups[userGroup.id].access = meta==='dataElements'?(userGroup.access.substring(0,2)+'------'):userGroup.access;
                     } else {
-                        element.sharing.userGroups[userGroup.id] = {id: userGroup.id, access: userGroup.access}
+                        element.sharing.userGroups[userGroup.id] = {id: userGroup.id, access: meta==='dataElements'?(userGroup.access.substring(0,2)+'------'):userGroup.access}
                     }
                 })
                 deleted.forEach(del => {

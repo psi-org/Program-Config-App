@@ -158,7 +158,8 @@ const ValidateMetadata = (props) => {
                         let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
 
                         let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
-                        dataElement.errors = dataElement.errors ? dataElement.errors.push(deErrs) : [deErrs];
+
+                        dataElement.errors ? dataElement.errors.push(deErrs) : dataElement.errors = [deErrs];
                     }
 
                     if (dataElement.errors) {
@@ -180,7 +181,9 @@ const ValidateMetadata = (props) => {
                     let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
 
                     let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
-                    dataElement.errors = dataElement.errors ? dataElement.errors.push(deErrs) : [deErrs];
+
+                    dataElement.errors ? dataElement.errors.push(deErrs) : dataElement.errors = [deErrs];
+
                 }
 
                 if (dataElement.errors) {
