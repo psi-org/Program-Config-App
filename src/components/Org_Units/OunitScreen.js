@@ -241,8 +241,6 @@ const OunitScreen = ({id, setOrgUnitProgramId, setNotification}) => {
                     }
                     else {
                         setContent('status');
-                        /* let stats = response?.stats;
-                        setImportStatus(stats); */
                         setNotification({ 
                             message: `Organisation Units assigned successfully! (Total: ${selectedOrgUnits.length})`, 
                             severity: 'success' 
