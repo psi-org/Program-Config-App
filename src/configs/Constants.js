@@ -28,7 +28,9 @@ const H2_REQUIRED = {
     optionSets : ["NDfZ129owtz","y752HEwvCGi"],
     options : ["BNjofUBvlJ8","Ox6VQNmvuS3","SzQKvyTKPEw","NPw1hV4degm","lztu61LKSII","McXRLIwjDh7","xTJOcijWyaD","UgcqvJVJ9f0","aYWZXNhvXQw","C9L7MCPeHr5","c8qOHzSbhWM","imVa2DiLgrJ","r8UqKmXwXqa","RHreLvo1UWn","hX7DJdCN9Ou","xaBeYsM2hFH","jdVVvtwuJ7Y","e10afvAkkPR","OqRNLt5Nbub","MstdLcCaYZW","Jhn703YNPa1"],
     trackedEntityTypes : ["oNwpeWkfoWc"],
-    attributes : ["LP171jpctBm","yhKEe6BLEer"]
+    trackedEntityAttributes: ["Xe5hUu6KkUT","NQdpdST0Gcx","nHg1hGgtJwm","UlUYUyZJ6o9","ulU9KKgSLYe"],
+    attributes : ["LP171jpctBm","yhKEe6BLEer"],
+    legendSets: ["RXxPYFwtgf4"]
 }
 
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'numeric',minute:'numeric',second:'numeric',hour12:false }

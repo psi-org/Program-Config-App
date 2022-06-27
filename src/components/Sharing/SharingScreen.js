@@ -14,6 +14,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
+import HelpIcon from '@mui/icons-material/Help';
 
 import {
     CircularProgress,
@@ -25,7 +26,7 @@ import {
     Popper,
     MenuItem,
     MenuList,
-    FormGroup, FormControlLabel, Checkbox
+    FormGroup, FormControlLabel, Checkbox, Tooltip
 } from "@mui/material";
 
 const sharingQuery = {
@@ -452,9 +453,14 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
                             </div>
                         </div>
                         {(selectedIndex === 1 || selectedIndex === 2) &&
-                            <FormGroup style={{ marginTop: "5px" }}>
-                                <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox} inputProps={{ 'aria-label': 'controlled' }} />} label={"Overwrite Existing Behaviors in Data Elements"} />
+                        <div style={{display: 'flex', alignItems: 'center', margin: "1em 0 0 1em"}}>
+                            <FormGroup>
+                                <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox} inputProps={{ 'aria-label': 'controlled' }} />} label={"Overwrite Existing Settings in Data Elements"} />
                             </FormGroup>
+                            <Tooltip title="Replaces the current Sharing Settings of the Data Elements contained in the Program" placement="top-start">
+                                <HelpIcon color="disabled" style={{cursor: 'pointer'}}/>
+                            </Tooltip>
+                        </div>
                         }
                     </div>
                     }
