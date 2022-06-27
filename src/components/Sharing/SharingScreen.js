@@ -356,11 +356,14 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
                         }
                     })
                 }
-                deleted.forEach(del => {
-                    if (element.sharing[del.type].hasOwnProperty(del.id)) {
-                        delete element.sharing[del.type][del.id];
-                    }
-                });
+                if (meta !== "dataElements" || overwrite) //Overwrite all the permission for dataElements if checked
+                {
+                    deleted.forEach(del => {
+                        if (element.sharing[del.type].hasOwnProperty(del.id)) {
+                            delete element.sharing[del.type][del.id];
+                        }
+                    });
+                }
             }
         });
     }
