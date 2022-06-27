@@ -31,7 +31,9 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
-const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, SectionActions/* , handleSectionEdit */ }) => {
+import Chip from '@mui/material/Chip';
+
+const DraggableSection = ({program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -87,7 +89,7 @@ const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, S
     var classNames = (stageSection.importStatus) ? ' import_' + stageSection.importStatus : '';
 
     return (
-        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined || DEActions.deToEdit!==''}>
+        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined || DEActions.deToEdit!=='' || !isSectionMode}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                     <div className={"ml_item section-header" + (openMenu?' section-selected':'') + classNames}>
@@ -95,7 +97,8 @@ const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, S
                             <img className="ml_list-img" alt="sec" src={sec_svg} />
                         </div>
                         <div className="ml_item-title">
-                            {sectionImportStatus} {stageSection.displayName} 
+                            <div>{sectionImportStatus} {stageSection.displayName} </div>
+                            <div>{editStatus && <Chip label={editStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{marginLeft:'1em'}} /> }</div>
                         </div>
                         <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div> {sectionImportSummary}</div>
                         <div className="ml_item-warning_error " onClick={()=>setShowValidationMessage(!showValidationMessage)}>
@@ -103,7 +106,7 @@ const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, S
                             {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                         </div>
                         <div className="ml_item-cta">
-                            <img src={move_vert_svg} alt="menu" id={'menu'+stageSection.id} onClick={()=>{setRef(document.getElementById('menu'+stageSection.id)); toggle()}} style={{cursor:'pointer'}}/>
+                            {isSectionMode && <img src={move_vert_svg} alt="menu" id={'menu'+stageSection.id} onClick={()=>{setRef(document.getElementById('menu'+stageSection.id)); toggle()}} style={{cursor:'pointer'}}/>}
                             {openMenu &&
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
@@ -125,7 +128,18 @@ const DraggableSection = ({ stageSection, stageDataElements, DEActions, index, S
                             <div {...provided.droppableProps} ref={provided.innerRef} className={"section_cont "} >
                                 {
                                     stageSection.dataElements.map((de, i) => {
-                                        return <DraggableDataElement dataElement={de} stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)} DEActions={DEActions} section={stageSection.id} index={i} key={de.id || i} />;
+                                        return <DraggableDataElement
+                                            program={program}
+                                            dataElement={de}
+                                            stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)}
+                                            DEActions={DEActions}
+                                            section={stageSection.id}
+                                            index={i}
+                                            key={de.id || i}
+                                            hnqisMode={hnqisMode}
+                                            deStatus={editStatus?.dataElements?.find(dataElement => dataElement.id === de.id)}
+                                            isSectionMode={isSectionMode}
+                                        />;
                                     })
                                 }
                                 {provided.placeholder}

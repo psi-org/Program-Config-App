@@ -1,4 +1,7 @@
 // *** Global State ***
+
+import {useEffect} from "react"
+
 import { useDispatch } from "react-redux";
 import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
@@ -11,6 +14,8 @@ import { Link, useParams } from "react-router-dom";
 import StageSections from "./StageSections";
 import { ajax } from "jquery";
 
+import {DeepCopy} from "../../configs/Utils"
+
 const query = {
     results: {
         resource: 'programStages',
@@ -18,14 +23,16 @@ const query = {
         params: {
             fields:[
                 'id','name','allowGenerateNextVisit','publicAccess','reportDateToUse','formType','generatedByEnrollmentDate','displayFormName','sortOrder','hideDueDate','enableUserAssignment','minDaysFromStart','favorite','executionDateLabel','preGenerateUID','displayName','externalAccess','openAfterEnrollment','repeatable','remindCompleted','displayGenerateEventBox','validationStrategy','autoGenerateEvent','blockEntryForm','program[id,name,shortName,attributeValues]','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
-                'programStageDataElements[id,name,compulsory,displayInReports,programStage,dataElement[id,name,shortName,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName],sortOrder]',
-                'programStageSections[id,name,displayName,sortOrder,dataElements[id,name,shortName,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName]]',
+                'programStageDataElements[id,name,compulsory,displayInReports,programStage,dataElement[id,name,shortName,style,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName],sortOrder]',
+                'programStageSections[id,name,displayName,sortOrder,dataElements[id,name,shortName,style,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName]]'
             ]
         }
     }
 };
 
 const ProgramStage = () => {
+
+    const h2Ready = localStorage.getItem('h2Ready') === 'true'
 
     const {id} = useParams();
 
@@ -35,7 +42,7 @@ const ProgramStage = () => {
         setProgramStage(id);
     }
     
-    const programStage = useSelector(state => state.programStage);
+    const programStage = id ?? useSelector(state => state.programStage);
 
     if(!programStage){
         return (
@@ -45,7 +52,11 @@ const ProgramStage = () => {
         )
     }
 
-    const { loading, error, data, refetch } = useDataQuery(query, {variables : {programStage}});
+    const { loading, error, data, refetch } = useDataQuery(query, {lazy:true, variables : {programStage}});
+
+    useEffect(()=>{
+        refetch()
+    },[])
 
     if (error) {
         return (
@@ -55,11 +66,28 @@ const ProgramStage = () => {
         )
     }
 
-    if (loading) {
-        return <span><CircularLoader /></span> 
+    /* if (loading) {
+        
+    } */
+
+    if(data){
+        const hnqisMode = !!data.results.program.attributeValues.find(av=>av.value==="HNQIS2")
+
+        if(hnqisMode && !h2Ready) return (
+            <div style={{margin:'2em'}}>
+                <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
+                    <span>First go to <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue</span>
+                </NoticeBox>
+            </div>
+        )
+
+        let programStageData = DeepCopy({...data.results})
+
+        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisMode={hnqisMode}/>
     }
 
-    return <StageSections programStage={data.results} stageRefetch={refetch}/>
+    return <span><CircularLoader /></span> 
+    
     
 }
 

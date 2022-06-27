@@ -6,6 +6,7 @@ import { Draggable } from "react-beautiful-dnd";
 import DataElementForm from "./DataElementForm";
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { METADATA } from "../../configs/Constants";
 
 // *** IMAGES ***
 import de_svg from './../../images/i-drag_black.svg';
@@ -28,14 +29,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
 
-const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
-    FEEDBACK_TEXT = "yhKEe6BLEer",
-    CRITICAL_QUESTION = "NPwvdTt0Naj",
-    METADATA = "haUflNqP85K",
-    SCORE_DEN = "l7WdLDhE3xW",
-    SCORE_NUM = "Zyr7rlDOJy8";
+import Chip from '@mui/material/Chip';
 
-const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, section, index}) => {
+const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode, deStatus, isSectionMode}) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -49,7 +45,6 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
 
     let classNames = '';
     
-    if(!dataElement.attributeValues) console.log(dataElement)
     let metadata = dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value;
     if(metadata) metadata=JSON.parse(metadata);
     let renderFormName = metadata?.labelFormName;
@@ -77,7 +72,7 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
 
     return (
         <>
-        <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined || DEActions.deToEdit!==''}>
+        <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined || DEActions.deToEdit!=='' || !isSectionMode}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                     <div id={"de_"+dataElement.id} className={'data-element-header '+(openMenu?'data-element-selected ':'')+classNames}>
@@ -92,7 +87,8 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
                             {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
                         </div>
                         <div className="ml_item-cta">
-                        <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>
+                            {deStatus && <Chip label={deStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{marginLeft:'1em'}} />}
+                            {isSectionMode && <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>}
                             {openMenu &&
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
@@ -105,15 +101,17 @@ const DraggableDataElement = ({dataElement, stageDE, DEActions, updateDEValues, 
                                     </Popper>
                                 </Layer>
                             }
-                            {/*<a target="_blank" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
+                            {/*<a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
                         </div>
                     </div>
                     { DEActions.deToEdit=== dataElement.id &&  
                         <DataElementForm 
+                            program={program}
                             programStageDataElement={stageDE}
                             section={section}
                             setDeToEdit={DEActions.setEdit}
                             save={DEActions.update}
+                            hnqisMode={hnqisMode}
                         /> 
                     }
                     { showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }

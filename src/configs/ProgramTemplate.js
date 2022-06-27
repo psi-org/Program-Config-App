@@ -4,73 +4,11 @@ const Program = {
     "shortName": "programShortName",
     "programType": "WITH_REGISTRATION",
     "skipOffline": false,
-    "publicAccess": "--------",
+    "publicAccess": "rwrw----",
     "enrollmentDateLabel": "Enrollment date",
     "registration": true,
     "displayFrontPageList": true,
-    "style": {
-        "color": "#3949ab",
-        "icon": "child_program_outline"
-    },
-    "trackedEntityType": {"id": "oNwpeWkfoWc"},
-    "attributeValues": [
-        {
-            "attribute": {"id": "haUflNqP85K"},
-            "value": "{\"buildVersion\":\"1.1\",\"useCompetencyClass\":\"Yes\",\"dePrefix\":\"programDEPrefix\"}"
-        }
-    ],
-    "programTrackedEntityAttributes": [
-        {
-            "trackedEntityAttribute": {"id": "Xe5hUu6KkUT"},
-            "mandatory": false,
-            "valueType": "TEXT",
-            "searchable": false,
-            "displayInList": true,
-            "sortOrder": 1
-        },
-        {
-            "trackedEntityAttribute": {"id": "nHg1hGgtJwm"},
-            "mandatory": false,
-            "valueType": "TEXT",
-            "searchable": false,
-            "displayInList": true,
-            "sortOrder": 2
-        },
-        {
-            "trackedEntityAttribute": {"id": "UlUYUyZJ6o9"},
-            "mandatory": false,
-            "valueType": "DATE",
-            "searchable": true,
-            "displayInList": true,
-            "sortOrder": 3
-        },
-        {
-            "trackedEntityAttribute": {"id": "NQdpdST0Gcx"},
-            "mandatory": false,
-            "valueType": "TEXT",
-            "searchable": false,
-            "displayInList": true,
-            "sortOrder": 4
-        },
-        {
-            "trackedEntityAttribute": {"id": "ulU9KKgSLYe"},
-            "mandatory": false,
-            "valueType": "TEXT",
-            "searchable": false,
-            "displayInList": false,
-            "sortOrder": 5
-        }
-    ],
-    "userGroupAccesses": [
-        {
-            "access": "rwrw----",
-            "id": "TOLEUuY7woR"
-        },
-        {
-            "access": "r-rw----",
-            "id": "QiJXeqMmXXQ"
-        }
-    ],
+    "style": {},
     "programStages": []
 }
 
@@ -98,7 +36,7 @@ const PS_AssessmentStage = {
     "program": {"id": "programId"},
     "programStageDataElements": [],
     "programStageSections": [],
-    "publicAccess": "--------",
+    "publicAccess": "rwrw----",
     "remindCompleted": true,
     "repeatable": false,
     "reportDateToUse": "enrollmentDate",
@@ -107,16 +45,7 @@ const PS_AssessmentStage = {
         "color": "#ffff00",
         "icon": "clinical_fe_outline"
     },
-    "userGroupAccesses": [
-        {
-            "access": "rwrw----",
-            "id": "TOLEUuY7woR"
-        },
-        {
-            "access": "r-rw----",
-            "id": "QiJXeqMmXXQ"
-        }
-    ]
+    "userGroupAccesses": []
 }
 
 const PS_ActionPlanStage = {
@@ -150,21 +79,12 @@ const PS_ActionPlanStage = {
         }
     ],
     "programStageSections": [],
-    "publicAccess": "--------",
+    "publicAccess": "rwrw----",
     "remindCompleted": false,
     "repeatable": true,
     "sortOrder": 2,
     "style": {"color": "#00b0ff"},
-    "userGroupAccesses": [
-        {
-            "access": "rwrw----",
-            "id": "TOLEUuY7woR"
-        },
-        {
-            "access": "r-rw----",
-            "id": "QiJXeqMmXXQ"
-        }
-    ]
+    "userGroupAccesses": []
 }
 
 const PSS_Default = {
@@ -195,8 +115,24 @@ const PSS_Scores = {
     "id": "scoresSectionId"
 }
 
+const PS_Generic = {
+    "publicAccess": "rw------",
+    "id": "stageID",
+    "name": "Stage",
+    "displayGenerateEventBox": true,
+    "autoGenerateEvent": true,
+    "program": {
+        "id": "programID"
+    },
+    "programStageDataElements": [],
+    "notificationTemplates": [],
+    "attributeValues": [],
+    "programStageSections": []
+}
+
 module.exports = {
     Program,
+    PS_Generic,
     PS_AssessmentStage,
     PS_ActionPlanStage,
     PSS_Default,

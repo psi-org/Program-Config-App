@@ -9,8 +9,7 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import SendIcon from '@mui/icons-material/Send';
-
-const SECTION_NAME_MAX_LENGTH = 230
+import { MAX_SECTION_NAME_LENGTH } from '../../configs/Constants';
 
 const queryId = {
     results: {
@@ -37,7 +36,7 @@ const SectionManager = (props) => {
     }
 
     const formDataIsValid = () =>{
-        return sectionName!=='' && sectionName.length<=SECTION_NAME_MAX_LENGTH;
+        return sectionName!=='' && sectionName.length<=MAX_SECTION_NAME_LENGTH;
     }
 
     function submission() {
@@ -52,9 +51,9 @@ const SectionManager = (props) => {
                 section.id = sectionId
                 props.sections.splice(props.newSectionIndex, 0, section);
             }
-            console.log(props.sections)
             props.refreshSections(props.sections)
-            props.notify(<span>Section {props.newSectionIndex!==undefined?'created':'edited'}! <strong>Remember to Validate and Save!</strong></span>)
+            props.notify(<span>Section {props.newSectionIndex!==undefined?'created':'edited'}! <strong>Remember to {props.hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>)
+            props.setAddedSection({index:props.sectionIndex ?? props.newSectionIndex ,mode:props.newSectionIndex!==undefined?'created':'edited',dataElements:[]})
             hideForm()
         }
     }
@@ -68,7 +67,7 @@ const SectionManager = (props) => {
                 
                 <TextField
                     error={sentForm && !formDataIsValid()}
-                    helperText={sentForm?(sectionName==='' ? 'This field is required' : (sectionName.length>SECTION_NAME_MAX_LENGTH ? `The Section Name cannot exceed ${SECTION_NAME_MAX_LENGTH} characters long` : '') ): ''}
+                    helperText={sentForm?(sectionName==='' ? 'This field is required' : (sectionName.length>MAX_SECTION_NAME_LENGTH ? `The Section Name cannot exceed ${MAX_SECTION_NAME_LENGTH} characters long` : '') ): ''}
                     margin="normal"
                     id="name"
                     label="Section Name"

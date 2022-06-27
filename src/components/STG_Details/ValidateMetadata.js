@@ -5,17 +5,11 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import SaveIcon from '@mui/icons-material/Save';
+import { METADATA, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "../../configs/Constants";
 
 
 import { useEffect, useState } from "react";
 import SaveMetadata from "./SaveMetadata";
-
-const METADATA = "haUflNqP85K",
-    CRITICAL_QUESTION = "NPwvdTt0Naj",
-    FEEDBACK_ORDER = 'LP171jpctBm';
-
-const MAX_FORM_NAME_LENGTH = 200;
-const MIN_FORM_NAME_LENGTH = 2;
 
 const ValidateMetadata = (props) => {
     let validationResults = {};
@@ -28,7 +22,7 @@ const ValidateMetadata = (props) => {
         programDetails: {
             enable: true,
             checkHasFormName: { enable: true, title: "Form name not defined for element", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
-            checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).` } },
+            checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).` } },
             //Disabled validation EXW103
             structureMatchesValue: { enable: false, title: "Label should be LONG_TEXT", errorMsg: { code: "EXW103", text: "The expected Value Type for the label Data Element is LONG_TEXT." } },
             hasFeedbackOrder: { enable: true, title: "Missing Feedback Order", errorMsg: { code: "EXW107", text: "The specified question has Numerator and Denominator assigned but does not contribute to any score." } },
@@ -38,12 +32,13 @@ const ValidateMetadata = (props) => {
             validAggregationQuestion: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW105", text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for numeric types and NONE for text inputs)" } },
             isNumeratorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW105", text: "The specified question Numerator is not numeric" } },
             isDenominatorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW108", text: "The specified question Denominator is not numeric" } },
-            hasParentQuestionNAnswerValue: { enable: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } }
+            hasParentQuestionNAnswerValue: { enable: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } },
+            matchesScore: { enable: true, title: "Score container not found", errorMsg: { code: "EXW110", text: "The specified question has been assigned to a score that is not defined." } }
         },
         scores: {
             enable: true,
             checkHasFormName: { enable: true, title: "Form name not defined for element", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
-            checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).` } },
+            checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).` } },
             //Disabled validation EXW102
             structureMatchesValue: { enable: false, title: "Score should be NUMBER", errorMsg: { code: "EXW102", text: "The expected Value Type for the score Data Element is NUMBER." } },
             hasScoreFeedbackOrder: { enable: true, title: "Missing Feedback Order", errorMsg: { code: "EXW111", text: "The specified score Data Element lacks Feedback Order." } },
@@ -60,7 +55,7 @@ const ValidateMetadata = (props) => {
         }
     }
 
-    const checkDuplicatedFeedbacks = (scores) => scores.filter(score => scores.find(match => match.feedbackOrder === score.feedbackOrder && match.code !== score.code));
+    const checkDuplicatedFeedbacks = props.hnqisMode?(scores) => scores.filter(score => scores.find(match => match.feedbackOrder === score.feedbackOrder && match.code !== score.code)):[];
 
     const groupBy = (data, key) => {
         return data.reduce((acu, cur) => {
@@ -130,20 +125,27 @@ const ValidateMetadata = (props) => {
         const importedScore = props.importedScores;
         let errorCounts = 0;
 
-        if (verifyProgramDetail(props.importResults)) {
+        if ( verifyProgramDetail(props.importResults)) {
             let questions = [];
             let scores = [];
 
             validationResults.questions = questions;
             validationResults.scores = scores;
 
+            let feedbacksErrors, feedbacksWarnings
+
             // CHECK FEEDBACK DATA
-            let { feedbacksErrors, feedbacksWarnings } = validateFeedbacks(importedSections.concat(importedScore))
-            errorCounts += feedbacksErrors.length
-            validationResults.feedbacks = feedbacksErrors;
+            if (props.hnqisMode) {
+                let validateResults = validateFeedbacks(importedSections.concat(importedScore))
+                feedbacksErrors = validateResults.feedbacksErrors
+                feedbacksWarnings = validateResults.feedbacksWarnings
+                //let { feedbacksErrors, feedbacksWarnings } = validateFeedbacks(importedSections.concat(importedScore))
+                errorCounts += feedbacksErrors.length
+                validationResults.feedbacks = feedbacksErrors;
+            }
 
             //ADD FEEDBACK ERRORS TO DATA ELEMENTS
-            importedSections.forEach((section) => {
+            if (props.hnqisMode) importedSections.forEach((section) => {
                 delete section.errors
                 let section_errors = 0;
                 section.dataElements.forEach((dataElement) => {
@@ -156,7 +158,8 @@ const ValidateMetadata = (props) => {
                         let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
 
                         let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
-                        dataElement.errors = dataElement.errors ? dataElement.errors.push(deErrs) : [deErrs];
+
+                        dataElement.errors ? dataElement.errors.push(deErrs) : dataElement.errors = [deErrs];
                     }
 
                     if (dataElement.errors) {
@@ -169,7 +172,7 @@ const ValidateMetadata = (props) => {
 
             let score_errors = 0;
             delete importedScore.errors
-            importedScore.dataElements.forEach((dataElement) => {
+            if (props.hnqisMode) importedScore.dataElements.forEach((dataElement) => {
                 delete dataElement.errors
                 validateScores(dataElement);
                 if (dataElement.errors) scores.push(dataElement);
@@ -178,7 +181,9 @@ const ValidateMetadata = (props) => {
                     let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
 
                     let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
-                    dataElement.errors = dataElement.errors ? dataElement.errors.push(deErrs) : [deErrs];
+
+                    dataElement.errors ? dataElement.errors.push(deErrs) : dataElement.errors = [deErrs];
+
                 }
 
                 if (dataElement.errors) {
@@ -193,8 +198,7 @@ const ValidateMetadata = (props) => {
             if (errorCounts === 0) {
                 setValid(true);
                 props.setValidationResults(false);
-            }
-            else {
+            } else {
                 setValidationMessage("Some Validation Errors occurred. Please check / fix the issues before proceeding.");
                 props.setSavingMetadata(false);
                 props.setValidationResults(validationResults);
@@ -239,6 +243,7 @@ const ValidateMetadata = (props) => {
                 if (programDetailsValidationSettings.isNumeratorNumeric.enable && !isNumeric(metaData, "scoreNum")) errors.push(programDetailsValidationSettings.isNumeratorNumeric.errorMsg);
                 if (programDetailsValidationSettings.isDenominatorNumeric.enable && !isNumeric(metaData, "scoreDen")) errors.push(programDetailsValidationSettings.isDenominatorNumeric.errorMsg);
                 if (programDetailsValidationSettings.hasParentQuestionNAnswerValue.enable && !hasBothParentQuestionNAnswerValue(metaData)) errors.push(programDetailsValidationSettings.hasParentQuestionNAnswerValue.errorMsg);
+                if (programDetailsValidationSettings.matchesScore.enable && !questionMatchesScore(dataElement)) errors.push(programDetailsValidationSettings.matchesScore.errorMsg);
                 if (errors.length > 0) dataElement.errors = errors;
             }
         }
@@ -267,9 +272,7 @@ const ValidateMetadata = (props) => {
             if (feedbackOrderValidationSettings.enable) {
 
                 let feedbackData = getFeedbackData(sections)
-                //console.log(feedbackData)
                 let duplicatedFeedbacks = groupBy(checkDuplicatedFeedbacks(feedbackData), 'feedbackOrder')
-                //console.log(duplicatedFeedbacks)
 
                 if (feedbackOrderValidationSettings.checkDuplicated.enable) {
                     duplicatedFeedbacks.forEach(df => {
@@ -293,7 +296,6 @@ const ValidateMetadata = (props) => {
                         }
 
                         let result = compareFeddbackAandB(current.levels, next.levels)
-                        //console.log(current.val+' vs '+next.val+(!result?'':' <<<<<< Feedback Order Gap Found'))
                         if (result) {
                             let errorIndex = result.expectedIndex
                             let expected = []
@@ -333,7 +335,7 @@ const ValidateMetadata = (props) => {
 
         function checkFormNameLength(metaData, dataElement) {
             if (metaData.elem !== "") {
-                return (dataElement.formName.length <= MAX_FORM_NAME_LENGTH && dataElement.formName.length >= MIN_FORM_NAME_LENGTH)
+                return (dataElement.formName.length <= (MAX_DATA_ELEMENT_NAME_LENGTH+5) && dataElement.formName.length >= MIN_DATA_ELEMENT_NAME_LENGTH)
             }
             return true;
         }
@@ -377,14 +379,18 @@ const ValidateMetadata = (props) => {
             return true;
         }
 
+        function questionMatchesScore(dataElement){
+            let feedbackOrder = dataElement.attributeValues.find(attributeValue => attributeValue.attribute.id === FEEDBACK_ORDER)?.value;
+            if(!feedbackOrder) return true
+
+            feedbackOrder = feedbackOrder.split('.').slice(0,-1).join('.')
+            let compositeScores = props.importedScores.dataElements.map(score => score.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value);
+            return compositeScores.includes(feedbackOrder)
+        }
+
         function getHNQISMetadata(dataElement) {
             let jsonData = dataElement.attributeValues.filter(attributeValue => attributeValue.attribute.id === METADATA);
             return (jsonData.length > 0) ? JSON.parse(jsonData[0].value) : '';
-        }
-
-        function getHNQISCriticalValue(dataElement) {
-            let criticalData = dataElement.attributeValues.filter(attributeValue => attributeValue.attribute.id === CRITICAL_QUESTION);
-            return (criticalData.length > 0) ? criticalData[0].value : '';
         }
 
         function getFeedbackOrder(dataElement) {
@@ -435,15 +441,16 @@ const ValidateMetadata = (props) => {
 
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>props.setSavingMetadata(false)}>
-            Assessment Validation
+            {props.hnqisMode?'Assessment Validation':'Save changes into the server?'}
         </CustomMUIDialogTitle >
         <DialogContent dividers style={{ padding: '1em 2em' }}>
-
-            <NoticeBox error = {!valid} title={processed ? "Sections and Scores Validated": "Validating Sections and Scores"}>
-                {!processed && <CircularLoader small/> }
-                {validationMessage}
-            </NoticeBox>
-            
+            {props.hnqisMode &&
+                <NoticeBox error = {!valid} title={processed ? "Sections and Scores Validated": "Validating Sections and Scores"}>
+                    {!processed && <CircularLoader small/> }
+                    {validationMessage}
+                </NoticeBox>
+            }
+            {!props.hnqisMode && 'This action cannot be undone'}
         </DialogContent>
 
         <DialogActions style={{ padding: '1em' }}>
@@ -451,6 +458,7 @@ const ValidateMetadata = (props) => {
             <Button variant='outlined' startIcon={<SaveIcon />} disabled={!valid} onClick={()=>setSave(true)}> Save </Button>
             {save &&
                 <SaveMetadata
+                    hnqisMode={props.hnqisMode}
                     newDEQty={props.newDEQty}
                     programStage={props.programStage}
                     importedSections={props.importedSections}

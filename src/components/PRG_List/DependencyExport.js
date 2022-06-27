@@ -61,12 +61,14 @@ const DependencyExport = ({ program, setExportProgramId }) => {
       program.organisationUnits = []
 
       delete program.created;
+      delete program.createdBy;
       delete program.lastUpdated;
       delete program.lastUpdatedBy;
       delete program.categoryCombo;
 
       program.programTrackedEntityAttributes?.forEach(tea => {
         delete tea.created;
+        delete tea.createdBy;
         delete tea.lastUpdated;
         delete tea.access;
       });
@@ -88,6 +90,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
     programMetadata.programStages?.forEach(stage => {
 
       delete stage.created;
+      delete stage.createdBy;
       delete stage.lastUpdated;
       delete stage.lastUpdatedBy;
 
@@ -106,6 +109,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     programMetadata.attributes?.forEach(att => {
       delete att.created;
+      delete att.createdBy;
       delete att.lastUpdated;
       delete att.lastUpdatedBy;
     });
@@ -123,6 +127,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     programMetadata.dataElements?.forEach(de => {
       delete de.created;
+      delete de.createdBy;
       delete de.lastUpdated;
       delete de.lastUpdatedBy;
       delete de.categoryCombo;
@@ -131,11 +136,13 @@ const DependencyExport = ({ program, setExportProgramId }) => {
     programMetadata.trackedEntityTypes?.forEach(tet => {
 
       delete tet.created;
+      delete tet.createdBy;
       delete tet.lastUpdated;
       delete tet.lastUpdatedBy;
 
       tet.trackedEntityTypeAttributes?.forEach(tea => {
         delete tea.created;
+        delete tea.createdBy;
         delete tea.lastUpdated;
         delete tea.access;
       });
@@ -144,6 +151,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     programMetadata.trackedEntityAttributes?.forEach(tea => {
       delete tea.created;
+      delete tea.createdBy;
       delete tea.lastUpdated;
       delete tea.lastUpdatedBy;
     });
@@ -161,6 +169,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     programMetadata.optionSets?.forEach(optionSet => {
       delete optionSet.created;
+      delete optionSet.createdBy;
       delete optionSet.lastUpdated;
       delete optionSet.lastUpdatedBy;
     });
@@ -187,7 +196,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
     })
 
     metadata.legendSets = legendSets
-
+    metadata.optionSets = metadata.optionSets ?? []
     metadata.optionSets.push({
       "name": "DB - Program Type",
       "id": "TOcCuCN2CLm",
@@ -238,6 +247,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
       }
     ];
 
+    metadata.options = metadata.options ?? [];
     metadata.options = metadata.options.concat(prgTypeOptions);
 
     setDownloading(true);
@@ -283,9 +293,10 @@ const DependencyExport = ({ program, setExportProgramId }) => {
             <div style={{ lineHeight: '1.5em' }}>
               <p><strong>Your file is ready!</strong></p>
               <p>You can now download the metadata related to the program by clicking "Download Now".</p>
-              <p><strong>Program:</strong> <em>{programMetadata.programs[0].name}</em></p>
+              <p><br/><strong>Program:</strong> <em>{programMetadata.programs[0].name}</em></p>
               <hr style={{ margin: '8px 0' }} />
               <p>Please consider that all of the metadata is downloaded without any sharing settings. Remember to assign sharings once you import the metadata and assign Org Units to the program.</p>
+              <p style={{color: '#2c6693'}}><br/><strong>NOTE: </strong>Keep in mind that any <em>Option Groups</em> or <em>Option Group Sets</em> related to the program are <strong>NOT</strong> included in the downloaded file.</p>
             </div>
           }
         </DialogContent>

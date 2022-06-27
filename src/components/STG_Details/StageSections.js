@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DraggableSection from "./Section";
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
+import { FEEDBACK_ORDER, METADATA } from "../../configs/Constants";
 
 import "react-sweet-progress/lib/style.css";
 import Scores from "./Scores";
@@ -37,6 +38,7 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
+import { DeepCopy } from "../../configs/Utils";
 
 const createMutation = {
     resource: 'metadata',
@@ -81,20 +83,13 @@ const queryPRV = {
     }
 };
 
-const StageSections = ({ programStage, stageRefetch }) => {
-
+const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     // Globals
-    const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
-        FEEDBACK_TEXT = "yhKEe6BLEer",
-        CRITICAL_QUESTION = "NPwvdTt0Naj",
-        METADATA = "haUflNqP85K",
-        SCORE_DEN = "l7WdLDhE3xW",
-        SCORE_NUM = "Zyr7rlDOJy8";
-
     const programId = programStage.program.id;
+    const [isSectionMode,setIsSectionMode] = useState(programStage.formType==="SECTION" || programStage.programStageDataElements.length === 0)
 
     // Flags
-    const [saveStatus, setSaveStatus] = useState('Validate');
+    const [saveStatus, setSaveStatus] = useState(hnqisMode?'Validate':'Save Changes');
     const [saveAndBuild, setSaveAndBuild] = useState(false);
     const [savingMetadata, setSavingMetadata] = useState(false);
     const [savedAndValidated, setSavedAndValidated] = useState(false)
@@ -114,8 +109,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
     const [deToEdit, setDeToEdit] = useState('')
 
-    //const [snackbarContent, setSnackbarContent] = useState('')
-
     const [snackParams, setSnackParams] = useState(false)
     const pushNotification = (content, severity = "success") => setSnackParams({ content, severity })
 
@@ -131,23 +124,38 @@ const StageSections = ({ programStage, stageRefetch }) => {
     // States
     const [removedElements, setRemovedElements] = useState([])
     const [originalProgramStageDataElements,setOriginalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
-    const [sections, setSections] = useState([...programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations")]);
-    const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => s.name == "Scores") });
-    const [criticalSection, setCriticalSection] = useState(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"));
+    const [sections, setSections] = useState((isSectionMode)
+        ?[...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
+        :[{name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement))}]
+    );
+    const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
+    const [criticalSection, setCriticalSection] = useState({...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations")});
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
-    const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"));
+    const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"));
     const [errorReports, setErrorReports] = useState(undefined)
+
+    const [addedSection,setAddedSection] = useState()
+
+    useEffect(()=>{
+        return (()=>{
+            setCriticalSection(undefined)
+        })
+    },[])
+
 
     // REFETCH STAGE
     const refetchProgramStage = (params={}) =>{
         stageRefetch({variables : {programStage:programStage.id}}).then(data => {
             let programStage = data.results
             setOriginalProgramStageDataElements(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
-            setSections([...programStage.programStageSections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations")])
-            setScoresSection({ ...programStage.programStageSections.find(s => s.name == "Scores") })
-            setCriticalSection(programStage.programStageSections.find(s => s.name == "Critical Steps Calculations"))
+            setSections((isSectionMode)
+                ?[...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
+                :[{name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement))}]
+            )
+            setScoresSection({ ...programStage.programStageSections.find(s =>  hnqisMode && (isSectionMode) && s.name === "Scores") })
+            setCriticalSection({...programStage.programStageSections.find(s =>  hnqisMode && (isSectionMode) && s.name === "Critical Steps Calculations")})
             setProgramStageDataElements([...programStage.programStageDataElements])
-            setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}"))
+            setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"))
         })
     }
 
@@ -164,7 +172,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
         setProgramStageDataElements(programStageDataElements)
         setSections(sections)
         setDeToEdit('')
-        pushNotification(<span>Data Element edited! <strong>Remember to Validate and Save!</strong></span>)
+        pushNotification(<span>Data Element edited! <strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>)
     }
 
     const removeDE = (id, section) => {
@@ -176,12 +184,16 @@ const StageSections = ({ programStage, stageRefetch }) => {
             programStageDataElements.splice(psdeIdx, 1)
             setSections(sections)
             setProgramStageDataElements(programStageDataElements)
-            pushNotification(<span>Data Element removed! <strong>Remember to Validate and Save!</strong></span>, "info")
+            pushNotification(<span>Data Element removed! <strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>, "info")
         }
     }
 
     const saveAdd = (params) => {
+
         let dataElementObjects = params.newDataElements.map(psde => psde.dataElement)
+        let sectionIndex = sections.findIndex(s => s.id === params.deRef.section)
+        let toBeAdded = params.newDataElements.map(de => ({id:de.dataElement.id,mode:de.type}))
+        params.newDataElements.forEach(de => delete de.type)
 
         sections.find(s => s.id === params.deRef.section).dataElements.splice(params.deRef.index, 0, ...dataElementObjects/* ...params.newDataElements */)
         let newProgramStageDataElements = programStageDataElements.concat(params.newDataElements)
@@ -189,7 +201,12 @@ const StageSections = ({ programStage, stageRefetch }) => {
         setSections(sections)
         setProgramStageDataElements(newProgramStageDataElements)
         setDeManager(false)
-        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to Validate and Save!</strong></span>)
+        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>)
+        setAddedSection({
+            index:sectionIndex,
+            mode:'Updated',
+            dataElements: toBeAdded
+        })
     }
 
     const [deManager, setDeManager] = useState(false)
@@ -221,7 +238,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
         setProgramStageDataElements(newPSDEs)
         sections.splice(idx, 1)
         setSections(sections)
-        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to Validate and Save!</strong></span>, "info")
+        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>, "info")
     }
 
     const SectionActions = {
@@ -245,7 +262,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const deleteMetadata = useDataMutation(deleteMetadataMutation)[0];
 
     // Get Ids
-    const idsQuery = useDataQuery(queryIds, { variables: { n: programStage.programStageDataElements.length * 5 } });
+    const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: programStage.programStageDataElements.length * 5 } });
     //setUidPool(idsQuery.data?.results.codes);
 
     // Fetch Program Rules from Program
@@ -255,9 +272,9 @@ const StageSections = ({ programStage, stageRefetch }) => {
     const prvDQ = useDataQuery(queryPRV, { variables: { programId: programStage.program.id } });
 
     useEffect(() => {
-        let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection.dataElements.length + criticalSection.dataElements.length) * 5;
+        let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection?.dataElements?.length + criticalSection?.dataElements?.length) * 5;
         //No Sections , get minimum ids for core Program Rules
-        if (n < 50) n = 50
+        if (isNaN(n) || n < 50) n = 50
 
         idsQuery.refetch({ n }).then(data => {
             if (data) {
@@ -288,7 +305,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     result.source.index,
                     result.destination.index
                 );
-                setSaveStatus('Validate & Save');
+                setSaveStatus(hnqisMode?'Validate & Save':'Save Changes');
                 break;
             case 'DATA_ELEMENT':
                 if (result.source.droppableId == result.destination.droppableId) {
@@ -304,7 +321,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     let element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
                     newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
                 }
-                setSaveStatus('Validate & Save');
+                setSaveStatus(hnqisMode?'Validate & Save':'Save Changes');
                 break;
             default:
         }
@@ -312,6 +329,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
     };
 
     const commit = () => {
+        setAddedSection(undefined)
         if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
         let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
         setRemovedElements(removed)
@@ -398,8 +416,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
 
         });
 
-
-
     }
 
     const parseErrors = (e) => {
@@ -421,19 +437,25 @@ const StageSections = ({ programStage, stageRefetch }) => {
                 <div className="c_srch"></div>
                 <div className="c_btns" style={{ color: '#444444' }}>
                     <ButtonStrip>
-                        <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
-                        <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
-                        <Button color='inherit' variant='outlined' startIcon={!exportToExcel?<FileDownloadIcon />:<CircularLoader small />} name="generator"
-                            onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
-                        <Button color='inherit' variant='outlined' startIcon={<PublishIcon />} name="importer"
-                            onClick={() => setImporterEnabled(true)}>Import Template</Button>
+                        {(isSectionMode) &&
+                            <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
+                        }
+                        {hnqisMode && (isSectionMode) &&
+                            <>
+                                <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
+                                <Button color='inherit' variant='outlined' startIcon={!exportToExcel?<FileDownloadIcon />:<CircularLoader small />} name="generator"
+                                    onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
+                                <Button color='inherit' variant='outlined' startIcon={<PublishIcon />} name="importer"
+                                    onClick={() => setImporterEnabled(true)}>Import Template</Button>
+                            </>
+                        }
                         <Button color='inherit' name="Reload" variant='outlined' startIcon={<CachedIcon />} onClick={() => { window.location.reload() }}>Reload</Button>
                     </ButtonStrip>
                 </div>
             </div>
-            {importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
+            {hnqisMode && importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
             <div className="title">Sections for Program Stage {programStage.displayName}</div>
-            {exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus} />}
+            {hnqisMode && exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus} />}
             {
                 createMetadata.loading && <ComponentCover translucent></ComponentCover>
                 /* <Backdrop
@@ -469,7 +491,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     </AlertBar>
                 </AlertStack>
             }
-            {saveAndBuild &&
+            {hnqisMode && saveAndBuild &&
 
                 <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
                     <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>{}}>
@@ -538,7 +560,6 @@ const StageSections = ({ programStage, stageRefetch }) => {
                                 Add New Section
                             </Button>
                         }
-                        {/* { programStageDataElements &&  <DataElementForm programStageDataElement={programStageDataElements[5]} /> } */}
                         {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
                             <Removed importResults={importResults} index={0} key={"removedSec"} />
@@ -553,20 +574,31 @@ const StageSections = ({ programStage, stageRefetch }) => {
                         {
                             createMetadata.data && createMetadata.data.status == 'ERROR' && <ErrorReports errors={parseErrors(createMetadata.data)} />
                         }
-                        <Droppable droppableId="dpb-sections" type="SECTION">
+                        <Droppable droppableId="dpb-sections" type="SECTION" isDra>
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
                                         sections.map((pss, idx) => {
-                                            return <DraggableSection stageSection={pss} stageDataElements={programStageDataElements} DEActions={DEActions} index={idx} key={pss.id || idx} SectionActions={SectionActions} /* handleSectionEdit={handleSectionEdit} */ />
+                                            return <DraggableSection 
+                                                program={programStage.program.id} 
+                                                stageSection={pss} 
+                                                editStatus={addedSection?.index === idx && addedSection } 
+                                                stageDataElements={programStageDataElements} 
+                                                DEActions={DEActions} 
+                                                index={idx} 
+                                                key={pss.id || idx} 
+                                                SectionActions={SectionActions} 
+                                                hnqisMode={hnqisMode}
+                                                isSectionMode={isSectionMode} 
+                                            />
                                         })
                                     }
                                     {provided.placeholder}
                                 </div>
                             )}
                         </Droppable>
-                        <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />
-                        <Scores stageSection={scoresSection} index={0} key={scoresSection.id} />
+                        {hnqisMode && (isSectionMode) && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />}
+                        {hnqisMode && (isSectionMode) && <Scores stageSection={scoresSection} index={0} key={scoresSection.id} program={programId}/>}
 
                     </div>
                 </div>
@@ -584,6 +616,7 @@ const StageSections = ({ programStage, stageRefetch }) => {
             {
                 savingMetadata &&
                 <ValidateMetadata
+                    hnqisMode={hnqisMode}
                     newDEQty={importResults ? importResults.questions.new + importResults.scores.new + importResults.sections.new : 0}
                     programStage={programStage}
                     importedSections={sections}
@@ -612,14 +645,18 @@ const StageSections = ({ programStage, stageRefetch }) => {
                     sections={sections}
                     refreshSections={setSections}
                     notify={pushNotification}
+                    setAddedSection={setAddedSection}
+                    hnqisMode={hnqisMode}
                 />
             }
             {deManager &&
                 <DataElementManager
+                    program={programStage.program.id}
                     deRef={deManager}
                     setDeManager={setDeManager}
                     programStageDataElements={programStageDataElements}
                     saveAdd={saveAdd}
+                    hnqisMode={hnqisMode}
                 />
             }
         </div>
