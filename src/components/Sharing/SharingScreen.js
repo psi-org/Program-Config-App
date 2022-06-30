@@ -14,6 +14,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
+import HelpIcon from '@mui/icons-material/Help';
 
 import {
     CircularProgress,
@@ -25,7 +26,7 @@ import {
     Popper,
     MenuItem,
     MenuList,
-    FormGroup, FormControlLabel, Checkbox
+    FormGroup, FormControlLabel, Checkbox, Tooltip
 } from "@mui/material";
 
 const sharingQuery = {
@@ -93,7 +94,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
     const anchorRef = useRef(null);
     const [selectedIndex, setSelectedIndex] = useState(2);
     const [content, setContent] = useState('form');
-    const [overwrite, setOverwrite] = useState(true);
+    const [overwrite, setOverwrite] = useState(false);
     const [deleted, setDeleted] = useState([]);
     const [ restrictions, setRestrictions ] = useState([]);
     const [ restrictedDEs, setRestrictedDEs] = useState([]);
@@ -330,30 +331,58 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
     }
 
     const applySharing = (elements, meta) => {
+        let DE_Sharing = deSharing(payload.object);
         elements?.forEach((element) => {
             if (!exclusionDataElements.includes(element.id)) {
-                element.sharing.public = meta==='dataElements'?(payload.object.publicAccess.substring(0,2)+'------'):payload.object.publicAccess;
-                payload.object.userAccesses.forEach((user) => {
-                    if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
-                        element.sharing.users[user.id].access = meta==='dataElements'?(user.access.substring(0,2)+'------'):user.access;
-                    } else {
-                        element.sharing.users[user.id] = {id: user.id, access: meta==='dataElements'?(user.access.substring(0,2)+'------'):user.access}
-                    }
-                })
-                payload.object.userGroupAccesses.forEach((userGroup) => {
-                    if (element.sharing.userGroups.hasOwnProperty(userGroup.id) && overwrite) {
-                        element.sharing.userGroups[userGroup.id].access = meta==='dataElements'?(userGroup.access.substring(0,2)+'------'):userGroup.access;
-                    } else {
-                        element.sharing.userGroups[userGroup.id] = {id: userGroup.id, access: meta==='dataElements'?(userGroup.access.substring(0,2)+'------'):userGroup.access}
-                    }
-                })
-                deleted.forEach(del => {
-                    if (element.sharing[del.type].hasOwnProperty(del.id)) {
-                        delete element.sharing[del.type][del.id];
-                    }
-                });
+                if (meta === "dataElements" && overwrite) //Overwrite all the permission for dataElements if checked
+                {
+                    element.sharing.public = DE_Sharing.public;
+                    element.sharing.users = DE_Sharing.users;
+                    element.sharing.userGroups = DE_Sharing.userGroups;
+                } else {
+                    element.sharing.public = meta==='dataElements'?dePermission(payload.object.publicAccess):payload.object.publicAccess;
+                    payload.object.userAccesses.forEach((user) => {
+
+                        if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
+                            element.sharing.users[user.id].access = meta==='dataElements'?dePermission(user.access):user.access; //update permission if user exist
+                        } else {
+                            element.sharing.users[user.id] = {id: user.id, access: meta==='dataElements'?dePermission(user.access):user.access} //Add user with permission if doesn't exist
+                        }
+                    })
+                    payload.object.userGroupAccesses.forEach((userGroup) => {
+                        if (element.sharing.userGroups.hasOwnProperty(userGroup.id) && overwrite) {
+                            element.sharing.userGroups[userGroup.id].access = meta==='dataElements'?dePermission(userGroup.access):userGroup.access;
+                        } else {
+                            element.sharing.userGroups[userGroup.id] = {id: userGroup.id, access: meta==='dataElements'?dePermission(userGroup.access):userGroup.access}
+                        }
+                    })
+                }
+                if (meta !== "dataElements" || overwrite) //Overwrite all the permission for dataElements if checked
+                {
+                    deleted.forEach(del => {
+                        if (element.sharing[del.type].hasOwnProperty(del.id)) {
+                            delete element.sharing[del.type][del.id];
+                        }
+                    });
+                }
             }
         });
+    }
+
+    const deSharing = (obj) => {
+        const temp = {public:"", users: {}, userGroups: {}};
+        temp.public = dePermission(obj.publicAccess);
+        obj.userAccesses.forEach((user) => {
+           temp.users[user.id] = {id: user.id, access: dePermission(user.access)};
+        });
+        obj.userGroupAccesses.forEach((userGroup) => {
+           temp.userGroups[userGroup.id] = {id: userGroup.id, access: dePermission(userGroup.access)};
+        });
+        return temp;
+    }
+
+    const dePermission = (permission) => {
+        return permission.substring(0,2)+'------';
     }
 
     return (
@@ -425,9 +454,14 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
                             </div>
                         </div>
                         {(selectedIndex === 1 || selectedIndex === 2) &&
-                            <FormGroup style={{ marginTop: "5px" }}>
-                                <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox} inputProps={{ 'aria-label': 'controlled' }} />} label={"Overwrite Existing Behavior"} />
+                        <div style={{display: 'flex', alignItems: 'center', margin: "1em 0 0 1em"}}>
+                            <FormGroup>
+                                <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox} inputProps={{ 'aria-label': 'controlled' }} />} label={"Overwrite Existing Settings in Data Elements"} />
                             </FormGroup>
+                            <Tooltip title="Replaces the current Sharing Settings of the Data Elements contained in the Program" placement="top-start">
+                                <HelpIcon color="disabled" style={{cursor: 'pointer'}}/>
+                            </Tooltip>
+                        </div>
                         }
                     </div>
                     }
