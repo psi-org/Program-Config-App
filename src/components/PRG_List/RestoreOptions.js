@@ -28,7 +28,8 @@ const RestoreOptions = props => {
 
     const [ouOption, setOUOption] = useState('keepOUnits');
     const [sharingOption, setSharingOption] = useState('keepSharing');
-    const [ content, setContent ] = useState('form');
+    const [content, setContent] = useState('form');
+    const [downloading, setDownloading] = useState(false);
 
     const { loading: programLoading, data: program, error: programErrors } = useDataQuery(programQuery, { variables: { id: props.backup.metadata.programs[0].id }});
     const metadataDM = useDataMutation(metadataMutation);
@@ -37,8 +38,6 @@ const RestoreOptions = props => {
         loading: metadataDM[1].loading,
         data: metadataDM[1].data
     }
-    if (!programLoading)
-        console.log("Program Basics", program);
 
     const onOUOptionChangeHandler = (e) => {
         setOUOption(e.target.value);
@@ -50,6 +49,17 @@ const RestoreOptions = props => {
 
     const hideFormHandler = () => {
         props.setRestoreProgramId(undefined);
+    }
+
+    const downloadBackupHandler = () => {
+        const blob = new Blob([JSON.stringify(props.backup.metadata)], {type: 'text/json'});
+        const link = document.createElement('a');
+        link.download = (props.backup.name)+'.json';
+        link.href = window.URL.createObjectURL(blob);
+
+        const eventClick = new MouseEvent('click', { view: window, bubbles: true, cancelable: true});
+        link.dispatchEvent(eventClick);
+        link.remove();
     }
 
     const restoreHandler = () => {
@@ -166,6 +176,7 @@ const RestoreOptions = props => {
                 </DialogContent>
                 <DialogActions style={{ padding: '1em'}}>
                     <Button onClick={hideFormHandler} color={"error"}>Close</Button>
+                    <Button onClick={downloadBackupHandler} color={"primary"}>Download</Button>
                     <Button onClick={restoreHandler} color={"primary"}>Restore</Button>
                 </DialogActions>
             </>
