@@ -40,6 +40,8 @@ const queryHNQIS2Metadata = {
 
 const H2Metadata = (props) => {
 
+    const h2Ready = localStorage.getItem('h2Ready') === 'true'
+
     const [sending,setSending] = useState(false)
     const [error,setError] = useState(undefined)
     const [success,setSuccess] = useState(undefined)
@@ -81,12 +83,21 @@ const H2Metadata = (props) => {
             <DialogContent dividers style={{ padding: '1em 2em', display:'flex', flexDirection:'column', gap:'1em' }}>
                 <div style={{display:'flex', flexDirection:'column', gap:'1.5em'}}>
                     <h3>HNQIS 2.0 Metadata Details</h3>
+                    <div><strong>Latest Metadata Package Version: </strong>{H2_METADATA_VERSION}</div>
                     <div>
-                        <strong>Installed Version: </strong>{hnqis2Metadata?.results?.version ?? "Not Found"}<br/>
-                        {!hnqis2Metadata?.results && <div style={{display:'flex', alignItems:'center', gap:'1em', color:"#ba000d", marginLeft:'1em'}}><WarningIcon/><em>The HNQIS 2.0 metadata package is required in order to enable HNQIS features</em></div>}
+                        <div><strong>Current Installed Version: </strong>{hnqis2Metadata?.results?.version ?? "Not Found"}</div>
+                        {!hnqis2Metadata?.results && 
+                            <div style={{display:'flex', alignItems:'center', gap:'1em', color:"#ba000d", marginLeft:'1em'}}><WarningIcon/><em>The HNQIS 2.0 metadata package is required in order to enable HNQIS features</em></div>
+                        }
                     </div>
-                    {hnqis2Metadata?.results && <p><strong>Installed on: </strong>{new Date(hnqis2Metadata.results.date).toLocaleString("en-US",DATE_FORMAT_OPTIONS)} </p>}
-                    <div><strong>Latest Version: </strong>{H2_METADATA_VERSION}</div>
+                    {hnqis2Metadata?.results && 
+                        <>
+                            <p><strong>Installation date: </strong>{new Date(hnqis2Metadata.results.date).toLocaleString("en-US",DATE_FORMAT_OPTIONS)} </p>
+                            <NoticeBox error={!h2Ready} title="Minimum Metadata Package Status">
+                                <p>{h2Ready?"The required Metadata Package is available.":"The required Metadata Package is incomplete or corrupted, please reinstall it."}</p>
+                            </NoticeBox>
+                        </>
+                    }
                 </div>
                 {success &&
                 <NoticeBox title="Installation Completed">

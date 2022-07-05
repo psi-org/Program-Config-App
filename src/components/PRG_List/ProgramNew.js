@@ -181,13 +181,7 @@ const ProgramNew = (props) => {
     const { data: haQuery, refetch: findHealthAreas } = useDataQuery(query, { lazy: true });
 
 
-
     const [haOptions, setHaOptions] = useState();
-
-
-
-
-
 
     const idsQuery = useDataQuery(queryId);
     const uidPool = idsQuery.data?.results.codes;
@@ -241,11 +235,6 @@ const ProgramNew = (props) => {
         if (value === 'hnqis') {
             let hnqisTET = trackedEntityTypes.find(tet => tet.id === "oNwpeWkfoWc")
             setProgramTET({ label: hnqisTET.name, id: hnqisTET.id })
-            findHealthAreas().then(data => {
-                if (data?.results?.optionSets[0].options) {
-                    setHaOptions(data?.results?.optionSets[0].options)
-                }
-            })
         } else {
             setProgramTET('')
             if (value === 'tracker') {
@@ -300,12 +289,6 @@ const ProgramNew = (props) => {
     }
 
     let healthAreaOptions = [];
-
-    if (haOptions) {
-        healthAreaOptions = healthAreaOptions.concat(haOptions.map(op => {
-            return { label: op.name, value: op.code }
-        }));
-    }
 
     if (uidPool && uidPool.length === 6 && !props.data) {
         setProgramId(uidPool.shift());
@@ -400,7 +383,24 @@ const ProgramNew = (props) => {
         }
     }, [])
 
+    useEffect(() => {
+        if(pgrTypePCA === 'hnqis'){
+            findHealthAreas().then(data => {
+                if (data?.results?.optionSets[0].options) {
+                    setHaOptions(data?.results?.optionSets[0].options)
+                }
+            })
+        }
+    }, [pgrTypePCA])
 
+    useEffect(() => {
+        if (haOptions) {
+            healthAreaOptions = healthAreaOptions.concat(haOptions.map(op => {
+                return { label: op.name, value: op.code }
+            }));
+        }
+    }, [haOptions])
+    
     function submission() {
         setSentForm(true)
         props.setNotification(undefined)

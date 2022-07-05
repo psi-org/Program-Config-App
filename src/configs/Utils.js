@@ -108,13 +108,15 @@ export function versionIsValid(serverVersion, limitMin, limitMax){
   return versionCompare(serverVersion, limitMin) >= 0 && versionCompare(serverVersion, limitMax) <= 0;
 }
 
-export function parseErrors(response){ 
+export function parseErrors(response){
+  let index = 0
   return response.typeReports.reduce((reports,typeReport)=>
       reports.concat(
         typeReport.objectReports.map(objectReport => 
-          objectReport.errorReports.map(err => 
-            (<p>{err.message}</p>)
-          )
+          objectReport.errorReports.map(err => {
+            index+=1;
+            return (<p key={index}>{err.message}</p>)
+          })
         )
       ),[]
     )
@@ -122,13 +124,15 @@ export function parseErrors(response){
 }
 
 export function parseErrorsUL(response){ 
+  let index = 0
   return <ul>{
     response.typeReports.reduce((reports,typeReport)=>
       reports.concat(
         typeReport.objectReports.map(objectReport => 
-          objectReport.errorReports.map(err => 
-            (<li>{err.message}</li>)
-          )
+          objectReport.errorReports.map(err => {
+            index+=1;
+            return (<li key={index}>{err.message}</li>)
+          })
         )
       ),[]
     )
