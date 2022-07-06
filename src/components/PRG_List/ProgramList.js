@@ -248,7 +248,14 @@ const ProgramList = () => {
                     onPageChange={(page) => { setCurrentPage(page); refetch({ page, pageSize }) }}
                 />
             </div>
-            {showProgramForm && <ProgramNew setShowProgramForm={setShowProgramForm} programsRefetch={refetch} setNotification={setNotification} doSearch={doSearch} />}
+            {showProgramForm && 
+                <ProgramNew
+                    setShowProgramForm={setShowProgramForm}
+                    programsRefetch={refetch}
+                    setNotification={setNotification}
+                    doSearch={doSearch} 
+                />
+            }
 
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
