@@ -105,7 +105,7 @@ const BackupScreen = (props) => {
             "backup_date":timestamp,
             "version": versionInput.current.value,
             "comment": commentInput.current.value,
-            "metadata": metaData.results
+            "metadata": processMetadata(metaData.results)
         };
         dsBackups.backups.push(backup);
         let backupToDatastore = !dsData?.results ? dsCreateRequest : dsUpdateRequest
@@ -126,6 +126,133 @@ const BackupScreen = (props) => {
                     })
                 }
             });
+    }
+
+    const processMetadata = metadata => {
+        if(metaData) {
+            delete metadata.date;
+            delete metadata.categories;
+            delete metadata.categoryCombos;
+            delete metadata.categoryOptions;
+            delete metadata.categoryOptionCombos;
+
+            metadata.programs?.forEach(program => {
+                delete program.created;
+                delete program.createdBy;
+                delete program.lastUpdated;
+                delete program.lastUpdatedBy;
+                delete program.categoryCombo;
+
+                program.programTrackedEntityAttributes?.forEach(tea => {
+                    delete tea.created;
+                    delete tea.createdBy;
+                    delete tea.lastUpdated;
+                    delete tea.access;
+                });
+            });
+
+            metadata.programRuleVariables?.forEach(prv => {
+                delete prv.created;
+                delete prv.lastUpdated;
+                delete prv.lastUpdatedBy;
+            });
+
+            metadata.programStageSections?.forEach(stageSection => {
+                delete stageSection.created;
+                delete stageSection.lastUpdated;
+                delete stageSection.lastUpdatedBy;
+            });
+
+            metadata.programStages?.forEach(stage => {
+
+                delete stage.created;
+                delete stage.createdBy;
+                delete stage.lastUpdated;
+                delete stage.lastUpdatedBy;
+
+                stage.programStageDataElements?.forEach(psde => {
+                    delete psde.created;
+                    delete psde.lastUpdated;
+                    delete psde.access;
+                });
+
+            });
+
+            metadata.options?.forEach(option => {
+                delete option.created;
+                delete option.lastUpdated;
+            });
+
+            metadata.attributes?.forEach(att => {
+                delete att.created;
+                delete att.createdBy;
+                delete att.lastUpdated;
+                delete att.lastUpdatedBy;
+            });
+
+            metadata.programTrackedEntityAttributes?.forEach(ptea => {
+                delete ptea.created;
+                delete ptea.lastUpdated;
+            });
+
+            metadata.programRules?.forEach(pr => {
+                delete pr.created;
+                delete pr.lastUpdated;
+                delete pr.lastUpdatedBy;
+            });
+
+            metadata.dataElements?.forEach(de => {
+                delete de.created;
+                delete de.createdBy;
+                delete de.lastUpdated;
+                delete de.lastUpdatedBy;
+                delete de.categoryCombo;
+            });
+
+            metadata.trackedEntityTypes?.forEach(tet => {
+
+                delete tet.created;
+                delete tet.createdBy;
+                delete tet.lastUpdated;
+                delete tet.lastUpdatedBy;
+
+                tet.trackedEntityTypeAttributes?.forEach(tea => {
+                    delete tea.created;
+                    delete tea.createdBy;
+                    delete tea.lastUpdated;
+                    delete tea.access;
+                });
+
+            });
+
+            metadata.trackedEntityAttributes?.forEach(tea => {
+                delete tea.created;
+                delete tea.createdBy;
+                delete tea.lastUpdated;
+                delete tea.lastUpdatedBy;
+            });
+
+            metadata.programStageDataElements?.forEach(psde => {
+                delete psde.created;
+                delete psde.lastUpdated;
+            });
+
+            metadata.programRuleActions?.forEach(pra => {
+                delete pra.created;
+                delete pra.lastUpdated;
+                delete pra.lastUpdatedBy;
+            });
+
+            metadata.optionSets?.forEach(optionSet => {
+                delete optionSet.created;
+                delete optionSet.createdBy;
+                delete optionSet.lastUpdated;
+                delete optionSet.lastUpdatedBy;
+            });
+
+            return metadata;
+        }
+        return null;
     }
 
     return  <>
