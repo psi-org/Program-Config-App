@@ -1,6 +1,7 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useState, useRef, useEffect } from "react";
 import { DialogActions, DialogContent, DialogContentText, Divider, Grid, Typography, FormGroup, FormLabel, FormControl, FormControlLabel, RadioGroup, Radio, Checkbox, Button, RadioButton, Box, CircularProgress, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { DeepCopy } from '../../configs/Utils';
 
 const programQuery = {
@@ -218,13 +219,13 @@ const RestoreOptions = props => {
                 }
             }
         }
-        setIsLoading(false);
-        console.log("Dry Run: ", dryRun);
+        console.log("Dry Run: ", dryRun, " isLoading: ", isLoading);
         let importmode = (dryRun) ? 'VALIDATE' : 'COMMIT';
         console.log("MEtaData Payload: ", metadataPayload, " ImportMode: ", importmode);
         let request = (dryRun) ? validateRequest : metadataRequest;
         request.mutate({ data: metadataPayload, importmode: importmode })
             .then(response => {
+                setIsLoading(false);
                 if(response.status !== 'OK')
                 {
                     console.log("Resposne: ", response);
@@ -290,6 +291,33 @@ const RestoreOptions = props => {
             {content === 'form' &&
             <>
                 <DialogContent dividers style={{padding: '1em 2em'}}>
+                    {validationResult &&
+                    <>
+                        <FormLabel id="elements-row-radio-buttons-group-label">Import Summary</FormLabel>
+                        <TableContainer sx={{ width: 450, marginLeft: 10}} justify={"center"} component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell align="right">Created</TableCell>
+                                        <TableCell align="right">Updated</TableCell>
+                                        <TableCell align="right">Deleted</TableCell>
+                                        <TableCell align="right">Ignored</TableCell>
+                                        <TableCell align="right">Total</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell align="right">{importStatus.created}</TableCell>
+                                        <TableCell align="right">{importStatus.updated}</TableCell>
+                                        <TableCell align="right">{importStatus.deleted}</TableCell>
+                                        <TableCell align="right">{importStatus.ignored}</TableCell>
+                                        <TableCell align="right">{importStatus.total}</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </>
+                    }
                         <FormControl>
                             <FormLabel id="elements-row-radio-buttons-group-label">Restore Elements: </FormLabel>
                             <FormControlLabel control={<Checkbox checked={programChecked} onClick={toggleProgram}/>} label="Program" inputRef={programRef}/>
@@ -315,40 +343,12 @@ const RestoreOptions = props => {
                         <FormControl>
                             <FormControlLabel control={<Switch checked={dryRun} />} label="Dry Run" onChange={dryRunHandler}/>
                         </FormControl>
-                    {validationResult &&
-                        <>
-                            <Typography variant="h6" gutterBottom component="div">
-                                Import Summary
-                            </Typography>
-                        <TableContainer sx={{ width: 450}} justify={"center"} component={Paper}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell align="right">Created</TableCell>
-                                        <TableCell align="right">Updated</TableCell>
-                                        <TableCell align="right">Deleted</TableCell>
-                                        <TableCell align="right">Ignored</TableCell>
-                                        <TableCell align="right">Total</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell align="right">{importStatus.created}</TableCell>
-                                        <TableCell align="right">{importStatus.updated}</TableCell>
-                                        <TableCell align="right">{importStatus.deleted}</TableCell>
-                                        <TableCell align="right">{importStatus.ignored}</TableCell>
-                                        <TableCell align="right">{importStatus.total}</TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </>
-                    }
+
                 </DialogContent>
                 <DialogActions style={{ padding: '1em'}}>
-                    <Button onClick={hideFormHandler} color={"error"}>Close</Button>
-                    <Button onClick={downloadBackupHandler} color={"primary"}>Download</Button>
-                    <Button onClick= {restoreHandler} disabled={isLoading} color={"primary"}>{isLoading && <CircularProgress/>} Restore</Button>
+                    <Button onClick={hideFormHandler} color={"error"} variant="outlined">Close</Button>
+                    <Button onClick={downloadBackupHandler} color={"primary"} variant="outlined">Download</Button>
+                    <LoadingButton onClick= {restoreHandler} disabled={isLoading} loading={isLoading} color={"primary"} variant="outlined"> Restore</LoadingButton>
                 </DialogActions>
             </>
             }

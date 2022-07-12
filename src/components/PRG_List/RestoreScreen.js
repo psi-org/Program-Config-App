@@ -60,7 +60,7 @@ const RestoreScreen = (props) => {
                                     </>
                                 }
                                 {dataStore && restoreBackup &&
-                                    <RestoreOptions backup={restoreBackup} setRestoreProgramId={props.setRestoreProgramId} setNotification={props.setNotification}/>
+                                    <RestoreOptions backup={restoreBackup} key={props.setRestoreProgramId} setRestoreProgramId={props.setRestoreProgramId} setNotification={props.setNotification}/>
                                 }
                         </>
                     }
