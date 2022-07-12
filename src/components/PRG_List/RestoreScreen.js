@@ -48,8 +48,8 @@ const RestoreScreen = (props) => {
                                             <List sx={{width: '100%', bgColor: 'background.paper'}}>
                                                 {dataStore.backups.map((backup, index, elements) => {
                                                     return <>
-                                                            <RestoreItem backup={backup} key={backup.id} restoreHandler={onRestoreHandler}/>
-                                                            { (elements[index+1]) && <Divider/> }
+                                                            <RestoreItem backup={backup} key={index} restoreHandler={onRestoreHandler}/>
+                                                            { (elements[index+1]) && <Divider key={`divider_${index}`}/> }
                                                         </>
                                                 })}
                                             </List>

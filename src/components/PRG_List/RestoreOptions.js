@@ -219,16 +219,12 @@ const RestoreOptions = props => {
                 }
             }
         }
-        console.log("Dry Run: ", dryRun, " isLoading: ", isLoading);
-        let importmode = (dryRun) ? 'VALIDATE' : 'COMMIT';
-        console.log("MEtaData Payload: ", metadataPayload, " ImportMode: ", importmode);
         let request = (dryRun) ? validateRequest : metadataRequest;
-        request.mutate({ data: metadataPayload, importmode: importmode })
+        request.mutate({ data: metadataPayload })
             .then(response => {
                 setIsLoading(false);
                 if(response.status !== 'OK')
                 {
-                    console.log("Resposne: ", response);
                     props.setNotification({
                         message: `Something went wrong while Restoring Program. Please try again later`,
                         severity: 'error'
