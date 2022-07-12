@@ -1,6 +1,6 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useState, useRef, useEffect } from "react";
-import { DialogActions, DialogContent, DialogContentText, Divider, Grid, Typography, FormGroup, FormLabel, FormControl, FormControlLabel, RadioGroup, Radio, Checkbox, Button, RadioButton, Box, CircularProgress } from '@mui/material';
+import { DialogActions, DialogContent, DialogContentText, Divider, Grid, Typography, FormGroup, FormLabel, FormControl, FormControlLabel, RadioGroup, Radio, Checkbox, Button, RadioButton, Box, CircularProgress, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { DeepCopy } from '../../configs/Utils';
 
 const programQuery = {
@@ -16,8 +16,20 @@ const programQuery = {
 const metadataMutation = {
     resource: 'metadata',
     type: 'create',
-    data: ({ data }) => data
+    data: ({ data }) => data,
+    params: {
+        importMode: 'COMMIT'
+    }
 };
+
+const metadataValidation = {
+    resource: 'metadata',
+    type: 'create',
+    data: ({ data }) => data,
+    params: {
+        importMode: 'VALIDATE'
+    }
+}
 
 const RestoreOptions = props => {
     let metadataPayload = {};
@@ -25,10 +37,7 @@ const RestoreOptions = props => {
     const TETypeRefs = useRef();
     const ounitsRef = useRef();
     const programRulesRef = useRef();
-    const programRuleActionRef = useRef();
-    const programRuleVariableRef = useRef();
     const optionSetRef = useRef();
-    const optionRef = useRef();
     const TEAttributesRef = useRef();
     const programTEAttrbutesRef = useRef();
     const programStageRef = useRef();
@@ -41,16 +50,26 @@ const RestoreOptions = props => {
     const [sharingOption, setSharingOption] = useState('keepSharing');
     const [content, setContent] = useState('form');
     const [downloading, setDownloading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [programChecked, setProgramChecked] = useState(false);
     const [programStageChecked, setProgramStageChecked] = useState(false);
     const [psDataELementsChecked, setPsDataElementsChecked] = useState(false);
+    const [dryRun, setDryRun] = useState(true);
+    const [validationResult, setValidationResult] = useState(false);
+    const [importStatus, setImportStatus] = useState({});
 
     const { loading: programLoading, data: program, error: programErrors } = useDataQuery(programQuery, { variables: { id: props.backup.metadata.programs[0].id }});
     const metadataDM = useDataMutation(metadataMutation);
+    const validateDM = useDataMutation(metadataValidation);
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,
         data: metadataDM[1].data
+    }
+    const validateRequest = {
+        mutate: validateDM[0],
+        loading: validateDM[1].loading,
+        data: validateDM[1].data
     }
 
     const onOUOptionChangeHandler = (e) => {
@@ -63,6 +82,10 @@ const RestoreOptions = props => {
 
     const hideFormHandler = () => {
         props.setRestoreProgramId(undefined);
+    }
+
+    const dryRunHandler = () => {
+        setDryRun(!dryRun);
     }
 
     const onCheckboxCheckedHandler = (e) => {
@@ -83,11 +106,11 @@ const RestoreOptions = props => {
 
     const setProgram = () => {
         if (!programRef.current.checked)
-            setProgramChecked(TETypeRefs.current.checked || optionRef.current.checked || optionSetRef.current.checked || programRulesRef.current.checked || programRuleActionRef.current.checked || programRuleVariableRef.current.checked || programTEAttrbutesRef.current.checked || TEAttributesRef.current.checked || programStageRef.current.checked || programStageSectionsRef.current.checked || programStageDataElementsRef.current.checked || dataElementsRef.current?.checked)
+            setProgramChecked(TETypeRefs.current.checked || optionSetRef.current.checked || programRulesRef.current.checked || programTEAttrbutesRef.current.checked || TEAttributesRef.current.checked || programStageRef.current.checked || programStageSectionsRef.current.checked || programStageDataElementsRef.current.checked || dataElementsRef.current?.checked)
     }
 
     const toggleProgram = () => {
-        if (!(TETypeRefs.current.checked || optionRef.current.checked || optionSetRef.current.checked || programRulesRef.current.checked || programRuleActionRef.current.checked || programRuleVariableRef.current.checked || programTEAttrbutesRef.current.checked || TEAttributesRef.current.checked || programStageRef.current.checked || programStageSectionsRef.current.checked || programStageDataElementsRef.current.checked || dataElementsRef.current?.checked)) {
+        if (!(TETypeRefs.current.checked || optionSetRef.current.checked || programRulesRef.current.checked || programTEAttrbutesRef.current.checked || TEAttributesRef.current.checked || programStageRef.current.checked || programStageSectionsRef.current.checked || programStageDataElementsRef.current.checked || dataElementsRef.current?.checked)) {
             if (programRef.current.checked)
                 setProgramChecked(true)
             else
@@ -127,29 +150,29 @@ const RestoreOptions = props => {
     }
 
     const restoreHandler = () => {
-        setContent('loading');
+        setValidationResult(false);
+        setIsLoading(true);
         if (programRef.current.checked) {
             metadataPayload.programs = DeepCopy(props.backup.metadata.programs);
             if (ouOption === "keepOUnits") {
                 metadataPayload.programs[0].organisationUnits = DeepCopy(program.results?.organisationUnits);
             }
             metadataPayload.attributes = DeepCopy(props.backup.metadata.attributes);
-            if (programRulesRef.current.checked)
+            if (programRulesRef.current.checked) {
                 metadataPayload.programRules = DeepCopy(props.backup.metadata.programRules);
-            if (programRuleActionRef.current.checked)
                 metadataPayload.programRuleActions = DeepCopy(props.backup.metadata.programRuleActions);
-            if (programRuleVariableRef.current.checked)
                 metadataPayload.programRuleVariables = DeepCopy(props.backup.metadata.programRuleVariables);
+            }
             if (programTEAttrbutesRef.current.checked)
                 metadataPayload.programTrackedEntityAttributes = DeepCopy(props.backup.metadata.programTrackedEntityAttributes);
             if (TETypeRefs.current.checked)
                 metadataPayload.trackedEntityTypes = DeepCopy(props.backup.metadata.trackedEntityTypes);
             if (TEAttributesRef.current.checked)
                 metadataPayload.trackedEntityAttributes = DeepCopy(props.backup.metadata.trackedEntityAttributes);
-            if (optionRef.current.checked)
+            if (optionSetRef.current.checked) {
                 metadataPayload.options = DeepCopy(props.backup.metadata.options);
-            if (optionSetRef.current.checked)
                 metadataPayload.optionSets = DeepCopy(props.backup.metadata.optionSets);
+            }
             if (sharingOption === "keepSharing") {
                 delete metadataPayload.programs[0].sharing;
                 metadataPayload.attributes.forEach((attribute) => {
@@ -195,10 +218,12 @@ const RestoreOptions = props => {
                 }
             }
         }
-
-
-        console.log("MEtaData Payload: ", metadataPayload);
-        metadataRequest.mutate({ data: metadataPayload })
+        setIsLoading(false);
+        console.log("Dry Run: ", dryRun);
+        let importmode = (dryRun) ? 'VALIDATE' : 'COMMIT';
+        console.log("MEtaData Payload: ", metadataPayload, " ImportMode: ", importmode);
+        let request = (dryRun) ? validateRequest : metadataRequest;
+        request.mutate({ data: metadataPayload, importmode: importmode })
             .then(response => {
                 if(response.status !== 'OK')
                 {
@@ -210,12 +235,17 @@ const RestoreOptions = props => {
                     hideFormHandler();
                 }
                 else {
-                    console.log("Success");
-                    props.setNotification({
-                        message: `Program Restored successfully!`,
-                        severity: 'success'
-                    })
-                    hideFormHandler();
+                    if (dryRun)
+                    {
+                        setValidationResult(true);
+                        setImportStatus(response.stats);
+                    } else {
+                        props.setNotification({
+                            message: `Program Restored successfully!`,
+                            severity: 'success'
+                        })
+                        hideFormHandler();
+                    }
                 }
             });
     }
@@ -237,11 +267,8 @@ const RestoreOptions = props => {
     const programChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml:3}}>
             <FormControlLabel label ="Tracked Entity Types" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={TETypeRefs}/>
-            <FormControlLabel label ="Option" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={optionRef}/>
-            <FormControlLabel label ="Optionsets" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={optionSetRef}/>
-            <FormControlLabel label ="Program Rules" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={programRulesRef}/>
-            <FormControlLabel label ="program Rule Action" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={programRuleActionRef}/>
-            <FormControlLabel label ="Program Rule Variable" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={programRuleVariableRef}/>
+            <FormControlLabel label ="Options (Options + Optionsets)" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={optionSetRef}/>
+            <FormControlLabel label ="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={programRulesRef}/>
             <FormControlLabel label ="Program Tracked Entity Attributes" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={programTEAttrbutesRef}/>
             <FormControlLabel label ="Tracked Entity Attributes" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={TEAttributesRef}/>
 
@@ -284,11 +311,44 @@ const RestoreOptions = props => {
                                 <FormControlLabel value="overwriteSharing" control={<Radio />} label="Overwrite with Backed up information " onChange={onSharingChangeHandler}/>
                             </RadioGroup>
                         </FormControl>
+                        <br/>
+                        <FormControl>
+                            <FormControlLabel control={<Switch checked={dryRun} />} label="Dry Run" onChange={dryRunHandler}/>
+                        </FormControl>
+                    {validationResult &&
+                        <>
+                            <Typography variant="h6" gutterBottom component="div">
+                                Import Summary
+                            </Typography>
+                        <TableContainer sx={{ width: 450}} justify={"center"} component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell align="right">Created</TableCell>
+                                        <TableCell align="right">Updated</TableCell>
+                                        <TableCell align="right">Deleted</TableCell>
+                                        <TableCell align="right">Ignored</TableCell>
+                                        <TableCell align="right">Total</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell align="right">{importStatus.created}</TableCell>
+                                        <TableCell align="right">{importStatus.updated}</TableCell>
+                                        <TableCell align="right">{importStatus.deleted}</TableCell>
+                                        <TableCell align="right">{importStatus.ignored}</TableCell>
+                                        <TableCell align="right">{importStatus.total}</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </>
+                    }
                 </DialogContent>
                 <DialogActions style={{ padding: '1em'}}>
                     <Button onClick={hideFormHandler} color={"error"}>Close</Button>
                     <Button onClick={downloadBackupHandler} color={"primary"}>Download</Button>
-                    <Button onClick={restoreHandler} color={"primary"}>Restore</Button>
+                    <Button onClick= {restoreHandler} disabled={isLoading} color={"primary"}>{isLoading && <CircularProgress/>} Restore</Button>
                 </DialogActions>
             </>
             }
