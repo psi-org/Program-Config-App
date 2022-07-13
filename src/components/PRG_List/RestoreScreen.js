@@ -40,7 +40,7 @@ const RestoreScreen = (props) => {
                         <>
                             <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_restore_dialog_title"}>Program Backups for - {props.program.name}</CustomMUIDialogTitle>
                                 {!dataStore &&
-                                    <Alert severity="error">No Backups found. Please do backup</Alert>
+                                    <Alert severity="error">No Backups found for the selected Program.</Alert>
                                 }
                                 {dataStore && !(typeof restoreBackup !== "undefined") &&
                                     <>

@@ -10,8 +10,8 @@ import NumberIcon from '@mui/icons-material/Numbers';
 import DateIcon from '@mui/icons-material/CalendarToday';
 import TimeIcon from '@mui/icons-material/AccessTime';
 
-const BUILD_VERSION = "1.4.0"
-const BUILD_DATE = "May 31st, 2022"
+const BUILD_VERSION = "1.5.0"
+const BUILD_DATE = "July 8th, 2022"
 const MIN_VERSION = "2.36.0"
 const MAX_VERSION = "2.38.0"
 

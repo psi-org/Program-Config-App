@@ -290,6 +290,12 @@ const ProgramNew = (props) => {
 
     let healthAreaOptions = [];
 
+    if (haOptions) {
+        healthAreaOptions = healthAreaOptions.concat(haOptions.map(op => {
+            return { label: op.name, value: op.code }
+        }));
+    }
+
     if (uidPool && uidPool.length === 6 && !props.data) {
         setProgramId(uidPool.shift());
         setAssessmentId(uidPool.shift());
@@ -392,14 +398,6 @@ const ProgramNew = (props) => {
             })
         }
     }, [pgrTypePCA])
-
-    useEffect(() => {
-        if (haOptions) {
-            healthAreaOptions = healthAreaOptions.concat(haOptions.map(op => {
-                return { label: op.name, value: op.code }
-            }));
-        }
-    }, [haOptions])
     
     function submission() {
         setSentForm(true)

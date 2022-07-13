@@ -9,7 +9,7 @@ const programQuery = {
         resource: 'programs',
         id: ({ id }) => id,
         params: {
-            fields: ['id','organisationUnits']
+            fields: ['id', 'organisationUnits']
         }
     }
 }
@@ -55,11 +55,11 @@ const RestoreOptions = props => {
     const [programChecked, setProgramChecked] = useState(false);
     const [programStageChecked, setProgramStageChecked] = useState(false);
     const [psDataELementsChecked, setPsDataElementsChecked] = useState(false);
-    const [dryRun, setDryRun] = useState(true);
+    /*const [dryRun, setDryRun] = useState(true);*/
     const [validationResult, setValidationResult] = useState(false);
     const [importStatus, setImportStatus] = useState({});
 
-    const { loading: programLoading, data: program, error: programErrors } = useDataQuery(programQuery, { variables: { id: props.backup.metadata.programs[0].id }});
+    const { loading: programLoading, data: program, error: programErrors } = useDataQuery(programQuery, { variables: { id: props.backup.metadata.programs[0].id } });
     const metadataDM = useDataMutation(metadataMutation);
     const validateDM = useDataMutation(metadataValidation);
     const metadataRequest = {
@@ -139,18 +139,7 @@ const RestoreOptions = props => {
         }
     }
 
-    const downloadBackupHandler = () => {
-        const blob = new Blob([JSON.stringify(props.backup.metadata)], {type: 'text/json'});
-        const link = document.createElement('a');
-        link.download = (props.backup.name)+'.json';
-        link.href = window.URL.createObjectURL(blob);
-
-        const eventClick = new MouseEvent('click', { view: window, bubbles: true, cancelable: true});
-        link.dispatchEvent(eventClick);
-        link.remove();
-    }
-
-    const restoreHandler = () => {
+    const restoreHandler = (dryRun) => {
         setValidationResult(false);
         setIsLoading(true);
         if (programRef.current.checked) {
@@ -177,7 +166,7 @@ const RestoreOptions = props => {
             if (sharingOption === "keepSharing") {
                 delete metadataPayload.programs[0].sharing;
                 metadataPayload.attributes.forEach((attribute) => {
-                   delete attribute.sharing;
+                    delete attribute.sharing;
                 });
                 if (TETypeRefs.current.checked) {
                     metadataPayload.trackedEntityTypes.forEach((tei) => {
@@ -195,8 +184,7 @@ const RestoreOptions = props => {
                     });
                 }
             }
-            if (programStageRef.current.checked)
-            {
+            if (programStageRef.current.checked) {
                 metadataPayload.programStages = DeepCopy(props.backup.metadata.programStages);
                 if (sharingOption === "keepSharing") {
                     metadataPayload.programStages.forEach((ps) => {
@@ -205,8 +193,7 @@ const RestoreOptions = props => {
                 }
                 if (programStageSectionsRef.current.checked)
                     metadataPayload.programStageSections = DeepCopy(props.backup.metadata.programStageSections);
-                if (programStageDataElementsRef.current.checked)
-                {
+                if (programStageDataElementsRef.current.checked) {
                     metadataPayload.programStageDataElements = DeepCopy(props.backup.metadata.programStageDataElements);
                     if (dataElementsRef.current.checked) {
                         metadataPayload.dataElements = DeepCopy(props.backup.metadata.dataElements);
@@ -223,8 +210,7 @@ const RestoreOptions = props => {
         request.mutate({ data: metadataPayload })
             .then(response => {
                 setIsLoading(false);
-                if(response.status !== 'OK')
-                {
+                if (response.status !== 'OK') {
                     props.setNotification({
                         message: `Something went wrong while Restoring Program. Please try again later`,
                         severity: 'error'
@@ -232,8 +218,7 @@ const RestoreOptions = props => {
                     hideFormHandler();
                 }
                 else {
-                    if (dryRun)
-                    {
+                    if (dryRun) {
                         setValidationResult(true);
                         setImportStatus(response.stats);
                     } else {
@@ -248,35 +233,42 @@ const RestoreOptions = props => {
     }
 
     const programStageDEChildren = (
-        <Box sx={{ display: 'flex', flexDirection: 'column', ml:3}}>
-            <FormControlLabel label ="Data Elements" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={dataElementsRef}/>
+        <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
+            <FormControlLabel label="Data Elements" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={dataElementsRef} />
         </Box>
     )
 
     const programStageChildren = (
-        <Box sx={{ display: 'flex', flexDirection: 'column', ml:3}}>
-            <FormControlLabel label ="Program Stage Sections" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={programStageSectionsRef}/>
-            <FormControlLabel label ="Program Stage Data Elements" control={<Checkbox checked={psDataELementsChecked} onChange={toggleProgramStageDataElement}/>} inputRef={programStageDataElementsRef}/>
+        <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
+            <FormControlLabel label="Program Stage Sections" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={programStageSectionsRef} />
+            <FormControlLabel label="Program Stage Data Elements" control={<Checkbox checked={psDataELementsChecked} onChange={toggleProgramStageDataElement} />} inputRef={programStageDataElementsRef} />
             {programStageDEChildren}
         </Box>
     )
 
     const programChildren = (
-        <Box sx={{ display: 'flex', flexDirection: 'column', ml:3}}>
-            <FormControlLabel label ="Tracked Entity Types" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={TETypeRefs}/>
-            <FormControlLabel label ="Options (Options + Optionsets)" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={optionSetRef}/>
-            <FormControlLabel label ="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={programRulesRef}/>
-            <FormControlLabel label ="Program Tracked Entity Attributes" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={programTEAttrbutesRef}/>
-            <FormControlLabel label ="Tracked Entity Attributes" control={<Checkbox onChange={onCheckboxCheckedHandler}/>} inputRef={TEAttributesRef}/>
-
-            <FormControlLabel label ="Program Stages" control={<Checkbox checked={programStageChecked} onChange={toggleProgramStage}/>} inputRef={programStageRef}/>
+        <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
+            <FormControlLabel label="Tracked Entity Types" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={TETypeRefs} />
+            <FormControlLabel label="Options (Options + Optionsets)" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={optionSetRef} />
+            <FormControlLabel label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={programRulesRef} />
+            <FormControlLabel label="Program Tracked Entity Attributes" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={programTEAttrbutesRef} />
+            <FormControlLabel label="Tracked Entity Attributes" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={TEAttributesRef} />
+            <FormControlLabel label="Program Stages" control={<Checkbox checked={programStageChecked} onChange={toggleProgramStage} />} inputRef={programStageRef} />
             {programStageChildren}
         </Box>
     )
 
+    const setSelectAll = (value) => {
+        TETypeRefs.current.checked = value
+        setProgramChecked(value)
+        setProgramStageChecked(value)
+        setPsDataElementsChecked(value)
+        console.log(TETypeRefs.current)
+    }
+
     return (
         <>
-            {content === 'loading' && 
+            {content === 'loading' &&
                 <>
                     <DialogContent dividers justify={"center"}>
                         <Box sx={{ display: 'flex' }}><CircularProgress /></Box>
@@ -285,41 +277,47 @@ const RestoreOptions = props => {
                 </>
             }
             {content === 'form' &&
-            <>
-                <DialogContent dividers style={{padding: '1em 2em'}}>
-                    {validationResult &&
-                    <>
-                        <FormLabel id="elements-row-radio-buttons-group-label">Import Summary</FormLabel>
-                        <TableContainer sx={{ width: 450, marginLeft: 10}} justify={"center"} component={Paper}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell align="right">Created</TableCell>
-                                        <TableCell align="right">Updated</TableCell>
-                                        <TableCell align="right">Deleted</TableCell>
-                                        <TableCell align="right">Ignored</TableCell>
-                                        <TableCell align="right">Total</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell align="right">{importStatus.created}</TableCell>
-                                        <TableCell align="right">{importStatus.updated}</TableCell>
-                                        <TableCell align="right">{importStatus.deleted}</TableCell>
-                                        <TableCell align="right">{importStatus.ignored}</TableCell>
-                                        <TableCell align="right">{importStatus.total}</TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </>
-                    }
-                        <FormControl>
-                            <FormLabel id="elements-row-radio-buttons-group-label">Restore Elements: </FormLabel>
-                            <FormControlLabel control={<Checkbox checked={programChecked} onClick={toggleProgram}/>} label="Program" inputRef={programRef}/>
-                            { programChildren }
+                <>
+                    <DialogContent dividers style={{ padding: '1em 2em' }}>
+                        {validationResult &&
+                            <>
+                                <FormLabel id="elements-row-radio-buttons-group-label">Import Summary</FormLabel>
+                                <TableContainer sx={{ width: 450, marginLeft: 10 }} justify={"center"} component={Paper}>
+                                    <Table>
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell align="right">Created</TableCell>
+                                                <TableCell align="right">Updated</TableCell>
+                                                <TableCell align="right">Deleted</TableCell>
+                                                <TableCell align="right">Ignored</TableCell>
+                                                <TableCell align="right">Total</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell align="right">{importStatus.created}</TableCell>
+                                                <TableCell align="right">{importStatus.updated}</TableCell>
+                                                <TableCell align="right">{importStatus.deleted}</TableCell>
+                                                <TableCell align="right">{importStatus.ignored}</TableCell>
+                                                <TableCell align="right">{importStatus.total}</TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </>
+                        }
+                        <FormControl style={{ width: '100%' }}>
+                            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <FormLabel id="elements-row-radio-buttons-group-label">Restore Elements: </FormLabel>
+                                <div style={{ display: 'flex', gap: '0.75em' }}>
+                                    <Button onClick={() => setSelectAll(true)} color='primary' variant="outlined">Select All</Button>
+                                    <Button onClick={() => setSelectAll(false)} color='primary' variant="outlined">Select None</Button>
+                                </div>
+                            </div>
+                            <FormControlLabel control={<Checkbox checked={programChecked} onClick={toggleProgram} />} label="Program" inputRef={programRef} />
+                            {programChildren}
                         </FormControl>
-                        <br/>
+                        <br />
                         <FormControl>
                             <FormLabel id="orgUnit-row-radio-buttons-group-label">Organisation Unit: </FormLabel>
                             <RadioGroup row aria-labelledby="orgUnit-row-radio-buttons-group-label" name="restore_OrganisationUnit" defaultValue="keepOUnits">
@@ -327,26 +325,29 @@ const RestoreOptions = props => {
                                 <FormControlLabel value="overwriteOUnits" control={<Radio />} label="Overwrite with Backed up Information" onChange={onOUOptionChangeHandler} />
                             </RadioGroup>
                         </FormControl>
-                        <br/>
+                        <br />
                         <FormControl>
                             <FormLabel id="sharing-row-radio-buttons-group-label">Sharing Settings: </FormLabel>
                             <RadioGroup row aria-labelledby="sharing-row-radio-buttons-group-label" name="restore_Sharing" defaultValue="keepSharing">
-                                <FormControlLabel value="keepSharing" control={<Radio />} label="Keep current Settings" onChange={onSharingChangeHandler}/>
-                                <FormControlLabel value="overwriteSharing" control={<Radio />} label="Overwrite with Backed up information " onChange={onSharingChangeHandler}/>
+                                <FormControlLabel value="keepSharing" control={<Radio />} label="Keep current Settings" onChange={onSharingChangeHandler} />
+                                <FormControlLabel value="overwriteSharing" control={<Radio />} label="Overwrite with Backed up information " onChange={onSharingChangeHandler} />
                             </RadioGroup>
                         </FormControl>
-                        <br/>
-                        <FormControl>
+                        <br />
+                        {/*<FormControl>
                             <FormControlLabel control={<Switch checked={dryRun} />} label="Dry Run" onChange={dryRunHandler}/>
-                        </FormControl>
+                        </FormControl>*/}
 
-                </DialogContent>
-                <DialogActions style={{ padding: '1em'}}>
-                    <Button onClick={hideFormHandler} color={"error"} variant="outlined">Close</Button>
-                    <Button onClick={downloadBackupHandler} color={"primary"} variant="outlined">Download</Button>
-                    <LoadingButton onClick= {restoreHandler} disabled={isLoading} loading={isLoading} color={"primary"} variant="outlined"> Restore</LoadingButton>
-                </DialogActions>
-            </>
+                    </DialogContent>
+                    <DialogActions style={{ padding: '1em', display: 'flex', flexDirection: 'column', alignItems: 'end' }}>
+                        <div style={{ display: 'flex', gap: '0.75em' }}>
+                            <Button onClick={hideFormHandler} color={"error"} variant="outlined">Cancel</Button>
+                            <LoadingButton onClick={() => restoreHandler(true)} disabled={isLoading} loading={isLoading} color={"primary"} variant="contained"> Dry Run</LoadingButton>
+                            <LoadingButton onClick={() => restoreHandler(false)} disabled={isLoading} loading={isLoading} color={"primary"} variant="outlined"> Restore</LoadingButton>
+                        </div>
+                        <label style={{ fontSize: '0.8em', paddingTop: '0.8em' }}><em>A dry run tests the import settings without importing any data</em></label>
+                    </DialogActions>
+                </>
             }
         </>
     )

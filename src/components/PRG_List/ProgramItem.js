@@ -4,7 +4,7 @@ import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
 
 //UI Elements
-import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
+import { FlyoutMenu, MenuItem, Popper, Layer, MenuSectionHeader } from "@dhis2/ui";
 import EditIcon from '@mui/icons-material/Edit';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,6 +12,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import PublicIcon from '@mui/icons-material/Public';
 import BackupIcon from '@mui/icons-material/Backup';
 import RestoreIcon from '@mui/icons-material/Restore';
+import StorageIcon from '@mui/icons-material/Storage';
 
 // *** Routing ***
 import { Link } from "react-router-dom";
@@ -74,9 +75,13 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                                 <MenuItem label="Edit Program" icon={<EditIcon />} onClick={() => { toggle(); setShowProgramForm(true) }} />
                                 <MenuItem label="Sharing Settings" icon={<ShareIcon/>} onClick={()=>{toggle(); shareProgram(program.id)}}/>
                                 <MenuItem label={"Assign Organisation Units"} icon={<PublicIcon/>} onClick={()=>{ toggle(); assignOrgUnit(program.id)}}/>
-                                <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={() => { toggle(); downloadMetadata(program.id) }} />
-                                <MenuItem label="Backup Program" icon={<BackupIcon/>} onClick={() => { toggle(); backupProgram(program) }} />
-                                <MenuItem label="Restore Program" icon={<RestoreIcon/>} onClick={() => { toggle(); restoreProgram(program) }} />
+                                <MenuItem label="Backup/Restore" icon={<StorageIcon/>}>
+                                    <MenuSectionHeader label="In Device" />
+                                    <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={() => { toggle(); downloadMetadata(program.id) }} />
+                                    <MenuSectionHeader label="In Server" />
+                                    <MenuItem label="Backup Program" icon={<BackupIcon/>} onClick={() => { toggle(); backupProgram(program) }} />
+                                    <MenuItem label="Restore Program" icon={<RestoreIcon/>} onClick={() => { toggle(); restoreProgram(program) }} />
+                                </MenuItem>
                                 <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
                             </FlyoutMenu>
                         </Popper>

@@ -1,9 +1,6 @@
-const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
-    FEEDBACK_TEXT = "yhKEe6BLEer",
-    CRITICAL_QUESTION = "NPwvdTt0Naj",
-    METADATA = "haUflNqP85K",
-    SCORE_DEN = "l7WdLDhE3xW",
-    SCORE_NUM = "Zyr7rlDOJy8";
+import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE } from "../../configs/Constants";
+import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable } from "../../configs/AnalyticsTemplates";
+import { DeepCopy } from "../../configs/Utils";
 
 /**
  * 
@@ -47,7 +44,7 @@ const buildScores = (branch) => {
             if (a.prgVarName) {
                 let num = `#{${a.prgVarName}}*${a.scoreNum}`;
                 let den = `d2:countIfZeroPos('${a.prgVarName}')*${a.scoreDen}`;
-                if (a.isCritical=="Yes") {
+                if (a.isCritical == "Yes") {
                     numC.push(num);
                     denC.push(den);
                 } else {
@@ -155,7 +152,7 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
                 name: name,
                 description: "_Scripted",
                 program: { id: programId },
-                programStage : {id : stageId},
+                programStage: { id: stageId },
                 condition: `d2:hasValue('_CV${composite.prgVarName}')`,
                 programRuleActions: [{ id: actionId }]
             };
@@ -183,7 +180,7 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
                 name: name,
                 description: "_Scripted",
                 program: { id: programId },
-                programStage : {id : stageId},
+                programStage: { id: stageId },
                 condition: "true",
                 programRuleActions: [{ id: actionId }]
             };
@@ -256,7 +253,7 @@ const buildCriticalScore = (branch, stageId, programId, uidPool) => {
         name,
         description: "_Scripted",
         program: { id: programId },
-        programStage : {id : stageId},
+        programStage: { id: stageId },
         condition: `d2:hasValue('_CV_CriticalQuestions')`,
         programRuleActions: [{ id: actionId }]
     };
@@ -329,7 +326,7 @@ const buildNonCriticalScore = (branch, stageId, programId, uidPool) => {
         name,
         description: "_Scripted",
         program: { id: programId },
-        programStage : {id : stageId},
+        programStage: { id: stageId },
         condition: `d2:hasValue('_CV_NonCriticalQuestions')`,
         programRuleActions: [{ id: actionId }]
     };
@@ -401,7 +398,7 @@ const buildCompetencyRules = (programId, stageId, uidPool) => {
 
         rule.id = programRuleUid;
         rule.program.id = programId;
-        rule.programStage = { id : stageId }
+        rule.programStage = { id: stageId }
 
         let actions = rule.programRuleActions;
         rule.programRuleActions = [];
@@ -548,7 +545,7 @@ const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass =
  * @param {Array} scores : Data Elements linked to Scores section
  * @returns {Object} uniqueScores:Boolean , compositeScores:<Array>, duplicatedScores:<Array>
  */
-const checkScores = (scores) => {
+ export const checkScores = (scores) => {
     let compositeScores = scores.map(score => score.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value);
     let duplicatedScores = compositeScores.filter((composite, index) => compositeScores.indexOf(composite) !== index);
     return {
@@ -558,7 +555,7 @@ const checkScores = (scores) => {
     };
 }
 
-const readQuestionComposites = (sections) => {
+export const readQuestionComposites = (sections) => {
     var questionCompositeScores = [];
     sections.forEach(section => {
         section.dataElements.forEach(de => {
@@ -589,12 +586,12 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
             let programRuleUid = uidPool.shift();
             let name = `PR - Show/Hide - Show when ${parentCode} is ${answer}`;
 
-            conditionValue = ["0","1"].includes(String(answer)) ? answer : `"${answer.replaceAll("'","")}"`
+            conditionValue = ["0", "1"].includes(String(answer)) ? answer : `"${answer.replaceAll("'", "")}"`
 
             const pr = {
                 id: programRuleUid,
                 name,
-                description:'_Scripted',
+                description: '_Scripted',
                 program: { id: programId },
                 condition: `!d2:hasValue(#{${parentCode}}) || (#{${parentCode}}!=${conditionValue})`,
                 programRuleActions: []
@@ -607,7 +604,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
             const pr_mfm = {
                 id: mfm_uid,
                 name: mfm_name,
-                description:'_Scripted',
+                description: '_Scripted',
                 program: { id: programId },
                 condition: `d2:hasValue(#{${parentCode}}) && (#{${parentCode}}==${conditionValue})`,
                 programRuleActions: []
@@ -653,15 +650,15 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
 }
 
 const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
-    var labelsRules = [] , labelsActions = [];
+    var labelsRules = [], labelsActions = [];
 
     hideShowLabels.forEach(hsRule => {
         let programRuleUid = uidPool.shift();
 
         var pr = {
             id: programRuleUid,
-            name:undefined,
-            description:'_Scripted',
+            name: undefined,
+            description: '_Scripted',
             program: { id: programId },
             condition: undefined,
             programRuleActions: []
@@ -672,7 +669,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
             pr.condition = `'true'`;
         } else {
             pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
-            let conditionValue = ["0","1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'","")}"`
+            let conditionValue = ["0", "1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'", "")}"`
             pr.condition = `d2:hasValue(#{${hsRule.parent}}) && (#{${hsRule.parent}}==${conditionValue})`;
         }
 
@@ -694,7 +691,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
         labelsRules.push(pr);
     });
 
-    return {labelsRules, labelsActions};
+    return { labelsRules, labelsActions };
 };
 
 /**
@@ -705,7 +702,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
  * @param {String} useCompetencyClass: Flag to include or not the competency class realated items
  * @returns {Array} programRuleVariables: <Array>{name,programRuleVariableSourceType,useCodeForOptionSet,program,|dataElement|}
  */
-const buildProgramRuleVariables = (sections, compositeScores, programId, useCompetencyClass = "Yes") => {
+ export const buildProgramRuleVariables = (sections, compositeScores, programId, useCompetencyClass = "Yes") => {
     // const criticalStepCalculations = sections.find(s => s.name == "Critical Step Calculations");
     // const scores = sections.find(s => s.name == "Scores");
     // sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
@@ -778,7 +775,7 @@ const buildProgramRuleVariables = (sections, compositeScores, programId, useComp
     return programRuleVariables.concat(criticalVariables)
 }
 
-const buildProgramRules = (sections, stageId, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea="FP", scoreMap = { childs: [] }) => {
+export const buildProgramRules = (sections, stageId, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea = "FP", scoreMap = { childs: [] }) => {
 
     var programRules = [];
     var programRuleActions = [];
@@ -787,7 +784,7 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
 
     const varNameRef = sections.map(sec => sec.dataElements.map(de => {
         let metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || "{}")
-        return { id:de.id , varName:metadata.varName }
+        return { id: de.id, varName: metadata.varName }
     })).flat();
 
     //Create Tree Object for Scoring PRs
@@ -810,7 +807,7 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
             }
 
             // Get parents hide/show logic
-            if (metadata.parentQuestion!==undefined && metadata.parentValue!==undefined) {
+            if (metadata.parentQuestion !== undefined && metadata.parentValue !== undefined) {
                 let parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
                 let parentValue = String(metadata.parentValue);
 
@@ -829,10 +826,10 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
                         });
                         hsIdx = hideShowLabels.length - 1;
                     }
-                    hideShowLabels[hsIdx].actions.push({id:dataElement.id, text: metadata.labelFormName.replaceAll("\"","'")});
+                    hideShowLabels[hsIdx].actions.push({ id: dataElement.id, text: metadata.labelFormName.replaceAll("\"", "'") });
                 }
             } else if (metadata.labelFormName) {
-                hideShowLabels[0].actions.push({id:dataElement.id, text: metadata.labelFormName.replaceAll("\"","'")});
+                hideShowLabels[0].actions.push({ id: dataElement.id, text: metadata.labelFormName.replaceAll("\"", "'") });
             }
         });
     });
@@ -864,7 +861,7 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
 
     // Attributes
 
-    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, scoreMap, useCompetencyClass,healthArea); //Define: useCompetencyClass & healthArea
+    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, scoreMap, useCompetencyClass, healthArea); //Define: useCompetencyClass & healthArea
 
     // Hide/Show Logic
 
@@ -895,9 +892,97 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
     return { programRules, programRuleActions }
 }
 
-module.exports = {
+export const buildProgramIndicators = (programId, programShortName, uidPool) => {
+    const indicatorValues = [
+        { name: 'C', condition: 'competent' },
+        { name: 'CNI', condition: 'improvement' },
+        { name: 'NC', condition: 'notcompetent' }
+    ];
+    let indicatorIDs = []
+
+    let programIndicators = indicatorValues.map(value => {
+        let result = DeepCopy(ProgramIndicatorTemplate)
+        result.id = uidPool.shift()
+        indicatorIDs.push(result.id)
+        result.name = programShortName+" - Competency - "+value.name
+        result.shortName = programShortName.slice(0,44)+" - "+value.name
+        result.program.id = programId
+        result.filter = `A{${COMPETENCY_ATTRIBUTE}} == "${value.condition}"`
+        return result
+    })
+
+    return { programIndicators, indicatorIDs }
+}
+
+export const buildH2BaseVisualizations = (programId, programShortName, indicatorIDs, uidPool) => {
+    
+    let series = []
+    let dataDimensionItems = []
+    let visualizations = []
+    let androidSettingsVisualizations = []
+    const timestamp = new Date().toISOString();
+
+    indicatorIDs.forEach(indicator => {
+        series.push({
+            "dimensionItem": indicator,
+            "axis": 0
+        })
+        dataDimensionItems.push({
+            "dataDimensionItemType": "PROGRAM_INDICATOR",
+            "programIndicator": { "id": indicator }
+        })
+    })
+
+    //Competency Classes - (Last 6 months by Org Units)
+    let table1 = DeepCopy(compLastSixMonthsByOUTable)
+
+    //Competency Classes Pie Chart - (Last 6 months)
+    let chart1 = DeepCopy(compLastSixMonthsPie)
+    chart1.id = uidPool.shift()
+    chart1.name = programShortName+" - Competency Classes Pie Chart - (Last 6 months)"
+    chart1.code = programId+"_Scripted2"
+    chart1.series = [...series]
+    chart1.dataDimensionItems = [...dataDimensionItems]
+    visualizations.push(chart1)
+    androidSettingsVisualizations.push({
+        id: chart1.id,
+        name: chart1.name,
+        timestamp
+    })
+
+    table1.id = uidPool.shift()
+    table1.name = programShortName+" - Competency Classes - (Last 6 months by Org Units)"
+    table1.code = programId+"_Scripted1"
+    table1.series = [...series]
+    table1.dataDimensionItems = [...dataDimensionItems]
+    visualizations.push(table1)
+    androidSettingsVisualizations.push({
+        id: table1.id,
+        name: table1.name,
+        timestamp
+    })
+
+    //Competency Classes - (Last 6 months)
+    let table2 = DeepCopy(compLastSixMonthsTable)
+    table2.id = uidPool.shift()
+    table2.name = programShortName+" - Competency Classes - (Last 6 months)"
+    table2.code = programId+"_Scripted3"
+    table2.series = [...series]
+    table2.dataDimensionItems = [...dataDimensionItems]
+    visualizations.push(table2)
+    androidSettingsVisualizations.push({
+        id: table2.id,
+        name: table2.name,
+        timestamp
+    })
+
+    return { visualizations, androidSettingsVisualizations }
+}
+
+/*module.exports = {
     checkScores,
     readQuestionComposites,
     buildProgramRuleVariables,
-    buildProgramRules
-};
+    buildProgramRules,
+    buildProgramIndicators
+};*/

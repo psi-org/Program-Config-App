@@ -1,5 +1,5 @@
 // DHIS2 UI
-import { ButtonStrip, AlertBar, AlertStack, ComponentCover, CircularLoader, Chip, IconCheckmarkCircle24, IconCross24 } from "@dhis2/ui";
+import { ButtonStrip, AlertBar, AlertStack, ComponentCover, CircularLoader, Chip, IconCheckmarkCircle24, IconWarning24, IconCross24 } from "@dhis2/ui";
 
 // React Hooks
 import { useState, useEffect } from "react";
@@ -13,7 +13,7 @@ import Scores from "./Scores";
 import CriticalCalculations from "./CriticalCalculations";
 import DataProcessor from "../Excel/DataProcessor";
 import Importer from "../Excel/Importer";
-import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules } from "./Scripting";
+import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Scripting";
 import { Link } from "react-router-dom";
 import Removed from "./Removed";
 import ValidateMetadata from "./ValidateMetadata";
@@ -83,10 +83,45 @@ const queryPRV = {
     }
 };
 
+const queryPIndicators = {
+    results: {
+        resource: 'programIndicators',
+        params: ({ programId }) => ({
+            fields: ['id', 'name'],
+            filter: ['program.id:eq:' + programId, 'description:eq:_H2LocalAnalytics']
+        })
+    }
+};
+
+const queryVisualizations = {
+    results: {
+        resource: 'visualizations',
+        params: ({ programId }) => ({
+            fields: ['id', 'name'],
+            filter: [`code:like:${programId}_Scripted`]
+        })
+    }
+};
+
+const updateAndroidSettings = {
+    resource: `dataStore/ANDROID_SETTINGS_APP/analytics`,
+    type: 'update',
+    data: ({ data }) => data
+};
+
+const queryAndroidSettings = {
+    results: {
+        resource: `dataStore/ANDROID_SETTINGS_APP/analytics`
+    }
+};
+
 const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     // Globals
     const programId = programStage.program.id;
     const [isSectionMode,setIsSectionMode] = useState(programStage.formType==="SECTION" || programStage.programStageDataElements.length === 0)
+    const { data: androidSettings } = useDataQuery(queryAndroidSettings);
+    const [androidSettingsUpdate, {error: androidSettingsUpdateError}] = useDataMutation(updateAndroidSettings);
+    const [androidSettingsError, setAndroidSettingsError] = useState(true);
 
     // Flags
     const [saveStatus, setSaveStatus] = useState(hnqisMode?'Validate':'Save Changes');
@@ -94,7 +129,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     const [savingMetadata, setSavingMetadata] = useState(false);
     const [savedAndValidated, setSavedAndValidated] = useState(false)
     const [exportToExcel, setExportToExcel] = useState(false);
-    //const { hasNotice, setHasNotice } = useState(false);
 
     const [exportStatus, setExportStatus] = useState("Download Template");
     const [importerEnabled, setImporterEnabled] = useState(false);
@@ -271,8 +305,18 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     // Fetch Program Rule Variables from Program
     const prvDQ = useDataQuery(queryPRV, { variables: { programId: programStage.program.id } });
 
+    // Fetch Program Indicators from Program
+    const pIndDQ = useDataQuery(queryPIndicators, { variables: { programId: programStage.program.id } });
+
+    // Fetch Visualizations from Program
+    const visualizationsDQ = useDataQuery(queryVisualizations, { variables: { programId: programStage.program.id } });
+
     useEffect(() => {
-        let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection?.dataElements?.length + criticalSection?.dataElements?.length) * 5;
+        const programIndicatorsAmount = 3;
+        const visualizationsAmount = 3;
+        const androidSettingsAmount = 1;
+
+        let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection?.dataElements?.length + criticalSection?.dataElements?.length) * 5 + programIndicatorsAmount + visualizationsAmount + androidSettingsAmount;
         //No Sections , get minimum ids for core Program Rules
         if (isNaN(n) || n < 50) n = 50
 
@@ -347,6 +391,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         setImporterEnabled(true);
     };
 
+    useEffect(()=>{
+        if(androidSettingsError) setProgressSteps(7);
+    }, [androidSettingsUpdateError])
+
     const run = () => {
         if (!savedAndValidated) return;
 
@@ -380,19 +428,24 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
 
         // III. Build new metadata
         // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
+        // Also, Program Indicators and Visualizations
         setProgressSteps(3);
 
         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
         const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
+        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool);
+        const { visualizations, androidSettingsVisualizations } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool);
 
-        const metadata = { programRuleVariables, programRules, programRuleActions };
+        const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations };
 
         // IV. Delete old metadata
         setProgressSteps(4);
 
         const oldMetadata = {
             programRules: prDQ.data.results.programRules.map(pr => ({ id: pr.id })),
-            programRuleVariables: prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }))
+            programRuleVariables: prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id })),
+            programIndicators: pIndDQ.data.results.programIndicators.map(pInd => ({ id: pInd.id })),
+            visualizations: visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id }))
         };
 
         // V. Import new metadata
@@ -410,6 +463,41 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                         prDQ.refetch();
                         prvDQ.refetch();
                         setProgressSteps(6);
+
+                        // VI. Enable in-app analytics
+
+                        if(androidSettings?.results){
+
+                            if(!androidSettings.results.dhisVisualizations) androidSettings.results.dhisVisualizations = {
+                                "dataSet": {},
+                                "home": [],
+                                "program": {}
+                            }
+
+                            if(!androidSettings.results.dhisVisualizations.home) androidSettings.results.dhisVisualizations.home = []
+
+                            androidSettings.results.dhisVisualizations.home = androidSettings.results.dhisVisualizations.home.filter(setting => 
+                                setting.program !== programId
+                            )
+
+                            androidSettings.results.dhisVisualizations.home.push({
+                                id: uidPool.shift(),
+                                name: programStage.program.name,
+                                program: programId,
+                                visualizations: androidSettingsVisualizations
+                            })
+
+                            androidSettings.results.lastUpdated = new Date().toISOString()
+
+                            androidSettingsUpdate({data:androidSettings.results}).then(res => {
+                                if(res.status=== 'OK') setAndroidSettingsError(false)
+                                setProgressSteps(7)
+                            })
+
+                        }else{
+                            setProgressSteps(7);
+                        }
+                        
                     }
                 });
             }
@@ -458,13 +546,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             {hnqisMode && exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus} />}
             {
                 createMetadata.loading && <ComponentCover translucent></ComponentCover>
-                /* <Backdrop
-                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                    open={open}
-                    onClick={handleClose}
-                >
-                    <CircularProgress color="inherit" />
-                </Backdrop> */
 
             }
 
@@ -494,7 +575,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             {hnqisMode && saveAndBuild &&
 
                 <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
-                    <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>{}}>
+                    <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>{if((saveAndBuild === 'Completed') || (createMetadata?.data?.status === 'ERROR')){setSaveAndBuild(false); setProgressSteps(0);}}}>
                         Setting Up Program
                     </CustomMUIDialogTitle >
                     <DialogContent dividers style={{ padding: '1em 2em' }}>
@@ -519,7 +600,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                                 {progressSteps === 3 && <CircularLoader small />}
                                 {progressSteps === 3 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Building new metadata</p>
+                                <p> Building new metadata and analytics</p>
                             </div>
                         }
                         {(progressSteps > 3) &&
@@ -540,7 +621,17 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                         }
                         {(progressSteps > 5) &&
                             <div className="progressItem">
-                                <IconCheckmarkCircle24 color={'#00b894'} />
+                                {progressSteps === 5 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps !== 6 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 6 && !androidSettings && <IconWarning24 color={'#ffbb00'} />}
+                                {progressSteps !== 6 && androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Enabling in-app analytics {!androidSettings?"(Android Settings app not enabled)":(androidSettingsError?"(Error while saving Android Settings)":"")}</p>
+                            </div>
+                        }
+                        {(progressSteps > 6) &&
+                            <div className="progressItem">
+                                {androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                {(!androidSettings || androidSettingsError) && <IconWarning24 color={'#ffbb00'} />}
                                 <p> Done!</p>
                             </div>
                         }
@@ -597,8 +688,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                                 </div>
                             )}
                         </Droppable>
-                        {hnqisMode && (isSectionMode) && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection.id} />}
-                        {hnqisMode && (isSectionMode) && <Scores stageSection={scoresSection} index={0} key={scoresSection.id} program={programId}/>}
+                        {hnqisMode && (isSectionMode) && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection?.id || "crit"} />}
+                        {hnqisMode && (isSectionMode) && <Scores stageSection={scoresSection} index={0} key={scoresSection?.id || "scores"} program={programId}/>}
 
                     </div>
                 </div>
