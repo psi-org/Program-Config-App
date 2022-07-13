@@ -17,7 +17,7 @@ const RestoreItem = (props) => {
                     </React.Fragment>
                 }/>
             </ListItem>
-            <Divider/>
+            {/*<Divider/>*/}
         </>
     )
 }

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
-import { DialogActions, DialogContent, Alert, Box, CircularProgress, Button, List } from "@mui/material";
+import { DialogActions, DialogContent, Alert, Box, CircularProgress, Button, List, Divider } from "@mui/material";
 import { NAMESPACE } from "../../configs/Constants";
 
 import RestoreItem from "./RestoreItem";
@@ -46,8 +46,11 @@ const RestoreScreen = (props) => {
                                     <>
                                         <DialogContent dividers style={{padding: '1em 2em'}}>
                                             <List sx={{width: '100%', bgColor: 'background.paper'}}>
-                                                {dataStore.backups.map((backup) => {
-                                                    return <RestoreItem backup={backup} key={backup.id} restoreHandler={onRestoreHandler}/>
+                                                {dataStore.backups.map((backup, index, elements) => {
+                                                    return <>
+                                                            <RestoreItem backup={backup} key={index} restoreHandler={onRestoreHandler}/>
+                                                            { (elements[index+1]) && <Divider key={`divider_${index}`}/> }
+                                                        </>
                                                 })}
                                             </List>
                                         </DialogContent>
@@ -57,7 +60,7 @@ const RestoreScreen = (props) => {
                                     </>
                                 }
                                 {dataStore && restoreBackup &&
-                                    <RestoreOptions backup={restoreBackup} setRestoreProgramId={props.setRestoreProgramId} setNotification={props.setNotification}/>
+                                    <RestoreOptions backup={restoreBackup} key={props.setRestoreProgramId} setRestoreProgramId={props.setRestoreProgramId} setNotification={props.setNotification}/>
                                 }
                         </>
                     }
