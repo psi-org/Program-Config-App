@@ -433,8 +433,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
 
         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
         const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
-        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool);
-        const { visualizations, androidSettingsVisualizations } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool);
+        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass);
+        const { visualizations, androidSettingsVisualizations } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool,programMetadata.useCompetencyClass);
 
         const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations };
 

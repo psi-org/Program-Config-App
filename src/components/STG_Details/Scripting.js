@@ -1,4 +1,4 @@
-import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE } from "../../configs/Constants";
+import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE } from "../../configs/Constants";
 import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable } from "../../configs/AnalyticsTemplates";
 import { DeepCopy } from "../../configs/Utils";
 
@@ -892,35 +892,42 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
     return { programRules, programRuleActions }
 }
 
-export const buildProgramIndicators = (programId, programShortName, uidPool) => {
-    const indicatorValues = [
-        { name: 'C', condition: 'competent' },
-        { name: 'CNI', condition: 'improvement' },
-        { name: 'NC', condition: 'notcompetent' }
+export const buildProgramIndicators = (programId, programShortName, uidPool, useCompetency) => {
+    const indicatorValues = useCompetency==="Yes"?[
+        { name: 'C', condition: `A{${COMPETENCY_ATTRIBUTE}} == "competent"` },
+        { name: 'CNI', condition: `A{${COMPETENCY_ATTRIBUTE}} == "improvement"` },
+        { name: 'NC', condition: `A{${COMPETENCY_ATTRIBUTE}} == "notcompetent"` }
+    ]:[
+        { name: 'A', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} >= 80.0` },
+        { name: 'B', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} < 80.0 && A{${GLOBAL_SCORE_ATTRIBUTE}} >= 50.0` },
+        { name: 'C', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} < 50.0` }
     ];
+    const nameComp = useCompetency==="Yes"?"Competency":"QoC";
+
     let indicatorIDs = []
 
     let programIndicators = indicatorValues.map(value => {
         let result = DeepCopy(ProgramIndicatorTemplate)
         result.id = uidPool.shift()
         indicatorIDs.push(result.id)
-        result.name = programShortName+" - Competency - "+value.name
+        result.name = programShortName+" - "+nameComp+" - "+value.name
         result.shortName = programShortName.slice(0,44)+" - "+value.name
         result.program.id = programId
-        result.filter = `A{${COMPETENCY_ATTRIBUTE}} == "${value.condition}"`
+        result.filter = value.condition
         return result
     })
 
     return { programIndicators, indicatorIDs }
 }
 
-export const buildH2BaseVisualizations = (programId, programShortName, indicatorIDs, uidPool) => {
+export const buildH2BaseVisualizations = (programId, programShortName, indicatorIDs, uidPool, useCompetency) => {
     
     let series = []
     let dataDimensionItems = []
     let visualizations = []
     let androidSettingsVisualizations = []
     const timestamp = new Date().toISOString();
+    const nameComp = useCompetency==="Yes"?"Competency Classes":"Quality of Care";
 
     indicatorIDs.forEach(indicator => {
         series.push({
@@ -933,13 +940,10 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
         })
     })
 
-    //Competency Classes - (Last 6 months by Org Units)
-    let table1 = DeepCopy(compLastSixMonthsByOUTable)
-
     //Competency Classes Pie Chart - (Last 6 months)
     let chart1 = DeepCopy(compLastSixMonthsPie)
     chart1.id = uidPool.shift()
-    chart1.name = programShortName+" - Competency Classes Pie Chart - (Last 6 months)"
+    chart1.name = programShortName+" - "+nameComp+" Pie Chart - (Last 6 months)"
     chart1.code = programId+"_Scripted2"
     chart1.series = [...series]
     chart1.dataDimensionItems = [...dataDimensionItems]
@@ -950,8 +954,11 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
         timestamp
     })
 
+    //Competency Classes - (Last 6 months by Org Units)
+    let table1 = DeepCopy(compLastSixMonthsByOUTable)
+
     table1.id = uidPool.shift()
-    table1.name = programShortName+" - Competency Classes - (Last 6 months by Org Units)"
+    table1.name = programShortName+" - "+nameComp+" - (Last 6 months by Org Units)"
     table1.code = programId+"_Scripted1"
     table1.series = [...series]
     table1.dataDimensionItems = [...dataDimensionItems]
@@ -961,11 +968,10 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
         name: table1.name,
         timestamp
     })
-
     //Competency Classes - (Last 6 months)
     let table2 = DeepCopy(compLastSixMonthsTable)
     table2.id = uidPool.shift()
-    table2.name = programShortName+" - Competency Classes - (Last 6 months)"
+    table2.name = programShortName+" - "+nameComp+" - (Last 6 months)"
     table2.code = programId+"_Scripted3"
     table2.series = [...series]
     table2.dataDimensionItems = [...dataDimensionItems]

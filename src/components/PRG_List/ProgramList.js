@@ -19,6 +19,7 @@ import RestoreScreen from "../PRG_List/RestoreScreen";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiButton from '@mui/material/Button';
+import ClearIcon from '@mui/icons-material/Clear';
 
 import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import IconButton from '@mui/material/IconButton';
@@ -28,6 +29,7 @@ import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 
 import About from "./About";
 import H2Metadata from "./H2Metadata";
+import { Tooltip } from "@mui/material";
 
 
 const queryProgramType = {
@@ -133,6 +135,12 @@ const ProgramList = () => {
         refetch({ token: filter ?? filterValue, page: 1, pageSize })
     }
 
+    const resetSearch = () => {
+        setFilterValue("")
+        setCurrentPage(1)
+        refetch({ token: "", page: 1, pageSize })
+    }
+
     return (
         <div>
             <div className="sub_nav">
@@ -200,6 +208,11 @@ const ProgramList = () => {
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position='end'>
+                                    <Tooltip title="Clear Search" placement="left">
+                                        <IconButton onClick={() => { resetSearch() }} style={{marginRight: '0.5em'}}>
+                                            <ClearIcon/>
+                                        </IconButton>
+                                    </Tooltip>
                                     <MuiButton
                                         onClick={() => {doSearch() }}
                                         startIcon={<SearchIcon />}

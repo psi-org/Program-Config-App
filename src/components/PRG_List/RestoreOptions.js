@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import { DialogActions, DialogContent, DialogContentText, Divider, Grid, Typography, FormGroup, FormLabel, FormControl, FormControlLabel, RadioGroup, Radio, Checkbox, Button, RadioButton, Box, CircularProgress, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { DeepCopy } from '../../configs/Utils';
+import { styled } from '@mui/material/styles';
+import { tableCellClasses } from '@mui/material/TableCell';
 
 const programQuery = {
     results: {
@@ -32,12 +34,23 @@ const metadataValidation = {
     }
 }
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+        backgroundColor: "#2c6693",
+        color: theme.palette.common.white,
+        fontWeight: "bold"
+    },
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 14,
+    },
+}));
+
 const RestoreOptions = props => {
     let metadataPayload = {};
 
     const [checkedState, setCheckedState] = useState(
         new Array(10).fill(false)
-      );
+    );
     const [ouOption, setOUOption] = useState('keepOUnits');
     const [sharingOption, setSharingOption] = useState('keepSharing');
     const [content, setContent] = useState('form');
@@ -76,14 +89,13 @@ const RestoreOptions = props => {
         if (changeState) {
             const updatedCheckedState = checkedState.map((item, index) =>
                 index === position ? !item : item
-                );
+            );
 
-            if (updatedCheckedState[position])
-            {
-                if (!updatedCheckedState[0]) 
+            if (updatedCheckedState[position]) {
+                if (!updatedCheckedState[0])
                     updatedCheckedState[0] = true;
-                
-                if ([7,8,9].includes(position))
+
+                if ([7, 8, 9].includes(position))
                     updatedCheckedState[6] = true;
 
                 if (position === 9)
@@ -95,7 +107,7 @@ const RestoreOptions = props => {
     }
 
     const childrenChecked = (position) => {
-        let children = checkedState.slice(position+1, 10);
+        let children = checkedState.slice(position + 1, 10);
         return children.includes(true);
     }
 
@@ -194,26 +206,26 @@ const RestoreOptions = props => {
 
     const programStageDEChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel label="Data Elements" control={<Checkbox checked={checkedState[9]} onChange={()=>onCheckBoxHandler(9)} />} />
+            <FormControlLabel label="Data Elements" control={<Checkbox checked={checkedState[9]} onChange={() => onCheckBoxHandler(9)} />} />
         </Box>
     )
 
     const programStageChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel label="Program Stage Sections" control={<Checkbox checked={checkedState[7]} onChange={()=>onCheckBoxHandler(7)} />} />
-            <FormControlLabel label="Program Stage Data Elements" control={<Checkbox checked={checkedState[8]} onChange={()=>onCheckBoxHandler(8)} />} />
+            <FormControlLabel label="Program Stage Sections" control={<Checkbox checked={checkedState[7]} onChange={() => onCheckBoxHandler(7)} />} />
+            <FormControlLabel label="Program Stage Data Elements" control={<Checkbox checked={checkedState[8]} onChange={() => onCheckBoxHandler(8)} />} />
             {programStageDEChildren}
         </Box>
     )
 
     const programChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel label="Options (Options + Optionsets)" control={<Checkbox checked={checkedState[1]} onChange={()=>onCheckBoxHandler(1)}  />} />
-            <FormControlLabel label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox checked={checkedState[2]} onChange={()=>onCheckBoxHandler(2)} />} />
-            <FormControlLabel label="Tracked Entity Types" control={<Checkbox checked={checkedState[3]} onChange={()=>onCheckBoxHandler(3)} />}/>
-            <FormControlLabel label="Tracked Entity Attributes" control={<Checkbox checked={checkedState[4]} onChange={()=>onCheckBoxHandler(4)} />}/>
-            <FormControlLabel label="Program Tracked Entity Attributes" control={<Checkbox checked={checkedState[5]} onChange={()=>onCheckBoxHandler(5)} />} />
-            <FormControlLabel label="Program Stages" control={<Checkbox checked={checkedState[6]} onChange={()=>onCheckBoxHandler(6)} />} />
+            <FormControlLabel label="Options (Options + Optionsets)" control={<Checkbox checked={checkedState[1]} onChange={() => onCheckBoxHandler(1)} />} />
+            <FormControlLabel label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox checked={checkedState[2]} onChange={() => onCheckBoxHandler(2)} />} />
+            <FormControlLabel label="Tracked Entity Types" control={<Checkbox checked={checkedState[3]} onChange={() => onCheckBoxHandler(3)} />} />
+            <FormControlLabel label="Tracked Entity Attributes" control={<Checkbox checked={checkedState[4]} onChange={() => onCheckBoxHandler(4)} />} />
+            <FormControlLabel label="Program Tracked Entity Attributes" control={<Checkbox checked={checkedState[5]} onChange={() => onCheckBoxHandler(5)} />} />
+            <FormControlLabel label="Program Stages" control={<Checkbox checked={checkedState[6]} onChange={() => onCheckBoxHandler(6)} />} />
             {programStageChildren}
         </Box>
     )
@@ -237,25 +249,25 @@ const RestoreOptions = props => {
                     <DialogContent dividers style={{ padding: '1em 2em' }}>
                         {validationResult &&
                             <>
-                                <FormLabel id="elements-row-radio-buttons-group-label">Import Summary</FormLabel>
-                                <TableContainer sx={{ width: 450, marginLeft: 10 }} justify={"center"} component={Paper}>
+                                <FormLabel focused={false} style={{fontWeight: 'bold'}}>Import Summary</FormLabel>
+                                <TableContainer sx={{ width: '100%', margin: '1em 0' }} justify={"center"} component={Paper}>
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell align="right">Created</TableCell>
-                                                <TableCell align="right">Updated</TableCell>
-                                                <TableCell align="right">Deleted</TableCell>
-                                                <TableCell align="right">Ignored</TableCell>
-                                                <TableCell align="right">Total</TableCell>
+                                                <StyledTableCell align="center">Created</StyledTableCell>
+                                                <StyledTableCell align="center">Updated</StyledTableCell>
+                                                <StyledTableCell align="center">Deleted</StyledTableCell>
+                                                <StyledTableCell align="center">Ignored</StyledTableCell>
+                                                <StyledTableCell align="center">Total</StyledTableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             <TableRow>
-                                                <TableCell align="right">{importStatus.created}</TableCell>
-                                                <TableCell align="right">{importStatus.updated}</TableCell>
-                                                <TableCell align="right">{importStatus.deleted}</TableCell>
-                                                <TableCell align="right">{importStatus.ignored}</TableCell>
-                                                <TableCell align="right">{importStatus.total}</TableCell>
+                                                <TableCell align="center">{importStatus.created}</TableCell>
+                                                <TableCell align="center">{importStatus.updated}</TableCell>
+                                                <TableCell align="center">{importStatus.deleted}</TableCell>
+                                                <TableCell align="center">{importStatus.ignored}</TableCell>
+                                                <TableCell align="center">{importStatus.total}</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
@@ -264,29 +276,29 @@ const RestoreOptions = props => {
                         }
                         <FormControl style={{ width: '100%' }}>
                             <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <FormLabel id="elements-row-radio-buttons-group-label">Restore Elements: </FormLabel>
+                                <FormLabel id="elements-row-radio-buttons-group-label" focused={false}  style={{fontWeight: 'bold'}}>Restore Elements: </FormLabel>
                                 <div style={{ display: 'flex', gap: '0.75em' }}>
                                     <Button onClick={() => setSelectAll(true)} color='primary' variant="outlined">Select All</Button>
                                     <Button onClick={() => setSelectAll(false)} color='primary' variant="outlined">Select None</Button>
                                 </div>
                             </div>
-                            <FormControlLabel control={<Checkbox checked={checkedState[0]} onChange={()=>onCheckBoxHandler(0)}/>} label="Program" />
+                            <FormControlLabel control={<Checkbox checked={checkedState[0]} onChange={() => onCheckBoxHandler(0)} />} label="Program" />
                             {programChildren}
                         </FormControl>
                         <br />
                         <FormControl>
-                            <FormLabel id="orgUnit-row-radio-buttons-group-label">Organisation Unit: </FormLabel>
+                            <FormLabel id="orgUnit-row-radio-buttons-group-label" focused={false}  style={{fontWeight: 'bold'}}>Organisation Units: </FormLabel>
                             <RadioGroup row aria-labelledby="orgUnit-row-radio-buttons-group-label" name="restore_OrganisationUnit" defaultValue="keepOUnits">
-                                <FormControlLabel value="keepOUnits" control={<Radio />} label="Keep current selection" onChange={onOUOptionChangeHandler} />
-                                <FormControlLabel value="overwriteOUnits" control={<Radio />} label="Overwrite with Backed up Information" onChange={onOUOptionChangeHandler} />
+                                <FormControlLabel value="keepOUnits" control={<Radio />} label="Keep current settings" onChange={onOUOptionChangeHandler} />
+                                <FormControlLabel value="overwriteOUnits" control={<Radio />} label="Overwrite with backed up configuration" onChange={onOUOptionChangeHandler} />
                             </RadioGroup>
                         </FormControl>
                         <br />
                         <FormControl>
-                            <FormLabel id="sharing-row-radio-buttons-group-label">Sharing Settings: </FormLabel>
+                            <FormLabel id="sharing-row-radio-buttons-group-label" focused={false}  style={{fontWeight: 'bold'}}>Sharing Settings: </FormLabel>
                             <RadioGroup row aria-labelledby="sharing-row-radio-buttons-group-label" name="restore_Sharing" defaultValue="keepSharing">
-                                <FormControlLabel value="keepSharing" control={<Radio />} label="Keep current Settings" onChange={onSharingChangeHandler} />
-                                <FormControlLabel value="overwriteSharing" control={<Radio />} label="Overwrite with Backed up information " onChange={onSharingChangeHandler} />
+                                <FormControlLabel value="keepSharing" control={<Radio />} label="Keep current settings" onChange={onSharingChangeHandler} />
+                                <FormControlLabel value="overwriteSharing" control={<Radio />} label="Overwrite with backed up configuration " onChange={onSharingChangeHandler} />
                             </RadioGroup>
                         </FormControl>
                         <br />

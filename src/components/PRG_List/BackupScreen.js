@@ -268,11 +268,11 @@ const BackupScreen = (props) => {
                     <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_backup_dialog_title"}>Create Backup
                         for Program {metaData.results?.programs[0].name}</CustomMUIDialogTitle>
                     <DialogContent dividers style={{padding: '1em 2em'}}>
-                        <TextField margin="normal" id="name" label="Backup Name (*)" type="text" value={programName} onChange={e => setProgramName(e.target.value)} fullWidth variant="standard" autoComplete="off" inputRef={nameInput} helperText={ validationError ? "Please provide a name" : " "} error={validationError} />
+                        <TextField margin="normal" id="name" label="Backup Name (*)" type="text" value={programName} onChange={e => setProgramName(e.target.value)} fullWidth variant="standard" autoComplete="off" inputRef={nameInput} helperText={ validationError ? "Please provide a Backup Name" : ""} error={validationError} />
                         <TextField
                             margin="normal"
                             id="version"
-                            label="Version"
+                            label="Version (*)"
                             type="text"
                             fullWidth
                             variant="standard"
@@ -280,7 +280,7 @@ const BackupScreen = (props) => {
                             inputRef={versionInput}
                             value={programVersion}
                             onChange={e => setProgramVersion(e.target.value)}
-                            helperText={ versionValidationError ? "Please provide the valid Version number" : " "}
+                            helperText={ versionValidationError ? "Please provide a valid Version identifier" : ""}
                             error={versionValidationError}
                             />
                         <TextField
