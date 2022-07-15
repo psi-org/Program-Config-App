@@ -3,16 +3,16 @@ import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
 import { DialogActions, DialogContent, Alert, Box, CircularProgress, Button, List, Divider } from "@mui/material";
-import { NAMESPACE } from "../../configs/Constants";
+import { BACKUPS_NAMESPACE } from "../../configs/Constants";
 
 import RestoreItem from "./RestoreItem";
 import RestoreOptions from "./RestoreOptions";
-
+``
 const RestoreScreen = (props) => {
 
     const queryDataStore = {
         results: {
-            resource: `dataStore/${NAMESPACE}/${props.program.id}`
+            resource: `dataStore/${BACKUPS_NAMESPACE}/${props.program.id}`
         }
     };
 
