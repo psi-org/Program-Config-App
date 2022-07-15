@@ -3,7 +3,7 @@ import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
 import { DialogActions, DialogContent, TextField, Button, Box, CircularProgress } from "@mui/material";
-import { NAMESPACE } from "../../configs/Constants";
+import { BACKUPS_NAMESPACE } from "../../configs/Constants";
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 
 const BackupScreen = (props) => {
@@ -15,18 +15,18 @@ const BackupScreen = (props) => {
 
     const queryDataStore = {
         results: {
-            resource: `dataStore/${NAMESPACE}/${props.program.id}`
+            resource: `dataStore/${BACKUPS_NAMESPACE}/${props.program.id}`
         }
     };
 
     const dsCreateMutation = {
-        resource: `dataStore/${NAMESPACE}/${props.program.id}`,
+        resource: `dataStore/${BACKUPS_NAMESPACE}/${props.program.id}`,
         type: 'create',
         data: ({data}) => data
     };
 
     const dsUpdateMutation = {
-        resource: `dataStore/${NAMESPACE}/${props.program.id}`,
+        resource: `dataStore/${BACKUPS_NAMESPACE}/${props.program.id}`,
         type: 'update',
         data: ({data}) => data
     };
@@ -52,6 +52,7 @@ const BackupScreen = (props) => {
     }
 
     const [validationError, setValidationError] = useState(false);
+    const [versionValidationError, setVersionValidationError] = useState(false);
     const [programName, setProgramName] = useState(props.program.name+'_'+  formatDate(new Date(), "_", "_"));
     const [programVersion, setProgramVersion] = useState(props.program.version);
     const [processing, setProcessing] = useState(false);
@@ -94,12 +95,15 @@ const BackupScreen = (props) => {
     const programBackupHandler = () => {
         setProcessing(true);
         const timestamp = formatDate(new Date(), "-", ":");
-        if(nameInput.current.value.trim() === "")
+        if(nameInput.current.value.trim() === "" || versionInput.current.value.trim() === "")
         {
-            setValidationError(true);
+            (nameInput.current.value.trim() === "") ? setValidationError(true) : setValidationError(false) ;
+            (versionInput.current.value.trim() === "") ? setVersionValidationError(true) : setVersionValidationError(false);
+            setProcessing(false);
             return;
         }
         setValidationError(false);
+        setVersionValidationError(false);
         let backup = {
             "id" : new Date().valueOf(),
             "name": nameInput.current.value,
@@ -276,6 +280,8 @@ const BackupScreen = (props) => {
                             inputRef={versionInput}
                             value={programVersion}
                             onChange={e => setProgramVersion(e.target.value)}
+                            helperText={ versionValidationError ? "Please provide the valid Version number" : " "}
+                            error={versionValidationError}
                             />
                         <TextField
                             id="comments"

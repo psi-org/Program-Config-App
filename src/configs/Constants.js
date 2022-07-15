@@ -36,6 +36,7 @@ const H2_REQUIRED = {
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'numeric',minute:'numeric',second:'numeric',hour12:false }
 
 const NAMESPACE = "programconfigapp"
+const BACKUPS_NAMESPACE = `${NAMESPACE}_backups`
 const DATASTORE_PCA_METADATA = "PCAMetadata"
 const DATASTORE_H2_METADATA = "H2Metadata"
 
@@ -122,6 +123,7 @@ export {
     REPORT_DATE_TO_USE,
     METADATA,
     NAMESPACE,
+    BACKUPS_NAMESPACE,
     DATASTORE_PCA_METADATA,
     DATASTORE_H2_METADATA,
     PCA_METADATA_VERSION,
