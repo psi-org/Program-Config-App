@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
-import { DialogActions, DialogContent, FormControl, InputLabel, TextField, Select, ButtonGroup, Button, MenuItem, Box, CircularProgress } from "@mui/material";
+import { DialogActions, DialogContent, TextField, Button, Box, CircularProgress } from "@mui/material";
 import { NAMESPACE } from "../../configs/Constants";
+import SaveAsIcon from '@mui/icons-material/SaveAs';
 
 const BackupScreen = (props) => {
     const programMetadata = {
@@ -121,7 +122,7 @@ const BackupScreen = (props) => {
                 }
                 else {
                     props.setNotification({
-                        message: `The program is backed up successfully.`,
+                        message: `The backup for the selected Program has been created successfully.`,
                         severity: 'success'
                     })
                 }
@@ -260,8 +261,8 @@ const BackupScreen = (props) => {
                 { (loadingMetadata || processing) && <Box sx={{ display: 'inline-flex', margin: "50px", display: 'flex' }}><CircularProgress /></Box>}
                 {!(loadingMetadata || processing) &&
                 <>
-                    <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_backup_dialog_title"}>Backup
-                        Program ({metaData.results?.programs[0].name})</CustomMUIDialogTitle>
+                    <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_backup_dialog_title"}>Create Backup
+                        for Program {metaData.results?.programs[0].name}</CustomMUIDialogTitle>
                     <DialogContent dividers style={{padding: '1em 2em'}}>
                         <TextField margin="normal" id="name" label="Backup Name (*)" type="text" value={programName} onChange={e => setProgramName(e.target.value)} fullWidth variant="standard" autoComplete="off" inputRef={nameInput} helperText={ validationError ? "Please provide a name" : " "} error={validationError} />
                         <TextField
@@ -288,7 +289,7 @@ const BackupScreen = (props) => {
                     </DialogContent>
                     <DialogActions style={{ padding: '1em'}}>
                         <Button onClick={hideFormHandler} color={"error"}>Close</Button>
-                        <Button onClick={programBackupHandler} color={"primary"}>Backup</Button>
+                        <Button onClick={programBackupHandler} color={"primary"} variant='outlined' startIcon={<SaveAsIcon/>}>Save Backup</Button>
                     </DialogActions>
                 </>
                 }

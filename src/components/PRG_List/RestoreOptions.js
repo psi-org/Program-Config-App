@@ -172,7 +172,7 @@ const RestoreOptions = props => {
                 setIsLoading(false);
                 if (response.status !== 'OK') {
                     props.setNotification({
-                        message: `Something went wrong while Restoring Program. Please try again later`,
+                        message: `Something went wrong while Restoring Program. Please try again later.`,
                         severity: 'error'
                     })
                     hideFormHandler();
@@ -183,7 +183,7 @@ const RestoreOptions = props => {
                         setImportStatus(response.stats);
                     } else {
                         props.setNotification({
-                            message: `Program Restored successfully!`,
+                            message: `Program Restored successfully.`,
                             severity: 'success'
                         })
                         hideFormHandler();

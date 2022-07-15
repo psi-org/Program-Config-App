@@ -38,7 +38,7 @@ const RestoreScreen = (props) => {
                     {loading && <Box sx={{ display: 'inline-flex', margin: "50px", display: 'flex' }}><CircularProgress /></Box>}
                     {!loading &&
                         <>
-                            <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_restore_dialog_title"}>Program Backups for - {props.program.name}</CustomMUIDialogTitle>
+                            <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_restore_dialog_title"}>Available Backups for Program {props.program.name}</CustomMUIDialogTitle>
                                 {!dataStore &&
                                     <Alert severity="error">No Backups found for the selected Program.</Alert>
                                 }
