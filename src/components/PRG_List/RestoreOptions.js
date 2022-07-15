@@ -34,28 +34,14 @@ const metadataValidation = {
 
 const RestoreOptions = props => {
     let metadataPayload = {};
-    const programRef = useRef();
-    const TETypeRefs = useRef();
-    const ounitsRef = useRef();
-    const programRulesRef = useRef();
-    const optionSetRef = useRef();
-    const TEAttributesRef = useRef();
-    const programTEAttrbutesRef = useRef();
-    const programStageRef = useRef();
-    const programStageSectionsRef = useRef();
-    const programStageDataElementsRef = useRef();
-    const dataElementsRef = useRef();
-    const attributesRef = useRef();
 
+    const [checkedState, setCheckedState] = useState(
+        new Array(10).fill(false)
+      );
     const [ouOption, setOUOption] = useState('keepOUnits');
     const [sharingOption, setSharingOption] = useState('keepSharing');
     const [content, setContent] = useState('form');
-    const [downloading, setDownloading] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [programChecked, setProgramChecked] = useState(false);
-    const [programStageChecked, setProgramStageChecked] = useState(false);
-    const [psDataELementsChecked, setPsDataElementsChecked] = useState(false);
-    /*const [dryRun, setDryRun] = useState(true);*/
     const [validationResult, setValidationResult] = useState(false);
     const [importStatus, setImportStatus] = useState({});
 
@@ -85,81 +71,55 @@ const RestoreOptions = props => {
         props.setRestoreProgramId(undefined);
     }
 
-    const dryRunHandler = () => {
-        setDryRun(!dryRun);
-    }
+    const onCheckBoxHandler = (position) => {
+        let changeState = [0, 6, 8].includes(position) && childrenChecked(position) ? false : true;
+        if (changeState) {
+            const updatedCheckedState = checkedState.map((item, index) =>
+                index === position ? !item : item
+                );
 
-    const onCheckboxCheckedHandler = (e) => {
-        setProgramStageDataElement();
-        setProgramStage();
-        setProgram();
-    }
+            if (updatedCheckedState[position])
+            {
+                if (!updatedCheckedState[0]) 
+                    updatedCheckedState[0] = true;
+                
+                if ([7,8,9].includes(position))
+                    updatedCheckedState[6] = true;
 
-    const setProgramStageDataElement = () => {
-        if (!programStageDataElementsRef.current.checked)
-            setPsDataElementsChecked(dataElementsRef.current?.checked);
-    }
+                if (position === 9)
+                    updatedCheckedState[8] = true;
+            }
 
-    const setProgramStage = () => {
-        if (!programStageRef.current.checked)
-            setProgramStageChecked(programStageSectionsRef.current.checked || programStageDataElementsRef.current.checked || dataElementsRef.current?.checked);
-    }
-
-    const setProgram = () => {
-        if (!programRef.current.checked)
-            setProgramChecked(TETypeRefs.current.checked || optionSetRef.current.checked || programRulesRef.current.checked || programTEAttrbutesRef.current.checked || TEAttributesRef.current.checked || programStageRef.current.checked || programStageSectionsRef.current.checked || programStageDataElementsRef.current.checked || dataElementsRef.current?.checked)
-    }
-
-    const toggleProgram = () => {
-        if (!(TETypeRefs.current.checked || optionSetRef.current.checked || programRulesRef.current.checked || programTEAttrbutesRef.current.checked || TEAttributesRef.current.checked || programStageRef.current.checked || programStageSectionsRef.current.checked || programStageDataElementsRef.current.checked || dataElementsRef.current?.checked)) {
-            if (programRef.current.checked)
-                setProgramChecked(true)
-            else
-                setProgramChecked(false);
+            setCheckedState(updatedCheckedState);
         }
     }
 
-    const toggleProgramStage = () => {
-        if (!(programStageSectionsRef.current.checked || programStageDataElementsRef.current.checked || dataElementsRef.current?.checked)) {
-            if (programStageRef.current.checked)
-                setProgramStageChecked(true)
-            else
-                setProgramStageChecked(false)
-            onCheckboxCheckedHandler();
-        }
-    }
-
-    const toggleProgramStageDataElement = () => {
-        if (!dataElementsRef.current.checked) {
-            if (programStageDataElementsRef.current.checked)
-                setPsDataElementsChecked(true)
-            else
-                setPsDataElementsChecked(false);
-            onCheckboxCheckedHandler();
-        }
+    const childrenChecked = (position) => {
+        let children = checkedState.slice(position+1, 10);
+        return children.includes(true);
     }
 
     const restoreHandler = (dryRun) => {
         setValidationResult(false);
         setIsLoading(true);
-        if (programRef.current.checked) {
+        if (checkedState[0]) { //Program Checked
             metadataPayload.programs = DeepCopy(props.backup.metadata.programs);
             if (ouOption === "keepOUnits") {
                 metadataPayload.programs[0].organisationUnits = DeepCopy(program.results?.organisationUnits);
             }
             metadataPayload.attributes = DeepCopy(props.backup.metadata.attributes);
-            if (programRulesRef.current.checked) {
+            if (checkedState[2]) { //ProgramRule CHecked
                 metadataPayload.programRules = DeepCopy(props.backup.metadata.programRules);
                 metadataPayload.programRuleActions = DeepCopy(props.backup.metadata.programRuleActions);
                 metadataPayload.programRuleVariables = DeepCopy(props.backup.metadata.programRuleVariables);
             }
-            if (programTEAttrbutesRef.current.checked)
+            if (checkedState[5]) //Program Tracked Entity Attributes
                 metadataPayload.programTrackedEntityAttributes = DeepCopy(props.backup.metadata.programTrackedEntityAttributes);
-            if (TETypeRefs.current.checked)
+            if (checkedState[3]) //TETypes Checked
                 metadataPayload.trackedEntityTypes = DeepCopy(props.backup.metadata.trackedEntityTypes);
-            if (TEAttributesRef.current.checked)
+            if (checkedState[4]) //Tracked Entity Attributes
                 metadataPayload.trackedEntityAttributes = DeepCopy(props.backup.metadata.trackedEntityAttributes);
-            if (optionSetRef.current.checked) {
+            if (checkedState[1]) { //Option Sets
                 metadataPayload.options = DeepCopy(props.backup.metadata.options);
                 metadataPayload.optionSets = DeepCopy(props.backup.metadata.optionSets);
             }
@@ -168,34 +128,34 @@ const RestoreOptions = props => {
                 metadataPayload.attributes.forEach((attribute) => {
                     delete attribute.sharing;
                 });
-                if (TETypeRefs.current.checked) {
+                if (checkedState[3]) { //TE Types 
                     metadataPayload.trackedEntityTypes.forEach((tei) => {
                         delete tei.sharing;
                     })
                 }
-                if (TEAttributesRef.current.checked) {
+                if (checkedState[4]) { //TE Attributes
                     metadataPayload.trackedEntityAttributes.forEach((tea) => {
                         delete tea.sharing;
                     });
                 }
-                if (optionSetRef.current.checked) {
+                if (checkedState[1]) { //OPtion Set
                     metadataPayload.optionSets.forEach((optionSet) => {
                         delete optionSet.sharing;
                     });
                 }
             }
-            if (programStageRef.current.checked) {
+            if (checkedState[6]) { //Program Stage
                 metadataPayload.programStages = DeepCopy(props.backup.metadata.programStages);
                 if (sharingOption === "keepSharing") {
                     metadataPayload.programStages.forEach((ps) => {
                         delete ps.sharing;
                     });
                 }
-                if (programStageSectionsRef.current.checked)
+                if (checkedState[7]) //Program Stage Section
                     metadataPayload.programStageSections = DeepCopy(props.backup.metadata.programStageSections);
-                if (programStageDataElementsRef.current.checked) {
+                if (checkedState[8]) { //Program Stage Data ELement
                     metadataPayload.programStageDataElements = DeepCopy(props.backup.metadata.programStageDataElements);
-                    if (dataElementsRef.current.checked) {
+                    if (checkedState[9]) { //Data ELement
                         metadataPayload.dataElements = DeepCopy(props.backup.metadata.dataElements);
                         if (sharingOption === "keepSharing") {
                             metadataPayload.dataElements.forEach((de) => {
@@ -234,36 +194,32 @@ const RestoreOptions = props => {
 
     const programStageDEChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel label="Data Elements" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={dataElementsRef} />
+            <FormControlLabel label="Data Elements" control={<Checkbox checked={checkedState[9]} onChange={()=>onCheckBoxHandler(9)} />} />
         </Box>
     )
 
     const programStageChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel label="Program Stage Sections" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={programStageSectionsRef} />
-            <FormControlLabel label="Program Stage Data Elements" control={<Checkbox checked={psDataELementsChecked} onChange={toggleProgramStageDataElement} />} inputRef={programStageDataElementsRef} />
+            <FormControlLabel label="Program Stage Sections" control={<Checkbox checked={checkedState[7]} onChange={()=>onCheckBoxHandler(7)} />} />
+            <FormControlLabel label="Program Stage Data Elements" control={<Checkbox checked={checkedState[8]} onChange={()=>onCheckBoxHandler(8)} />} />
             {programStageDEChildren}
         </Box>
     )
 
     const programChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel label="Tracked Entity Types" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={TETypeRefs} />
-            <FormControlLabel label="Options (Options + Optionsets)" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={optionSetRef} />
-            <FormControlLabel label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={programRulesRef} />
-            <FormControlLabel label="Program Tracked Entity Attributes" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={programTEAttrbutesRef} />
-            <FormControlLabel label="Tracked Entity Attributes" control={<Checkbox onChange={onCheckboxCheckedHandler} />} inputRef={TEAttributesRef} />
-            <FormControlLabel label="Program Stages" control={<Checkbox checked={programStageChecked} onChange={toggleProgramStage} />} inputRef={programStageRef} />
+            <FormControlLabel label="Options (Options + Optionsets)" control={<Checkbox checked={checkedState[1]} onChange={()=>onCheckBoxHandler(1)}  />} />
+            <FormControlLabel label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox checked={checkedState[2]} onChange={()=>onCheckBoxHandler(2)} />} />
+            <FormControlLabel label="Tracked Entity Types" control={<Checkbox checked={checkedState[3]} onChange={()=>onCheckBoxHandler(3)} />}/>
+            <FormControlLabel label="Tracked Entity Attributes" control={<Checkbox checked={checkedState[4]} onChange={()=>onCheckBoxHandler(4)} />}/>
+            <FormControlLabel label="Program Tracked Entity Attributes" control={<Checkbox checked={checkedState[5]} onChange={()=>onCheckBoxHandler(5)} />} />
+            <FormControlLabel label="Program Stages" control={<Checkbox checked={checkedState[6]} onChange={()=>onCheckBoxHandler(6)} />} />
             {programStageChildren}
         </Box>
     )
 
     const setSelectAll = (value) => {
-        TETypeRefs.current.checked = value
-        setProgramChecked(value)
-        setProgramStageChecked(value)
-        setPsDataElementsChecked(value)
-        console.log(TETypeRefs.current)
+        setCheckedState(new Array(10).fill(value));
     }
 
     return (
@@ -314,7 +270,7 @@ const RestoreOptions = props => {
                                     <Button onClick={() => setSelectAll(false)} color='primary' variant="outlined">Select None</Button>
                                 </div>
                             </div>
-                            <FormControlLabel control={<Checkbox checked={programChecked} onClick={toggleProgram} />} label="Program" inputRef={programRef} />
+                            <FormControlLabel control={<Checkbox checked={checkedState[0]} onChange={()=>onCheckBoxHandler(0)}/>} label="Program" />
                             {programChildren}
                         </FormControl>
                         <br />
