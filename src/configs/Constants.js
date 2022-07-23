@@ -11,11 +11,11 @@ import DateIcon from '@mui/icons-material/CalendarToday';
 import TimeIcon from '@mui/icons-material/AccessTime';
 
 const BUILD_VERSION = "1.5.0"
-const BUILD_DATE = "July 8th, 2022"
+const BUILD_DATE = "July 29th, 2022"
 const MIN_VERSION = "2.36.0"
 const MAX_VERSION = "2.38.0"
 
-const PCA_METADATA_VERSION = "1.0.0"
+const PCA_METADATA_VERSION = "1.0.1"
 const H2_METADATA_VERSION = "1.0.0"
 
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI","haUflNqP85K"]

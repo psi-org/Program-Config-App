@@ -3,7 +3,7 @@ import React from 'react'
 
 import classes from './App.module.css'
 import { useDataQuery } from "@dhis2/app-runtime";
-import { MIN_VERSION, MAX_VERSION, PCA_ATTRIBUTES, PCA_OPTIONS, PCA_USER_ROLES, PCA_OPTION_SETS, H2_REQUIRED } from './configs/Constants';
+import { MIN_VERSION, MAX_VERSION, PCA_ATTRIBUTES, PCA_OPTIONS, PCA_USER_ROLES, PCA_OPTION_SETS, H2_REQUIRED, PCA_METADATA_VERSION, NAMESPACE, DATASTORE_PCA_METADATA } from './configs/Constants';
 import { versionIsValid } from './configs/Utils';
 
 /**
@@ -25,6 +25,7 @@ import ProgramList from "./components/PRG_List/ProgramList";
 import ProgramStage from './components/STG_Details/ProgramStage';
 import VersionErrorPage from './components/PCA_Loading/VersionErrorPage';
 import MetadataErrorPage from './components/PCA_Loading/MetadataErrorPage';
+import MetadataUpdatePage from './components/PCA_Loading/MetadataUpdatePage';
 import LoadingPage from './components/PCA_Loading/LoadingPage';
 
 /**
@@ -58,7 +59,15 @@ const queryH2AvailableMetadata = {
     }
 }
 
+const queryPCAAvailableMetadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}`
+    }
+};
+
 const App = () => {
+
+    const { data: pcaMetadataData } = useDataQuery(queryPCAAvailableMetadata);
 
     const serverInfoQuery = useDataQuery(queryServerInfo);
     const serverInfo = serverInfoQuery.data?.results;
@@ -90,7 +99,9 @@ const App = () => {
         ?VersionErrorPage
         :(pcaReady===undefined
             ?LoadingPage
-            :(!pcaReady?MetadataErrorPage:undefined))
+            :(!pcaReady?MetadataErrorPage:(pcaMetadataData?.version<PCA_METADATA_VERSION?MetadataUpdatePage:undefined)))
+
+    console.log(pcaMetadataData?.version)
 
     return (
     <>
