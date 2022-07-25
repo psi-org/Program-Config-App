@@ -99,9 +99,7 @@ const App = () => {
         ?VersionErrorPage
         :(pcaReady===undefined
             ?LoadingPage
-            :(!pcaReady?MetadataErrorPage:(pcaMetadataData?.version<PCA_METADATA_VERSION?MetadataUpdatePage:undefined)))
-
-    console.log(pcaMetadataData?.version)
+            :(!pcaReady?MetadataErrorPage:(pcaMetadataData?.results?.version<PCA_METADATA_VERSION?MetadataUpdatePage:undefined)))
 
     return (
     <>

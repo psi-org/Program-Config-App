@@ -80,8 +80,8 @@ const MetadataErrorPage = () => {
             </div>
             <div className="wrapper">
                 <div style={{width: '500px', margin: 'auto', display: 'flex', flexDirection:'column', paddingTop: '1em'}}>
-                    {!error && <NoticeBox title="Missing Required Metadata">
-                        <p>The server contains an outdated version of the PCA Metadata Package. Please updaten the package before proceeding.</p>
+                    {!error && <NoticeBox title="Outdated Metadata Package">
+                        <p>A new version of the PCA Metadata Package has been released. Please update it before proceeding.</p>
                     </NoticeBox>}
 
                     {!error && <LoadingButton

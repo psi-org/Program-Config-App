@@ -92,7 +92,7 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                         <Popper reference={ref} placement="bottom-end">
                             <FlyoutMenu>
                                 <MenuItem label="Edit Program" icon={<EditIcon />} onClick={() => { toggle(); setShowProgramForm(true) }} />
-                                <MenuItem label="Sharing Settings" icon={<ShareIcon />} onClick={() => { toggle(); shareProgram(program.id) }} />
+                                <MenuItem label="Sharing Settings" icon={<ShareIcon />} onClick={() => { toggle(); shareProgram(program.id, programType === 'HNQIS2' ? 'hnqis' : 'tracker') }} />
                                 <MenuItem label={"Assign Organisation Units"} icon={<PublicIcon />} onClick={() => { toggle(); assignOrgUnit(program.id) }} />
                                 <MenuItem label="Backup/Restore" icon={<StorageIcon />}>
                                     <MenuSectionHeader label="In Current Device" />

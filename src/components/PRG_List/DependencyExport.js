@@ -185,7 +185,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
     let legendSets = []
 
     legends.forEach(legend => {
-      if (metadata.dataElements.find(de => de.legendSets?.find(l => l.id == legend.id))) {
+      if (metadata.dataElements?.find(de => de.legendSets?.find(l => l.id == legend.id))) {
         legend.legends?.forEach(l => {
           delete l.created;
           delete l.lastUpdated;

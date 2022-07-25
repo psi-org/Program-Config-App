@@ -93,8 +93,8 @@ const H2Metadata = (props) => {
                     {hnqis2Metadata?.results && 
                         <>
                             <p><strong>Installation date: </strong>{new Date(hnqis2Metadata.results.date).toLocaleString("en-US",DATE_FORMAT_OPTIONS)} </p>
-                            <NoticeBox error={!h2Ready} title="Minimum Metadata Package Status">
-                                <p>{h2Ready?"The required Metadata Package is available.":"The required Metadata Package is incomplete or corrupted, please reinstall it."}</p>
+                            <NoticeBox error={!h2Ready || hnqis2Metadata?.results?.version<H2_METADATA_VERSION} title="Minimum Metadata Package Status">
+                                <p>{h2Ready?(hnqis2Metadata?.results?.version<H2_METADATA_VERSION?"The required Metadata Package is outdated, please install the newest version.":"The required Metadata Package is available."):"The required Metadata Package is incomplete or corrupted, please reinstall it."}</p>
                             </NoticeBox>
                         </>
                     }
@@ -111,7 +111,7 @@ const H2Metadata = (props) => {
             <DialogActions style={{ padding: '1em' }}>
                 <Button color={'error'} variant={'outlined'} onClick={() => props.setH2Modal(false)}>Close</Button>
                 <LoadingButton onClick={install} endIcon={<InstallDesktopIcon />} loading={sending} loadingPosition="end" variant="outlined" loadingIndicator="Installing..." >
-                    Install Metadata
+                    Install Metadata (version {H2_METADATA_VERSION})
                 </LoadingButton>
             </DialogActions>
         </CustomMUIDialog>

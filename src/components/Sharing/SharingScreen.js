@@ -75,7 +75,7 @@ const metadataMutation = {
 
 const btnOptions = ['Apply Only to Program', 'Apply to Program & Program Stages', 'Apply to Program, Program Stages & Data Elements'];
 
-const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotification }) => {
+const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOnly, setNotification }) => {
 
     const programMetadata = {
         results: {
@@ -92,7 +92,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
     const [open, setOpen] = useState(false);
     const [importStatus, setImportStatus] = useState({});
     const anchorRef = useRef(null);
-    const [selectedIndex, setSelectedIndex] = useState(2);
+    const [selectedIndex, setSelectedIndex] = useState(type==='hnqis'?2:0);
     const [content, setContent] = useState('form');
     const [overwrite, setOverwrite] = useState(false);
     const [deleted, setDeleted] = useState([]);
@@ -171,6 +171,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, readOnly, setNotifica
 
     const hideForm = () => {
         setSharingProgramId(undefined)
+        setType(undefined)
     }
 
     const loadSuggestions = (search) => {

@@ -5,7 +5,7 @@ import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 //import styles from './Program.module.css'
 import { Program, PS_AssessmentStage, PS_ActionPlanStage, PSS_Default, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
 
-import { METADATA, COMPETENCY_ATTRIBUTE, COMPETENCY_CLASS, BUILD_VERSION, MAX_PREFIX_LENGTH, MAX_PROGRAM_NAME_LENGTH, MIN_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from './../../configs/Constants';
+import { METADATA, COMPETENCY_ATTRIBUTE, COMPETENCY_CLASS, BUILD_VERSION, MAX_PREFIX_LENGTH, MAX_PROGRAM_NAME_LENGTH, MIN_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, H2_METADATA_VERSION, NAMESPACE, DATASTORE_H2_METADATA } from './../../configs/Constants';
 
 import Button from '@mui/material/Button';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -108,6 +108,12 @@ const metadataMutation = {
     data: ({ data }) => data
 };
 
+const queryHNQIS2Metadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}`
+    }
+};
+
 const hnqisProgramConfigs = {
     "trackedEntityType": { "id": "oNwpeWkfoWc" },
     "attributeValues": [
@@ -164,6 +170,7 @@ const hnqisProgramConfigs = {
 const ProgramNew = (props) => {
 
     const h2Ready = localStorage.getItem('h2Ready') === 'true'
+    const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
 
     // Create Mutation
     let metadataDM = useDataMutation(metadataMutation);
@@ -502,6 +509,17 @@ const ProgramNew = (props) => {
                             {id: "pzWDtDUorBt"},
                             {id: "NAaHST5ZDTE"}
                         ]
+                        prgrm.programTrackedEntityAttributes = prgrm.programTrackedEntityAttributes
+                        .filter(ptea => ptea.trackedEntityAttribute.id !== COMPETENCY_ATTRIBUTE)
+                        
+                        prgrm.programTrackedEntityAttributes.push({ 
+                            "trackedEntityAttribute": { "id": "ulU9KKgSLYe" },
+                            "mandatory": false,
+                            "valueType": "TEXT",
+                            "searchable": false,
+                            "displayInList": false,
+                            "sortOrder": 5
+                        })
                     }
     
                     createOrUpdateMetaData(prgrm.attributeValues);
@@ -624,7 +642,7 @@ const ProgramNew = (props) => {
                                 <em>None</em>
                             </MenuItem>
                             <MenuItem value={'tracker'}>Tracker Program</MenuItem>
-                            <MenuItem disabled={!h2Ready} value={'hnqis'}>HNQIS 2.0 {!h2Ready && <span style={{display:'flex', alignItems: 'center', marginLeft:'8px'}}>[Unavailable] <RemoveCircleOutlineIcon/></span>}</MenuItem>
+                            <MenuItem disabled={!h2Ready || hnqis2Metadata?.results?.version<H2_METADATA_VERSION} value={'hnqis'}>HNQIS 2.0 {(hnqis2Metadata?.results?.version<H2_METADATA_VERSION) && <span style={{display:'flex', alignItems: 'center', marginLeft:'8px'}}>[Unavailable] <RemoveCircleOutlineIcon/></span>}</MenuItem>
                         </Select>
                         <FormHelperText>{validationErrors.pgrType}</FormHelperText>
                     </FormControl>

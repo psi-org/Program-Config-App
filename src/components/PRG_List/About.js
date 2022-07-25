@@ -40,7 +40,7 @@ const About = (props) => {
                                 <div>
                                     <em>Version: {pcaMetadata.results.version} </em>
                                     {pcaMetadata.results.version < PCA_METADATA_VERSION
-                                        ? <span style={{ color: 'red' }}>Your installed version is outdated. Last version is: {PCA_METADATA_VERSION}</span>
+                                        ? <span style={{ color: 'red' }}>Your installed version is outdated. Latest version is: {PCA_METADATA_VERSION}</span>
                                         : <span style={{ color: 'green' }}>You are up to date!</span>
                                     }
                                 </div>
@@ -55,7 +55,7 @@ const About = (props) => {
                                 <div>
                                     <em>Version: {hnqis2Metadata.results.version} </em>
                                     {hnqis2Metadata.results.version < H2_METADATA_VERSION
-                                        ? <span style={{ color: 'red' }}>Your installed version is outdated. Last version is: {H2_METADATA_VERSION}</span>
+                                        ? <span style={{ color: 'red' }}>Your installed version is outdated. Latest version is: {H2_METADATA_VERSION}</span>
                                         : <span style={{ color: 'green' }}>You are up to date!</span>
                                     }
                                 </div>
