@@ -28,6 +28,7 @@ import {
     MenuList,
     FormGroup, FormControlLabel, Checkbox, Tooltip
 } from "@mui/material";
+import VisualizationSharing from "./VisualizationSharing";
 
 const sharingQuery = {
     results: {
@@ -35,6 +36,17 @@ const sharingQuery = {
         params: ({ element, id }) => ({
             id,
             type: element
+        }),
+    }
+}
+
+const visualSharing = {
+    results: {
+        resource: 'visualizations',
+        params: ({ids}) => ({
+            filter: [`id:in:[${ids}]`],
+            fields: ['id','name','sharing'],
+            paging: false
         }),
     }
 }
@@ -53,6 +65,16 @@ const entitiesQuery = {
             paging: false,
             fields: ['id', 'name', 'displayName']
         }
+    }
+}
+
+const visualizationQuery = {
+    result : {
+        resource: 'visualizations',
+        params: ({ id }) => ({
+            filter: [`code:like:${id}_Scripted`],
+            fields: ['id']
+        }),
     }
 }
 
@@ -98,11 +120,14 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     const [deleted, setDeleted] = useState([]);
     const [ restrictions, setRestrictions ] = useState([]);
     const [ restrictedDEs, setRestrictedDEs] = useState([]);
+    const [ runVisualizationSharing, setRunVisualizationSharing] = useState(false);
 
     const { loading, error, data } = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
     const { loading: entityLoading, data: entities, error: entityErrors } = useDataQuery(entitiesQuery);
     const { loading: metadataLoading, data: prgMetaData } = useDataQuery(programMetadata);
     const { loading: prgDELoading, data: prgDEData } = useDataQuery(psDataElementAccess, {variables: {id: id}});
+    const { loading: visualizerLoading, data: vData } = useDataQuery(visualizationQuery, {variables: {id: id}});
+
     const metadataDM = useDataMutation(metadataMutation);
     const metadataRequest = {
         mutate: metadataDM[0],
@@ -313,7 +338,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
         Object.keys(payloadMetadata).forEach(meta => {
             applySharing(payloadMetadata[meta],meta);
         });
-
+        setRunVisualizationSharing(true);
         metadataRequest.mutate({ data: payloadMetadata })
             .then(response => { 
                 if(response?.status === "OK"){
@@ -329,6 +354,8 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                 }
                 hideForm()
             });
+
+         
     }
 
     const applySharing = (elements, meta) => {
@@ -388,6 +415,9 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
 
     return (
         <>
+            {runVisualizationSharing && !visualizerLoading && vData.result.visualizations.map(function(v) {
+                return <VisualizationSharing key={v.id} id={v.id} sharing={payload}/>
+            })}
             <Modal onClose={hideForm}>
                 <ModalTitle>Sharing settings</ModalTitle>
                 <ModalContent>
@@ -427,10 +457,6 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                         <div style={{ fontWeight: 400, padding: "16px", backgroundColor: 'rgb(245,245,245)', display: "flex", flexDirection: 'column', justifyContent: "center" }}>
                             <div style={{ color: 'rgb(129, 129, 129)', paddingBottom: "8px" }}>Add users and user groups</div>
                             <div style={{ display: "flex", flexDirection: "row", alignItems: 'center', flex: "1 1 0"}}>
-                                
-                                
-
-
 
                                 <div style={{ display: "inline-block", position: "relative", width: "100%", backgroundColor: "white", boxShadow: 'rgb(204,204,204) 2px 2px 2px', padding: "0 16px", marginRight: "16px", height: '3em' }}>
                                     <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={handleSuggestions} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} disabled={userAccessRestricted} />
