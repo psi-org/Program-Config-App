@@ -40,17 +40,6 @@ const sharingQuery = {
     }
 }
 
-const visualSharing = {
-    results: {
-        resource: 'visualizations',
-        params: ({ids}) => ({
-            filter: [`id:in:[${ids}]`],
-            fields: ['id','name','sharing'],
-            paging: false
-        }),
-    }
-}
-
 const entitiesQuery = {
     userData: {
         resource: 'users',

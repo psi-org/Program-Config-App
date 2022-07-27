@@ -1,5 +1,4 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { useRef, useState, useEffect } from "react";
 import { DeepCopy } from '../../configs/Utils';
 
 const sharingQuery = {
