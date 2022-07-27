@@ -315,6 +315,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
         setContent('loading');
         let payloadMetadata = {};
         payloadMetadata.programs = metadata.programs;
+        payloadMetadata.programIndicators = metadata.programIndicators;
         switch (level) {
             case 2:
                 payloadMetadata.dataElements = metadata.dataElements;
@@ -343,8 +344,6 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                 }
                 hideForm()
             });
-
-         
     }
 
     const applySharing = (elements, meta) => {
@@ -357,20 +356,20 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                     element.sharing.users = DE_Sharing.users;
                     element.sharing.userGroups = DE_Sharing.userGroups;
                 } else {
-                    element.sharing.public = meta==='dataElements'?dePermission(payload.object.publicAccess):payload.object.publicAccess;
+                    element.sharing.public = (meta==='dataElements' || meta==='programIndicators')?dePermission(payload.object.publicAccess):payload.object.publicAccess;
                     payload.object.userAccesses.forEach((user) => {
 
                         if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
-                            element.sharing.users[user.id].access = meta==='dataElements'?dePermission(user.access):user.access; //update permission if user exist
+                            element.sharing.users[user.id].access = (meta==='dataElements' || meta==='programIndicators')?dePermission(user.access):user.access; //update permission if user exist
                         } else {
-                            element.sharing.users[user.id] = {id: user.id, access: meta==='dataElements'?dePermission(user.access):user.access} //Add user with permission if doesn't exist
+                            element.sharing.users[user.id] = {id: user.id, access: (meta==='dataElements' || meta==='programIndicators')?dePermission(user.access):user.access} //Add user with permission if doesn't exist
                         }
                     })
                     payload.object.userGroupAccesses.forEach((userGroup) => {
                         if (element.sharing.userGroups.hasOwnProperty(userGroup.id) && overwrite) {
-                            element.sharing.userGroups[userGroup.id].access = meta==='dataElements'?dePermission(userGroup.access):userGroup.access;
+                            element.sharing.userGroups[userGroup.id].access = (meta==='dataElements' || meta==='programIndicators')?dePermission(userGroup.access):userGroup.access;
                         } else {
-                            element.sharing.userGroups[userGroup.id] = {id: userGroup.id, access: meta==='dataElements'?dePermission(userGroup.access):userGroup.access}
+                            element.sharing.userGroups[userGroup.id] = {id: userGroup.id, access: (meta==='dataElements' || meta==='programIndicators')?dePermission(userGroup.access):userGroup.access}
                         }
                     })
                 }
