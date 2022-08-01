@@ -47,7 +47,7 @@ const ProgramStage = () => {
     if(!programStage){
         return (
             <NoticeBox title="Missing Program Stage ID" error>
-                No program stage ID was given, please try again! <Link to="/program">Go to program stages</Link>
+                No program stage ID was provided, please try again! <Link to="/program">Go to program stages</Link>
             </NoticeBox>
         )
     }

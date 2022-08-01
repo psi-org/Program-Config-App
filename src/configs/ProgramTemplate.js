@@ -8,23 +8,10 @@ const Program = {
     "enrollmentDateLabel": "Enrollment date",
     "registration": true,
     "displayFrontPageList": true,
-    "style": {},
     "programStages": []
 }
 
 const PS_AssessmentStage = {
-    "access": {
-        "read": true,
-        "update": true,
-        "externalize": true,
-        "delete": true,
-        "write": true,
-        "manage": true,
-        "data": {
-            "read": true,
-            "write": true
-        }
-    },
     "autoGenerateEvent": true,
     "executionDateLabel": "Assessment date",
     "generatedByEnrollmentDate": true,

@@ -58,7 +58,7 @@ const ProgramDetails = () => {
 
     if (!program) return (
         <NoticeBox title="Missing Program ID" error>
-            No program ID was given, please try again! <Link to="/">Go to programs list</Link>
+            No program ID was provided, please try again! <Link to="/">Go to programs list</Link>
         </NoticeBox>
     )
 

@@ -150,11 +150,13 @@
       "id": "QbYqOgwk5fJ",
       "displayName": "_App - Program Config App",
       "publicAccess": "rw------",
-      "description": "Program Config App",
+      "description": "Program Config App access and required authorities for basic usage.",
       "authorities": [
         "F_DATAELEMENT_PUBLIC_ADD",
+        "F_LEGEND_SET_PUBLIC_ADD",
         "F_METADATA_EXPORT",
         "F_METADATA_IMPORT",
+        "F_OPTIONSET_PUBLIC_ADD",
         "F_PROGRAM_DELETE",
         "F_PROGRAM_INDICATOR_DELETE",
         "F_PROGRAM_INDICATOR_PUBLIC_ADD",
@@ -176,12 +178,27 @@
       ]
     },
     {
+      "name": "PCA - Administrator",
+      "id": "akI7EzBaRaJ",
+      "displayName": "PCA - Administrator",
+      "publicAccess": "rw------",
+      "description": "Program Config App additional authorities for installing metadata.",
+      "authorities": [
+        "F_ATTRIBUTE_PUBLIC_ADD",
+        "F_TRACKED_ENTITY_ADD",
+        "F_TRACKED_ENTITY_ATTRIBUTE_PUBLIC_ADD",
+        "F_USERGROUP_PUBLIC_ADD"
+      ]
+    },
+    {
       "name": "PCA - Users Sharing Management",
       "id": "JDmJ4ADTaDq",
       "displayName": "PCA - Users Sharing Management",
       "publicAccess": "rw------",
       "description": "Users view authorities for the Sharing Settings in the Program Config App",
-      "authorities": ["F_USER_VIEW"]
+      "authorities": [
+        "F_USER_VIEW"
+      ]
     }
   ]
 }

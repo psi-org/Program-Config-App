@@ -435,9 +435,11 @@ const ProgramNew = (props) => {
                 prgrm.shortName = programShortName;
                 prgrm.id = programId;
     
-                prgrm.style = {}
-                if (programIcon) prgrm.style.icon = programIcon
-                if (programColor) prgrm.style.color = programColor
+                let auxstyle = {}
+                if (programIcon) auxstyle.icon = programIcon
+                if (programColor) auxstyle.color = programColor
+
+                if (Object.keys(auxstyle).length > 0) prgrm.style = auxstyle
     
                 if (pgrTypePCA === 'hnqis') {
                     //HNQIS2 Programs
