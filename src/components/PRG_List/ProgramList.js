@@ -30,6 +30,7 @@ import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 import About from "./About";
 import H2Metadata from "./H2Metadata";
 import { Tooltip } from "@mui/material";
+import H2Convert from "./H2Convert";
 
 
 const queryProgramType = {
@@ -46,12 +47,12 @@ const query = {
     results: {
         resource: "programs",
         paging: false,
-        params: ({ token, pageSize, page, pgrTypeAttrId }) => {
+        params: ({ token, pageSize, page }) => {
             let paramsObject = {
                 pageSize,
                 page,
-                fields: ["code", "id", "name", "shortName", "created", "lastUpdated", "href", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "relatedProgram", "categoryCombo[id,name]", "trackedEntityType[id,name]", "style", "programTrackedEntityAttributes", "notificationTemplates", "translations", "organisationUnits", "programSections", "attributeValues", "programStages[id,name,programStageSections[*]]", "access"],
-                filter: ['withoutRegistration:eq:false']
+                fields: ["code", "id", "name", "shortName", "created", "lastUpdated", "href", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "relatedProgram", "categoryCombo[id,name]", "trackedEntityType[id,name]", "style", "programTrackedEntityAttributes", "notificationTemplates", "translations", "organisationUnits", "programSections", "attributeValues", "programStages[id,name,programStageSections[*]]", "access", "withoutRegistration"]
+                //filter: ['withoutRegistration:eq:false']
             }
 
             if (token !== "") paramsObject.filter.push(`identifiable:token:${token}`)
@@ -75,6 +76,7 @@ const ProgramList = () => {
     const [restoreProgramId, setRestoreProgramId] = useState(undefined);
     const [readOnlyPermission, setReadOnlyPermission] = useState(false);
     const [orgUnitProgramId, setOrgUnitProgramId] = useState(undefined);
+    const [conversionH2ProgramId, setConversionH2ProgramId] = useState(undefined);
 
     // *********************** //
 
@@ -118,6 +120,10 @@ const ProgramList = () => {
         setBackupProgramId(program)
     }
 
+    const convertToH2 = (program) => {
+        setConversionH2ProgramId(program)
+    }
+
     const restoreProgram = (program) => {
         setRestoreProgramId(program)
     }
@@ -126,7 +132,7 @@ const ProgramList = () => {
 
     }
 
-    const { loading, error, data, refetch } = useDataQuery(query, { variables: { token: filterValue, pageSize, page: currentPage, prgTypeId } });
+    const { loading, error, data, refetch } = useDataQuery(query, { variables: { token: filterValue, pageSize, page: currentPage } });
 
     if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
     if (loading) return <CircularLoader />
@@ -184,6 +190,10 @@ const ProgramList = () => {
                     {
                         backupProgramId &&
                             <BackupScreen program={backupProgramId} setBackupProgramId={setBackupProgramId} setNotification={setNotification}/>
+                    }
+                    {
+                        conversionH2ProgramId &&
+                            <H2Convert program={conversionH2ProgramId} setConversionH2ProgramId={setConversionH2ProgramId} setNotification={setNotification}/>
                     }
                     {
                         restoreProgramId &&
@@ -246,6 +256,7 @@ const ProgramList = () => {
                                     refetch={refetch}
                                     setNotification={setNotification}
                                     doSearch={doSearch}
+                                    convertToH2={convertToH2}
                                 />
                             })
                         }

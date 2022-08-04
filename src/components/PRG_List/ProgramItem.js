@@ -15,6 +15,8 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import StorageIcon from '@mui/icons-material/Storage';
 import InfoIcon from '@mui/icons-material/Info';
 import Popover from '@mui/material/Popover';
+import AltRouteIcon from '@mui/icons-material/AltRoute';
+import MoveDownIcon from '@mui/icons-material/MoveDown';
 
 // *** Routing ***
 import { Link } from "react-router-dom";
@@ -30,7 +32,7 @@ import { IconButton, Typography } from "@mui/material";
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
-const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, backupProgram, restoreProgram, deleteProgram, prgTypeId, refetch, setNotification, doSearch }) => {
+const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, backupProgram, restoreProgram, deleteProgram, prgTypeId, refetch, setNotification, doSearch, convertToH2 }) => {
     const [ref, setRef] = useState(undefined);
     const [open, setOpen] = useState(false)
     const [showProgramForm, setShowProgramForm] = useState(false);
@@ -42,6 +44,7 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
     const dispatch = useDispatch();
     const { setProgram } = bindActionCreators(actionCreators, dispatch);
     const programType = program.attributeValues.find(av => av.attribute.id === prgTypeId)?.value || "Tracker";
+    const pcaMetadata = JSON.parse(program.attributeValues.find(av => av.attribute.id === METADATA)?.value || '{}')
     const typeTag = {
         "HNQIS2": { color: "#03a9f4", text: "HNQIS 2.0" },
         "HNQIS": { color: "#03a9f4", text: "HNQIS 1.X" },
@@ -91,16 +94,25 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                     <Layer onClick={toggle}>
                         <Popper reference={ref} placement="bottom-end">
                             <FlyoutMenu>
-                                <MenuItem label="Edit Program" icon={<EditIcon />} onClick={() => { toggle(); setShowProgramForm(true) }} />
-                                <MenuItem label="Sharing Settings" icon={<ShareIcon />} onClick={() => { toggle(); shareProgram(program.id, programType === 'HNQIS2' ? 'hnqis' : 'tracker') }} />
-                                <MenuItem label={"Assign Organisation Units"} icon={<PublicIcon />} onClick={() => { toggle(); assignOrgUnit(program.id) }} />
-                                <MenuItem label="Backup/Restore" icon={<StorageIcon />}>
-                                    <MenuSectionHeader label="In Current Device" />
-                                    <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={() => { toggle(); downloadMetadata(program.id) }} />
-                                    <MenuSectionHeader label="In Server" />
-                                    <MenuItem label="Backup Program" icon={<BackupIcon />} onClick={() => { toggle(); backupProgram(program) }} />
-                                    <MenuItem label="Restore Program" icon={<RestoreIcon />} onClick={() => { toggle(); restoreProgram(program) }} />
-                                </MenuItem>
+                                {!program.withoutRegistration &&
+                                <>
+                                    <MenuItem label="Edit Program" icon={<EditIcon />} onClick={() => { toggle(); setShowProgramForm(true) }} />
+                                    <MenuItem label="Sharing Settings" icon={<ShareIcon />} onClick={() => { toggle(); shareProgram(program.id, programType === 'HNQIS2' ? 'hnqis' : 'tracker') }} />
+                                    <MenuItem label={"Assign Organisation Units"} icon={<PublicIcon />} onClick={() => { toggle(); assignOrgUnit(program.id) }} />
+                                    <MenuItem label="Backup/Restore" icon={<StorageIcon />}>
+                                        <MenuSectionHeader label="In Current Device" />
+                                        <MenuItem label="Export JSON Metadata" icon={<DownloadIcon />} onClick={() => { toggle(); downloadMetadata(program.id) }} />
+                                        <MenuSectionHeader label="In Server" />
+                                        <MenuItem label="Backup Program" icon={<BackupIcon />} onClick={() => { toggle(); backupProgram(program) }} />
+                                        <MenuItem label="Restore Program" icon={<RestoreIcon />} onClick={() => { toggle(); restoreProgram(program) }} />
+                                    </MenuItem>
+                                </>}
+                                {programType === "HNQIS" && !pcaMetadata.h2Converted &&
+                                    <MenuItem label={"Convert to HNQIS 2.0 Program"} disabled={pcaMetadata.h2Converted} icon={<AltRouteIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
+                                }
+                                {programType === "HNQIS" && !pcaMetadata.dataConverted &&
+                                    <MenuItem label={"Export Assessment Data to HNQIS 2.0"} disabled={!pcaMetadata.h2Converted || true} icon={<MoveDownIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
+                                }
                                 <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
                             </FlyoutMenu>
                         </Popper>
@@ -114,14 +126,22 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                         doSearch={doSearch}
                         data={program}
                         programType={programType === 'HNQIS2' ? 'hnqis' : 'tracker'}
-                        pcaMetadata={JSON.parse(program.attributeValues.find(av => av.attribute.id === METADATA)?.value || '{}')}
+                        pcaMetadata={pcaMetadata}
                     />
                 }
-                <Link to={"/program/" + program.id} style={{ color: '#333333' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setProgram(program.id)}>
+                {!program.withoutRegistration &&
+                    <Link to={"/program/" + program.id} style={{ color: '#333333' }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setProgram(program.id)}>
+                            <NavigateNextIcon />
+                        </div>
+                    </Link>
+                }
+                {program.withoutRegistration &&
+
+                    <div style={{ display: 'flex', alignItems: 'center', color: '#AAAAAA', cursor: 'not-allowed' }}>
                         <NavigateNextIcon />
                     </div>
-                </Link>
+                }
             </div>
             <Popover
                 id={id}
