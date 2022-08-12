@@ -15,7 +15,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import StorageIcon from '@mui/icons-material/Storage';
 import InfoIcon from '@mui/icons-material/Info';
 import Popover from '@mui/material/Popover';
-import AltRouteIcon from '@mui/icons-material/AltRoute';
+import UpgradeIcon from '@mui/icons-material/SwitchAccessShortcutAdd';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 
 // *** Routing ***
@@ -43,14 +43,15 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
 
     const dispatch = useDispatch();
     const { setProgram } = bindActionCreators(actionCreators, dispatch);
-    const programType = program.attributeValues.find(av => av.attribute.id === prgTypeId)?.value || "Tracker";
+    const programType = program.attributeValues.find(av => av.attribute.id === prgTypeId)?.value || (!program.withoutRegistration ? "Tracker" : "Event");
     const pcaMetadata = JSON.parse(program.attributeValues.find(av => av.attribute.id === METADATA)?.value || '{}')
     const typeTag = {
         "HNQIS2": { color: "#03a9f4", text: "HNQIS 2.0" },
-        "HNQIS": { color: "#03a9f4", text: "HNQIS 1.X" },
+        "HNQIS": { color: "#00deff", text: "HNQIS 1.X" },
         "RDQA": { color: "#00acc1", text: "RDQA PRG" },
         "EDS": { color: "#607d8b", text: "EDS" },
-        "Tracker": { color: "#2c6693", text: "TRACKER" }
+        "Tracker": { color: "#2c6693", text: "TRACKER" },
+        "Event": { color: "#6e8ea6", text: "EVENT" }
     }
 
     const handleOpen = (event) => {
@@ -83,19 +84,18 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                 <IconButton style={{ marginRight: '0.5em' }} onClick={handleOpen} aria-describedby={id}>
                     <InfoIcon />
                 </IconButton>
+                <div>{program.programStages.length} program stages</div>
                 <div style={{ backgroundColor: typeTag[programType].color, width: '85px', display: 'flex', justifyContent: 'center' }}>
                     {typeTag[programType].text}
                 </div>
-                <div>{program.programStages.length} program stages</div>
             </div>
             <div className="ml_item-cta">
                 <img src={move_vert_svg} id={'menu' + program.id} alt="menu" onClick={() => { setRef(document.getElementById('menu' + program.id)); toggle() }} style={{ cursor: 'pointer' }} />
                 {open &&
                     <Layer onClick={toggle}>
                         <Popper reference={ref} placement="bottom-end">
-                            <FlyoutMenu>
-                                {!program.withoutRegistration &&
-                                <>
+                            {!program.withoutRegistration &&
+                                <FlyoutMenu>
                                     <MenuItem label="Edit Program" icon={<EditIcon />} onClick={() => { toggle(); setShowProgramForm(true) }} />
                                     <MenuItem label="Sharing Settings" icon={<ShareIcon />} onClick={() => { toggle(); shareProgram(program.id, programType === 'HNQIS2' ? 'hnqis' : 'tracker') }} />
                                     <MenuItem label={"Assign Organisation Units"} icon={<PublicIcon />} onClick={() => { toggle(); assignOrgUnit(program.id) }} />
@@ -106,15 +106,20 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                                         <MenuItem label="Backup Program" icon={<BackupIcon />} onClick={() => { toggle(); backupProgram(program) }} />
                                         <MenuItem label="Restore Program" icon={<RestoreIcon />} onClick={() => { toggle(); restoreProgram(program) }} />
                                     </MenuItem>
-                                </>}
-                                {programType === "HNQIS" && !pcaMetadata.h2Converted &&
-                                    <MenuItem label={"Convert to HNQIS 2.0 Program"} disabled={pcaMetadata.h2Converted} icon={<AltRouteIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
-                                }
-                                {programType === "HNQIS" && !pcaMetadata.dataConverted &&
-                                    <MenuItem label={"Export Assessment Data to HNQIS 2.0"} disabled={!pcaMetadata.h2Converted || true} icon={<MoveDownIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
-                                }
-                                <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
-                            </FlyoutMenu>
+                                    <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
+                                </FlyoutMenu>
+                            }
+                            {program.withoutRegistration &&
+                                <FlyoutMenu>
+                                    {programType === "HNQIS" && !pcaMetadata.h2Converted &&
+                                        <MenuItem label={"Convert to HNQIS 2.0 Program"} disabled={pcaMetadata.h2Converted} icon={<UpgradeIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
+                                    }
+                                    {programType === "HNQIS" && !pcaMetadata.dataConverted &&
+                                        <MenuItem label={"Export Assessment Data to HNQIS 2.0"} disabled={!pcaMetadata.h2Converted || true} icon={<MoveDownIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
+                                    }
+                                    <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
+                                </FlyoutMenu>
+                            }
                         </Popper>
                     </Layer>
                 }
@@ -157,12 +162,12 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                     horizontal: 'right',
                 }}
             >
-                <div style={{padding: '1em', display: 'flex', flexDirection: 'column', gap: '1em'}}>
-                    <p><strong>Program ID</strong><br/>{program.id}</p>
-                    <p><strong>Program Short Name</strong><br/>{program.shortName}</p>
-                    <p><strong>Created</strong><br/>{new Date(program.created).toLocaleString("en-US",DATE_FORMAT_OPTIONS)}</p>
-                    <p><strong>Last Updated</strong><br/>{new Date(program.lastUpdated).toLocaleString("en-US",DATE_FORMAT_OPTIONS)}</p>
-                    <p><strong>API URL</strong><br/><a href={program.href+".json"} target="_blank">{program.href}</a></p>
+                <div style={{ padding: '1em', display: 'flex', flexDirection: 'column', gap: '1em' }}>
+                    <p><strong>Program ID</strong><br />{program.id}</p>
+                    <p><strong>Program Short Name</strong><br />{program.shortName}</p>
+                    <p><strong>Created</strong><br />{new Date(program.created).toLocaleString("en-US", DATE_FORMAT_OPTIONS)}</p>
+                    <p><strong>Last Updated</strong><br />{new Date(program.lastUpdated).toLocaleString("en-US", DATE_FORMAT_OPTIONS)}</p>
+                    <p><strong>API URL</strong><br /><a href={program.href + ".json"} target="_blank">{program.href}</a></p>
                 </div>
             </Popover>
         </div>
