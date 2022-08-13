@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Transfer } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 //import styles from './Program.module.css'
-import { Program, PS_AssessmentStage, PS_ActionPlanStage, PSS_Default, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
+import { Program, HnqisProgramConfigs, PS_AssessmentStage, PS_ActionPlanStage, PSS_Default, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
 
 import { METADATA, COMPETENCY_ATTRIBUTE, COMPETENCY_CLASS, BUILD_VERSION, MAX_PREFIX_LENGTH, MAX_PROGRAM_NAME_LENGTH, MIN_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, H2_METADATA_VERSION, NAMESPACE, DATASTORE_H2_METADATA } from './../../configs/Constants';
 
@@ -113,59 +113,6 @@ const queryHNQIS2Metadata = {
         resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}`
     }
 };
-
-const hnqisProgramConfigs = {
-    "trackedEntityType": { "id": "oNwpeWkfoWc" },
-    "attributeValues": [
-        {
-            "attribute": { "id": "haUflNqP85K" },
-            "value": "{\"buildVersion\":\"1.1\",\"useCompetencyClass\":\"Yes\",\"dePrefix\":\"programDEPrefix\"}"
-        }
-    ],
-    "programTrackedEntityAttributes": [
-        {
-            "trackedEntityAttribute": { "id": "Xe5hUu6KkUT" },
-            "mandatory": false,
-            "valueType": "TEXT",
-            "searchable": false,
-            "displayInList": true,
-            "sortOrder": 1
-        },
-        {
-            "trackedEntityAttribute": { "id": "nHg1hGgtJwm" },
-            "mandatory": false,
-            "valueType": "TEXT",
-            "searchable": false,
-            "displayInList": true,
-            "sortOrder": 2
-        },
-        {
-            "trackedEntityAttribute": { "id": "UlUYUyZJ6o9" },
-            "mandatory": false,
-            "valueType": "DATE",
-            "searchable": true,
-            "displayInList": true,
-            "sortOrder": 3
-        },
-        {
-            "trackedEntityAttribute": { "id": "NQdpdST0Gcx" },
-            "mandatory": false,
-            "valueType": "TEXT",
-            "searchable": false,
-            "displayInList": true,
-            "sortOrder": 4
-        },
-        {
-            "trackedEntityAttribute": { "id": "ulU9KKgSLYe" },
-            "mandatory": false,
-            "valueType": "TEXT",
-            "searchable": false,
-            "displayInList": false,
-            "sortOrder": 5
-        }
-    ],
-    "userGroupAccesses": []
-}
 
 const ProgramNew = (props) => {
 
@@ -451,7 +398,7 @@ const ProgramNew = (props) => {
                     let scores = undefined;
     
                     if (!props.data) {
-                        Object.assign(prgrm, hnqisProgramConfigs)
+                        Object.assign(prgrm, HnqisProgramConfigs)
                         prgrm.attributeValues.push({
                             "value": "HNQIS2",
                             "attribute": { "id": prgTypeId }

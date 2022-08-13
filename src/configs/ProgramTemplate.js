@@ -11,6 +11,59 @@ const Program = {
     "programStages": []
 }
 
+const HnqisProgramConfigs = {
+    "trackedEntityType": { "id": "oNwpeWkfoWc" },
+    "attributeValues": [
+        {
+            "attribute": { "id": "haUflNqP85K" },
+            "value": "{\"buildVersion\":\"1.1\",\"useCompetencyClass\":\"Yes\",\"dePrefix\":\"programDEPrefix\"}"
+        }
+    ],
+    "programTrackedEntityAttributes": [
+        {
+            "trackedEntityAttribute": { "id": "Xe5hUu6KkUT" },
+            "mandatory": false,
+            "valueType": "TEXT",
+            "searchable": false,
+            "displayInList": true,
+            "sortOrder": 1
+        },
+        {
+            "trackedEntityAttribute": { "id": "nHg1hGgtJwm" },
+            "mandatory": false,
+            "valueType": "TEXT",
+            "searchable": false,
+            "displayInList": true,
+            "sortOrder": 2
+        },
+        {
+            "trackedEntityAttribute": { "id": "UlUYUyZJ6o9" },
+            "mandatory": false,
+            "valueType": "DATE",
+            "searchable": true,
+            "displayInList": true,
+            "sortOrder": 3
+        },
+        {
+            "trackedEntityAttribute": { "id": "NQdpdST0Gcx" },
+            "mandatory": false,
+            "valueType": "TEXT",
+            "searchable": false,
+            "displayInList": true,
+            "sortOrder": 4
+        },
+        {
+            "trackedEntityAttribute": { "id": "ulU9KKgSLYe" },
+            "mandatory": false,
+            "valueType": "TEXT",
+            "searchable": false,
+            "displayInList": false,
+            "sortOrder": 5
+        }
+    ],
+    "userGroupAccesses": []
+}
+
 const PS_AssessmentStage = {
     "autoGenerateEvent": true,
     "executionDateLabel": "Assessment date",
@@ -41,7 +94,7 @@ const PS_ActionPlanStage = {
     "hideDueDate": false,
     "id": "actionPlanId",
     "minDaysFromStart": 0,
-    "name": "ActionPlan",
+    "name": "Action Plan",
     "openAfterEnrollment": false,
     "program": {"id": "programId"},
     "programStageDataElements": [
@@ -119,6 +172,7 @@ const PS_Generic = {
 
 module.exports = {
     Program,
+    HnqisProgramConfigs,
     PS_Generic,
     PS_AssessmentStage,
     PS_ActionPlanStage,

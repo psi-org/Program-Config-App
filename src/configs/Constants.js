@@ -10,7 +10,7 @@ import NumberIcon from '@mui/icons-material/Numbers';
 import DateIcon from '@mui/icons-material/CalendarToday';
 import TimeIcon from '@mui/icons-material/AccessTime';
 
-const BUILD_VERSION = "1.5.0"
+const BUILD_VERSION = "1.6.0"
 const BUILD_DATE = "July 28th, 2022"
 const MIN_VERSION = "2.36.0"
 const MAX_VERSION = "2.38.0"
@@ -85,6 +85,7 @@ const QUESTION_PARENT_OPTIONS_ATTRIBUTE = "zszUcUt6cH0"
 const COMPOSITIVE_SCORE_ATTRIBUTE = "k738RpAYLmz"
 const SCORE_NUM_ATTRIBUTE = "Zyr7rlDOJy8"
 const SCORE_DEN_ATTRIBUTE = "l7WdLDhE3xW"
+const QUESTION_ORDER_ATTRIBUTE = "xf9iDHNFLgx"
 
 const COMPETENCY_CLASS = "NAaHST5ZDTE"
 
@@ -172,5 +173,6 @@ export {
     QUESTION_PARENT_OPTIONS_ATTRIBUTE,
     COMPOSITIVE_SCORE_ATTRIBUTE,
     SCORE_NUM_ATTRIBUTE,
-    SCORE_DEN_ATTRIBUTE
+    SCORE_DEN_ATTRIBUTE,
+    QUESTION_ORDER_ATTRIBUTE
 }

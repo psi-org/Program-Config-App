@@ -3,7 +3,7 @@
   "title": "Program Config App",
   "short_name": "Program Config App",
   "author": "Fernando Gomez - Mario Lopez - Utsav Koju",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Tracker Programs management tool",
   "license": "CC-BY-4.0",
   "private": true,
