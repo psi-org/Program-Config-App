@@ -92,7 +92,7 @@ const DataElementManager = (props) => {
 
     // DATA GRID //
     const [loading, setLoading] = useState(false)
-    const [page, setPage] = useState(0)
+    const [page, setPage] = useState(1)
     const [pageChanged,setPageChanged] = useState(false)
     const [rows, setRows] = useState([])
     const [totalRows, setTotalRows] = useState(0)
@@ -126,25 +126,24 @@ const DataElementManager = (props) => {
     },[page])
 
     useEffect(()=>{
+        console.log("Selection model changed, page is ",page, "and pageChanged value is ",pageChanged," and selectionModel is ",selectionModel)
         if( page > 0 ){
             if(pageChanged) setPageChanged(false)
             else checkSelectedDE(selectionModel)
         }
     },[selectionModel])
-
+        
     useEffect(()=>{
-
+        console.log({newDataElements})
     },[newDataElements])
 
     const checkSelectedDE = (model) => {
-        setNewDataElements(
-            model.map(id => {
-                let deObject
-                deObject = newDataElements.find(de => de.id === id)
-                if(!deObject) deObject = rows.find(de => de.id===id)
-                return deObject
-            })
-        )
+        setNewDataElements(model.map(id => {
+            let deObject
+            deObject = newDataElements.find(de => de.id === id)
+            if(!deObject) deObject = rows.find(de => de.id===id)
+            return deObject
+        }))
     }
     // END DATA GRID //
 
@@ -247,11 +246,13 @@ const DataElementManager = (props) => {
                                     rowCount={totalRows}
                                     paginationMode="server"
                                     onPageChange={(newPage) => {
+                                        console.log({newPage})
                                         setPageChanged(true)
                                         prevSelectionModel.current = selectionModel
                                         setPage(newPage+1)
                                     }}
                                     onSelectionModelChange={(newSelectionModel) => {
+                                        console.log({newSelectionModel})
                                         setSelectionModel(newSelectionModel)
                                     }}
                                     selectionModel={selectionModel}
