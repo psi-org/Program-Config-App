@@ -92,7 +92,7 @@ const DataElementManager = (props) => {
 
     // DATA GRID //
     const [loading, setLoading] = useState(false)
-    const [page, setPage] = useState(1)
+    const [page, setPage] = useState(0)
     const [pageChanged,setPageChanged] = useState(false)
     const [rows, setRows] = useState([])
     const [totalRows, setTotalRows] = useState(0)
@@ -107,8 +107,8 @@ const DataElementManager = (props) => {
         { field: "lastUpdated", headerName: "Last Updated", flex: 2, editable: false, valueGetter: craftDate }
     ]
 
-    const doSearch = () => {
-        search({ token: filterValue, page:page }).then(data => {
+    const doSearch = async () => {
+        /* search({ token: filterValue, page:page }).then(data => {
             if (data?.results?.dataElements) {
                 setRows(data.results.dataElements)
                 setTotalRows(data.results.pager.total)    
@@ -117,16 +117,21 @@ const DataElementManager = (props) => {
                 setSelectionModel(prevSelectionModel.current)
                 
             });
-        })
+        }) */
+
+        const data = await search({ token: filterValue, page:page })
+        if(data.results?.dataElements){
+            setRows(data.results.dataElements)
+            setTotalRows(data.results.pager.total)
+            setSelectionModel(Array.from(prevSelectionModel.current))
+        }
     }
 
     useEffect(()=>{
-        if(page<1) return
-        doSearch()
+        if(page>0) doSearch()
     },[page])
 
     useEffect(()=>{
-        console.log("Selection model changed, page is ",page, "and pageChanged value is ",pageChanged," and selectionModel is ",selectionModel)
         if( page > 0 ){
             if(pageChanged) setPageChanged(false)
             else checkSelectedDE(selectionModel)
@@ -134,7 +139,6 @@ const DataElementManager = (props) => {
     },[selectionModel])
         
     useEffect(()=>{
-        console.log({newDataElements})
     },[newDataElements])
 
     const checkSelectedDE = (model) => {
@@ -246,13 +250,11 @@ const DataElementManager = (props) => {
                                     rowCount={totalRows}
                                     paginationMode="server"
                                     onPageChange={(newPage) => {
-                                        console.log({newPage})
                                         setPageChanged(true)
                                         prevSelectionModel.current = selectionModel
                                         setPage(newPage+1)
                                     }}
                                     onSelectionModelChange={(newSelectionModel) => {
-                                        console.log({newSelectionModel})
                                         setSelectionModel(newSelectionModel)
                                     }}
                                     selectionModel={selectionModel}
