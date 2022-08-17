@@ -36,7 +36,11 @@ import {
     QUESTION_ORDER_ATTRIBUTE,
     METADATA,
     FEEDBACK_ORDER,
+    BUILD_VERSION,
+    COMPETENCY_ATTRIBUTE,
+    COMPETENCY_CLASS
 } from "../../configs/Constants";
+import { Program, HnqisProgramConfigs, PS_AssessmentStage, PS_ActionPlanStage, PSS_Default, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
 import { DeepCopy } from "../../configs/Utils";
 
 const queryProgramMetadata = {
@@ -45,7 +49,7 @@ const queryProgramMetadata = {
         params: ({ program }) => ({
             //Special care in Organisation Units and Sharing Settings
             fields: [
-                "id","name","shortName","ignoreOverdueEvents","skipOffline","onlyEnrollOnce","sharing","maxTeiCountToReturn","selectIncidentDatesInFuture","selectEnrollmentDatesInFuture","registration","favorite","useFirstStageDuringRegistration","completeEventsExpiryDays","withoutRegistration","featureType","minAttributesRequiredToSearch","displayFrontPageList","programType","accessLevel","expiryDays","categoryCombo","programIndicators","translations","attributeValues","userRoles","favorites","programRuleVariables","programTrackedEntityAttributes","notificationTemplates","organisationUnits","programSections","programStages[programStageDataElements[dataElement[*,attributeValues[value,attribute[id,name]]],compulsory,displayInReports,sortOrder],programStageSections[name,dataElements[id]]]",
+                "id","name","shortName","style","ignoreOverdueEvents","skipOffline","onlyEnrollOnce","sharing","maxTeiCountToReturn","selectIncidentDatesInFuture","selectEnrollmentDatesInFuture","registration","favorite","useFirstStageDuringRegistration","completeEventsExpiryDays","withoutRegistration","featureType","minAttributesRequiredToSearch","displayFrontPageList","programType","accessLevel","expiryDays","categoryCombo","programIndicators","translations","attributeValues","userRoles","favorites","programRuleVariables","programTrackedEntityAttributes","notificationTemplates","organisationUnits","programSections","programStages[programStageDataElements[dataElement[*,attributeValues[value,attribute[id,name]]],compulsory,displayInReports,sortOrder],programStageSections[name,dataElements[id]]]",
             ],
             filter: [`id:eq:${program}`],
         }),
@@ -60,6 +64,23 @@ const queryHealthAreas = {
             filter: ["id:eq:y752HEwvCGi"],
         },
     },
+};
+
+const queryProgramType = {
+    results: {
+        resource: 'attributes',
+        params: {
+            fields: ['id'],
+            filter: ['code:eq:PROGRAM_TYPE']
+        }
+    }
+};
+
+const queryId = {
+    results: {
+        resource: 'system/id.json',
+        params: ({ n }) => ({ limit: n })
+    }
 };
 
 const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
@@ -78,6 +99,9 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
 
     const [sectionsData, setSectionsData] = useState(undefined);
     const [scoresData, setScoresData] = useState(undefined);
+
+    const { data: idQueryRes, refetch: getIDs } = useDataQuery(queryId, { lazy: true, variables: { n: undefined } });
+    const { data: idProgramType, refetch: getProgramTypeAttribute } = useDataQuery(queryProgramType, { lazy: true });
 
     useEffect(() => {
         if (programData && haQuery) {
@@ -192,20 +216,33 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
         }
     };
 
-    const convertProgram = () => {
+    const convertProgram = async () => {
         console.log({sectionsData,scoresData});
         const sections = DeepCopy(sectionsData)
+        const scores = DeepCopy(scoresData)
 
         let compositiveScoreOrder = ''
         let questionFeedbackOrder = 1
+        let labelsQtty = 0
 
-        const newSections = sections.map(
+        const program_dataElements = []
+        const program_programStageDataElements = []
+
+        let newSections = sections.map(
             (section,sectionIndex) => {
                 
                 section.dataElements = section.dataElements.sort( 
                     (a,b) => parseInt(a.metadata[QUESTION_ORDER_ATTRIBUTE]) - parseInt(b.metadata[QUESTION_ORDER_ATTRIBUTE])
                 ).map(
                     (de,deIndex) => {
+
+                        // SAVE PROGRAM STAGE DATA ELEMENT
+                        let psde = DeepCopy(de.programStageDataElement)
+                        psde.sortOrder = deIndex+1
+                        psde.dataElement = {id:de.programStageDataElement.dataElement.id}
+                        program_programStageDataElements.push(psde)
+
+
                         let dataElement = de.programStageDataElement.dataElement
 
                         // FEEDBACK ORDER
@@ -218,8 +255,13 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
 
                             let feedbackOrder = `${compositiveScoreOrder}.${questionFeedbackOrder++}` 
                             let foIndex = dataElement.attributeValues.findIndex(att => att.attribute.id === FEEDBACK_ORDER)
+                            
                             if(foIndex > -1){
                                 // Update FeedbackOrder
+                                dataElement.attributeValues[foIndex] = {
+                                    attribute : {id:FEEDBACK_ORDER},
+                                    value:feedbackOrder
+                                }
                             }else{
                                 dataElement.attributeValues.push({
                                     attribute : {id:FEEDBACK_ORDER},
@@ -227,7 +269,6 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
                                 })
                             }
                         }
-                        
                         
                         const pcaMetadata = {
                             elemType : 'question',
@@ -243,11 +284,17 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
                             pcaMetadata.elemType = 'label'
                             pcaMetadata.labelFormName = dataElement.formName
                             dataElement.formName = '   '
+                            labelsQtty += 1
                         }
 
                         let pcaMetadataIndex = dataElement.attributeValues.findIndex(att => att.attribute.id === METADATA)
+                        
                         if(pcaMetadataIndex > -1){
                             // Update PCA Metadata
+                            dataElement.attributeValues[pcaMetadataIndex] = {
+                                attribute : {id:METADATA},
+                                value:JSON.stringify(pcaMetadata)
+                            }
                         }else{
                             dataElement.attributeValues.push({
                                 attribute : {id:METADATA},
@@ -255,13 +302,201 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
                             })
                         }
 
-                        return dataElement
+                        program_dataElements.push(dataElement)
+                        return ({id:dataElement.id})
                     }
                 )
+
+                section.sortOrder = (sectionIndex+1)*10
+                section.programStage = { id : 'STAGE ID'}
+
                 return section
             }
         )
-        console.log({newSections})
+
+        let newScores = scores.sort( 
+            (a,b) => parseInt(a.metadata[QUESTION_ORDER_ATTRIBUTE]) - parseInt(b.metadata[QUESTION_ORDER_ATTRIBUTE])
+        ).map((score,scoreIndex) => {
+
+            let de = DeepCopy(score.dataElement)
+
+            // FEEDBACK ORDER
+            let foIndex = de.attributeValues.findIndex(att => att.attribute.id === FEEDBACK_ORDER)
+            
+            if(foIndex > -1){
+                // Update FeedbackOrder
+                de.attributeValues[foIndex] = {
+                    attribute : {id:FEEDBACK_ORDER},
+                    value:score.metadata[COMPOSITIVE_SCORE_ATTRIBUTE]
+                }
+            }else{
+                de.attributeValues.push({
+                    attribute : {id:FEEDBACK_ORDER},
+                    value:score.metadata[COMPOSITIVE_SCORE_ATTRIBUTE]
+                })
+            }
+
+            // PCA METADATA
+
+            let pcaMetadata = {
+                isCompulsory:"No",
+                isCritical:"No",
+                elemType:"score"
+            }
+            let pcaMetadataIndex = de.attributeValues.findIndex(att => att.attribute.id === METADATA)
+            
+            if(pcaMetadataIndex > -1){
+                // Update PCA Metadata
+                de.attributeValues[pcaMetadataIndex] = {
+                    attribute : {id:METADATA},
+                    value:JSON.stringify(pcaMetadata)
+                }
+            }else{
+                de.attributeValues.push({
+                    attribute : {id:METADATA},
+                    value:JSON.stringify(pcaMetadata)
+                })
+            }
+
+            program_programStageDataElements.push({
+                displayInReports : false,
+                compulsory:false,
+                sortOrder: scoreIndex+1,
+                dataElement: {id:de.id},
+                programStage: {id:'X'}
+            })
+
+            program_dataElements.push(de)
+
+            
+            return {id:score.dataElement.id}
+        })
+
+        const newIds = await getIDs({n: 5 + labelsQtty + newSections.length})
+        let uidPool = newIds?.results?.codes
+
+        const programTypeData = await getProgramTypeAttribute()
+        let prgTypeId = programTypeData?.results?.attributes[0]?.id
+        
+        if (uidPool && prgTypeId){
+            //Program Setup
+            let programOld = programData?.results?.programs[0]
+            console.log(programOld)
+
+            let programId = uidPool.shift()
+            let assessmentId = uidPool.shift()
+            let actionPlanId = uidPool.shift()
+            let stepsSectionId = uidPool.shift()
+            let scoresSectionId = uidPool.shift()
+
+            let prgrm = DeepCopy(Program)
+            Object.assign(prgrm, HnqisProgramConfigs)
+
+            let assessmentStage = undefined;
+            let actionPlanStage = undefined;
+
+            let criticalSteps = undefined;
+            let scores = undefined;
+
+            let programStages = undefined
+            let programStageSections = undefined
+            prgrm.attributeValues = []
+
+            prgrm.attributeValues.push({
+                "value": "HNQIS2",
+                "attribute": { "id": prgTypeId }
+            });
+
+            let pcaMetadataVal = {}
+            pcaMetadataVal.buildVersion = BUILD_VERSION
+            pcaMetadataVal.useCompetencyClass = useCompetency ? 'Yes' : 'No'
+            pcaMetadataVal.healthArea = healthArea
+            pcaMetadataVal.dePrefix = (programOld.shortName.slice(0,22))+" H2"
+            prgrm.attributeValues.push({
+                value:JSON.stringify(pcaMetadataVal),
+                attribute:{ id: METADATA }
+            })
+
+            prgrm.id = programId
+            prgrm.name = '[HNQIS2] '+(programOld.name.slice(0,221))
+            prgrm.shortName = '[HNQIS2] '+(programOld.shortName.slice(0,41))
+            prgrm.style = programOld.style
+            prgrm.programStages.push({ id: assessmentId })
+            prgrm.programStages.push({ id: actionPlanId })
+
+            assessmentStage = DeepCopy(PS_AssessmentStage)
+            assessmentStage.id = assessmentId
+            assessmentStage.name = assessmentStage.name
+            
+            //Assign Sections
+            newSections = newSections.map(section => {
+                section.programStage.id = assessmentId
+                section.id = uidPool.shift()
+                return section
+            })
+
+            assessmentStage.programStageSections.push({ id: stepsSectionId })
+            assessmentStage.programStageSections.push({ id: scoresSectionId })
+            assessmentStage.program.id = programId
+
+            actionPlanStage = DeepCopy(PS_ActionPlanStage);
+            actionPlanStage.id = actionPlanId;
+            actionPlanStage.program.id = programId;
+
+            criticalSteps = DeepCopy(PSS_CriticalSteps)
+            criticalSteps.id = stepsSectionId
+            criticalSteps.programStage.id = assessmentId
+            criticalSteps.sortOrder = (newSections.length + 1 )*10
+
+            scores = DeepCopy(PSS_Scores)
+            scores.id = scoresSectionId
+            scores.programStage.id = assessmentId
+            scores.sortOrder = criticalSteps.sortOrder + 10
+            scores.dataElements = newScores
+
+            if (!useCompetency) {
+                const indexA = prgrm.programTrackedEntityAttributes.findIndex(attr => {
+                    return attr.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE
+                });
+                prgrm.programTrackedEntityAttributes.splice(indexA, 1);
+
+                prgrm.programStages = prgrm.programStages.map(ps => ({id:ps.id}))
+
+                const indexB = criticalSteps.dataElements.findIndex(de => {
+                    return de.id === COMPETENCY_CLASS;
+                })
+                criticalSteps.dataElements.splice(indexB, 1);
+            }
+
+            assessmentStage.programStageDataElements = program_programStageDataElements.map(psde => {
+                psde.programStage = {id : assessmentId}
+                return psde
+            })
+
+            programStages = [assessmentStage, actionPlanStage]
+            programStageSections = newSections.concat(criticalSteps, scores)
+            
+            let h1PCAMetadata = {
+                attribute: {id: METADATA},
+                value: JSON.stringify({h2Reworked: "Yes"})
+            }
+
+            let metadataIdx = programOld.attributeValues.findIndex(att => att.attribute.id === METADATA)
+            if(metadataIdx > -1) {
+                programOld.attributeValues[metadataIdx] = h1PCAMetadata
+            }else {
+                programOld.attributeValues.push(h1PCAMetadata)
+            }
+
+            console.log({
+                programs: [prgrm,programOld],
+                programStages,
+                programStageSections,
+                dataElements:program_dataElements
+            })
+        }else{
+            //Fail
+        }
     };
 
     return (

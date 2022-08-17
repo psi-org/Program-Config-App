@@ -111,11 +111,11 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                             }
                             {program.withoutRegistration &&
                                 <FlyoutMenu>
-                                    {programType === "HNQIS" && !pcaMetadata.h2Converted &&
-                                        <MenuItem label={"Convert to HNQIS 2.0 Program"} disabled={pcaMetadata.h2Converted} icon={<UpgradeIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
+                                    {programType === "HNQIS" && pcaMetadata.h2Reworked!=='Yes' &&
+                                        <MenuItem label={"Convert to HNQIS 2.0 Program"} disabled={pcaMetadata.h2Reworked==='Yes'} icon={<UpgradeIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
                                     }
-                                    {programType === "HNQIS" && !pcaMetadata.dataConverted &&
-                                        <MenuItem label={"Export Assessment Data to HNQIS 2.0"} disabled={!pcaMetadata.h2Converted || true} icon={<MoveDownIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
+                                    {programType === "HNQIS" && pcaMetadata.dataConverted!=='Yes' &&
+                                        <MenuItem label={"Export Assessment Data to HNQIS 2.0"} disabled={pcaMetadata.h2Reworked!=='Yes' || true} icon={<MoveDownIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
                                     }
                                     <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
                                 </FlyoutMenu>

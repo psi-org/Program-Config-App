@@ -1,3 +1,4 @@
+// EXCEL TEMPLATE RELEASE NOTES
 export const ReleaseNotes = [
     {
         "version": "v1.0",
