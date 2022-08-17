@@ -107,8 +107,8 @@ const DataElementManager = (props) => {
         { field: "lastUpdated", headerName: "Last Updated", flex: 2, editable: false, valueGetter: craftDate }
     ]
 
-    const doSearch = () => {
-        search({ token: filterValue, page:page }).then(data => {
+    const doSearch = async () => {
+        /* search({ token: filterValue, page:page }).then(data => {
             if (data?.results?.dataElements) {
                 setRows(data.results.dataElements)
                 setTotalRows(data.results.pager.total)    
@@ -117,12 +117,18 @@ const DataElementManager = (props) => {
                 setSelectionModel(prevSelectionModel.current)
                 
             });
-        })
+        }) */
+
+        const data = await search({ token: filterValue, page:page })
+        if(data.results?.dataElements){
+            setRows(data.results.dataElements)
+            setTotalRows(data.results.pager.total)
+            setSelectionModel(Array.from(prevSelectionModel.current))
+        }
     }
 
     useEffect(()=>{
-        if(page<1) return
-        doSearch()
+        if(page>0) doSearch()
     },[page])
 
     useEffect(()=>{
@@ -131,20 +137,17 @@ const DataElementManager = (props) => {
             else checkSelectedDE(selectionModel)
         }
     },[selectionModel])
-
+        
     useEffect(()=>{
-
     },[newDataElements])
 
     const checkSelectedDE = (model) => {
-        setNewDataElements(
-            model.map(id => {
-                let deObject
-                deObject = newDataElements.find(de => de.id === id)
-                if(!deObject) deObject = rows.find(de => de.id===id)
-                return deObject
-            })
-        )
+        setNewDataElements(model.map(id => {
+            let deObject
+            deObject = newDataElements.find(de => de.id === id)
+            if(!deObject) deObject = rows.find(de => de.id===id)
+            return deObject
+        }))
     }
     // END DATA GRID //
 
