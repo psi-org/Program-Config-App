@@ -38,7 +38,8 @@ import {
     FEEDBACK_ORDER,
     BUILD_VERSION,
     COMPETENCY_ATTRIBUTE,
-    COMPETENCY_CLASS
+    COMPETENCY_CLASS,
+    FEEDBACK_TEXT
 } from "../../configs/Constants";
 import { Program, HnqisProgramConfigs, PS_AssessmentStage, PS_ActionPlanStage, PSS_Default, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
 import { DeepCopy } from "../../configs/Utils";
@@ -83,6 +84,17 @@ const queryId = {
     }
 };
 
+const queryOptions = {
+    results: {
+        resource: 'options',
+        params: ({optionsList}) => ({
+            fields: ['id','code'],
+            paging: false,
+            filter: [`id:in:[${optionsList.join(',')}]`]
+        })
+    }
+};
+
 const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
     const [dialogStatus, setDialogStatus] = useState(false);
     const [errorHA, setErrorHA] = useState();
@@ -99,9 +111,11 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
 
     const [sectionsData, setSectionsData] = useState(undefined);
     const [scoresData, setScoresData] = useState(undefined);
+    const [currentChecklistOptions, setCurrentChecklistOptions] = useState(undefined)
 
     const { data: idQueryRes, refetch: getIDs } = useDataQuery(queryId, { lazy: true, variables: { n: undefined } });
     const { data: idProgramType, refetch: getProgramTypeAttribute } = useDataQuery(queryProgramType, { lazy: true });
+    const { data: checklistOptions, refetch: getChecklistOptions } = useDataQuery(queryOptions, { lazy: true, variables: { optionsList: undefined } });
 
     useEffect(() => {
         if (programData && haQuery) {
@@ -119,6 +133,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
 
     useEffect(() => {
         if (programData) {
+            let optionsList = []
             let program = programData?.results?.programs[0];
 
             let h1Tabs = program.programStages[0].programStageSections;
@@ -141,6 +156,9 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
                                 },
                                 {}
                             );
+                        if(metadata[QUESTION_PARENT_OPTIONS_ATTRIBUTE] && !optionsList.includes(metadata[QUESTION_PARENT_OPTIONS_ATTRIBUTE]))
+                            optionsList.push(metadata[QUESTION_PARENT_OPTIONS_ATTRIBUTE].split(',')[0]);
+                        
                         return {
                             tabName: tab.name,
                             programStageDataElement,
@@ -149,6 +167,8 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
                     })
                 ))
             );
+
+            setCurrentChecklistOptions(optionsList)
 
             // Build NEW sections
             setSectionsData(
@@ -224,6 +244,10 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
         let compositiveScoreOrder = ''
         let questionFeedbackOrder = 1
         let labelsQtty = 0
+        let psdeSortOrder = 1
+
+        const optionsResult = await getChecklistOptions({optionsList: currentChecklistOptions})
+        let optionsMap = optionsResult?.results?.options
 
         const program_dataElements = []
         const program_programStageDataElements = []
@@ -238,10 +262,10 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
 
                         // SAVE PROGRAM STAGE DATA ELEMENT
                         let psde = DeepCopy(de.programStageDataElement)
-                        psde.sortOrder = deIndex+1
+                        psde.sortOrder = psdeSortOrder
                         psde.dataElement = {id:de.programStageDataElement.dataElement.id}
                         program_programStageDataElements.push(psde)
-
+                        psdeSortOrder += 1
 
                         let dataElement = de.programStageDataElement.dataElement
 
@@ -255,26 +279,49 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
 
                             let feedbackOrder = `${compositiveScoreOrder}.${questionFeedbackOrder++}` 
                             let foIndex = dataElement.attributeValues.findIndex(att => att.attribute.id === FEEDBACK_ORDER)
-                            
+                            let feedbackOrderAttribute = {
+                                attribute : {id:FEEDBACK_ORDER},
+                                value:feedbackOrder
+                            }
+
                             if(foIndex > -1){
                                 // Update FeedbackOrder
-                                dataElement.attributeValues[foIndex] = {
-                                    attribute : {id:FEEDBACK_ORDER},
-                                    value:feedbackOrder
-                                }
+                                dataElement.attributeValues[foIndex] = feedbackOrderAttribute
                             }else{
-                                dataElement.attributeValues.push({
-                                    attribute : {id:FEEDBACK_ORDER},
-                                    value:feedbackOrder
-                                })
+                                dataElement.attributeValues.push(feedbackOrderAttribute)
                             }
+
+                        }
+
+                        if(dataElement.description){
+
+                            let ftIndex = dataElement.attributeValues.findIndex(att => att.attribute.id === FEEDBACK_TEXT)
+                            let feedbackTextAttribute = {
+                                attribute : {id:FEEDBACK_TEXT},
+                                value:dataElement.description
+                            }
+
+                            if(ftIndex > -1){
+                                // Update FeedbackText
+                                dataElement.attributeValues[ftIndex] = feedbackTextAttribute
+                            }else{
+                                dataElement.attributeValues.push(feedbackTextAttribute)
+                            }
+
+                            dataElement.description = undefined
+                            dataElement.displayDescription = undefined
+
                         }
                         
+
+                        let parentValue = optionsMap.find(option => option.id === de.metadata[QUESTION_PARENT_OPTIONS_ATTRIBUTE]?.split(',')[0] )?.code
                         const pcaMetadata = {
                             elemType : 'question',
                             isCompulsory: de.programStageDataElement.compulsory ? 'Yes':'No',
                             isCritical: de.programStageDataElement.compulsory ? 'Yes':'No',
                             varName: `_S${sectionIndex+1}Q${deIndex+1}`,
+                            parentQuestion: de.metadata[QUESTION_PARENT_ATTRIBUTE],
+                            parentValue: (parseFloat(parentValue) || parentValue),
                             scoreNum:de.metadata[SCORE_NUM_ATTRIBUTE],
                             scoreDen:de.metadata[SCORE_DEN_ATTRIBUTE]
                         }
@@ -361,10 +408,12 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
             program_programStageDataElements.push({
                 displayInReports : false,
                 compulsory:false,
-                sortOrder: scoreIndex+1,
+                sortOrder: psdeSortOrder,
                 dataElement: {id:de.id},
                 programStage: {id:'X'}
             })
+
+            psdeSortOrder += 1
 
             program_dataElements.push(de)
 
