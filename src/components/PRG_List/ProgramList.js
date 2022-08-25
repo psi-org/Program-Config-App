@@ -30,6 +30,7 @@ import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 import About from "./About";
 import H2Metadata from "./H2Metadata";
 import { Tooltip } from "@mui/material";
+//import { semverCoerce } from "semver/functions/coerce";
 
 
 const queryProgramType = {
@@ -67,6 +68,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const ProgramList = () => {
 
+    //console.log(semverCoerce("2.37-SNAPSHOT"))
     // Export Program Metadata //
     const [exportProgramId, setExportProgramId] = useState(undefined)
     const [sharingProgramId, setSharingProgramId] = useState(undefined);

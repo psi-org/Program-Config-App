@@ -2,7 +2,7 @@ export const ProgramIndicatorTemplate = {
     "id": "<indicatorId>",
     "name": "<Short Name> - Competency - C",
     "shortName": "<Short Name> - C",
-    "description": "_H2LocalAnalytics",
+    "description": "_H2Analytics",
     "aggregationType": "COUNT",
     "expression": "V{enrollment_count}",
     "sharing": {
