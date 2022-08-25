@@ -252,6 +252,7 @@ const StageNew = (props) => {
                         fullWidth
                         variant="standard"
                         autoComplete='off'
+                        inputProps={{ maxLength: MAX_STAGE_NAME_LENGTH }}
                         value={stageName}
                         onChange={handleChangeStageName}
                     />

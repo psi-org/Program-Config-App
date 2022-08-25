@@ -606,6 +606,7 @@ const ProgramNew = (props) => {
                             fullWidth
                             variant="standard"
                             autoComplete='off'
+                            inputProps={{ maxLength: MAX_PREFIX_LENGTH }}
                             value={dePrefix}
                             onChange={handleChangeDePrefix}
                         />
@@ -621,6 +622,7 @@ const ProgramNew = (props) => {
                     fullWidth
                     variant="standard"
                     autoComplete='off'
+                    inputProps={{ maxLength: MAX_PROGRAM_NAME_LENGTH-dePrefix.length }}
                     value={programName}
                     onChange={handleChangeProgramName}
                 />
@@ -635,6 +637,7 @@ const ProgramNew = (props) => {
                         sx={{ width: '48%' }}
                         variant="standard"
                         autoComplete='off'
+                        inputProps={{ maxLength: MAX_SHORT_NAME_LENGTH-dePrefix.length }}
                         value={programShortName}
                         onChange={handleChangeProgramShortName}
                     />

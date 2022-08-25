@@ -13,7 +13,7 @@ import TimeIcon from '@mui/icons-material/AccessTime';
 const BUILD_VERSION = "1.6.0"
 const BUILD_DATE = "July 28th, 2022"
 const MIN_VERSION = "2.36.0"
-const MAX_VERSION = "2.38.0"
+const MAX_VERSION = "2.38.2"
 
 const PCA_METADATA_VERSION = "1.0.1"
 const H2_METADATA_VERSION = "1.0.1"

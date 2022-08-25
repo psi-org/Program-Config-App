@@ -68,6 +68,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const ProgramList = () => {
 
+    //console.log(semverCoerce("2.37-SNAPSHOT"))
     // Export Program Metadata //
     const [exportProgramId, setExportProgramId] = useState(undefined)
     const [sharingProgramId, setSharingProgramId] = useState(undefined);
