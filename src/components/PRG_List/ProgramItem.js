@@ -37,6 +37,8 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
     const [open, setOpen] = useState(false)
     const [showProgramForm, setShowProgramForm] = useState(false);
 
+    const h2Ready = localStorage.getItem('h2Ready') === 'true'
+
     const [anchorEl, setAnchorEl] = useState(null);
 
     const toggle = () => setOpen(!open)
@@ -111,11 +113,11 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                             }
                             {program.withoutRegistration &&
                                 <FlyoutMenu>
-                                    {programType === "HNQIS" && pcaMetadata.h2Reworked!=='Yes' &&
+                                    {programType === "HNQIS" && pcaMetadata.h2Reworked!=='Yes' && h2Ready &&
                                         <MenuItem label={"Convert to HNQIS 2.0 Program"} disabled={pcaMetadata.h2Reworked==='Yes'} icon={<UpgradeIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
                                     }
-                                    {programType === "HNQIS" && pcaMetadata.dataConverted!=='Yes' &&
-                                        <MenuItem label={"Export Assessment Data to HNQIS 2.0"} disabled={pcaMetadata.h2Reworked!=='Yes' || true} icon={<MoveDownIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
+                                    {programType === "HNQIS" && pcaMetadata.dataConverted!=='Yes' && h2Ready &&
+                                        <MenuItem label={"Export Assessment Data to HNQIS 2.0"} disabled={pcaMetadata.h2Reworked!=='Yes'} icon={<MoveDownIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
                                     }
                                     <MenuItem disabled={true} destructive label="Delete Program" icon={<DeleteIcon />} onClick={() => { toggle(); deleteProgram(program.id) }} />
                                 </FlyoutMenu>

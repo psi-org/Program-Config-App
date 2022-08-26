@@ -194,7 +194,7 @@ const ProgramList = () => {
                     }
                     {
                         conversionH2ProgramId &&
-                            <H2Convert program={conversionH2ProgramId} setConversionH2ProgramId={setConversionH2ProgramId} setNotification={setNotification}/>
+                            <H2Convert program={conversionH2ProgramId} setConversionH2ProgramId={setConversionH2ProgramId} setNotification={setNotification} doSearch={doSearch} />
                     }
                     {
                         restoreProgramId &&

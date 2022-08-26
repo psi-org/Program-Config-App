@@ -1,4 +1,4 @@
-import { useDataQuery } from "@dhis2/app-runtime";
+import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 
 import { CircularLoader } from "@dhis2/ui";
 import Button from "@mui/material/Button";
@@ -15,7 +15,7 @@ import QuizIcon from "@mui/icons-material/Quiz";
 import PercentIcon from "@mui/icons-material/Percent";
 
 import { useState, useEffect } from "react";
-import { FormControl, FormControlLabel, Switch } from "@mui/material";
+import { DialogTitle, FormControl, FormControlLabel, Switch } from "@mui/material";
 import SelectOptions from "../UIElements/SelectOptions";
 
 import Accordion from "@mui/material/Accordion";
@@ -23,6 +23,8 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
+
+import {parseErrors} from '../../configs/Utils'
 
 import {
     QUESTION_TYPE_ATTRIBUTE,
@@ -50,7 +52,7 @@ const queryProgramMetadata = {
         params: ({ program }) => ({
             //Special care in Organisation Units and Sharing Settings
             fields: [
-                "id","name","shortName","style","ignoreOverdueEvents","skipOffline","onlyEnrollOnce","sharing","maxTeiCountToReturn","selectIncidentDatesInFuture","selectEnrollmentDatesInFuture","registration","favorite","useFirstStageDuringRegistration","completeEventsExpiryDays","withoutRegistration","featureType","minAttributesRequiredToSearch","displayFrontPageList","programType","accessLevel","expiryDays","categoryCombo","programIndicators","translations","attributeValues","userRoles","favorites","programRuleVariables","programTrackedEntityAttributes","notificationTemplates","organisationUnits","programSections","programStages[programStageDataElements[dataElement[*,attributeValues[value,attribute[id,name]]],compulsory,displayInReports,sortOrder],programStageSections[name,dataElements[id]]]",
+                "id","name","shortName","style","ignoreOverdueEvents","skipOffline","onlyEnrollOnce","sharing","maxTeiCountToReturn","selectIncidentDatesInFuture","selectEnrollmentDatesInFuture","registration","favorite","useFirstStageDuringRegistration","completeEventsExpiryDays","withoutRegistration","featureType","minAttributesRequiredToSearch","displayFrontPageList","programType","accessLevel","expiryDays","categoryCombo","programIndicators","translations","attributeValues","userRoles","favorites","programRuleVariables","programTrackedEntityAttributes","notificationTemplates","organisationUnits","programSections","programStages[id,programStageDataElements[dataElement[*,attributeValues[value,attribute[id,name]]],compulsory,displayInReports,sortOrder],programStageSections[name,dataElements[id]]]",
             ],
             filter: [`id:eq:${program}`],
         }),
@@ -95,10 +97,29 @@ const queryOptions = {
     }
 };
 
-const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
+const metadataMutation = {
+    resource: 'metadata?mergeMode=REPLACE',
+    type: 'create',
+    data: ({ data }) => data
+};
+
+const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearch }) => {
+
+    let metadataDM = useDataMutation(metadataMutation);
+    const metadataRequest = {
+        mutate: metadataDM[0],
+        loading: metadataDM[1].loading,
+        error: metadataDM[1].error,
+        data: metadataDM[1].data,
+        called: metadataDM[1].called
+    };
+
     const [dialogStatus, setDialogStatus] = useState(false);
     const [errorHA, setErrorHA] = useState();
     const [loading, setLoading] = useState(true);
+    const [loadingConversion, setLoadingConversion] = useState(false);
+    const [statusModal, setStatusModal] = useState(false);
+    const [conversionError, setConversionError] = useState(undefined);
 
     const { data: programData } = useDataQuery(queryProgramMetadata, {
         variables: { program },
@@ -237,7 +258,9 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
     };
 
     const convertProgram = async () => {
-        console.log({sectionsData,scoresData});
+        setLoadingConversion(true)
+        setStatusModal(true)
+        console.log({sectionsData,scoresData}); // TODO: Remove when import is working
         const sections = DeepCopy(sectionsData)
         const scores = DeepCopy(scoresData)
 
@@ -430,7 +453,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
         if (uidPool && prgTypeId){
             //Program Setup
             let programOld = programData?.results?.programs[0]
-            console.log(programOld)
+            console.log(programOld) // TODO: Remove when import is working
 
             let programId = uidPool.shift()
             let assessmentId = uidPool.shift()
@@ -537,15 +560,35 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
                 programOld.attributeValues.push(h1PCAMetadata)
             }
 
-            console.log({
+            programOld.programStages.forEach(ps => {
+                delete ps.programStageDataElements
+                delete ps.programStageSections
+            })
+            
+
+            let resultMeta = {
                 programs: [prgrm,programOld],
                 programStages,
                 programStageSections,
                 dataElements:program_dataElements
+            }
+
+            metadataRequest.mutate({ data: resultMeta }).then(response => {
+                if (response.status === 'OK') {
+                    doSearch(programOld.name)
+                    setNotification({
+                        message: 'The HNQIS 1.X Program has been converted to HNQIS 2.0 successfully, access it to apply changes and finish setting it up.',
+                        severity: 'success'
+                    });
+                    setConversionH2ProgramId(undefined)
+                } else {
+                    setConversionError(parseErrors(response))
+                }
             })
         }else{
-            //Fail
+            setConversionError("Error while fetching Metadata from the server")
         }
+        setLoadingConversion(false)
     };
 
     return (
@@ -738,8 +781,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
 
                 <DialogActions style={{ padding: "1em" }}>
                     <Button onClick={() => hideForm()} color="error">
-                        {" "}
-                        Cancel{" "}
+                        Cancel
                     </Button>
                     {!loading && (
                         <Button
@@ -750,8 +792,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
                             disabled={!programData?.results}
                             startIcon={<UpgradeIcon />}
                         >
-                            {" "}
-                            Convert to HNQIS 2.0{" "}
+                            Convert to HNQIS 2.0
                         </Button>
                     )}
                 </DialogActions>
@@ -775,6 +816,31 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification }) => {
                     },
                 }}
             />
+            <CustomMUIDialog open={statusModal} maxWidth="sm" fullWidth={true}>
+                <DialogTitle id="alert-dialog-title">
+                    Conversion Status
+                </DialogTitle>
+                <DialogContent
+                    dividers
+                    style={{
+                        padding: "1em 2em",
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
+                >
+                    {loadingConversion &&
+                        <CircularLoader />
+                    }
+                    {conversionError && <p style={{color: '#AA0000'}}>{conversionError}</p>}
+                </DialogContent>
+                <DialogActions>
+                    {!loadingConversion &&
+                        <Button onClick={() => setStatusModal(false)} color="primary">
+                            Close
+                        </Button>
+                    }
+                </DialogActions>
+            </CustomMUIDialog>
         </>
     );
 };
