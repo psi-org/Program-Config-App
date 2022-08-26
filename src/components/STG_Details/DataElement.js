@@ -79,15 +79,17 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
                         <div className="ml_item-title"> 
                             {deImportStatus}
                             { 
-                                renderFormName || 
-                                (dataElement.formName && dataElement.formName?.replaceAll(' ','')!=='')?
-                                    dataElement.formName:
-                                    <span style={{display: 'flex', alignItems: 'center'}}>
-                                        <em style={{marginRight: '0.5em'}}>{dataElement.name}</em>
-                                        <Tooltip title="No Form Name provided" placement="right" color="warning">
-                                            <WarningAmberIcon fontSize="small"/>
-                                        </Tooltip>
-                                    </span>
+                                renderFormName?renderFormName:
+                                (
+                                    (dataElement.formName && dataElement.formName?.replaceAll(' ','')!=='')?
+                                        dataElement.formName:
+                                        <span style={{display: 'flex', alignItems: 'center'}}>
+                                            <em style={{marginRight: '0.5em'}}>{dataElement.name}</em>
+                                            <Tooltip title="No Form Name provided" placement="right" color="warning">
+                                                <WarningAmberIcon fontSize="small"/>
+                                            </Tooltip>
+                                        </span>
+                                )
                             }
                         </div>
                         <div className="ml_item-warning_error" onClick={()=>setShowValidationMessage(!showValidationMessage)}>
