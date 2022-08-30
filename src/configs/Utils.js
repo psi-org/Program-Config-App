@@ -1,3 +1,5 @@
+import { coerce, gte, lte } from 'semver';
+
 export function splitPosition(position) {
   return position.split(/(\d+)/);
 }
@@ -105,7 +107,9 @@ function versionCompare(v1, v2, options) {
 }
 
 export function versionIsValid(serverVersion, limitMin, limitMax){
-  return versionCompare(serverVersion, limitMin) >= 0 && versionCompare(serverVersion, limitMax) <= 0;
+  let coercedVersion = coerce(serverVersion)
+  //return versionCompare(serverVersion, limitMin) >= 0 && versionCompare(serverVersion, limitMax) <= 0;
+  return gte(coercedVersion, coerce(limitMin)) && lte(coercedVersion, coerce(limitMax));
 }
 
 export function parseErrors(response){
