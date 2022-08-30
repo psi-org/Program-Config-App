@@ -24,6 +24,9 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
+
 import {parseErrors} from '../../configs/Utils'
 
 import {
@@ -352,7 +355,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
                         // Element Type is Label
                         if(de.metadata[QUESTION_TYPE_ATTRIBUTE] === '7'){
                             pcaMetadata.elemType = 'label'
-                            pcaMetadata.labelFormName = dataElement.formName
+                            pcaMetadata.labelFormName = dataElement.formName+""
                             dataElement.formName = '   '
                             labelsQtty += 1
                         }
@@ -481,6 +484,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
 
             let pcaMetadataVal = {}
             pcaMetadataVal.buildVersion = BUILD_VERSION
+            pcaMetadataVal.h1Program = programOld.id
             pcaMetadataVal.useCompetencyClass = useCompetency ? 'Yes' : 'No'
             pcaMetadataVal.healthArea = healthArea
             pcaMetadataVal.dePrefix = (programOld.shortName.slice(0,22))+" H2"
@@ -504,6 +508,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
             newSections = newSections.map(section => {
                 section.programStage.id = assessmentId
                 section.id = uidPool.shift()
+                assessmentStage.programStageSections.push({ id: section.id })
                 return section
             })
 
@@ -573,6 +578,8 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
                 dataElements:program_dataElements
             }
 
+            console.log(resultMeta)
+
             metadataRequest.mutate({ data: resultMeta }).then(response => {
                 if (response.status === 'OK') {
                     doSearch(programOld.name)
@@ -584,11 +591,14 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
                 } else {
                     setConversionError(parseErrors(response))
                 }
+
+                setLoadingConversion(false)
             })
+
         }else{
             setConversionError("Error while fetching Metadata from the server")
         }
-        setLoadingConversion(false)
+        
     };
 
     return (
@@ -829,7 +839,9 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
                     }}
                 >
                     {loadingConversion &&
-                        <CircularLoader />
+                        <Box sx={{ width: '100%' }}>
+                            <LinearProgress />
+                        </Box>
                     }
                     {conversionError && <p style={{color: '#AA0000'}}>{conversionError}</p>}
                 </DialogContent>
