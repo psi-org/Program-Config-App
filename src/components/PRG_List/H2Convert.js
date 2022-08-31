@@ -555,7 +555,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
             
             let h1PCAMetadata = {
                 attribute: {id: METADATA},
-                value: JSON.stringify({h2Reworked: "Yes"})
+                value: JSON.stringify({h2Reworked:"Yes",upgradedProgram:prgrm.id})
             }
 
             let metadataIdx = programOld.attributeValues.findIndex(att => att.attribute.id === METADATA)

@@ -113,8 +113,8 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
                             }
                             {program.withoutRegistration &&
                                 <FlyoutMenu>
-                                    {programType === "HNQIS" && pcaMetadata.h2Reworked!=='Yes' && h2Ready &&
-                                        <MenuItem label={"Convert to HNQIS 2.0 Program"} disabled={pcaMetadata.h2Reworked==='Yes'} icon={<UpgradeIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
+                                    {programType === "HNQIS" && h2Ready &&
+                                        <MenuItem label={pcaMetadata.h2Reworked!=='Yes'?"Convert to HNQIS 2.0 Program":"Already Converted to HNQIS 2.0"} disabled={pcaMetadata.h2Reworked==='Yes'} icon={<UpgradeIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
                                     }
                                     {programType === "HNQIS" && pcaMetadata.dataConverted!=='Yes' && h2Ready &&
                                         <MenuItem label={"Export Assessment Data to HNQIS 2.0"} disabled={pcaMetadata.h2Reworked!=='Yes'} icon={<MoveDownIcon />} onClick={() => { toggle(); convertToH2(program.id) }} />
