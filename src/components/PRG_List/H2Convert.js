@@ -263,7 +263,6 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
     const convertProgram = async () => {
         setLoadingConversion(true)
         setStatusModal(true)
-        console.log({sectionsData,scoresData}); // TODO: Remove when import is working
         const sections = DeepCopy(sectionsData)
         const scores = DeepCopy(scoresData)
 
@@ -348,8 +347,8 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
                             varName: `_S${sectionIndex+1}Q${deIndex+1}`,
                             parentQuestion: de.metadata[QUESTION_PARENT_ATTRIBUTE],
                             parentValue: (parseFloat(parentValue) || parentValue),
-                            scoreNum:de.metadata[SCORE_NUM_ATTRIBUTE],
-                            scoreDen:de.metadata[SCORE_DEN_ATTRIBUTE]
+                            scoreNum:parseFloat(de.metadata[SCORE_NUM_ATTRIBUTE]) || undefined,
+                            scoreDen:parseFloat(de.metadata[SCORE_DEN_ATTRIBUTE]) || undefined
                         }
 
                         // Element Type is Label
@@ -456,7 +455,6 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
         if (uidPool && prgTypeId){
             //Program Setup
             let programOld = programData?.results?.programs[0]
-            console.log(programOld) // TODO: Remove when import is working
 
             let programId = uidPool.shift()
             let assessmentId = uidPool.shift()
@@ -577,8 +575,6 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
                 programStageSections,
                 dataElements:program_dataElements
             }
-
-            console.log(resultMeta)
 
             metadataRequest.mutate({ data: resultMeta }).then(response => {
                 if (response.status === 'OK') {
