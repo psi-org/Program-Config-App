@@ -270,6 +270,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
         let questionFeedbackOrder = 1
         let labelsQtty = 0
         let psdeSortOrder = 1
+        let originalLabelIDs = []
 
         const optionsResult = await getChecklistOptions({optionsList: currentChecklistOptions})
         let optionsMap = optionsResult?.results?.options
@@ -282,7 +283,8 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
                 
                 section.dataElements = section.dataElements.sort( 
                     (a,b) => parseInt(a.metadata[QUESTION_ORDER_ATTRIBUTE]) - parseInt(b.metadata[QUESTION_ORDER_ATTRIBUTE])
-                ).map(
+                ).filter(de => de.programStageDataElement.dataElement.formName.toLowerCase().replaceAll(' ','') !== 'endoftab')
+                .map(
                     (de,deIndex) => {
 
                         // SAVE PROGRAM STAGE DATA ELEMENT
@@ -355,7 +357,11 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
                         if(de.metadata[QUESTION_TYPE_ATTRIBUTE] === '7'){
                             pcaMetadata.elemType = 'label'
                             pcaMetadata.labelFormName = dataElement.formName+""
+                            dataElement.name = dataElement.name.slice(0,225)+" [H2]"
+                            dataElement.shortName = dataElement.shortName.slice(0,45)+" [H2]"
+                            dataElement.code = dataElement.code.slice(0,45)+" [H2]"
                             dataElement.formName = '   '
+                            originalLabelIDs.push(dataElement.id)
                             labelsQtty += 1
                         }
 
@@ -500,7 +506,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
 
             assessmentStage = DeepCopy(PS_AssessmentStage)
             assessmentStage.id = assessmentId
-            assessmentStage.name = assessmentStage.name
+            assessmentStage.name = programId+'_Assessment' //! Not adding the ID may result in an error
             
             //Assign Sections
             newSections = newSections.map(section => {
@@ -515,6 +521,7 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
             assessmentStage.program.id = programId
 
             actionPlanStage = DeepCopy(PS_ActionPlanStage);
+            actionPlanStage.name = programId+'_Action Plan' //! Not adding the ID may result in an error
             actionPlanStage.id = actionPlanId;
             actionPlanStage.program.id = programId;
 
@@ -567,14 +574,40 @@ const H2Convert = ({ program, setConversionH2ProgramId, setNotification, doSearc
                 delete ps.programStageDataElements
                 delete ps.programStageSections
             })
-            
 
+            // Creating New Data Elements for labels (Patching IDs)
+            let labelIDMapping = {}
+            originalLabelIDs.forEach(id => labelIDMapping[id] = uidPool.shift())
+
+            programStages.forEach(ps => {
+                ps.programStageDataElements.forEach(psde => psde.id = (labelIDMapping[psde.id] || psde.id))
+            })
+
+            programStageSections.forEach(pss => {
+                pss.dataElements.forEach(de => de.id = (labelIDMapping[de.id] || de.id))
+            })
+
+            program_dataElements.forEach(de => {
+                de.id = (labelIDMapping[de.id] || de.id)
+            })
+            
+            // Building results object
             let resultMeta = {
                 programs: [prgrm,programOld],
                 programStages,
                 programStageSections,
                 dataElements:program_dataElements
             }
+
+            /*console.log(resultMeta)
+
+            doSearch(programOld.name)
+            setNotification({
+                message: 'The HNQIS 1.X Program has been converted to HNQIS 2.0 successfully, access it to apply changes and finish setting it up.',
+                severity: 'success'
+            });
+            setConversionH2ProgramId(undefined)
+            setLoadingConversion(false)*/
 
             metadataRequest.mutate({ data: resultMeta }).then(response => {
                 if (response.status === 'OK') {

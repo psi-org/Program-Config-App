@@ -408,7 +408,7 @@ const ProgramNew = (props) => {
     
                         assessmentStage = DeepCopy(PS_AssessmentStage);
                         assessmentStage.id = assessmentId;
-                        assessmentStage.name = assessmentStage.name;
+                        assessmentStage.name = programId+'_Assessment'; //! Not adding the ID may result in an error
                         assessmentStage.programStageSections.push({ id: defaultSectionId });
                         assessmentStage.programStageSections.push({ id: stepsSectionId });
                         assessmentStage.programStageSections.push({ id: scoresSectionId });
@@ -416,7 +416,7 @@ const ProgramNew = (props) => {
     
                         actionPlanStage = DeepCopy(PS_ActionPlanStage);
                         actionPlanStage.id = actionPlanId;
-                        actionPlanStage.name = actionPlanStage.name;
+                        actionPlanStage.name = programId+'_Action Plan'; //! Not adding the ID may result in an error
                         actionPlanStage.program.id = programId;
     
                         defaultSection = DeepCopy(PSS_Default);
