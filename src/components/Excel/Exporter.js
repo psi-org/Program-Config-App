@@ -549,26 +549,41 @@ const Exporter = (props) => {
     dataValidation(ws, "D3:D3000", {
       type: 'list',
       allowBlank: true,
+      error: 'Please select the valid value from the dropdown',
+      errorTitle: 'Invalid Selection',
+      showErrorMessage: true,
       formulae: yesNoValidator
     });
     dataValidation(ws, "E3:E3000", {
       type: 'list',
       allowBlank: true,
+      error: 'Please select the valid value from the dropdown',
+      errorTitle: 'Invalid Selection',
+      showErrorMessage: true,
       formulae: yesNoValidator
     });
     dataValidation(ws, "F3:F3000", {
       type: 'list',
       allowBlank: true,
+      error: 'Please select the valid value from the dropdown',
+      errorTitle: 'Invalid Selection',
+      showErrorMessage: true,
       formulae: ['Value_Type']
     });
     dataValidation(ws, "G3:G3000", {
       type: 'list',
       allowBlank: true,
+      error: 'Please select the valid value from the dropdown',
+      errorTitle: 'Invalid Selection',
+      showErrorMessage: true,
       formulae: ['Option_Sets_option']
     });
     dataValidation(ws, "H3:H3000", {
       type: 'list',
       allowBlank: true,
+      error: 'Please select the valid value from the dropdown',
+      errorTitle: 'Invalid Selection',
+      showErrorMessage: true,
       formulae: ['Legend_Set_Option']
     });
     dataValidation(ws, "I3:J3000", {
@@ -745,13 +760,13 @@ const Exporter = (props) => {
     defineName(ws, "B3:B100", "Value_Type");
     defineName(ws, "D3:D100", "Render_Type");
     defineName(ws, "F3:F100", "Agg_Operator");
-    defineName(ws, "H2:J100", "Option_Sets_Data");
-    defineName(ws, "H3:H100", "Option_Sets_option");
+    defineName(ws, "H2:J3000", "Option_Sets_Data");
+    defineName(ws, "H3:H3000", "Option_Sets_option");
     defineName(ws, "L2:M100", "Health_Area_Data");
     defineName(ws, "M3:M100", "Health_Area_Option");
-    defineName(ws, "O2:P100", "Legend_Set_Data");
-    defineName(ws, "O3:O100", "Legend_Set_Option");
-    defineName(ws, "R2:S100", "Program_Data");
+    defineName(ws, "O2:P3000", "Legend_Set_Data");
+    defineName(ws, "O3:O3000", "Legend_Set_Option");
+    defineName(ws, "R2:S3000", "Program_Data");
     await ws.protect(password);
   };
 

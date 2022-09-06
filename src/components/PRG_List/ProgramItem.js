@@ -65,10 +65,10 @@ const ProgramItem = ({ program, downloadMetadata, shareProgram, assignOrgUnit, b
         <div className="ml_item" style={{ color: "#333333", backgroundColor: "#F8F8F8", border: "0.5px solid #D5DDE5", borderRadius: "4px", padding: '5px' }}>
             <div className="ml_list-icon"> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
                 <div className="ml_item-desc" style={{ width: '3.2em' }}>
-                    <div style={{ backgroundColor: (program.style?.color || '#2c6693'), width: '3em', height: '3em', minWidth: '3em', minHeight: '3em', border: '1px solid #DDD', borderRadius: '10%', padding: '0' }}>
+                    <div style={{ backgroundColor: (program.style?.color || '#e0e0e0'), width: '3em', height: '3em', minWidth: '3em', minHeight: '3em', border: '1px solid #DDD', borderRadius: '10%', padding: '0' }}>
                         <img
-                            src={`${(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)}/api/icons/${program.style?.icon || 'dhis2_logo_positive'}/icon.svg`}
-                            style={{ width: '100%', height: 'auto', borderRadius: '10%', zIndex: '999', filter: `brightness(0) invert(${tinycolor(program.style?.color || '#2c6693').isDark() ? 1 : 0})`, objectFit: 'cover' }}
+                            src={`${(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)}/api/icons/${program.style?.icon || 'clinical_fe_outline'}/icon.svg`}
+                            style={{ width: '100%', height: 'auto', borderRadius: '10%', zIndex: '999', filter: `brightness(0) invert(${tinycolor(program.style?.color || '#e0e0e0').isDark() ? 1 : 0})`, objectFit: 'cover' }}
                         />
                     </div>
                 </div>
