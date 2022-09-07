@@ -170,6 +170,28 @@ const PS_Generic = {
     "programStageSections": []
 }
 
+const HNQIS2_TEI = {
+    trackedEntityType: "<Assessment HNQIS>",
+    orgUnit: "<Downloaded Event Org Unit>",
+    attributes: [
+        {
+            attribute: "<Attribute ID>",
+            value: "<Value>",
+        },
+    ],
+    enrollments: [
+        {
+            orgUnit: "<Downloaded Event Org Unit>",
+            program: "<HNQIS2 Program ID>",
+            enrollmentDate: "<Downloaded Event Date>",
+            incidentDate: "<Downloaded Event Date>",
+            events: [
+                //One event for the assessment and up to three action plans
+            ],
+        },
+    ],
+};
+
 module.exports = {
     Program,
     HnqisProgramConfigs,
@@ -178,5 +200,6 @@ module.exports = {
     PS_ActionPlanStage,
     PSS_Default,
     PSS_CriticalSteps,
-    PSS_Scores
-}
+    PSS_Scores,
+    HNQIS2_TEI
+};

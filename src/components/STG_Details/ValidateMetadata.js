@@ -29,7 +29,7 @@ const ValidateMetadata = (props) => {
             hasVarName: { enable: true, title: "Parent Name not valid", errorMsg: { code: "EXW110", text: "The specified question does not have a valid Parent Name." } },
             hasBothNumeratorDenominator: { enable: true, title: "Numerator or Denominator missing", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (Numerator or Denominator)" } },
             validAggregationType: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW104", text: "The expected Aggregation Operator for the label Data Element is NONE" } },
-            validAggregationQuestion: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW105", text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for numeric types and NONE for text inputs)" } },
+            validAggregationQuestion: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW105", text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for Integer and Number types, and NONE for text inputs)" } },
             isNumeratorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW105", text: "The specified question Numerator is not numeric" } },
             isDenominatorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW108", text: "The specified question Denominator is not numeric" } },
             hasParentQuestionNAnswerValue: { enable: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } },
@@ -405,8 +405,16 @@ const ValidateMetadata = (props) => {
 
         function validAggregationQuestion(metaData, dataElement) {
             if (metaData.elemType === "question") {
-                if (dataElement.valueType === "NUMBER") return (dataElement.aggregationType === "SUM" || dataElement.aggregationType === "AVERAGE");
-                else if (dataElement.valueType === "LONG_TEXT") return (dataElement.aggregationType === "NONE");
+                if (
+                    dataElement.valueType === "NUMBER" ||
+                    dataElement.valueType === "INTEGER"
+                )
+                    return (
+                        dataElement.aggregationType === "SUM" ||
+                        dataElement.aggregationType === "AVERAGE"
+                    );
+                else if (dataElement.valueType === "LONG_TEXT")
+                    return dataElement.aggregationType === "NONE";
                 return true;
             }
             return true;
