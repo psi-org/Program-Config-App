@@ -32,7 +32,7 @@ import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 
-import { parseErrors } from "../../configs/Utils";
+import { parseErrorsUL } from "../../configs/Utils";
 
 import {
     QUESTION_TYPE_ATTRIBUTE,
@@ -748,7 +748,10 @@ const H2Convert = ({
 
             programStages.forEach((ps) => {
                 ps.programStageDataElements.forEach(
-                    (psde) => (psde.id = labelIDMapping[psde.id] || psde.id)
+                    (psde) =>
+                        (psde.dataElement.id =
+                            labelIDMapping[psde.dataElement.id] ||
+                            psde.dataElement.id)
                 );
             });
 
@@ -790,7 +793,7 @@ const H2Convert = ({
                     });
                     setConversionH2ProgramId(undefined);
                 } else {
-                    setConversionError(parseErrors(response));
+                    setConversionError(parseErrorsUL(response));
                 }
 
                 setLoadingConversion(false);
@@ -1143,13 +1146,21 @@ const H2Convert = ({
                         </Box>
                     )}
                     {conversionError && (
-                        <p style={{ color: "#AA0000" }}>{conversionError}</p>
+                        <div>
+                            <p>
+                                The process could not be completed, see details
+                                below:
+                            </p>
+                            <div style={{ color: "#AA0000", padding: "0 1.2em" }}>
+                                {conversionError}
+                            </div>
+                        </div>
                     )}
                 </DialogContent>
                 <DialogActions>
                     {!loadingConversion && (
                         <Button
-                            onClick={() => setStatusModal(false)}
+                            onClick={() => {setConversionError(undefined);setStatusModal(false);}}
                             color="primary"
                         >
                             Close

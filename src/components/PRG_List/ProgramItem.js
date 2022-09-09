@@ -271,7 +271,7 @@ const ProgramItem = ({
                                         h2Ready && (
                                             <MenuItem
                                                 label={
-                                                    "Export Assessment Data to HNQIS 2.0"
+                                                    "Transfer Assessment Data to HNQIS 2.0"
                                                 }
                                                 disabled={
                                                     pcaMetadata.h2Reworked !==
@@ -280,7 +280,7 @@ const ProgramItem = ({
                                                 icon={<MoveDownIcon />}
                                                 onClick={() => {
                                                     toggle();
-                                                    transferDataH2(program.id);
+                                                    transferDataH2(program);
                                                 }}
                                             />
                                         )}

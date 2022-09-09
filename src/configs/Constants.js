@@ -23,15 +23,72 @@ const PCA_OPTION_SETS = ["TOcCuCN2CLm"]
 const PCA_OPTIONS = ["Ip3IqzzqgLN","Jz4YKD15lnK","QR0HHcQri91","v9XPATv6G3N"]
 const PCA_USER_ROLES = ["QbYqOgwk5fJ", "JDmJ4ADTaDq"]
 
+// *HNQIS2 Attributes
+const COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe"
+const GLOBAL_SCORE_ATTRIBUTE = "NQdpdST0Gcx"
+const ASSESSMENT_DATE_ATTRIBUTE = "UlUYUyZJ6o9"
+const HEALTH_AREA_ATTRIBUTE = "Xe5hUu6KkUT"
+const ORGANISATION_UNIT_ATTRIBUTE = "nHg1hGgtJwm"
+
+// *H2 Data Elements
+const COMPETENCY_CLASS = "NAaHST5ZDTE"
+const CRITICAL_STEPS = "VqBfZjZhKkU"
+const NON_CRITICAL_STEPS = "pzWDtDUorBt"
+const ACTION_PLAN_ACTION = "F0Qcr8ANr7t"
+const ACTION_PLAN_DUE_DATE = "DIoqtxbSJIL"
+const ACTION_PLAN_RESPONSIBLE = "nswci5V4j0d"
+
+// *H2 Tracked Entity Type
+const ASSESSMENT_TET = "oNwpeWkfoWc"
+
+// *H1 Control Data Elements
+const H1_OVERALL_SCORE = "Y8Nmpp7RhXw"
+const H1_COMPETENCY_CLASS = "KesgQ5NHkQW"
+
 const H2_REQUIRED = {
-    dataElements : ["NAaHST5ZDTE","VqBfZjZhKkU","pzWDtDUorBt","F0Qcr8ANr7t","DIoqtxbSJIL","nswci5V4j0d"],
-    optionSets : ["NDfZ129owtz","y752HEwvCGi"],
-    options : ["BNjofUBvlJ8","Ox6VQNmvuS3","SzQKvyTKPEw","NPw1hV4degm","lztu61LKSII","McXRLIwjDh7","xTJOcijWyaD","UgcqvJVJ9f0","aYWZXNhvXQw","C9L7MCPeHr5","c8qOHzSbhWM","imVa2DiLgrJ","r8UqKmXwXqa","RHreLvo1UWn","hX7DJdCN9Ou","xaBeYsM2hFH","jdVVvtwuJ7Y","e10afvAkkPR","OqRNLt5Nbub","MstdLcCaYZW","Jhn703YNPa1"],
-    trackedEntityTypes : ["oNwpeWkfoWc"],
-    trackedEntityAttributes: ["Xe5hUu6KkUT","NQdpdST0Gcx","nHg1hGgtJwm","UlUYUyZJ6o9","ulU9KKgSLYe"],
-    attributes : ["LP171jpctBm","yhKEe6BLEer"],
-    legendSets: ["RXxPYFwtgf4"]
-}
+    dataElements: [
+        COMPETENCY_CLASS,
+        CRITICAL_STEPS,
+        NON_CRITICAL_STEPS,
+        ACTION_PLAN_ACTION,
+        ACTION_PLAN_DUE_DATE,
+        ACTION_PLAN_RESPONSIBLE,
+    ],
+    optionSets: ["NDfZ129owtz", "y752HEwvCGi"],
+    options: [
+        "BNjofUBvlJ8",
+        "Ox6VQNmvuS3",
+        "SzQKvyTKPEw",
+        "NPw1hV4degm",
+        "lztu61LKSII",
+        "McXRLIwjDh7",
+        "xTJOcijWyaD",
+        "UgcqvJVJ9f0",
+        "aYWZXNhvXQw",
+        "C9L7MCPeHr5",
+        "c8qOHzSbhWM",
+        "imVa2DiLgrJ",
+        "r8UqKmXwXqa",
+        "RHreLvo1UWn",
+        "hX7DJdCN9Ou",
+        "xaBeYsM2hFH",
+        "jdVVvtwuJ7Y",
+        "e10afvAkkPR",
+        "OqRNLt5Nbub",
+        "MstdLcCaYZW",
+        "Jhn703YNPa1",
+    ],
+    trackedEntityTypes: [ASSESSMENT_TET],
+    trackedEntityAttributes: [
+        HEALTH_AREA_ATTRIBUTE,
+        GLOBAL_SCORE_ATTRIBUTE,
+        ORGANISATION_UNIT_ATTRIBUTE,
+        ASSESSMENT_DATE_ATTRIBUTE,
+        COMPETENCY_ATTRIBUTE,
+    ],
+    attributes: ["LP171jpctBm", "yhKEe6BLEer"],
+    legendSets: ["RXxPYFwtgf4"],
+};
 
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'numeric',minute:'numeric',second:'numeric',hour12:false }
 
@@ -74,9 +131,6 @@ const REPORT_DATE_TO_USE = [
 
 const METADATA = "haUflNqP85K"
 
-const COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe"
-const GLOBAL_SCORE_ATTRIBUTE = "NQdpdST0Gcx"
-
 const QUESTION_TYPE_ATTRIBUTE = "RkNBKHl7FcO"
 const DE_TYPE_ATTRIBUTE = "IMVz39TtAHM"
 const HEADER_ATTRIBUTE = "olcVXnDPG1U"
@@ -87,7 +141,7 @@ const SCORE_NUM_ATTRIBUTE = "Zyr7rlDOJy8"
 const SCORE_DEN_ATTRIBUTE = "l7WdLDhE3xW"
 const QUESTION_ORDER_ATTRIBUTE = "xf9iDHNFLgx"
 
-const COMPETENCY_CLASS = "NAaHST5ZDTE"
+
 
 const FEEDBACK_ORDER = "LP171jpctBm"
 const FEEDBACK_TEXT = "yhKEe6BLEer"
@@ -174,5 +228,16 @@ export {
     COMPOSITIVE_SCORE_ATTRIBUTE,
     SCORE_NUM_ATTRIBUTE,
     SCORE_DEN_ATTRIBUTE,
-    QUESTION_ORDER_ATTRIBUTE
-}
+    QUESTION_ORDER_ATTRIBUTE,
+    ASSESSMENT_DATE_ATTRIBUTE,
+    HEALTH_AREA_ATTRIBUTE,
+    ORGANISATION_UNIT_ATTRIBUTE,
+    CRITICAL_STEPS,
+    NON_CRITICAL_STEPS,
+    ACTION_PLAN_ACTION,
+    ACTION_PLAN_DUE_DATE,
+    ACTION_PLAN_RESPONSIBLE,
+    ASSESSMENT_TET,
+    H1_OVERALL_SCORE,
+    H1_COMPETENCY_CLASS
+};

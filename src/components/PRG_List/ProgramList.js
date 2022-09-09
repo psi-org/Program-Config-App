@@ -79,7 +79,7 @@ const ProgramList = () => {
     const [readOnlyPermission, setReadOnlyPermission] = useState(false);
     const [orgUnitProgramId, setOrgUnitProgramId] = useState(undefined);
     const [conversionH2ProgramId, setConversionH2ProgramId] = useState(undefined);
-    const [transferH2ProgramID, setTransferH2ProgramID] = useState(undefined);
+    const [transferH2Program, setTransferH2Program] = useState(undefined);
 
     // *********************** //
 
@@ -128,7 +128,7 @@ const ProgramList = () => {
     }
 
     const transferDataH2 = (program) => {
-        setTransferH2ProgramID(program);
+        setTransferH2Program(program);
     };
 
     const restoreProgram = (program) => {
@@ -246,10 +246,10 @@ const ProgramList = () => {
                             doSearch={doSearch}
                         />
                     )}
-                    {transferH2ProgramID && (
+                    {transferH2Program && (
                         <H2Transfer
-                            program={transferH2ProgramID}
-                            setTransferH2ProgramID={setTransferH2ProgramID}
+                            programConfig={transferH2Program}
+                            setTransferH2Program={setTransferH2Program}
                             setNotification={setNotification}
                             doSearch={doSearch}
                         />
