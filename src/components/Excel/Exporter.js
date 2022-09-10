@@ -757,16 +757,17 @@ const Exporter = (props) => {
     printObjectArray(ws, props.healthAreaData, "L2", "d5a6bd")
     printObjectArray(ws, props.legendSetData, "O2", "9fc5e8");
     printObjectArray(ws, props.programData, "R2", "9fc5e8");
-    defineName(ws, "B3:B100", "Value_Type");
-    defineName(ws, "D3:D100", "Render_Type");
-    defineName(ws, "F3:F100", "Agg_Operator");
-    defineName(ws, "H2:J3000", "Option_Sets_Data");
-    defineName(ws, "H3:H3000", "Option_Sets_option");
-    defineName(ws, "L2:M100", "Health_Area_Data");
-    defineName(ws, "M3:M100", "Health_Area_Option");
-    defineName(ws, "O2:P3000", "Legend_Set_Data");
-    defineName(ws, "O3:O3000", "Legend_Set_Option");
-    defineName(ws, "R2:S3000", "Program_Data");
+
+    defineName(ws, `B3:B${valueType.length+2}`, "Value_Type");
+    defineName(ws, `D3:D${renderType.length+2}`, "Render_Type");
+    defineName(ws, `F3:F${aggOperator.length+2}`, "Agg_Operator");
+    defineName(ws, `H2:J${props.optionData.length+2}`, "Option_Sets_Data");
+    defineName(ws, `H3:H${props.optionData.length+2}`, "Option_Sets_option");
+    defineName(ws, `L2:M${props.healthAreaData.length+2}`, "Health_Area_Data");
+    defineName(ws, `M3:M${props.healthAreaData.length+2}`, "Health_Area_Option");
+    defineName(ws, `O2:P${props.legendSetData.length+2}`, "Legend_Set_Data");
+    defineName(ws, `O3:O${props.legendSetData.length+2}`, "Legend_Set_Option");
+    defineName(ws, `R2:S${props.programData.length+2}`, "Program_Data");
     await ws.protect(password);
   };
 
