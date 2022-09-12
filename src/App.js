@@ -79,7 +79,7 @@ const App = () => {
 
     if(serverInfo) window.localStorage.SERVER_VERSION = serverInfo.version
 
-    const versionValid = serverInfo?versionIsValid(serverInfo.version.split("-")[0], MIN_VERSION, MAX_VERSION):true
+    const versionValid = serverInfo?versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION):true
 
     const pcaReady = availableMetadata?
         availableMetadata.attributes?.filter(att => PCA_ATTRIBUTES.includes(att.id)).length >= PCA_ATTRIBUTES.length &&
