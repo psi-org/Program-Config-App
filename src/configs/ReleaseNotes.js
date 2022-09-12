@@ -13,5 +13,10 @@ export const ReleaseNotes = [
         "version": "v1.2",
         "date": "2022-04-01",
         "description": " - Use of defined Names instead of static range.\n - Added Conditional Validation to Check 'Parent Question' and 'Parent Name'."
+    },
+    {
+        "version": "v1.3",
+        "date": "2022-09-12",
+        "description": "Fixed dropdown validations for Critical Step, Compulsory, Value Type, Option Set and Legend columns."
     }
 ]
