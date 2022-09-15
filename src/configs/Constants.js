@@ -45,6 +45,25 @@ const ASSESSMENT_TET = "oNwpeWkfoWc"
 const H1_OVERALL_SCORE = "Y8Nmpp7RhXw"
 const H1_COMPETENCY_CLASS = "KesgQ5NHkQW"
 
+const H1_ACTION1 = "wRaxfSNz5Xb"
+const H1_RESPONSIBLE1 = "hUXusK1q7qX"
+const H1_DUE_DATE1 = "zAWljfTXSnZ"
+const H1_COMPLETION_DATE1 = "bu0dDZmEqb6"
+
+const H1_ACTION2 = "uv22UMpXUA2"
+const H1_RESPONSIBLE2 = "Qor2Meb1sNf"
+const H1_DUE_DATE2 = "BtReGP2EMKA"
+const H1_COMPLETION_DATE2 = "ClN8h6d1C9o"
+
+const H1_ACTION3 = "OJRW4LPDsdU"
+const H1_RESPONSIBLE3 = "z9bskG067HE"
+const H1_DUE_DATE3 = "bVPpgPm1hj0"
+const H1_COMPLETION_DATE3 = "LPFqIi0Ml4a"
+
+const H1_ACTION_PLAN_OLD = "Im5C86I2ObV"    // ?Interpreted as Action 1
+const H1_ACTION1_OLD = "ibpjjNJLn44"        // ?Interpreted as Action 2
+const H1_ACTION2_OLD = "bwwyHVzxnTZ"        // ?Interpreted as Action 3
+
 const H2_REQUIRED = {
     dataElements: [
         COMPETENCY_CLASS,
@@ -239,5 +258,20 @@ export {
     ACTION_PLAN_RESPONSIBLE,
     ASSESSMENT_TET,
     H1_OVERALL_SCORE,
-    H1_COMPETENCY_CLASS
+    H1_COMPETENCY_CLASS,
+    H1_ACTION1,
+    H1_RESPONSIBLE1,
+    H1_DUE_DATE1,
+    H1_COMPLETION_DATE1,
+    H1_ACTION2,
+    H1_RESPONSIBLE2,
+    H1_DUE_DATE2,
+    H1_COMPLETION_DATE2,
+    H1_ACTION3,
+    H1_RESPONSIBLE3,
+    H1_DUE_DATE3,
+    H1_COMPLETION_DATE3,
+    H1_ACTION_PLAN_OLD,
+    H1_ACTION1_OLD,
+    H1_ACTION2_OLD
 };

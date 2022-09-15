@@ -510,6 +510,7 @@ const H2Convert = ({
                             dataElement.code.slice(0, 45) + " [H2]";
                         dataElement.formName = "   ";
                         originalLabelIDs.push(dataElement.id);
+                        dataElement.valueType = "LONG_TEXT"
                         dataElement.aggregationType = "NONE";
                         labelsQtty += 1;
                     }
@@ -655,10 +656,12 @@ const H2Convert = ({
             prgrm.style = programOld.style;
             prgrm.programStages.push({ id: assessmentId });
             prgrm.programStages.push({ id: actionPlanId });
+            prgrm.organisationUnits = programOld.organisationUnits;
+            prgrm.sharing = programOld.sharing;
 
             assessmentStage = DeepCopy(PS_AssessmentStage);
             assessmentStage.id = assessmentId;
-            assessmentStage.name = programId + "_Assessment"; //! Not adding the ID may result in an error
+            assessmentStage.name = "Assessment [" + programId + "]"; //! Not adding the ID may result in an error
 
             //Assign Sections
             newSections = newSections.map((section) => {
@@ -673,7 +676,7 @@ const H2Convert = ({
             assessmentStage.program.id = programId;
 
             actionPlanStage = DeepCopy(PS_ActionPlanStage);
-            actionPlanStage.name = programId + "_Action Plan"; //! Not adding the ID may result in an error
+            actionPlanStage.name = "Action Plan [" + programId + "]"; //! Not adding the ID may result in an error
             actionPlanStage.id = actionPlanId;
             actionPlanStage.program.id = programId;
 

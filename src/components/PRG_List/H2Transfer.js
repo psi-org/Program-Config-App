@@ -12,9 +12,7 @@ import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import MoveDownIcon from "@mui/icons-material/MoveDown";
 
 import { useState, useEffect } from "react";
-import {
-    DialogTitle,
-} from "@mui/material";
+import { DialogTitle } from "@mui/material";
 
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -42,7 +40,22 @@ import {
     ACTION_PLAN_RESPONSIBLE,
     ASSESSMENT_TET,
     H1_OVERALL_SCORE,
-    H1_COMPETENCY_CLASS
+    H1_COMPETENCY_CLASS,
+    H1_ACTION1,
+    H1_RESPONSIBLE1,
+    H1_DUE_DATE1,
+    H1_COMPLETION_DATE1,
+    H1_ACTION2,
+    H1_RESPONSIBLE2,
+    H1_DUE_DATE2,
+    H1_COMPLETION_DATE2,
+    H1_ACTION3,
+    H1_RESPONSIBLE3,
+    H1_DUE_DATE3,
+    H1_COMPLETION_DATE3,
+    H1_ACTION_PLAN_OLD,
+    H1_ACTION1_OLD,
+    H1_ACTION2_OLD,
 } from "../../configs/Constants";
 
 import { DeepCopy } from "../../configs/Utils";
@@ -51,8 +64,13 @@ const queryProgramMetadata = {
     results: {
         resource: "programs",
         params: ({ program }) => ({
-            fields: ["id", "name", "attributeValues","programStages[programStageDataElements[compulsory,dataElement[id,attributeValues]]]"],
-            filter: [`id:eq:${program}`]
+            fields: [
+                "id",
+                "name",
+                "attributeValues",
+                "programStages[id,name,programStageDataElements[compulsory,dataElement[id,attributeValues]]]",
+            ],
+            filter: [`id:eq:${program}`],
         }),
     },
 };
@@ -63,6 +81,7 @@ const queryProgramEvents = {
         params: ({ program }) => ({
             program,
             fields: [
+                "event",
                 "program",
                 "orgUnit",
                 "eventDate",
@@ -70,6 +89,7 @@ const queryProgramEvents = {
                 "completedDate",
                 "storedBy",
                 "dataValues[dataElement, value]",
+                "notes",
             ],
             filter: [],
             skipPaging: true,
@@ -77,8 +97,27 @@ const queryProgramEvents = {
     },
 };
 
+const queryEventData = {
+    results: {
+        resource: "events",
+        params: ({ program, eventId }) => ({
+            event: eventId,
+            program,
+            fields: [
+                "*"
+            ],
+        }),
+    },
+};
+
 const metadataMutation = {
     resource: "trackedEntityInstances",
+    type: "create",
+    data: ({ data }) => data,
+};
+
+const eventMutation = {
+    resource: "events",
     type: "create",
     data: ({ data }) => data,
 };
@@ -98,6 +137,18 @@ const H2Transfer = ({
         called: metadataDM[1].called,
     };
 
+    let eventDM = useDataMutation(eventMutation, {
+        lazy: true,
+    });
+
+    const eventRequest = {
+        mutate: eventDM[0],
+        loading: eventDM[1].loading,
+        error: eventDM[1].error,
+        data: eventDM[1].data,
+        called: eventDM[1].called,
+    };
+
     const [h2Program, setH2Program] = useState(undefined);
 
     const [dialogStatus, setDialogStatus] = useState(false);
@@ -105,15 +156,53 @@ const H2Transfer = ({
     const [loadingConversion, setLoadingConversion] = useState(false);
     const [statusModal, setStatusModal] = useState(false);
     const [conversionError, setConversionError] = useState(undefined);
+    const [requestsData, setRequestsData] = useState(undefined);
+    const [progressValue, setProgressValue] = useState(0);
 
     const { data: programData } = useDataQuery(queryProgramEvents, {
         variables: { program: programConfig.id },
+    });
+
+    const { refetch: getEvent } = useDataQuery(queryEventData, {
+        variables: { program: undefined, eventId: undefined },
+        lazy: true
     });
 
     const { refetch: getH2Program } = useDataQuery(queryProgramMetadata, {
         lazy: true,
         variables: {},
     });
+
+    const buildActionPlan = (
+        eventTemplate,
+        apStage,
+        action,
+        responsible,
+        dueDate,
+        completionDate
+    ) => {
+        if (!action) return undefined;
+
+        eventTemplate.eventDate = completionDate || eventTemplate.eventDate;
+        eventTemplate.programStage = apStage;
+
+        eventTemplate.dataValues.push({
+            dataElement: ACTION_PLAN_ACTION,
+            value: action,
+        });
+
+        eventTemplate.dataValues.push({
+            dataElement: ACTION_PLAN_RESPONSIBLE,
+            value: responsible || "-",
+        });
+
+        eventTemplate.dataValues.push({
+            dataElement: ACTION_PLAN_DUE_DATE,
+            value: dueDate || "-",
+        });
+
+        return eventTemplate;
+    };
 
     useEffect(() => {
         if (programData) {
@@ -143,41 +232,141 @@ const H2Transfer = ({
                 )?.value || "{}"
             );
 
-            console.log({h2Program});
+            let assessmentStageId = "";
+            let actionPlanStageId = "";
+            let assessmentStageDataElements = [];
 
-            let mapDataElements = h2Program.programStages.reduce((programDataElements,stage)=>{
-                let stageDataElements = stage.programStageDataElements.reduce((acu,de)=>{
-                    acu[de.dataElement.id] = {
-                        metadata: JSON.parse(de.dataElement.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"), 
-                        critical: de.compulsory
+            let mapDataElements = h2Program.programStages.reduce(
+                (programDataElements, stage) => {
+                    if (stage.name.toLowerCase().includes("assessment")) {
+                        assessmentStageId = stage.id;
+                        assessmentStageDataElements =
+                            stage.programStageDataElements;
+                    } else {
+                        actionPlanStageId = stage.id;
                     }
-                    return acu
-                },{})
-                return {...programDataElements,...stageDataElements}
-            },{})
+                    let stageDataElements =
+                        stage.programStageDataElements.reduce((acu, de) => {
+                            let metadata = JSON.parse(
+                                de.dataElement.attributeValues.find(
+                                    (att) => att.attribute.id === METADATA
+                                )?.value || "{}"
+                            );
+                            acu[de.dataElement.id] = {
+                                metadata,
+                                critical: metadata.isCritical === "Yes",
+                            };
+                            return acu;
+                        }, {});
+                    return { ...programDataElements, ...stageDataElements };
+                },
+                {}
+            );
 
-            console.log({mapDataElements})
-
-            let trackedEntityInstances = []
+            let trackedEntityInstances = [];
             let competencyMap = {
-                "C": 'competent',
-                "CNI": 'improvement',
-                "NC": 'notcompetent'
-            }
-            console.log({metadataH2});
-            console.log({eventExample: programData.results?.events[0]})
+                C: "competent",
+                CNI: "improvement",
+                NC: "notcompetent",
+            };
 
-            programData.results?.events?.forEach(event => {
+            let actionPlanControlDEs = [
+                H1_ACTION1,
+                H1_RESPONSIBLE1,
+                H1_DUE_DATE1,
+                H1_COMPLETION_DATE1,
+                H1_ACTION2,
+                H1_RESPONSIBLE2,
+                H1_DUE_DATE2,
+                H1_COMPLETION_DATE2,
+                H1_ACTION3,
+                H1_RESPONSIBLE3,
+                H1_DUE_DATE3,
+                H1_COMPLETION_DATE3,
+                H1_ACTION_PLAN_OLD,
+                H1_ACTION1_OLD,
+                H1_ACTION2_OLD,
+            ];
+
+            let convertEvents = DeepCopy(programData.results)?.events?.filter(
+                (event) =>
+                    !event.notes?.find(
+                        // TODO: REMEMBER TO UNCOMMENT THE ! SIGN
+                        (note) => note.value === "<H2Transferred>"
+                    )
+            );
+
+            convertEvents.forEach((event) => {
                 let hnqisTEI = {};
                 let h2Events = [];
 
+                let pasedEventDate = event.eventDate.split("T")[0];
+
                 // *Events Creation (One event for the assessment and up to three action plans)
-                // TODO: The scores calculation goes first (Store values to CRITICAL_STEPS and NON_CRITICAL_STEPS DEs)
+                let eventTemplate = {
+                    dataValues: [], //* Format -> {dataElement: 'id', value: 'value'}
+                    eventDate: pasedEventDate,
+                    orgUnit: event.orgUnit,
+                    program: h2Program.id,
+                    programStage: "",
+                    storedBy: event.storedBy,
+                    completedDate: event.completedDate,
+                    status: event.status,
+                };
 
+                let actionPlanDataValues = event.dataValues.reduce(
+                    (acu, de) => {
+                        let mapVal = actionPlanControlDEs.find(
+                            (cde) => cde === de.dataElement
+                        );
+                        if (mapVal) acu[mapVal] = de.value;
+                        return acu;
+                    },
+                    {}
+                );
 
+                let assessmentDataValues = event.dataValues.reduce(
+                    (acu, de) => {
+                        if (!actionPlanControlDEs.includes(de.dataElement))
+                            acu[de.dataElement] = de.value;
+                        return acu;
+                    },
+                    {}
+                );
 
+                // *Action Plan Events
+                let actionPlan1 = buildActionPlan(
+                    DeepCopy(eventTemplate),
+                    actionPlanStageId,
+                    actionPlanDataValues[H1_ACTION1] ||
+                        actionPlanDataValues[H1_ACTION_PLAN_OLD],
+                    actionPlanDataValues[H1_RESPONSIBLE1],
+                    actionPlanDataValues[H1_DUE_DATE1],
+                    actionPlanDataValues[H1_COMPLETION_DATE1]
+                );
+                if (actionPlan1) h2Events.push(actionPlan1);
 
-                
+                let actionPlan2 = buildActionPlan(
+                    DeepCopy(eventTemplate),
+                    actionPlanStageId,
+                    actionPlanDataValues[H1_ACTION2] ||
+                        actionPlanDataValues[H1_ACTION1_OLD],
+                    actionPlanDataValues[H1_RESPONSIBLE2],
+                    actionPlanDataValues[H1_DUE_DATE2],
+                    actionPlanDataValues[H1_COMPLETION_DATE2]
+                );
+                if (actionPlan2) h2Events.push(actionPlan2);
+
+                let actionPlan3 = buildActionPlan(
+                    DeepCopy(eventTemplate),
+                    actionPlanStageId,
+                    actionPlanDataValues[H1_ACTION3] ||
+                        actionPlanDataValues[H1_ACTION2_OLD],
+                    actionPlanDataValues[H1_RESPONSIBLE3],
+                    actionPlanDataValues[H1_DUE_DATE3],
+                    actionPlanDataValues[H1_COMPLETION_DATE3]
+                );
+                if (actionPlan3) h2Events.push(actionPlan3);
 
                 // *TEI Configuration
                 hnqisTEI.orgUnit = event.orgUnit;
@@ -191,7 +380,7 @@ const H2Transfer = ({
                     },
                     {
                         attribute: ASSESSMENT_DATE_ATTRIBUTE,
-                        value: event.eventDate,
+                        value: pasedEventDate,
                     },
                     {
                         attribute: HEALTH_AREA_ATTRIBUTE,
@@ -200,31 +389,106 @@ const H2Transfer = ({
                     { attribute: ORGANISATION_UNIT_ATTRIBUTE, value: "" }, //! Stores the Org Unit Code (not present in every OU)
                 ];
 
+                // *Assessment Event
+                let assessmentEvent = DeepCopy(eventTemplate);
+                assessmentEvent.programStage = assessmentStageId;
+                let criticalNum = 0;
+                let criticalDen = 0;
+                let nonCriticalNum = 0;
+                let nonCriticalDen = 0;
+
+                assessmentStageDataElements.forEach((psde) => {
+                    let deID = psde.dataElement.id;
+                    let deValue = assessmentDataValues[deID];
+
+                    if (
+                        deValue &&
+                        ![
+                            COMPETENCY_CLASS,
+                            CRITICAL_STEPS,
+                            NON_CRITICAL_STEPS,
+                        ].includes(deID)
+                    ) {
+                        let mappedDe = mapDataElements[deID];
+                        let num = mappedDe.metadata.scoreNum;
+                        let den = mappedDe.metadata.scoreDen;
+
+                        if (num && den) {
+                            if (mappedDe.critical) {
+                                criticalNum += num * parseFloat(deValue || "0");
+                                criticalDen += den;
+                            } else {
+                                nonCriticalNum +=
+                                    num * parseFloat(deValue || "0");
+                                nonCriticalDen += den;
+                            }
+                        }
+                        assessmentEvent.dataValues.push({
+                            dataElement: deID,
+                            value: deValue,
+                        });
+                    }
+                });
+
+                assessmentEvent.dataValues.push({
+                    dataElement: CRITICAL_STEPS,
+                    value:
+                        criticalDen > 0
+                            ? (criticalNum / criticalDen) * 100 + ""
+                            : "",
+                });
+
+                assessmentEvent.dataValues.push({
+                    dataElement: NON_CRITICAL_STEPS,
+                    value:
+                        nonCriticalDen > 0
+                            ? (nonCriticalNum / nonCriticalDen) * 100 + ""
+                            : "",
+                });
+
+                // *Competency Assignment
                 if (metadataH2.useCompetencyClass === "Yes") {
-                    hnqisTEI.attributes.push({
-                        attribute: COMPETENCY_ATTRIBUTE,
-                        value: competencyMap[
+                    let eventCompetency =
+                        competencyMap[
                             event.dataValues.find(
                                 (dv) => dv.dataElement === H1_COMPETENCY_CLASS
                             )?.value
-                        ],
+                        ];
+
+                    hnqisTEI.attributes.push({
+                        attribute: COMPETENCY_ATTRIBUTE,
+                        value: eventCompetency,
+                    });
+
+                    assessmentEvent.dataValues.push({
+                        dataElement: COMPETENCY_CLASS,
+                        value: eventCompetency,
                     });
                 }
+
+                h2Events.push(assessmentEvent);
 
                 // *Enrollment Configuration
                 hnqisTEI.enrollments = [
                     {
                         orgUnit: event.orgUnit,
                         program: h2Program.id,
-                        enrollmentDate: event.eventDate,
-                        incidentDate: event.eventDate,
+                        enrollmentDate: pasedEventDate,
+                        incidentDate: pasedEventDate,
                         events: h2Events,
                     },
                 ];
 
-                trackedEntityInstances.push(hnqisTEI);
+                trackedEntityInstances.push({
+                    tei: {trackedEntityInstances: [hnqisTEI]},
+                    event: event.event,
+                    program: event.program
+                });
             });
-            console.log({trackedEntityInstances});
+
+            console.log({ events: programData.results?.events });
+            console.log({ trackedEntityInstances });
+            setRequestsData(trackedEntityInstances);
 
             setLoading(false);
         }
@@ -234,7 +498,67 @@ const H2Transfer = ({
         setTransferH2Program(undefined);
     };
 
-    const submission = async () => {};
+    const submission = async () => {
+        setProgressValue(0);
+        setConversionError(undefined);
+        setStatusModal(true);
+        setLoadingConversion(true);
+        if (requestsData) {
+            let failedEvents = [];
+            let numberRequests = requestsData.length;
+            for (const [index, requestData] of requestsData.entries()) {
+                const eventReq = await getEvent({
+                    program: requestData.program,
+                    eventId: requestData.event,
+                });
+
+                let event = eventReq.results?.events[0];
+
+                if (event) {
+                    event.notes = [
+                        {
+                            value: "<H2Transferred>",
+                        },
+                    ];
+
+                    const storedData = await metadataRequest.mutate({
+                        data: requestData.tei,
+                    });
+
+                    if (storedData.httpStatus === "OK") {
+                        const storedNote = await eventRequest.mutate({
+                            data: { events: [event] },
+                        });
+                        setProgressValue(((index + 1) / numberRequests) * 100);
+                    } else {
+                        failedEvents.push({
+                            id: requestData.event,
+                            msg: "Failed to convert Assessment to HNQIS 2.0.",
+                        });
+                        setProgressValue(((index + 1) / numberRequests) * 100);
+                    }
+                } else {
+                    failedEvents.push({
+                        id: requestData.event,
+                        msg: "Event not found in server.",
+                    });
+                    setProgressValue(((index + 1) / numberRequests) * 100);
+                }
+            }
+            
+            if(failedEvents.length>0){
+                setConversionError(failedEvents.join("<br/>"))
+            }else{
+                doSearch(programConfig.name);
+                setNotification({
+                    message:
+                        "HNQIS 1.X Data converted to HNQIS 2.0",
+                    severity: "success",
+                });
+                setTransferH2Program(undefined)
+            }
+        }
+    };
 
     return (
         <>
@@ -298,8 +622,7 @@ const H2Transfer = ({
                                         Transfer Data
                                     </Typography>
                                     <Typography variant="body2">
-                                        {programData?.results?.events?.length +
-                                            " Assessments"}
+                                        {requestsData?.length + " Assessments"}
                                     </Typography>
                                 </CardContent>
                             </Card>
@@ -370,9 +693,28 @@ const H2Transfer = ({
                     }}
                 >
                     {loadingConversion && (
-                        <Box sx={{ width: "100%" }}>
-                            <LinearProgress />
-                        </Box>
+                        <div
+                            style={{
+                                width: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: 'space-between'
+                            }}
+                        >
+                            <Box sx={{ width: "90%" }}>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={progressValue}
+                                />
+                            </Box>
+                            <Typography
+                                variant="caption"
+                                component="div"
+                                color="text.secondary"
+                            >
+                                {`${Math.round(progressValue)}%`}
+                            </Typography>
+                        </div>
                     )}
                     {conversionError && (
                         <p style={{ color: "#AA0000" }}>{conversionError}</p>
