@@ -570,176 +570,304 @@ const ProgramNew = (props) => {
         dataElements.splice(index, 1);
     }
 
-    return <>
-        <CustomMUIDialog open={true} maxWidth='md' fullWidth={true} >
-            <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
-                {props.data?('Edit Program '+props.data.name):'Create New Program'}
-            </CustomMUIDialogTitle >
-            <DialogContent dividers style={{ padding: '1em 2em' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <FormControl sx={{ minWidth: '30%' }} error={validationErrors.pgrType !== undefined}>
-                        <InputLabel id="label-prgType">Program Type (*)</InputLabel>
-                        <Select
-                            labelId="label-prgType"
-                            id="prgTypePCA"
-                            value={pgrTypePCA}
-                            disabled={props.programType !== undefined}
-                            onChange={handleChangePgrType}
-                            label="Program Type (*)"
+    return (
+        <>
+            <CustomMUIDialog open={true} maxWidth="md" fullWidth={true}>
+                <CustomMUIDialogTitle
+                    id="customized-dialog-title"
+                    onClose={() => hideForm()}
+                >
+                    {props.data
+                        ? "Edit Program " + props.data.name
+                        : "Create New Program"}
+                </CustomMUIDialogTitle>
+                <DialogContent dividers style={{ padding: "1em 2em" }}>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <FormControl
+                            sx={{ minWidth: "30%" }}
+                            error={validationErrors.pgrType !== undefined}
                         >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={'tracker'}>Tracker Program</MenuItem>
-                            <MenuItem disabled={!h2Ready || hnqis2Metadata?.results?.version<H2_METADATA_VERSION} value={'hnqis'}>HNQIS 2.0 {(hnqis2Metadata?.results?.version<H2_METADATA_VERSION) && <span style={{display:'flex', alignItems: 'center', marginLeft:'8px'}}>[Unavailable] <RemoveCircleOutlineIcon/></span>}</MenuItem>
-                        </Select>
-                        <FormHelperText>{validationErrors.pgrType}</FormHelperText>
-                    </FormControl>
-                    <FormControl sx={{ minWidth: '65%' }}>
-                        <TextField
-                            error={validationErrors.prefix !== undefined}
-                            helperText={validationErrors.prefix}
-                            margin="normal"
-                            id="prefix"
-                            label="Program Data Element Prefix (*)"
-                            type="text"
-                            fullWidth
-                            variant="standard"
-                            autoComplete='off'
-                            inputProps={{ maxLength: MAX_PREFIX_LENGTH }}
-                            value={dePrefix}
-                            onChange={handleChangeDePrefix}
-                        />
-                    </FormControl>
-                </div>
-                <TextField
-                    error={validationErrors.programName !== undefined}
-                    helperText={validationErrors.programName}
-                    margin="normal"
-                    id="name"
-                    label="Program Name (*)"
-                    type="text"
-                    fullWidth
-                    variant="standard"
-                    autoComplete='off'
-                    inputProps={{ maxLength: MAX_PROGRAM_NAME_LENGTH-dePrefix.length }}
-                    value={programName}
-                    onChange={handleChangeProgramName}
-                />
-                <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <TextField
-                        error={validationErrors.shortName !== undefined}
-                        helperText={validationErrors.shortName}
-                        margin="normal"
-                        id="shortName"
-                        label="Program Short Name (*)"
-                        type="text"
-                        sx={{ width: '48%' }}
-                        variant="standard"
-                        autoComplete='off'
-                        inputProps={{ maxLength: MAX_SHORT_NAME_LENGTH-dePrefix.length }}
-                        value={programShortName}
-                        onChange={handleChangeProgramShortName}
-                    />
-                    <Autocomplete
-                        id="tetSelect"
-                        disabled={pgrTypePCA !== 'tracker'}
-                        options={trackedEntityTypes?.map(tet => ({ label: tet.name, id: tet.id })) || [{ label: '', id: '' }]}
-                        sx={{ width: '48%' }}
-                        renderInput={(params) => <TextField
-                            {...params}
-                            error={validationErrors.programTET !== undefined}
-                            label="Tracked Entity Type (*)"
-                            margin='normal'
-                            variant="standard"
-                            helperText={validationErrors.programTET} />}
-                        value={programTET}
-                        onChange={programTETChange}
-                        getOptionLabel={(option) => (option.label || '')}
-                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                        defaultValue={''}
-                    />
-                </div>
-                <StyleManager
-                    icon={programIcon}
-                    setIcon={setProgramIcon}
-                    color={programColor}
-                    setColor={setProgramColor}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'end', width: '100%', minHeight: '5em', marginTop: '1em' }}
-                />
-                {pgrTypePCA === 'hnqis' &&
-                    <FormControl margin="dense" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
-                        <FormControlLabel
-                            control={
-                                <Switch checked={useCompetency} onChange={handleChangeComp} name="competency" />
-                            }
-                            label="Use Competency Class"
-                        />
-                        <SelectOptions
-                            useError={validationErrors.healthArea !== undefined}
-                            helperText={validationErrors.healthArea}
-                            label={'Program Health Area (*)'}
-                            items={healthAreaOptions}
-                            handler={healthAreaChange}
-                            styles={{ width: '70%' }}
-                            value={healthArea}
-                            defaultOption='Select Health Area'
-                        />
-                    </FormControl>
-                }
-                {pgrTypePCA === 'tracker' &&
-                    <>
-                        <FormControl sx={{ minWidth: '100%' }} error={validationErrors.categoryCombo !== undefined}>
-                            <Autocomplete
-                                id="ccSelect"
-                                disabled={pgrTypePCA !== 'tracker'}
-                                options={programCategoryCombos?.map(pcc => ({ label: pcc.name, id: pcc.id }))}
-                                sx={{ width: '100%' }}
-                                renderInput={(params) => <TextField
-                                    {...params}
-                                    error={validationErrors.categoryCombo !== undefined}
-                                    label="Category Combination"
-                                    variant="standard"
-                                    margin="dense"
-                                    helperText={validationErrors.categoryCombo} />
-                                }
-                                value={categoryCombo}
-                                onChange={categoryComboChange}
-                                getOptionLabel={(option) => (option.label || '')}
-                                isOptionEqualToValue={(option, value) => option.id === value.id}
-                                defaultValue={'default'}
+                            <InputLabel id="label-prgType">
+                                Program Type (*)
+                            </InputLabel>
+                            <Select
+                                labelId="label-prgType"
+                                id="prgTypePCA"
+                                value={pgrTypePCA}
+                                disabled={props.programType !== undefined}
+                                onChange={handleChangePgrType}
+                                label="Program Type (*)"
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                <MenuItem value={"tracker"}>
+                                    Tracker Program
+                                </MenuItem>
+                                <MenuItem
+                                    disabled={
+                                        !h2Ready ||
+                                        hnqis2Metadata?.results?.version <
+                                            H2_METADATA_VERSION
+                                    }
+                                    value={"hnqis"}
+                                >
+                                    HNQIS 2.0{" "}
+                                    {hnqis2Metadata?.results?.version <
+                                        H2_METADATA_VERSION && (
+                                        <span
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                marginLeft: "8px",
+                                            }}
+                                        >
+                                            [Unavailable]{" "}
+                                            <RemoveCircleOutlineIcon />
+                                        </span>
+                                    )}
+                                </MenuItem>
+                            </Select>
+                            <FormHelperText>
+                                {validationErrors.pgrType}
+                            </FormHelperText>
+                        </FormControl>
+                        <FormControl sx={{ minWidth: "65%" }}>
+                            <TextField
+                                error={validationErrors.prefix !== undefined}
+                                helperText={validationErrors.prefix}
+                                margin="normal"
+                                id="prefix"
+                                label="Program Data Element Prefix (*)"
+                                type="text"
+                                fullWidth
+                                variant="standard"
+                                autoComplete="off"
+                                inputProps={{ maxLength: MAX_PREFIX_LENGTH }}
+                                value={dePrefix}
+                                onChange={handleChangeDePrefix}
                             />
                         </FormControl>
-                        <div style={{ marginTop: '1.5em' }}>
-                            <FormLabel style={{ display: 'inline-block', marginBottom: '8px' }}>Program Tracked Entity Attributes</FormLabel>
-                            <Transfer
-                                filterable
-                                onChange={handleChangeTEAs}
-                                options={programTEAs.available.map(tea => ({
-                                    label: tea.name,
-                                    value: tea.id
-                                }))}
-                                selected={programTEAs.selected}
-                                optionsWidth='48%'
-                                selectedWidth='48%'
-                            />
-                        </div>
-                    </>
-                }
-            </DialogContent>
-            <DialogActions style={{ padding: '1em' }}>
-                <Button onClick={() => hideForm()} color="error" > Close </Button>
-                <LoadingButton
-                    onClick={() => submission()}
-                    loading={sentForm}
-                    variant='outlined'
-                    loadingPosition="start"
-                    startIcon={<SendIcon />} >
-                    Submit
-                </LoadingButton>
-            </DialogActions>
-        </CustomMUIDialog>
-    </>
+                    </div>
+                    <TextField
+                        error={validationErrors.programName !== undefined}
+                        helperText={validationErrors.programName}
+                        margin="normal"
+                        id="name"
+                        label="Program Name (*)"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                        autoComplete="off"
+                        inputProps={{
+                            maxLength:
+                                MAX_PROGRAM_NAME_LENGTH - dePrefix.length,
+                        }}
+                        value={programName}
+                        onChange={handleChangeProgramName}
+                    />
+                    <div
+                        style={{
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}
+                    >
+                        <TextField
+                            error={validationErrors.shortName !== undefined}
+                            helperText={validationErrors.shortName}
+                            margin="normal"
+                            id="shortName"
+                            label="Program Short Name (*)"
+                            type="text"
+                            sx={{ width: "48%" }}
+                            variant="standard"
+                            autoComplete="off"
+                            inputProps={{
+                                maxLength:
+                                    MAX_SHORT_NAME_LENGTH - dePrefix.length,
+                            }}
+                            value={programShortName}
+                            onChange={handleChangeProgramShortName}
+                        />
+                        <Autocomplete
+                            id="tetSelect"
+                            disabled={pgrTypePCA !== "tracker"}
+                            options={
+                                trackedEntityTypes?.map((tet) => ({
+                                    label: tet.name,
+                                    id: tet.id,
+                                })) || [{ label: "", id: "" }]
+                            }
+                            sx={{ width: "48%" }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    error={
+                                        validationErrors.programTET !==
+                                        undefined
+                                    }
+                                    label="Tracked Entity Type (*)"
+                                    margin="normal"
+                                    variant="standard"
+                                    helperText={validationErrors.programTET}
+                                />
+                            )}
+                            value={programTET}
+                            onChange={programTETChange}
+                            getOptionLabel={(option) => option.label || ""}
+                            isOptionEqualToValue={(option, value) =>
+                                option.id === value.id
+                            }
+                            defaultValue={""}
+                        />
+                    </div>
+                    <StyleManager
+                        icon={programIcon}
+                        setIcon={setProgramIcon}
+                        color={programColor}
+                        setColor={setProgramColor}
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "end",
+                            width: "100%",
+                            minHeight: "5em",
+                            marginTop: "1em",
+                        }}
+                    />
+                    {pgrTypePCA === "hnqis" && (
+                        <>
+                            <FormControl
+                                margin="dense"
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    flexDirection: "row",
+                                }}
+                            >
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={useCompetency}
+                                            onChange={handleChangeComp}
+                                            name="competency"
+                                        />
+                                    }
+                                    label="Use Competency Class"
+                                />
+                                <SelectOptions
+                                    useError={
+                                        validationErrors.healthArea !==
+                                        undefined
+                                    }
+                                    helperText={validationErrors.healthArea}
+                                    label={"Program Health Area (*)"}
+                                    items={healthAreaOptions}
+                                    handler={healthAreaChange}
+                                    styles={{ width: "70%" }}
+                                    value={healthArea}
+                                    defaultOption="Select Health Area"
+                                />
+                            </FormControl>
+                        </>
+                    )}
+                    {pgrTypePCA === "tracker" && (
+                        <>
+                            <FormControl
+                                sx={{ minWidth: "100%" }}
+                                error={
+                                    validationErrors.categoryCombo !== undefined
+                                }
+                            >
+                                <Autocomplete
+                                    id="ccSelect"
+                                    disabled={pgrTypePCA !== "tracker"}
+                                    options={programCategoryCombos?.map(
+                                        (pcc) => ({
+                                            label: pcc.name,
+                                            id: pcc.id,
+                                        })
+                                    )}
+                                    sx={{ width: "100%" }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            error={
+                                                validationErrors.categoryCombo !==
+                                                undefined
+                                            }
+                                            label="Category Combination"
+                                            variant="standard"
+                                            margin="dense"
+                                            helperText={
+                                                validationErrors.categoryCombo
+                                            }
+                                        />
+                                    )}
+                                    value={categoryCombo}
+                                    onChange={categoryComboChange}
+                                    getOptionLabel={(option) =>
+                                        option.label || ""
+                                    }
+                                    isOptionEqualToValue={(option, value) =>
+                                        option.id === value.id
+                                    }
+                                    defaultValue={"default"}
+                                />
+                            </FormControl>
+                            <div style={{ marginTop: "1.5em" }}>
+                                <FormLabel
+                                    style={{
+                                        display: "inline-block",
+                                        marginBottom: "8px",
+                                    }}
+                                >
+                                    Program Tracked Entity Attributes
+                                </FormLabel>
+                                <Transfer
+                                    filterable
+                                    onChange={handleChangeTEAs}
+                                    options={programTEAs.available.map(
+                                        (tea) => ({
+                                            label: tea.name,
+                                            value: tea.id,
+                                        })
+                                    )}
+                                    selected={programTEAs.selected}
+                                    optionsWidth="48%"
+                                    selectedWidth="48%"
+                                />
+                            </div>
+                        </>
+                    )}
+                </DialogContent>
+                <DialogActions style={{ padding: "1em" }}>
+                    <Button onClick={() => hideForm()} color="error">
+                        {" "}
+                        Close{" "}
+                    </Button>
+                    <LoadingButton
+                        onClick={() => submission()}
+                        loading={sentForm}
+                        variant="outlined"
+                        loadingPosition="start"
+                        startIcon={<SendIcon />}
+                    >
+                        Submit
+                    </LoadingButton>
+                </DialogActions>
+            </CustomMUIDialog>
+        </>
+    );
 }
 
 export default ProgramNew;
