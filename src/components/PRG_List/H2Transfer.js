@@ -122,6 +122,15 @@ const eventMutation = {
     data: ({ data }) => data,
 };
 
+const queryIds = {
+    results: {
+        resource: "system/id.json",
+        params: ({ n }) => ({
+            limit: n,
+        }),
+    },
+};
+
 const H2Transfer = ({
     programConfig,
     setTransferH2Program,
@@ -171,6 +180,11 @@ const H2Transfer = ({
     const { refetch: getH2Program } = useDataQuery(queryProgramMetadata, {
         lazy: true,
         variables: {},
+    });
+
+    const idsQuery = useDataQuery(queryIds, {
+        lazy: true,
+        variables: { n: undefined },
     });
 
     const buildActionPlan = (
@@ -300,6 +314,9 @@ const H2Transfer = ({
                 let hnqisTEI = {};
                 let h2Events = [];
 
+                /*const uidData = await idsQuery.refetch({ n:5 })
+                let uiPool = uidData?.results?.codes*/
+
                 let pasedEventDate = event.eventDate.split("T")[0];
 
                 // *Events Creation (One event for the assessment and up to three action plans)
@@ -369,6 +386,7 @@ const H2Transfer = ({
                 if (actionPlan3) h2Events.push(actionPlan3);
 
                 // *TEI Configuration
+                //hnqisTEI.trackedEntityInstance = event.event
                 hnqisTEI.orgUnit = event.orgUnit;
                 hnqisTEI.trackedEntityType = ASSESSMENT_TET;
                 hnqisTEI.attributes = [
