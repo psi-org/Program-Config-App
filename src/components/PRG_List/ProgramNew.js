@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from "react";
-import { Transfer } from "@dhis2/ui";
+import {OrganisationUnitTree, Transfer} from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
 //import styles from './Program.module.css'
 import { Program, HnqisProgramConfigs, PS_AssessmentStage, PS_ActionPlanStage, PSS_Default, PSS_CriticalSteps, PSS_Scores } from './../../configs/ProgramTemplate'
@@ -30,7 +30,6 @@ import { DeepCopy } from '../../configs/Utils';
 import { VolunteerActivismOutlined } from '@mui/icons-material';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Tooltip from '@mui/material/Tooltip';
-
 
 //const { Form, Field } = ReactFinalForm
 
@@ -114,6 +113,23 @@ const queryHNQIS2Metadata = {
     }
 };
 
+const orgUnitsQuery = {
+    userOrgUnits: {
+        resource: 'me',
+        params: {
+            fields: ['organisationUnits[id, path]']
+        }
+    },
+    orgUnitLevels: {
+        resource: 'organisationUnitLevels',
+        params: {
+            paging: false,
+            fields: ['id','level','displayName'],
+            order: 'level'
+        }
+    }
+}
+
 const ProgramNew = (props) => {
 
     const h2Ready = localStorage.getItem('h2Ready') === 'true'
@@ -136,6 +152,7 @@ const ProgramNew = (props) => {
 
 
     const [haOptions, setHaOptions] = useState();
+    const [ouLevels, setOULevels] = useState();
 
     const idsQuery = useDataQuery(queryId);
     const uidPool = idsQuery.data?.results.codes;
@@ -146,6 +163,7 @@ const ProgramNew = (props) => {
     const { data: trackedEntityAttributes, refetch: findTEAttributes } = useDataQuery(queryTEAttributes, { lazy: true });
     const { data: categoryCombos, refetch: findCategoryCombos } = useDataQuery(queryCatCombos, { lazy: true });
     const { data: existingPrefixes, refetch: checkForExistingPrefix } = useDataQuery(queryAvailablePrefix, { lazy: true, variables: { dePrefix: undefined, program:undefined } });
+    const {loading: ouMetadataLoading, data: ouMetadata} = useDataQuery(orgUnitsQuery);
 
     const [programId, setProgramId] = useState(props.data?.id);
     const [assessmentId, setAssessmentId] = useState(undefined);
@@ -160,6 +178,8 @@ const ProgramNew = (props) => {
     const [programTET, setProgramTET] = useState(props.data ? { label: props.data.trackedEntityType.name, id: props.data.trackedEntityType.id } : '');
     const [useCompetency, setUseCompetency] = useState(props.pcaMetadata?.useCompetencyClass === 'Yes');
     const [healthArea, setHealthArea] = useState(props.pcaMetadata?.healthArea || '');
+    const [ouTableRow, setOUTableRow] = useState('');
+    const [ouMapPolygon, setOUMapPolygon] = useState('');
     const [dePrefix, setDePrefix] = useState(props.pcaMetadata?.dePrefix || '');
     const [programName, setProgramName] = useState(props.data?.name || '');
     const [programShortName, setProgramShortName] = useState(props.data?.shortName || '');
@@ -167,6 +187,10 @@ const ProgramNew = (props) => {
     const [programTEAs, setProgramTEAs] = useState({ available: [], selected: [] })
     const [programCategoryCombos, setProgramCategoryCombos] = useState([{ name: 'Select an option', id: '' }])
     const [categoryCombo, setCategoryCombo] = useState(props.data ? { label: props.data.categoryCombo.name, id: props.data.categoryCombo.id } : '')
+
+    const [ selectedOrgUnits, setSelectedOrgUnits ] = useState([]);
+    const [ orgUnitTreeRoot, setOrgUnitTreeRoot ] = useState([]);
+    const [ orgUnitPathSelected, setOrgUnitPathSelected ] = useState([]);
 
     //Validation Messages
     const [validationErrors, setValidationErrors] = useState(
@@ -237,17 +261,33 @@ const ProgramNew = (props) => {
         setHealthArea(event.target.value);
     }
 
+    const ouTableRowChange = (event) => {
+        setOUTableRow(event.target.value);
+    }
+
+    const ouMapPolygonChange = (event) => {
+        setOUMapPolygon(event.target.value);
+    }
+
     const handleChangeTEAs = (res) => {
         programTEAs.selected = res.selected
         setProgramTEAs(DeepCopy(programTEAs))
     }
 
     let healthAreaOptions = [];
+    let ouLevelOptions = [];
 
     if (haOptions) {
         healthAreaOptions = healthAreaOptions.concat(haOptions.map(op => {
             return { label: op.name, value: op.code }
         }));
+    }
+
+    if (ouLevels) {
+        ouLevelOptions = ouLevelOptions.concat(ouLevels.map(ou => {
+            return { label: ou.displayName, value: ou.id }
+        }));
+        console.log("Level Options ", ouLevelOptions);
     }
 
     if (uidPool && uidPool.length === 6 && !props.data) {
@@ -352,6 +392,13 @@ const ProgramNew = (props) => {
             })
         }
     }, [pgrTypePCA])
+
+    useEffect(() => {
+        if (!ouMetadataLoading) {
+            setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
+            setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
+        }
+    }, [ouMetadata]);
     
     function submission() {
         setSentForm(true)
@@ -540,6 +587,9 @@ const ProgramNew = (props) => {
             if (pgrTypePCA === 'hnqis') {
                 metaData_value.useCompetencyClass = useCompetency ? 'Yes' : 'No';
                 metaData_value.healthArea = healthArea;
+                metaData_value.ouRoot = selectedOrgUnits;
+                metaData_value.ouTableRows = ouTableRow;
+                metaData_value.ouMapPolygon = ouMapPolygon;
             }
             metaData_value.dePrefix = dePrefix;
             metaDataArray[0].value = JSON.stringify(metaData_value);
@@ -569,6 +619,19 @@ const ProgramNew = (props) => {
         })
         dataElements.splice(index, 1);
     }
+
+    const orgUnitSelectionHandler = (event) => {
+        console.log("Event: ", event);
+        if (event.checked)
+        {
+            setSelectedOrgUnits([event.id]);
+            setOrgUnitPathSelected([event.path]);
+        }
+        else {
+            setSelectedOrgUnits([]);
+            setOrgUnitPathSelected([])
+        }
+    };
 
     return (
         <>
@@ -745,39 +808,42 @@ const ProgramNew = (props) => {
                     />
                     {pgrTypePCA === "hnqis" && (
                         <>
-                            <FormControl
-                                margin="dense"
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                    flexDirection: "row",
-                                }}
-                            >
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={useCompetency}
-                                            onChange={handleChangeComp}
-                                            name="competency"
-                                        />
-                                    }
-                                    label="Use Competency Class"
-                                />
-                                <SelectOptions
-                                    useError={
-                                        validationErrors.healthArea !==
-                                        undefined
-                                    }
-                                    helperText={validationErrors.healthArea}
-                                    label={"Program Health Area (*)"}
-                                    items={healthAreaOptions}
-                                    handler={healthAreaChange}
-                                    styles={{ width: "70%" }}
-                                    value={healthArea}
-                                    defaultOption="Select Health Area"
-                                />
-                            </FormControl>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <div style={{position:"relative"}}>
+                                    <div style={{ marginTop: "10px"}}> Organisation Unit Root </div>
+                                    <div style={{ minHeight: "300px", maxHeight: "450px", minWidth: "300px", maxWidth: "480px", overflow: "auto", border: "1px solid rgb(189, 189, 189)", borderRadius: "3px", padding: "4px", margin: "4px 0px", display: "inline-block", verticalAlign: "top"}}>
+                                        <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ selectedOrgUnits } singleSelection/>
+                                    </div>
+                                    <div style={{width: "400px", background: "white", marginLeft: "2rem", marginTop: "1rem", display: "inline-block"}}>
+                                        <div style={{ flexDirection: "row"}}>
+                                            <FormControlLabel control={ <Switch checked={useCompetency} onChange={handleChangeComp} name="competency"/> } label="Use Competency Class" />
+                                            <SelectOptions useError={ validationErrors.healthArea !== undefined }
+                                                helperText={validationErrors.healthArea}
+                                                label={"Program Health Area (*)"}
+                                                items={healthAreaOptions}
+                                                handler={healthAreaChange}
+                                                styles={{ width: "80%" }}
+                                                value={healthArea}
+                                                defaultOption="Select Health Area"
+                                            />
+                                            <SelectOptions useError={false}
+                                                           label={"Organisation Unit Level for table rows"}
+                                                           items={ouLevelOptions}
+                                                           handler={ouTableRowChange}
+                                                           styles={{ width: "80%" }}
+                                                           value={ouTableRow}
+                                                           defaultOption={"Select Organisation Unit Level"}/>
+                                            <SelectOptions useError={false}
+                                                           label={"Organisation Unit Level for Map Polygons"}
+                                                           items={ouLevelOptions}
+                                                           handler={ouMapPolygonChange}
+                                                           styles={{ width: "80%" }}
+                                                           value={ouMapPolygon}
+                                                           defaultOption={"Select Organisation Unit Level"}/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </>
                     )}
                     {pgrTypePCA === "tracker" && (
