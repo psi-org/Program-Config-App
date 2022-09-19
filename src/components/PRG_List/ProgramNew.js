@@ -610,7 +610,7 @@ const ProgramNew = (props) => {
             if (pgrTypePCA === 'hnqis') {
                 metaData_value.useCompetencyClass = useCompetency ? 'Yes' : 'No';
                 metaData_value.healthArea = healthArea;
-                metaData_value.ouRoot = selectedOrgUnits;
+                metaData_value.ouRoot = selectedOrgUnits[0];
                 metaData_value.ouTableRows = ouTableRow;
                 metaData_value.ouMapPolygon = ouMapPolygon;
             }
