@@ -130,10 +130,21 @@ const orgUnitsQuery = {
     }
 }
 
+const ouUnitQUery = {
+    result: {
+        resource: 'organisationUnits',
+        id: ({ id }) => id,
+        params: {
+            fields: ['id','level']
+        }
+    }
+}
+
 const ProgramNew = (props) => {
 
     const h2Ready = localStorage.getItem('h2Ready') === 'true'
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
+    let id;
 
     // Create Mutation
     let metadataDM = useDataMutation(metadataMutation);
@@ -164,6 +175,7 @@ const ProgramNew = (props) => {
     const { data: categoryCombos, refetch: findCategoryCombos } = useDataQuery(queryCatCombos, { lazy: true });
     const { data: existingPrefixes, refetch: checkForExistingPrefix } = useDataQuery(queryAvailablePrefix, { lazy: true, variables: { dePrefix: undefined, program:undefined } });
     const {loading: ouMetadataLoading, data: ouMetadata} = useDataQuery(orgUnitsQuery);
+    const getOuLevel = useDataQuery(ouUnitQUery, {variables: {id: id}})
 
     const [programId, setProgramId] = useState(props.data?.id);
     const [assessmentId, setAssessmentId] = useState(undefined);
@@ -200,13 +212,17 @@ const ProgramNew = (props) => {
             programName: undefined,
             shortName: undefined,
             programTET: undefined,
-            healthArea: undefined
+            healthArea: undefined,
+            ouTableRow: undefined,
+            ouMapPolygon: undefined,
         });
 
     const handleChangePgrType = (event) => {
         validationErrors.pgrType = undefined
         validationErrors.programTET = undefined
         validationErrors.healthArea = undefined
+        validationErrors.ouTableRow = undefined
+        validationErrors.ouMapPolygon = undefined
         setValidationErrors({ ...validationErrors })
         let value = event.target.value
         setPgrTypePCA(value);
@@ -262,10 +278,14 @@ const ProgramNew = (props) => {
     }
 
     const ouTableRowChange = (event) => {
+        validationErrors.ouTableRow = undefined
+        setValidationErrors({ ...validationErrors })
         setOUTableRow(event.target.value);
     }
 
     const ouMapPolygonChange = (event) => {
+        validationErrors.ouMapPolygon = undefined
+        setValidationErrors({ ...validationErrors })
         setOUMapPolygon(event.target.value);
     }
 
@@ -351,11 +371,14 @@ const ProgramNew = (props) => {
             validationErrors.programTET = undefined
         }
 
-        if (pgrTypePCA !== 'tracker' && (pgrTypePCA === 'hnqis' && healthArea === '')) {
-            response = false
-            validationErrors.healthArea = 'This field is required'
+        if (pgrTypePCA !== 'tracker' && pgrTypePCA === 'hnqis') {
+            if (healthArea === '' || ouTableRow === '' || ouMapPolygon === '')
+                response = false;
+            validationErrors.healthArea = (healthArea === '') ? 'This field is required' : undefined
+            validationErrors.ouTableRow = (ouTableRow === '') ? 'This field is required' : undefined
+            validationErrors.ouMapPolygon = (ouMapPolygon === '') ? 'This field is required' : undefined
         } else {
-            validationErrors.healthArea = undefined
+            validationErrors.healthArea = validationErrors.ouTableRow = validationErrors.ouMapPolygon = undefined
         }
 
         setValidationErrors({ ...validationErrors })
@@ -621,9 +644,15 @@ const ProgramNew = (props) => {
     }
 
     const orgUnitSelectionHandler = (event) => {
-        console.log("Event: ", event);
         if (event.checked)
         {
+            getOuLevel.refetch({id: event.id}).then(data => {
+                if(typeof data.result !== "undefined")
+                {
+                    let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level > data.result.level);
+                    setOULevels(ouLevels);
+                }
+            });
             setSelectedOrgUnits([event.id]);
             setOrgUnitPathSelected([event.path]);
         }
@@ -826,14 +855,16 @@ const ProgramNew = (props) => {
                                                 value={healthArea}
                                                 defaultOption="Select Health Area"
                                             />
-                                            <SelectOptions useError={false}
+                                            <SelectOptions useError={validationErrors.ouTableRow !== undefined}
+                                                           helperText={validationErrors.ouTableRow}
                                                            label={"Organisation Unit Level for table rows"}
                                                            items={ouLevelOptions}
                                                            handler={ouTableRowChange}
                                                            styles={{ width: "80%" }}
                                                            value={ouTableRow}
                                                            defaultOption={"Select Organisation Unit Level"}/>
-                                            <SelectOptions useError={false}
+                                            <SelectOptions useError={validationErrors.ouMapPolygon !== undefined}
+                                                           helperText={validationErrors.ouMapPolygon}
                                                            label={"Organisation Unit Level for Map Polygons"}
                                                            items={ouLevelOptions}
                                                            handler={ouMapPolygonChange}
