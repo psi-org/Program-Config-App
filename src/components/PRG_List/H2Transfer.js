@@ -22,6 +22,7 @@ import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { parseErrors } from "../../configs/Utils";
 
@@ -166,6 +167,7 @@ const H2Transfer = ({
     const [statusModal, setStatusModal] = useState(false);
     const [conversionError, setConversionError] = useState(undefined);
     const [requestsData, setRequestsData] = useState(undefined);
+
     const [progressValue, setProgressValue] = useState(0);
 
     const { data: programData } = useDataQuery(queryProgramEvents, {
@@ -523,7 +525,6 @@ const H2Transfer = ({
         setLoadingConversion(true);
         if (requestsData) {
             let failedEvents = [];
-            let numberRequests = requestsData.length;
             for (const [index, requestData] of requestsData.entries()) {
                 const eventReq = await getEvent({
                     program: requestData.program,
@@ -547,20 +548,20 @@ const H2Transfer = ({
                         const storedNote = await eventRequest.mutate({
                             data: { events: [event] },
                         });
-                        setProgressValue(((index + 1) / numberRequests) * 100);
+                        setProgressValue(index + 1);
                     } else {
                         failedEvents.push({
                             id: requestData.event,
                             msg: "Failed to convert Assessment to HNQIS 2.0.",
                         });
-                        setProgressValue(((index + 1) / numberRequests) * 100);
+                        setProgressValue(index + 1);
                     }
                 } else {
                     failedEvents.push({
                         id: requestData.event,
                         msg: "Event not found in server.",
                     });
-                    setProgressValue(((index + 1) / numberRequests) * 100);
+                    setProgressValue(index + 1);
                 }
             }
             
@@ -715,23 +716,49 @@ const H2Transfer = ({
                             style={{
                                 width: "100%",
                                 display: "flex",
-                                alignItems: "center",
-                                justifyContent: 'space-between'
+                                justifyContent: "center",
+                                flexDirection: "column",
                             }}
                         >
-                            <Box sx={{ width: "90%" }}>
-                                <LinearProgress
-                                    variant="determinate"
-                                    value={progressValue}
-                                />
-                            </Box>
                             <Typography
                                 variant="caption"
                                 component="div"
-                                color="text.secondary"
+                                color="inherit"
                             >
-                                {`${Math.round(progressValue)}%`}
+                                {`Transferring Assessment ${progressValue} of ${requestsData.length}`}
                             </Typography>
+                            <div
+                                style={{
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <Box sx={{ display: "flex" }}>
+                                    <CircularProgress size={20}/>
+                                </Box>
+                                <Box sx={{ width: "85%" }}>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={
+                                            (progressValue /
+                                                requestsData.length) *
+                                            100
+                                        }
+                                    />
+                                </Box>
+                                <Typography
+                                    variant="caption"
+                                    component="div"
+                                    color="text.secondary"
+                                >
+                                    {`${Math.round(
+                                        (progressValue / requestsData.length) *
+                                            100
+                                    )}%`}
+                                </Typography>
+                            </div>
                         </div>
                     )}
                     {conversionError && (
