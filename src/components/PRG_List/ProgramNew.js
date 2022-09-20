@@ -215,6 +215,7 @@ const ProgramNew = (props) => {
             healthArea: undefined,
             ouTableRow: undefined,
             ouMapPolygon: undefined,
+            orgUnitRoot: undefined,
         });
 
     const handleChangePgrType = (event) => {
@@ -223,6 +224,7 @@ const ProgramNew = (props) => {
         validationErrors.healthArea = undefined
         validationErrors.ouTableRow = undefined
         validationErrors.ouMapPolygon = undefined
+        validationErrors.orgUnitRoot = undefined
         setValidationErrors({ ...validationErrors })
         let value = event.target.value
         setPgrTypePCA(value);
@@ -372,11 +374,12 @@ const ProgramNew = (props) => {
         }
 
         if (pgrTypePCA !== 'tracker' && pgrTypePCA === 'hnqis') {
-            if (healthArea === '' || ouTableRow === '' || ouMapPolygon === '')
+            if (healthArea === '' || ouTableRow === '' || ouMapPolygon === '' || selectedOrgUnits.length === 0)
                 response = false;
             validationErrors.healthArea = (healthArea === '') ? 'This field is required' : undefined
             validationErrors.ouTableRow = (ouTableRow === '') ? 'This field is required' : undefined
             validationErrors.ouMapPolygon = (ouMapPolygon === '') ? 'This field is required' : undefined
+            validationErrors.orgUnitRoot = (selectedOrgUnits.length === 0) ? 'This field is required' : undefined
         } else {
             validationErrors.healthArea = validationErrors.ouTableRow = validationErrors.ouMapPolygon = undefined
         }
@@ -611,7 +614,7 @@ const ProgramNew = (props) => {
                 metaData_value.useCompetencyClass = useCompetency ? 'Yes' : 'No';
                 metaData_value.healthArea = healthArea;
                 metaData_value.ouRoot = selectedOrgUnits[0];
-                metaData_value.ouTableRows = ouTableRow;
+                metaData_value.ouLevelRoot = ouTableRow;
                 metaData_value.ouMapPolygon = ouMapPolygon;
             }
             metaData_value.dePrefix = dePrefix;
@@ -649,17 +652,20 @@ const ProgramNew = (props) => {
             getOuLevel.refetch({id: event.id}).then(data => {
                 if(typeof data.result !== "undefined")
                 {
-                    let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level > data.result.level);
+                    let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level >= data.result.level);
                     setOULevels(ouLevels);
                 }
             });
             setSelectedOrgUnits([event.id]);
             setOrgUnitPathSelected([event.path]);
+            validationErrors.orgUnitRoot = undefined;
         }
         else {
             setSelectedOrgUnits([]);
             setOrgUnitPathSelected([])
         }
+        setOUTableRow('');
+        setOUMapPolygon('');
     };
 
     return (
@@ -839,9 +845,12 @@ const ProgramNew = (props) => {
                         <>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <div style={{position:"relative"}}>
-                                    <div style={{ marginTop: "10px"}}> Organisation Unit Root </div>
+                                    <div style={{ marginTop: "10px"}}> Organisation Unit Root for Global Analytics (*) </div>
                                     <div style={{ minHeight: "300px", maxHeight: "450px", minWidth: "300px", maxWidth: "480px", overflow: "auto", border: "1px solid rgb(189, 189, 189)", borderRadius: "3px", padding: "4px", margin: "4px 0px", display: "inline-block", verticalAlign: "top"}}>
-                                        <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ selectedOrgUnits } singleSelection/>
+                                        <FormControl variant={"standard"} error={validationErrors.orgUnitRoot !== undefined} >
+                                            <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ selectedOrgUnits } singleSelection/>
+                                        <FormHelperText>{validationErrors.orgUnitRoot}</FormHelperText>
+                                        </FormControl>
                                     </div>
                                     <div style={{width: "400px", background: "white", marginLeft: "2rem", marginTop: "1rem", display: "inline-block"}}>
                                         <div style={{ flexDirection: "row"}}>
@@ -851,24 +860,24 @@ const ProgramNew = (props) => {
                                                 label={"Program Health Area (*)"}
                                                 items={healthAreaOptions}
                                                 handler={healthAreaChange}
-                                                styles={{ width: "80%" }}
+                                                styles={{ width: "90%" }}
                                                 value={healthArea}
                                                 defaultOption="Select Health Area"
                                             />
                                             <SelectOptions useError={validationErrors.ouTableRow !== undefined}
                                                            helperText={validationErrors.ouTableRow}
-                                                           label={"Organisation Unit Level for table rows"}
+                                                           label={"Organisation Unit Level for the Visualizations (*)"}
                                                            items={ouLevelOptions}
                                                            handler={ouTableRowChange}
-                                                           styles={{ width: "80%" }}
+                                                           styles={{ width: "90%" }}
                                                            value={ouTableRow}
                                                            defaultOption={"Select Organisation Unit Level"}/>
                                             <SelectOptions useError={validationErrors.ouMapPolygon !== undefined}
                                                            helperText={validationErrors.ouMapPolygon}
-                                                           label={"Organisation Unit Level for Map Polygons"}
+                                                           label={"Organisation Unit Level for the Map (*)"}
                                                            items={ouLevelOptions}
                                                            handler={ouMapPolygonChange}
-                                                           styles={{ width: "80%" }}
+                                                           styles={{ width: "90%" }}
                                                            value={ouMapPolygon}
                                                            defaultOption={"Select Organisation Unit Level"}/>
                                         </div>
