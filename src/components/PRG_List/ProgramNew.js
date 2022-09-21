@@ -141,7 +141,6 @@ const ouUnitQUery = {
 }
 
 const ProgramNew = (props) => {
-    console.log("Props: ", props);
     const h2Ready = localStorage.getItem('h2Ready') === 'true'
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
     let id;
@@ -428,7 +427,9 @@ const ProgramNew = (props) => {
                 getOuLevel.refetch({id: props.pcaMetadata?.ouRoot}).then(data => {
                     if(typeof data.result !== "undefined")
                     {
+                        let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level >= data.result.level);
                         setOrgUnitPathSelected([data.result.path])
+                        setOULevels(ouLevels);
                     }
                 });
             }
