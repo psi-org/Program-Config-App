@@ -135,13 +135,13 @@ const ouUnitQUery = {
         resource: 'organisationUnits',
         id: ({ id }) => id,
         params: {
-            fields: ['id','level']
+            fields: ['id','level','path']
         }
     }
 }
 
 const ProgramNew = (props) => {
-
+    console.log("Props: ", props);
     const h2Ready = localStorage.getItem('h2Ready') === 'true'
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
     let id;
@@ -190,8 +190,8 @@ const ProgramNew = (props) => {
     const [programTET, setProgramTET] = useState(props.data ? { label: props.data.trackedEntityType.name, id: props.data.trackedEntityType.id } : '');
     const [useCompetency, setUseCompetency] = useState(props.pcaMetadata?.useCompetencyClass === 'Yes');
     const [healthArea, setHealthArea] = useState(props.pcaMetadata?.healthArea || '');
-    const [ouTableRow, setOUTableRow] = useState('');
-    const [ouMapPolygon, setOUMapPolygon] = useState('');
+    const [ouTableRow, setOUTableRow] = useState(props.pcaMetadata?.ouLevelTable || '');
+    const [ouMapPolygon, setOUMapPolygon] = useState(props.pcaMetadata?.ouLevelMap || '');
     const [dePrefix, setDePrefix] = useState(props.pcaMetadata?.dePrefix || '');
     const [programName, setProgramName] = useState(props.data?.name || '');
     const [programShortName, setProgramShortName] = useState(props.data?.shortName || '');
@@ -309,7 +309,6 @@ const ProgramNew = (props) => {
         ouLevelOptions = ouLevelOptions.concat(ouLevels.map(ou => {
             return { label: ou.displayName, value: ou.id }
         }));
-        console.log("Level Options ", ouLevelOptions);
     }
 
     if (uidPool && uidPool.length === 6 && !props.data) {
@@ -423,6 +422,17 @@ const ProgramNew = (props) => {
         if (!ouMetadataLoading) {
             setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
             setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
+            if (props.pcaMetadata?.ouRoot)
+            {
+                setSelectedOrgUnits([props.pcaMetadata?.ouRoot])
+                getOuLevel.refetch({id: props.pcaMetadata?.ouRoot}).then(data => {
+                    if(typeof data.result !== "undefined")
+                    {
+                        setOrgUnitPathSelected([data.result.path])
+                    }
+                });
+            }
+
         }
     }, [ouMetadata]);
     
@@ -614,8 +624,8 @@ const ProgramNew = (props) => {
                 metaData_value.useCompetencyClass = useCompetency ? 'Yes' : 'No';
                 metaData_value.healthArea = healthArea;
                 metaData_value.ouRoot = selectedOrgUnits[0];
-                metaData_value.ouLevelRoot = ouTableRow;
-                metaData_value.ouMapPolygon = ouMapPolygon;
+                metaData_value.ouLevelTable = ouTableRow;
+                metaData_value.ouLevelMap = ouMapPolygon;
             }
             metaData_value.dePrefix = dePrefix;
             metaDataArray[0].value = JSON.stringify(metaData_value);
@@ -841,7 +851,7 @@ const ProgramNew = (props) => {
                             marginTop: "1em",
                         }}
                     />
-                    {pgrTypePCA === "hnqis" && (
+                    {pgrTypePCA === "hnqis" &&  orgUnitTreeRoot.length >0 && (
                         <>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <div style={{position:"relative"}}>
