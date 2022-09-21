@@ -113,6 +113,7 @@ const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', d
 
 const NAMESPACE = "programconfigapp"
 const BACKUPS_NAMESPACE = `${NAMESPACE}_backups`
+const TRANSFERRED_EVENTS_NAMESPACE = `${NAMESPACE}_transferred`;
 const DATASTORE_PCA_METADATA = "PCAMetadata"
 const DATASTORE_H2_METADATA = "H2Metadata"
 
@@ -208,6 +209,7 @@ export {
     METADATA,
     NAMESPACE,
     BACKUPS_NAMESPACE,
+    TRANSFERRED_EVENTS_NAMESPACE,
     DATASTORE_PCA_METADATA,
     DATASTORE_H2_METADATA,
     PCA_METADATA_VERSION,
