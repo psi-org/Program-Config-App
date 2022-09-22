@@ -13,7 +13,7 @@ import Scores from "./Scores";
 import CriticalCalculations from "./CriticalCalculations";
 import DataProcessor from "../Excel/DataProcessor";
 import Importer from "../Excel/Importer";
-import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Scripting";
+import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations,  buildProgramIndicatorsGA} from "./Scripting";
 import { Link } from "react-router-dom";
 import Removed from "./Removed";
 import ValidateMetadata from "./ValidateMetadata";
@@ -39,6 +39,7 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
 import { DeepCopy } from "../../configs/Utils";
+import { isEmptyObject } from "jquery";
 
 const createMutation = {
     resource: 'metadata',
@@ -90,7 +91,17 @@ const queryPIndicators = {
             fields: ['id', 'name'],
             filter: ['program.id:eq:' + programId, 'description:eq:_H2Analytics']
         })
-    }
+    },
+};
+
+const queryMaps = {
+    results: {
+        resource: 'maps',
+        params: ({ programId }) => ({
+            fields: ['id', 'name'],
+            filter: [`code:like:${programId}_Scripted`]
+        })
+    },
 };
 
 const queryVisualizations = {
@@ -103,6 +114,17 @@ const queryVisualizations = {
     }
 };
 
+const queryEventReport = {
+    results: {
+        resource: 'eventReports',
+        params: ({ programId }) => ({
+            fields: ['id', 'name'],
+            filter: [`code:like:${programId}_Scripted`]
+        })
+    }
+};
+
+
 const updateAndroidSettings = {
     resource: `dataStore/ANDROID_SETTINGS_APP/analytics`,
     type: 'update',
@@ -112,6 +134,16 @@ const updateAndroidSettings = {
 const queryAndroidSettings = {
     results: {
         resource: `dataStore/ANDROID_SETTINGS_APP/analytics`
+    }
+};
+
+const queryDashboards = {
+    results: {
+        resource: 'dashboards',
+        params: ({ programId }) => ({
+            fields: ['id', 'name'],
+            filter: [`code:like:${programId}`]
+        })
     }
 };
 
@@ -192,6 +224,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"))
         })
     }
+
 
     // ***** DATA ELEMENT ACTIONS ***** //
     const updateDEValues = (dataElementId, sectionId, stageDataElement) => {
@@ -310,10 +343,19 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
 
     // Fetch Visualizations from Program
     const visualizationsDQ = useDataQuery(queryVisualizations, { variables: { programId: programStage.program.id } });
+    
+    // Fetch Event Reports from Program
+    const eventReportDQ = useDataQuery(queryEventReport, { variables: { programId: programStage.program.id } });
+
+    // Fetch Visualizations from Program
+    const mapsDQ = useDataQuery(queryMaps, { variables: { programId: programStage.program.id } });
+  
+    // Fetch Dashboards from Program
+    const dashboardsDQ = useDataQuery(queryDashboards, { variables: { programId: programStage.program.id } });
 
     useEffect(() => {
-        const programIndicatorsAmount = 3;
-        const visualizationsAmount = 3;
+        const programIndicatorsAmount = 3+2;
+        const visualizationsAmount = 3+5;
         const androidSettingsAmount = 1;
 
         let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection?.dataElements?.length + criticalSection?.dataElements?.length) * 5 + programIndicatorsAmount + visualizationsAmount + androidSettingsAmount;
@@ -434,9 +476,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
         const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
         const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass);
-        const { visualizations, androidSettingsVisualizations } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool,programMetadata.useCompetencyClass);
-
-        const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations };
+        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool,programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id);
+        const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports};
 
         // IV. Delete old metadata
         setProgressSteps(4);
@@ -450,7 +491,9 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             programRules: programRulesDel.length>0?programRulesDel:undefined,
             programRuleVariables: programRuleVariablesDel.length>0?programRuleVariablesDel:undefined,
             programIndicators: programIndicatorsDel.length>0?programIndicatorsDel:undefined,
-            visualizations: visualizationsDel.length>0?visualizationsDel:undefined
+            visualizations: visualizationsDel.length>0?visualizationsDel:undefined,
+            eventReports: eventReportDQ.data.results.eventReports.map(er => ({ id: er.id })),
+            maps: mapsDQ.data.results.maps.map(mp => ({ id: mp.id }))
         };
 
         // V. Import new metadata
