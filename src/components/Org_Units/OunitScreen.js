@@ -264,9 +264,9 @@ const OunitScreen = ({id, setOrgUnitProgramId, setNotification}) => {
                         <div style={{ position: "relative", minWidth: "850px"}}>
                             <TextField id={"filterOrgUnitName"} label={"Filtering Organisation unit by Name"} /*onChange={organisationUnitFilterHandler}*/ variant={"standard"} ref={filterRef} style={{ width: "100%"}}/>
                             <div style={{ marginTop: "10px"}}> { selectedOrgUnits.length } Organisation units selected </div>
-                            {!poLoading &&
+                            {!poLoading && orgUnitTreeRoot.length > 0 &&
                                 <div style={{ minHeight: "300px", maxHeight: "450px", minWidth: "300px", maxWidth: "480px", overflow: "auto", border: "1px solid rgb(189, 189, 189)", borderRadius: "3px", padding: "4px", margin: "4px 0px", display: "inline-block", verticalAlign: "top"}}>
-                                    <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ selectedOrgUnits }/>
+                                    <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ orgUnitPathSelected }/>
                                 </div>
                             }
                             <div style={{width: "400px", background: "white", marginLeft: "1rem", marginTop: "1rem", display: "inline-block"}}>
