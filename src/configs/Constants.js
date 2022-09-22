@@ -11,7 +11,7 @@ import DateIcon from '@mui/icons-material/CalendarToday';
 import TimeIcon from '@mui/icons-material/AccessTime';
 
 const BUILD_VERSION = "1.6.0"
-const BUILD_DATE = "July 28th, 2022"
+const BUILD_DATE = "September 21st, 2022"
 const MIN_VERSION = "2.36"
 const MAX_VERSION = "2.38.2"
 

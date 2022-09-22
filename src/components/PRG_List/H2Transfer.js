@@ -139,7 +139,6 @@ const H2Transfer = ({
     const dsUpdateMutation = {
         resource: `dataStore/${TRANSFERRED_EVENTS_NAMESPACE}/${programConfig.id}`,
         type: "update",
-        partial: true,
         data: ({ data }) => data,
     };
 
@@ -525,7 +524,7 @@ const H2Transfer = ({
             H1_ACTION2_OLD,
         ];
 
-        //let obj = dsData?.results || {};
+        let obj = dsData?.results || {};
         setProgressValue(0);
         setConversionError(undefined);
         setStatusModal(true);
@@ -562,7 +561,6 @@ const H2Transfer = ({
 
                     if (storedData.httpStatus === "OK") {
 
-                        let obj = {};
                         obj[eventReq.event] = new Date().toLocaleString(
                             "en-US",
                             DATE_FORMAT_OPTIONS
@@ -591,7 +589,11 @@ const H2Transfer = ({
                 setConversionError(failedEvents.join("<br/>"))
             }else{
                 doSearch(programConfig.name);
-                if(cancelTransfer){
+                setNotification({
+                    message: "HNQIS 1.X Data transferred to HNQIS 2.0",
+                    severity: "success",
+                });
+                /*if(cancelTransfer){
                     setNotification({
                         message:
                             "HNQIS 1.X Data transferred to HNQIS 2.0",
@@ -602,7 +604,7 @@ const H2Transfer = ({
                         message: "Data transfer interrupted",
                         severity: "warning",
                     });
-                }
+                }*/
                 setTransferH2Program(undefined)
             }
         }
