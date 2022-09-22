@@ -6,8 +6,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import CustomMUIDialogTitle from "./../UIElements/CustomMUIDialogTitle";
 import CustomMUIDialog from "./../UIElements/CustomMUIDialog";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
+import PanToolIcon from "@mui/icons-material/PanTool";
 
 import MoveDownIcon from "@mui/icons-material/MoveDown";
 
@@ -117,21 +117,6 @@ const metadataMutation = {
     data: ({ data }) => data,
 };
 
-const eventMutation = {
-    resource: "events",
-    type: "create",
-    data: ({ data }) => data,
-};
-
-const queryIds = {
-    results: {
-        resource: "system/id.json",
-        params: ({ n }) => ({
-            limit: n,
-        }),
-    },
-};
-
 const H2Transfer = ({
     programConfig,
     setTransferH2Program,
@@ -154,6 +139,7 @@ const H2Transfer = ({
     const dsUpdateMutation = {
         resource: `dataStore/${TRANSFERRED_EVENTS_NAMESPACE}/${programConfig.id}`,
         type: "update",
+        partial: true,
         data: ({ data }) => data,
     };
 
@@ -182,18 +168,6 @@ const H2Transfer = ({
         called: metadataDM[1].called,
     };
 
-    let eventDM = useDataMutation(eventMutation, {
-        lazy: true,
-    });
-
-    const eventRequest = {
-        mutate: eventDM[0],
-        loading: eventDM[1].loading,
-        error: eventDM[1].error,
-        data: eventDM[1].data,
-        called: eventDM[1].called,
-    };
-
     const [h2Program, setH2Program] = useState(undefined);
 
     const [dialogStatus, setDialogStatus] = useState(false);
@@ -204,6 +178,7 @@ const H2Transfer = ({
     const [requestsData, setRequestsData] = useState(undefined);
 
     const [progressValue, setProgressValue] = useState(0);
+    const [cancelTransfer, setCancelTransfer] = useState(false);
 
     const { data: programData } = useDataQuery(queryEventList, {
         variables: { program: programConfig.id },
@@ -217,11 +192,6 @@ const H2Transfer = ({
     const { refetch: getH2Program } = useDataQuery(queryProgramMetadata, {
         lazy: true,
         variables: {},
-    });
-
-    const idsQuery = useDataQuery(queryIds, {
-        lazy: true,
-        variables: { n: undefined },
     });
 
     const buildActionPlan = (
@@ -491,6 +461,8 @@ const H2Transfer = ({
     };
 
     const submission = async () => {
+        setCancelTransfer(false);
+
         let metadataH2 = JSON.parse(
             h2Program.attributeValues.find((av) => av.attribute.id === METADATA)
                 ?.value || "{}"
@@ -553,7 +525,7 @@ const H2Transfer = ({
             H1_ACTION2_OLD,
         ];
 
-        let obj = dsData?.results || {};
+        //let obj = dsData?.results || {};
         setProgressValue(0);
         setConversionError(undefined);
         setStatusModal(true);
@@ -561,7 +533,10 @@ const H2Transfer = ({
         if (requestsData) {
             let failedEvents = [];
             for (const [index, eventReq] of requestsData.entries()) {
-                // TODO: Stop process if cancelled (Add Stop Button in modal)
+                console.log(cancelTransfer)
+                
+                if (cancelTransfer) break;
+
                 const eventFetch = await getEvent({
                     program: programConfig.id,
                     eventId: eventReq.event,
@@ -570,8 +545,6 @@ const H2Transfer = ({
                 let event = eventFetch.results?.events[0];
 
                 if (event) {
-
-                    //! Convert Event to TEI
                     let hnqisTEI = await buildHnqisTEI(
                         event,
                         metadataH2,
@@ -589,6 +562,7 @@ const H2Transfer = ({
 
                     if (storedData.httpStatus === "OK") {
 
+                        let obj = {};
                         obj[eventReq.event] = new Date().toLocaleString(
                             "en-US",
                             DATE_FORMAT_OPTIONS
@@ -617,11 +591,18 @@ const H2Transfer = ({
                 setConversionError(failedEvents.join("<br/>"))
             }else{
                 doSearch(programConfig.name);
-                setNotification({
-                    message:
-                        "HNQIS 1.X Data converted to HNQIS 2.0",
-                    severity: "success",
-                });
+                if(cancelTransfer){
+                    setNotification({
+                        message:
+                            "HNQIS 1.X Data transferred to HNQIS 2.0",
+                        severity: "success",
+                    });
+                } else {
+                    setNotification({
+                        message: "Data transfer interrupted",
+                        severity: "warning",
+                    });
+                }
                 setTransferH2Program(undefined)
             }
         }
@@ -784,7 +765,7 @@ const H2Transfer = ({
                                 }}
                             >
                                 <Box sx={{ display: "flex" }}>
-                                    <CircularProgress size={20}/>
+                                    <CircularProgress size={20} />
                                 </Box>
                                 <Box sx={{ width: "85%" }}>
                                     <LinearProgress
@@ -820,6 +801,17 @@ const H2Transfer = ({
                             color="primary"
                         >
                             Close
+                        </Button>
+                    )}
+                    {loadingConversion && (
+                        <Button
+                            onClick={() => setCancelTransfer(true)}
+                            color="error"
+                            variant="contained"
+                            startIcon={<PanToolIcon/>}
+                            disabled={cancelTransfer}
+                        >
+                            Stop
                         </Button>
                     )}
                 </DialogActions>
