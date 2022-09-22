@@ -486,14 +486,16 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         let programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
         let programIndicatorsDel = pIndDQ.data.results.programIndicators.map(pInd => ({ id: pInd.id }));
         let visualizationsDel = visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id }));
+        let eventReportsDel = eventReportDQ.data.results.eventReports.map(er => ({ id: er.id }));
+        let mapsDel = mapsDQ.data.results.maps.map(mp => ({ id: mp.id }));
 
         const oldMetadata = {
             programRules: programRulesDel.length>0?programRulesDel:undefined,
             programRuleVariables: programRuleVariablesDel.length>0?programRuleVariablesDel:undefined,
             programIndicators: programIndicatorsDel.length>0?programIndicatorsDel:undefined,
             visualizations: visualizationsDel.length>0?visualizationsDel:undefined,
-            eventReports: eventReportDQ.data.results.eventReports.map(er => ({ id: er.id })),
-            maps: mapsDQ.data.results.maps.map(mp => ({ id: mp.id }))
+            eventReports: eventReportsDel.length>0?eventReportsDel:undefined,
+            maps: mapsDel.length>0?mapsDel:undefined
         };
 
         // V. Import new metadata
