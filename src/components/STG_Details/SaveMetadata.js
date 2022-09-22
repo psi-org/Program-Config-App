@@ -104,6 +104,8 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
          * Prepare new data elements (payloads)
          * Get program stage data elements for each question
          */
+
+        let psdeSortOrder = 1
         importedSections.forEach((section, secIdx) => { //v1.4.0 WORK
 
             if (section.importStatus == 'new') section.id = uidPool.shift();
@@ -151,9 +153,10 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
                 new_programStageDataElements.push({
                     compulsory: (DE_metadata.isCompulsory == 'Yes' && !DE_metadata.parentQuestion), // True: mandatory is Yes and has no parents.
                     displayInReports: dataElement.displayInReports,
-                    sortOrder: deIdx + 1,
+                    sortOrder: psdeSortOrder,
                     dataElement: { id: dataElement.id }
                 });
+                psdeSortOrder+=1
                 delete dataElement.displayInReports;
 
                 if(!hnqisMode) ['isCritical','elemType','labelFormName','varName','parentQuestion','parentValue'].forEach(key => delete DE_metadata[key])

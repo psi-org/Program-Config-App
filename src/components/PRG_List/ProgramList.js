@@ -30,6 +30,8 @@ import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 import About from "./About";
 import H2Metadata from "./H2Metadata";
 import { Tooltip } from "@mui/material";
+import H2Convert from "./H2Convert";
+import H2Transfer from "./H2Transfer";
 
 
 const queryProgramType = {
@@ -46,12 +48,12 @@ const query = {
     results: {
         resource: "programs",
         paging: false,
-        params: ({ token, pageSize, page, pgrTypeAttrId }) => {
+        params: ({ token, pageSize, page }) => {
             let paramsObject = {
                 pageSize,
                 page,
-                fields: ["code", "id", "name", "shortName", "created", "lastUpdated", "href", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "relatedProgram", "categoryCombo[id,name]", "trackedEntityType[id,name]", "style", "programTrackedEntityAttributes", "notificationTemplates", "translations", "organisationUnits", "programSections", "attributeValues", "programStages[id,name,programStageSections[*]]", "access"],
-                filter: ['withoutRegistration:eq:false']
+                fields: ["code", "id", "name", "shortName", "created", "lastUpdated", "href", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "relatedProgram", "categoryCombo[id,name]", "trackedEntityType[id,name]", "style", "programTrackedEntityAttributes", "notificationTemplates", "translations", "organisationUnits", "programSections", "attributeValues", "programStages[id,name,programStageSections[*]]", "access", "withoutRegistration"],
+                filter: []
             }
 
             if (token !== "") paramsObject.filter.push(`identifiable:token:${token}`)
@@ -67,6 +69,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const ProgramList = () => {
 
+    //console.log(semverCoerce("2.37-SNAPSHOT"))
     // Export Program Metadata //
     const [exportProgramId, setExportProgramId] = useState(undefined)
     const [sharingProgramId, setSharingProgramId] = useState(undefined);
@@ -75,6 +78,8 @@ const ProgramList = () => {
     const [restoreProgramId, setRestoreProgramId] = useState(undefined);
     const [readOnlyPermission, setReadOnlyPermission] = useState(false);
     const [orgUnitProgramId, setOrgUnitProgramId] = useState(undefined);
+    const [conversionH2ProgramId, setConversionH2ProgramId] = useState(undefined);
+    const [transferH2Program, setTransferH2Program] = useState(undefined);
 
     // *********************** //
 
@@ -118,6 +123,14 @@ const ProgramList = () => {
         setBackupProgramId(program)
     }
 
+    const convertToH2 = (program) => {
+        setConversionH2ProgramId(program)
+    }
+
+    const transferDataH2 = (program) => {
+        setTransferH2Program(program);
+    };
+
     const restoreProgram = (program) => {
         setRestoreProgramId(program)
     }
@@ -126,7 +139,7 @@ const ProgramList = () => {
 
     }
 
-    const { loading, error, data, refetch } = useDataQuery(query, { variables: { token: filterValue, pageSize, page: currentPage, prgTypeId } });
+    const { loading, error, data, refetch } = useDataQuery(query, { variables: { token: filterValue, pageSize, page: currentPage } });
 
     if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
     if (loading) return <CircularLoader />
@@ -146,54 +159,113 @@ const ProgramList = () => {
     return (
         <div>
             <div className="sub_nav">
-                <div className="cnt_p"><Chip>Home</Chip></div>
+                <div className="cnt_p">
+                    <Chip>Home</Chip>
+                </div>
                 <div className="c_srch"></div>
                 <div className="c_btns">
                     <MuiButton
                         variant="outlined"
-                        color='inherit'
+                        color="inherit"
                         startIcon={<AddCircleOutlineIcon />}
                         onClick={() => setShowProgramForm(true)}
-                        disabled={showProgramForm}>
+                        disabled={showProgramForm}
+                    >
                         Add Program
                     </MuiButton>
-                    <IconButton color="inherit" onClick={()=>{setRef(document.getElementById('settingsMenu')); setSettingsMenu(!settingsMenu);}} id={'settingsMenu'}>
-                        <SettingsIcon/>
+                    <IconButton
+                        color="inherit"
+                        onClick={() => {
+                            setRef(document.getElementById("settingsMenu"));
+                            setSettingsMenu(!settingsMenu);
+                        }}
+                        id={"settingsMenu"}
+                    >
+                        <SettingsIcon />
                     </IconButton>
-                    {settingsMenu &&
-                        <Layer onClick={()=>setSettingsMenu(!settingsMenu)}>
+                    {settingsMenu && (
+                        <Layer onClick={() => setSettingsMenu(!settingsMenu)}>
                             <Popper reference={ref} placement="bottom-end">
                                 <FlyoutMenu>
-                                    <MenuItem label="About PCA" icon={<InfoIcon />} onClick={() => { setSettingsMenu(false); setAboutModal(true); }} />
-                                    <MenuItem label="HNQIS 2.0 Status" icon={<InstallDesktopIcon />} onClick={()=>{ setSettingsMenu(false); setH2Modal(true) ;}}/>
+                                    <MenuItem
+                                        label="About PCA"
+                                        icon={<InfoIcon />}
+                                        onClick={() => {
+                                            setSettingsMenu(false);
+                                            setAboutModal(true);
+                                        }}
+                                    />
+                                    <MenuItem
+                                        label="HNQIS 2.0 Status"
+                                        icon={<InstallDesktopIcon />}
+                                        onClick={() => {
+                                            setSettingsMenu(false);
+                                            setH2Modal(true);
+                                        }}
+                                    />
                                 </FlyoutMenu>
                             </Popper>
                         </Layer>
-                    }
-                    {exportProgramId &&
-                        <DependencyExport program={exportProgramId} setExportProgramId={setExportProgramId} />
-                    }
-                    {
-                        sharingProgramId &&
-                        <SharingScreen element="program" id={sharingProgramId} setSharingProgramId={setSharingProgramId} type={sharingProgramType} setType={setSharingProgramType} readOnly={readOnlyPermission} setNotification={setNotification}/>
-                    }
-                    {
-                        orgUnitProgramId &&
-                            <OunitScreen id={orgUnitProgramId} setOrgUnitProgramId={setOrgUnitProgramId} setNotification={setNotification}/>
-                    }
-                    {
-                        backupProgramId &&
-                            <BackupScreen program={backupProgramId} setBackupProgramId={setBackupProgramId} setNotification={setNotification}/>
-                    }
-                    {
-                        restoreProgramId &&
-                            <RestoreScreen program={restoreProgramId} setRestoreProgramId={setRestoreProgramId} setNotification={setNotification}/>
-                    }
+                    )}
+                    {exportProgramId && (
+                        <DependencyExport
+                            program={exportProgramId}
+                            setExportProgramId={setExportProgramId}
+                        />
+                    )}
+                    {sharingProgramId && (
+                        <SharingScreen
+                            element="program"
+                            id={sharingProgramId}
+                            setSharingProgramId={setSharingProgramId}
+                            type={sharingProgramType}
+                            setType={setSharingProgramType}
+                            readOnly={readOnlyPermission}
+                            setNotification={setNotification}
+                        />
+                    )}
+                    {orgUnitProgramId && (
+                        <OunitScreen
+                            id={orgUnitProgramId}
+                            setOrgUnitProgramId={setOrgUnitProgramId}
+                            setNotification={setNotification}
+                        />
+                    )}
+                    {backupProgramId && (
+                        <BackupScreen
+                            program={backupProgramId}
+                            setBackupProgramId={setBackupProgramId}
+                            setNotification={setNotification}
+                        />
+                    )}
+                    {conversionH2ProgramId && (
+                        <H2Convert
+                            program={conversionH2ProgramId}
+                            setConversionH2ProgramId={setConversionH2ProgramId}
+                            setNotification={setNotification}
+                            doSearch={doSearch}
+                        />
+                    )}
+                    {transferH2Program && (
+                        <H2Transfer
+                            programConfig={transferH2Program}
+                            setTransferH2Program={setTransferH2Program}
+                            setNotification={setNotification}
+                            doSearch={doSearch}
+                        />
+                    )}
+                    {restoreProgramId && (
+                        <RestoreScreen
+                            program={restoreProgramId}
+                            setRestoreProgramId={setRestoreProgramId}
+                            setNotification={setNotification}
+                        />
+                    )}
                 </div>
             </div>
-            <div style={{ margin: '0px 16px 8px' }}>
+            <div style={{ margin: "0px 16px 8px" }}>
                 <div className="title">List of programs</div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: "flex", alignItems: "center" }}>
                     <TextField
                         margin="dense"
                         id="name"
@@ -202,28 +274,41 @@ const ProgramList = () => {
                         variant="outlined"
                         value={filterValue}
                         onChange={(event) => setFilterValue(event.target.value)}
-                        onKeyPress={event => {
-                            if (event.key === 'Enter') { doSearch() }
+                        onKeyPress={(event) => {
+                            if (event.key === "Enter") {
+                                doSearch();
+                            }
                         }}
-                        sx={{ width: '100%' }}
-                        autoComplete='off'
+                        sx={{ width: "100%" }}
+                        autoComplete="off"
                         InputProps={{
                             endAdornment: (
-                                <InputAdornment position='end'>
-                                    <Tooltip title="Clear Search" placement="left">
-                                        <IconButton onClick={() => { resetSearch() }} style={{marginRight: '0.5em'}}>
-                                            <ClearIcon/>
+                                <InputAdornment position="end">
+                                    <Tooltip
+                                        title="Clear Search"
+                                        placement="left"
+                                    >
+                                        <IconButton
+                                            onClick={() => {
+                                                resetSearch();
+                                            }}
+                                            style={{ marginRight: "0.5em" }}
+                                        >
+                                            <ClearIcon />
                                         </IconButton>
                                     </Tooltip>
                                     <MuiButton
-                                        onClick={() => {doSearch() }}
+                                        onClick={() => {
+                                            doSearch();
+                                        }}
                                         startIcon={<SearchIcon />}
-                                        variant='contained'
-                                        color='primary'>
+                                        variant="contained"
+                                        color="primary"
+                                    >
                                         Search
                                     </MuiButton>
                                 </InputAdornment>
-                            )
+                            ),
                         }}
                     />
                 </div>
@@ -231,9 +316,9 @@ const ProgramList = () => {
             <div className="wrapper">
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
-                        {
-                            data.results.programs.map((program) => {
-                                return <ProgramItem
+                        {data.results.programs.map((program) => {
+                            return (
+                                <ProgramItem
                                     program={program}
                                     key={program.id}
                                     downloadMetadata={downloadMetadata}
@@ -246,9 +331,11 @@ const ProgramList = () => {
                                     refetch={refetch}
                                     setNotification={setNotification}
                                     doSearch={doSearch}
+                                    convertToH2={convertToH2}
+                                    transferDataH2={transferDataH2}
                                 />
-                            })
-                        }
+                            );
+                        })}
                     </div>
                 </div>
             </div>
@@ -259,31 +346,45 @@ const ProgramList = () => {
                     pageCount={data.results.pager.pageCount}
                     total={data.results.pager.pageCount}
                     pageSizes={["5", "10", "15", "20", "25", "50", "100"]}
-                    onPageSizeChange={(pageSize) => { setPageSize(pageSize); refetch({ pageSize, page: 1 }) }}
-                    onPageChange={(page) => { setCurrentPage(page); refetch({ page, pageSize }) }}
+                    onPageSizeChange={(pageSize) => {
+                        setPageSize(pageSize);
+                        refetch({ pageSize, page: 1 });
+                    }}
+                    onPageChange={(page) => {
+                        setCurrentPage(page);
+                        refetch({ page, pageSize });
+                    }}
                 />
             </div>
-            {showProgramForm && 
+            {showProgramForm && (
                 <ProgramNew
                     setShowProgramForm={setShowProgramForm}
                     programsRefetch={refetch}
                     setNotification={setNotification}
-                    doSearch={doSearch} 
+                    doSearch={doSearch}
                 />
-            }
+            )}
 
             <Snackbar
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 open={notification !== undefined}
-                key={'topcenter'}
+                key={"topcenter"}
             >
-                <Alert onClose={() => setNotification(undefined)} severity={notification?.severity || snackSeverity} sx={{ width: '100%' }}>
+                <Alert
+                    onClose={() => setNotification(undefined)}
+                    severity={notification?.severity || snackSeverity}
+                    sx={{ width: "100%" }}
+                >
                     {notification?.message}
                 </Alert>
             </Snackbar>
 
-            {aboutModal && <About aboutModal={aboutModal} setAboutModal={setAboutModal} /> }
-            {H2Modal && <H2Metadata H2Modal={H2Modal} setH2Modal={setH2Modal} /> }
+            {aboutModal && (
+                <About aboutModal={aboutModal} setAboutModal={setAboutModal} />
+            )}
+            {H2Modal && (
+                <H2Metadata H2Modal={H2Modal} setH2Modal={setH2Modal} />
+            )}
         </div>
     );
 };

@@ -119,10 +119,15 @@ const DependencyExport = ({ program, setExportProgramId }) => {
       delete ptea.lastUpdated;
     });
 
+    let programRuleActionsDict = {}
+
     programMetadata.programRules?.forEach(pr => {
       delete pr.created;
       delete pr.lastUpdated;
       delete pr.lastUpdatedBy;
+      pr.programRuleActions.forEach(pra => {
+        programRuleActionsDict[pra.id] = pr.id
+      })
     });
 
     programMetadata.dataElements?.forEach(de => {
@@ -165,6 +170,9 @@ const DependencyExport = ({ program, setExportProgramId }) => {
       delete pra.created;
       delete pra.lastUpdated;
       delete pra.lastUpdatedBy;
+      pra.programRule = {
+        id: programRuleActionsDict[pra.id]
+      }
     });
 
     programMetadata.optionSets?.forEach(optionSet => {
@@ -172,6 +180,13 @@ const DependencyExport = ({ program, setExportProgramId }) => {
       delete optionSet.createdBy;
       delete optionSet.lastUpdated;
       delete optionSet.lastUpdatedBy;
+    });
+
+    programMetadata.programIndicators?.forEach(pInd => {
+      delete pInd.created;
+      delete pInd.createdBy;
+      delete pInd.lastUpdated;
+      delete pInd.lastUpdatedBy;
     });
 
     setCleanMetadata(programMetadata)

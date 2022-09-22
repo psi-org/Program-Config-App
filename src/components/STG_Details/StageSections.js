@@ -482,11 +482,16 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         // IV. Delete old metadata
         setProgressSteps(4);
 
+        let programRulesDel = prDQ.data.results.programRules.map(pr => ({ id: pr.id }));
+        let programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
+        let programIndicatorsDel = pIndDQ.data.results.programIndicators.map(pInd => ({ id: pInd.id }));
+        let visualizationsDel = visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id }));
+
         const oldMetadata = {
-            programRules: prDQ.data.results.programRules.map(pr => ({ id: pr.id })),
-            programRuleVariables: prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id })),
-            programIndicators: pIndDQ.data.results.programIndicators.map(pInd => ({ id: pInd.id })),
-            visualizations: visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id })),
+            programRules: programRulesDel.length>0?programRulesDel:undefined,
+            programRuleVariables: programRuleVariablesDel.length>0?programRuleVariablesDel:undefined,
+            programIndicators: programIndicatorsDel.length>0?programIndicatorsDel:undefined,
+            visualizations: visualizationsDel.length>0?visualizationsDel:undefined,
             eventReports: eventReportDQ.data.results.eventReports.map(er => ({ id: er.id })),
             maps: mapsDQ.data.results.maps.map(mp => ({ id: mp.id }))
         };

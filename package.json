@@ -3,8 +3,8 @@
   "title": "Program Config App",
   "short_name": "Program Config App",
   "author": "Fernando Gomez - Mario Lopez - Utsav Koju",
-  "version": "1.5.0",
-  "description":"Tracker Programs management tool",
+  "version": "1.6.0",
+  "description": "Tracker Programs management tool",
   "license": "CC-BY-4.0",
   "private": true,
   "scripts": {
@@ -35,12 +35,14 @@
     "jquery": "^3.6.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "2.17.3",
+    "react-hook-form": "^7.34.0",
     "react-redux": "^7.2.5",
     "react-router-dom": "^5.3.0",
     "react-sweet-progress": "^1.1.2",
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
     "rehype-sanitize": "^5.0.1",
+    "semver": "^7.3.7",
     "tinycolor2": "^1.4.2"
   }
 }

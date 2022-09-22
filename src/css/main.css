@@ -862,3 +862,25 @@ code {
 }
 
 /*# sourceMappingURL=main.css.map */
+
+@keyframes fadeInOut {
+  0%{
+    opacity:1;
+  }
+  50%{
+    opacity: 0.5;
+    transform: translateX(5px);
+  }
+  100%{
+    opacity:1;
+    transform: translateX(0px);
+  }
+}
+
+.progress-animation {
+  color:#2c6693 !important;
+  animation-name: fadeInOut;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;;
+
+}

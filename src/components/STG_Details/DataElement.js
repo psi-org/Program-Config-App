@@ -6,14 +6,11 @@ import { Draggable } from "react-beautiful-dnd";
 import DataElementForm from "./DataElementForm";
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { Tooltip } from "@mui/material";
 import { METADATA } from "../../configs/Constants";
 
 // *** IMAGES ***
 import de_svg from './../../images/i-drag_black.svg';
-import warning_svg from './../../images/i-warning.svg';
-import error_svg from './../../images/i-error.svg';
-import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import open_external_svg from './../../images/open_external.svg';
 import {FlyoutMenu, MenuItem, Popper, Layer, colors,IconAdd16,IconDelete16,IconEdit16, Tag } from '@dhis2/ui';
 
 import BadgeWarnings from "./BadgeWarnings";
@@ -80,7 +77,20 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
                             <img className="ml_list-img" alt="de" src={de_svg} />
                         </div>
                         <div className="ml_item-title"> 
-                            {deImportStatus} { renderFormName || dataElement.formName}
+                            {deImportStatus}
+                            { 
+                                renderFormName?renderFormName:
+                                (
+                                    (dataElement.formName && dataElement.formName?.replaceAll(' ','')!=='')?
+                                        dataElement.formName:
+                                        <span style={{display: 'flex', alignItems: 'center'}}>
+                                            <em style={{marginRight: '0.5em'}}>{dataElement.name}</em>
+                                            <Tooltip title="No Form Name provided" placement="right" color="warning">
+                                                <WarningAmberIcon fontSize="small"/>
+                                            </Tooltip>
+                                        </span>
+                                )
+                            }
                         </div>
                         <div className="ml_item-warning_error" onClick={()=>setShowValidationMessage(!showValidationMessage)}>
                             {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length}/> }

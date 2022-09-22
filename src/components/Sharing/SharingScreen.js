@@ -230,8 +230,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     const handleMenuItemClick = (event, index) => {
         setSelectedIndex(index);
         setOpen(false);
-        apply(index);
-    };
+     };
 
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
@@ -468,7 +467,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                                 <Button onClick={() => assignRole()} variant="outlined" disabled={userAccessRestricted}>Assign</Button>
                             </div>
                         </div>
-                        {(selectedIndex === 1 || selectedIndex === 2) &&
+                        {(selectedIndex === 2) &&
                         <div style={{display: 'flex', alignItems: 'center', margin: "1em 0 0 1em"}}>
                             <FormGroup>
                                 <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox} inputProps={{ 'aria-label': 'controlled' }} />} label={"Overwrite Existing Settings in Data Elements"} />
