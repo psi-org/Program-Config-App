@@ -304,12 +304,14 @@ const H2Transfer = ({
         //hnqisTEI.trackedEntityInstance = event.event
         hnqisTEI.orgUnit = event.orgUnit;
         hnqisTEI.trackedEntityType = ASSESSMENT_TET;
+        let globalScore = event.dataValues.find(
+            (dv) => dv.dataElement === H1_OVERALL_SCORE
+        )?.value;
+
         hnqisTEI.attributes = [
             {
                 attribute: GLOBAL_SCORE_ATTRIBUTE,
-                value: event.dataValues.find(
-                    (dv) => dv.dataElement === H1_OVERALL_SCORE
-                )?.value,
+                value: /*Number(globalScore)>0.01?globalScore:'0'*/ "2.3999948E-4", //! Forced Error
             },
             {
                 attribute: ASSESSMENT_DATE_ATTRIBUTE,
@@ -532,9 +534,7 @@ const H2Transfer = ({
         setLoadingConversion(true);
         if (requestsData) {
             let failedEvents = [];
-            for (const [index, eventReq] of requestsData.entries()) {
-                console.log(cancelTransfer)
-                
+            for (const [index, eventReq] of requestsData.entries()) {             
                 if (cancelTransfer.current) break;
 
                 const eventFetch = await getEvent({
