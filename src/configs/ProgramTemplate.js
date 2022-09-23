@@ -4,7 +4,6 @@ const Program = {
     "shortName": "programShortName",
     "programType": "WITH_REGISTRATION",
     "skipOffline": false,
-    "publicAccess": "rwrw----",
     "enrollmentDateLabel": "Enrollment date",
     "registration": true,
     "displayFrontPageList": true,
@@ -76,7 +75,7 @@ const PS_AssessmentStage = {
     "program": {"id": "programId"},
     "programStageDataElements": [],
     "programStageSections": [],
-    "publicAccess": "rwrw----",
+    "publicAccess": "rwrw----", //! Remove?
     "remindCompleted": true,
     "repeatable": false,
     "reportDateToUse": "enrollmentDate",
@@ -119,7 +118,7 @@ const PS_ActionPlanStage = {
         }
     ],
     "programStageSections": [],
-    "publicAccess": "rwrw----",
+    "publicAccess": "rwrw----", //! Remove?
     "remindCompleted": false,
     "repeatable": true,
     "sortOrder": 2,
@@ -156,7 +155,7 @@ const PSS_Scores = {
 }
 
 const PS_Generic = {
-    "publicAccess": "rw------",
+    "publicAccess": "rw------", //! Remove?
     "id": "stageID",
     "name": "Stage",
     "displayGenerateEventBox": true,

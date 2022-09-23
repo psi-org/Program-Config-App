@@ -1,204 +1,208 @@
 {
-  "options": [
-    {
-      "code": "HNQIS",
-      "name": "HNQIS",
-      "id": "Ip3IqzzqgLN",
-      "sortOrder": 1,
-      "optionSet": {
-        "id": "TOcCuCN2CLm"
-      },
-      "translations": []
-    },
-    {
-      "code": "HNQIS2",
-      "name": "HNQIS 2.0",
-      "id": "Jz4YKD15lnK",
-      "sortOrder": 2,
-      "optionSet": {
-        "id": "TOcCuCN2CLm"
-      },
-      "translations": []
-    },
-    {
-      "code": "RDQA",
-      "name": "RDQA",
-      "id": "QR0HHcQri91",
-      "sortOrder": 3,
-      "optionSet": {
-        "id": "TOcCuCN2CLm"
-      },
-      "translations": []
-    },
-    {
-      "code": "EDS",
-      "name": "EDS",
-      "id": "v9XPATv6G3N",
-      "sortOrder": 4,
-      "optionSet": {
-        "id": "TOcCuCN2CLm"
-      },
-      "translations": []
-    }
-  ],
-  "optionSets": [
-    {
-      "name": "DB - Program Type",
-      "id": "TOcCuCN2CLm",
-      "version": 7,
-      "valueType": "TEXT",
-      "attributeValues": [],
-      "translations": [],
-      "options": [
+    "options": [
         {
-          "id": "Ip3IqzzqgLN"
+            "code": "HNQIS",
+            "name": "HNQIS",
+            "id": "Ip3IqzzqgLN",
+            "sortOrder": 1,
+            "optionSet": {
+                "id": "TOcCuCN2CLm"
+            },
+            "translations": []
         },
         {
-          "id": "Jz4YKD15lnK"
+            "code": "HNQIS2",
+            "name": "HNQIS 2.0",
+            "id": "Jz4YKD15lnK",
+            "sortOrder": 2,
+            "optionSet": {
+                "id": "TOcCuCN2CLm"
+            },
+            "translations": []
         },
         {
-          "id": "QR0HHcQri91"
+            "code": "RDQA",
+            "name": "RDQA",
+            "id": "QR0HHcQri91",
+            "sortOrder": 3,
+            "optionSet": {
+                "id": "TOcCuCN2CLm"
+            },
+            "translations": []
         },
         {
-          "id": "v9XPATv6G3N"
+            "code": "EDS",
+            "name": "EDS",
+            "id": "v9XPATv6G3N",
+            "sortOrder": 4,
+            "optionSet": {
+                "id": "TOcCuCN2CLm"
+            },
+            "translations": []
         }
-      ]
-    }
-  ],
-  "attributes": [
-    {
-      "id": "yB5tFAAN7bI",
-      "name": "PRG Program Type",
-      "code": "PROGRAM_TYPE",
-      "indicatorAttribute": false,
-      "indicatorGroupAttribute": false,
-      "userGroupAttribute": false,
-      "dataElementAttribute": false,
-      "constantAttribute": false,
-      "valueType": "TEXT",
-      "categoryOptionAttribute": false,
-      "optionSetAttribute": false,
-      "sqlViewAttribute": false,
-      "legendSetAttribute": false,
-      "trackedEntityAttributeAttribute": false,
-      "organisationUnitAttribute": false,
-      "dataSetAttribute": false,
-      "documentAttribute": false,
-      "unique": false,
-      "validationRuleGroupAttribute": false,
-      "dataElementGroupAttribute": false,
-      "sectionAttribute": false,
-      "trackedEntityTypeAttribute": false,
-      "userAttribute": false,
-      "mandatory": false,
-      "categoryOptionGroupAttribute": false,
-      "programStageAttribute": false,
-      "programAttribute": true,
-      "categoryAttribute": false,
-      "categoryOptionComboAttribute": false,
-      "categoryOptionGroupSetAttribute": false,
-      "validationRuleAttribute": false,
-      "programIndicatorAttribute": false,
-      "organisationUnitGroupAttribute": false,
-      "dataElementGroupSetAttribute": false,
-      "organisationUnitGroupSetAttribute": false,
-      "optionAttribute": false
-    },
-    {
-      "id": "haUflNqP85K",
-      "name": "PCA Metadata",
-      "shortName": "PCA Metadata",
-      "code": "PCA Metadata",
-      "indicatorAttribute": false,
-      "indicatorGroupAttribute": false,
-      "userGroupAttribute": false,
-      "dataElementAttribute": true,
-      "constantAttribute": false,
-      "valueType": "LONG_TEXT",
-      "categoryOptionAttribute": false,
-      "optionSetAttribute": false,
-      "sqlViewAttribute": false,
-      "legendSetAttribute": false,
-      "trackedEntityAttributeAttribute": false,
-      "organisationUnitAttribute": false,
-      "dataSetAttribute": false,
-      "documentAttribute": false,
-      "unique": false,
-      "validationRuleGroupAttribute": false,
-      "dataElementGroupAttribute": false,
-      "sectionAttribute": false,
-      "trackedEntityTypeAttribute": false,
-      "userAttribute": false,
-      "mandatory": false,
-      "categoryOptionGroupAttribute": false,
-      "programStageAttribute": true,
-      "programAttribute": true,
-      "categoryAttribute": false,
-      "categoryOptionComboAttribute": false,
-      "categoryOptionGroupSetAttribute": false,
-      "validationRuleAttribute": false,
-      "programIndicatorAttribute": false,
-      "organisationUnitGroupAttribute": false,
-      "dataElementGroupSetAttribute": false,
-      "organisationUnitGroupSetAttribute": false,
-      "optionAttribute": false
-    }
-  ],
-  "userRoles": [
-    {
-      "name": "_App - Program Config App",
-      "id": "QbYqOgwk5fJ",
-      "displayName": "_App - Program Config App",
-      "publicAccess": "rw------",
-      "description": "Program Config App access and required authorities for basic usage.",
-      "authorities": [
-        "F_DATAELEMENT_PUBLIC_ADD",
-        "F_LEGEND_SET_PUBLIC_ADD",
-        "F_METADATA_EXPORT",
-        "F_METADATA_IMPORT",
-        "F_OPTIONSET_PUBLIC_ADD",
-        "F_PROGRAM_DELETE",
-        "F_PROGRAM_INDICATOR_DELETE",
-        "F_PROGRAM_INDICATOR_PUBLIC_ADD",
-        "F_PROGRAM_PUBLIC_ADD",
-        "F_PROGRAM_RULE_ADD",
-        "F_PROGRAM_RULE_DELETE",
-        "F_PROGRAM_RULE_MANAGEMENT",
-        "F_PROGRAMSTAGE_ADD",
-        "F_PROGRAMSTAGE_DELETE",
-        "F_SECTION_ADD",
-        "F_SECTION_DELETE",
-        "F_VISUALIZATION_PUBLIC_ADD",
-        "M_dhis-web-cache-cleaner",
-        "M_dhis-web-dashboard",
-        "M_dhis-web-datastore",
-        "M_dhis-web-maintenance",
-        "M_dhis-web-tracker-capture",
-        "M_programconfigapp"
-      ]
-    },
-    {
-      "name": "PCA - Administrator",
-      "id": "akI7EzBaRaJ",
-      "displayName": "PCA - Administrator",
-      "publicAccess": "rw------",
-      "description": "Program Config App additional authorities for installing metadata.",
-      "authorities": [
-        "F_ATTRIBUTE_PUBLIC_ADD",
-        "F_TRACKED_ENTITY_ADD",
-        "F_TRACKED_ENTITY_ATTRIBUTE_PUBLIC_ADD",
-        "F_USERGROUP_PUBLIC_ADD"
-      ]
-    },
-    {
-      "name": "PCA - Users Sharing Management",
-      "id": "JDmJ4ADTaDq",
-      "displayName": "PCA - Users Sharing Management",
-      "publicAccess": "rw------",
-      "description": "Users view authorities for the Sharing Settings in the Program Config App",
-      "authorities": [
-        "F_USER_VIEW"
-      ]
-    }
-  ]
+    ],
+    "optionSets": [
+        {
+            "name": "DB - Program Type",
+            "id": "TOcCuCN2CLm",
+            "version": 7,
+            "valueType": "TEXT",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {
+                    "id": "Ip3IqzzqgLN"
+                },
+                {
+                    "id": "Jz4YKD15lnK"
+                },
+                {
+                    "id": "QR0HHcQri91"
+                },
+                {
+                    "id": "v9XPATv6G3N"
+                }
+            ]
+        }
+    ],
+    "attributes": [
+        {
+            "id": "yB5tFAAN7bI",
+            "name": "PRG Program Type",
+            "code": "PROGRAM_TYPE",
+            "indicatorAttribute": false,
+            "indicatorGroupAttribute": false,
+            "userGroupAttribute": false,
+            "dataElementAttribute": false,
+            "constantAttribute": false,
+            "valueType": "TEXT",
+            "categoryOptionAttribute": false,
+            "optionSetAttribute": false,
+            "sqlViewAttribute": false,
+            "legendSetAttribute": false,
+            "trackedEntityAttributeAttribute": false,
+            "organisationUnitAttribute": false,
+            "dataSetAttribute": false,
+            "documentAttribute": false,
+            "unique": false,
+            "validationRuleGroupAttribute": false,
+            "dataElementGroupAttribute": false,
+            "sectionAttribute": false,
+            "trackedEntityTypeAttribute": false,
+            "userAttribute": false,
+            "mandatory": false,
+            "categoryOptionGroupAttribute": false,
+            "programStageAttribute": false,
+            "programAttribute": true,
+            "categoryAttribute": false,
+            "categoryOptionComboAttribute": false,
+            "categoryOptionGroupSetAttribute": false,
+            "validationRuleAttribute": false,
+            "programIndicatorAttribute": false,
+            "organisationUnitGroupAttribute": false,
+            "dataElementGroupSetAttribute": false,
+            "organisationUnitGroupSetAttribute": false,
+            "optionAttribute": false
+        },
+        {
+            "id": "haUflNqP85K",
+            "name": "PCA Metadata",
+            "shortName": "PCA Metadata",
+            "code": "PCA Metadata",
+            "indicatorAttribute": false,
+            "indicatorGroupAttribute": false,
+            "userGroupAttribute": false,
+            "dataElementAttribute": true,
+            "constantAttribute": false,
+            "valueType": "LONG_TEXT",
+            "categoryOptionAttribute": false,
+            "optionSetAttribute": false,
+            "sqlViewAttribute": false,
+            "legendSetAttribute": false,
+            "trackedEntityAttributeAttribute": false,
+            "organisationUnitAttribute": false,
+            "dataSetAttribute": false,
+            "documentAttribute": false,
+            "unique": false,
+            "validationRuleGroupAttribute": false,
+            "dataElementGroupAttribute": false,
+            "sectionAttribute": false,
+            "trackedEntityTypeAttribute": false,
+            "userAttribute": false,
+            "mandatory": false,
+            "categoryOptionGroupAttribute": false,
+            "programStageAttribute": true,
+            "programAttribute": true,
+            "categoryAttribute": false,
+            "categoryOptionComboAttribute": false,
+            "categoryOptionGroupSetAttribute": false,
+            "validationRuleAttribute": false,
+            "programIndicatorAttribute": false,
+            "organisationUnitGroupAttribute": false,
+            "dataElementGroupSetAttribute": false,
+            "organisationUnitGroupSetAttribute": false,
+            "optionAttribute": false
+        }
+    ],
+    "userRoles": [
+        {
+            "name": "_App - Program Config App",
+            "id": "QbYqOgwk5fJ",
+            "displayName": "_App - Program Config App",
+            "publicAccess": "rw------",
+            "description": "Program Config App access and required authorities for basic usage.",
+            "authorities": [
+                "F_PROGRAM_PRIVATE_ADD",
+                "F_VISUALIZATION_PUBLIC_ADD",
+                "F_OPTIONSET_PUBLIC_ADD",
+                "F_LEGEND_SET_PRIVATE_ADD",
+                "F_MAP_PUBLIC_ADD",
+                "F_OPTIONSET_PRIVATE_ADD",
+                "F_PROGRAM_RULE_DELETE",
+                "F_PROGRAMSTAGE_DELETE",
+                "F_PROGRAM_RULE_ADD",
+                "M_dhis-web-tracker-capture",
+                "F_LEGEND_SET_PUBLIC_ADD",
+                "F_SECTION_DELETE",
+                "F_PROGRAMSTAGE_ADD",
+                "F_PROGRAM_DELETE",
+                "F_DASHBOARD_PUBLIC_ADD",
+                "F_METADATA_IMPORT",
+                "F_PROGRAM_INDICATOR_PRIVATE_ADD",
+                "F_SECTION_ADD",
+                "M_programconfigapp",
+                "M_dhis-web-maintenance",
+                "M_dhis-web-dashboard",
+                "F_PROGRAM_RULE_MANAGEMENT",
+                "F_METADATA_EXPORT",
+                "M_dhis-web-cache-cleaner",
+                "F_PROGRAM_INDICATOR_DELETE",
+                "F_DATAELEMENT_PRIVATE_ADD",
+                "M_dhis-web-datastore"
+            ]
+        },
+        {
+            "name": "PCA - Administrator",
+            "id": "akI7EzBaRaJ",
+            "displayName": "PCA - Administrator",
+            "publicAccess": "rw------",
+            "description": "Program Config App additional authorities for installing metadata.",
+            "authorities": [
+                "F_ATTRIBUTE_PUBLIC_ADD",
+                "F_TRACKED_ENTITY_ADD",
+                "F_TRACKED_ENTITY_ATTRIBUTE_PUBLIC_ADD",
+                "F_USERGROUP_PUBLIC_ADD"
+            ]
+        },
+        {
+            "name": "PCA - Users Sharing Management",
+            "id": "JDmJ4ADTaDq",
+            "displayName": "PCA - Users Sharing Management",
+            "publicAccess": "rw------",
+            "description": "Users view authorities for the Sharing Settings in the Program Config App",
+            "authorities": [
+                "F_USER_VIEW"
+            ]
+        }
+    ]
 }

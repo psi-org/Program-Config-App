@@ -1,5 +1,6 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 
+
 import { CircularLoader } from "@dhis2/ui";
 import Button from "@mui/material/Button";
 import DialogActions from "@mui/material/DialogActions";
@@ -11,7 +12,7 @@ import PanToolIcon from "@mui/icons-material/PanTool";
 
 import MoveDownIcon from "@mui/icons-material/MoveDown";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DialogTitle } from "@mui/material";
 
 import Card from "@mui/material/Card";
@@ -177,7 +178,7 @@ const H2Transfer = ({
     const [requestsData, setRequestsData] = useState(undefined);
 
     const [progressValue, setProgressValue] = useState(0);
-    const [cancelTransfer, setCancelTransfer] = useState(false);
+    const cancelTransfer = useRef(false);
 
     const { data: programData } = useDataQuery(queryEventList, {
         variables: { program: programConfig.id },
@@ -460,7 +461,7 @@ const H2Transfer = ({
     };
 
     const submission = async () => {
-        setCancelTransfer(false);
+        cancelTransfer.current = false;
 
         let metadataH2 = JSON.parse(
             h2Program.attributeValues.find((av) => av.attribute.id === METADATA)
@@ -534,7 +535,7 @@ const H2Transfer = ({
             for (const [index, eventReq] of requestsData.entries()) {
                 console.log(cancelTransfer)
                 
-                if (cancelTransfer) break;
+                if (cancelTransfer.current) break;
 
                 const eventFetch = await getEvent({
                     program: programConfig.id,
@@ -561,10 +562,19 @@ const H2Transfer = ({
 
                     if (storedData.httpStatus === "OK") {
 
-                        obj[eventReq.event] = new Date().toLocaleString(
-                            "en-US",
-                            DATE_FORMAT_OPTIONS
-                        );
+                        let trackedEntityInstance = storedData.response.importSummaries[0]
+                        let enrollment = trackedEntityInstance?.enrollments?.importSummaries[0]
+
+                        obj[eventReq.event] = {
+                            transferDate: new Date().toLocaleString(
+                                "en-US",
+                                DATE_FORMAT_OPTIONS
+                            ),
+                            trackedEntityInstance:
+                                trackedEntityInstance?.reference,
+                            enrollment: enrollment?.reference,
+                            originEvent: eventReq.event
+                        };
                         const transferredEvent = await dsUpdateRequest.mutate({
                             data: obj,
                         });
@@ -589,22 +599,18 @@ const H2Transfer = ({
                 setConversionError(failedEvents.join("<br/>"))
             }else{
                 doSearch(programConfig.name);
-                setNotification({
-                    message: "HNQIS 1.X Data transferred to HNQIS 2.0",
-                    severity: "success",
-                });
-                /*if(cancelTransfer){
+                if(!cancelTransfer.current){
                     setNotification({
                         message:
-                            "HNQIS 1.X Data transferred to HNQIS 2.0",
+                            "HNQIS 1.X Program Data transferred to HNQIS 2.0",
                         severity: "success",
                     });
                 } else {
                     setNotification({
-                        message: "Data transfer interrupted",
+                        message: "Data transfer interrupted by user",
                         severity: "warning",
                     });
-                }*/
+                }
                 setTransferH2Program(undefined)
             }
         }
@@ -807,11 +813,11 @@ const H2Transfer = ({
                     )}
                     {loadingConversion && (
                         <Button
-                            onClick={() => setCancelTransfer(true)}
+                            onClick={() => cancelTransfer.current = true}
                             color="error"
                             variant="contained"
                             startIcon={<PanToolIcon/>}
-                            disabled={cancelTransfer}
+                            disabled={cancelTransfer.current}
                         >
                             Stop
                         </Button>
