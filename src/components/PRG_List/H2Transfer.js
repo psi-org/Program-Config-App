@@ -1,6 +1,5 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 
-
 import { CircularLoader } from "@dhis2/ui";
 import Button from "@mui/material/Button";
 import DialogActions from "@mui/material/DialogActions";
@@ -124,7 +123,6 @@ const H2Transfer = ({
     setNotification,
     doSearch,
 }) => {
-
     const queryDataStore = {
         results: {
             resource: `dataStore/${TRANSFERRED_EVENTS_NAMESPACE}/${programConfig.id}`,
@@ -311,7 +309,7 @@ const H2Transfer = ({
         hnqisTEI.attributes = [
             {
                 attribute: GLOBAL_SCORE_ATTRIBUTE,
-                value: /*Number(globalScore)>0.01?globalScore:'0'*/ "2.3999948E-4", //! Forced Error
+                value: Number(globalScore)>0.01?globalScore:'0', //! Forced Error
             },
             {
                 attribute: ASSESSMENT_DATE_ATTRIBUTE,
@@ -443,7 +441,6 @@ const H2Transfer = ({
 
     useEffect(() => {
         if (h2Program) {
-
             let convertEvents = DeepCopy(programData.results)?.events?.filter(
                 (event) =>
                     /*!event.notes?.find(
@@ -452,7 +449,7 @@ const H2Transfer = ({
                     )*/
                     !dsData?.results[event.event]
             );
-            
+
             setRequestsData(convertEvents);
             setLoading(false);
         }
@@ -534,7 +531,7 @@ const H2Transfer = ({
         setLoadingConversion(true);
         if (requestsData) {
             let failedEvents = [];
-            for (const [index, eventReq] of requestsData.entries()) {             
+            for (const [index, eventReq] of requestsData.entries()) {
                 if (cancelTransfer.current) break;
 
                 const eventFetch = await getEvent({
@@ -561,9 +558,11 @@ const H2Transfer = ({
                     });
 
                     if (storedData.httpStatus === "OK") {
-
-                        let trackedEntityInstance = storedData.response.importSummaries[0]
-                        let enrollment = trackedEntityInstance?.enrollments?.importSummaries[0]
+                        let trackedEntityInstance =
+                            storedData.response.importSummaries[0];
+                        let enrollment =
+                            trackedEntityInstance?.enrollments
+                                ?.importSummaries[0];
 
                         obj[eventReq.event] = {
                             transferDate: new Date().toLocaleString(
@@ -573,7 +572,7 @@ const H2Transfer = ({
                             trackedEntityInstance:
                                 trackedEntityInstance?.reference,
                             enrollment: enrollment?.reference,
-                            originEvent: eventReq.event
+                            originEvent: eventReq.event,
                         };
                         const transferredEvent = await dsUpdateRequest.mutate({
                             data: obj,
@@ -594,12 +593,12 @@ const H2Transfer = ({
                     setProgressValue(index + 1);
                 }
             }
-            
-            if(failedEvents.length>0){
-                setConversionError(failedEvents.join("<br/>"))
-            }else{
+
+            if (failedEvents.length > 0) {
+                setConversionError(failedEvents.join("<br/>"));
+            } else {
                 doSearch(programConfig.name);
-                if(!cancelTransfer.current){
+                if (!cancelTransfer.current) {
                     setNotification({
                         message:
                             "HNQIS 1.X Program Data transferred to HNQIS 2.0",
@@ -611,7 +610,7 @@ const H2Transfer = ({
                         severity: "warning",
                     });
                 }
-                setTransferH2Program(undefined)
+                setTransferH2Program(undefined);
             }
         }
     };
@@ -813,10 +812,10 @@ const H2Transfer = ({
                     )}
                     {loadingConversion && (
                         <Button
-                            onClick={() => cancelTransfer.current = true}
+                            onClick={() => (cancelTransfer.current = true)}
                             color="error"
                             variant="contained"
-                            startIcon={<PanToolIcon/>}
+                            startIcon={<PanToolIcon />}
                             disabled={cancelTransfer.current}
                         >
                             Stop
