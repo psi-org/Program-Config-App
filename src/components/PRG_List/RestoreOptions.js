@@ -137,9 +137,11 @@ const RestoreOptions = props => {
             }
             if (sharingOption === "keepSharing") {
                 delete metadataPayload.programs[0].sharing;
-                metadataPayload.attributes.forEach((attribute) => {
-                    delete attribute.sharing;
-                });
+                if(metadataPayload.attributes?.length > 0) {
+                    metadataPayload.attributes.forEach((attribute) => {
+                        delete attribute.sharing;
+                    });
+                }
                 if (checkedState[3]) { //TE Types 
                     metadataPayload.trackedEntityTypes.forEach((tei) => {
                         delete tei.sharing;
@@ -150,7 +152,7 @@ const RestoreOptions = props => {
                         delete tea.sharing;
                     });
                 }
-                if (checkedState[1]) { //OPtion Set
+                if (checkedState[1]) { //Option Set
                     metadataPayload.optionSets.forEach((optionSet) => {
                         delete optionSet.sharing;
                     });
@@ -159,7 +161,7 @@ const RestoreOptions = props => {
             if (checkedState[6]) { //Program Stage
                 metadataPayload.programStages = DeepCopy(props.backup.metadata.programStages);
                 if (sharingOption === "keepSharing") {
-                    metadataPayload.programStages.forEach((ps) => {
+                    metadataPayload?.programStages.forEach((ps) => {
                         delete ps.sharing;
                     });
                 }
@@ -170,7 +172,7 @@ const RestoreOptions = props => {
                     if (checkedState[9]) { //Data ELement
                         metadataPayload.dataElements = DeepCopy(props.backup.metadata.dataElements);
                         if (sharingOption === "keepSharing") {
-                            metadataPayload.dataElements.forEach((de) => {
+                            metadataPayload?.dataElements.forEach((de) => {
                                 delete de.sharing;
                             })
                         }

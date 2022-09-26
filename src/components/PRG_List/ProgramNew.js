@@ -188,6 +188,7 @@ const ProgramNew = (props) => {
     const [pgrTypePCA, setPgrTypePCA] = useState(props.programType || '');
     const [programTET, setProgramTET] = useState(props.data ? { label: props.data.trackedEntityType.name, id: props.data.trackedEntityType.id } : '');
     const [useCompetency, setUseCompetency] = useState(props.pcaMetadata?.useCompetencyClass === 'Yes');
+    const [useUserOrgUnit, setUseUserOrgUnit] = useState(props.pcaMetadata?.useUserOrgUnit === 'Yes');
     const [healthArea, setHealthArea] = useState(props.pcaMetadata?.healthArea || '');
     const [ouTableRow, setOUTableRow] = useState(props.pcaMetadata?.ouLevelTable || '');
     const [ouMapPolygon, setOUMapPolygon] = useState(props.pcaMetadata?.ouLevelMap || '');
@@ -271,6 +272,10 @@ const ProgramNew = (props) => {
     const handleChangeComp = (event) => {
         setUseCompetency(event.target.checked);
     };
+
+    const handleUserOrgUnit = (event) => {
+        setUseUserOrgUnit(event.target.checked);
+    }
 
     const healthAreaChange = (event) => {
         validationErrors.healthArea = undefined
@@ -625,6 +630,7 @@ const ProgramNew = (props) => {
                 metaData_value.useCompetencyClass = useCompetency ? 'Yes' : 'No';
                 metaData_value.healthArea = healthArea;
                 metaData_value.ouRoot = selectedOrgUnits[0];
+                metaData_value.useUserOrgUnit = useUserOrgUnit ? 'Yes' : 'No';
                 metaData_value.ouLevelTable = ouTableRow;
                 metaData_value.ouLevelMap = ouMapPolygon;
             }
@@ -852,6 +858,12 @@ const ProgramNew = (props) => {
                             marginTop: "1em",
                         }}
                     />
+                    {pgrTypePCA != "" &&
+                        <>
+                            <hr/>
+                            <h5 style={{ margin: "5px"}}><b>{pgrTypePCA.toUpperCase()} Settings</b></h5>
+                        </>
+                    }
                     {pgrTypePCA === "hnqis" &&  orgUnitTreeRoot.length >0 && (
                         <>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -865,16 +877,19 @@ const ProgramNew = (props) => {
                                     </div>
                                     <div style={{width: "400px", background: "white", marginLeft: "2rem", marginTop: "1rem", display: "inline-block"}}>
                                         <div style={{ flexDirection: "row"}}>
-                                            <FormControlLabel control={ <Switch checked={useCompetency} onChange={handleChangeComp} name="competency"/> } label="Use Competency Class" />
-                                            <SelectOptions useError={ validationErrors.healthArea !== undefined }
-                                                helperText={validationErrors.healthArea}
-                                                label={"Program Health Area (*)"}
-                                                items={healthAreaOptions}
-                                                handler={healthAreaChange}
-                                                styles={{ width: "90%" }}
-                                                value={healthArea}
-                                                defaultOption="Select Health Area"
-                                            />
+                                            <fieldset style={{borderRadius: "10px", padding: "10px"}}>
+                                                <FormControlLabel control={ <Switch checked={useCompetency} onChange={handleChangeComp} name="competency"/> } label="Use Competency Class" />
+                                                <SelectOptions useError={ validationErrors.healthArea !== undefined }
+                                                    helperText={validationErrors.healthArea}
+                                                    label={"Program Health Area (*)"}
+                                                    items={healthAreaOptions}
+                                                    handler={healthAreaChange}
+                                                    styles={{ width: "90%" }}
+                                                    value={healthArea}
+                                                    defaultOption="Select Health Area"
+                                                />
+                                            </fieldset>
+                                            <FormControlLabel style={{ marginTop: "10px"}} control={ <Switch checked={useUserOrgUnit} onChange={handleUserOrgUnit} name="userOrgUnit"/> } label="Use User Org Units when possible (*) " />
                                             <SelectOptions useError={validationErrors.ouTableRow !== undefined}
                                                            helperText={validationErrors.ouTableRow}
                                                            label={"Organisation Unit Level for the Visualizations (*)"}
