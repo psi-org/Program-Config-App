@@ -424,8 +424,6 @@ const ProgramNew = (props) => {
 
     useEffect(() => {
         if (!ouMetadataLoading) {
-            setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
-            setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
             if (props.pcaMetadata?.ouRoot)
             {
                 setSelectedOrgUnits([props.pcaMetadata?.ouRoot])
@@ -438,6 +436,10 @@ const ProgramNew = (props) => {
                     }
                 });
             }
+            setTimeout(function() {
+                setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
+                setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
+            }, 2000)
 
         }
     }, [ouMetadata]);
