@@ -311,7 +311,7 @@ const ProgramNew = (props) => {
 
     if (ouLevels) {
         ouLevelOptions = ouLevelOptions.concat(ouLevels.map(ou => {
-            return { label: ou.displayName, value: ou.id }
+            return { label: ou.displayName, value: ou.level }
         }));
     }
 
@@ -871,7 +871,7 @@ const ProgramNew = (props) => {
                                     <div style={{ marginTop: "10px"}}> Organisation Unit Root for Global Analytics (*) </div>
                                     <div style={{ minHeight: "300px", maxHeight: "450px", minWidth: "300px", maxWidth: "480px", overflow: "auto", border: "1px solid rgb(189, 189, 189)", borderRadius: "3px", padding: "4px", margin: "4px 0px", display: "inline-block", verticalAlign: "top"}}>
                                         <FormControl variant={"standard"} error={validationErrors.orgUnitRoot !== undefined} >
-                                            <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ selectedOrgUnits } singleSelection/>
+                                            <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ orgUnitPathSelected } singleSelection/>
                                         <FormHelperText>{validationErrors.orgUnitRoot}</FormHelperText>
                                         </FormControl>
                                     </div>
