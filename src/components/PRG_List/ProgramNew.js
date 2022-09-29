@@ -381,7 +381,7 @@ const ProgramNew = (props) => {
     if (ouLevels) {
         ouLevelOptions = ouLevelOptions.concat(
             ouLevels.map((ou) => {
-                return { label: ou.displayName, value: ou.level };
+                return { label: ou.displayName, value: ou.id };
             })
         );
     }
@@ -546,7 +546,7 @@ const ProgramNew = (props) => {
             setTimeout(function() {
                 setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
                 setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
-            }, 1000)
+            }, 2000)
 
         }
     }, [ouMetadata]);
