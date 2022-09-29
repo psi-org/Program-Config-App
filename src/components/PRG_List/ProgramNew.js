@@ -1053,14 +1053,14 @@ const ProgramNew = (props) => {
                                 <FormLabel
                                     sx={
                                         validationErrors.orgUnitRoot !== undefined
-                                            ? {color: "red", marginTop: "0.5em" }
+                                            ? {color: "#d32f2f", marginTop: "0.5em" }
                                             : { marginTop: "0.5em" }
                                     }
                                 >
                                     Organisation Unit Root for Global Analytics
                                     (*)
                                 </FormLabel>
-                                <FormHelperText sx={{ color: "red" }}>
+                                <FormHelperText sx={{ color: "#d32f2f" }}>
                                     {validationErrors.orgUnitRoot}
                                 </FormHelperText>
                                 <FormControl
@@ -1071,11 +1071,12 @@ const ProgramNew = (props) => {
                                     }
                                     style={{
                                         overflow: "auto",
-                                        border: "1px solid rgb(189, 189, 189)",
+                                        border: "1px solid #bdbdbd",
                                         borderRadius: "3px",
                                         padding: "4px",
                                         marginTop: "0.8em",
-                                        flexBasis: "100%",
+                                        height: "300px",
+                                        maxHeight: "300px"
                                     }}
                                 >
                                     <OrganisationUnitTree
@@ -1112,7 +1113,7 @@ const ProgramNew = (props) => {
                                     }
                                     helperText={validationErrors.ouTableRow}
                                     label={
-                                        "Organisation Unit Level for the Visualizations (*)"
+                                        "Organisation Unit Level for the Dashboard Visualizations (*)"
                                     }
                                     items={ouLevelOptions}
                                     handler={ouTableRowChange}
@@ -1129,7 +1130,7 @@ const ProgramNew = (props) => {
                                     }
                                     helperText={validationErrors.ouMapPolygon}
                                     label={
-                                        "Organisation Unit Level for the Map (*)"
+                                        "Organisation Unit Level for the Dashboard Maps (*)"
                                     }
                                     items={ouLevelOptions}
                                     handler={ouMapPolygonChange}
@@ -1172,33 +1173,6 @@ const ProgramNew = (props) => {
                                     />
                                 </fieldset>
                             </div>
-                            {/*<div style={{ position: "relative" }}>
-                                <div style={{ marginTop: "10px" }}>
-                                    {" "}
-                                    {" "}
-                                </div>
-                                <div
-                                    style={{
-                                        
-                                        
-                                        display: "inline-block",
-                                        verticalAlign: "top",
-                                    }}
-                                >
-                                    
-                                </div>
-                                <div
-                                    style={{
-                                        width: "400px",
-                                        background: "white",
-                                        marginLeft: "2rem",
-                                        marginTop: "1rem",
-                                        display: "inline-block",
-                                    }}
-                                >
-                                    
-                                </div>
-                                        </div>*/}
                         </div>
                     )}
                     {pgrTypePCA === "tracker" && (
