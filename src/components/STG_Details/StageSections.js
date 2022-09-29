@@ -1,5 +1,5 @@
 // DHIS2 UI
-import { ButtonStrip, AlertBar, AlertStack, ComponentCover, CircularLoader, Chip, IconCheckmarkCircle24, IconWarning24, IconCross24 } from "@dhis2/ui";
+import { ButtonStrip, AlertBar, AlertStack, ComponentCover, CircularLoader, Chip, IconCheckmarkCircle24, IconWarning24, IconCross24, NoticeBox } from "@dhis2/ui";
 
 // React Hooks
 import { useState, useEffect } from "react";
@@ -177,6 +177,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     const { data: androidSettings } = useDataQuery(queryAndroidSettings);
     const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings);
     const [androidSettingsError, setAndroidSettingsError] = useState(true);
+    const [programSettingsError, setProgramSettingsError] = useState(undefined);
     const { data: OrganizationLevel, refetch: setOuLevel } = useDataQuery(queryOrganizationsUnit, { lazy: true, variables: { ouLevel: undefined } });
     console.log()
 
@@ -464,150 +465,154 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     };
 
     useEffect(() => {
-        if (androidSettingsError) setProgressSteps(7);
+        if (androidSettingsError) setProgressSteps(8);
     }, [androidSettingsUpdateError])
 
     const run = () => {
         if (!savedAndValidated) return;
         //--------------------- NEW METADATA --------------------//
-        let pcaMetadata = JSON.parse(programAttributes.data?.results?.programs[0]?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}")
+        setProgressSteps(1);
         let programConfig = programAttributes.data?.results?.programs[0]
-        if (pcaMetadata.useUserOrgUnit == "Yes") { pcaMetadata.useUserOrgUnit = "true" } else { pcaMetadata.useUserOrgUnit = "false" }
+        let pcaMetadata = JSON.parse(programConfig?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}")
 
         // Set flag to enable/disable actions (buttons)
         setSaveAndBuild('Run');
 
         //--------------------- Organization Unit Validations -----------//
-        if (!Object.hasOwn(pcaMetadata, "ouRoot") || !Object.hasOwn(pcaMetadata, "ouLevelTable") || !Object.hasOwn(pcaMetadata, "ouLevelMap")){
-            setProgressSteps(-99);
+        if (!Object.hasOwn(pcaMetadata, "ouRoot") ||
+            !Object.hasOwn(pcaMetadata, "ouLevelTable") ||
+            !Object.hasOwn(pcaMetadata, "ouLevelMap") ||
+            !Object.hasOwn(pcaMetadata, "useUserOrgUnit")) {
+            setProgramSettingsError(1);
             setSaveAndBuild("Completed");
         } else {
+            if (pcaMetadata.useUserOrgUnit == "Yes") { pcaMetadata.useUserOrgUnit = true } else { pcaMetadata.useUserOrgUnit = false }
+
             //-------------------------------------------------------//
             setOuLevel({ ouLevel: [pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap] }).then((data) => {
                 if (data?.results?.organisationUnitLevels) {
                     let valueLevel = data?.results?.organisationUnitLevels
-                    let visualizationLevel = valueLevel.find(ouLevel=>ouLevel.id = pcaMetadata.ouLevelTable)?.offlineLevels
-                    let mapLevel = valueLevel.find(ouLevel=>ouLevel.id = pcaMetadata.ouLevelTable)?.offlineLevels
+                    let visualizationLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelTable)?.offlineLevels
+                    let mapLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelMap)?.offlineLevels
 
                     pcaMetadata.ouLevelTable = visualizationLevel
                     pcaMetadata.ouLevelMap = mapLevel
-                    console.log(pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap)
 
-                    if(visualizationLevel == undefined || mapLevel == undefined){
-                        setProgressSteps(-199);
+                    if (visualizationLevel == undefined || mapLevel == undefined) {
+                        setProgramSettingsError(2);
                         setSaveAndBuild("Completed");
                     } else {
 
-                    // --------------- PROCESSING ---------------- //
-                    // Globals, States & more...
+                        // --------------- PROCESSING ---------------- //
+                        // Globals, States & more...
 
-                    // I. Scores Checking
-                    // Requires: scoresSection
-                    //      Break point: When duplicated scores found
-                    setProgressSteps(1);
+                        // I. Scores Checking
+                        // Requires: scoresSection
+                        //      Break point: When duplicated scores found
+                        setProgressSteps(2);
 
-                    const { uniqueScores, compositeScores, duplicatedScores } = checkScores(scoresSection.dataElements);
-                    if (!uniqueScores) throw { msg: "Duplicated scores", duplicatedScores, status: 400 };
-                    const scoresMapping = scoresSection.dataElements.reduce((acc, cur) => (
-                        {
-                            ...acc,
-                            [cur.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value]: cur
-                        }), {});   // { feedbackOrder:deUid, ... }
+                        const { uniqueScores, compositeScores, duplicatedScores } = checkScores(scoresSection.dataElements);
+                        if (!uniqueScores) throw { msg: "Duplicated scores", duplicatedScores, status: 400 };
+                        const scoresMapping = scoresSection.dataElements.reduce((acc, cur) => (
+                            {
+                                ...acc,
+                                [cur.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value]: cur
+                            }), {});   // { feedbackOrder:deUid, ... }
 
-                    // II. Read questions
-                    // Requires: sections (with or WITHOUT scores&critical)
-                    //      Breakpoint: When a score is missing
-                    setProgressSteps(2);
+                        // II. Read questions
+                        // Requires: sections (with or WITHOUT scores&critical)
+                        //      Breakpoint: When a score is missing
+                        setProgressSteps(3);
 
-                    const questionCompositeScores = readQuestionComposites(sections);
-                    const missingComposites = questionCompositeScores.filter(cs => !compositeScores.includes(cs));
-                    if (missingComposites.length > 0) throw { msg: "Some questions Feedback Order don't match any Score item", missingComposites, status: 400 }
+                        const questionCompositeScores = readQuestionComposites(sections);
+                        const missingComposites = questionCompositeScores.filter(cs => !compositeScores.includes(cs));
+                        if (missingComposites.length > 0) throw { msg: "Some questions Feedback Order don't match any Score item", missingComposites, status: 400 }
 
-                    // III. Build new metadata
-                    // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
-                    // Also, Program Indicators and Visualizations
-                    setProgressSteps(3);
+                        // III. Build new metadata
+                        // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
+                        // Also, Program Indicators and Visualizations
+                        setProgressSteps(4);
 
-                    const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
-                    const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
-                    const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass, programConfig.sharing.owner, programConfig.sharing.external, programConfig.sharing.public);
-                    const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, programConfig.sharing.owner, programConfig.sharing.external, programConfig.sharing.public, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap);
-                    const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports };
+                        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
+                        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
+                        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass, programConfig.sharing.owner, programConfig.sharing.external, programConfig.sharing.public);
+                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, programConfig.sharing.owner, programConfig.sharing.external, programConfig.sharing.public, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap);
+                        const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports };
 
-                    // IV. Delete old metadata
-                    setProgressSteps(4);
+                        // IV. Delete old metadata
+                        setProgressSteps(5);
 
-                    let programRulesDel = prDQ.data.results.programRules.map(pr => ({ id: pr.id }));
-                    let programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
-                    let programIndicatorsDel = pIndDQ.data.results.programIndicators.map(pInd => ({ id: pInd.id }));
-                    let visualizationsDel = visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id }));
-                    let eventReportsDel = eventReportDQ.data.results.eventReports.map(er => ({ id: er.id }));
-                    let mapsDel = mapsDQ.data.results.maps.map(mp => ({ id: mp.id }));
+                        let programRulesDel = prDQ.data.results.programRules.map(pr => ({ id: pr.id }));
+                        let programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
+                        let programIndicatorsDel = pIndDQ.data.results.programIndicators.map(pInd => ({ id: pInd.id }));
+                        let visualizationsDel = visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id }));
+                        let eventReportsDel = eventReportDQ.data.results.eventReports.map(er => ({ id: er.id }));
+                        let mapsDel = mapsDQ.data.results.maps.map(mp => ({ id: mp.id }));
 
-                    const oldMetadata = {
-                        programRules: programRulesDel.length > 0 ? programRulesDel : undefined,
-                        programRuleVariables: programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined,
-                        programIndicators: programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined,
-                        visualizations: visualizationsDel.length > 0 ? visualizationsDel : undefined,
-                        eventReports: eventReportsDel.length > 0 ? eventReportsDel : undefined,
-                        maps: mapsDel.length > 0 ? mapsDel : undefined
-                    };
+                        const oldMetadata = {
+                            programRules: programRulesDel.length > 0 ? programRulesDel : undefined,
+                            programRuleVariables: programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined,
+                            programIndicators: programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined,
+                            visualizations: visualizationsDel.length > 0 ? visualizationsDel : undefined,
+                            eventReports: eventReportsDel.length > 0 ? eventReportsDel : undefined,
+                            maps: mapsDel.length > 0 ? mapsDel : undefined
+                        };
 
-                    // V. Import new metadata
+                        // V. Import new metadata
 
-                    deleteMetadata({ data: oldMetadata }).then((res) => {
-                        if (res.status == 'OK') {
-                            setProgressSteps(5);
+                        deleteMetadata({ data: oldMetadata }).then((res) => {
+                            if (res.status == 'OK') {
+                                setProgressSteps(6);
 
-                            createMetadata.mutate({ data: metadata }).then(response => {
+                                createMetadata.mutate({ data: metadata }).then(response => {
 
-                                if (response.status == 'OK') {
-                                    setSaveAndBuild('Completed');
-                                    setSavedAndValidated(false);
+                                    if (response.status == 'OK') {
+                                        setSaveAndBuild('Completed');
+                                        setSavedAndValidated(false);
 
-                                    prDQ.refetch();
-                                    prvDQ.refetch();
-                                    setProgressSteps(6);
+                                        prDQ.refetch();
+                                        prvDQ.refetch();
+                                        setProgressSteps(7);
 
-                                    // VI. Enable in-app analytics
+                                        // VI. Enable in-app analytics
 
-                                    if (androidSettings?.results) {
+                                        if (androidSettings?.results) {
 
-                                        if (!androidSettings.results.dhisVisualizations) androidSettings.results.dhisVisualizations = {
-                                            "dataSet": {},
-                                            "home": [],
-                                            "program": {}
+                                            if (!androidSettings.results.dhisVisualizations) androidSettings.results.dhisVisualizations = {
+                                                "dataSet": {},
+                                                "home": [],
+                                                "program": {}
+                                            }
+
+                                            if (!androidSettings.results.dhisVisualizations.home) androidSettings.results.dhisVisualizations.home = []
+
+                                            androidSettings.results.dhisVisualizations.home = androidSettings.results.dhisVisualizations.home.filter(setting =>
+                                                setting.program !== programId
+                                            )
+
+                                            androidSettings.results.dhisVisualizations.home.push({
+                                                id: uidPool.shift(),
+                                                name: programStage.program.name,
+                                                program: programId,
+                                                visualizations: androidSettingsVisualizations
+                                            })
+
+                                            androidSettings.results.lastUpdated = new Date().toISOString()
+
+                                            androidSettingsUpdate({ data: androidSettings.results }).then(res => {
+                                                if (res.status === 'OK') setAndroidSettingsError(false)
+                                                setProgressSteps(8)
+                                            })
+
+                                        } else {
+                                            setProgressSteps(8);
                                         }
 
-                                        if (!androidSettings.results.dhisVisualizations.home) androidSettings.results.dhisVisualizations.home = []
-
-                                        androidSettings.results.dhisVisualizations.home = androidSettings.results.dhisVisualizations.home.filter(setting =>
-                                            setting.program !== programId
-                                        )
-
-                                        androidSettings.results.dhisVisualizations.home.push({
-                                            id: uidPool.shift(),
-                                            name: programStage.program.name,
-                                            program: programId,
-                                            visualizations: androidSettingsVisualizations
-                                        })
-
-                                        androidSettings.results.lastUpdated = new Date().toISOString()
-
-                                        androidSettingsUpdate({ data: androidSettings.results }).then(res => {
-                                            if (res.status === 'OK') setAndroidSettingsError(false)
-                                            setProgressSteps(7)
-                                        })
-
-                                    } else {
-                                        setProgressSteps(7);
                                     }
+                                });
+                            }
 
-                                }
-                            });
-                        }
-
-                    });
+                        });
                     }
                 }
             })
@@ -686,68 +691,96 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                         Setting Up Program
                     </CustomMUIDialogTitle >
                     <DialogContent dividers style={{ padding: '1em 2em' }}>
-                        {(progressSteps == -99) &&
-                            <div className="progressItem">
-                                {progressSteps !== 6 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
-                                <p>You do not have an associated organization unit, you can go to edit program and assign it.</p>
-                            </div>
-                        }
-                        {(progressSteps == -199) &&
-                            <div className="progressItem">
-                                {progressSteps !== 6 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
-                                <p>An error was detected at the organizational unit levels,  check that the organizational units have not been modified!</p>
-                            </div>
-                        }
                         {(progressSteps > 0) &&
-                            <div className="progressItem">
-                                {progressSteps === 1 && <CircularLoader small />}
-                                {progressSteps === 1 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps !== 1 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Checking scores</p>
-                            </div>
+                            <>
+                                <div className="progressItem">
+                                    {progressSteps === 1 && !programSettingsError && <CircularLoader small />}
+                                    {progressSteps === 1 && programSettingsError && <IconCross24 color={'#d63031'} />}
+                                    {progressSteps !== 1 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                    {
+                                        !programSettingsError
+                                            ? <p>Checking Program settings'</p>
+                                            : (programSettingsError === 1
+                                                ? <p>Global analytics settings missing.</p>
+                                                : (programSettingsError === 2
+                                                    ? <p>Configured Organisation Unit Levels not found.</p>
+                                                    : <p>Unknown Error</p>
+                                                )
+                                            )
+                                    }
+                                </div>
+                                {programSettingsError === 1 &&
+                                    <NoticeBox title="Please do the following:">
+                                        <ol>
+                                            <li>Go to the Programs List</li>
+                                            <li>Search for program: {programStage.program.name}</li>
+                                            <li>Open Program Menu</li>
+                                            <li>Click Edit Program and check that the current program settings are complete</li>
+                                        </ol>
+                                    </NoticeBox>
+                                }
+                                {programSettingsError === 2 &&
+                                    <NoticeBox title="Please do the following:">
+                                        <ol>
+                                            <li>Go to the Programs List</li>
+                                            <li>Search for program: {programStage.program.name}</li>
+                                            <li>Open Program Menu</li>
+                                            <li>Click Edit Program and make sure that the Organisation Unit Levels are valid.</li>
+                                        </ol>
+                                    </NoticeBox>
+                                }
+                            </>
                         }
-                        {(progressSteps > 1) &&
+                        {(progressSteps > 1) && !programSettingsError &&
                             <div className="progressItem">
                                 {progressSteps === 2 && <CircularLoader small />}
                                 {progressSteps === 2 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 2 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Checking scores</p>
+                            </div>
+                        }
+                        {(progressSteps > 2) && !programSettingsError &&
+                            <div className="progressItem">
+                                {progressSteps === 3 && <CircularLoader small />}
+                                {progressSteps === 3 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Reading assesment's questions</p>
                             </div>
                         }
-                        {(progressSteps > 2) &&
+                        {(progressSteps > 3) && !programSettingsError &&
                             <div className="progressItem">
-                                {progressSteps === 3 && <CircularLoader small />}
-                                {progressSteps === 3 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                {progressSteps === 4 && <CircularLoader small />}
+                                {progressSteps === 4 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 4 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Building new metadata and analytics</p>
                             </div>
                         }
-                        {(progressSteps > 3) &&
-                            <div className="progressItem">
-                                {progressSteps === 4 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
-                                {progressSteps === 4 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps !== 4 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Deleting old metadata</p>
-                            </div>
-                        }
-                        {(progressSteps > 4) &&
+                        {(progressSteps > 4) && !programSettingsError &&
                             <div className="progressItem">
                                 {progressSteps === 5 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
                                 {progressSteps === 5 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 5 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Deleting old metadata</p>
+                            </div>
+                        }
+                        {(progressSteps > 5) && !programSettingsError &&
+                            <div className="progressItem">
+                                {progressSteps === 6 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps === 6 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 6 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Importing new metadata</p>
                             </div>
                         }
-                        {(progressSteps > 5) &&
+                        {(progressSteps > 6) && !programSettingsError &&
                             <div className="progressItem">
-                                {progressSteps === 5 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
-                                {progressSteps !== 6 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
-                                {progressSteps !== 6 && !androidSettings && <IconWarning24 color={'#ffbb00'} />}
-                                {progressSteps !== 6 && androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                {progressSteps === 7 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps !== 7 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 7 && !androidSettings && <IconWarning24 color={'#ffbb00'} />}
+                                {progressSteps !== 7 && androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Enabling in-app analytics {!androidSettings ? "(Android Settings app not enabled)" : (androidSettingsError ? "(Error while saving Android Settings)" : "")}</p>
                             </div>
                         }
-                        {(progressSteps > 6) &&
+                        {(progressSteps > 7) && !programSettingsError &&
                             <div className="progressItem">
                                 {androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 {(!androidSettings || androidSettingsError) && <IconWarning24 color={'#ffbb00'} />}
