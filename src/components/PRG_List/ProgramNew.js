@@ -207,7 +207,7 @@ const ProgramNew = (props) => {
         });
     const { loading: ouMetadataLoading, data: ouMetadata } =
         useDataQuery(orgUnitsQuery);
-    const getOuLevel = useDataQuery(ouUnitQUery, { variables: { id: id } });
+    const {loading: ouLevelLoading, data: getOuLevel, refetch: ouLevelRefetch} = useDataQuery(ouUnitQUery, { variables: { id: id } });
 
     const [programId, setProgramId] = useState(props.data?.id);
     const [assessmentId, setAssessmentId] = useState(undefined);
@@ -529,12 +529,12 @@ const ProgramNew = (props) => {
         }
     }, [pgrTypePCA]);
 
-    useEffect(() => {
+    useEffect( () => {
         if (!ouMetadataLoading) {
             if (props.pcaMetadata?.ouRoot)
             {
                 setSelectedOrgUnits([props.pcaMetadata?.ouRoot])
-                getOuLevel.refetch({id: props.pcaMetadata?.ouRoot}).then(data => {
+                ouLevelRefetch({id: props.pcaMetadata?.ouRoot}).then(data => {
                     if(typeof data.result !== "undefined")
                     {
                         let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level >= data.result.level);
@@ -543,13 +543,22 @@ const ProgramNew = (props) => {
                     }
                 });
             }
-            setTimeout(function() {
-                setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
-                setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
-            }, 2000)
-
+            else {
+                ouTreeNLevelInit()
+            }
         }
     }, [ouMetadata]);
+
+    useEffect(()=> {
+        if (!ouLevelLoading && orgUnitPathSelected.length > 0) {
+            ouTreeNLevelInit(ouMetadata)
+        }
+    }, [orgUnitPathSelected])
+
+    let ouTreeNLevelInit = () => {
+        setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
+        setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
+    }
 
     function submission() {
         setSentForm(true);
@@ -824,7 +833,7 @@ const ProgramNew = (props) => {
 
     const orgUnitSelectionHandler = (event) => {
         if (event.checked) {
-            getOuLevel.refetch({ id: event.id }).then((data) => {
+            ouLevelRefetch({ id: event.id }).then((data) => {
                 if (typeof data.result !== "undefined") {
                     let ouLevels =
                         ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(
