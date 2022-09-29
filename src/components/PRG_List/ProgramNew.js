@@ -1017,7 +1017,7 @@ const ProgramNew = (props) => {
                             marginTop: "1em",
                         }}
                     />
-                    {pgrTypePCA !== "" && (
+                    {pgrTypePCA !== "" &&
                         <>
                             <hr style={{ marginTop: "0.5em" }} />
                             <h4
@@ -1075,19 +1075,8 @@ const ProgramNew = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div
-                                    style={{
-                                        width: "400px",
-                                        background: "white",
-                                        marginLeft: "2rem",
-                                        marginTop: "1rem",
-                                        display: "inline-block",
-                                    }}
-                                >
-
-                                </div>
-                                        </div>*/}
-                        </div>
+                            </div>
+                        </>
                     )}
                     {pgrTypePCA === "tracker" && (
                         <>
