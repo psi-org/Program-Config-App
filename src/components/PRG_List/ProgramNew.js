@@ -1038,7 +1038,7 @@ const ProgramNew = (props) => {
                                 {pgrTypePCA.toUpperCase()} Settings
                             </h4>
                         </>
-                    )}
+                    }
                     {pgrTypePCA === "hnqis" && orgUnitTreeRoot.length > 0 && (
                         <div
                             style={{
