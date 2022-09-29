@@ -531,27 +531,23 @@ const ProgramNew = (props) => {
 
     useEffect(() => {
         if (!ouMetadataLoading) {
-            setOrgUnitTreeRoot([
-                ...ouMetadata.userOrgUnits?.organisationUnits.map(
-                    (ou) => ou.id
-                ),
-            ]);
-            setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
-            if (props.pcaMetadata?.ouRoot) {
-                setSelectedOrgUnits([props.pcaMetadata?.ouRoot]);
-                getOuLevel
-                    .refetch({ id: props.pcaMetadata?.ouRoot })
-                    .then((data) => {
-                        if (typeof data.result !== "undefined") {
-                            let ouLevels =
-                                ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(
-                                    (ol) => ol.level >= data.result.level
-                                );
-                            setOrgUnitPathSelected([data.result.path]);
-                            setOULevels(ouLevels);
-                        }
-                    });
+            if (props.pcaMetadata?.ouRoot)
+            {
+                setSelectedOrgUnits([props.pcaMetadata?.ouRoot])
+                getOuLevel.refetch({id: props.pcaMetadata?.ouRoot}).then(data => {
+                    if(typeof data.result !== "undefined")
+                    {
+                        let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level >= data.result.level);
+                        setOrgUnitPathSelected([data.result.path])
+                        setOULevels(ouLevels);
+                    }
+                });
             }
+            setTimeout(function() {
+                setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
+                setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
+            }, 2000)
+
         }
     }, [ouMetadata]);
 
@@ -1021,7 +1017,7 @@ const ProgramNew = (props) => {
                             marginTop: "1em",
                         }}
                     />
-                    {pgrTypePCA !== "" && (
+                    {pgrTypePCA !== "" &&
                         <>
                             <hr style={{ marginTop: "0.5em" }} />
                             <h4
@@ -1084,7 +1080,7 @@ const ProgramNew = (props) => {
                                         roots={orgUnitTreeRoot}
                                         onChange={orgUnitSelectionHandler}
                                         selected={orgUnitPathSelected}
-                                        initiallyExpanded={selectedOrgUnits}
+                                        initiallyExpanded={orgUnitPathSelected}
                                         singleSelection
                                     />
                                 </FormControl>
