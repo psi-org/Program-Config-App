@@ -1038,54 +1038,147 @@ const ProgramNew = (props) => {
                                 {pgrTypePCA.toUpperCase()} Settings
                             </h4>
                         </>
-                    }
-                    {pgrTypePCA === "hnqis" &&  orgUnitTreeRoot.length >0 && (
-                        <>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{position:"relative"}}>
-                                    <div style={{ marginTop: "10px"}}> Organisation Unit Root for Global Analytics (*) </div>
-                                    <div style={{ minHeight: "300px", maxHeight: "450px", minWidth: "300px", maxWidth: "480px", overflow: "auto", border: "1px solid rgb(189, 189, 189)", borderRadius: "3px", padding: "4px", margin: "4px 0px", display: "inline-block", verticalAlign: "top"}}>
-                                        <FormControl variant={"standard"} error={validationErrors.orgUnitRoot !== undefined} >
-                                            <OrganisationUnitTree name={"Root org unit"} roots={orgUnitTreeRoot} onChange={orgUnitSelectionHandler} selected={ orgUnitPathSelected } initiallyExpanded={ orgUnitPathSelected } singleSelection/>
-                                        <FormHelperText>{validationErrors.orgUnitRoot}</FormHelperText>
-                                        </FormControl>
-                                    </div>
-                                    <div style={{width: "400px", background: "white", marginLeft: "2rem", marginTop: "1rem", display: "inline-block"}}>
-                                        <div style={{ flexDirection: "row"}}>
-                                            <fieldset style={{borderRadius: "10px", padding: "10px"}}>
-                                                <FormControlLabel control={ <Switch checked={useCompetency} onChange={handleChangeComp} name="competency"/> } label="Use Competency Class" />
-                                                <SelectOptions useError={ validationErrors.healthArea !== undefined }
-                                                    helperText={validationErrors.healthArea}
-                                                    label={"Program Health Area (*)"}
-                                                    items={healthAreaOptions}
-                                                    handler={healthAreaChange}
-                                                    styles={{ width: "90%" }}
-                                                    value={healthArea}
-                                                    defaultOption="Select Health Area"
-                                                />
-                                            </fieldset>
-                                            <FormControlLabel style={{ marginTop: "10px"}} control={ <Switch checked={useUserOrgUnit} onChange={handleUserOrgUnit} name="userOrgUnit"/> } label="Use User Org Units when possible (*) " />
-                                            <SelectOptions useError={validationErrors.ouTableRow !== undefined}
-                                                           helperText={validationErrors.ouTableRow}
-                                                           label={"Organisation Unit Level for the Visualizations (*)"}
-                                                           items={ouLevelOptions}
-                                                           handler={ouTableRowChange}
-                                                           styles={{ width: "90%" }}
-                                                           value={ouTableRow}
-                                                           defaultOption={"Select Organisation Unit Level"}/>
-                                            <SelectOptions useError={validationErrors.ouMapPolygon !== undefined}
-                                                           helperText={validationErrors.ouMapPolygon}
-                                                           label={"Organisation Unit Level for the Map (*)"}
-                                                           items={ouLevelOptions}
-                                                           handler={ouMapPolygonChange}
-                                                           styles={{ width: "90%" }}
-                                                           value={ouMapPolygon}
-                                                           defaultOption={"Select Organisation Unit Level"}/>
-                                        </div>
-                                    </div>
-                                </div>
+                    )}
+                    {pgrTypePCA === "hnqis" && orgUnitTreeRoot.length > 0 && (
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    width: "40%",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignSelf: "stretch",
+                                }}
+                            >
+                                <FormLabel
+                                    sx={
+                                        validationErrors.orgUnitRoot !== undefined
+                                            ? {color: "#d32f2f", marginTop: "0.5em" }
+                                            : { marginTop: "0.5em" }
+                                    }
+                                >
+                                    Organisation Unit Root for Global Analytics
+                                    (*)
+                                </FormLabel>
+                                <FormHelperText sx={{ color: "#d32f2f" }}>
+                                    {validationErrors.orgUnitRoot}
+                                </FormHelperText>
+                                <FormControl
+                                    variant={"standard"}
+                                    error={
+                                        validationErrors.orgUnitRoot !==
+                                        undefined
+                                    }
+                                    style={{
+                                        overflow: "auto",
+                                        border: "1px solid #bdbdbd",
+                                        borderRadius: "3px",
+                                        padding: "4px",
+                                        marginTop: "0.8em",
+                                        height: "300px",
+                                        maxHeight: "300px"
+                                    }}
+                                >
+                                    <OrganisationUnitTree
+                                        name={"Root org unit"}
+                                        roots={orgUnitTreeRoot}
+                                        onChange={orgUnitSelectionHandler}
+                                        selected={orgUnitPathSelected}
+                                        initiallyExpanded={orgUnitPathSelected}
+                                        singleSelection
+                                    />
+                                </FormControl>
                             </div>
-                        </>
+                            <div
+                                style={{
+                                    width: "55%",
+                                    flexDirection: "column",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={useUserOrgUnit}
+                                            onChange={handleUserOrgUnit}
+                                            name="userOrgUnit"
+                                        />
+                                    }
+                                    label="Use User Org Units for Analytics when possible"
+                                />
+                                <SelectOptions
+                                    useError={
+                                        validationErrors.ouTableRow !==
+                                        undefined
+                                    }
+                                    helperText={validationErrors.ouTableRow}
+                                    label={
+                                        "Organisation Unit Level for the Dashboard Visualizations (*)"
+                                    }
+                                    items={ouLevelOptions}
+                                    handler={ouTableRowChange}
+                                    styles={{ width: "100%" }}
+                                    value={ouTableRow}
+                                    defaultOption={
+                                        "Select Organisation Unit Level"
+                                    }
+                                />
+                                <SelectOptions
+                                    useError={
+                                        validationErrors.ouMapPolygon !==
+                                        undefined
+                                    }
+                                    helperText={validationErrors.ouMapPolygon}
+                                    label={
+                                        "Organisation Unit Level for the Dashboard Maps (*)"
+                                    }
+                                    items={ouLevelOptions}
+                                    handler={ouMapPolygonChange}
+                                    styles={{ width: "100%" }}
+                                    value={ouMapPolygon}
+                                    defaultOption={
+                                        "Select Organisation Unit Level"
+                                    }
+                                />
+                                <fieldset
+                                    style={{
+                                        borderRadius: "0.5em",
+                                        padding: "10px",
+                                        border: "1px solid rgb(189, 189, 189)",
+                                        marginTop: '1em'
+                                    }}
+                                >
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={useCompetency}
+                                                onChange={handleChangeComp}
+                                                name="competency"
+                                            />
+                                        }
+                                        label="Use Competency Class"
+                                    />
+                                    <SelectOptions
+                                        useError={
+                                            validationErrors.healthArea !==
+                                            undefined
+                                        }
+                                        helperText={validationErrors.healthArea}
+                                        label={"Program Health Area (*)"}
+                                        items={healthAreaOptions}
+                                        handler={healthAreaChange}
+                                        styles={{ width: "100%" }}
+                                        value={healthArea}
+                                        defaultOption="Select Health Area"
+                                    />
+                                </fieldset>
+                            </div>
+                        </div>
                     )}
                     {pgrTypePCA === "tracker" && (
                         <>
