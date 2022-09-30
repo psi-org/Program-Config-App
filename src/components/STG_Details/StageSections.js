@@ -1,5 +1,5 @@
 // DHIS2 UI
-import { ButtonStrip, AlertBar, AlertStack, ComponentCover, CircularLoader, Chip, IconCheckmarkCircle24, IconWarning24, IconCross24 } from "@dhis2/ui";
+import { ButtonStrip, AlertBar, AlertStack, ComponentCover, CircularLoader, Chip, IconCheckmarkCircle24, IconWarning24, IconCross24, NoticeBox } from "@dhis2/ui";
 
 // React Hooks
 import { useState, useEffect } from "react";
@@ -13,7 +13,7 @@ import Scores from "./Scores";
 import CriticalCalculations from "./CriticalCalculations";
 import DataProcessor from "../Excel/DataProcessor";
 import Importer from "../Excel/Importer";
-import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations,  buildProgramIndicatorsGA} from "./Scripting";
+import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Scripting";
 import { Link } from "react-router-dom";
 import Removed from "./Removed";
 import ValidateMetadata from "./ValidateMetadata";
@@ -147,16 +147,42 @@ const queryDashboards = {
     }
 };
 
+
+/*------------------------------------------------------ */
+const queryPCAMetadata = {
+    results: {
+        resource: 'programs',
+        params: ({ programId }) => ({
+            id: programId,
+            fields: ['attributeValues', 'sharing'],
+            filter: [`id:eq:${programId}`]
+        })
+    }
+
+}
+const queryOrganizationsUnit = {
+    results: {
+        resource: 'organisationUnitLevels',
+        params: ({ programId, ouLevel }) => ({
+            fields: ['id', 'level', 'offlineLevels'],
+            filter: ['id:in:[' + ouLevel.join(',') + ']']
+        })
+    }
+}
+
 const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     // Globals
     const programId = programStage.program.id;
-    const [isSectionMode,setIsSectionMode] = useState(programStage.formType==="SECTION" || programStage.programStageDataElements.length === 0)
+    const [isSectionMode, setIsSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0)
     const { data: androidSettings } = useDataQuery(queryAndroidSettings);
-    const [androidSettingsUpdate, {error: androidSettingsUpdateError}] = useDataMutation(updateAndroidSettings);
+    const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings);
     const [androidSettingsError, setAndroidSettingsError] = useState(true);
+    const [programSettingsError, setProgramSettingsError] = useState(undefined);
+    const { data: OrganizationLevel, refetch: setOuLevel } = useDataQuery(queryOrganizationsUnit, { lazy: true, variables: { ouLevel: undefined } });
+    console.log()
 
     // Flags
-    const [saveStatus, setSaveStatus] = useState(hnqisMode?'Validate':'Save Changes');
+    const [saveStatus, setSaveStatus] = useState(hnqisMode ? 'Validate' : 'Save Changes');
     const [saveAndBuild, setSaveAndBuild] = useState(false);
     const [savingMetadata, setSavingMetadata] = useState(false);
     const [savedAndValidated, setSavedAndValidated] = useState(false)
@@ -189,37 +215,37 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
 
     // States
     const [removedElements, setRemovedElements] = useState([])
-    const [originalProgramStageDataElements,setOriginalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
+    const [originalProgramStageDataElements, setOriginalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
     const [sections, setSections] = useState((isSectionMode)
-        ?[...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
-        :[{name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement))}]
+        ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
+        : [{ name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement)) }]
     );
     const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
-    const [criticalSection, setCriticalSection] = useState({...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations")});
+    const [criticalSection, setCriticalSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations") });
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
     const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"));
     const [errorReports, setErrorReports] = useState(undefined)
 
-    const [addedSection,setAddedSection] = useState()
+    const [addedSection, setAddedSection] = useState()
 
-    useEffect(()=>{
-        return (()=>{
+    useEffect(() => {
+        return (() => {
             setCriticalSection(undefined)
         })
-    },[])
+    }, [])
 
 
     // REFETCH STAGE
-    const refetchProgramStage = (params={}) =>{
-        stageRefetch({variables : {programStage:programStage.id}}).then(data => {
+    const refetchProgramStage = (params = {}) => {
+        stageRefetch({ variables: { programStage: programStage.id } }).then(data => {
             let programStage = data.results
             setOriginalProgramStageDataElements(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
             setSections((isSectionMode)
-                ?[...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
-                :[{name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement))}]
+                ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
+                : [{ name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement)) }]
             )
-            setScoresSection({ ...programStage.programStageSections.find(s =>  hnqisMode && (isSectionMode) && s.name === "Scores") })
-            setCriticalSection({...programStage.programStageSections.find(s =>  hnqisMode && (isSectionMode) && s.name === "Critical Steps Calculations")})
+            setScoresSection({ ...programStage.programStageSections.find(s => hnqisMode && (isSectionMode) && s.name === "Scores") })
+            setCriticalSection({ ...programStage.programStageSections.find(s => hnqisMode && (isSectionMode) && s.name === "Critical Steps Calculations") })
             setProgramStageDataElements([...programStage.programStageDataElements])
             setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"))
         })
@@ -239,7 +265,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         setProgramStageDataElements(programStageDataElements)
         setSections(sections)
         setDeToEdit('')
-        pushNotification(<span>Data Element edited! <strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>)
+        pushNotification(<span>Data Element edited! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>)
     }
 
     const removeDE = (id, section) => {
@@ -251,7 +277,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             programStageDataElements.splice(psdeIdx, 1)
             setSections(sections)
             setProgramStageDataElements(programStageDataElements)
-            pushNotification(<span>Data Element removed! <strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>, "info")
+            pushNotification(<span>Data Element removed! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
         }
     }
 
@@ -259,7 +285,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
 
         let dataElementObjects = params.newDataElements.map(psde => psde.dataElement)
         let sectionIndex = sections.findIndex(s => s.id === params.deRef.section)
-        let toBeAdded = params.newDataElements.map(de => ({id:de.dataElement.id,mode:de.type}))
+        let toBeAdded = params.newDataElements.map(de => ({ id: de.dataElement.id, mode: de.type }))
         params.newDataElements.forEach(de => delete de.type)
 
         sections.find(s => s.id === params.deRef.section).dataElements.splice(params.deRef.index, 0, ...dataElementObjects/* ...params.newDataElements */)
@@ -268,10 +294,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         setSections(sections)
         setProgramStageDataElements(newProgramStageDataElements)
         setDeManager(false)
-        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>)
+        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>)
         setAddedSection({
-            index:sectionIndex,
-            mode:'Updated',
+            index: sectionIndex,
+            mode: 'Updated',
             dataElements: toBeAdded
         })
     }
@@ -305,11 +331,11 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         setProgramStageDataElements(newPSDEs)
         sections.splice(idx, 1)
         setSections(sections)
-        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to {hnqisMode? " Validate and Save!":" save your changes!"}</strong></span>, "info")
+        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
     }
 
     const SectionActions = {
-        append : () => handleSectionEdit(undefined,sections.length),
+        append: () => handleSectionEdit(undefined, sections.length),
         handleSectionEdit: (section = undefined, newSection = undefined) => handleSectionEdit(section, newSection),
         remove: id => removeSection(id)
     }
@@ -343,19 +369,24 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
 
     // Fetch Visualizations from Program
     const visualizationsDQ = useDataQuery(queryVisualizations, { variables: { programId: programStage.program.id } });
-    
+
     // Fetch Event Reports from Program
     const eventReportDQ = useDataQuery(queryEventReport, { variables: { programId: programStage.program.id } });
 
     // Fetch Visualizations from Program
     const mapsDQ = useDataQuery(queryMaps, { variables: { programId: programStage.program.id } });
-  
+
     // Fetch Dashboards from Program
     const dashboardsDQ = useDataQuery(queryDashboards, { variables: { programId: programStage.program.id } });
 
+    // Fetch Metadata from Program
+    const programAttributes = useDataQuery(queryPCAMetadata, { variables: { programId: programStage.program.id } });
+
+
+
     useEffect(() => {
-        const programIndicatorsAmount = 3+2;
-        const visualizationsAmount = 3+5;
+        const programIndicatorsAmount = 3 + 2;
+        const visualizationsAmount = 3 + 5;
         const androidSettingsAmount = 1;
 
         let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection?.dataElements?.length + criticalSection?.dataElements?.length) * 5 + programIndicatorsAmount + visualizationsAmount + androidSettingsAmount;
@@ -391,7 +422,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                     result.source.index,
                     result.destination.index
                 );
-                setSaveStatus(hnqisMode?'Validate & Save':'Save Changes');
+                setSaveStatus(hnqisMode ? 'Validate & Save' : 'Save Changes');
                 break;
             case 'DATA_ELEMENT':
                 if (result.source.droppableId == result.destination.droppableId) {
@@ -407,7 +438,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                     let element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
                     newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
                 }
-                setSaveStatus(hnqisMode?'Validate & Save':'Save Changes');
+                setSaveStatus(hnqisMode ? 'Validate & Save' : 'Save Changes');
                 break;
             default:
         }
@@ -433,129 +464,160 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
         setImporterEnabled(true);
     };
 
-    useEffect(()=>{
-        if(androidSettingsError) setProgressSteps(7);
+    useEffect(() => {
+        if (androidSettingsError) setProgressSteps(8);
     }, [androidSettingsUpdateError])
 
     const run = () => {
         if (!savedAndValidated) return;
+        //--------------------- NEW METADATA --------------------//
+        setProgressSteps(1);
+        let programConfig = programAttributes.data?.results?.programs[0]
+        let pcaMetadata = JSON.parse(programConfig?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}")
 
         // Set flag to enable/disable actions (buttons)
         setSaveAndBuild('Run');
 
-        // --------------- PROCESSING ---------------- //
-        // Globals, States & more...
+        //--------------------- Organization Unit Validations -----------//
+        if (!Object.hasOwn(pcaMetadata, "ouRoot") ||
+            !Object.hasOwn(pcaMetadata, "ouLevelTable") ||
+            !Object.hasOwn(pcaMetadata, "ouLevelMap") ||
+            !Object.hasOwn(pcaMetadata, "useUserOrgUnit")) {
+            setProgramSettingsError(1);
+            setSaveAndBuild("Completed");
+        } else {
+            if (pcaMetadata.useUserOrgUnit == "Yes") { pcaMetadata.useUserOrgUnit = true } else { pcaMetadata.useUserOrgUnit = false }
 
-        // I. Scores Checking
-        // Requires: scoresSection
-        //      Break point: When duplicated scores found
-        setProgressSteps(1);
+            //-------------------------------------------------------//
+            setOuLevel({ ouLevel: [pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap] }).then((data) => {
+                if (data?.results?.organisationUnitLevels) {
+                    let valueLevel = data?.results?.organisationUnitLevels
+                    let visualizationLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelTable)?.offlineLevels
+                    let mapLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelMap)?.offlineLevels
 
-        const { uniqueScores, compositeScores, duplicatedScores } = checkScores(scoresSection.dataElements);
-        if (!uniqueScores) throw { msg: "Duplicated scores", duplicatedScores, status: 400 };
-        const scoresMapping = scoresSection.dataElements.reduce((acc, cur) => (
-            {
-                ...acc,
-                [cur.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value]: cur
-            }), {});   // { feedbackOrder:deUid, ... }
+                    pcaMetadata.ouLevelTable = visualizationLevel
+                    pcaMetadata.ouLevelMap = mapLevel
 
-        // II. Read questions
-        // Requires: sections (with or WITHOUT scores&critical)
-        //      Breakpoint: When a score is missing
-        setProgressSteps(2);
+                    if (visualizationLevel == undefined || mapLevel == undefined) {
+                        setProgramSettingsError(2);
+                        setSaveAndBuild("Completed");
+                    } else {
 
-        const questionCompositeScores = readQuestionComposites(sections);
-        const missingComposites = questionCompositeScores.filter(cs => !compositeScores.includes(cs));
-        if (missingComposites.length > 0) throw { msg: "Some questions Feedback Order don't match any Score item", missingComposites, status: 400 }
+                        // --------------- PROCESSING ---------------- //
+                        // Globals, States & more...
 
-        // III. Build new metadata
-        // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
-        // Also, Program Indicators and Visualizations
-        setProgressSteps(3);
+                        // I. Scores Checking
+                        // Requires: scoresSection
+                        //      Break point: When duplicated scores found
+                        setProgressSteps(2);
 
-        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
-        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
-        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass);
-        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool,programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id);
-        const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports};
+                        const { uniqueScores, compositeScores, duplicatedScores } = checkScores(scoresSection.dataElements);
+                        if (!uniqueScores) throw { msg: "Duplicated scores", duplicatedScores, status: 400 };
+                        const scoresMapping = scoresSection.dataElements.reduce((acc, cur) => (
+                            {
+                                ...acc,
+                                [cur.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value]: cur
+                            }), {});   // { feedbackOrder:deUid, ... }
 
-        // IV. Delete old metadata
-        setProgressSteps(4);
+                        // II. Read questions
+                        // Requires: sections (with or WITHOUT scores&critical)
+                        //      Breakpoint: When a score is missing
+                        setProgressSteps(3);
 
-        let programRulesDel = prDQ.data.results.programRules.map(pr => ({ id: pr.id }));
-        let programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
-        let programIndicatorsDel = pIndDQ.data.results.programIndicators.map(pInd => ({ id: pInd.id }));
-        let visualizationsDel = visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id }));
-        let eventReportsDel = eventReportDQ.data.results.eventReports.map(er => ({ id: er.id }));
-        let mapsDel = mapsDQ.data.results.maps.map(mp => ({ id: mp.id }));
+                        const questionCompositeScores = readQuestionComposites(sections);
+                        const missingComposites = questionCompositeScores.filter(cs => !compositeScores.includes(cs));
+                        if (missingComposites.length > 0) throw { msg: "Some questions Feedback Order don't match any Score item", missingComposites, status: 400 }
 
-        const oldMetadata = {
-            programRules: programRulesDel.length>0?programRulesDel:undefined,
-            programRuleVariables: programRuleVariablesDel.length>0?programRuleVariablesDel:undefined,
-            programIndicators: programIndicatorsDel.length>0?programIndicatorsDel:undefined,
-            visualizations: visualizationsDel.length>0?visualizationsDel:undefined,
-            eventReports: eventReportsDel.length>0?eventReportsDel:undefined,
-            maps: mapsDel.length>0?mapsDel:undefined
-        };
+                        // III. Build new metadata
+                        // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
+                        // Also, Program Indicators and Visualizations
+                        setProgressSteps(4);
 
-        // V. Import new metadata
+                        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
+                        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
+                        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass, programConfig.sharing.owner, programConfig.sharing.external, programConfig.sharing.public);
+                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, programConfig.sharing.owner, programConfig.sharing.external, programConfig.sharing.public, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap);
+                        const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports };
 
-        deleteMetadata({ data: oldMetadata }).then((res) => {
-            if (res.status == 'OK') {
-                setProgressSteps(5);
+                        // IV. Delete old metadata
+                        setProgressSteps(5);
 
-                createMetadata.mutate({ data: metadata }).then(response => {
+                        let programRulesDel = prDQ.data.results.programRules.map(pr => ({ id: pr.id }));
+                        let programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
+                        let programIndicatorsDel = pIndDQ.data.results.programIndicators.map(pInd => ({ id: pInd.id }));
+                        let visualizationsDel = visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id }));
+                        let eventReportsDel = eventReportDQ.data.results.eventReports.map(er => ({ id: er.id }));
+                        let mapsDel = mapsDQ.data.results.maps.map(mp => ({ id: mp.id }));
 
-                    if (response.status == 'OK') {
-                        setSaveAndBuild('Completed');
-                        setSavedAndValidated(false);
+                        const oldMetadata = {
+                            programRules: programRulesDel.length > 0 ? programRulesDel : undefined,
+                            programRuleVariables: programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined,
+                            programIndicators: programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined,
+                            visualizations: visualizationsDel.length > 0 ? visualizationsDel : undefined,
+                            eventReports: eventReportsDel.length > 0 ? eventReportsDel : undefined,
+                            maps: mapsDel.length > 0 ? mapsDel : undefined
+                        };
 
-                        prDQ.refetch();
-                        prvDQ.refetch();
-                        setProgressSteps(6);
+                        // V. Import new metadata
 
-                        // VI. Enable in-app analytics
+                        deleteMetadata({ data: oldMetadata }).then((res) => {
+                            if (res.status == 'OK') {
+                                setProgressSteps(6);
 
-                        if(androidSettings?.results){
+                                createMetadata.mutate({ data: metadata }).then(response => {
 
-                            if(!androidSettings.results.dhisVisualizations) androidSettings.results.dhisVisualizations = {
-                                "dataSet": {},
-                                "home": [],
-                                "program": {}
+                                    if (response.status == 'OK') {
+                                        setSaveAndBuild('Completed');
+                                        setSavedAndValidated(false);
+
+                                        prDQ.refetch();
+                                        prvDQ.refetch();
+                                        setProgressSteps(7);
+
+                                        // VI. Enable in-app analytics
+
+                                        if (androidSettings?.results) {
+
+                                            if (!androidSettings.results.dhisVisualizations) androidSettings.results.dhisVisualizations = {
+                                                "dataSet": {},
+                                                "home": [],
+                                                "program": {}
+                                            }
+
+                                            if (!androidSettings.results.dhisVisualizations.home) androidSettings.results.dhisVisualizations.home = []
+
+                                            androidSettings.results.dhisVisualizations.home = androidSettings.results.dhisVisualizations.home.filter(setting =>
+                                                setting.program !== programId
+                                            )
+
+                                            androidSettings.results.dhisVisualizations.home.push({
+                                                id: uidPool.shift(),
+                                                name: programStage.program.name,
+                                                program: programId,
+                                                visualizations: androidSettingsVisualizations
+                                            })
+
+                                            androidSettings.results.lastUpdated = new Date().toISOString()
+
+                                            androidSettingsUpdate({ data: androidSettings.results }).then(res => {
+                                                if (res.status === 'OK') setAndroidSettingsError(false)
+                                                setProgressSteps(8)
+                                            })
+
+                                        } else {
+                                            setProgressSteps(8);
+                                        }
+
+                                    }
+                                });
                             }
 
-                            if(!androidSettings.results.dhisVisualizations.home) androidSettings.results.dhisVisualizations.home = []
-
-                            androidSettings.results.dhisVisualizations.home = androidSettings.results.dhisVisualizations.home.filter(setting => 
-                                setting.program !== programId
-                            )
-
-                            androidSettings.results.dhisVisualizations.home.push({
-                                id: uidPool.shift(),
-                                name: programStage.program.name,
-                                program: programId,
-                                visualizations: androidSettingsVisualizations
-                            })
-
-                            androidSettings.results.lastUpdated = new Date().toISOString()
-
-                            androidSettingsUpdate({data:androidSettings.results}).then(res => {
-                                if(res.status=== 'OK') setAndroidSettingsError(false)
-                                setProgressSteps(7)
-                            })
-
-                        }else{
-                            setProgressSteps(7);
-                        }
-                        
+                        });
                     }
-                });
-            }
-
-        });
-
+                }
+            })
+        }
     }
-
     const parseErrors = (e) => {
         let data = e.typeReports.map(tr => {
             let type = tr.klass.split('.').pop()
@@ -581,7 +643,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                         {hnqisMode && (isSectionMode) &&
                             <>
                                 <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
-                                <Button color='inherit' variant='outlined' startIcon={!exportToExcel?<FileDownloadIcon />:<CircularLoader small />} name="generator"
+                                <Button color='inherit' variant='outlined' startIcon={!exportToExcel ? <FileDownloadIcon /> : <CircularLoader small />} name="generator"
                                     onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
                                 <Button color='inherit' variant='outlined' startIcon={<PublishIcon />} name="importer"
                                     onClick={() => setImporterEnabled(true)}>Import Template</Button>
@@ -625,60 +687,100 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             {hnqisMode && saveAndBuild &&
 
                 <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
-                    <CustomMUIDialogTitle id="customized-dialog-title" onClose={()=>{if((saveAndBuild === 'Completed') || (createMetadata?.data?.status === 'ERROR')){setSaveAndBuild(false); setProgressSteps(0);}}}>
+                    <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => { if ((saveAndBuild === 'Completed') || (createMetadata?.data?.status === 'ERROR')) { setSaveAndBuild(false); setProgressSteps(0); } }}>
                         Setting Up Program
                     </CustomMUIDialogTitle >
                     <DialogContent dividers style={{ padding: '1em 2em' }}>
                         {(progressSteps > 0) &&
-                            <div className="progressItem">
-                                {progressSteps === 1 && <CircularLoader small />}
-                                {progressSteps === 1 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps !== 1 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Checking scores</p>
-                            </div>
+                            <>
+                                <div className="progressItem">
+                                    {progressSteps === 1 && !programSettingsError && <CircularLoader small />}
+                                    {progressSteps === 1 && programSettingsError && <IconCross24 color={'#d63031'} />}
+                                    {progressSteps !== 1 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                    {
+                                        !programSettingsError
+                                            ? <p>Checking Program settings'</p>
+                                            : (programSettingsError === 1
+                                                ? <p>Global analytics settings missing.</p>
+                                                : (programSettingsError === 2
+                                                    ? <p>Configured Organisation Unit Levels not found.</p>
+                                                    : <p>Unknown Error</p>
+                                                )
+                                            )
+                                    }
+                                </div>
+                                {programSettingsError === 1 &&
+                                    <NoticeBox title="Please do the following:">
+                                        <ol>
+                                            <li>Go to the Programs List</li>
+                                            <li>Search for program: {programStage.program.name}</li>
+                                            <li>Open Program Menu</li>
+                                            <li>Click Edit Program and check that the current program settings are complete</li>
+                                        </ol>
+                                    </NoticeBox>
+                                }
+                                {programSettingsError === 2 &&
+                                    <NoticeBox title="Please do the following:">
+                                        <ol>
+                                            <li>Go to the Programs List</li>
+                                            <li>Search for program: {programStage.program.name}</li>
+                                            <li>Open Program Menu</li>
+                                            <li>Click Edit Program and make sure that the Organisation Unit Levels are valid.</li>
+                                        </ol>
+                                    </NoticeBox>
+                                }
+                            </>
                         }
-                        {(progressSteps > 1) &&
+                        {(progressSteps > 1) && !programSettingsError &&
                             <div className="progressItem">
                                 {progressSteps === 2 && <CircularLoader small />}
                                 {progressSteps === 2 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 2 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Checking scores</p>
+                            </div>
+                        }
+                        {(progressSteps > 2) && !programSettingsError &&
+                            <div className="progressItem">
+                                {progressSteps === 3 && <CircularLoader small />}
+                                {progressSteps === 3 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Reading assesment's questions</p>
                             </div>
                         }
-                        {(progressSteps > 2) &&
+                        {(progressSteps > 3) && !programSettingsError &&
                             <div className="progressItem">
-                                {progressSteps === 3 && <CircularLoader small />}
-                                {progressSteps === 3 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                {progressSteps === 4 && <CircularLoader small />}
+                                {progressSteps === 4 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 4 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Building new metadata and analytics</p>
                             </div>
                         }
-                        {(progressSteps > 3) &&
-                            <div className="progressItem">
-                                {progressSteps === 4 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
-                                {progressSteps === 4 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
-                                {progressSteps !== 4 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Deleting old metadata</p>
-                            </div>
-                        }
-                        {(progressSteps > 4) &&
+                        {(progressSteps > 4) && !programSettingsError &&
                             <div className="progressItem">
                                 {progressSteps === 5 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
                                 {progressSteps === 5 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 5 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Deleting old metadata</p>
+                            </div>
+                        }
+                        {(progressSteps > 5) && !programSettingsError &&
+                            <div className="progressItem">
+                                {progressSteps === 6 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps === 6 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 6 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 <p> Importing new metadata</p>
                             </div>
                         }
-                        {(progressSteps > 5) &&
+                        {(progressSteps > 6) && !programSettingsError &&
                             <div className="progressItem">
-                                {progressSteps === 5 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
-                                {progressSteps !== 6 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
-                                {progressSteps !== 6 && !androidSettings && <IconWarning24 color={'#ffbb00'} />}
-                                {progressSteps !== 6 && androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Enabling in-app analytics {!androidSettings?"(Android Settings app not enabled)":(androidSettingsError?"(Error while saving Android Settings)":"")}</p>
+                                {progressSteps === 7 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps !== 7 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 7 && !androidSettings && <IconWarning24 color={'#ffbb00'} />}
+                                {progressSteps !== 7 && androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p> Enabling in-app analytics {!androidSettings ? "(Android Settings app not enabled)" : (androidSettingsError ? "(Error while saving Android Settings)" : "")}</p>
                             </div>
                         }
-                        {(progressSteps > 6) &&
+                        {(progressSteps > 7) && !programSettingsError &&
                             <div className="progressItem">
                                 {androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
                                 {(!androidSettings || androidSettingsError) && <IconWarning24 color={'#ffbb00'} />}
@@ -696,8 +798,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
-                        {sections.length === 0 && 
-                            <Button startIcon={<AddBoxIcon/>} variant='contained' style={{margin: '8px'}} onClick={SectionActions.append}>
+                        {sections.length === 0 &&
+                            <Button startIcon={<AddBoxIcon />} variant='contained' style={{ margin: '8px' }} onClick={SectionActions.append}>
                                 Add New Section
                             </Button>
                         }
@@ -720,17 +822,17 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
                                         sections.map((pss, idx) => {
-                                            return <DraggableSection 
-                                                program={programStage.program.id} 
-                                                stageSection={pss} 
-                                                editStatus={addedSection?.index === idx && addedSection } 
-                                                stageDataElements={programStageDataElements} 
-                                                DEActions={DEActions} 
-                                                index={idx} 
-                                                key={pss.id || idx} 
-                                                SectionActions={SectionActions} 
+                                            return <DraggableSection
+                                                program={programStage.program.id}
+                                                stageSection={pss}
+                                                editStatus={addedSection?.index === idx && addedSection}
+                                                stageDataElements={programStageDataElements}
+                                                DEActions={DEActions}
+                                                index={idx}
+                                                key={pss.id || idx}
+                                                SectionActions={SectionActions}
                                                 hnqisMode={hnqisMode}
-                                                isSectionMode={isSectionMode} 
+                                                isSectionMode={isSectionMode}
                                             />
                                         })
                                     }
@@ -739,7 +841,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                             )}
                         </Droppable>
                         {hnqisMode && (isSectionMode) && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection?.id || "crit"} />}
-                        {hnqisMode && (isSectionMode) && <Scores stageSection={scoresSection} index={0} key={scoresSection?.id || "scores"} program={programId}/>}
+                        {hnqisMode && (isSectionMode) && <Scores stageSection={scoresSection} index={0} key={scoresSection?.id || "scores"} program={programId} />}
 
                     </div>
                 </div>

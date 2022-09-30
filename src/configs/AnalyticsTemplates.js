@@ -1,3 +1,4 @@
+
 export const ProgramIndicatorTemplate = {
     "id": "<indicatorId>",
     "name": "<Short Name> - Competency - C",
@@ -6,10 +7,11 @@ export const ProgramIndicatorTemplate = {
     "aggregationType": "COUNT",
     "expression": "V{enrollment_count}",
     "sharing": {
-        "external": false,
-        "users": {},
-        "userGroups": {},
-        "public": "rw------"
+      "owner": "id",
+      "external": false,
+      "users": {    },
+      "userGroups": {    },
+      "public": "--------"
     },
     "filter": "A{ulU9KKgSLYe} == \"competent\"",
     "analyticsType": "ENROLLMENT",
@@ -20,9 +22,11 @@ export const ProgramIndicatorTemplate = {
             "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
             "boundaryTarget": "ENROLLMENT_DATE",
             "sharing": {
-                "external": false,
-                "users": {},
-                "userGroups": {}
+              "owner": "id",
+              "external": false,
+              "users": {    },
+              "userGroups": {    },
+              "public": "--------"
             },
             "favorite": false
         },
@@ -31,9 +35,11 @@ export const ProgramIndicatorTemplate = {
             "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
             "boundaryTarget": "ENROLLMENT_DATE",
             "sharing": {
-                "external": false,
-                "users": {},
-                "userGroups": {}
+              "owner": "id",
+              "external": false,
+              "users": {    },
+              "userGroups": {    },
+              "public": "--------"
             },
             "favorite": false
         }
@@ -73,6 +79,13 @@ export const compLastSixMonthsByOUTable = {
     "regressionType": "NONE",
     "completedOnly": false,
     "colTotals": false,
+    "sharing": {
+      "owner": "id",
+      "external": false,
+      "users": {    },
+      "userGroups": {    },
+      "public": "--------"
+    },
     "hideEmptyRowItems": "NONE",
     "aggregationType": "DEFAULT",
     "hideSubtitle": false,
@@ -184,6 +197,13 @@ export const compLastSixMonthsPie = {
     "regressionType": "NONE",
     "completedOnly": false,
     "colTotals": false,
+    "sharing": {
+      "owner": "id",
+      "external": false,
+      "users": {    },
+      "userGroups": {    },
+      "public": "--------"
+    },
     "hideEmptyRowItems": "NONE",
     "aggregationType": "DEFAULT",
     "hideSubtitle": false,
@@ -296,6 +316,13 @@ export const compLastSixMonthsTable = {
     "regressionType": "NONE",
     "completedOnly": false,
     "colTotals": false,
+    "sharing": {
+      "owner": "id",
+      "external": false,
+      "users": {    },
+      "userGroups": {    },
+      "public": "--------"
+    },
     "hideEmptyRowItems": "NONE",
     "aggregationType": "DEFAULT",
     "hideSubtitle": false,
@@ -382,10 +409,11 @@ export const ProgramIndicatorTemplateNoA = {
     "aggregationType": "COUNT",
     "expression": "V{enrollment_count}",
     "sharing": {
-        "external": false,
-        "users": {},
-        "userGroups": {},
-        "public": "rw------"
+      "owner": "id",
+      "external": false,
+      "users": {    },
+      "userGroups": {    },
+      "public": "--------"
     },
     "analyticsType": "ENROLLMENT",
     "program": { "id": "<Program Id>" },
@@ -424,10 +452,11 @@ export const ProgramIndicatorTemplateGS = {
     "aggregationType": "AVERAGE",
     "expression": "A{NQdpdST0Gcx}",
     "sharing": {
-        "external": false,
-        "users": {},
-        "userGroups": {},
-        "public": "rw------"
+      "owner": "id",
+      "external": false,
+      "users": {    },
+      "userGroups": {    },
+      "public": "--------"
     },
     "filter": "d2:hasValue(A{NQdpdST0Gcx})",
     "decimals": 0,
@@ -477,7 +506,7 @@ export const AverageScoreByDistrictByPivotTable = {
                 "external": false,
                 "users": {},
                 "userGroups": {},
-                "public": "rw------"
+                "public": "--------"
             },
             "legends": [
                 {
@@ -564,9 +593,10 @@ export const AverageScoreByDistrictByPivotTable = {
     "completedOnly": false,
     "colTotals": false,
     "sharing": {
+        "owner": "id",
         "external": false,
-        "users": {},
-        "userGroups": {},
+        "users": {    },
+        "userGroups": {    },
         "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
@@ -642,15 +672,8 @@ export const AverageScoreByDistrictByPivotTable = {
     "organisationUnits": [],
     "filters": [],
     "rows": [{ "id": "ou" }],
-    "organisationUnitLevels": [],
-    "organisationUnitLevels": [
-        4
-      ],
-      "organisationUnits": [
-        {
-          "id": "Wgo93BIG20V"
-        }
-    ]
+    "organisationUnitLevels": [ ],
+    "organisationUnits": [ { "id": "id" } ]
 }
 
 export const NumberOfAssessmentByPivotTable = {
@@ -690,9 +713,10 @@ export const NumberOfAssessmentByPivotTable = {
     "completedOnly": false,
     "colTotals": true,
     "sharing": {
+        "owner": "id",
         "external": false,
-        "users": {},
-        "userGroups": {},
+        "users": {    },
+        "userGroups": {    },
         "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
@@ -775,8 +799,8 @@ export const NumberOfAssessmentByPivotTable = {
     "organisationUnits": [],
     "filters": [{ "id": "ou" }],
     "rows": [{ "id": "pe" }],
-    "organisationUnitLevels": [],
-    "organisationUnits": []
+    "organisationUnitLevels": [ ],
+    "organisationUnits": [ { "id": "id" } ]
 }
 
 export const AverageGlobalScoreByColumn = {
@@ -817,9 +841,10 @@ export const AverageGlobalScoreByColumn = {
     "completedOnly": false,
     "colTotals": false,
     "sharing": {
+        "owner": "id",
         "external": false,
-        "users": {},
-        "userGroups": {},
+        "users": {    },
+        "userGroups": {    },
         "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
@@ -936,8 +961,8 @@ export const AverageGlobalScoreByColumn = {
             "id": "pe"
         }
     ],
-    "organisationUnitLevels": [],
-    "organisationUnits": [ ]
+    "organisationUnitLevels": [ ],
+    "organisationUnits": [ { "id": "id" } ]
 }
 
 export const AssessmentByCompetencyByColumn = {
@@ -977,9 +1002,10 @@ export const AssessmentByCompetencyByColumn = {
     "completedOnly": false,
     "colTotals": false,
     "sharing": {
+        "owner": "id",
         "external": false,
-        "users": {},
-        "userGroups": {},
+        "users": {    },
+        "userGroups": {    },
         "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
@@ -1072,8 +1098,8 @@ export const AssessmentByCompetencyByColumn = {
     "organisationUnits": [],
     "filters": [{ "id": "ou" }],
     "rows": [{ "id": "pe" }],
-    "organisationUnitLevels": [],
-    "organisationUnits": [ ]
+    "organisationUnitLevels": [ ],
+    "organisationUnits": [ { "id": "id" } ]
 }
 
 export const GlobalScoreByMap = {
@@ -1085,8 +1111,11 @@ export const GlobalScoreByMap = {
     "externalAccess": false,
     "subscribed": false,
     "sharing": {
+        "owner": "id",
         "external": false,
-        "public": "rw------"
+        "users": {    },
+        "userGroups": {    },
+        "public": "--------"
     },
     "favorite": false,
     "access": {
@@ -1120,9 +1149,11 @@ export const GlobalScoreByMap = {
             "completedOnly": false,
             "eventPointRadius": 0,
             "sharing": {
+                "owner": "id",
                 "external": false,
-                "users": {},
-                "userGroups": {}
+                "users": {    },
+                "userGroups": {    },
+                "public": "--------"
             },
             "hideSubtitle": false,
             "externalAccess": false,
@@ -1174,9 +1205,11 @@ export const GlobalScoreByMap = {
             "completedOnly": false,
             "eventPointRadius": 0,
             "sharing": {
+                "owner": "id",
                 "external": false,
-                "users": {},
-                "userGroups": {}
+                "users": {    },
+                "userGroups": {    },
+                "public": "--------"
             },
             "hideSubtitle": false,
             "externalAccess": false,
@@ -1261,14 +1294,8 @@ export const GlobalScoreByMap = {
                     }
                 }
             ],
-            "organisationUnitLevels": [
-                4
-              ],
-              "organisationUnits": [
-                {
-                  "id": "Wgo93BIG20V"
-                }
-              ],
+            "organisationUnitLevels": [ ],
+            "organisationUnits": [ { "id": "id" } ],
             "filters": [
                 {
                     "id": "pe"
@@ -1288,14 +1315,14 @@ export const dashboardsTemplate = {
     "name": "<programName>",
     "code": "<ProgramId>",
     "publicAccess": "--------",
-    "description": "<programId>",
     "restrictFilters": false,
     "externalAccess": false,
     "itemConfig": { "insertPosition": "END" },
     "sharing": {
+        "owner": "id",
         "external": false,
-        "users": {},
-        "userGroups": {},
+        "users": {    },
+        "userGroups": {    },
         "public": "--------"
     },
     "itemCount": 0,
@@ -1310,7 +1337,13 @@ export const dashVisualization = {
     "contentCount": [],
     //"height": 29,
     "interpretationCount": 0,
-    "sharing": { "external": false },
+    "sharing": {
+        "owner": "id",
+        "external": false,
+        "users": {    },
+        "userGroups": {    },
+        "public": "--------"
+    },
     //"width": "<28 or 32>",
     //"x": "<28 or 0>",
     //"y": 33,
@@ -1329,32 +1362,6 @@ export const dashVisualization = {
     }
 }
 
-/*export const dashVisualizationChart = {
-    "id": "<dashbboarCHARTdId>",
-    "type": "CHART",
-    "externalAccess": false,
-    "contentCount": 2,
-    //"height": 29,
-    "interpretationCount": 0,
-    "sharing": { "external": false },
-    //"width": 28,
-    //"x": 0,
-    //"y": 33,
-    "interpretationLikeCount": 0,
-    "favorite": false,
-    "visualization": {
-        "id": "<visualizationId>"
-    },
-    "access": {
-        "read": true,
-        "update": true,
-        "externalize": true,
-        "delete": true,
-        "write": true,
-        "manage": true
-    }
-}*/
-
 export const dashMap = {
     "id": "<dashboardMAPId>",
     "type": "MAP",
@@ -1363,9 +1370,11 @@ export const dashMap = {
     "height": 30,
     "interpretationCount": 0,
     "sharing": {
+        "owner": "id",
         "external": false,
-        "users": {},
-        "userGroups": {}
+        "users": {    },
+        "userGroups": {    },
+        "public": "--------"
     },
     "width": 60,
     "x": 0,
@@ -1402,8 +1411,11 @@ export const LineListGlobalScore = {
     "dataType": "EVENTS",
     "completedOnly": false,
     "sharing": {
-      "external": false,
-      "public": "rw------"
+        "owner": "id",
+        "external": false,
+        "users": {    },
+        "userGroups": {    },
+        "public": "--------"
     },
     "colTotals": true,
     "showDimensionLabels": true,
@@ -1498,7 +1510,6 @@ export const LineListGlobalScore = {
       ],
     "columns": [ ],
     "organisationUnitGroupSetDimensions": [  ],
-    "organisationUnitLevels": [  ],
     "dataElementDimensions": [
       {
         "programStage": {
@@ -1510,7 +1521,8 @@ export const LineListGlobalScore = {
       }
     ],
     "periods": [  ],
-    "organisationUnits": [ ],
+    "organisationUnitLevels": [ ],
+    "organisationUnits": [ { "id": "id" } ],
     "categoryDimensions": [  ],
     "filters": [  ],
     "rows": [  ],
@@ -1524,7 +1536,11 @@ export const  dashEventReport = {
     "height": 14,
     "interpretationCount": 0,
     "sharing": {
-      "external": false
+        "owner": "id",
+        "external": false,
+        "users": {    },
+        "userGroups": {    },
+        "public": "--------"
     },
     "width": 60,
     "x": 0,
