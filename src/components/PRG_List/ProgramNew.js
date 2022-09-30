@@ -25,6 +25,8 @@ import {
     H2_METADATA_VERSION,
     NAMESPACE,
     DATASTORE_H2_METADATA,
+    CRITICAL_STEPS,
+    NON_CRITICAL_STEPS,
 } from "./../../configs/Constants";
 
 import Button from "@mui/material/Button";
@@ -224,9 +226,9 @@ const ProgramNew = (props) => {
     const [programTET, setProgramTET] = useState(
         props.data
             ? {
-                  label: props.data.trackedEntityType.name,
-                  id: props.data.trackedEntityType.id,
-              }
+                label: props.data.trackedEntityType.name,
+                id: props.data.trackedEntityType.id,
+            }
             : ""
     );
     const [useCompetency, setUseCompetency] = useState(
@@ -260,9 +262,9 @@ const ProgramNew = (props) => {
     const [categoryCombo, setCategoryCombo] = useState(
         props.data
             ? {
-                  label: props.data.categoryCombo.name,
-                  id: props.data.categoryCombo.id,
-              }
+                label: props.data.categoryCombo.name,
+                id: props.data.categoryCombo.id,
+            }
             : ""
     );
 
@@ -425,16 +427,15 @@ const ProgramNew = (props) => {
         } else if (
             programName.length < MIN_NAME_LENGTH ||
             programName.length >
-                MAX_PROGRAM_NAME_LENGTH -
-                    (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
-                    1
+            MAX_PROGRAM_NAME_LENGTH -
+            (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
+            1
         ) {
             response = false;
-            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${
-                MAX_PROGRAM_NAME_LENGTH -
+            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_PROGRAM_NAME_LENGTH -
                 (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
                 1
-            } characters`;
+                } characters`;
         } else {
             validationErrors.programName = undefined;
         }
@@ -445,15 +446,14 @@ const ProgramNew = (props) => {
         } else if (
             programShortName.length >
             MAX_SHORT_NAME_LENGTH -
-                (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
-                1
+            (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
+            1
         ) {
             response = false;
-            validationErrors.shortName = `This field cannot exceed ${
-                MAX_SHORT_NAME_LENGTH -
+            validationErrors.shortName = `This field cannot exceed ${MAX_SHORT_NAME_LENGTH -
                 (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
                 1
-            } characters`;
+                } characters`;
         } else {
             validationErrors.shortName = undefined;
         }
@@ -487,7 +487,7 @@ const ProgramNew = (props) => {
             validationErrors.healthArea =
                 validationErrors.ouTableRow =
                 validationErrors.ouMapPolygon =
-                    undefined;
+                undefined;
         }
 
         setValidationErrors({ ...validationErrors });
@@ -531,19 +531,17 @@ const ProgramNew = (props) => {
 
     useEffect(() => {
         if (!ouMetadataLoading) {
-            if (props.pcaMetadata?.ouRoot)
-            {
+            if (props.pcaMetadata?.ouRoot) {
                 setSelectedOrgUnits([props.pcaMetadata?.ouRoot])
-                getOuLevel.refetch({id: props.pcaMetadata?.ouRoot}).then(data => {
-                    if(typeof data.result !== "undefined")
-                    {
+                getOuLevel.refetch({ id: props.pcaMetadata?.ouRoot }).then(data => {
+                    if (typeof data.result !== "undefined") {
                         let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level >= data.result.level);
                         setOrgUnitPathSelected([data.result.path])
                         setOULevels(ouLevels);
                     }
                 });
             }
-            setTimeout(function() {
+            setTimeout(function () {
                 setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
                 setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
             }, 2000)
@@ -671,13 +669,22 @@ const ProgramNew = (props) => {
                             .flat()
                             .find((section) =>
                                 section.dataElements.find(
-                                    (de) => de.id === "VqBfZjZhKkU"
+                                    (de) => de.id === CRITICAL_STEPS
                                 )
                             );
+
+                        if (!criticalSteps) {
+                            criticalSteps = prgrm.programStages
+                                .map((pStage) => pStage.programStageSections)
+                                .flat()
+                                .find((section) =>
+                                    section.name === "Critical Steps Calculations"
+                                );
+                        }
                         criticalSteps.dataElements = [
-                            { id: "VqBfZjZhKkU" },
-                            { id: "pzWDtDUorBt" },
-                            { id: "NAaHST5ZDTE" },
+                            { id: CRITICAL_STEPS },
+                            { id: NON_CRITICAL_STEPS },
+                            { id: COMPETENCY_CLASS },
                         ];
                         prgrm.programTrackedEntityAttributes =
                             prgrm.programTrackedEntityAttributes.filter(
@@ -739,14 +746,14 @@ const ProgramNew = (props) => {
                 // If editing only send program
                 let metadata = props.data
                     ? {
-                          programs: [prgrm],
-                          programStageSections: programStageSections,
-                      }
+                        programs: [prgrm],
+                        programStageSections: programStageSections,
+                    }
                     : {
-                          programs: [prgrm],
-                          programStages,
-                          programStageSections,
-                      };
+                        programs: [prgrm],
+                        programStages,
+                        programStageSections,
+                    };
 
                 metadataRequest.mutate({ data: metadata }).then((response) => {
                     if (response.status != "OK") {
@@ -760,9 +767,8 @@ const ProgramNew = (props) => {
                         props.setShowProgramForm(false);
                     } else {
                         props.setNotification({
-                            message: `Program ${prgrm.name} ${
-                                !props.data ? "created" : "updated"
-                            } successfully`,
+                            message: `Program ${prgrm.name} ${!props.data ? "created" : "updated"
+                                } successfully`,
                             severity: "success",
                         });
                         props.setShowProgramForm(false);
@@ -888,24 +894,24 @@ const ProgramNew = (props) => {
                                     disabled={
                                         !h2Ready ||
                                         hnqis2Metadata?.results?.version <
-                                            H2_METADATA_VERSION
+                                        H2_METADATA_VERSION
                                     }
                                     value={"hnqis"}
                                 >
                                     HNQIS 2.0{" "}
                                     {hnqis2Metadata?.results?.version <
                                         H2_METADATA_VERSION && (
-                                        <span
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                marginLeft: "8px",
-                                            }}
-                                        >
-                                            [Unavailable]{" "}
-                                            <RemoveCircleOutlineIcon />
-                                        </span>
-                                    )}
+                                            <span
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    marginLeft: "8px",
+                                                }}
+                                            >
+                                                [Unavailable]{" "}
+                                                <RemoveCircleOutlineIcon />
+                                            </span>
+                                        )}
                                 </MenuItem>
                             </Select>
                             <FormHelperText>
@@ -1049,7 +1055,7 @@ const ProgramNew = (props) => {
                                 <FormLabel
                                     sx={
                                         validationErrors.orgUnitRoot !== undefined
-                                            ? {color: "#d32f2f", marginTop: "0.5em" }
+                                            ? { color: "#d32f2f", marginTop: "0.5em" }
                                             : { marginTop: "0.5em" }
                                     }
                                 >
