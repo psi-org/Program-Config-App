@@ -15,8 +15,8 @@ const BUILD_DATE = "September 21st, 2022"
 const MIN_VERSION = "2.36"
 const MAX_VERSION = "2.38.2"
 
-const PCA_METADATA_VERSION = "1.0.2"
-const H2_METADATA_VERSION = "1.0.1"
+const PCA_METADATA_VERSION = "1.1.0"
+const H2_METADATA_VERSION = "1.1.0"
 
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI","haUflNqP85K"]
 const PCA_OPTION_SETS = ["TOcCuCN2CLm"]
@@ -106,7 +106,7 @@ const H2_REQUIRED = {
         COMPETENCY_ATTRIBUTE,
     ],
     attributes: ["LP171jpctBm", "yhKEe6BLEer"],
-    legendSets: ["RXxPYFwtgf4"],
+    legendSets: ["RXxPYFwtgf4", "nvVrBnbud3L"],
 };
 
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'numeric',minute:'numeric',second:'numeric',hour12:false }
