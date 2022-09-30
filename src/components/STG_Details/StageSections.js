@@ -492,11 +492,11 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             setOuLevel({ ouLevel: [pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap] }).then((data) => {
                 if (data?.results?.organisationUnitLevels) {
                     let valueLevel = data?.results?.organisationUnitLevels
-                    let visualizationLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelTable)?.offlineLevels
-                    let mapLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelMap)?.offlineLevels
+                    let visualizationLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelTable)
+                    let mapLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelMap)
 
-                    pcaMetadata.ouLevelTable = visualizationLevel
-                    pcaMetadata.ouLevelMap = mapLevel
+                    pcaMetadata.ouLevelTable = visualizationLevel?.offlineLevels || visualizationLevel?.level
+                    pcaMetadata.ouLevelMap = mapLevel?.offlineLevels || mapLevel?.level
 
                     if (visualizationLevel == undefined || mapLevel == undefined) {
                         setProgramSettingsError(2);

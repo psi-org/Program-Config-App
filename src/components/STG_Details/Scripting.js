@@ -679,7 +679,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
             const pra = {
                 id: actionId,
                 programRuleActionType: "ASSIGN",
-                data: action.text,
+                data: "'" + action.text.replaceAll(/'/g, "’") +"'",
                 dataElement: { id: action.id },
                 programRule: { id: programRuleUid }
             };
