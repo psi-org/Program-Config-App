@@ -1,4 +1,4 @@
-import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, ACTION_PLAN_ACTION} from "../../configs/Constants";
+import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND } from "../../configs/Constants";
 import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../configs/AnalyticsTemplates";
 import { DeepCopy } from "../../configs/Utils";
 
@@ -679,7 +679,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
             const pra = {
                 id: actionId,
                 programRuleActionType: "ASSIGN",
-                data: "'" + action.text.replaceAll(/'/g, "’") +"'",
+                data: "'" + action.text.replaceAll(/'/g, "’") + "'",
                 dataElement: { id: action.id },
                 programRule: { id: programRuleUid }
             };
@@ -933,7 +933,7 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
         { name: 'Number of Assessment' }
     ];
 
-    programIndicators = programIndicators.concat( indicatorNoA.map(value => {
+    programIndicators = programIndicators.concat(indicatorNoA.map(value => {
         let AnalyticNoA = DeepCopy(ProgramIndicatorTemplateNoA)
         AnalyticNoA.id = uidPool.shift()
         indicatorIDs.push(AnalyticNoA.id)
@@ -957,7 +957,7 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
         { name: 'Global Score' }
     ];
 
-    programIndicators = programIndicators.concat( indicatorGS.map(value => {
+    programIndicators = programIndicators.concat(indicatorGS.map(value => {
         let AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
         AnalyticGS.id = uidPool.shift()
         indicatorIDs.push(AnalyticGS.id)
@@ -981,7 +981,6 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
 }
 
 export const buildH2BaseVisualizations = (programId, programShortName, indicatorIDs, uidPool, useCompetency, currentDashboardId, userOU, ouRoot, stageId, ownerS, externalS, publicS, visualizationLevel, mapLevel) => {
-
     let series = []
     let dataDimensionItems = []
     let visualizations = []
@@ -990,15 +989,15 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     let maps = []
     let dashboardItems = []
     let dashboards = []
-    
+
     let columnDimensions = []
     columnDimensions[0] = "pe"
     columnDimensions[1] = "ou"
     columnDimensions[2] = GLOBAL_SCORE_ATTRIBUTE
     columnDimensions[3] = ACTION_PLAN_ACTION
-    
+
     const timestamp = new Date().toISOString();
-    const nameComp = useCompetency === "Yes" ? "Competency Classes" : "Quality of Care"; 
+    const nameComp = useCompetency === "Yes" ? "Competency Classes" : "Quality of Care";
 
     indicatorIDs.forEach(indicator => {
         series.push({
@@ -1019,8 +1018,8 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     chart1.sharing.owner = ownerS
     chart1.sharing.external = externalS
     chart1.sharing.public = publicS
-    chart1.series = series.slice(0,3)
-    chart1.dataDimensionItems = dataDimensionItems.slice(0,3)
+    chart1.series = series.slice(0, 3)
+    chart1.dataDimensionItems = dataDimensionItems.slice(0, 3)
     visualizations.push(chart1)
     androidSettingsVisualizations.push({
         id: chart1.id,
@@ -1036,8 +1035,8 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     table1.sharing.owner = ownerS
     table1.sharing.external = externalS
     table1.sharing.public = publicS
-    table1.series = series.slice(0,3)
-    table1.dataDimensionItems = dataDimensionItems.slice(0,3)
+    table1.series = series.slice(0, 3)
+    table1.dataDimensionItems = dataDimensionItems.slice(0, 3)
     visualizations.push(table1)
     androidSettingsVisualizations.push({
         id: table1.id,
@@ -1053,8 +1052,8 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     table2.sharing.owner = ownerS
     table2.sharing.external = externalS
     table2.sharing.public = publicS
-    table2.series = series.slice(0,3)
-    table2.dataDimensionItems = dataDimensionItems.slice(0,3)
+    table2.series = series.slice(0, 3)
+    table2.dataDimensionItems = dataDimensionItems.slice(0, 3)
     visualizations.push(table2)
     androidSettingsVisualizations.push({
         id: table2.id,
@@ -1074,6 +1073,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     avergeScorebyTable.dataDimensionItems = [dataDimensionItems.at(4)]
     avergeScorebyTable.organisationUnits[0].id = ouRoot
     avergeScorebyTable.organisationUnitLevels = [visualizationLevel]
+    avergeScorebyTable.legendSet.id = VISUALIZATIONS_LEGEND
     visualizations.push(avergeScorebyTable)
     // Dashboard - Tables
     let avergeScorebyTableDash1 = DeepCopy(dashVisualization)
@@ -1082,7 +1082,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     avergeScorebyTableDash1.sharing.owner = ownerS
     avergeScorebyTableDash1.sharing.external = externalS
     avergeScorebyTableDash1.sharing.public = publicS
-    avergeScorebyTableDash1.visualization.id = avergeScorebyTable.id 
+    avergeScorebyTableDash1.visualization.id = avergeScorebyTable.id
     dashboardItems.push(avergeScorebyTableDash1)
 
     //!Average Global Score by checklist from last 12 months
@@ -1104,7 +1104,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     avergeScorebyChartDash1.sharing.external = externalS
     avergeScorebyChartDash1.sharing.public = publicS
     avergeScorebyChartDash1.type = "CHART"
-    avergeScorebyChartDash1.visualization.id = AverageGlobalScorebyColumn.id 
+    avergeScorebyChartDash1.visualization.id = AverageGlobalScorebyColumn.id
     dashboardItems.push(avergeScorebyChartDash1)
 
     //!Number and Percentage of Assessment by Competency Class (last 4 quarters)
@@ -1116,8 +1116,8 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     AssessmentByCompetencybyColumn.sharing.external = externalS
     AssessmentByCompetencybyColumn.sharing.public = publicS
     AssessmentByCompetencybyColumn.userOrganisationUnit = userOU
-    AssessmentByCompetencybyColumn.series = series.slice(0,3)
-    AssessmentByCompetencybyColumn.dataDimensionItems = dataDimensionItems.slice(0,3)
+    AssessmentByCompetencybyColumn.series = series.slice(0, 3)
+    AssessmentByCompetencybyColumn.dataDimensionItems = dataDimensionItems.slice(0, 3)
     AssessmentByCompetencybyColumn.organisationUnits[0].id = ouRoot
     visualizations.push(AssessmentByCompetencybyColumn)
     // Dashboard - Chart
@@ -1127,7 +1127,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     avergeScorebyChartDash2.sharing.owner = ownerS
     avergeScorebyChartDash2.sharing.external = externalS
     avergeScorebyChartDash2.sharing.public = publicS
-    avergeScorebyChartDash2.visualization.id = AssessmentByCompetencybyColumn.id 
+    avergeScorebyChartDash2.visualization.id = AssessmentByCompetencybyColumn.id
     dashboardItems.push(avergeScorebyChartDash2)
 
     //! Number of Assessment by checklist (last 12 months)
@@ -1142,7 +1142,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     NumberOfAssessmentbyTable.series = [series.at(3)]
     NumberOfAssessmentbyTable.dataDimensionItems = [dataDimensionItems.at(3)]
     NumberOfAssessmentbyTable.organisationUnits[0].id = ouRoot
-    visualizations.push(NumberOfAssessmentbyTable) 
+    visualizations.push(NumberOfAssessmentbyTable)
     // Dashboard - Tables
     let avergeScorebyTableDash2 = DeepCopy(dashVisualization)
     avergeScorebyTableDash2.id = uidPool.shift()
@@ -1150,30 +1150,28 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     avergeScorebyTableDash2.sharing.owner = ownerS
     avergeScorebyTableDash2.sharing.external = externalS
     avergeScorebyTableDash2.sharing.public = publicS
-    avergeScorebyTableDash2.visualization.id = NumberOfAssessmentbyTable.id 
+    avergeScorebyTableDash2.visualization.id = NumberOfAssessmentbyTable.id
     dashboardItems.push(avergeScorebyTableDash2)
 
     //! Global Score Map
     let GlobalScorebyMap = DeepCopy(GlobalScoreByMap)
-    GlobalScorebyMap.id = uidPool.shift() 
+    GlobalScorebyMap.id = uidPool.shift()
     GlobalScorebyMap.name = programShortName + " - Global Score Map"
     GlobalScorebyMap.code = programId + "_Scripted8"
     GlobalScorebyMap.sharing.owner = ownerS
     GlobalScorebyMap.sharing.external = externalS
     GlobalScorebyMap.sharing.public = publicS
-    GlobalScorebyMap.mapViews[1].sharing.owner = ownerS
-    GlobalScorebyMap.mapViews[1].sharing.external = externalS
-    GlobalScorebyMap.mapViews[1].sharing.public = publicS
     GlobalScorebyMap.mapViews[0].sharing.owner = ownerS
     GlobalScorebyMap.mapViews[0].sharing.external = externalS
-    GlobalScorebyMap.mapViews[0].sharing.public = publicS
-    GlobalScorebyMap.mapViews[1].name = programShortName + " - Global Score"
-    GlobalScorebyMap.mapViews[1].program.id = programId
-    GlobalScorebyMap.mapViews[1].dataDimensionItems = [dataDimensionItems.at(4)]
     GlobalScorebyMap.mapViews[0].organisationUnitLevels = [mapLevel]
     GlobalScorebyMap.mapViews[0].organisationUnits[0].id = ouRoot
+    GlobalScorebyMap.mapViews[1].sharing.owner = ownerS
+    GlobalScorebyMap.mapViews[1].sharing.external = externalS
+    GlobalScorebyMap.mapViews[1].program.id = programId
+    GlobalScorebyMap.mapViews[1].dataDimensionItems = [dataDimensionItems.at(4)]
     GlobalScorebyMap.mapViews[1].organisationUnitLevels = [mapLevel]
     GlobalScorebyMap.mapViews[1].organisationUnits[0].id = ouRoot
+    GlobalScorebyMap.mapViews[1].legendSet.id = VISUALIZATIONS_LEGEND
     maps.push(GlobalScorebyMap)
     //Dashboard - Map
     let GlobalScorebyMap1 = DeepCopy(dashMap)
@@ -1182,12 +1180,12 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     GlobalScorebyMap1.sharing.owner = ownerS
     GlobalScorebyMap1.sharing.external = externalS
     GlobalScorebyMap1.sharing.public = publicS
-    GlobalScorebyMap1.map.id = GlobalScorebyMap.id 
+    GlobalScorebyMap1.map.id = GlobalScorebyMap.id
     dashboardItems.push(GlobalScorebyMap1)
- 
+
     //! Global Score Line List    
     let LineListScore = DeepCopy(LineListGlobalScore)
-    LineListScore.id = uidPool.shift() 
+    LineListScore.id = uidPool.shift()
     LineListScore.name = programShortName + " - Global Score"
     LineListScore.code = programId + "_Scripted9"
     LineListScore.program.id = programId
@@ -1209,23 +1207,23 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     GlobalScorebyEventReport1.sharing.owner = ownerS
     GlobalScorebyEventReport1.sharing.external = externalS
     GlobalScorebyEventReport1.sharing.public = publicS
-    GlobalScorebyEventReport1.eventReport.id = LineListScore.id 
+    GlobalScorebyEventReport1.eventReport.id = LineListScore.id
     dashboardItems.push(GlobalScorebyEventReport1)
 
     //!Dashboard
     let dashboardsGA = DeepCopy(dashboardsTemplate)
     dashboardsGA.id = currentDashboardId || uidPool.shift()
     dashboardsGA.name = programShortName
-    dashboardsGA.code = programId 
+    dashboardsGA.code = programId
     dashboardsGA.sharing.owner = ownerS
     dashboardsGA.sharing.external = externalS
     dashboardsGA.sharing.public = publicS
     dashboardsGA.dashboardItems = [...dashboardItems]
     dashboards.push(dashboardsGA)
-    
+
 
     //Return
-    return { visualizations, maps, androidSettingsVisualizations, dashboards, eventReports}
+    return { visualizations, maps, androidSettingsVisualizations, dashboards, eventReports }
 }
 
 

@@ -491,74 +491,12 @@ export const ProgramIndicatorTemplateGS = {
     ]
 }
 
-export const AverageScoreByDistrictByPivotTable = {
-    "id": "<AverageScoreByDistrictId>",
-    "name": "<Short Name> - Average Score by District from last 12 months",
-    "code": "<ProgramId>_Scripted4",
+export const AverageScoreByDistrictByPivotTable =  {
+    "id": "idPivotTable",
+    "name": "programId - Average Score by District from last 12 months",
+    "code": "programId_Scripted4",
     "legend": {
-        "showKey": false,
-        "style": "FILL",
-        "set": {
-            "name": "Red - Yellow - Green (<80%, 80-89%, >89%)",
-            "externalAccess": false,
-            "publicAccess": "rw------",
-            "sharing": {
-                "external": false,
-                "users": {},
-                "userGroups": {},
-                "public": "--------"
-            },
-            "legends": [
-                {
-                    "name": "80 - 89",
-                    "externalAccess": false,
-                    "sharing": {
-                        "external": false,
-                        "users": {},
-                        "userGroups": {}
-                    },
-                    "startValue": 79.0,
-                    "endValue": 89.0,
-                    "color": "#FAF74C",
-                    "displayName": "80 - 89",
-                    "favorite": false,
-                    "id": "PW1oDBZJrkr"
-                },
-                {
-                    "name": "< 80",
-                    "externalAccess": false,
-                    "sharing": {
-                        "external": false,
-                        "users": {},
-                        "userGroups": {}
-                    },
-                    "startValue": 0.0,
-                    "endValue": 79.0,
-                    "color": "#EE4747",
-                    "displayName": "< 80",
-                    "favorite": false,
-                    "id": "flSEdJ5rBlt"
-                },
-                {
-                    "name": "> 89",
-                    "externalAccess": false,
-                    "sharing": {
-                        "external": false,
-                        "users": {},
-                        "userGroups": {}
-                    },
-                    "startValue": 89.0,
-                    "endValue": 1000.0,
-                    "color": "#39A62D",
-                    "displayName": "> 89",
-                    "favorite": false,
-                    "id": "FjbcPEMJOXE"
-                }
-            ],
-            "favorite": false,
-            "id": "XH05Y73UXln"
-        },
-        "strategy": "FIXED"
+      "hidden": false
     },
     "publicAccess": "--------",
     "userOrganisationUnitChildren": false,
@@ -578,103 +516,110 @@ export const AverageScoreByDistrictByPivotTable = {
     "percentStackedValues": false,
     "noSpaceBetweenColumns": false,
     "showHierarchy": false,
-    "seriesKey": {
-        "hidden": false
-    },
     "hideTitle": false,
     "colorSet": "DEFAULT",
     "skipRounding": false,
     "showData": true,
     "numberType": "VALUE",
     "hideEmptyRows": true,
-    "parentGraphMap": {},
+    "parentGraphMap": { },
     "displayDensity": "NORMAL",
     "regressionType": "NONE",
     "completedOnly": false,
     "colTotals": false,
     "sharing": {
-        "owner": "id",
-        "external": false,
-        "users": {    },
-        "userGroups": {    },
-        "public": "--------"
+      "owner": "id",
+      "external": false,
+      "users": {    },
+      "userGroups": {    },
+      "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
     "aggregationType": "DEFAULT",
     "hideSubtitle": false,
     "description": "Average Score by district (last 12 months) for the lists available in the country",
     "hideLegend": false,
-    "fixColumnHeaders": false,
     "externalAccess": false,
     "legendDisplayStrategy": "FIXED",
     "colSubTotals": false,
     "rowTotals": false,
     "digitGroupSeparator": "SPACE",
     "regression": false,
-    "fontStyle": {},
+    "fontStyle": {  },
+    "access": {
+      "read": true,
+      "update": true,
+      "externalize": true,
+      "delete": true,
+      "write": true,
+      "manage": true
+    },
     "reportingParams": {
-        "parentOrganisationUnit": false,
-        "reportingPeriod": false,
-        "organisationUnit": false,
-        "grandParentOrganisationUnit": false
+      "parentOrganisationUnit": false,
+      "reportingPeriod": false,
+      "organisationUnit": false,
+      "grandParentOrganisationUnit": false
     },
     "relativePeriods": {
-        "thisYear": false,
-        "quartersLastYear": false,
-        "last30Days": false,
-        "last52Weeks": false,
-        "thisWeek": false,
-        "last90Days": false,
-        "last60Days": false,
-        "lastMonth": false,
-        "last14Days": false,
-        "biMonthsThisYear": false,
-        "monthsThisYear": false,
-        "last2SixMonths": false,
-        "yesterday": false,
-        "thisQuarter": false,
-        "last12Months": true,
-        "last5FinancialYears": false,
-        "thisSixMonth": false,
-        "lastQuarter": false,
-        "thisFinancialYear": false,
-        "last4Weeks": false,
-        "last3Months": false,
-        "thisDay": false,
-        "thisMonth": false,
-        "last5Years": false,
-        "last6BiMonths": false,
-        "last4BiWeeks": false,
-        "lastFinancialYear": false,
-        "lastBiWeek": false,
-        "weeksThisYear": false,
-        "last6Months": false,
-        "last3Days": false,
-        "quartersThisYear": false,
-        "monthsLastYear": false,
-        "lastWeek": false,
-        "last7Days": false,
-        "last180Days": false,
-        "thisBimonth": false,
-        "lastBimonth": false,
-        "lastSixMonth": false,
-        "thisBiWeek": false,
-        "lastYear": false,
-        "last12Weeks": false,
-        "last4Quarters": false
+      "thisYear": false,
+      "quartersLastYear": false,
+      "last30Days": false,
+      "last52Weeks": false,
+      "thisWeek": false,
+      "last90Days": false,
+      "last60Days": false,
+      "lastMonth": false,
+      "last14Days": false,
+      "biMonthsThisYear": false,
+      "monthsThisYear": false,
+      "last2SixMonths": false,
+      "yesterday": false,
+      "thisQuarter": false,
+      "last12Months": true,
+      "last5FinancialYears": false,
+      "thisSixMonth": false,
+      "lastQuarter": false,
+      "thisFinancialYear": false,
+      "last4Weeks": false,
+      "last3Months": false,
+      "thisDay": false,
+      "thisMonth": false,
+      "last5Years": false,
+      "last6BiMonths": false,
+      "last4BiWeeks": false,
+      "lastFinancialYear": false,
+      "lastBiWeek": false,
+      "weeksThisYear": false,
+      "last6Months": false,
+      "last3Days": false,
+      "quartersThisYear": false,
+      "monthsLastYear": false,
+      "lastWeek": false,
+      "last7Days": false,
+      "last180Days": false,
+      "thisBimonth": false,
+      "lastBimonth": false,
+      "lastSixMonth": false,
+      "thisBiWeek": false,
+      "lastYear": false,
+      "last12Weeks": false,
+      "last4Quarters": false
     },
-    "filterDimensions": [],
-    "columns": [{ "id": "dx" }, { "id": "pe" }],
-    "rowDimensions": ["ou"],
-    "series": [{ "axis": 0 }, { "axis": 0 }],
-    "columnDimensions": ["dx", "pe"],
-    "dataDimensionItems": [],
-    "organisationUnits": [],
-    "filters": [],
-    "rows": [{ "id": "ou" }],
-    "organisationUnitLevels": [ ],
-    "organisationUnits": [ { "id": "id" } ]
-}
+    "legendSet": {
+      "id": "id"
+    },
+    "columns": [{"id": "dx"}, {"id": "pe"}],
+    "rowDimensions": [ "ou"],
+    "series": [ ],
+    "columnDimensions": ["dx","pe"],
+    "dataDimensionItems": [ ],
+    "organisationUnitLevels": [],
+    "organisationUnits": [
+      {
+        "id": "id"
+      }],
+    "rows": [{"id": "ou"}]
+  }
 
 export const NumberOfAssessmentByPivotTable = {
     "id": "<NumberOfAssessmentId>",
@@ -1103,32 +1048,31 @@ export const AssessmentByCompetencyByColumn = {
 }
 
 export const GlobalScoreByMap = {
-    "id": "lb4w7bWTmwT",
-    "name": "test",
-    "code": "<ProgramId>_Scripted8",
-    "publicAccess": "rw------",
-    "basemap": "osmLight",
-    "externalAccess": false,
-    "subscribed": false,
-    "sharing": {
-        "owner": "id",
-        "external": false,
-        "users": {    },
-        "userGroups": {    },
-        "public": "--------"
-    },
-    "favorite": false,
-    "access": {
-        "read": true,
-        "update": true,
-        "externalize": true,
-        "delete": true,
-        "write": true,
-        "manage": true
-    },
-    "mapViews": [
-        {
-            "name": "YjvYH7sFn7a",
+        "id": "id_Map",
+        "name": "CD IM H2 - test",
+        "code": "IdProgram_Scripted8",
+        "publicAccess": "rw------",
+        "basemap": "osmLight",
+        "externalAccess": false,
+        "subscribed": false,
+        "sharing": {
+          "owner": "id",
+          "external": false,
+          "users": {    },
+          "userGroups": {    },
+          "public": "--------"
+        },
+        "favorite": false,
+        "access": {
+          "read": true,
+          "update": true,
+          "externalize": true,
+          "delete": true,
+          "write": true,
+          "manage": true
+        },
+        "mapViews": [
+          {
             "userOrganisationUnitChildren": false,
             "subscribed": false,
             "userOrganisationUnit": false,
@@ -1137,177 +1081,139 @@ export const GlobalScoreByMap = {
             "favorite": false,
             "topLimit": 0,
             "userOrganisationUnitGrandChildren": false,
-            "displayName": "YjvYH7sFn7a",
-            "layer": "orgUnit",
+            "layer": "boundary",
             "hideTitle": false,
             "eventClustering": false,
             "opacity": 1.0,
             "parentLevel": 0,
-            "parentGraphMap": {
-                "Wgo93BIG20V": {}
-            },
+            "parentGraphMap": { },
             "completedOnly": false,
             "eventPointRadius": 0,
             "sharing": {
-                "owner": "id",
-                "external": false,
-                "users": {    },
-                "userGroups": {    },
-                "public": "--------"
+              "owner": "id",
+              "external": false,
+              "users": {        },
+              "userGroups": {        }
             },
             "hideSubtitle": false,
             "externalAccess": false,
             "digitGroupSeparator": "SPACE",
             "access": {
-                "read": true,
-                "update": true,
-                "externalize": true,
-                "delete": true,
-                "write": true,
-                "manage": true
+              "read": true,
+              "update": true,
+              "externalize": true,
+              "delete": true,
+              "write": true,
+              "manage": true
             },
-            "organisationUnitLevels": [
-                4
-              ],
-              "organisationUnits": [
-                {
-                  "id": "Wgo93BIG20V"
-                }
-              ],
-            "filters": [],
-            "rows": [
-                {
-                    "id": "ou"
-                }
-            ]
-        },
-        {
-            "name": "SL HNQIS Hypertension - Global Score",
+            "organisationUnitLevels": [ ],
+            "organisationUnits": [{
+                "id": "id"
+              }],
+            "rows": [ {"id": "ou"}]
+          },
+          {
             "userOrganisationUnitChildren": false,
             "subscribed": false,
             "userOrganisationUnit": false,
             "method": 1,
-            "renderingStrategy": "SINGLE",
+            "renderingStrategy": "TIMELINE",
             "sortOrder": 0,
             "favorite": false,
             "topLimit": 0,
             "userOrganisationUnitGrandChildren": false,
-            "displayName": "SL HNQIS Hypertension - Global Score",
             "layer": "thematic",
             "hideTitle": false,
             "eventClustering": false,
-            "opacity": 0.9,
+            "opacity": 1.0,
             "parentLevel": 0,
-            "parentGraphMap": {
-                "DLBRREc72M8": "",
-                "Wgo93BIG20V": ""
-            },
+            "parentGraphMap": { },
             "completedOnly": false,
             "eventPointRadius": 0,
             "sharing": {
-                "owner": "id",
-                "external": false,
-                "users": {    },
-                "userGroups": {    },
-                "public": "--------"
+              "owner": "id",
+              "external": false,
+              "users": {        },
+              "userGroups": {        }
             },
+            "aggregationType": "AVERAGE",
             "hideSubtitle": false,
             "externalAccess": false,
             "digitGroupSeparator": "SPACE",
             "program": {
-                "id": "wBOuislY5ki"
+              "id": "idPorgram"
             },
             "access": {
-                "read": true,
-                "update": true,
-                "externalize": true,
-                "delete": true,
-                "write": true,
-                "manage": true
+              "read": true,
+              "update": true,
+              "externalize": true,
+              "delete": true,
+              "write": true,
+              "manage": true
             },
             "relativePeriods": {
-                "thisYear": false,
-                "quartersLastYear": false,
-                "last10Years": false,
-                "last30Days": false,
-                "last52Weeks": false,
-                "thisWeek": false,
-                "last90Days": false,
-                "last60Days": false,
-                "lastMonth": false,
-                "last14Days": false,
-                "biMonthsThisYear": false,
-                "monthsThisYear": false,
-                "last2SixMonths": false,
-                "yesterday": false,
-                "thisQuarter": false,
-                "last12Months": true,
-                "last5FinancialYears": false,
-                "thisSixMonth": false,
-                "lastQuarter": false,
-                "thisFinancialYear": false,
-                "last4Weeks": false,
-                "last3Months": false,
-                "thisDay": false,
-                "thisMonth": false,
-                "last5Years": false,
-                "last6BiMonths": false,
-                "last10FinancialYears": false,
-                "last4BiWeeks": false,
-                "lastFinancialYear": false,
-                "lastBiWeek": false,
-                "weeksThisYear": false,
-                "last6Months": false,
-                "last3Days": false,
-                "quartersThisYear": false,
-                "monthsLastYear": false,
-                "lastWeek": false,
-                "last7Days": false,
-                "last180Days": false,
-                "thisBimonth": false,
-                "lastBimonth": false,
-                "lastSixMonth": false,
-                "thisBiWeek": false,
-                "lastYear": false,
-                "last12Weeks": false,
-                "last4Quarters": false
+              "thisYear": false,
+              "quartersLastYear": false,
+              "last30Days": false,
+              "last52Weeks": false,
+              "thisWeek": false,
+              "last90Days": false,
+              "last60Days": false,
+              "lastMonth": false,
+              "last14Days": false,
+              "biMonthsThisYear": false,
+              "monthsThisYear": false,
+              "last2SixMonths": false,
+              "yesterday": false,
+              "thisQuarter": false,
+              "last12Months": true,
+              "last5FinancialYears": false,
+              "thisSixMonth": false,
+              "lastQuarter": false,
+              "thisFinancialYear": false,
+              "last4Weeks": false,
+              "last3Months": false,
+              "thisDay": false,
+              "thisMonth": false,
+              "last5Years": false,
+              "last6BiMonths": false,
+              "last4BiWeeks": false,
+              "lastFinancialYear": false,
+              "lastBiWeek": false,
+              "weeksThisYear": false,
+              "last6Months": false,
+              "last3Days": false,
+              "quartersThisYear": false,
+              "monthsLastYear": false,
+              "lastWeek": false,
+              "last7Days": false,
+              "last180Days": false,
+              "thisBimonth": false,
+              "lastBimonth": false,
+              "lastSixMonth": false,
+              "thisBiWeek": false,
+              "lastYear": false,
+              "last12Weeks": false,
+              "last4Quarters": false
             },
             "legendSet": {
-                "id": "XH05Y73UXln"
+              "id": "id"
             },
             "filterDimensions": [
-                "pe"
+              "pe"
             ],
-            "columns": [
-                {
-                    "id": "dx"
-                }
-            ],
-            "columnDimensions": [
-                "dx"
-            ],
-            "dataDimensionItems": [
-                {
-                    "dataDimensionItemType": "PROGRAM_INDICATOR",
-                    "programIndicator": {
-                        "id": "xcdClk4RKin"
-                    }
-                }
-            ],
-            "organisationUnitLevels": [ ],
-            "organisationUnits": [ { "id": "id" } ],
-            "filters": [
-                {
-                    "id": "pe"
-                }
-            ],
-            "rows": [
-                {
-                    "id": "ou"
-                }
-            ]
-        }
-    ]
+            "columns": [{
+                "id": "dx"}],
+            "columnDimensions": ["dx"],
+            "dataDimensionItems": [ ],
+            "organisationUnitLevels": [],
+            "organisationUnits": [{
+                "id": "id"
+              }],
+            "filters": [{"id": "pe"}],
+            "rows": [{"id": "ou"}]
+          }
+        ]
 }
 
 export const dashboardsTemplate = {

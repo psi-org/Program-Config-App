@@ -64,6 +64,9 @@ const H1_ACTION_PLAN_OLD = "Im5C86I2ObV"    // ?Interpreted as Action 1
 const H1_ACTION1_OLD = "ibpjjNJLn44"        // ?Interpreted as Action 2
 const H1_ACTION2_OLD = "bwwyHVzxnTZ"        // ?Interpreted as Action 3
 
+
+const VISUALIZATIONS_LEGEND = "nvVrBnbud3L"
+
 const H2_REQUIRED = {
     dataElements: [
         COMPETENCY_CLASS,
@@ -273,5 +276,6 @@ export {
     H1_COMPLETION_DATE3,
     H1_ACTION_PLAN_OLD,
     H1_ACTION1_OLD,
-    H1_ACTION2_OLD
+    H1_ACTION2_OLD, 
+    VISUALIZATIONS_LEGEND
 };
