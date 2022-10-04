@@ -17,6 +17,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import Popover from '@mui/material/Popover';
 import UpgradeIcon from '@mui/icons-material/SwitchAccessShortcutAdd';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
+import NewReleasesIcon from '@mui/icons-material/NewReleases';
 
 // *** Routing ***
 import { Link } from "react-router-dom";
@@ -27,8 +28,9 @@ import move_vert_svg from './../../images/i-more_vert_black.svg';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import tinycolor from 'tinycolor2';
 import ProgramNew from "./ProgramNew";
-import { DATE_FORMAT_OPTIONS, METADATA } from "../../configs/Constants";
-import { IconButton, Typography } from "@mui/material";
+import { BUILD_VERSION, DATE_FORMAT_OPTIONS, METADATA } from "../../configs/Constants";
+import { IconButton, Tooltip, Typography } from "@mui/material";
+import { versionIsValid } from "../../configs/Utils";
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
@@ -100,6 +102,11 @@ const ProgramItem = ({
             </div>
             <div className="ml_item-title">{program.name}</div>
             <div className="ml_item-desc">
+                {programType === 'HNQIS2' && pcaMetadata.buildVersion && !versionIsValid(pcaMetadata.buildVersion, BUILD_VERSION, BUILD_VERSION) &&
+                    <Tooltip title={"This HNQIS 2.0 Program was built in version " + pcaMetadata.buildVersion + ", please Set Up Program again to update it."}>
+                        <NewReleasesIcon color="error" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
+                    </Tooltip>
+                }
                 <IconButton
                     style={{ marginRight: "0.5em" }}
                     onClick={handleOpen}
