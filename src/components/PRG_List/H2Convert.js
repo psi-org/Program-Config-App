@@ -653,6 +653,7 @@ const H2Convert = ({
             prgrm.id = programId;
             prgrm.name = "[HNQIS2] " + programOld.name.slice(0, 221);
             prgrm.shortName = "[HNQIS2] " + programOld.shortName.slice(0, 41);
+            prgrm.code = programOld.code?("[HNQIS2] " + programOld.code.slice(0, 41)):undefined;
             prgrm.style = programOld.style;
             prgrm.programStages.push({ id: assessmentId });
             prgrm.programStages.push({ id: actionPlanId });
