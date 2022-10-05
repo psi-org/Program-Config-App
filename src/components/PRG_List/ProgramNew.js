@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { OrganisationUnitTree, Transfer } from "@dhis2/ui";
+import { OrganisationUnitTree, Transfer, CircularLoader } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 //import styles from './Program.module.css'
 import {
@@ -11,7 +11,7 @@ import {
     PSS_Default,
     PSS_CriticalSteps,
     PSS_Scores,
-} from "./../../configs/ProgramTemplate";
+} from "../../configs/ProgramTemplate";
 
 import {
     METADATA,
@@ -27,7 +27,7 @@ import {
     DATASTORE_H2_METADATA,
     CRITICAL_STEPS,
     NON_CRITICAL_STEPS,
-} from "./../../configs/Constants";
+} from "../../configs/Constants";
 
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -1043,6 +1043,9 @@ const ProgramNew = (props) => {
                             >
                                 {pgrTypePCA.toUpperCase()} Settings
                             </h4>
+                            {pgrTypePCA === "hnqis" && orgUnitTreeRoot.length == 0 &&
+                                <CircularLoader small />
+                            }
                         </>
                     }
                     {pgrTypePCA === "hnqis" && orgUnitTreeRoot.length > 0 && (

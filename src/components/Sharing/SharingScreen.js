@@ -28,7 +28,7 @@ import {
     MenuList,
     FormGroup, FormControlLabel, Checkbox, Tooltip
 } from "@mui/material";
-import VisualizationSharing from "./VisualizationSharing";
+import ObjectSharing from "./ObjectSharing";
 
 const sharingQuery = {
     results: {
@@ -76,7 +76,50 @@ const psDataElementAccess = {
             fields: ['programStages[programStageDataElements[dataElement[id,name,access]]]']
         }
     }
-}
+};
+
+const queryMaps = {
+    results: {
+        resource: 'maps',
+        params: _ref7 => {
+            let {
+                programId
+            } = _ref7;
+            return {
+                filter: ["code:like:".concat(programId, "_Scripted")],
+                fields: ['id']
+            };
+        }
+    }
+};
+const queryEventReport = {
+    results: {
+        resource: 'eventReports',
+        params: _ref9 => {
+            let {
+                programId
+            } = _ref9;
+            return {
+                filter: ["code:like:".concat(programId, "_Scripted")],
+                fields: ['id']
+            };
+        }
+    }
+};
+const queryDashboards = {
+    results: {
+        resource: 'dashboards',
+        params: _ref11 => {
+            let {
+                programId
+            } = _ref11;
+            return {
+                fields: ['id'],
+                filter: ["code:like:".concat(programId)]
+            };
+        }
+    }
+};
 
 const metadataMutation = {
     resource: 'metadata',
@@ -109,13 +152,17 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     const [deleted, setDeleted] = useState([]);
     const [ restrictions, setRestrictions ] = useState([]);
     const [ restrictedDEs, setRestrictedDEs] = useState([]);
-    const [ runVisualizationSharing, setRunVisualizationSharing] = useState(false);
+    const [ runAdditionalSharing, setRunAdditionalSharing] = useState(false);
+    const [ additionalElements, setAdditionalElements ] = useState([]);
 
     const { loading, error, data } = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
     const { loading: entityLoading, data: entities, error: entityErrors } = useDataQuery(entitiesQuery);
     const { loading: metadataLoading, data: prgMetaData } = useDataQuery(programMetadata);
     const { loading: prgDELoading, data: prgDEData } = useDataQuery(psDataElementAccess, {variables: {id: id}});
     const { loading: visualizerLoading, data: vData } = useDataQuery(visualizationQuery, {variables: {id: id}});
+    const mapsDQ = useDataQuery(queryMaps, { variables: { programId: id}});
+    const eventReportDQ = useDataQuery(queryEventReport, { variables: { programId: id}});
+    const dashboardsDQ = useDataQuery(queryDashboards, { variables: { programId: id}});
 
     const metadataDM = useDataMutation(metadataMutation);
     const metadataRequest = {
@@ -127,6 +174,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     let payload, usersNGroups, metadata;
     let userAccessRestricted = false;
     let errorStates = [];
+    let hnqisElements = [];
     const exclusionDataElements = ["NAaHST5ZDTE", "VqBfZjZhKkU", "pzWDtDUorBt" , "F0Qcr8ANr7t", "DIoqtxbSJIL", "nswci5V4j0d"]; //Excluding HNQIS2 specific data elements from sharing update
 
     useEffect(()=> {
@@ -312,6 +360,20 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
 
     const apply = (level) => {
         setContent('loading');
+
+        const programTypeId = metadata.attributes.filter((attribute) => {
+            return attribute.code === "PROGRAM_TYPE"
+        })[0].id;
+        const programType = metadata.programs[0].attributeValues.filter((av) => { return av.attribute.id === programTypeId})[0].value;
+
+        if (programType === "HNQIS2")
+        {
+            addHNQISElement4Sharing();
+            if (hnqisElements.length > 0)
+                setAdditionalElements([...hnqisElements]);
+                setRunAdditionalSharing(true);
+        }
+
         let payloadMetadata = {};
         payloadMetadata.programs = metadata.programs;
         payloadMetadata.programIndicators = metadata.programIndicators;
@@ -327,24 +389,22 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
         Object.keys(payloadMetadata).forEach(meta => {
             applySharing(payloadMetadata[meta],meta);
         });
-        setRunVisualizationSharing(true);
         metadataRequest.mutate({ data: payloadMetadata })
-            .then(response => { 
+            .then(response => {
                 if(response?.status === "OK"){
-                    setNotification({ 
-                        message: `Chages to the Sharing Settings applied successfully`, 
-                        severity: 'success' 
+                    setNotification({
+                        message: `Chages to the Sharing Settings applied successfully`,
+                        severity: 'success'
                     })
                 }else{
-                    setNotification({ 
-                        message: parseErrors(response), 
-                        severity: 'error' 
+                    setNotification({
+                        message: parseErrors(response),
+                        severity: 'error'
                     })
                 }
                 hideForm()
             });
     }
-
     const applySharing = (elements, meta) => {
         let DE_Sharing = deSharing(payload.object);
         elements?.forEach((element) => {
@@ -396,14 +456,34 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
         return temp;
     }
 
+    const addHNQISElement4Sharing = (hnqisElements) => {
+        if(mapsDQ.data.results?.maps) {
+            addElement("map", mapsDQ.data.results.maps, hnqisElements);
+        }
+        if(dashboardsDQ.data?.results.dashboards) {
+            addElement("dashboard", dashboardsDQ.data?.results.dashboards, hnqisElements);
+        }
+        if(vData.result?.visualizations) {
+            addElement("visualization", vData.result?.visualizations, hnqisElements);
+        }
+        if(eventReportDQ.data.results?.eventReports) {
+            addElement("eventReport", eventReportDQ.data.results?.eventReports, hnqisElements);
+        }
+    }
+
+    const addElement = (element, items) => {
+        let elements = items.map(item=> ({element: element, id: item.id}));
+        hnqisElements = hnqisElements.concat(elements);
+    }
+
     const dePermission = (permission) => {
         return permission.substring(0,2)+'------';
     }
 
     return (
         <>
-            {runVisualizationSharing && !visualizerLoading && vData.result.visualizations.map(function(v) {
-                return <VisualizationSharing key={v.id} id={v.id} sharing={payload}/>
+            {runAdditionalSharing && additionalElements.length > 0 && additionalElements.map(function(v) {
+                return <ObjectSharing key={v.id} id={v.id} element={v.element} sharing={payload}/>
             })}
             <Modal onClose={hideForm}>
                 <ModalTitle>Sharing settings</ModalTitle>

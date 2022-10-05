@@ -10,7 +10,9 @@ const sharingQuery = {
         }),
     }
 }
-
+/**
+ * @deprecated
+ */
 const VisualizationSharing = ({id, sharing}) => {
     const metadataMutation = {
         resource: `sharing?type=visualization&id=${id}`,
