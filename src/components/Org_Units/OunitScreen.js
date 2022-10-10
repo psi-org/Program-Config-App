@@ -1,20 +1,20 @@
-import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { OrganisationUnitTree } from "@dhis2/ui";
-import { useState, useEffect, useRef } from "react";
+import {useDataMutation, useDataQuery} from "@dhis2/app-runtime";
+import {OrganisationUnitTree} from "@dhis2/ui";
+import {useEffect, useRef, useState} from "react";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
 import {
+    Box,
+    Button,
+    ButtonGroup,
+    CircularProgress,
     DialogActions,
     DialogContent,
     FormControl,
     InputLabel,
-    TextField,
-    Select,
-    ButtonGroup,
-    Button,
     MenuItem,
-    Box,
-    CircularProgress,
+    Select,
+    TextField,
 } from "@mui/material";
 
 const orgUnitsQuery = {
@@ -72,8 +72,8 @@ const searchOrgUnitQuery = {
         resource: "organisationUnits",
         params: ({ filterString }) => ({
             pageSize: 100,
-            fields: ["id", "path", "displayName", "children::isNotEmpty"],
-            filter: [`displayName:ilike:${filterString}`],
+            fields: ["id", "path", "displayName"],
+            filter: [`identifiable:token:${filterString}`],
             withinUserHierarchy: true,
         }),
     },
@@ -111,6 +111,9 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     const [selectedOrgUnits, setSelectedOrgUnits] = useState([]);
     const [orgUnitPathSelected, setOrgUnitPathSelected] = useState([]);
     const [orgUnitTreeRoot, setOrgUnitTreeRoot] = useState([]);
+    const [orgUnitFiltered, setOrgUnitFiltered] = useState([]);
+    const [forceReload, setForceReload] = useState(false);
+    const [orgUnitExpanded, setOrgUnitExpanded] = useState([]);
 
     const { loading: ouMetadataLoading, data: ouMetadata } =
         useDataQuery(orgUnitsQuery);
@@ -190,9 +193,10 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
         }
         setHasChanges(true);
     };
-    //TODO: Organisation Units filter not 100% working. Missing search by Code, shortName
+
     const organisationUnitFilterHandler = (event) => {
-        if (event.target.value.length > 0) {
+        setForceReload(false);
+        if (event.target?.value) {
             let filterString =
                 document.getElementById("filterOrgUnitName").value;
             searchOunits
@@ -200,16 +204,22 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                 .then((data) => {
                     if (typeof data.results !== "undefined") {
                         setOrgUnitTreeRoot([]);
-                        setOrgUnitTreeRoot([
+                        let filterResults = [
                             ...data.results?.organisationUnits.map(
-                                (ou) => ou.id
+                                (ou) => ou.path
                             ),
-                        ]);
-                        // const rootOrgUnits = orgUnits.results.organisationUnits.filter(ou=>(new RegExp(`${filterString}`)).test(ou.displayName)).map(ou=> ou.id);
-                        // setOrgUnitTreeRoot([...rootOrgUnits]);;
+                        ];
+                        setOrgUnitFiltered(filterResults);
+                        setOrgUnitExpanded(filterResults);
+                        setForceReload(true);
+                        setOrgUnitTreeRoot(userOrgUnits);
                     }
                 });
         } else {
+            setOrgUnitTreeRoot([]);
+            setOrgUnitFiltered([]);
+            setOrgUnitExpanded([]);
+            setForceReload(true);
             setOrgUnitTreeRoot(userOrgUnits);
         }
     };
@@ -338,7 +348,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                                     label={
                                         "Filtering Organisation unit by Name"
                                     }
-                                    /*onChange={organisationUnitFilterHandler}*/ variant={
+                                    onChange={organisationUnitFilterHandler} variant={
                                         "standard"
                                     }
                                     ref={filterRef}
@@ -371,8 +381,10 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                                             onChange={orgUnitSelectionHandler}
                                             selected={orgUnitPathSelected}
                                             initiallyExpanded={
-                                                orgUnitPathSelected
+                                                orgUnitExpanded
                                             }
+                                            filter={orgUnitFiltered}
+                                            forceReload={forceReload}
                                         />
                                     </div>
                                 )}
