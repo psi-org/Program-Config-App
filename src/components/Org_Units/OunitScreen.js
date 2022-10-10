@@ -1,6 +1,6 @@
 import {useDataMutation, useDataQuery} from "@dhis2/app-runtime";
 import {OrganisationUnitTree} from "@dhis2/ui";
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
 import {
@@ -137,6 +137,25 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     let userOrgUnits;
 
     useEffect(() => {
+        if (!poLoading) {
+            let ouPaths = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path)];
+            let ouIds = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.id)];
+            if (ouPaths.length > 0 && ouIds.length > 0) {
+                setOrgUnitPathSelected(ouPaths);
+                setOrgUnitExpanded(ouPaths)
+                setSelectedOrgUnits(ouIds);
+            } else {
+                ouTreeRootInit();
+            }
+        }
+    }, [ouMetadata, prgOrgUnitData]);
+
+    useEffect(() => {
+        if(orgUnitPathSelected.length > 0)
+            ouTreeRootInit();
+    }, [orgUnitPathSelected, selectedOrgUnits])
+
+    let ouTreeRootInit = () => {
         if (!ouMetadataLoading) {
             setOrgUnitTreeRoot([
                 ...ouMetadata.userOrgUnits?.organisationUnits.map(
@@ -144,20 +163,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                 ),
             ]);
         }
-    }, [ouMetadata]);
-
-    useEffect(() => {
-        if (!poLoading) {
-            setSelectedOrgUnits([
-                ...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.id),
-            ]);
-            setOrgUnitPathSelected([
-                ...prgOrgUnitData.results?.organisationUnits.map(
-                    (ou) => ou.path
-                ),
-            ]);
-        }
-    }, [prgOrgUnitData]);
+    }
 
     if (!ouMetadataLoading) {
         userOrgUnits = ouMetadata.userOrgUnits?.organisationUnits.map(
@@ -380,11 +386,8 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                                             roots={orgUnitTreeRoot}
                                             onChange={orgUnitSelectionHandler}
                                             selected={orgUnitPathSelected}
-                                            initiallyExpanded={
-                                                orgUnitExpanded
-                                            }
+                                            initiallyExpanded={orgUnitExpanded}
                                             filter={orgUnitFiltered}
-                                            forceReload={forceReload}
                                         />
                                     </div>
                                 )}
