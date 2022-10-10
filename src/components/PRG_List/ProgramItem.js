@@ -279,7 +279,7 @@ const ProgramItem = ({
                         pcaMetadata={pcaMetadata}
                     />
                 )}
-                {!program.withoutRegistration && (
+                {/*!program.withoutRegistration &&*/ (
                     <Link
                         to={"/program/" + program.id}
                         style={{ color: "#333333" }}
@@ -292,7 +292,7 @@ const ProgramItem = ({
                         </div>
                     </Link>
                 )}
-                {program.withoutRegistration && (
+                {/*program.withoutRegistration && (
                     <div
                         style={{
                             display: "flex",
@@ -303,7 +303,7 @@ const ProgramItem = ({
                     >
                         <NavigateNextIcon />
                     </div>
-                )}
+                    )*/}
             </div>
             <Popover
                 id={id}

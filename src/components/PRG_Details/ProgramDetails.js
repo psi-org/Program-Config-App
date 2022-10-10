@@ -15,13 +15,14 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import MuiChip from '@mui/material/Chip';
 
 const query = {
     results: {
         resource: 'programs',
         id: ({ program }) => program,
         params: {
-            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues','programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements']
+            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', 'programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements]', 'withoutRegistration']
         }
     },
 };
@@ -92,7 +93,7 @@ const ProgramDetails = () => {
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns">
-                    {!hnqisMode &&
+                    {!hnqisMode && !data.results.withoutRegistration &&
                         <MuiButton
                             variant="outlined"
                             color='inherit'
@@ -104,8 +105,13 @@ const ProgramDetails = () => {
                     }
                 </div>
             </div>
+            <div className="title" style={{ margin: '0 8px 0 16px'}}>
+                {!data.results.withoutRegistration ? 'Program Stages for' : 'Event'} Program <strong>{data.results.displayName}</strong>
+                {data.results.withoutRegistration &&
+                    <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
+                }
+            </div>
             <div className="wrapper">
-                <div className="title">Program Stages for Program {data.results.displayName}</div>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
                         {
@@ -121,6 +127,7 @@ const ProgramDetails = () => {
                                         setNewStage={setNewStage}
                                         editStatus={newStage?.stage===programStage.id && newStage?.mode }
                                         hnqisMode={hnqisMode}
+                                        eventMode={data.results.withoutRegistration}
                                     />
                                 )
                             })

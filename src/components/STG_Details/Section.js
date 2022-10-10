@@ -33,7 +33,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 import Chip from '@mui/material/Chip';
 
-const DraggableSection = ({program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode }) => {
+const DraggableSection = ({ program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode, readOnly }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -89,7 +89,7 @@ const DraggableSection = ({program, stageSection, stageDataElements, DEActions, 
     var classNames = (stageSection.importStatus) ? ' import_' + stageSection.importStatus : '';
 
     return (
-        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined || DEActions.deToEdit!=='' || !isSectionMode}>
+        <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined || DEActions.deToEdit !== '' || !isSectionMode || readOnly}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                     <div className={"ml_item section-header" + (openMenu?' section-selected':'') + classNames}>
@@ -100,13 +100,13 @@ const DraggableSection = ({program, stageSection, stageDataElements, DEActions, 
                             <div>{sectionImportStatus} {stageSection.displayName} </div>
                             <div>{editStatus && <Chip label={editStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{marginLeft:'1em'}} /> }</div>
                         </div>
-                        <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div> {sectionImportSummary}</div>
+                        <div className="ml_item-desc"><div>{stageSection.dataElements.length} Data Elements</div> {sectionImportSummary}</div>
                         <div className="ml_item-warning_error " onClick={()=>setShowValidationMessage(!showValidationMessage)}>
                             {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
                             {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                         </div>
                         <div className="ml_item-cta">
-                            {isSectionMode && <img src={move_vert_svg} alt="menu" id={'menu'+stageSection.id} onClick={()=>{setRef(document.getElementById('menu'+stageSection.id)); toggle()}} style={{cursor:'pointer'}}/>}
+                            {isSectionMode && !readOnly && <img src={move_vert_svg} alt="menu" id={'menu'+stageSection.id} onClick={()=>{setRef(document.getElementById('menu'+stageSection.id)); toggle()}} style={{cursor:'pointer'}}/>}
                             {openMenu &&
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
@@ -120,7 +120,7 @@ const DraggableSection = ({program, stageSection, stageDataElements, DEActions, 
                                     </Popper>
                                 </Layer>
                             }
-                            <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
+                            <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} style={{ cursor: 'pointer' }} />
                         </div>
                     </div>
                     <Droppable droppableId={stageSection.id || 'dropSec' + index} type="DATA_ELEMENT">
@@ -139,6 +139,7 @@ const DraggableSection = ({program, stageSection, stageDataElements, DEActions, 
                                             hnqisMode={hnqisMode}
                                             deStatus={editStatus?.dataElements?.find(dataElement => dataElement.id === de.id)}
                                             isSectionMode={isSectionMode}
+                                            readOnly={readOnly}
                                         />;
                                     })
                                 }

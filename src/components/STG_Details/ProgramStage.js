@@ -22,7 +22,7 @@ const query = {
         id: ({programStage}) => programStage,
         params: {
             fields:[
-                'id','name','allowGenerateNextVisit','publicAccess','reportDateToUse','formType','generatedByEnrollmentDate','displayFormName','sortOrder','hideDueDate','enableUserAssignment','minDaysFromStart','favorite','executionDateLabel','preGenerateUID','displayName','externalAccess','openAfterEnrollment','repeatable','remindCompleted','displayGenerateEventBox','validationStrategy','autoGenerateEvent','blockEntryForm','program[id,name,shortName,attributeValues]','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
+                'id', 'name', 'allowGenerateNextVisit', 'publicAccess', 'reportDateToUse', 'formType', 'generatedByEnrollmentDate', 'displayFormName', 'sortOrder', 'hideDueDate', 'enableUserAssignment', 'minDaysFromStart', 'favorite', 'executionDateLabel', 'preGenerateUID', 'displayName', 'externalAccess', 'openAfterEnrollment', 'repeatable', 'remindCompleted', 'displayGenerateEventBox', 'validationStrategy', 'autoGenerateEvent', 'blockEntryForm','program[id,name,shortName,attributeValues,withoutRegistration]','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
                 'programStageDataElements[id,name,compulsory,displayInReports,programStage,dataElement[id,name,shortName,style,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName],sortOrder]',
                 'programStageSections[id,name,displayName,sortOrder,dataElements[id,name,shortName,style,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName]]'
             ]
@@ -72,6 +72,7 @@ const ProgramStage = () => {
 
     if(data){
         const hnqisMode = !!data.results.program.attributeValues.find(av=>av.value==="HNQIS2")
+        const readOnly = !!data.results.program.attributeValues.find(av => av.value === "HNQIS")
 
         if(hnqisMode && !h2Ready) return (
             <div style={{margin:'2em'}}>
@@ -83,7 +84,7 @@ const ProgramStage = () => {
 
         let programStageData = DeepCopy({...data.results})
 
-        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisMode={hnqisMode}/>
+        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisMode={hnqisMode} readOnly={readOnly}/>
     }
 
     return <span><CircularLoader /></span> 

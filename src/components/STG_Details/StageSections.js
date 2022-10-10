@@ -29,6 +29,7 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import MuiChip from '@mui/material/Chip';
 
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
@@ -170,7 +171,7 @@ const queryOrganizationsUnit = {
     }
 }
 
-const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
+const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     // Globals
     const programId = programStage.program.id;
     const [isSectionMode, setIsSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0)
@@ -179,7 +180,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
     const [androidSettingsError, setAndroidSettingsError] = useState(true);
     const [programSettingsError, setProgramSettingsError] = useState(undefined);
     const { data: OrganizationLevel, refetch: setOuLevel } = useDataQuery(queryOrganizationsUnit, { lazy: true, variables: { ouLevel: undefined } });
-    console.log()
 
     // Flags
     const [saveStatus, setSaveStatus] = useState(hnqisMode ? 'Validate' : 'Save Changes');
@@ -637,10 +637,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                 <div className="c_srch"></div>
                 <div className="c_btns" style={{ color: '#444444' }}>
                     <ButtonStrip>
-                        {(isSectionMode) &&
+                        {isSectionMode && !readOnly &&
                             <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
                         }
-                        {hnqisMode && (isSectionMode) &&
+                        {hnqisMode && isSectionMode &&
                             <>
                                 <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
                                 <Button color='inherit' variant='outlined' startIcon={!exportToExcel ? <FileDownloadIcon /> : <CircularLoader small />} name="generator"
@@ -654,7 +654,11 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                 </div>
             </div>
             {hnqisMode && importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
-            <div className="title">Sections for Program Stage {programStage.displayName}</div>
+            <div className="title">Sections for Program Stage <strong>{programStage.displayName}</strong>
+                {readOnly &&
+                    <MuiChip style = {{marginLeft: '1em'}} label="Read Only" variant="outlined" />
+                }
+            </div>
             {hnqisMode && exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus} />}
             {
                 createMetadata.loading && <ComponentCover translucent></ComponentCover>
@@ -798,7 +802,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
-                        {sections.length === 0 &&
+                        {sections.length === 0 && !readOnly &&
                             <Button startIcon={<AddBoxIcon />} variant='contained' style={{ margin: '8px' }} onClick={SectionActions.append}>
                                 Add New Section
                             </Button>
@@ -817,7 +821,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                         {
                             createMetadata.data && createMetadata.data.status == 'ERROR' && <ErrorReports errors={parseErrors(createMetadata.data)} />
                         }
-                        <Droppable droppableId="dpb-sections" type="SECTION" isDra>
+                        <Droppable droppableId="dpb-sections" type="SECTION" isDropDisabled={readOnly}>
                             {(provided, snapshot) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
                                     {
@@ -833,6 +837,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode }) => {
                                                 SectionActions={SectionActions}
                                                 hnqisMode={hnqisMode}
                                                 isSectionMode={isSectionMode}
+                                                readOnly={readOnly}
                                             />
                                         })
                                     }

@@ -28,7 +28,7 @@ import UpIcon from '@mui/icons-material/ArrowUpward';
 
 import Chip from '@mui/material/Chip';
 
-const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode, deStatus, isSectionMode}) => {
+const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode, deStatus, isSectionMode, readOnly}) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -69,7 +69,7 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
 
     return (
         <>
-        <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined || DEActions.deToEdit!=='' || !isSectionMode}>
+        <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined || DEActions.deToEdit!=='' || !isSectionMode || readOnly}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                     <div id={"de_"+dataElement.id} className={'data-element-header '+(openMenu?'data-element-selected ':'')+classNames}>
@@ -98,8 +98,8 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
                         </div>
                         <div className="ml_item-cta">
                             {deStatus && <Chip label={deStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{marginLeft:'1em'}} />}
-                            {isSectionMode && <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>}
-                            {openMenu &&
+                                {isSectionMode && !readOnly && <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>}
+                            {openMenu && 
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
                                         <FlyoutMenu>
