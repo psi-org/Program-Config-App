@@ -118,6 +118,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     const [orgUnitTreeRoot, setOrgUnitTreeRoot] = useState([]);
     const [orgUnitFiltered, setOrgUnitFiltered] = useState([]);
     const [orgUnitExpanded, setOrgUnitExpanded] = useState([]);
+    const [filterValue, setFilterValue] = useState('')
 
     const { loading: ouMetadataLoading, data: ouMetadata } =
         useDataQuery(orgUnitsQuery);
@@ -206,9 +207,10 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     };
 
     const doSearch = () => {
-        let filterString = document.getElementById("filterOrgUnitName").value;
+        let filterString = filterRef.current.value;
         if (filterString)
         {
+            setFilterValue(filterString)
             searchOunits.refetch({ filterString: filterString })
                 .then((data) => {
                     if (data?.results) {
@@ -229,7 +231,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     }
 
     const resetSearch = () => {
-        document.getElementById("filterOrgUnitName").value = "";
+        setFilterValue("")
         setOrgUnitTreeRoot([]);
         setOrgUnitFiltered([]);
         setOrgUnitExpanded([]);
@@ -366,7 +368,9 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                                         id={"filterOrgUnitName"}
                                         label={ "Filtering Organisation unit by id, code or Name"}
                                         variant="outlined"
-                                        ref={filterRef}
+                                        inputRef={filterRef}
+                                        value={filterValue}
+                                        onChange={(event) => setFilterValue(event.target.value)}
                                         onKeyPress={(event) => {
                                             if (event.key === "Enter") {
                                                 doSearch();
