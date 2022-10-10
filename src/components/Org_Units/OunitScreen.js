@@ -14,8 +14,13 @@ import {
     InputLabel,
     MenuItem,
     Select,
-    TextField,
+    TextField, Tooltip,
 } from "@mui/material";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import ClearIcon from "@mui/icons-material/Clear";
+import MuiButton from "@mui/material/Button";
+import SearchIcon from "@mui/icons-material/Search";
 
 const orgUnitsQuery = {
     userOrgUnits: {
@@ -102,7 +107,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
         },
     };
     let level, filterString, groupId;
-    const filterRef = useRef();
+    const filterRef = useRef(null);
     const [orgUnitLevel, setOrgUnitLevel] = useState(undefined);
     const [orgUnitGroup, setOrgUnitGroup] = useState("");
     const [hasChanges, setHasChanges] = useState(false);
@@ -112,7 +117,6 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     const [orgUnitPathSelected, setOrgUnitPathSelected] = useState([]);
     const [orgUnitTreeRoot, setOrgUnitTreeRoot] = useState([]);
     const [orgUnitFiltered, setOrgUnitFiltered] = useState([]);
-    const [forceReload, setForceReload] = useState(false);
     const [orgUnitExpanded, setOrgUnitExpanded] = useState([]);
 
     const { loading: ouMetadataLoading, data: ouMetadata } =
@@ -136,13 +140,14 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
 
     let userOrgUnits;
 
-    useEffect(() => {
+    useEffect(() => { 
         if (!poLoading) {
             let ouPaths = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path)];
+            let ouExpanded = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path.split('/').slice(0, -1).join('/'))]
             let ouIds = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.id)];
             if (ouPaths.length > 0 && ouIds.length > 0) {
                 setOrgUnitPathSelected(ouPaths);
-                setOrgUnitExpanded(ouPaths)
+                setOrgUnitExpanded(ouExpanded)
                 setSelectedOrgUnits(ouIds);
             } else {
                 ouTreeRootInit();
@@ -200,15 +205,13 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
         setHasChanges(true);
     };
 
-    const organisationUnitFilterHandler = (event) => {
-        setForceReload(false);
-        if (event.target?.value) {
-            let filterString =
-                document.getElementById("filterOrgUnitName").value;
-            searchOunits
-                .refetch({ filterString: filterString })
+    const doSearch = () => {
+        let filterString = document.getElementById("filterOrgUnitName").value;
+        if (filterString)
+        {
+            searchOunits.refetch({ filterString: filterString })
                 .then((data) => {
-                    if (typeof data.results !== "undefined") {
+                    if (data?.results) {
                         setOrgUnitTreeRoot([]);
                         let filterResults = [
                             ...data.results?.organisationUnits.map(
@@ -217,18 +220,21 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                         ];
                         setOrgUnitFiltered(filterResults);
                         setOrgUnitExpanded(filterResults);
-                        setForceReload(true);
                         setOrgUnitTreeRoot(userOrgUnits);
                     }
                 });
         } else {
-            setOrgUnitTreeRoot([]);
-            setOrgUnitFiltered([]);
-            setOrgUnitExpanded([]);
-            setForceReload(true);
-            setOrgUnitTreeRoot(userOrgUnits);
+            resetSearch();
         }
-    };
+    }
+
+    const resetSearch = () => {
+        document.getElementById("filterOrgUnitName").value = "";
+        setOrgUnitTreeRoot([]);
+        setOrgUnitFiltered([]);
+        setOrgUnitExpanded([]);
+        setOrgUnitTreeRoot(userOrgUnits);
+    }
 
     const ouLevelAssignmentHandler = () => {
         let id = userOrgUnits[0];
@@ -329,244 +335,284 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                 >
                     Assign Organisation Units
                 </CustomMUIDialogTitle>
-                <DialogContent dividers style={{ padding: "1em 2em" }}>
-                    {content === "loading" && (
-                        <Box sx={{ display: "inline-flex" }}>
-                            <CircularProgress />
-                        </Box>
-                    )}
-                    {content === "form" && (
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                            }}
-                        >
+                {orgUnitTreeRoot.length === 0 && (
+                    <Box sx={{ display: "inline-flex", paddingLeft: "20px" }}>
+                        <CircularProgress />
+                    </Box>
+                )}
+                {orgUnitTreeRoot.length > 0 &&
+                    <DialogContent dividers style={{ padding: "1em 2em" }}>
+                        {content === "loading" && (
+                            <Box sx={{ display: "inline-flex" }}>
+                                <CircularProgress />
+                            </Box>
+                        )}
+                        {content === "form" && (
                             <div
                                 style={{
-                                    position: "relative",
-                                    minWidth: "850px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
                                 }}
                             >
-                                <TextField
-                                    id={"filterOrgUnitName"}
-                                    label={
-                                        "Filtering Organisation unit by Name"
-                                    }
-                                    onChange={organisationUnitFilterHandler} variant={
-                                        "standard"
-                                    }
-                                    ref={filterRef}
-                                    style={{ width: "100%" }}
-                                />
-                                <div style={{ marginTop: "10px" }}>
-                                    {" "}
-                                    {selectedOrgUnits.length} Organisation units
-                                    selected{" "}
-                                </div>
-                                {!poLoading && orgUnitTreeRoot.length > 0 && (
-                                    <div
-                                        style={{
-                                            minHeight: "300px",
-                                            maxHeight: "450px",
-                                            minWidth: "300px",
-                                            maxWidth: "480px",
-                                            overflow: "auto",
-                                            border: "1px solid rgb(189, 189, 189)",
-                                            borderRadius: "3px",
-                                            padding: "4px",
-                                            margin: "4px 0px",
-                                            display: "inline-block",
-                                            verticalAlign: "top",
-                                        }}
-                                    >
-                                        <OrganisationUnitTree
-                                            name={"Root org unit"}
-                                            roots={orgUnitTreeRoot}
-                                            onChange={orgUnitSelectionHandler}
-                                            selected={orgUnitPathSelected}
-                                            initiallyExpanded={orgUnitExpanded}
-                                            filter={orgUnitFiltered}
-                                        />
-                                    </div>
-                                )}
                                 <div
                                     style={{
-                                        width: "400px",
-                                        background: "white",
-                                        marginLeft: "1rem",
-                                        marginTop: "1rem",
-                                        display: "inline-block",
+                                        position: "relative",
+                                        minWidth: "850px",
                                     }}
                                 >
-                                    <span>For Organisation units within</span>
-                                    <div style={{ flexDirection: "row" }}>
-                                        <FormControl
-                                            variant={"standard"}
-                                            style={{ width: "200px" }}
-                                        >
-                                            <InputLabel
-                                                id={
-                                                    "organisation-unit-level-label"
-                                                }
-                                            >
-                                                Organisation Unit Level
-                                            </InputLabel>
-                                            <Select
-                                                labelId={"orgUnitLevelId"}
-                                                label={
-                                                    "Organisation Unit Level"
-                                                }
-                                                onChange={(event) =>
-                                                    setOrgUnitLevel(
-                                                        event.target.value
-                                                    )
-                                                }
-                                            >
-                                                <MenuItem
-                                                    value={undefined}
-                                                    key={undefined}
-                                                >
-                                                    None
-                                                </MenuItem>
-                                                {!ouMetadataLoading &&
-                                                    ouMetadata.orgUnitLevels?.organisationUnitLevels.map(
-                                                        function (ouLevel) {
-                                                            return (
-                                                                <MenuItem
-                                                                    value={
-                                                                        ouLevel.level
-                                                                    }
-                                                                    key={
-                                                                        ouLevel.id
-                                                                    }
-                                                                >
-                                                                    <em>
-                                                                        {
-                                                                            ouLevel.displayName
-                                                                        }
-                                                                    </em>
-                                                                </MenuItem>
-                                                            );
-                                                        }
-                                                    )}
-                                            </Select>
-                                        </FormControl>
-                                        <ButtonGroup
-                                            variant="outlined"
-                                            style={{
-                                                marginTop: "12px",
-                                                marginLeft: "10px",
-                                            }}
-                                        >
-                                            <Button
-                                                disabled={!orgUnitLevel}
-                                                onClick={
-                                                    ouLevelAssignmentHandler
-                                                }
-                                            >
-                                                SELECT
-                                            </Button>
-                                            <Button
-                                                disabled={!orgUnitLevel}
-                                                onClick={ouLevelRemovalHandler}
-                                            >
-                                                DESELECT
-                                            </Button>
-                                        </ButtonGroup>
+                                    <TextField
+                                        margin="dense"
+                                        id={"filterOrgUnitName"}
+                                        label={ "Filtering Organisation unit by id, code or Name"}
+                                        variant="outlined"
+                                        ref={filterRef}
+                                        onKeyPress={(event) => {
+                                            if (event.key === "Enter") {
+                                                doSearch();
+                                            }
+                                        }}
+                                        sx={{ width: "100%"}}
+                                        autoComplete={"off"}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <Tooltip
+                                                        title="Clear Filter"
+                                                        placement="left"
+                                                    >
+                                                        <IconButton
+                                                            onClick={() => {
+                                                                resetSearch();
+                                                            }}
+                                                            style={{ marginRight: "0.5em" }}
+                                                        >
+                                                            <ClearIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                    <MuiButton
+                                                        onClick={() => {
+                                                            doSearch();
+                                                        }}
+                                                        startIcon={<SearchIcon />}
+                                                        variant="contained"
+                                                        color="primary"
+                                                    >
+                                                        Filter
+                                                    </MuiButton>
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+
+                                    <div style={{ marginTop: "10px" }}>
+                                        {" "}
+                                        {selectedOrgUnits.length} Organisation units
+                                        selected{" "}
                                     </div>
-                                    <div style={{ flexDirection: "row" }}>
-                                        <FormControl
-                                            variant={"standard"}
-                                            style={{ width: "200px" }}
-                                        >
-                                            <InputLabel
-                                                id={
-                                                    "organisation-unit-Group-label"
-                                                }
-                                            >
-                                                Organisation Unit Group
-                                            </InputLabel>
-                                            <Select
-                                                labelId={"orgUnitGroupId"}
-                                                label={
-                                                    "Organisation Unit Group"
-                                                }
-                                                onChange={(event) =>
-                                                    setOrgUnitGroup(
-                                                        event.target.value
-                                                    )
-                                                }
-                                            >
-                                                <MenuItem
-                                                    value={undefined}
-                                                    key={undefined}
-                                                >
-                                                    None
-                                                </MenuItem>
-                                                {!ouMetadataLoading &&
-                                                    ouMetadata.orgUnitGroups?.organisationUnitGroups.map(
-                                                        function (ouGroup) {
-                                                            return (
-                                                                <MenuItem
-                                                                    value={
-                                                                        ouGroup.id
-                                                                    }
-                                                                    key={
-                                                                        ouGroup.id
-                                                                    }
-                                                                >
-                                                                    <em>
-                                                                        {
-                                                                            ouGroup.displayName
-                                                                        }
-                                                                    </em>
-                                                                </MenuItem>
-                                                            );
-                                                        }
-                                                    )}
-                                            </Select>
-                                        </FormControl>
-                                        <ButtonGroup
-                                            variant="outlined"
+                                    {!poLoading && orgUnitTreeRoot.length > 0 && (
+                                        <div
                                             style={{
-                                                marginTop: "12px",
-                                                marginLeft: "10px",
+                                                minHeight: "300px",
+                                                maxHeight: "450px",
+                                                minWidth: "300px",
+                                                maxWidth: "480px",
+                                                overflow: "auto",
+                                                border: "1px solid rgb(189, 189, 189)",
+                                                borderRadius: "3px",
+                                                padding: "4px",
+                                                margin: "4px 0px",
+                                                display: "inline-block",
+                                                verticalAlign: "top",
                                             }}
                                         >
-                                            <Button
-                                                disabled={!orgUnitGroup}
-                                                onClick={
-                                                    ouGroupAssignmentHandler
-                                                }
+                                            <OrganisationUnitTree
+                                                name={"Root org unit"}
+                                                roots={orgUnitTreeRoot}
+                                                onChange={orgUnitSelectionHandler}
+                                                selected={orgUnitPathSelected}
+                                                initiallyExpanded={orgUnitExpanded}
+                                                filter={orgUnitFiltered}
+                                            />
+                                        </div>
+                                    )}
+                                    <div
+                                        style={{
+                                            width: "400px",
+                                            background: "white",
+                                            marginLeft: "1rem",
+                                            marginTop: "1rem",
+                                            display: "inline-block",
+                                        }}
+                                    >
+                                        <span>For Organisation units within</span>
+                                        <div style={{ flexDirection: "row" }}>
+                                            <FormControl
+                                                variant={"standard"}
+                                                style={{ width: "200px" }}
                                             >
-                                                SELECT
-                                            </Button>
-                                            <Button
-                                                disabled={!orgUnitGroup}
-                                                onClick={ouGroupRemovalHandler}
+                                                <InputLabel
+                                                    id={
+                                                        "organisation-unit-level-label"
+                                                    }
+                                                >
+                                                    Organisation Unit Level
+                                                </InputLabel>
+                                                <Select
+                                                    labelId={"orgUnitLevelId"}
+                                                    label={
+                                                        "Organisation Unit Level"
+                                                    }
+                                                    onChange={(event) =>
+                                                        setOrgUnitLevel(
+                                                            event.target.value
+                                                        )
+                                                    }
+                                                >
+                                                    <MenuItem
+                                                        value={undefined}
+                                                        key={undefined}
+                                                    >
+                                                        None
+                                                    </MenuItem>
+                                                    {!ouMetadataLoading &&
+                                                        ouMetadata.orgUnitLevels?.organisationUnitLevels.map(
+                                                            function (ouLevel) {
+                                                                return (
+                                                                    <MenuItem
+                                                                        value={
+                                                                            ouLevel.level
+                                                                        }
+                                                                        key={
+                                                                            ouLevel.id
+                                                                        }
+                                                                    >
+                                                                        <em>
+                                                                            {
+                                                                                ouLevel.displayName
+                                                                            }
+                                                                        </em>
+                                                                    </MenuItem>
+                                                                );
+                                                            }
+                                                        )}
+                                                </Select>
+                                            </FormControl>
+                                            <ButtonGroup
+                                                variant="outlined"
+                                                style={{
+                                                    marginTop: "12px",
+                                                    marginLeft: "10px",
+                                                }}
                                             >
-                                                DESELECT
-                                            </Button>
-                                        </ButtonGroup>
+                                                <Button
+                                                    disabled={!orgUnitLevel}
+                                                    onClick={
+                                                        ouLevelAssignmentHandler
+                                                    }
+                                                >
+                                                    SELECT
+                                                </Button>
+                                                <Button
+                                                    disabled={!orgUnitLevel}
+                                                    onClick={ouLevelRemovalHandler}
+                                                >
+                                                    DESELECT
+                                                </Button>
+                                            </ButtonGroup>
+                                        </div>
+                                        <div style={{ flexDirection: "row" }}>
+                                            <FormControl
+                                                variant={"standard"}
+                                                style={{ width: "200px" }}
+                                            >
+                                                <InputLabel
+                                                    id={
+                                                        "organisation-unit-Group-label"
+                                                    }
+                                                >
+                                                    Organisation Unit Group
+                                                </InputLabel>
+                                                <Select
+                                                    labelId={"orgUnitGroupId"}
+                                                    label={
+                                                        "Organisation Unit Group"
+                                                    }
+                                                    onChange={(event) =>
+                                                        setOrgUnitGroup(
+                                                            event.target.value
+                                                        )
+                                                    }
+                                                >
+                                                    <MenuItem
+                                                        value={undefined}
+                                                        key={undefined}
+                                                    >
+                                                        None
+                                                    </MenuItem>
+                                                    {!ouMetadataLoading &&
+                                                        ouMetadata.orgUnitGroups?.organisationUnitGroups.map(
+                                                            function (ouGroup) {
+                                                                return (
+                                                                    <MenuItem
+                                                                        value={
+                                                                            ouGroup.id
+                                                                        }
+                                                                        key={
+                                                                            ouGroup.id
+                                                                        }
+                                                                    >
+                                                                        <em>
+                                                                            {
+                                                                                ouGroup.displayName
+                                                                            }
+                                                                        </em>
+                                                                    </MenuItem>
+                                                                );
+                                                            }
+                                                        )}
+                                                </Select>
+                                            </FormControl>
+                                            <ButtonGroup
+                                                variant="outlined"
+                                                style={{
+                                                    marginTop: "12px",
+                                                    marginLeft: "10px",
+                                                }}
+                                            >
+                                                <Button
+                                                    disabled={!orgUnitGroup}
+                                                    onClick={
+                                                        ouGroupAssignmentHandler
+                                                    }
+                                                >
+                                                    SELECT
+                                                </Button>
+                                                <Button
+                                                    disabled={!orgUnitGroup}
+                                                    onClick={ouGroupRemovalHandler}
+                                                >
+                                                    DESELECT
+                                                </Button>
+                                            </ButtonGroup>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
-                    {content === "status" && (
-                        <div>
-                            <b>Import Status</b>
-                            <hr />
-                            <p>Created: {importStatus.created}</p>
-                            <p>Updated: {importStatus.updated}</p>
-                            <p>Deleted: {importStatus.deleted}</p>
-                            <p>Ignored: {importStatus.ignored}</p>
-                            <p>Total: {importStatus.total}</p>
-                        </div>
-                    )}
-                </DialogContent>
+                        )}
+                        {content === "status" && (
+                            <div>
+                                <b>Import Status</b>
+                                <hr />
+                                <p>Created: {importStatus.created}</p>
+                                <p>Updated: {importStatus.updated}</p>
+                                <p>Deleted: {importStatus.deleted}</p>
+                                <p>Ignored: {importStatus.ignored}</p>
+                                <p>Total: {importStatus.total}</p>
+                            </div>
+                        )}
+                    </DialogContent>
+                }
                 <DialogActions style={{ padding: "1em" }}>
                     <Button onClick={hideFormHandler} color={"error"}>
                         Close
