@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { OrganisationUnitTree, Transfer, CircularLoader } from "@dhis2/ui";
+import { OrganisationUnitTree, Transfer } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 //import styles from './Program.module.css'
 import {
@@ -51,7 +51,8 @@ import StyleManager from "../UIElements/StyleManager";
 import { DeepCopy } from "../../configs/Utils";
 import { VolunteerActivismOutlined } from "@mui/icons-material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import Tooltip from "@mui/material/Tooltip";
+import LinearProgress from '@mui/material/LinearProgress';
+import Box from '@mui/material/Box';
 
 //const { Form, Field } = ReactFinalForm
 
@@ -1044,7 +1045,9 @@ const ProgramNew = (props) => {
                                 {pgrTypePCA.toUpperCase()} Settings
                             </h4>
                             {pgrTypePCA === "hnqis" && orgUnitTreeRoot.length == 0 &&
-                                <CircularLoader small />
+                                <Box sx={{ width: '100%' }}>
+                                    <LinearProgress />
+                                </Box>
                             }
                         </>
                     }
