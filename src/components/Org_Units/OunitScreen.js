@@ -14,12 +14,13 @@ import {
     InputLabel,
     MenuItem,
     Select,
-    TextField, Tooltip,
+    TextField,
+    Tooltip
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import ClearIcon from "@mui/icons-material/Clear";
-import MuiButton from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
 
 const orgUnitsQuery = {
@@ -118,7 +119,8 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     const [orgUnitTreeRoot, setOrgUnitTreeRoot] = useState([]);
     const [orgUnitFiltered, setOrgUnitFiltered] = useState([]);
     const [orgUnitExpanded, setOrgUnitExpanded] = useState([]);
-    const [filterValue, setFilterValue] = useState('')
+    const [filterValue, setFilterValue] = useState('');
+    const [filterLoading, setFilterLoading] = useState(false);
 
     const { loading: ouMetadataLoading, data: ouMetadata } =
         useDataQuery(orgUnitsQuery);
@@ -207,6 +209,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     };
 
     const doSearch = () => {
+        setFilterLoading(true)
         let filterString = filterRef.current.value;
         if (filterString)
         {
@@ -224,6 +227,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                         setOrgUnitExpanded(filterResults);
                         setOrgUnitTreeRoot(userOrgUnits);
                     }
+                    setFilterLoading(false)
                 });
         } else {
             resetSearch();
@@ -236,6 +240,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
         setOrgUnitFiltered([]);
         setOrgUnitExpanded([]);
         setOrgUnitTreeRoot(userOrgUnits);
+        setFilterLoading(false)
     }
 
     const ouLevelAssignmentHandler = () => {
@@ -394,16 +399,17 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                                                             <ClearIcon />
                                                         </IconButton>
                                                     </Tooltip>
-                                                    <MuiButton
+                                                    <LoadingButton
                                                         onClick={() => {
                                                             doSearch();
                                                         }}
                                                         startIcon={<SearchIcon />}
                                                         variant="contained"
                                                         color="primary"
+                                                        loading={filterLoading}
                                                     >
                                                         Filter
-                                                    </MuiButton>
+                                                    </LoadingButton>
                                                 </InputAdornment>
                                             ),
                                         }}
