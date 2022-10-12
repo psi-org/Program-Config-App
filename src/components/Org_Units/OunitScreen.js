@@ -371,7 +371,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                                     <TextField
                                         margin="dense"
                                         id={"filterOrgUnitName"}
-                                        label={ "Filtering Organisation unit by id, code or Name"}
+                                        label={ "Filter Organisation Units by UID, Code or Name"}
                                         variant="outlined"
                                         inputRef={filterRef}
                                         value={filterValue}
@@ -424,9 +424,9 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                                         <div
                                             style={{
                                                 minHeight: "300px",
-                                                maxHeight: "450px",
+                                                maxHeight: "300px",
                                                 minWidth: "300px",
-                                                maxWidth: "480px",
+                                                maxWidth: "300px",
                                                 overflow: "auto",
                                                 border: "1px solid rgb(189, 189, 189)",
                                                 borderRadius: "3px",

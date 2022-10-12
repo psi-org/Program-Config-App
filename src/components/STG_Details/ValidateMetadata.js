@@ -220,7 +220,7 @@ const ValidateMetadata = (props) => {
                         return true;
                     }
                 }
-                setValidationMessage("Programs Name and Id doesn't exist or is not valid. Please check the details again");
+                setValidationMessage("Program Name and ID doesn't exist or is not valid. Please check the details again");
                 return false;
             }
             return true;
@@ -232,6 +232,7 @@ const ValidateMetadata = (props) => {
                 let errors = [];
                 let warnings = [];
                 let metaData = getHNQISMetadata(dataElement);
+                dataElement.labelFormName = metaData.labelFormName;
                 if (programDetailsValidationSettings.checkHasFormName.enable && !checkHasFormName(metaData, dataElement)) errors.push(programDetailsValidationSettings.checkHasFormName.errorMsg);
                 if (programDetailsValidationSettings.checkFormNameLength.enable && !checkFormNameLength(metaData, dataElement)) errors.push(programDetailsValidationSettings.checkFormNameLength.errorMsg);
                 if (programDetailsValidationSettings.structureMatchesValue.enable && !structureMatchesValue(metaData, dataElement, "label", "LONG_TEXT")) errors.push(programDetailsValidationSettings.structureMatchesValue.errorMsg);
@@ -326,7 +327,7 @@ const ValidateMetadata = (props) => {
 
         function checkHasFormName(metaData, dataElement) {
             if (metaData.elem !== "") {
-                if (metaData.elemType === "label") return (!isBlank(dataElement.name));
+                if (metaData.elemType === "label") return (!isBlank(dataElement.labelFormName));
                 return (!isBlank(dataElement.formName)); //displayname ? formName
 
             }
@@ -334,8 +335,9 @@ const ValidateMetadata = (props) => {
         }
 
         function checkFormNameLength(metaData, dataElement) {
+            let formName = dataElement.labelFormName || dataElement.formName;
             if (metaData.elem !== "") {
-                return (dataElement.formName.length <= (MAX_DATA_ELEMENT_NAME_LENGTH+5) && dataElement.formName.length >= MIN_DATA_ELEMENT_NAME_LENGTH)
+                return (formName.replace(' [C]', '').length <= (MAX_DATA_ELEMENT_NAME_LENGTH) && formName.replace(' [C]', '').length >= MIN_DATA_ELEMENT_NAME_LENGTH)
             }
             return true;
         }

@@ -110,8 +110,9 @@ const H2Metadata = (props) => {
             </DialogContent>
             <DialogActions style={{ padding: '1em' }}>
                 <Button color={'error'} variant={'outlined'} onClick={() => props.setH2Modal(false)}>Close</Button>
-                <LoadingButton onClick={install} endIcon={<InstallDesktopIcon />} loading={sending} loadingPosition="end" variant="outlined" loadingIndicator="Installing..." >
-                    Install Metadata (version {H2_METADATA_VERSION})
+                <LoadingButton onClick={install} endIcon={<InstallDesktopIcon />} loading={sending} loadingPosition="end" variant="outlined" >
+                    {!sending && `Install Metadata (version ${H2_METADATA_VERSION})`}
+                    {sending && `Installing...`}
                 </LoadingButton>
             </DialogActions>
         </CustomMUIDialog>
