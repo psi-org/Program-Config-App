@@ -403,7 +403,7 @@ export const compLastSixMonthsTable = {
 
 export const ProgramIndicatorTemplateNoA = {
     "id": "<indicatorId>",
-    "name": " <Short Name> - Number of Assessment",
+    "name": " <Short Name> - Number of Assessments",
     "shortName": " <Short Name> - NoA",
     "description": "_H2Analytics",
     "aggregationType": "COUNT",
@@ -623,7 +623,7 @@ export const AverageScoreByDistrictByPivotTable =  {
 
 export const NumberOfAssessmentByPivotTable = {
     "id": "<NumberOfAssessmentId>",
-    "name": "<Short Name> -  Number of Assessment by checklist (last 12 months)",
+    "name": "<Short Name> -  Number of Assessments by checklist (last 12 months)",
     "code": "<ProgramId>_Scripted5",
     "legend": { "hidden": false },
     "publicAccess": "--------",
@@ -667,7 +667,7 @@ export const NumberOfAssessmentByPivotTable = {
     "hideEmptyRowItems": "NONE",
     "aggregationType": "DEFAULT",
     "hideSubtitle": false,
-    "description": "Number of Assessment by checklist (last 12 months) for the all the lists available in the country",
+    "description": "Number of Assessments by checklist (last 12 months) for all the lists available in the country",
     "hideLegend": false,
     "externalAccess": false,
     "legendDisplayStrategy": "FIXED",

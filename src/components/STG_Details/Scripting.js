@@ -928,9 +928,9 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
         return result
     })
 
-    // Global  Analytics - Number of Assesment
+    // Global  Analytics - Number of Assesments
     const indicatorNoA = [
-        { name: 'Number of Assessment' }
+        { name: 'Number of Assessments' }
     ];
 
     programIndicators = programIndicators.concat(indicatorNoA.map(value => {
@@ -1110,7 +1110,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     //!Number and Percentage of Assessment by Competency Class (last 4 quarters)
     let AssessmentByCompetencybyColumn = DeepCopy(AssessmentByCompetencyByColumn)
     AssessmentByCompetencybyColumn.id = uidPool.shift()
-    AssessmentByCompetencybyColumn.name = programShortName + " - Number and Percentage of Assessment by Competency Class (last 4 quarters)"
+    AssessmentByCompetencybyColumn.name = programShortName + " - Number and Percentage of Assessments by Competency Class (last 4 quarters)"
     AssessmentByCompetencybyColumn.code = programId + "_Scripted6"
     AssessmentByCompetencybyColumn.sharing.owner = ownerS
     AssessmentByCompetencybyColumn.sharing.external = externalS
@@ -1133,7 +1133,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     //! Number of Assessment by checklist (last 12 months)
     let NumberOfAssessmentbyTable = DeepCopy(NumberOfAssessmentByPivotTable)
     NumberOfAssessmentbyTable.id = uidPool.shift()
-    NumberOfAssessmentbyTable.name = programShortName + " - Number of Assessment by checklist (last 12 months)"
+    NumberOfAssessmentbyTable.name = programShortName + " - Number of Assessments by checklist (last 12 months)"
     NumberOfAssessmentbyTable.code = programId + "_Scripted7"
     NumberOfAssessmentbyTable.sharing.owner = ownerS
     NumberOfAssessmentbyTable.sharing.external = externalS

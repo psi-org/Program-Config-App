@@ -655,7 +655,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             </div>
             {hnqisMode && importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
             <div className="title">Sections for Program Stage <strong>{programStage.displayName}</strong>
-                {readOnly &&
+                {(readOnly || !isSectionMode)  &&
                     <MuiChip style = {{marginLeft: '1em'}} label="Read Only" variant="outlined" />
                 }
             </div>
