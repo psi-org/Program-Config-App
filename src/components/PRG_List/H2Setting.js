@@ -1,7 +1,7 @@
-import {FormLabel} from "@mui/material";
+import {Alert, FormLabel} from "@mui/material";
 import FormHelperText from "@mui/material/FormHelperText";
 import FormControl from "@mui/material/FormControl";
-import {OrganisationUnitTree} from "@dhis2/ui";
+import {AlertBar, OrganisationUnitTree} from "@dhis2/ui";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import SelectOptions from "../UIElements/SelectOptions";
@@ -236,9 +236,7 @@ const H2Setting = forwardRef((props, ref) => {
                 </Box>
             }
             {orgUnitTreeRootLoaded && orgUnitTreeRoot.length === 0 &&
-                <AlertBar critical>
-                    <span>Organisation unit root is not assigned. Please contact System administrator for support.</span>
-                </AlertBar>
+                <Alert severity="error">Your user has not been assigned to any Organisation Units. Please contact your System Administrator for support.</Alert>
             }
             {orgUnitTreeRoot.length > 0 && (
                 <div
