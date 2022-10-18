@@ -156,7 +156,14 @@ const H2Setting = forwardRef((props, ref) => {
     let ouTreeNLevelInit = () => {
         setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
         setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
+        
     }
+
+    useEffect(()=>{
+        if (orgUnitTreeRoot.length > 0){
+            props.setButtonDisabled(false)
+        }
+    }, [orgUnitTreeRoot])
 
     const orgUnitSelectionHandler = (event) => {
         if (event.checked) {

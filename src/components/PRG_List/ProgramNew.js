@@ -216,6 +216,8 @@ const ProgramNew = (props) => {
         orgUnitRoot: undefined,
     });
 
+    const [buttonDisabled, setButtonDisabled] = useState(true);
+
     const handleChangePgrType = (event) => {
         validationErrors.pgrType = undefined;
         validationErrors.programTET = undefined;
@@ -223,6 +225,7 @@ const ProgramNew = (props) => {
         let value = event.target.value;
         setPgrTypePCA(value);
         if (value === "hnqis") {
+            setButtonDisabled(true);
             let hnqisTET = trackedEntityTypes.find(
                 (tet) => tet.id === "oNwpeWkfoWc"
             );
@@ -230,7 +233,10 @@ const ProgramNew = (props) => {
         } else {
             setProgramTET("");
             if (value === "tracker") {
+                setButtonDisabled(false);
                 fetchTrackerMetadata();
+            }else{
+                setButtonDisabled(true);
             }
         }
     };
@@ -850,6 +856,7 @@ const ProgramNew = (props) => {
                         <H2Setting 
                             pcaMetadata={props.pcaMetadata}
                             ref={h2SettingsRef}
+                            setButtonDisabled={setButtonDisabled}
                         />
                     )}
                     {pgrTypePCA === "tracker" && (
@@ -929,6 +936,7 @@ const ProgramNew = (props) => {
                     </Button>
                     <LoadingButton
                         onClick={() => submission()}
+                        disabled={buttonDisabled}
                         loading={sentForm}
                         variant="outlined"
                         loadingPosition="start"
