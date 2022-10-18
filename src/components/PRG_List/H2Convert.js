@@ -13,8 +13,9 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LabelIcon from "@mui/icons-material/LabelImportant";
 import QuizIcon from "@mui/icons-material/Quiz";
 import PercentIcon from "@mui/icons-material/Percent";
+import SettingsIcon from '@mui/icons-material/Settings';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     DialogTitle,
     FormControl,
@@ -61,6 +62,7 @@ import {
     PSS_Scores,
 } from "./../../configs/ProgramTemplate";
 import { DeepCopy } from "../../configs/Utils";
+import H2Setting from "./H2Setting";
 
 const queryProgramMetadata = {
     results: {
@@ -173,6 +175,7 @@ const H2Convert = ({
     const [loadingConversion, setLoadingConversion] = useState(false);
     const [statusModal, setStatusModal] = useState(false);
     const [conversionError, setConversionError] = useState(undefined);
+    const [errorBadge, setErrorBadge ] = useState(false);
 
     const { data: programData } = useDataQuery(queryProgramMetadata, {
         variables: { program },
@@ -199,6 +202,8 @@ const H2Convert = ({
             lazy: true,
             variables: { optionsList: undefined },
         });
+
+    const h2SettingsRef = useRef();
 
     useEffect(() => {
         if (programData && haQuery) {
@@ -341,23 +346,14 @@ const H2Convert = ({
         }
     }, [programData]);
 
-    const handleChangeComp = (event) => {
-        setUseCompetency(event.target.checked);
-    };
-
-    const healthAreaChange = (event) => {
-        setErrorHA(undefined);
-        setHealthArea(event.target.value);
-    };
-
     const hideForm = () => {
         setConversionH2ProgramId(undefined);
     };
 
     const submission = () => {
-        if (healthArea === "") {
-            setErrorHA("This field is required");
-        } else {
+        let hnqisValidation = h2SettingsRef.current.handleFormValidation()
+        setErrorBadge(!hnqisValidation)
+        if (hnqisValidation) {
             setDialogStatus(true);
         }
     };
@@ -639,11 +635,13 @@ const H2Convert = ({
                 attribute: { id: prgTypeId },
             });
 
-            let pcaMetadataVal = {};
-            pcaMetadataVal.buildVersion = BUILD_VERSION;
-            pcaMetadataVal.h1Program = programOld.id;
+            let pcaMetadataVal = h2SettingsRef.current.saveMetaData();
+            /*
             pcaMetadataVal.useCompetencyClass = useCompetency ? "Yes" : "No";
             pcaMetadataVal.healthArea = healthArea;
+            */
+            
+            pcaMetadataVal.h1Program = programOld.id;
             pcaMetadataVal.dePrefix = programOld.shortName.slice(0, 22) + " H2";
             prgrm.attributeValues.push({
                 value: JSON.stringify(pcaMetadataVal),
@@ -777,15 +775,15 @@ const H2Convert = ({
                 dataElements: program_dataElements,
             };
 
-            /*console.log(resultMeta)
+            // console.log(resultMeta)
 
-            doSearch(programOld.name)
-            setNotification({
-                message: 'The HNQIS 1.X Program has been converted to HNQIS 2.0 successfully, access it to apply changes and finish setting it up.',
-                severity: 'success'
-            });
-            setConversionH2ProgramId(undefined)
-            setLoadingConversion(false)*/
+            // doSearch(programOld.name)
+            // setNotification({
+            //     message: 'The HNQIS 1.X Program has been converted to HNQIS 2.0 successfully, access it to apply changes and finish setting it up.',
+            //     severity: 'success'
+            // });
+            // setConversionH2ProgramId(undefined)
+            // setLoadingConversion(false)
 
             metadataRequest.mutate({ data: resultMeta }).then((response) => {
                 if (response.status === "OK") {
@@ -846,40 +844,62 @@ const H2Convert = ({
                     )}
                     {!loading && (
                         <>
-                            <p>
+                            <p style={{marginTop: '0.5em'}}>
                                 <strong>Selected Program: </strong>
                                 {programData?.results?.programs[0].name}
                             </p>
-                            <FormControl
-                                margin="dense"
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                    flexDirection: "row",
-                                }}
+                            <Accordion
+                                style={{ margin: "1.5em 0" }}
                             >
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={useCompetency}
-                                            onChange={handleChangeComp}
-                                            name="competency"
-                                        />
+                                <AccordionSummary
+                                    expandIcon={
+                                        <ExpandMoreIcon sx={{color: 'white'}}/>
                                     }
-                                    label="Use Competency Class"
-                                />
-                                <SelectOptions
-                                    useError={errorHA !== undefined}
-                                    helperText={errorHA}
-                                    label={"Program Health Area (*)"}
-                                    items={healthAreaOptions}
-                                    handler={healthAreaChange}
-                                    styles={{ width: "60%" }}
-                                    value={healthArea}
-                                    defaultOption="Select Health Area"
-                                />
-                            </FormControl>
+                                    style={
+                                        errorBadge?{
+                                            backgroundColor: "#d32f2f",
+                                            color: "#FFF",
+                                        }:
+                                        {
+                                            backgroundColor: "#757575",
+                                            color: "#FFF",
+                                        }
+                                    }
+                                >
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            justifyContent:
+                                                "space-between",
+                                            alignItems: "center",
+                                            width: "100%",
+                                        }}
+                                    >
+                                        <div style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                width: "80%",
+                                            }}
+                                        >
+                                            <SettingsIcon sx={{marginRight: '0.5em'}}/>
+                                            <span>HNQIS 2.0 Settings</span>
+                                        </div>
+                                        <span style={{
+                                                marginRight: '0.5em',
+                                            }}>
+                                                {errorBadge?'Errors Found':''}
+                                        </span>
+                                    </div>
+                                </AccordionSummary>
+                                <AccordionDetails
+                                    sx={{ backgroundColor: "#f1f1f1" }}
+                                >
+                                    <H2Setting
+                                        ref={h2SettingsRef}
+                                    />
+                                </AccordionDetails>
+                            </Accordion>
+                            
                         </>
                     )}
                     {sectionsData && (

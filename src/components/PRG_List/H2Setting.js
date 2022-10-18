@@ -9,6 +9,7 @@ import React, {useEffect, useState, forwardRef, useImperativeHandle} from "react
 import {useDataQuery} from "@dhis2/app-runtime";
 import LinearProgress from "@mui/material/LinearProgress";
 import Box from "@mui/material/Box";
+import { BUILD_VERSION } from "../../configs/Constants";
 
 const query = {
     results: {
@@ -61,6 +62,7 @@ const H2Setting = forwardRef((props, ref) => {
     const [orgUnitPathSelected, setOrgUnitPathSelected] = useState([]);
     const [haOptions, setHaOptions] = useState();
     const [ouLevels, setOULevels] = useState();
+    const [useCompetency, setUseCompetency] = useState(props.pcaMetadata?.useCompetencyClass === "Yes");
 
     const [useUserOrgUnit, setUseUserOrgUnit] = useState(props.pcaMetadata?.useUserOrgUnit === "Yes");
     const [ouTableRow, setOUTableRow] = useState(props.pcaMetadata?.ouLevelTable || "");
@@ -80,14 +82,14 @@ const H2Setting = forwardRef((props, ref) => {
                 setHaOptions(data?.results?.optionSets[0].options);
             }
         });
-    });
+    }, []);
 
     const handleUserOrgUnit = (event) => {
         setUseUserOrgUnit(event.target.checked);
     };
 
     const handleChangeComp = (event) => {
-        props.setUseCompetency(event.target.checked);
+        setUseCompetency(event.target.checked);
     };
 
     const healthAreaChange = (event) => {
@@ -203,7 +205,10 @@ const H2Setting = forwardRef((props, ref) => {
 
         saveMetaData(){
             let data = {};
-            data.useCompetencyClass = props.useCompetency ? "Yes" : "No";
+            //data.buildVersion = props.pcaMetadata?.buildVersion;
+            //data.saveVersion = BUILD_VERSION;
+            data.buildVersion = BUILD_VERSION;
+            data.useCompetencyClass = useCompetency ? "Yes" : "No";
             data.healthArea = healthArea;
             data.ouRoot = selectedOrgUnits[0];
             data.useUserOrgUnit = useUserOrgUnit ? "Yes" : "No";
@@ -338,7 +343,7 @@ const H2Setting = forwardRef((props, ref) => {
                                 <FormControlLabel
                                     control={
                                         <Switch
-                                            checked={props.useCompetency}
+                                            checked={useCompetency}
                                             onChange={handleChangeComp}
                                             name="competency"
                                         />

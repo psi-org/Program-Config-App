@@ -13,7 +13,6 @@ import {
 } from "../../configs/ProgramTemplate";
 
 import {
-    BUILD_VERSION,
     COMPETENCY_ATTRIBUTE,
     COMPETENCY_CLASS,
     CRITICAL_STEPS,
@@ -165,7 +164,6 @@ const ProgramNew = (props) => {
     const [defaultSectionId, setDefaultSectionId] = useState(undefined);
     const [stepsSectionId, setStepsSectionId] = useState(undefined);
     const [scoresSectionId, setScoresSectionId] = useState(undefined);
-    const [useCompetency, setUseCompetency] = useState(props.pcaMetadata?.useCompetencyClass === "Yes");
 
     const [programIcon, setProgramIcon] = useState(
         props.data?.style?.icon || ""
@@ -180,8 +178,6 @@ const ProgramNew = (props) => {
             }
             : ""
     );
-
-
 
     const [dePrefix, setDePrefix] = useState(props.pcaMetadata?.dePrefix || "");
     const [programName, setProgramName] = useState(props.data?.name || "");
@@ -204,6 +200,7 @@ const ProgramNew = (props) => {
             }
             : ""
     );
+
     const h2SettingsRef = useRef();
 
     //Validation Messages
@@ -397,6 +394,8 @@ const ProgramNew = (props) => {
             setSentForm(false);
             return;
         }
+
+        let useCompetency = props.pcaMetadata?.useCompetencyClass === "Yes";
 
         //Validating available prefix
         checkForExistingPrefix({
@@ -625,18 +624,20 @@ const ProgramNew = (props) => {
         );
         if (metaDataArray.length > 0) {
             let metaData_value = JSON.parse(metaDataArray[0].value);
-            metaData_value.buildVersion = BUILD_VERSION;
+            let h1Program = metaData_value.h1Program;
             if (pgrTypePCA === "hnqis") {
                 metaData_value = h2SettingsRef.current.saveMetaData()
             }
+            metaData_value.h1Program = h1Program;
             metaData_value.dePrefix = dePrefix;
             metaDataArray[0].value = JSON.stringify(metaData_value);
         } else {
             let attr = { id: METADATA };
-            let val = { buildVersion: BUILD_VERSION, dePrefix: dePrefix };
+            let val = {};
             if (pgrTypePCA === "hnqis") {
                 val = h2SettingsRef.current.saveMetadata();
             }
+            val.dePrefix = dePrefix;
             let attributeValue = {
                 attribute: attr,
                 value: JSON.stringify(val),
@@ -846,7 +847,10 @@ const ProgramNew = (props) => {
                         </>
                     }
                     {pgrTypePCA === "hnqis" && (
-                        <H2Setting pcaMetadata={props.pcaMetadata} ref={h2SettingsRef} setUseCompetency={setUseCompetency} useCompetency={useCompetency}/>
+                        <H2Setting 
+                            pcaMetadata={props.pcaMetadata}
+                            ref={h2SettingsRef}
+                        />
                     )}
                     {pgrTypePCA === "tracker" && (
                         <>
