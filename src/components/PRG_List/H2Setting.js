@@ -68,6 +68,7 @@ const H2Setting = forwardRef((props, ref) => {
     const [ouTableRow, setOUTableRow] = useState(props.pcaMetadata?.ouLevelTable || "");
     const [ouMapPolygon, setOUMapPolygon] = useState(props.pcaMetadata?.ouLevelMap || "");
     const [healthArea, setHealthArea] = useState(props.pcaMetadata?.healthArea || "");
+    const [orgUnitTreeRootLoaded, setorgUnitTreeRootLoaded] = useState(false);
 
     const [validationErrors, setValidationErrors] = useState({
         healthArea: undefined,
@@ -156,6 +157,7 @@ const H2Setting = forwardRef((props, ref) => {
     let ouTreeNLevelInit = () => {
         setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
         setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
+        setorgUnitTreeRootLoaded(true)
     }
 
     const orgUnitSelectionHandler = (event) => {
@@ -221,10 +223,15 @@ const H2Setting = forwardRef((props, ref) => {
 
     return (
         <>
-            {orgUnitTreeRoot.length === 0 &&
+            {!orgUnitTreeRootLoaded &&
                 <Box sx={{ width: '100%' }}>
                     <LinearProgress />
                 </Box>
+            }
+            {orgUnitTreeRootLoaded && orgUnitTreeRoot.length === 0 &&
+                <AlertBar critical>
+                    <span>Organisation unit root is not assigned. Please contact System administrator for support.</span>
+                </AlertBar>
             }
             {orgUnitTreeRoot.length > 0 && (
                 <div
