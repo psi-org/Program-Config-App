@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DraggableSection from "./Section";
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
-import { FEEDBACK_ORDER, METADATA } from "../../configs/Constants";
+import { BUILD_VERSION, FEEDBACK_ORDER, METADATA } from "../../configs/Constants";
 
 import "react-sweet-progress/lib/style.css";
 import Scores from "./Scores";
@@ -164,11 +164,21 @@ const queryPCAMetadata = {
 const queryOrganizationsUnit = {
     results: {
         resource: 'organisationUnitLevels',
-        params: ({ programId, ouLevel }) => ({
+        params: ({  ouLevel }) => ({
             fields: ['id', 'level', 'offlineLevels'],
             filter: ['id:in:[' + ouLevel.join(',') + ']']
         })
     }
+}
+
+const queryProgramSettings = {
+    results: {
+        resource: 'programs',
+        id: ({ programId }) => programId,
+        params: {
+            fields: ['*']
+        }
+    },
 }
 
 const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
@@ -180,6 +190,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [androidSettingsError, setAndroidSettingsError] = useState(true);
     const [programSettingsError, setProgramSettingsError] = useState(undefined);
     const { data: OrganizationLevel, refetch: setOuLevel } = useDataQuery(queryOrganizationsUnit, { lazy: true, variables: { ouLevel: undefined } });
+    const { refetch: getProgramSettings } = useDataQuery(queryProgramSettings, { lazy: true, variables: { programId } });
 
     // Flags
     const [saveStatus, setSaveStatus] = useState(hnqisMode ? 'Validate' : 'Save Changes');
@@ -601,7 +612,20 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
                                             androidSettingsUpdate({ data: androidSettings.results }).then(res => {
                                                 if (res.status === 'OK') setAndroidSettingsError(false)
-                                                setProgressSteps(8)
+                                                getProgramSettings({programId}).then(res => {
+                                                    res.results?.attributeValues.forEach(av => {
+                                                        if(av.attribute.id === METADATA){
+                                                            let pcaMetadata = JSON.parse(av.value || "{}")
+                                                            pcaMetadata.buildVersion = BUILD_VERSION;
+                                                            av.value = JSON.stringify(pcaMetadata)
+                                                        }
+                                                    }) 
+                                                    createMetadata.mutate({ data: { programs: [res.results] } }).then(response => {
+                                                        if (response.status == 'OK') {
+                                                            setProgressSteps(8)
+                                                        }
+                                                    })
+                                                })
                                             })
 
                                         } else {

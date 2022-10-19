@@ -47,7 +47,6 @@ import {
     QUESTION_ORDER_ATTRIBUTE,
     METADATA,
     FEEDBACK_ORDER,
-    BUILD_VERSION,
     COMPETENCY_ATTRIBUTE,
     COMPETENCY_CLASS,
     FEEDBACK_TEXT,
@@ -188,8 +187,9 @@ const H2Convert = ({
 
     const [sectionsData, setSectionsData] = useState(undefined);
     const [scoresData, setScoresData] = useState(undefined);
-    const [currentChecklistOptions, setCurrentChecklistOptions] =
-        useState(undefined);
+    const [currentChecklistOptions, setCurrentChecklistOptions] = useState(undefined);
+
+    const [buttonDisabled, setButtonDisabled] = useState(true);
 
     const { data: idQueryRes, refetch: getIDs } = useDataQuery(queryId, {
         lazy: true,
@@ -896,6 +896,7 @@ const H2Convert = ({
                                 >
                                     <H2Setting
                                         ref={h2SettingsRef}
+                                        setButtonDisabled={setButtonDisabled}
                                     />
                                 </AccordionDetails>
                             </Accordion>
@@ -1184,6 +1185,7 @@ const H2Convert = ({
                 <DialogActions>
                     {!loadingConversion && (
                         <Button
+                            disabled={buttonDisabled}
                             onClick={() => {setConversionError(undefined);setStatusModal(false);}}
                             color="primary"
                         >

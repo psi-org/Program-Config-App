@@ -214,9 +214,8 @@ const H2Setting = forwardRef((props, ref) => {
 
         saveMetaData(){
             let data = {};
-            //data.buildVersion = props.pcaMetadata?.buildVersion;
-            //data.saveVersion = BUILD_VERSION;
-            data.buildVersion = BUILD_VERSION;
+            data.saveVersion = BUILD_VERSION;
+            data.buildVersion = props.pcaMetadata?.buildVersion;
             data.useCompetencyClass = useCompetency ? "Yes" : "No";
             data.healthArea = healthArea;
             data.ouRoot = selectedOrgUnits[0];

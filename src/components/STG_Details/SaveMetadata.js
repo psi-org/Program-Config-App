@@ -291,13 +291,19 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
         if(hnqisMode){
             new_programMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
             new_programMetadata.healthArea = programMetadata.healthArea;
+            new_programMetadata.buildVersion = programMetadata.buildVersion;
         }
-        new_programMetadata.buildVersion = BUILD_VERSION;
+        new_programMetadata.saveVersion = BUILD_VERSION;
 
-        programPayload.attributeValues[programMetadataIdx] = {
+        let metadataObject = {
             attribute: { id: METADATA },
             value: JSON.stringify(new_programMetadata)
         };
+        if(programMetadataIdx >= 0){
+            programPayload.attributeValues[programMetadataIdx] = metadataObject;
+        }else{
+            programPayload.attributeValues.push(metadataObject)
+        }
 
         // PROGRAM TRACKED ENTITY ATTRIBUTES
         let currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE);

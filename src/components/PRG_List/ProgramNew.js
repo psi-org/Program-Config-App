@@ -13,6 +13,7 @@ import {
 } from "../../configs/ProgramTemplate";
 
 import {
+    BUILD_VERSION,
     COMPETENCY_ATTRIBUTE,
     COMPETENCY_CLASS,
     CRITICAL_STEPS,
@@ -216,7 +217,7 @@ const ProgramNew = (props) => {
         orgUnitRoot: undefined,
     });
 
-    const [buttonDisabled, setButtonDisabled] = useState(true);
+    const [buttonDisabled, setButtonDisabled] = useState(props.data?false:true);
 
     const handleChangePgrType = (event) => {
         validationErrors.pgrType = undefined;
@@ -630,12 +631,13 @@ const ProgramNew = (props) => {
         );
         if (metaDataArray.length > 0) {
             let metaData_value = JSON.parse(metaDataArray[0].value);
-            let h1Program = metaData_value.h1Program;
             if (pgrTypePCA === "hnqis") {
+                let h1Program = metaData_value.h1Program;
                 metaData_value = h2SettingsRef.current.saveMetaData()
+                metaData_value.h1Program = h1Program;
             }
-            metaData_value.h1Program = h1Program;
             metaData_value.dePrefix = dePrefix;
+            metaData_value.saveVersion = BUILD_VERSION;
             metaDataArray[0].value = JSON.stringify(metaData_value);
         } else {
             let attr = { id: METADATA };
@@ -643,6 +645,7 @@ const ProgramNew = (props) => {
             if (pgrTypePCA === "hnqis") {
                 val = h2SettingsRef.current.saveMetadata();
             }
+            val.saveVersion = BUILD_VERSION;
             val.dePrefix = dePrefix;
             let attributeValue = {
                 attribute: attr,

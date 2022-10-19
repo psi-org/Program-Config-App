@@ -159,7 +159,7 @@ const ProgramList = () => {
     return (
         <div>
             <div className="sub_nav">
-                <div className="cnt_p">
+                <div className="cnt_p" onClick={() => { resetSearch(); }}>
                     <Chip>Home</Chip>
                 </div>
                 <div className="c_srch"></div>

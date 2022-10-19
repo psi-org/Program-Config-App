@@ -107,6 +107,11 @@ const ProgramItem = ({
                         <NewReleasesIcon color="error" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
                     </Tooltip>
                 }
+                {programType === 'HNQIS2' && !pcaMetadata.buildVersion &&
+                    <Tooltip title={"This HNQIS 2.0 Program hasn't been built yet."}>
+                        <NewReleasesIcon color="error" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
+                    </Tooltip>
+                }
                 <IconButton
                     style={{ marginRight: "0.5em" }}
                     onClick={handleOpen}
@@ -353,6 +358,18 @@ const ProgramItem = ({
                             DATE_FORMAT_OPTIONS
                         )}
                     </p>
+                    <p>
+                        <strong>Save Version</strong>
+                        <br />
+                        {pcaMetadata.saveVersion || 'N/A'}
+                    </p>
+                    {programType === 'HNQIS2' &&
+                        <p>
+                            <strong>Build Version</strong>
+                            <br />
+                            {pcaMetadata.buildVersion || 'N/A'}
+                        </p>
+                    }
                     <p>
                         <strong>API URL</strong>
                         <br />

@@ -222,12 +222,12 @@ const StageNew = (props) => {
         let metaDataArray = attributeValues.filter(av => av.attribute.id === METADATA);
         if (metaDataArray.length > 0) {
             let metaData_value = JSON.parse(metaDataArray[0].value);
-            metaData_value.buildVersion = BUILD_VERSION;
+            metaData_value.saveVersion = BUILD_VERSION;
             metaDataArray[0].value = JSON.stringify(metaData_value);
         }
         else {
             let attr = { id: METADATA };
-            let val = { buildVersion: BUILD_VERSION };
+            let val = { saveVersion: BUILD_VERSION };
             let attributeValue = { attribute: attr, value: JSON.stringify(val) }
             attributeValues.push(attributeValue);
         }
