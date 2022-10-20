@@ -5,6 +5,7 @@ import { useState } from "react";
 import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 import metadataPackage from './pcaMetadataPackage.json'
 import {NAMESPACE,PCA_METADATA_VERSION,DATASTORE_PCA_METADATA} from '../../configs/Constants'
+import { parseErrorsUL } from "../../configs/Utils";
 
 const metadataMutation = {
     resource: 'metadata',
@@ -96,7 +97,7 @@ const MetadataErrorPage = () => {
                     {error &&
                     <NoticeBox error={true} title="Install Error">
                         <p>The Metadata Package could not be updated.</p>
-                        <p><br/>{error.typeReports[0].objectReports[0].errorReports.map(er => er.message).join('<br/>')}</p>
+                        {parseErrorsULrrorsUL(error)}
                     </NoticeBox>}
                 </div>
             </div>

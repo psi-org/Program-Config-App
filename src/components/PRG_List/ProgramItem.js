@@ -119,7 +119,7 @@ const ProgramItem = ({
                 >
                     <InfoIcon />
                 </IconButton>
-                <div>{program.programStages.length} program stages</div>
+                <div>{program.programStages.length} Program Stages</div>
                 <div
                     style={{
                         backgroundColor: typeTag[programType].color,
