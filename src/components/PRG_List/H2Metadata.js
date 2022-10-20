@@ -46,9 +46,24 @@ const H2Metadata = (props) => {
     const [error,setError] = useState(undefined)
     const [success,setSuccess] = useState(undefined)
     const { data: hnqis2Metadata, refetch: hnqis2MetadataRefetch } = useDataQuery(queryHNQIS2Metadata);
-    const [metadataMutate] = useDataMutation(metadataMutation)
-    const [dataStoreUpdate] = useDataMutation(updateDataStoreMutation)
-    const [dataStoreCreate] = useDataMutation(dataStoreMutation)
+    const [metadataMutate] = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            setSending(false);
+            setError(err.details)
+        }
+    });
+    const [dataStoreUpdate] = useDataMutation(updateDataStoreMutation, {
+        onError: (err) => {
+            setSending(false);
+            setError(err.details)
+        }
+    });
+    const [dataStoreCreate] = useDataMutation(dataStoreMutation, {
+        onError: (err) => {
+            setSending(false);
+            setError(err.details)
+        }
+    });
 
     const install = () => {
         setSending(true)

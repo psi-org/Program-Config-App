@@ -33,7 +33,12 @@ const dataStoreMutationUpdate = {
 
 const MetadataErrorPage = () => {
 
-    let metadataDM = useDataMutation(metadataMutation);
+    let metadataDM = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            setSentData(false);
+            setError(err.details)
+        }
+    });
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,
@@ -44,8 +49,18 @@ const MetadataErrorPage = () => {
 
     const { data: pcaMetadataData } = useDataQuery(queryDataStore);
 
-    const [dataStoreCreate] = useDataMutation(dataStoreMutation)
-    const [dataStoreUpdate] = useDataMutation(dataStoreMutationUpdate)
+    const [dataStoreCreate] = useDataMutation(dataStoreMutation, {
+        onError: (err) => {
+            setSentData(false);
+            setError(err.details)
+        }
+    });
+    const [dataStoreUpdate] = useDataMutation(dataStoreMutationUpdate, {
+        onError: (err) => {
+            setSentData(false);
+            setError(err.details)
+        }
+    });
     
 
 

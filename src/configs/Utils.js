@@ -70,9 +70,20 @@ export function parseErrors(response) {
                 })
             )
         ), []
-    )
-        .flat()
+    ).flat()
 }
+
+export function parseErrorsJoin(response,joinVal) {
+    let errorRes = response.response || response;
+    return errorRes.typeReports.reduce((reports, typeReport) =>
+        reports.concat(
+            typeReport.objectReports.map(objectReport =>
+                objectReport.errorReports.map(err => err.message)
+            )
+        ), []
+    ).flat().join(joinVal)
+}
+
 
 export function parseErrorsUL(response) {
     let errorRes = response.response || response;
@@ -87,8 +98,7 @@ export function parseErrorsUL(response) {
                     })
                 )
             ), []
-        )
-            .flat()
+        ).flat()
     }
     </ul>
 }

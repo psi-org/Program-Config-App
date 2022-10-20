@@ -17,6 +17,7 @@ import SendIcon from '@mui/icons-material/Send';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import SelectOptions from '../UIElements/SelectOptions';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { parseErrorsJoin } from '../../configs/Utils';
 
 //const { Form, Field } = ReactFinalForm
 
@@ -35,7 +36,16 @@ const metadataMutation = {
 
 const StageNew = (props) => {
     // Create Mutation
-    let metadataDM = useDataMutation(metadataMutation);
+    let metadataDM = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            console.error(err.details);
+            props.setNotification({
+                message: parseErrorsJoin(err.details, ' | '),
+                severity: 'error'
+            });
+            props.setShowStageForm(false);
+        }
+    });
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,
@@ -204,7 +214,7 @@ const StageNew = (props) => {
             metadataRequest.mutate({ data: metadata }).then(response => {
                 if (response.status != 'OK') {
                     props.setNotification({
-                        message: response.typeReports[0].objectReports[0].errorReports.map(er => er.message).join(' | '),
+                        message: parseErrorsJoin(response, ' | '),
                         severity: 'error'
                     });
                     props.setShowStageForm(false);

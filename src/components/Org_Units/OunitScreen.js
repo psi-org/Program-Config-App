@@ -139,7 +139,11 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
         programOrgUnitsQuery,
         { variables: { id: id } }
     );
-    const metadataDM = useDataMutation(metadataMutation);
+    const metadataDM = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            console.error(err.details)
+        }
+    });
 
     let userOrgUnits;
 
