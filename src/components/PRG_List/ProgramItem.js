@@ -100,7 +100,12 @@ const ProgramItem = ({
                     </div>
                 </div>
             </div>
-            <div className="ml_item-title">{program.name}</div>
+            <Tooltip title={program.name}>
+            <div className="ml_item-title" style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+                }}>{program.name}</div>
+            </Tooltip>
             <div className="ml_item-desc">
                 {programType === 'HNQIS2' && pcaMetadata.buildVersion && !versionIsValid(pcaMetadata.buildVersion, BUILD_VERSION, BUILD_VERSION) &&
                     <Tooltip title={"This HNQIS 2.0 Program was built in version " + pcaMetadata.buildVersion + ", please Set Up Program again to update it."}>

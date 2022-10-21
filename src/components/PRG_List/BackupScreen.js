@@ -63,8 +63,26 @@ const BackupScreen = (props) => {
     const { loading: dsLoading, data: dsData } = useDataQuery(queryDataStore);
     const { loading: loadingMetadata, error: errorMetadata, data: metaData } = useDataQuery(programMetadata);
 
-    const dsCreateDM = useDataMutation(dsCreateMutation);
-    const dsUpdateDM = useDataMutation(dsUpdateMutation);
+    const dsCreateDM = useDataMutation(dsCreateMutation, {
+        onError: (err) => {
+            props.setNotification({
+                message: parseErrorsJoin(err.details, ' | '),
+                severity: "error",
+            });
+            setProcessing(false);
+            hideFormHandler();
+        }
+    });
+    const dsUpdateDM = useDataMutation(dsUpdateMutation, {
+        onError: (err) => {
+            props.setNotification({
+                message: parseErrorsJoin(err.details, ' | '),
+                severity: "error",
+            });
+            setProcessing(false);
+            hideFormHandler();
+        }
+    });
 
     let dsBackups = {};
 
@@ -116,8 +134,6 @@ const BackupScreen = (props) => {
         let backupToDatastore = !dsData?.results ? dsCreateRequest : dsUpdateRequest
         backupToDatastore.mutate({data: dsBackups})
             .then(response=>{
-                setProcessing(false);
-                hideFormHandler();
                 if(response.status != 'OK') {
                     props.setNotification({
                         message: `Some errors occured while backing up your Program. Please contact the administrator.`,
@@ -130,6 +146,8 @@ const BackupScreen = (props) => {
                         severity: 'success'
                     })
                 }
+                setProcessing(false);
+                hideFormHandler();
             });
     }
 

@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from "react";
-import {Transfer} from "@dhis2/ui";
-import {useDataMutation, useDataQuery} from "@dhis2/app-runtime";
+import React, { useEffect, useRef, useState } from "react";
+import { Transfer } from "@dhis2/ui";
+import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 //import styles from './Program.module.css'
 import {
     HnqisProgramConfigs,
@@ -42,9 +42,9 @@ import Select from "@mui/material/Select";
 import SendIcon from "@mui/icons-material/Send";
 import FormHelperText from "@mui/material/FormHelperText";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {FormLabel} from "@mui/material";
+import { FormLabel } from "@mui/material";
 import StyleManager from "../UIElements/StyleManager";
-import {DeepCopy} from "../../configs/Utils";
+import { DeepCopy, parseErrorsJoin } from "../../configs/Utils";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import H2Setting from "./H2Setting"
 
@@ -128,7 +128,15 @@ const ProgramNew = (props) => {
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
 
     // Create Mutation
-    let metadataDM = useDataMutation(metadataMutation);
+    let metadataDM = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            props.setNotification({
+                message: parseErrorsJoin(err.details, ' | '),
+                severity: "error",
+            });
+            props.setShowProgramForm(false);
+        }
+    });
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,
@@ -217,7 +225,7 @@ const ProgramNew = (props) => {
         orgUnitRoot: undefined,
     });
 
-    const [buttonDisabled, setButtonDisabled] = useState(props.data?false:true);
+    const [buttonDisabled, setButtonDisabled] = useState(props.data ? false : true);
 
     const handleChangePgrType = (event) => {
         validationErrors.pgrType = undefined;
@@ -236,7 +244,7 @@ const ProgramNew = (props) => {
             if (value === "tracker") {
                 setButtonDisabled(false);
                 fetchTrackerMetadata();
-            }else{
+            } else {
                 setButtonDisabled(true);
             }
         }
@@ -315,16 +323,11 @@ const ProgramNew = (props) => {
             validationErrors.programName = "This field is required";
         } else if (
             programName.length < MIN_NAME_LENGTH ||
-            programName.length >
-            MAX_PROGRAM_NAME_LENGTH -
-            (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
-            1
+            programName.length > MAX_PROGRAM_NAME_LENGTH /*- (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1*/
         ) {
             response = false;
-            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_PROGRAM_NAME_LENGTH -
-                (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
-                1
-                } characters`;
+            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_PROGRAM_NAME_LENGTH /*-
+        (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1*/} characters`;
         } else {
             validationErrors.programName = undefined;
         }
@@ -334,15 +337,12 @@ const ProgramNew = (props) => {
             validationErrors.shortName = "This field is required";
         } else if (
             programShortName.length >
-            MAX_SHORT_NAME_LENGTH -
-            (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
-            1
+            MAX_SHORT_NAME_LENGTH /*- (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1*/
         ) {
             response = false;
-            validationErrors.shortName = `This field cannot exceed ${MAX_SHORT_NAME_LENGTH -
+            validationErrors.shortName = `This field cannot exceed ${MAX_SHORT_NAME_LENGTH /*-
                 (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
-                1
-                } characters`;
+                1*/ } characters`;
         } else {
             validationErrors.shortName = undefined;
         }
@@ -402,7 +402,7 @@ const ProgramNew = (props) => {
             return;
         }
 
-        let useCompetency = props.pcaMetadata?.useCompetencyClass === "Yes";
+        let useCompetency = props.pcaMetadata?.useCompetencyClass || h2SettingsRef.current.saveMetaData();
 
         //Validating available prefix
         checkForExistingPrefix({
@@ -491,7 +491,6 @@ const ProgramNew = (props) => {
                         removeCompetencyAttribute(
                             prgrm.programTrackedEntityAttributes
                         );
-                        //Fix required here v
                         if (props.data) {
                             criticalSteps = prgrm.programStages
                                 .map((pStage) => pStage.programStageSections)
@@ -603,10 +602,7 @@ const ProgramNew = (props) => {
                 metadataRequest.mutate({ data: metadata }).then((response) => {
                     if (response.status != "OK") {
                         props.setNotification({
-                            message:
-                                response.typeReports[0].objectReports[0].errorReports
-                                    .map((er) => er.message)
-                                    .join(" | "),
+                            message: parseErrorsJoin(response, ' | '),
                             severity: "error",
                         });
                         props.setShowProgramForm(false);
@@ -766,7 +762,7 @@ const ProgramNew = (props) => {
                         autoComplete="off"
                         inputProps={{
                             maxLength:
-                                MAX_PROGRAM_NAME_LENGTH - dePrefix.length,
+                                MAX_PROGRAM_NAME_LENGTH /*- dePrefix.length*/,
                         }}
                         value={programName}
                         onChange={handleChangeProgramName}
@@ -791,7 +787,7 @@ const ProgramNew = (props) => {
                             autoComplete="off"
                             inputProps={{
                                 maxLength:
-                                    MAX_SHORT_NAME_LENGTH - dePrefix.length,
+                                    MAX_SHORT_NAME_LENGTH /*- dePrefix.length*/,
                             }}
                             value={programShortName}
                             onChange={handleChangeProgramShortName}
@@ -856,7 +852,7 @@ const ProgramNew = (props) => {
                         </>
                     }
                     {pgrTypePCA === "hnqis" && (
-                        <H2Setting 
+                        <H2Setting
                             pcaMetadata={props.pcaMetadata}
                             ref={h2SettingsRef}
                             setButtonDisabled={setButtonDisabled}
