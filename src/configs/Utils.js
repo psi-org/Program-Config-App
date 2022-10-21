@@ -61,7 +61,7 @@ export function versionIsValid(serverVersion, limitMin, limitMax) {
 export function parseErrors(response) {
     let errorRes = response.response || response;
     let index = 0
-    return errorRes.typeReports.reduce((reports, typeReport) =>
+    return errorRes.typeReports?.reduce((reports, typeReport) =>
         reports.concat(
             typeReport.objectReports.map(objectReport =>
                 objectReport.errorReports.map(err => {
@@ -70,18 +70,18 @@ export function parseErrors(response) {
                 })
             )
         ), []
-    ).flat()
+    ).flat() || <p>{response.httpStatus}: {response.message}.</p>
 }
 
 export function parseErrorsJoin(response,joinVal) {
     let errorRes = response.response || response;
-    return errorRes.typeReports.reduce((reports, typeReport) =>
+    return errorRes.typeReports?.reduce((reports, typeReport) =>
         reports.concat(
             typeReport.objectReports.map(objectReport =>
                 objectReport.errorReports.map(err => err.message)
             )
         ), []
-    ).flat().join(joinVal)
+    ).flat().join(joinVal) || (response.httpStatus+": "+response.message+".")
 }
 
 
@@ -89,7 +89,7 @@ export function parseErrorsUL(response) {
     let errorRes = response.response || response;
     let index = 0
     return <ul>{
-        errorRes.typeReports.reduce((reports, typeReport) =>
+        errorRes.typeReports?.reduce((reports, typeReport) =>
             reports.concat(
                 typeReport.objectReports.map(objectReport =>
                     objectReport.errorReports.map(err => {
@@ -98,7 +98,7 @@ export function parseErrorsUL(response) {
                     })
                 )
             ), []
-        ).flat()
+        ).flat() || <li>{response.httpStatus}: {response.message}.</li>
     }
     </ul>
 }

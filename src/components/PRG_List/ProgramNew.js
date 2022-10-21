@@ -402,7 +402,7 @@ const ProgramNew = (props) => {
             return;
         }
 
-        let useCompetency = props.pcaMetadata?.useCompetencyClass || h2SettingsRef.current.saveMetaData();
+        let useCompetency = pgrTypePCA === "hnqis"?(props.pcaMetadata?.useCompetencyClass || h2SettingsRef.current.saveMetaData()):undefined;
 
         //Validating available prefix
         checkForExistingPrefix({
@@ -574,6 +574,7 @@ const ProgramNew = (props) => {
                         let newTEA = programTEAs.available.find(
                             (tea) => tea.id === selectedTEA
                         );
+                        console.log(newTEA)
                         prgrm.programTrackedEntityAttributes.push({
                             trackedEntityAttribute: { id: newTEA.id },
                             mandatory: false,
@@ -935,7 +936,7 @@ const ProgramNew = (props) => {
                     </Button>
                     <LoadingButton
                         onClick={() => submission()}
-                        disabled={buttonDisabled}
+                        disabled={buttonDisabled || props.readOnly}
                         loading={sentForm}
                         variant="outlined"
                         loadingPosition="start"

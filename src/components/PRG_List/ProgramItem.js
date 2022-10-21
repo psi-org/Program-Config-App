@@ -287,6 +287,7 @@ const ProgramItem = ({
                             programType === "HNQIS2" ? "hnqis" : "tracker"
                         }
                         pcaMetadata={pcaMetadata}
+                        readOnly={!program.access.update}
                     />
                 )}
                 {/*!program.withoutRegistration &&*/ (

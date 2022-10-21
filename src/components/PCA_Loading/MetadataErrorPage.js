@@ -99,7 +99,7 @@ const MetadataErrorPage = () => {
             <div className="wrapper">
                 <div style={{width: '500px', margin: 'auto', display: 'flex', flexDirection:'column', paddingTop: '1em'}}>
                     {!error && <NoticeBox title="Missing Required Metadata">
-                        <p>The server lacks the necessary Metadata package to work correctly.</p>
+                        <p>The server lacks the necessary Metadata package needed to work correctly.</p>
                     </NoticeBox>}
 
                     {!error && <LoadingButton

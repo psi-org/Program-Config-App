@@ -363,8 +363,8 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
 
         const programTypeId = metadata.attributes.filter((attribute) => {
             return attribute.code === "PROGRAM_TYPE"
-        })[0].id;
-        const programType = metadata.programs[0].attributeValues.filter((av) => { return av.attribute.id === programTypeId})[0].value;
+        })[0]?.id;
+        const programType = programTypeId?metadata.programs[0].attributeValues.filter((av) => { return av.attribute.id === programTypeId})[0].value:'Tracker';
 
         if (programType === "HNQIS2")
         {
