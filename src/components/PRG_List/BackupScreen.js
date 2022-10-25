@@ -5,6 +5,7 @@ import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
 import { DialogActions, DialogContent, TextField, Button, Box, CircularProgress } from "@mui/material";
 import { BACKUPS_NAMESPACE } from "../../configs/Constants";
 import SaveAsIcon from '@mui/icons-material/SaveAs';
+import { truncateString } from "../../configs/Utils";
 
 const BackupScreen = (props) => {
     const programMetadata = {
@@ -22,13 +23,13 @@ const BackupScreen = (props) => {
     const dsCreateMutation = {
         resource: `dataStore/${BACKUPS_NAMESPACE}/${props.program.id}`,
         type: 'create',
-        data: ({data}) => data
+        data: ({ data }) => data
     };
 
     const dsUpdateMutation = {
         resource: `dataStore/${BACKUPS_NAMESPACE}/${props.program.id}`,
         type: 'update',
-        data: ({data}) => data
+        data: ({ data }) => data
     };
 
     const pad2Digits = num => {
@@ -53,7 +54,7 @@ const BackupScreen = (props) => {
 
     const [validationError, setValidationError] = useState(false);
     const [versionValidationError, setVersionValidationError] = useState(false);
-    const [programName, setProgramName] = useState(props.program.name+'_'+  formatDate(new Date(), "_", "_"));
+    const [programName, setProgramName] = useState(truncateString(props.program.name, 30, false) + '_' + formatDate(new Date(), "_", "_"));
     const [programVersion, setProgramVersion] = useState(props.program.version);
     const [processing, setProcessing] = useState(false);
     let nameInput = useRef();
@@ -86,8 +87,7 @@ const BackupScreen = (props) => {
 
     let dsBackups = {};
 
-    if (!dsLoading)
-    {
+    if (!dsLoading) {
         if (!dsData?.results) {
             dsBackups.backups = [];
         } else {
@@ -113,9 +113,8 @@ const BackupScreen = (props) => {
     const programBackupHandler = () => {
         setProcessing(true);
         const timestamp = formatDate(new Date(), "-", ":");
-        if(nameInput.current.value.trim() === "" || versionInput.current.value.trim() === "")
-        {
-            (nameInput.current.value.trim() === "") ? setValidationError(true) : setValidationError(false) ;
+        if (nameInput.current.value.trim() === "" || versionInput.current.value.trim() === "") {
+            (nameInput.current.value.trim() === "") ? setValidationError(true) : setValidationError(false);
             (versionInput.current.value.trim() === "") ? setVersionValidationError(true) : setVersionValidationError(false);
             setProcessing(false);
             return;
@@ -123,18 +122,18 @@ const BackupScreen = (props) => {
         setValidationError(false);
         setVersionValidationError(false);
         let backup = {
-            "id" : new Date().valueOf(),
+            "id": new Date().valueOf(),
             "name": nameInput.current.value,
-            "backup_date":timestamp,
+            "backup_date": timestamp,
             "version": versionInput.current.value,
             "comment": commentInput.current.value,
             "metadata": processMetadata(metaData.results)
         };
         dsBackups.backups.push(backup);
         let backupToDatastore = !dsData?.results ? dsCreateRequest : dsUpdateRequest
-        backupToDatastore.mutate({data: dsBackups})
-            .then(response=>{
-                if(response.status != 'OK') {
+        backupToDatastore.mutate({ data: dsBackups })
+            .then(response => {
+                if (response.status != 'OK') {
                     props.setNotification({
                         message: `Some errors occured while backing up your Program. Please contact the administrator.`,
                         severity: 'error'
@@ -152,7 +151,7 @@ const BackupScreen = (props) => {
     }
 
     const processMetadata = metadata => {
-        if(metaData) {
+        if (metaData) {
             delete metadata.date;
             delete metadata.categories;
             delete metadata.categoryCombos;
@@ -278,15 +277,31 @@ const BackupScreen = (props) => {
         return null;
     }
 
-    return  <>
-            <CustomMUIDialog open={true} maxWidth="md" fullWidth={true}>
-                { (loadingMetadata || processing) && <Box sx={{ display: 'inline-flex', margin: "50px", display: 'flex' }}><CircularProgress /></Box>}
-                {!(loadingMetadata || processing) &&
+    return <>
+        <CustomMUIDialog open={true} maxWidth="md" fullWidth={true}>
+            {(loadingMetadata || processing) && <Box sx={{ display: 'inline-flex', margin: "50px", display: 'flex' }}><CircularProgress /></Box>}
+            {!(loadingMetadata || processing) &&
                 <>
                     <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_backup_dialog_title"}>Create Backup
-                        for Program {metaData.results?.programs[0].name}</CustomMUIDialogTitle>
-                    <DialogContent dividers style={{padding: '1em 2em'}}>
-                        <TextField margin="normal" id="name" label="Backup Name (*)" type="text" value={programName} onChange={e => setProgramName(e.target.value)} fullWidth variant="standard" autoComplete="off" inputRef={nameInput} helperText={ validationError ? "Please provide a Backup Name" : ""} error={validationError} />
+                        for Program {truncateString(metaData.results?.programs[0].name, 40)}</CustomMUIDialogTitle>
+                    <DialogContent dividers style={{ padding: '1em 2em' }}>
+                        <TextField
+                            margin="normal"
+                            id="name"
+                            label="Backup Name (*)"
+                            type="text"
+                            value={programName}
+                            onChange={e => setProgramName(e.target.value)}
+                            fullWidth
+                            variant="standard"
+                            autoComplete="off"
+                        inputRef={nameInput}
+                            inputProps={{
+                                maxLength: 50
+                            }}
+                            helperText={validationError ? "Please provide a Backup Name" : ""}
+                            error={validationError}
+                        />
                         <TextField
                             margin="normal"
                             id="version"
@@ -298,9 +313,9 @@ const BackupScreen = (props) => {
                             inputRef={versionInput}
                             value={programVersion}
                             onChange={e => setProgramVersion(e.target.value)}
-                            helperText={ versionValidationError ? "Please provide a valid Version identifier" : ""}
+                            helperText={versionValidationError ? "Please provide a valid Version identifier" : ""}
                             error={versionValidationError}
-                            />
+                        />
                         <TextField
                             id="comments"
                             label="Comments"
@@ -309,16 +324,16 @@ const BackupScreen = (props) => {
                             fullWidth
                             variant="standard"
                             inputRef={commentInput}
-                            />
+                        />
                     </DialogContent>
-                    <DialogActions style={{ padding: '1em'}}>
+                    <DialogActions style={{ padding: '1em' }}>
                         <Button onClick={hideFormHandler} color={"error"}>Close</Button>
-                        <Button onClick={programBackupHandler} color={"primary"} variant='outlined' startIcon={<SaveAsIcon/>}>Save Backup</Button>
+                        <Button onClick={programBackupHandler} color={"primary"} variant='outlined' startIcon={<SaveAsIcon />}>Save Backup</Button>
                     </DialogActions>
                 </>
-                }
-            </CustomMUIDialog>
-            </>
+            }
+        </CustomMUIDialog>
+    </>
 }
 
 export default BackupScreen

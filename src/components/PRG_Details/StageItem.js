@@ -22,6 +22,7 @@ import Chip from '@mui/material/Chip';
 import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Tooltip } from "@mui/material";
 
 const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
 
@@ -37,12 +38,22 @@ const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editSta
         setShowStageForm(true)
     }
     return (
-        <div className="ml_item" style={{ color: "#333333", backgroundColor: "#c5e3fc", border: "0.5px solid #D5DDE5", borderRadius: "4px", margin: '8px' }}>
+        <div className="ml_item" style={{ color: "#333333", backgroundColor: "#c5e3fc", border: "0.5px solid #D5DDE5", borderRadius: "4px" }}>
             <div className="ml_list-icon"> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
                 <img className="ml_list-img" alt="prg" src={stg_svg} />
             </div>
-            <div className="ml_item-title">
-                <div>{stage.displayName}</div>
+            <div className="ml_item-title" style={{
+                overflow: 'hidden'
+            }}>
+                <Tooltip title={stage.displayName} placement="bottom-start" arrow>
+                    <span style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '100%',
+                        width: '100%'
+                    }}>{stage.displayName}</span>
+                </Tooltip>
                 {editStatus && <Chip label={editStatus.toUpperCase()} color="success" className="blink-opacity-2" style={{ marginLeft: '1em' }} />}
             </div>
             <div className="ml_item-desc">

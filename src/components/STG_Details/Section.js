@@ -32,6 +32,7 @@ import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 import Chip from '@mui/material/Chip';
+import { Tooltip } from "@mui/material";
 
 const DraggableSection = ({ program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode, readOnly }) => {
 
@@ -96,8 +97,19 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
                         <div className="ml_item-icon">
                             <img className="ml_list-img" alt="sec" src={sec_svg} />
                         </div>
-                        <div className="ml_item-title">
-                            <div>{sectionImportStatus} {stageSection.displayName} </div>
+                        <div className="ml_item-title" style={{
+                            overflow: 'hidden'
+                        }}>
+                            {sectionImportStatus}
+                            <Tooltip title={stageSection.displayName} placement="bottom-start" arrow>
+                                <span style={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    maxWidth: '100%',
+                                    width: '100%'
+                                }}>{stageSection.displayName}</span>
+                            </Tooltip>
                             <div>{editStatus && <Chip label={editStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{marginLeft:'1em'}} /> }</div>
                         </div>
                         <div className="ml_item-desc"><div>{stageSection.dataElements.length} Data Elements</div> {sectionImportSummary}</div>

@@ -44,7 +44,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { FormLabel } from "@mui/material";
 import StyleManager from "../UIElements/StyleManager";
-import { DeepCopy, parseErrorsJoin } from "../../configs/Utils";
+import { DeepCopy, parseErrorsJoin, truncateString } from "../../configs/Utils";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import H2Setting from "./H2Setting"
 
@@ -402,7 +402,8 @@ const ProgramNew = (props) => {
             return;
         }
 
-        let useCompetency = pgrTypePCA === "hnqis"?(props.pcaMetadata?.useCompetencyClass || h2SettingsRef.current.saveMetaData()):undefined;
+        let useCompetency = pgrTypePCA === "hnqis"?(props.pcaMetadata?.useCompetencyClass || h2SettingsRef.current.saveMetaData())==='Yes':undefined;
+        console.log(useCompetency)
 
         //Validating available prefix
         checkForExistingPrefix({
@@ -499,7 +500,7 @@ const ProgramNew = (props) => {
                                     section.dataElements.find(
                                         (de) => de.id === "VqBfZjZhKkU"
                                     )
-                                );
+                            );
                         }
 
                         prgrm.programStages = prgrm.programStages.map((ps) => ({
@@ -674,7 +675,7 @@ const ProgramNew = (props) => {
                     onClose={() => hideForm()}
                 >
                     {props.data
-                        ? "Edit Program " + props.data.name
+                        ? ("Edit Program " + truncateString(props.data.name))
                         : "Create New Program"}
                 </CustomMUIDialogTitle>
                 <DialogContent dividers style={{ padding: "1em 2em" }}>

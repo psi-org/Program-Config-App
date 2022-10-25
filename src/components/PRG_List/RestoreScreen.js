@@ -7,6 +7,7 @@ import { BACKUPS_NAMESPACE } from "../../configs/Constants";
 
 import RestoreItem from "./RestoreItem";
 import RestoreOptions from "./RestoreOptions";
+import { truncateString } from "../../configs/Utils";
 ``
 const RestoreScreen = (props) => {
 
@@ -39,7 +40,7 @@ const RestoreScreen = (props) => {
                     {!loading &&
                         <>
                             <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_restore_dialog_title"}>
-                                {(dataStore && restoreBackup)?"Restoring "+restoreBackup.name:"Available Backups for Program "+props.program.name}
+                                {(dataStore && restoreBackup)?"Restoring "+restoreBackup.name:"Available Backups for Program "+truncateString(props.program.name,40)}
                             </CustomMUIDialogTitle>
                                 {!dataStore &&
                                     <Alert severity="error">No Backups found for the selected Program.</Alert>

@@ -39,7 +39,7 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
-import { DeepCopy } from "../../configs/Utils";
+import { DeepCopy, truncateString } from "../../configs/Utils";
 import { isEmptyObject } from "jquery";
 
 const createMutation = {
@@ -655,8 +655,12 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             <div className="sub_nav align-items-center">
                 <div className="cnt_p">
                     <Link to={'/'}><Chip>Home</Chip></Link>/
-                    <Link to={'/program/' + programStage.program.id}><Chip>Program: {programStage.program.name}</Chip></Link>/
-                    <Chip>Stage: {programStage.displayName}</Chip>
+                    <Link to={'/program/' + programStage.program.id}>
+                        <Chip>
+                            Program: {truncateString(programStage.program.name)}
+                        </Chip>
+                    </Link>/
+                    <Chip>Stage: {truncateString(programStage.displayName)}</Chip>
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns" style={{ color: '#444444' }}>
@@ -678,7 +682,14 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 </div>
             </div>
             {hnqisMode && importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
-            <div className="title">Sections for Program Stage <strong>{programStage.displayName}</strong>
+            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', margin: '0' }}>
+                <span style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                }}>
+                    Sections for Program Stage <strong>{programStage.displayName}</strong>
+                </span>
                 {(readOnly || !isSectionMode)  &&
                     <MuiChip style = {{marginLeft: '1em'}} label="Read Only" variant="outlined" />
                 }
@@ -824,7 +835,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 </CustomMUIDialog>
             }
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="wrapper" style={{ overflow: 'auto' }}>
+                <div className="wrapper" style={{ overflow: 'auto'}}>
                     <div className="layout_prgms_stages">
                         {sections.length === 0 && !readOnly &&
                             <Button startIcon={<AddBoxIcon />} variant='contained' style={{ margin: '8px' }} onClick={SectionActions.append}>

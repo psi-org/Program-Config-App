@@ -263,9 +263,9 @@ const ProgramList = () => {
                     )}
                 </div>
             </div>
-            <div style={{ margin: "0px 16px 8px" }}>
-                <div className="title">List of programs</div>
-                <div style={{ display: "flex", alignItems: "center" }}>
+            <div>
+                <div className="title" style={{ padding: '1.5em 1em 0' }}>List of programs</div>
+                <div style={{ display: "flex", alignItems: "center", padding: '0 1.2em' }}>
                     <TextField
                         margin="dense"
                         id="name"
@@ -313,7 +313,7 @@ const ProgramList = () => {
                     />
                 </div>
             </div>
-            <div className="wrapper">
+            <div className="wrapper" style={{ padding: '1em  1.2em 0' }}>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
                         {data.results.programs.map((program) => {
@@ -339,7 +339,7 @@ const ProgramList = () => {
                     </div>
                 </div>
             </div>
-            <div className="wrapper">
+            <div className="wrapper" style={{ padding: '0 1.2em' }}>
                 <Pagination
                     page={data.results.pager.page}
                     pageSize={data.results.pager.pageSize}

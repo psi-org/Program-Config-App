@@ -16,6 +16,7 @@ import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
+import { truncateString } from "../../configs/Utils";
 
 const query = {
     results: {
@@ -89,7 +90,7 @@ const ProgramDetails = () => {
             <div className="sub_nav">
                 <div className="cnt_p">
                     <Link to={'/'}><Chip>Home</Chip></Link>/
-                    <Chip>Program: {data.results.displayName}</Chip>
+                    <Chip>{'Program: '+truncateString(data.results.displayName)}</Chip>
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns">
@@ -105,13 +106,22 @@ const ProgramDetails = () => {
                     }
                 </div>
             </div>
-            <div className="title" style={{ margin: '0 8px 0 16px'}}>
-                {!data.results.withoutRegistration ? 'Program Stages for' : 'Event'} Program <strong>{data.results.displayName}</strong>
+            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent:'start'}}>
+                <span style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                }}>
+                    {!data.results.withoutRegistration ? 'Program Stages for Program ' : 'Event Program '}
+                    <strong style={{ maxWidth: '100%' }}>
+                        {data.results.displayName}
+                    </strong>
+                </span>
                 {data.results.withoutRegistration &&
                     <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
                 }
             </div>
-            <div className="wrapper">
+            <div className="wrapper" style={{ padding: '1em 1.2em 0' }}>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
                         {

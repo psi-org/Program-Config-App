@@ -1,7 +1,7 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { CircularLoader, Modal, ModalContent, ModalTitle, NoticeBox, ModalActions, ButtonStrip, CenteredContent } from "@dhis2/ui";
 import SharingItem from './SharingItem';
-import { DeepCopy, parseErrors } from '../../configs/Utils';
+import { DeepCopy, parseErrors, truncateString } from '../../configs/Utils';
 
 import EditIcon from '@mui/icons-material/Edit';
 import { useRef, useState, useEffect } from "react";
@@ -490,7 +490,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                 <ModalContent>
                     {content === 'loading' && <Box sx={{ display: 'inline-flex' }}><CircularProgress /></Box>}
                     {content === 'form' && <div>
-                        <h2 style={{ fontSize: 24, fontWeight: 300, margin: 0 }}>{data.results?.object.displayName}</h2>
+                        <h2 style={{ fontSize: 24, fontWeight: 300, margin: 0 }}>{truncateString(data.results?.object.displayName,40)}</h2>
                         <div>Created by: {data.results?.object.user.name}</div>
                         {restrictions.length > 0 && <Alert severity="error" style={{ marginTop: "10px", maxHeight: "100px", overflow: 'auto'}}>Limited Access:
                             <ul>

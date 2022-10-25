@@ -8,17 +8,17 @@ const Suggestions = ({ usersNGroups, keyword, setSearch, addEntity, posRef }) =>
     useEffect(()=>{
         let keyVal = keyword.trim().toLowerCase();
 
-        let nUsers = usersNGroups.userData.users?.filter((user) => { 
-            return String(user.displayName.toLowerCase()).includes(keyVal) || String(user.userCredentials.username.toLowerCase()).includes(keyVal)
+        let nUsers = usersNGroups?.userData.users?.filter((user) => { 
+            return String(user.displayName?.toLowerCase()||'').includes(keyVal) || String(user.userCredentials.username?.toLowerCase()||'').includes(keyVal)
         })?.map(user => (
             <MenuItem label={user.displayName} key={user.id} onClick={() => {selectUserOrGroup("userAccesses", user)}}/>
-        ));
+        ))||[];
 
-        let nUserGroups = usersNGroups.userGroupData.userGroups?.filter((userGroup) => { 
-            return String(userGroup.displayName.toLowerCase()).includes(keyVal)
+        let nUserGroups = usersNGroups?.userGroupData.userGroups?.filter((userGroup) => { 
+            return String(userGroup.displayName?.toLowerCase()||'').includes(keyVal)
         })?.map(userGroup => (
             <MenuItem label={userGroup.displayName} key={userGroup.id} onClick={()=>{selectUserOrGroup("userGroupAccesses", userGroup)}}/>
-        ));
+        ))||[];
 
         setResults([...nUsers].concat([...nUserGroups]));
 

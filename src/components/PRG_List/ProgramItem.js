@@ -89,7 +89,7 @@ const ProgramItem = ({
     const id = openPop ? "simple-popover" : undefined;
 
     return (
-        <div className="ml_item" style={{ color: "#333333", backgroundColor: "#F8F8F8", border: "0.5px solid #D5DDE5", borderRadius: "4px", padding: '5px' }}>
+        <div className="ml_item" style={{ color: "#333333", backgroundColor: "#F8F8F8", border: "0.5px solid #D5DDE5", borderRadius: "4px", padding: '5px', width: '100%', maxWidth: '100%' }}>
             <div className="ml_list-icon"> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
                 <div className="ml_item-desc" style={{ width: '3.2em' }}>
                     <div style={{ backgroundColor: (program.style?.color || '#e0e0e0'), width: '3em', height: '3em', minWidth: '3em', minHeight: '3em', border: '1px solid #DDD', borderRadius: '10%', padding: '0' }}>
@@ -100,12 +100,19 @@ const ProgramItem = ({
                     </div>
                 </div>
             </div>
-            <Tooltip title={program.name}>
             <div className="ml_item-title" style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-                }}>{program.name}</div>
-            </Tooltip>
+                overflow: 'hidden'
+            }}>
+                <Tooltip title={program.name} placement="bottom-start" arrow>
+                    <span style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '100%',
+                        width: '100%'
+                    }}>{program.name}</span>
+                </Tooltip>
+            </div>
             <div className="ml_item-desc">
                 {programType === 'HNQIS2' && pcaMetadata.buildVersion && !versionIsValid(pcaMetadata.buildVersion, BUILD_VERSION, BUILD_VERSION) &&
                     <Tooltip title={"This HNQIS 2.0 Program was built in version " + pcaMetadata.buildVersion + ", please Set Up Program again to update it."}>

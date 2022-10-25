@@ -102,3 +102,7 @@ export function parseErrorsUL(response) {
     }
     </ul>
 }
+
+export function truncateString(strVal, characters = 50,useEllipsis=true) {
+    return (strVal.substring(0, characters) + ((strVal.length > characters && useEllipsis) ? '...' : ''))
+}
