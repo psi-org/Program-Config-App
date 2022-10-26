@@ -77,7 +77,7 @@ const ProgramList = () => {
     const [backupProgramId, setBackupProgramId] = useState(undefined);
     const [restoreProgramId, setRestoreProgramId] = useState(undefined);
     const [readOnlyPermission, setReadOnlyPermission] = useState(false);
-    const [orgUnitProgramId, setOrgUnitProgramId] = useState(undefined);
+    const [orgUnitProgram, setOrgUnitProgram] = useState(undefined);
     const [conversionH2ProgramId, setConversionH2ProgramId] = useState(undefined);
     const [transferH2Program, setTransferH2Program] = useState(undefined);
 
@@ -115,8 +115,8 @@ const ProgramList = () => {
         setSharingProgramType(prgType)
     }
 
-    const assignOrgUnit = (program) => {
-        setOrgUnitProgramId(program)
+    const assignOrgUnit = (program, readOnly) => {
+        setOrgUnitProgram({ program, readOnly })
     }
 
     const backupProgram = (program) => {
@@ -224,10 +224,11 @@ const ProgramList = () => {
                             setNotification={setNotification}
                         />
                     )}
-                    {orgUnitProgramId && (
+                    {orgUnitProgram && (
                         <OunitScreen
-                            id={orgUnitProgramId}
-                            setOrgUnitProgramId={setOrgUnitProgramId}
+                            id={orgUnitProgram.program}
+                            readOnly={orgUnitProgram.readOnly}
+                            setOrgUnitProgram={setOrgUnitProgram}
                             setNotification={setNotification}
                         />
                     )}

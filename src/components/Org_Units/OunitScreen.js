@@ -1,6 +1,6 @@
-import {useDataMutation, useDataQuery} from "@dhis2/app-runtime";
-import {OrganisationUnitTree} from "@dhis2/ui";
-import React, {useEffect, useRef, useState} from "react";
+import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
+import { OrganisationUnitTree } from "@dhis2/ui";
+import React, { useEffect, useRef, useState } from "react";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
 import {
@@ -22,6 +22,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
+import { truncateString } from "../../configs/Utils";
 
 const orgUnitsQuery = {
     userOrgUnits: {
@@ -101,7 +102,7 @@ const programOrgUnitsQuery = {
     },
 };
 
-const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
+const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const programMetadata = {
         results: {
             resource: "programs/" + id + "/metadata.json",
@@ -147,7 +148,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
 
     let userOrgUnits;
 
-    useEffect(() => { 
+    useEffect(() => {
         if (!poLoading) {
             let ouPaths = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path)];
             let ouExpanded = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path.split('/').slice(0, -1).join('/'))]
@@ -163,7 +164,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     }, [ouMetadata, prgOrgUnitData]);
 
     useEffect(() => {
-        if(orgUnitPathSelected.length > 0)
+        if (orgUnitPathSelected.length > 0)
             ouTreeRootInit();
     }, [orgUnitPathSelected, selectedOrgUnits])
 
@@ -190,7 +191,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     };
 
     const hideFormHandler = () => {
-        setOrgUnitProgramId(undefined);
+        setOrgUnitProgram(undefined);
     };
 
     const orgUnitSelectionHandler = (event) => {
@@ -215,8 +216,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
     const doSearch = () => {
         setFilterLoading(true)
         let filterString = filterRef.current.value;
-        if (filterString)
-        {
+        if (filterString) {
             setFilterValue(filterString)
             searchOunits.refetch({ filterString: filterString })
                 .then((data) => {
@@ -344,7 +344,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                     onClose={hideFormHandler}
                     id={"orgUnit_assignemnt_dialog_title"}
                 >
-                    Assign Organisation Units
+                    Assign Organisation Units for Program {prgMetaData && truncateString(prgMetaData.results?.programs[0].name, 40)}
                 </CustomMUIDialogTitle>
                 {orgUnitTreeRoot.length === 0 && (
                     <Box sx={{ display: "inline-flex", paddingLeft: "20px" }}>
@@ -375,7 +375,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                                     <TextField
                                         margin="dense"
                                         id={"filterOrgUnitName"}
-                                        label={ "Filter Organisation Units by UID, Code or Name"}
+                                        label={"Filter Organisation Units by UID, Code or Name"}
                                         variant="outlined"
                                         inputRef={filterRef}
                                         value={filterValue}
@@ -385,7 +385,7 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                                                 doSearch();
                                             }
                                         }}
-                                        sx={{ width: "100%"}}
+                                        sx={{ width: "100%" }}
                                         autoComplete={"off"}
                                         InputProps={{
                                             endAdornment: (
@@ -631,13 +631,25 @@ const OunitScreen = ({ id, setOrgUnitProgramId, setNotification }) => {
                     <Button onClick={hideFormHandler} color={"error"}>
                         Close
                     </Button>
-                    {hasChanges && (
+                    {hasChanges && !readOnly && (
                         <Button
                             onClick={orgUnitAssignmentHandler}
                             color={"primary"}
                         >
                             Apply
                         </Button>
+                    )}
+                    {hasChanges && readOnly && (
+                        <Tooltip title="You don't have access to edit this Program" placement="top" arrow>
+                            <span>
+                                <Button
+                                    disabled={true}
+                                    color={"primary"}
+                                >
+                                    Apply
+                                </Button>
+                            </span>
+                        </Tooltip>
                     )}
                 </DialogActions>
             </CustomMUIDialog>

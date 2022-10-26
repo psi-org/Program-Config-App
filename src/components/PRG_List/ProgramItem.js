@@ -185,7 +185,7 @@ const ProgramItem = ({
                                         icon={<PublicIcon />}
                                         onClick={() => {
                                             toggle();
-                                            assignOrgUnit(program.id);
+                                            assignOrgUnit(program.id, !program.access.update);
                                         }}
                                     />
                                     <MenuItem

@@ -13,6 +13,7 @@ import {
 } from "../../configs/ProgramTemplate";
 
 import {
+    ASSESSMENT_TET,
     BUILD_VERSION,
     COMPETENCY_ATTRIBUTE,
     COMPETENCY_CLASS,
@@ -42,7 +43,7 @@ import Select from "@mui/material/Select";
 import SendIcon from "@mui/icons-material/Send";
 import FormHelperText from "@mui/material/FormHelperText";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { FormLabel } from "@mui/material";
+import { FormLabel, Tooltip } from "@mui/material";
 import StyleManager from "../UIElements/StyleManager";
 import { DeepCopy, parseErrorsJoin, truncateString } from "../../configs/Utils";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -225,7 +226,7 @@ const ProgramNew = (props) => {
         orgUnitRoot: undefined,
     });
 
-    const [buttonDisabled, setButtonDisabled] = useState(props.data ? false : true);
+    const [buttonDisabled, setButtonDisabled] = useState(!props.data);
 
     const handleChangePgrType = (event) => {
         validationErrors.pgrType = undefined;
@@ -236,7 +237,7 @@ const ProgramNew = (props) => {
         if (value === "hnqis") {
             setButtonDisabled(true);
             let hnqisTET = trackedEntityTypes.find(
-                (tet) => tet.id === "oNwpeWkfoWc"
+                (tet) => tet.id === ASSESSMENT_TET
             );
             setProgramTET({ label: hnqisTET.name, id: hnqisTET.id });
         } else {
@@ -403,7 +404,6 @@ const ProgramNew = (props) => {
         }
 
         let useCompetency = pgrTypePCA === "hnqis"?(props.pcaMetadata?.useCompetencyClass || h2SettingsRef.current.saveMetaData())==='Yes':undefined;
-        console.log(useCompetency)
 
         //Validating available prefix
         checkForExistingPrefix({
@@ -432,7 +432,8 @@ const ProgramNew = (props) => {
                 if (programIcon) auxstyle.icon = programIcon;
                 if (programColor) auxstyle.color = programColor;
 
-                if (Object.keys(auxstyle).length > 0) prgrm.style = auxstyle;
+                if (Object.keys(auxstyle).length > 0) prgrm.style = auxstyle
+                else prgrm.style = undefined
 
                 if (pgrTypePCA === "hnqis") {
                     //HNQIS2 Programs
@@ -488,6 +489,8 @@ const ProgramNew = (props) => {
                         scores.programStage.id = assessmentId;
                     }
 
+                    prgrm.programTrackedEntityAttributes = DeepCopy(HnqisProgramConfigs.programTrackedEntityAttributes);
+
                     if (!useCompetency) {
                         removeCompetencyAttribute(
                             prgrm.programTrackedEntityAttributes
@@ -498,14 +501,20 @@ const ProgramNew = (props) => {
                                 .flat()
                                 .find((section) =>
                                     section.dataElements.find(
-                                        (de) => de.id === "VqBfZjZhKkU"
-                                    )
+                                        (de) => de.id === CRITICAL_STEPS
+                                    ) || section.name === "Critical Steps Calculations"
                             );
                         }
 
                         prgrm.programStages = prgrm.programStages.map((ps) => ({
                             id: ps.id,
                         }));
+
+                        criticalSteps.dataElements = [
+                            { id: CRITICAL_STEPS },
+                            { id: NON_CRITICAL_STEPS },
+                            { id: COMPETENCY_CLASS },
+                        ];
 
                         removeCompetencyClass(criticalSteps.dataElements);
                     } else if (useCompetency && props.data) {
@@ -575,7 +584,6 @@ const ProgramNew = (props) => {
                         let newTEA = programTEAs.available.find(
                             (tea) => tea.id === selectedTEA
                         );
-                        console.log(newTEA)
                         prgrm.programTrackedEntityAttributes.push({
                             trackedEntityAttribute: { id: newTEA.id },
                             mandatory: false,
@@ -935,16 +943,30 @@ const ProgramNew = (props) => {
                         {" "}
                         Close{" "}
                     </Button>
-                    <LoadingButton
-                        onClick={() => submission()}
-                        disabled={buttonDisabled || props.readOnly}
-                        loading={sentForm}
-                        variant="outlined"
-                        loadingPosition="start"
-                        startIcon={<SendIcon />}
-                    >
-                        Submit
-                    </LoadingButton>
+                    {props.readOnly &&
+                        <Tooltip title="You don't have access to edit this Program" placement="top" arrow>
+                            <span>
+                                <Button
+                                    variant="outlined"
+                                    disabled={true}
+                                    startIcon={<SendIcon />}
+                                >
+                                    Submit
+                                </Button>
+                            </span>
+                        </Tooltip>}
+                    {!props.readOnly &&
+                        <LoadingButton
+                            onClick={() => submission()}
+                            disabled={buttonDisabled}
+                            loading={sentForm}
+                            variant="outlined"
+                            loadingPosition="start"
+                            startIcon={<SendIcon />}
+                        >
+                            Submit
+                        </LoadingButton>
+                    }
                 </DialogActions>
             </CustomMUIDialog>
         </>
