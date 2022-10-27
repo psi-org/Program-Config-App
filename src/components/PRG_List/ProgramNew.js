@@ -402,8 +402,8 @@ const ProgramNew = (props) => {
             setSentForm(false);
             return;
         }
-
-        let useCompetency = pgrTypePCA === "hnqis"?(props.pcaMetadata?.useCompetencyClass || h2SettingsRef.current.saveMetaData())==='Yes':undefined;
+        
+        let useCompetency = pgrTypePCA === "hnqis" ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass ==='Yes':undefined;
 
         //Validating available prefix
         checkForExistingPrefix({
