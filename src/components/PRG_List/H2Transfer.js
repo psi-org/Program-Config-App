@@ -24,7 +24,7 @@ import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import CircularProgress from "@mui/material/CircularProgress";
 
-import { parseErrors } from "../../configs/Utils";
+import { parseErrors, parseErrorsJoin } from "../../configs/Utils";
 
 import {
     METADATA,
@@ -142,8 +142,24 @@ const H2Transfer = ({
     };
 
     const { loading: dsLoading, data: dsData } = useDataQuery(queryDataStore);
-    const dsCreateDM = useDataMutation(dsCreateMutation);
-    const dsUpdateDM = useDataMutation(dsUpdateMutation);
+    const dsCreateDM = useDataMutation(dsCreateMutation, {
+        onError: (err) => {
+            setNotification({
+                message: parseErrorsJoin(err.details, ' | '),
+                severity: "error",
+            });
+            setTransferH2Program(undefined);
+        }
+    });
+    const dsUpdateDM = useDataMutation(dsUpdateMutation, {
+        onError: (err) => {
+            setNotification({
+                message: parseErrorsJoin(err.details, ' | '),
+                severity: "error",
+            });
+            setTransferH2Program(undefined);
+        }
+    });
 
     const dsCreateRequest = {
         mutate: dsCreateDM[0],

@@ -20,7 +20,11 @@ const VisualizationSharing = ({id, sharing}) => {
         data: ({data}) => data
     };
     const {loading, data} = useDataQuery(sharingQuery, { variables: {element: 'visualization', id: id}});
-    let metadataDM = useDataMutation(metadataMutation);
+    let metadataDM = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            console.error(err)
+        }
+    });
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,

@@ -59,8 +59,24 @@ const RestoreOptions = props => {
     const [importStatus, setImportStatus] = useState({});
 
     const { loading: programLoading, data: program, error: programErrors } = useDataQuery(programQuery, { variables: { id: props.backup.metadata.programs[0].id } });
-    const metadataDM = useDataMutation(metadataMutation);
-    const validateDM = useDataMutation(metadataValidation);
+    const metadataDM = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            props.setNotification({
+                message: parseErrorsJoin(err.details, ' | '),
+                severity: "error",
+            });
+            hideFormHandler();
+        }
+    });
+    const validateDM = useDataMutation(metadataValidation, {
+        onError: (err) => {
+            props.setNotification({
+                message: parseErrorsJoin(err.details, ' | '),
+                severity: "error",
+            });
+            hideFormHandler();
+        }
+    });
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,

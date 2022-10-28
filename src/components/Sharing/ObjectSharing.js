@@ -21,7 +21,11 @@ const ObjectSharing = ({element, id, sharing}) => {
     }
 
     const {loading, data} = useDataQuery(sharingQuery, { variables: {element: element, id: id}});
-    let metadataDM = useDataMutation(metadataMutation);
+    let metadataDM = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            console.error(err)
+        }
+    });
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,

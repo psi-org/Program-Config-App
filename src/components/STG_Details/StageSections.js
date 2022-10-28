@@ -186,7 +186,11 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const programId = programStage.program.id;
     const [isSectionMode, setIsSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0)
     const { data: androidSettings } = useDataQuery(queryAndroidSettings);
-    const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings);
+    const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings, {
+        onError: (err) => {
+            console.error(err)
+        }
+    });
     const [androidSettingsError, setAndroidSettingsError] = useState(true);
     const [programSettingsError, setProgramSettingsError] = useState(undefined);
     const { data: OrganizationLevel, refetch: setOuLevel } = useDataQuery(queryOrganizationsUnit, { lazy: true, variables: { ouLevel: undefined } });
@@ -354,7 +358,11 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     // ***** END OF SECTIONS ACTIONS ***** //
 
     // Create Mutation
-    let metadataDM = useDataMutation(createMutation);
+    let metadataDM = useDataMutation(createMutation, {
+        onError: (err) => {
+            console.error(err)
+        }
+    });
     const createMetadata = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,
@@ -363,7 +371,11 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     };
 
     //Delete mutations
-    const deleteMetadata = useDataMutation(deleteMetadataMutation)[0];
+    const deleteMetadata = useDataMutation(deleteMetadataMutation, {
+        onError: (err) => {
+            console.error(err)
+        }
+    })[0];
 
     // Get Ids
     const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: programStage.programStageDataElements.length * 5 } });

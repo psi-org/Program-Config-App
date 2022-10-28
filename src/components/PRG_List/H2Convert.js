@@ -33,7 +33,7 @@ import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 
-import { parseErrorsUL } from "../../configs/Utils";
+import { parseErrorsJoin, parseErrorsUL } from "../../configs/Utils";
 
 import {
     QUESTION_TYPE_ATTRIBUTE,
@@ -159,7 +159,15 @@ const H2Convert = ({
     setNotification,
     doSearch,
 }) => {
-    let metadataDM = useDataMutation(metadataMutation);
+    let metadataDM = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            setNotification({
+                message: parseErrorsJoin(err.details, ' | '),
+                severity: "error",
+            });
+            setConversionH2ProgramId(undefined);
+        }
+    });
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,

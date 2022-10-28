@@ -22,7 +22,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
-import { truncateString } from "../../configs/Utils";
+import { parseErrorsJoin, truncateString } from "../../configs/Utils";
 
 const orgUnitsQuery = {
     userOrgUnits: {
@@ -140,9 +140,15 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
         programOrgUnitsQuery,
         { variables: { id: id } }
     );
+
     const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             console.error(err.details)
+            setNotification({
+                message: parseErrorsJoin(err.details, ' | '),
+                severity: "error",
+            });
+            setOrgUnitProgram(undefined)
         }
     });
 
