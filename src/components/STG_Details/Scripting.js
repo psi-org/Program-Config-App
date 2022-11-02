@@ -913,7 +913,7 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
         result.id = uidPool.shift()
         indicatorIDs.push(result.id)
         result.name = programShortName + " - " + nameComp + " - " + value.name
-        result.shortName = programShortName.slice(0, 44) + " - " + value.name
+        result.shortName = programShortName.slice(0, 50-(value.name.length + 3)) + " - " + value.name
         result.program.id = programId
         result.sharing.owner = ownerS
         result.sharing.external = externalS
@@ -938,7 +938,7 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
         AnalyticNoA.id = uidPool.shift()
         indicatorIDs.push(AnalyticNoA.id)
         AnalyticNoA.name = programShortName + " - " + value.name
-        AnalyticNoA.shortName = programShortName.slice(0, 44) + " - " + value.name
+        AnalyticNoA.shortName = programShortName.slice(0, 50 - (value.name.length + 3)) + " - " + value.name
         AnalyticNoA.program.id = programId
         AnalyticNoA.sharing.owner = ownerS
         AnalyticNoA.sharing.external = externalS
@@ -962,7 +962,7 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
         AnalyticGS.id = uidPool.shift()
         indicatorIDs.push(AnalyticGS.id)
         AnalyticGS.name = programShortName + " - " + value.name
-        AnalyticGS.shortName = programShortName.slice(0, 44) + " - " + value.name
+        AnalyticGS.shortName = programShortName.slice(0, 50 - (value.name.length + 3)) + " - " + value.name
         AnalyticGS.program.id = programId
         AnalyticGS.sharing.owner = ownerS
         AnalyticGS.sharing.external = externalS
@@ -1192,6 +1192,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     LineListScore.sharing.owner = ownerS
     LineListScore.sharing.external = externalS
     LineListScore.sharing.public = publicS
+    LineListScore.publicAccess = publicS
     LineListScore.programStage.id = stageId
     LineListScore.dataElementDimensions[0].programStage.id = stageId
     LineListScore.dataElementDimensions[0].dataElement.id = ACTION_PLAN_ACTION

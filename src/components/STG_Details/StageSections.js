@@ -188,10 +188,11 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const { data: androidSettings } = useDataQuery(queryAndroidSettings);
     const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings, {
         onError: (err) => {
+            setAndroidSettingsError(err)
             console.error(err)
         }
     });
-    const [androidSettingsError, setAndroidSettingsError] = useState(true);
+    const [androidSettingsError, setAndroidSettingsError] = useState(undefined);
     const [programSettingsError, setProgramSettingsError] = useState(undefined);
     const { data: OrganizationLevel, refetch: setOuLevel } = useDataQuery(queryOrganizationsUnit, { lazy: true, variables: { ouLevel: undefined } });
     const { refetch: getProgramSettings } = useDataQuery(queryProgramSettings, { lazy: true, variables: { programId } });
@@ -488,8 +489,25 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     };
 
     useEffect(() => {
-        if (androidSettingsError) setProgressSteps(8);
+        if (androidSettingsError) updateProgramBuildVersion(programId);
     }, [androidSettingsUpdateError])
+
+    const updateProgramBuildVersion = (programId) => {
+        getProgramSettings({ programId }).then(res => {
+            res.results?.attributeValues.forEach(av => {
+                if (av.attribute.id === METADATA) {
+                    let pcaMetadata = JSON.parse(av.value || "{}")
+                    pcaMetadata.buildVersion = BUILD_VERSION;
+                    av.value = JSON.stringify(pcaMetadata)
+                }
+            })
+            createMetadata.mutate({ data: { programs: [res.results] } }).then(response => {
+                if (response.status == 'OK') {
+                    setProgressSteps(8)
+                }
+            })
+        })
+    }
 
     const run = () => {
         if (!savedAndValidated) return;
@@ -623,25 +641,12 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                             androidSettings.results.lastUpdated = new Date().toISOString()
 
                                             androidSettingsUpdate({ data: androidSettings.results }).then(res => {
-                                                if (res.status === 'OK') setAndroidSettingsError(false)
-                                                getProgramSettings({programId}).then(res => {
-                                                    res.results?.attributeValues.forEach(av => {
-                                                        if(av.attribute.id === METADATA){
-                                                            let pcaMetadata = JSON.parse(av.value || "{}")
-                                                            pcaMetadata.buildVersion = BUILD_VERSION;
-                                                            av.value = JSON.stringify(pcaMetadata)
-                                                        }
-                                                    }) 
-                                                    createMetadata.mutate({ data: { programs: [res.results] } }).then(response => {
-                                                        if (response.status == 'OK') {
-                                                            setProgressSteps(8)
-                                                        }
-                                                    })
-                                                })
+                                                if (res.status === 'OK') setAndroidSettingsError(undefined);
+                                                updateProgramBuildVersion(programId)
                                             })
 
                                         } else {
-                                            setProgressSteps(8);
+                                            updateProgramBuildVersion(programId)
                                         }
 
                                     }
@@ -750,12 +755,12 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                     {progressSteps !== 1 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                     {
                                         !programSettingsError
-                                            ? <p>Checking Program settings'</p>
+                                        ? <p style={{ maxWidth: '90%' }}>Checking Program settings</p>
                                             : (programSettingsError === 1
-                                                ? <p>Global analytics settings missing.</p>
+                                                ? <p style={{maxWidth: '90%'}}>Global analytics settings missing.</p>
                                                 : (programSettingsError === 2
-                                                    ? <p>Configured Organisation Unit Levels not found.</p>
-                                                    : <p>Unknown Error</p>
+                                                    ? <p style={{maxWidth: '90%'}}>Configured Organisation Unit Levels not found.</p>
+                                                    : <p style={{maxWidth: '90%'}}>Unknown Error</p>
                                                 )
                                             )
                                     }
@@ -787,7 +792,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 {progressSteps === 2 && <CircularLoader small />}
                                 {progressSteps === 2 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 2 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Checking scores</p>
+                                <p style={{ maxWidth: '90%' }}> Checking scores</p>
                             </div>
                         }
                         {(progressSteps > 2) && !programSettingsError &&
@@ -795,7 +800,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 {progressSteps === 3 && <CircularLoader small />}
                                 {progressSteps === 3 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Reading assesment's questions</p>
+                                <p style={{ maxWidth: '90%' }}> Reading assesment's questions</p>
                             </div>
                         }
                         {(progressSteps > 3) && !programSettingsError &&
@@ -803,7 +808,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 {progressSteps === 4 && <CircularLoader small />}
                                 {progressSteps === 4 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 4 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Building new metadata and analytics</p>
+                                <p style={{ maxWidth: '90%' }}> Building new metadata and analytics</p>
                             </div>
                         }
                         {(progressSteps > 4) && !programSettingsError &&
@@ -811,7 +816,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 {progressSteps === 5 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
                                 {progressSteps === 5 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 5 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Deleting old metadata</p>
+                                <p style={{ maxWidth: '90%' }}> Deleting old metadata</p>
                             </div>
                         }
                         {(progressSteps > 5) && !programSettingsError &&
@@ -819,7 +824,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 {progressSteps === 6 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
                                 {progressSteps === 6 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 6 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Importing new metadata</p>
+                                <p style={{ maxWidth: '90%' }}> Importing new metadata</p>
                             </div>
                         }
                         {(progressSteps > 6) && !programSettingsError &&
@@ -828,7 +833,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 {progressSteps !== 7 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 7 && !androidSettings && <IconWarning24 color={'#ffbb00'} />}
                                 {progressSteps !== 7 && androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p> Enabling in-app analytics {!androidSettings ? "(Android Settings app not enabled)" : (androidSettingsError ? "(Error while saving Android Settings)" : "")}</p>
+                                <p style={{maxWidth: '90%'}}> Enabling in-app analytics {!androidSettings ? "(Android Settings app not enabled)" : (androidSettingsError ? '(Error: '+androidSettingsError.message+')' : "")}</p>
                             </div>
                         }
                         {(progressSteps > 7) && !programSettingsError &&
