@@ -32,6 +32,7 @@ import H2Metadata from "./H2Metadata";
 import { Tooltip } from "@mui/material";
 import H2Convert from "./H2Convert";
 import H2Transfer from "./H2Transfer";
+import { formatAlert } from "../../configs/Utils";
 
 
 const queryProgramType = {
@@ -376,7 +377,7 @@ const ProgramList = () => {
                     severity={notification?.severity || snackSeverity}
                     sx={{ width: "100%" }}
                 >
-                    {notification?.message}
+                    {formatAlert(notification?.message)}
                 </Alert>
             </Snackbar>
 

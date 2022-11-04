@@ -106,3 +106,7 @@ export function parseErrorsUL(response) {
 export function truncateString(strVal, characters = 50,useEllipsis=true) {
     return (strVal.substring(0, characters) + ((strVal.length > characters && useEllipsis) ? '...' : ''))
 }
+
+export function formatAlert(text) {
+    return text?.split('\\n').map(elem => <p>{elem}</p>)
+}

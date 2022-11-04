@@ -145,7 +145,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
         onError: (err) => {
             console.error(err.details)
             setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: "error",
             });
             setOrgUnitProgram(undefined)

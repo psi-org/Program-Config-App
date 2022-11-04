@@ -52,11 +52,12 @@ const getParentUid = (parentName, dataElements) => {
 };
 
 const parseErrors = (e) => {
-    let data = e.typeReports.map(tr => {
+    let errors = e.response || e;
+    let data = errors.typeReports.map(tr => {
         let type = tr.klass.split('.').pop()
         return tr.objectReports.map(or => or.errorReports.map(er => ({ type, uid: or.uid, errorCode: er.errorCode, message: er.message })))
     })
-    return data.flat().flat()
+    return data.flat(2)
 }
 
 const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, refetchProgramStage }) => {
@@ -69,7 +70,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
     // Create Mutation
     let metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
-            console.error(err)
+            gotResponseError(err.details);
         }
     });
     const metadataRequest = {
@@ -87,6 +88,13 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
     // Get Ids for new Data Elements
     const idsQuery = useDataQuery(queryId, { variables: { n: newDEQty + 5 } });
     const uidPool = idsQuery.data?.results.codes;
+
+    const gotResponseError = (response) => {
+        setErrorStatus(true);
+        setTypeReports(parseErrors(response));
+        setCompleted(true);
+        setErrorReports(parseErrors(response))
+    };
 
     if (uidPool && programPayload && !completed && !metadataRequest.called /* && !programRequest.called */) {
 
@@ -329,12 +337,6 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
             programStageDataElements: programStage.programStageDataElements
         };
         // ========================================================== //
-        const gotResponseError = (response) => {
-            setErrorStatus(true);
-            setTypeReports(response);
-            setCompleted(true);
-            setErrorReports(parseErrors(response))
-        };
 
         /**
          * CALL METADATA REQUESTS - POST DHIS2

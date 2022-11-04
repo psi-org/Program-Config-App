@@ -162,7 +162,7 @@ const H2Convert = ({
     let metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: "error",
             });
             setConversionH2ProgramId(undefined);

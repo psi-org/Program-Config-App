@@ -40,7 +40,7 @@ const StageNew = (props) => {
         onError: (err) => {
             console.error(err.details);
             props.setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: 'error'
             });
             props.setShowStageForm(false);
@@ -155,6 +155,9 @@ const StageNew = (props) => {
         if (scheduledDaysStart === '') {
             response = false
             validationErrors.scheduledDaysStart = 'This field is required'
+        } else if (scheduledDaysStart < 0) {
+            response = false
+            validationErrors.scheduledDaysStart = 'This field must be equal or greater than 0'
         } else {
             validationErrors.scheduledDaysStart = undefined
         }
@@ -214,7 +217,7 @@ const StageNew = (props) => {
             metadataRequest.mutate({ data: metadata }).then(response => {
                 if (response.status != 'OK') {
                     props.setNotification({
-                        message: parseErrorsJoin(response, ' | '),
+                        message: parseErrorsJoin(response, '\\n'),
                         severity: 'error'
                     });
                     props.setShowStageForm(false);

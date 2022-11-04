@@ -39,7 +39,7 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
-import { DeepCopy, truncateString } from "../../configs/Utils";
+import { DeepCopy, formatAlert, truncateString } from "../../configs/Utils";
 import { isEmptyObject } from "jquery";
 
 const createMutation = {
@@ -910,7 +910,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 onClose={() => setSnackParams(false)}
             >
                 <Alert onClose={() => setSnackParams(false)} severity={snackParams.severity} sx={{ width: '100%' }}>
-                    {snackParams.content}
+                    {formatAlert(snackParams.content)}
                 </Alert>
             </Snackbar>
             {

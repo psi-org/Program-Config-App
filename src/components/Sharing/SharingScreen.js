@@ -167,7 +167,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: "error",
             });
             hideForm();

@@ -2,7 +2,7 @@ import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useState, useRef, useEffect } from "react";
 import { DialogActions, DialogContent, DialogContentText, Divider, Grid, Typography, FormGroup, FormLabel, FormControl, FormControlLabel, RadioGroup, Radio, Checkbox, Button, RadioButton, Box, CircularProgress, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { DeepCopy } from '../../configs/Utils';
+import { DeepCopy, parseErrorsJoin } from '../../configs/Utils';
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
 
@@ -47,7 +47,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const RestoreOptions = props => {
     let metadataPayload = {};
-
+    
     const [checkedState, setCheckedState] = useState(
         new Array(10).fill(false)
     );
@@ -62,7 +62,7 @@ const RestoreOptions = props => {
     const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             props.setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: "error",
             });
             hideFormHandler();
@@ -71,7 +71,7 @@ const RestoreOptions = props => {
     const validateDM = useDataMutation(metadataValidation, {
         onError: (err) => {
             props.setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: "error",
             });
             hideFormHandler();

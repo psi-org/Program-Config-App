@@ -132,7 +132,7 @@ const ProgramNew = (props) => {
     let metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             props.setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: "error",
             });
             props.setShowProgramForm(false);
@@ -612,7 +612,7 @@ const ProgramNew = (props) => {
                 metadataRequest.mutate({ data: metadata }).then((response) => {
                     if (response.status != "OK") {
                         props.setNotification({
-                            message: parseErrorsJoin(response, ' | '),
+                            message: parseErrorsJoin(response, '\\n'),
                             severity: "error",
                         });
                         props.setShowProgramForm(false);

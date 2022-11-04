@@ -145,7 +145,7 @@ const H2Transfer = ({
     const dsCreateDM = useDataMutation(dsCreateMutation, {
         onError: (err) => {
             setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: "error",
             });
             setTransferH2Program(undefined);
@@ -154,7 +154,7 @@ const H2Transfer = ({
     const dsUpdateDM = useDataMutation(dsUpdateMutation, {
         onError: (err) => {
             setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: "error",
             });
             setTransferH2Program(undefined);

@@ -16,7 +16,7 @@ import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
-import { truncateString } from "../../configs/Utils";
+import { formatAlert, truncateString } from "../../configs/Utils";
 
 const query = {
     results: {
@@ -153,7 +153,7 @@ const ProgramDetails = () => {
                     open={notification !== undefined}
                     key={'topcenter'}>
                     <Alert onClose={() => setNotification(undefined)} severity={notification?.severity || snackSeverity} sx={{ width: '100%' }}>
-                        {notification?.message}
+                        {formatAlert(notification?.message)}
                     </Alert>
                 </Snackbar>
             </div>

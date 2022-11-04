@@ -67,7 +67,7 @@ const BackupScreen = (props) => {
     const dsCreateDM = useDataMutation(dsCreateMutation, {
         onError: (err) => {
             props.setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: "error",
             });
             setProcessing(false);
@@ -77,7 +77,7 @@ const BackupScreen = (props) => {
     const dsUpdateDM = useDataMutation(dsUpdateMutation, {
         onError: (err) => {
             props.setNotification({
-                message: parseErrorsJoin(err.details, ' | '),
+                message: parseErrorsJoin(err.details, '\\n'),
                 severity: "error",
             });
             setProcessing(false);
