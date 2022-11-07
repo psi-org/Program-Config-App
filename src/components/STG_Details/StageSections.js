@@ -910,7 +910,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 onClose={() => setSnackParams(false)}
             >
                 <Alert onClose={() => setSnackParams(false)} severity={snackParams.severity} sx={{ width: '100%' }}>
-                    {formatAlert(snackParams.content)}
+                    {snackParams.content}
                 </Alert>
             </Snackbar>
             {
