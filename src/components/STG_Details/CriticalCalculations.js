@@ -26,7 +26,7 @@ const CriticalCalculations = ({ stageSection, index }) => {
                 <div className="ml_item-desc"><div>{stageSection.dataElements.length} Data Elements</div></div>
                 <div className="ml_item-warning_error "></div>
                 <div className="ml_item-cta">
-                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
+                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} style={{ cursor: 'pointer' }} />
                 </div>
             </div>
             <div className="section_cont" >

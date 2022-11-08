@@ -34,7 +34,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import Chip from '@mui/material/Chip';
 import { Tooltip } from "@mui/material";
 
-const DraggableSection = ({ program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode, readOnly }) => {
+const DraggableSection = ({ program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -152,6 +152,7 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
                                             deStatus={editStatus?.dataElements?.find(dataElement => dataElement.id === de.id)}
                                             isSectionMode={isSectionMode}
                                             readOnly={readOnly}
+                                            setSaveStatus={setSaveStatus}
                                         />;
                                     })
                                 }

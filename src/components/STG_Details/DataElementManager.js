@@ -180,6 +180,7 @@ const DataElementManager = (props) => {
             })
             setSelectionModel([])
             setNewDataElements([])
+            if (props.hnqisMode) props.setSaveStatus('Validate & Save');
         }
     }
 
@@ -278,6 +279,7 @@ const DataElementManager = (props) => {
                                 saveFlag={saveDeFlag}
                                 setSaveFlag={setSaveDeFlag}
                                 hnqisMode={props.hnqisMode}
+                                setSaveStatus={props.setSaveStatus}
                             />
                         </TabPanel>
                     </Box>

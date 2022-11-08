@@ -153,7 +153,7 @@ const ProgramDetails = () => {
                     open={notification !== undefined}
                     key={'topcenter'}>
                     <Alert onClose={() => setNotification(undefined)} severity={notification?.severity || snackSeverity} sx={{ width: '100%' }}>
-                        {notification?.message}
+                        {formatAlert(notification?.message)}
                     </Alert>
                 </Snackbar>
             </div>

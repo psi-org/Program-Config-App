@@ -164,7 +164,7 @@ const queryPCAMetadata = {
 const queryOrganizationsUnit = {
     results: {
         resource: 'organisationUnitLevels',
-        params: ({  ouLevel }) => ({
+        params: ({ ouLevel }) => ({
             fields: ['id', 'level', 'offlineLevels'],
             filter: ['id:in:[' + ouLevel.join(',') + ']']
         })
@@ -293,6 +293,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             programStageDataElements.splice(psdeIdx, 1)
             setSections(sections)
             setProgramStageDataElements(programStageDataElements)
+            if (hnqisMode) setSaveStatus('Validate & Save');
             pushNotification(<span>Data Element removed! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
         }
     }
@@ -347,6 +348,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         setProgramStageDataElements(newPSDEs)
         sections.splice(idx, 1)
         setSections(sections)
+        if (hnqisMode) setSaveStatus('Validate & Save');
         pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
     }
 
@@ -707,8 +709,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 }}>
                     Sections for Program Stage <strong>{programStage.displayName}</strong>
                 </span>
-                {(readOnly || !isSectionMode)  &&
-                    <MuiChip style = {{marginLeft: '1em'}} label="Read Only" variant="outlined" />
+                {(readOnly || !isSectionMode) &&
+                    <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
                 }
             </div>
             {hnqisMode && exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} setStatus={setExportStatus} />}
@@ -755,12 +757,12 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                     {progressSteps !== 1 && <IconCheckmarkCircle24 color={'#00b894'} />}
                                     {
                                         !programSettingsError
-                                        ? <p style={{ maxWidth: '90%' }}>Checking Program settings</p>
+                                            ? <p style={{ maxWidth: '90%' }}>Checking Program settings</p>
                                             : (programSettingsError === 1
-                                                ? <p style={{maxWidth: '90%'}}>Global analytics settings missing.</p>
+                                                ? <p style={{ maxWidth: '90%' }}>Global analytics settings missing.</p>
                                                 : (programSettingsError === 2
-                                                    ? <p style={{maxWidth: '90%'}}>Configured Organisation Unit Levels not found.</p>
-                                                    : <p style={{maxWidth: '90%'}}>Unknown Error</p>
+                                                    ? <p style={{ maxWidth: '90%' }}>Configured Organisation Unit Levels not found.</p>
+                                                    : <p style={{ maxWidth: '90%' }}>Unknown Error</p>
                                                 )
                                             )
                                     }
@@ -833,7 +835,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 {progressSteps !== 7 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 7 && !androidSettings && <IconWarning24 color={'#ffbb00'} />}
                                 {progressSteps !== 7 && androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p style={{maxWidth: '90%'}}> Enabling in-app analytics {!androidSettings ? "(Android Settings app not enabled)" : (androidSettingsError ? '(Error: '+androidSettingsError.message+')' : "")}</p>
+                                <p style={{ maxWidth: '90%' }}> Enabling in-app analytics {!androidSettings ? "(Android Settings app not enabled)" : (androidSettingsError ? '(Error: ' + androidSettingsError.message + ')' : "")}</p>
                             </div>
                         }
                         {(progressSteps > 7) && !programSettingsError &&
@@ -852,7 +854,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 </CustomMUIDialog>
             }
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="wrapper" style={{ overflow: 'auto'}}>
+                <div className="wrapper" style={{ overflow: 'auto' }}>
                     <div className="layout_prgms_stages">
                         {sections.length === 0 && !readOnly &&
                             <Button startIcon={<AddBoxIcon />} variant='contained' style={{ margin: '8px' }} onClick={SectionActions.append}>
@@ -890,6 +892,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                                 hnqisMode={hnqisMode}
                                                 isSectionMode={isSectionMode}
                                                 readOnly={readOnly}
+                                                setSaveStatus={setSaveStatus}
                                             />
                                         })
                                     }
@@ -947,6 +950,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     notify={pushNotification}
                     setAddedSection={setAddedSection}
                     hnqisMode={hnqisMode}
+                    setSaveStatus={setSaveStatus}
                 />
             }
             {deManager &&
@@ -957,6 +961,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     programStageDataElements={programStageDataElements}
                     saveAdd={saveAdd}
                     hnqisMode={hnqisMode}
+                    setSaveStatus={setSaveStatus}
                 />
             }
         </div>

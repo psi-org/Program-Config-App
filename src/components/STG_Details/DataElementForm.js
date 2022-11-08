@@ -65,7 +65,7 @@ const queryId = {
     }
 };
 
-const DataElementForm = ({ program, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisMode }) => {
+const DataElementForm = ({ program, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisMode, setSaveStatus }) => {
 
     const de = programStageDataElement.dataElement
 
@@ -301,6 +301,14 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         })
     }
 
+    const buildStyle = () => {
+        let auxstyle = {};
+        if (deIcon) auxstyle.icon = deIcon;
+        if (deColor) auxstyle.color = deColor;
+
+        return (Object.keys(auxstyle).length > 0)?auxstyle:undefined
+    }
+
     const callSave = () => {
 
         // Save new values in local variable de
@@ -308,9 +316,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         let attributeValues = []
         let metadata = JSON.parse(de?.attributeValues?.find(att => att.attribute.id === METADATA)?.value || '{}')
 
-        data.style = {}
-        if(deIcon) data.style.icon = deIcon
-        if(deColor) data.style.color = deColor
+        data.style = buildStyle()
 
         data.displayInReports = displayInReports
 
@@ -356,6 +362,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         stageDataElement.dataElement.attributeValues = attributeValues
 
         save(de.id, section, stageDataElement)
+        if (hnqisMode) setSaveStatus('Validate & Save');
 
     }
 
@@ -449,12 +456,14 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                         optionSetValue: optionSetValue!==undefined,
                         attributeValues: attributes,
                         legendSets: legendSetsValue,
-                        legendSet : legendSetsValue[0]
+                        legendSet: legendSetsValue[0],
+                        style: buildStyle()
                     }
                 }
                 save(newCreatedDe)
             }
             setSaveFlag(false)
+            if (hnqisMode) setSaveStatus('Validate & Save');
         }
     }, [saveFlag])
     //End New DE

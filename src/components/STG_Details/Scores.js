@@ -53,8 +53,7 @@ const Scores = ({ stageSection, program, index }) => {
                     {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                 </div>
                 <div className="ml_item-cta">
-                    <img src={move_vert_svg} alt="menu" />
-                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
+                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} style={{ cursor: 'pointer' }} />
                 </div>
             </div>
             <div className="section_cont" >

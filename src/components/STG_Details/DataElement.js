@@ -28,7 +28,7 @@ import UpIcon from '@mui/icons-material/ArrowUpward';
 
 import Chip from '@mui/material/Chip';
 
-const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode, deStatus, isSectionMode, readOnly}) => {
+const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode, deStatus, isSectionMode, readOnly, setSaveStatus}) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -122,6 +122,7 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
                             setDeToEdit={DEActions.setEdit}
                             save={DEActions.update}
                             hnqisMode={hnqisMode}
+                            setSaveStatus={setSaveStatus}
                         /> 
                     }
                     { showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }

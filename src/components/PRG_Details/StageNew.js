@@ -276,7 +276,7 @@ const StageNew = (props) => {
                         id="scheduledDaysStart"
                         label="Scheduled Days From Start (*)"
                         type="number"
-                        InputProps={{ inputProps: { min: 0 } }}
+                        inputProps={{ min: 0 }}
                         sx={{ width: '30%' }}
                         fullWidth
                         variant="standard"
