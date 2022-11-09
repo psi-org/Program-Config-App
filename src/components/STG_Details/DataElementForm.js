@@ -313,6 +313,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
         // Save new values in local variable de
         let data = JSON.parse(JSON.stringify(de))
+        
         let attributeValues = []
         let metadata = JSON.parse(de?.attributeValues?.find(att => att.attribute.id === METADATA)?.value || '{}')
 
@@ -322,6 +323,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
         // Value Type
         data.valueType = valueType
+        data.aggregationType = aggType
         // Option Set
         if (optionSet) {
             data.optionSetValue = true

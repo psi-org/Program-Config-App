@@ -559,6 +559,15 @@ const ProgramNew = (props) => {
 
                     createOrUpdateMetaData(prgrm.attributeValues);
 
+                    if (assessmentStage?.programStageDataElements.length == 0)
+                        assessmentStage.programStageDataElements = criticalSteps.dataElements.map((de, index) => ({
+                            sortOrder: index,
+                            compulsory: false,
+                            displayInReports: false,
+                            programStage: { id: assessmentStage.id },
+                            dataElement: de
+                        }));
+
                     if (!props.data) {
                         programStages = [assessmentStage, actionPlanStage];
                         programStageSections = [
