@@ -443,6 +443,7 @@ const ProgramNew = (props) => {
                     let criticalSteps = undefined;
                     let defaultSection = undefined;
                     let scores = undefined;
+                    let excludedStageDEs = [];
 
                     if (!props.data) {
                         Object.assign(prgrm, HnqisProgramConfigs);
@@ -487,6 +488,10 @@ const ProgramNew = (props) => {
                         scores.id = scoresSectionId;
                         scores.name = scores.name;
                         scores.programStage.id = assessmentId;
+                    } else {
+                        assessmentStage = prgrm.programStages.find(section => section.name.toLowerCase().includes('assessment'))
+                        let exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS]
+                        excludedStageDEs = assessmentStage.programStageDataElements.filter(elem => !exclusionsDEs.includes(elem.dataElement.id))
                     }
 
                     prgrm.programTrackedEntityAttributes = DeepCopy(HnqisProgramConfigs.programTrackedEntityAttributes);
@@ -559,14 +564,14 @@ const ProgramNew = (props) => {
 
                     createOrUpdateMetaData(prgrm.attributeValues);
 
-                    if (assessmentStage?.programStageDataElements.length == 0)
-                        assessmentStage.programStageDataElements = criticalSteps.dataElements.map((de, index) => ({
-                            sortOrder: index,
+                    if (assessmentStage?.programStageDataElements.length == 0 || props.data)
+                        assessmentStage.programStageDataElements = excludedStageDEs.concat(criticalSteps.dataElements.map((de, index) => ({
+                            sortOrder: index + excludedStageDEs.length,
                             compulsory: false,
                             displayInReports: false,
                             programStage: { id: assessmentStage.id },
                             dataElement: de
-                        }));
+                        })));
 
                     if (!props.data) {
                         programStages = [assessmentStage, actionPlanStage];
@@ -579,6 +584,7 @@ const ProgramNew = (props) => {
                         programStageSections = criticalSteps
                             ? [criticalSteps]
                             : undefined;
+                        programStages = [assessmentStage];
                     }
                 } else {
                     //Tracker Programs
@@ -611,6 +617,7 @@ const ProgramNew = (props) => {
                     ? {
                         programs: [prgrm],
                         programStageSections: programStageSections,
+                        programStages
                     }
                     : {
                         programs: [prgrm],

@@ -142,7 +142,7 @@ const StageNew = (props) => {
 
         let response = true;
 
-        if (stageName === '') {
+        if (stageName.trim() === '') {
             response = false
             validationErrors.stageName = 'This field is required'
         }else if (stageName.length > MAX_STAGE_NAME_LENGTH) {

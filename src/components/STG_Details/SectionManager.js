@@ -36,7 +36,7 @@ const SectionManager = (props) => {
     }
 
     const formDataIsValid = () =>{
-        return sectionName!=='' && sectionName.length<=MAX_SECTION_NAME_LENGTH;
+        return sectionName.trim() !== '' && sectionName.length<=MAX_SECTION_NAME_LENGTH;
     }
 
     function submission() {
@@ -68,7 +68,7 @@ const SectionManager = (props) => {
                 
                 <TextField
                     error={sentForm && !formDataIsValid()}
-                    helperText={sentForm?(sectionName==='' ? 'This field is required' : (sectionName.length>MAX_SECTION_NAME_LENGTH ? `The Section Name cannot exceed ${MAX_SECTION_NAME_LENGTH} characters long` : '') ): ''}
+                    helperText={sentForm?(sectionName.trim()==='' ? 'This field is required' : (sectionName.length>MAX_SECTION_NAME_LENGTH ? `The Section Name cannot exceed ${MAX_SECTION_NAME_LENGTH} characters long` : '') ): ''}
                     margin="normal"
                     id="name"
                     label="Section Name"
