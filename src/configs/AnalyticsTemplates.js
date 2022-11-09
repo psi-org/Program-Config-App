@@ -7,11 +7,11 @@ export const ProgramIndicatorTemplate = {
     "aggregationType": "COUNT",
     "expression": "V{enrollment_count}",
     "sharing": {
-      "owner": "id",
-      "external": false,
-      "users": {    },
-      "userGroups": {    },
-      "public": "--------"
+        "owner": "id",
+        "external": false,
+        "users": {},
+        "userGroups": {},
+        "public": "--------"
     },
     "filter": "A{ulU9KKgSLYe} == \"competent\"",
     "analyticsType": "ENROLLMENT",
@@ -22,11 +22,11 @@ export const ProgramIndicatorTemplate = {
             "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
             "boundaryTarget": "ENROLLMENT_DATE",
             "sharing": {
-              "owner": "id",
-              "external": false,
-              "users": {    },
-              "userGroups": {    },
-              "public": "--------"
+                "owner": "id",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "--------"
             },
             "favorite": false
         },
@@ -35,11 +35,11 @@ export const ProgramIndicatorTemplate = {
             "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
             "boundaryTarget": "ENROLLMENT_DATE",
             "sharing": {
-              "owner": "id",
-              "external": false,
-              "users": {    },
-              "userGroups": {    },
-              "public": "--------"
+                "owner": "id",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "--------"
             },
             "favorite": false
         }
@@ -80,11 +80,11 @@ export const compLastSixMonthsByOUTable = {
     "completedOnly": false,
     "colTotals": false,
     "sharing": {
-      "owner": "id",
-      "external": false,
-      "users": {    },
-      "userGroups": {    },
-      "public": "--------"
+        "owner": "id",
+        "external": false,
+        "users": {},
+        "userGroups": {},
+        "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
     "aggregationType": "DEFAULT",
@@ -198,11 +198,11 @@ export const compLastSixMonthsPie = {
     "completedOnly": false,
     "colTotals": false,
     "sharing": {
-      "owner": "id",
-      "external": false,
-      "users": {    },
-      "userGroups": {    },
-      "public": "--------"
+        "owner": "id",
+        "external": false,
+        "users": {},
+        "userGroups": {},
+        "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
     "aggregationType": "DEFAULT",
@@ -317,11 +317,11 @@ export const compLastSixMonthsTable = {
     "completedOnly": false,
     "colTotals": false,
     "sharing": {
-      "owner": "id",
-      "external": false,
-      "users": {    },
-      "userGroups": {    },
-      "public": "--------"
+        "owner": "id",
+        "external": false,
+        "users": {},
+        "userGroups": {},
+        "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
     "aggregationType": "DEFAULT",
@@ -409,11 +409,11 @@ export const ProgramIndicatorTemplateNoA = {
     "aggregationType": "COUNT",
     "expression": "V{enrollment_count}",
     "sharing": {
-      "owner": "id",
-      "external": false,
-      "users": {    },
-      "userGroups": {    },
-      "public": "--------"
+        "owner": "id",
+        "external": false,
+        "users": {},
+        "userGroups": {},
+        "public": "--------"
     },
     "analyticsType": "ENROLLMENT",
     "program": { "id": "<Program Id>" },
@@ -452,11 +452,11 @@ export const ProgramIndicatorTemplateGS = {
     "aggregationType": "AVERAGE",
     "expression": "A{NQdpdST0Gcx}",
     "sharing": {
-      "owner": "id",
-      "external": false,
-      "users": {    },
-      "userGroups": {    },
-      "public": "--------"
+        "owner": "id",
+        "external": false,
+        "users": {},
+        "userGroups": {},
+        "public": "--------"
     },
     "filter": "d2:hasValue(A{NQdpdST0Gcx})",
     "decimals": 0,
@@ -491,12 +491,12 @@ export const ProgramIndicatorTemplateGS = {
     ]
 }
 
-export const AverageScoreByDistrictByPivotTable =  {
+export const AverageScoreByDistrictByPivotTable = {
     "id": "idPivotTable",
     "name": "programId - Average Score by District from last 12 months",
     "code": "programId_Scripted4",
     "legend": {
-      "hidden": false
+        "hidden": false
     },
     "publicAccess": "--------",
     "userOrganisationUnitChildren": false,
@@ -522,17 +522,17 @@ export const AverageScoreByDistrictByPivotTable =  {
     "showData": true,
     "numberType": "VALUE",
     "hideEmptyRows": true,
-    "parentGraphMap": { },
+    "parentGraphMap": {},
     "displayDensity": "NORMAL",
     "regressionType": "NONE",
     "completedOnly": false,
     "colTotals": false,
     "sharing": {
-      "owner": "id",
-      "external": false,
-      "users": {    },
-      "userGroups": {    },
-      "public": "--------"
+        "owner": "id",
+        "external": false,
+        "users": {},
+        "userGroups": {},
+        "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
     "aggregationType": "DEFAULT",
@@ -545,81 +545,81 @@ export const AverageScoreByDistrictByPivotTable =  {
     "rowTotals": false,
     "digitGroupSeparator": "SPACE",
     "regression": false,
-    "fontStyle": {  },
+    "fontStyle": {},
     "access": {
-      "read": true,
-      "update": true,
-      "externalize": true,
-      "delete": true,
-      "write": true,
-      "manage": true
+        "read": true,
+        "update": true,
+        "externalize": true,
+        "delete": true,
+        "write": true,
+        "manage": true
     },
     "reportingParams": {
-      "parentOrganisationUnit": false,
-      "reportingPeriod": false,
-      "organisationUnit": false,
-      "grandParentOrganisationUnit": false
+        "parentOrganisationUnit": false,
+        "reportingPeriod": false,
+        "organisationUnit": false,
+        "grandParentOrganisationUnit": false
     },
     "relativePeriods": {
-      "thisYear": false,
-      "quartersLastYear": false,
-      "last30Days": false,
-      "last52Weeks": false,
-      "thisWeek": false,
-      "last90Days": false,
-      "last60Days": false,
-      "lastMonth": false,
-      "last14Days": false,
-      "biMonthsThisYear": false,
-      "monthsThisYear": false,
-      "last2SixMonths": false,
-      "yesterday": false,
-      "thisQuarter": false,
-      "last12Months": true,
-      "last5FinancialYears": false,
-      "thisSixMonth": false,
-      "lastQuarter": false,
-      "thisFinancialYear": false,
-      "last4Weeks": false,
-      "last3Months": false,
-      "thisDay": false,
-      "thisMonth": false,
-      "last5Years": false,
-      "last6BiMonths": false,
-      "last4BiWeeks": false,
-      "lastFinancialYear": false,
-      "lastBiWeek": false,
-      "weeksThisYear": false,
-      "last6Months": false,
-      "last3Days": false,
-      "quartersThisYear": false,
-      "monthsLastYear": false,
-      "lastWeek": false,
-      "last7Days": false,
-      "last180Days": false,
-      "thisBimonth": false,
-      "lastBimonth": false,
-      "lastSixMonth": false,
-      "thisBiWeek": false,
-      "lastYear": false,
-      "last12Weeks": false,
-      "last4Quarters": false
+        "thisYear": false,
+        "quartersLastYear": false,
+        "last30Days": false,
+        "last52Weeks": false,
+        "thisWeek": false,
+        "last90Days": false,
+        "last60Days": false,
+        "lastMonth": false,
+        "last14Days": false,
+        "biMonthsThisYear": false,
+        "monthsThisYear": false,
+        "last2SixMonths": false,
+        "yesterday": false,
+        "thisQuarter": false,
+        "last12Months": true,
+        "last5FinancialYears": false,
+        "thisSixMonth": false,
+        "lastQuarter": false,
+        "thisFinancialYear": false,
+        "last4Weeks": false,
+        "last3Months": false,
+        "thisDay": false,
+        "thisMonth": false,
+        "last5Years": false,
+        "last6BiMonths": false,
+        "last4BiWeeks": false,
+        "lastFinancialYear": false,
+        "lastBiWeek": false,
+        "weeksThisYear": false,
+        "last6Months": false,
+        "last3Days": false,
+        "quartersThisYear": false,
+        "monthsLastYear": false,
+        "lastWeek": false,
+        "last7Days": false,
+        "last180Days": false,
+        "thisBimonth": false,
+        "lastBimonth": false,
+        "lastSixMonth": false,
+        "thisBiWeek": false,
+        "lastYear": false,
+        "last12Weeks": false,
+        "last4Quarters": false
     },
     "legendSet": {
-      "id": "id"
+        "id": "id"
     },
-    "columns": [{"id": "dx"}, {"id": "pe"}],
-    "rowDimensions": [ "ou"],
-    "series": [ ],
-    "columnDimensions": ["dx","pe"],
-    "dataDimensionItems": [ ],
+    "columns": [{ "id": "dx" }, { "id": "pe" }],
+    "rowDimensions": ["ou"],
+    "series": [],
+    "columnDimensions": ["dx", "pe"],
+    "dataDimensionItems": [],
     "organisationUnitLevels": [],
     "organisationUnits": [
-      {
-        "id": "id"
-      }],
-    "rows": [{"id": "ou"}]
-  }
+        {
+            "id": "id"
+        }],
+    "rows": [{ "id": "ou" }]
+}
 
 export const NumberOfAssessmentByPivotTable = {
     "id": "<NumberOfAssessmentId>",
@@ -660,8 +660,8 @@ export const NumberOfAssessmentByPivotTable = {
     "sharing": {
         "owner": "id",
         "external": false,
-        "users": {    },
-        "userGroups": {    },
+        "users": {},
+        "userGroups": {},
         "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
@@ -744,8 +744,8 @@ export const NumberOfAssessmentByPivotTable = {
     "organisationUnits": [],
     "filters": [{ "id": "ou" }],
     "rows": [{ "id": "pe" }],
-    "organisationUnitLevels": [ ],
-    "organisationUnits": [ { "id": "id" } ]
+    "organisationUnitLevels": [],
+    "organisationUnits": [{ "id": "id" }]
 }
 
 export const AverageGlobalScoreByColumn = {
@@ -788,8 +788,8 @@ export const AverageGlobalScoreByColumn = {
     "sharing": {
         "owner": "id",
         "external": false,
-        "users": {    },
-        "userGroups": {    },
+        "users": {},
+        "userGroups": {},
         "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
@@ -906,8 +906,8 @@ export const AverageGlobalScoreByColumn = {
             "id": "pe"
         }
     ],
-    "organisationUnitLevels": [ ],
-    "organisationUnits": [ { "id": "id" } ]
+    "organisationUnitLevels": [],
+    "organisationUnits": [{ "id": "id" }]
 }
 
 export const AssessmentByCompetencyByColumn = {
@@ -949,8 +949,8 @@ export const AssessmentByCompetencyByColumn = {
     "sharing": {
         "owner": "id",
         "external": false,
-        "users": {    },
-        "userGroups": {    },
+        "users": {},
+        "userGroups": {},
         "public": "--------"
     },
     "hideEmptyRowItems": "NONE",
@@ -1043,36 +1043,36 @@ export const AssessmentByCompetencyByColumn = {
     "organisationUnits": [],
     "filters": [{ "id": "ou" }],
     "rows": [{ "id": "pe" }],
-    "organisationUnitLevels": [ ],
-    "organisationUnits": [ { "id": "id" } ]
+    "organisationUnitLevels": [],
+    "organisationUnits": [{ "id": "id" }]
 }
 
 export const GlobalScoreByMap = {
-        "id": "id_Map",
-        "name": "CD IM H2 - test",
-        "code": "IdProgram_Scripted8",
-        "publicAccess": "rw------",
-        "basemap": "osmLight",
-        "externalAccess": false,
-        "subscribed": false,
-        "sharing": {
-          "owner": "id",
-          "external": false,
-          "users": {    },
-          "userGroups": {    },
-          "public": "--------"
-        },
-        "favorite": false,
-        "access": {
-          "read": true,
-          "update": true,
-          "externalize": true,
-          "delete": true,
-          "write": true,
-          "manage": true
-        },
-        "mapViews": [
-          {
+    "id": "id_Map",
+    "name": "CD IM H2 - test",
+    "code": "IdProgram_Scripted8",
+    "publicAccess": "rw------",
+    "basemap": "osmLight",
+    "externalAccess": false,
+    "subscribed": false,
+    "sharing": {
+        "owner": "id",
+        "external": false,
+        "users": {},
+        "userGroups": {},
+        "public": "--------"
+    },
+    "favorite": false,
+    "access": {
+        "read": true,
+        "update": true,
+        "externalize": true,
+        "delete": true,
+        "write": true,
+        "manage": true
+    },
+    "mapViews": [
+        {
             "userOrganisationUnitChildren": false,
             "subscribed": false,
             "userOrganisationUnit": false,
@@ -1086,28 +1086,28 @@ export const GlobalScoreByMap = {
             "eventClustering": false,
             "opacity": 1.0,
             "parentLevel": 0,
-            "parentGraphMap": { },
+            "parentGraphMap": {},
             "completedOnly": false,
             "eventPointRadius": 0,
-            "sharing": { },
+            "sharing": {},
             "hideSubtitle": false,
             "externalAccess": false,
             "digitGroupSeparator": "SPACE",
             "access": {
-              "read": true,
-              "update": true,
-              "externalize": true,
-              "delete": true,
-              "write": true,
-              "manage": true
+                "read": true,
+                "update": true,
+                "externalize": true,
+                "delete": true,
+                "write": true,
+                "manage": true
             },
-            "organisationUnitLevels": [ ],
+            "organisationUnitLevels": [],
             "organisationUnits": [{
                 "id": "id"
-              }],
-            "rows": [ {"id": "ou"}]
-          },
-          {
+            }],
+            "rows": [{ "id": "ou" }]
+        },
+        {
             "userOrganisationUnitChildren": false,
             "subscribed": false,
             "userOrganisationUnit": false,
@@ -1122,88 +1122,89 @@ export const GlobalScoreByMap = {
             "eventClustering": false,
             "opacity": 1.0,
             "parentLevel": 0,
-            "parentGraphMap": { },
+            "parentGraphMap": {},
             "completedOnly": false,
             "eventPointRadius": 0,
-            "sharing": { },
+            "sharing": {},
             "aggregationType": "AVERAGE",
             "hideSubtitle": false,
             "externalAccess": false,
             "digitGroupSeparator": "SPACE",
             "program": {
-              "id": "idPorgram"
+                "id": "idPorgram"
             },
             "access": {
-              "read": true,
-              "update": true,
-              "externalize": true,
-              "delete": true,
-              "write": true,
-              "manage": true
+                "read": true,
+                "update": true,
+                "externalize": true,
+                "delete": true,
+                "write": true,
+                "manage": true
             },
             "relativePeriods": {
-              "thisYear": false,
-              "quartersLastYear": false,
-              "last30Days": false,
-              "last52Weeks": false,
-              "thisWeek": false,
-              "last90Days": false,
-              "last60Days": false,
-              "lastMonth": false,
-              "last14Days": false,
-              "biMonthsThisYear": false,
-              "monthsThisYear": false,
-              "last2SixMonths": false,
-              "yesterday": false,
-              "thisQuarter": false,
-              "last12Months": true,
-              "last5FinancialYears": false,
-              "thisSixMonth": false,
-              "lastQuarter": false,
-              "thisFinancialYear": false,
-              "last4Weeks": false,
-              "last3Months": false,
-              "thisDay": false,
-              "thisMonth": false,
-              "last5Years": false,
-              "last6BiMonths": false,
-              "last4BiWeeks": false,
-              "lastFinancialYear": false,
-              "lastBiWeek": false,
-              "weeksThisYear": false,
-              "last6Months": false,
-              "last3Days": false,
-              "quartersThisYear": false,
-              "monthsLastYear": false,
-              "lastWeek": false,
-              "last7Days": false,
-              "last180Days": false,
-              "thisBimonth": false,
-              "lastBimonth": false,
-              "lastSixMonth": false,
-              "thisBiWeek": false,
-              "lastYear": false,
-              "last12Weeks": false,
-              "last4Quarters": false
+                "thisYear": false,
+                "quartersLastYear": false,
+                "last30Days": false,
+                "last52Weeks": false,
+                "thisWeek": false,
+                "last90Days": false,
+                "last60Days": false,
+                "lastMonth": false,
+                "last14Days": false,
+                "biMonthsThisYear": false,
+                "monthsThisYear": false,
+                "last2SixMonths": false,
+                "yesterday": false,
+                "thisQuarter": false,
+                "last12Months": true,
+                "last5FinancialYears": false,
+                "thisSixMonth": false,
+                "lastQuarter": false,
+                "thisFinancialYear": false,
+                "last4Weeks": false,
+                "last3Months": false,
+                "thisDay": false,
+                "thisMonth": false,
+                "last5Years": false,
+                "last6BiMonths": false,
+                "last4BiWeeks": false,
+                "lastFinancialYear": false,
+                "lastBiWeek": false,
+                "weeksThisYear": false,
+                "last6Months": false,
+                "last3Days": false,
+                "quartersThisYear": false,
+                "monthsLastYear": false,
+                "lastWeek": false,
+                "last7Days": false,
+                "last180Days": false,
+                "thisBimonth": false,
+                "lastBimonth": false,
+                "lastSixMonth": false,
+                "thisBiWeek": false,
+                "lastYear": false,
+                "last12Weeks": false,
+                "last4Quarters": false
             },
             "legendSet": {
-              "id": "id"
+                "id": "id"
             },
             "filterDimensions": [
-              "pe"
+                "pe"
             ],
             "columns": [{
-                "id": "dx"}],
+                "id": "dx"
+            }],
             "columnDimensions": ["dx"],
-            "dataDimensionItems": [ ],
+            "dataDimensionItems": [],
             "organisationUnitLevels": [],
             "organisationUnits": [{
                 "id": "id"
-              }],
-            "filters": [{"id": "pe"}],
-            "rows": [{"id": "ou"}]
-          }
-        ]
+            }],
+            "filters": [{ "id": "pe" }],
+            "rows": [{ "id": "ou" }]
+        }
+    ]
 }
 
 export const dashboardsTemplate = {
@@ -1236,8 +1237,8 @@ export const dashVisualization = {
     "sharing": {
         "owner": "id",
         "external": false,
-        "users": {    },
-        "userGroups": {    },
+        "users": {},
+        "userGroups": {},
         "public": "--------"
     },
     //"width": "<28 or 32>",
@@ -1268,8 +1269,8 @@ export const dashMap = {
     "sharing": {
         "owner": "id",
         "external": false,
-        "users": {    },
-        "userGroups": {    },
+        "users": {},
+        "userGroups": {},
         "public": "--------"
     },
     "width": 60,
@@ -1298,7 +1299,7 @@ export const LineListGlobalScore = {
     "subscribed": false,
     "hideEmptyRows": false,
     "parentGraphMap": {
-      "DLBRREc72M8": ""
+        "DLBRREc72M8": ""
     },
     "userOrganisationUnit": true,
     "rowSubTotals": false,
@@ -1309,8 +1310,8 @@ export const LineListGlobalScore = {
     "sharing": {
         "owner": "id",
         "external": false,
-        "users": {    },
-        "userGroups": {    },
+        "users": {},
+        "userGroups": {},
         "public": "--------"
     },
     "colTotals": true,
@@ -1330,102 +1331,102 @@ export const LineListGlobalScore = {
     "digitGroupSeparator": "SPACE",
     "hideTitle": false,
     "program": {
-      "id": "<program id>"
+        "id": "<program id>"
     },
     "access": {
-      "read": true,
-      "update": true,
-      "externalize": true,
-      "delete": true,
-      "write": true,
-      "manage": true
+        "read": true,
+        "update": true,
+        "externalize": true,
+        "delete": true,
+        "write": true,
+        "manage": true
     },
     "relativePeriods": {
-      "thisYear": false,
-      "quartersLastYear": false,
-      "last10Years": false,
-      "last30Days": false,
-      "last52Weeks": false,
-      "thisWeek": false,
-      "last90Days": false,
-      "last60Days": false,
-      "lastMonth": false,
-      "last14Days": false,
-      "biMonthsThisYear": false,
-      "monthsThisYear": false,
-      "last2SixMonths": false,
-      "yesterday": false,
-      "thisQuarter": false,
-      "last12Months": true,
-      "last5FinancialYears": false,
-      "thisSixMonth": false,
-      "lastQuarter": false,
-      "thisFinancialYear": false,
-      "last4Weeks": false,
-      "last3Months": false,
-      "thisDay": false,
-      "thisMonth": false,
-      "last5Years": false,
-      "last6BiMonths": false,
-      "last10FinancialYears": false,
-      "last4BiWeeks": false,
-      "lastFinancialYear": false,
-      "lastBiWeek": false,
-      "weeksThisYear": false,
-      "last6Months": false,
-      "last3Days": false,
-      "quartersThisYear": false,
-      "monthsLastYear": false,
-      "lastWeek": false,
-      "last7Days": false,
-      "last180Days": false,
-      "thisBimonth": false,
-      "lastBimonth": false,
-      "lastSixMonth": false,
-      "thisBiWeek": false,
-      "lastYear": false,
-      "last12Weeks": false,
-      "last4Quarters": false
+        "thisYear": false,
+        "quartersLastYear": false,
+        "last10Years": false,
+        "last30Days": false,
+        "last52Weeks": false,
+        "thisWeek": false,
+        "last90Days": false,
+        "last60Days": false,
+        "lastMonth": false,
+        "last14Days": false,
+        "biMonthsThisYear": false,
+        "monthsThisYear": false,
+        "last2SixMonths": false,
+        "yesterday": false,
+        "thisQuarter": false,
+        "last12Months": true,
+        "last5FinancialYears": false,
+        "thisSixMonth": false,
+        "lastQuarter": false,
+        "thisFinancialYear": false,
+        "last4Weeks": false,
+        "last3Months": false,
+        "thisDay": false,
+        "thisMonth": false,
+        "last5Years": false,
+        "last6BiMonths": false,
+        "last10FinancialYears": false,
+        "last4BiWeeks": false,
+        "lastFinancialYear": false,
+        "lastBiWeek": false,
+        "weeksThisYear": false,
+        "last6Months": false,
+        "last3Days": false,
+        "quartersThisYear": false,
+        "monthsLastYear": false,
+        "lastWeek": false,
+        "last7Days": false,
+        "last180Days": false,
+        "thisBimonth": false,
+        "lastBimonth": false,
+        "lastSixMonth": false,
+        "thisBiWeek": false,
+        "lastYear": false,
+        "last12Weeks": false,
+        "last4Quarters": false
     },
     "programStage": {
-      "id": "<stage id>"
+        "id": "<stage id>"
     },
-    "dataElementGroupSetDimensions": [  ],
+    "dataElementGroupSetDimensions": [],
     "attributeDimensions": [
-      {
-        "attribute": {
-          "id": "<attribute DE id"
+        {
+            "attribute": {
+                "id": "<attribute DE id"
+            }
         }
-      }
     ],
     "columnDimensions": [
         "pe",
         "ou",
         "NQdpdST0Gcx",
         "F0Qcr8ANr7t"
-      ],
-    "columns": [ ],
-    "organisationUnitGroupSetDimensions": [  ],
-    "dataElementDimensions": [
-      {
-        "programStage": {
-          "id": "<program id>"
-        },
-        "dataElement": {
-          "id": "<DE id>"
-        }
-      }
     ],
-    "periods": [  ],
-    "organisationUnitLevels": [ ],
-    "organisationUnits": [ { "id": "id" } ],
-    "categoryDimensions": [  ],
-    "filters": [  ],
-    "rows": [  ],
-    "rowDimensions": [  ]
+    "columns": [],
+    "organisationUnitGroupSetDimensions": [],
+    "dataElementDimensions": [
+        {
+            "programStage": {
+                "id": "<program id>"
+            },
+            "dataElement": {
+                "id": "<DE id>"
+            }
+        }
+    ],
+    "periods": [],
+    "organisationUnitLevels": [],
+    "organisationUnits": [{ "id": "id" }],
+    "categoryDimensions": [],
+    "filters": [],
+    "rows": [],
+    "rowDimensions": []
 }
 
-export const  dashEventReport = {
+export const dashEventReport = {
     "type": "EVENT_REPORT",
     "externalAccess": false,
     "contentCount": 1,
@@ -1434,8 +1435,8 @@ export const  dashEventReport = {
     "sharing": {
         "owner": "id",
         "external": false,
-        "users": {    },
-        "userGroups": {    },
+        "users": {},
+        "userGroups": {},
         "public": "--------"
     },
     "width": 60,
@@ -1444,14 +1445,14 @@ export const  dashEventReport = {
     "interpretationLikeCount": 0,
     "favorite": false,
     "access": {
-      "read": true,
-      "update": true,
-      "externalize": true,
-      "delete": true,
-      "write": true,
-      "manage": true
+        "read": true,
+        "update": true,
+        "externalize": true,
+        "delete": true,
+        "write": true,
+        "manage": true
     },
     "eventReport": {
-      "id": "<eventReport id>"
+        "id": "<eventReport id>"
     }
-  }
+}

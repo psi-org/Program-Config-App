@@ -1118,6 +1118,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     GlobalScorebyMap.id = uidPool.shift()
     GlobalScorebyMap.name = programShortName + " - Global Score Map"
     GlobalScorebyMap.code = programId + "_Scripted8"
+    GlobalScorebyMap.publicAccess = sharingSettings.public
     GlobalScorebyMap.sharing = sharingSettings
     GlobalScorebyMap.mapViews[0].sharing = sharingSettings
     GlobalScorebyMap.mapViews[0].organisationUnitLevels = [mapLevel]
@@ -1129,12 +1130,12 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     GlobalScorebyMap.mapViews[1].organisationUnits[0].id = ouRoot
     GlobalScorebyMap.mapViews[1].legendSet.id = VISUALIZATIONS_LEGEND
     maps.push(GlobalScorebyMap)
-    console.log(GlobalScorebyMap.mapViews[1].sharing)
     //Dashboard - Map
     let GlobalScorebyMap1 = DeepCopy(dashMap)
     GlobalScorebyMap1.id = uidPool.shift()
     GlobalScorebyMap1.type = "MAP"
     GlobalScorebyMap1.sharing = sharingSettings
+    GlobalScorebyMap1.publicAccess = sharingSettings.public
     GlobalScorebyMap1.map.id = GlobalScorebyMap.id
     dashboardItems.push(GlobalScorebyMap1)
 
@@ -1169,9 +1170,6 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     dashboardsGA.sharing = sharingSettings
     dashboardsGA.dashboardItems = [...dashboardItems]
     dashboards.push(dashboardsGA)
-
-    console.log (dashboardsGA.sharing)
-
 
     //Return
     return { visualizations, maps, androidSettingsVisualizations, dashboards, eventReports }
