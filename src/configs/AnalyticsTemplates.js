@@ -1089,12 +1089,7 @@ export const GlobalScoreByMap = {
             "parentGraphMap": { },
             "completedOnly": false,
             "eventPointRadius": 0,
-            "sharing": {
-              "owner": "id",
-              "external": false,
-              "users": {        },
-              "userGroups": {        }
-            },
+            "sharing": { },
             "hideSubtitle": false,
             "externalAccess": false,
             "digitGroupSeparator": "SPACE",
@@ -1130,12 +1125,7 @@ export const GlobalScoreByMap = {
             "parentGraphMap": { },
             "completedOnly": false,
             "eventPointRadius": 0,
-            "sharing": {
-              "owner": "id",
-              "external": false,
-              "users": {        },
-              "userGroups": {        }
-            },
+            "sharing": { },
             "aggregationType": "AVERAGE",
             "hideSubtitle": false,
             "externalAccess": false,
@@ -1227,8 +1217,8 @@ export const dashboardsTemplate = {
     "sharing": {
         "owner": "id",
         "external": false,
-        "users": {    },
-        "userGroups": {    },
+        "users": "",
+        "userGroups": "",
         "public": "--------"
     },
     "itemCount": 0,
