@@ -146,11 +146,11 @@
     ],
     "userRoles": [
         {
-            "name": "_App - Program Config App",
+            "name": "_App - Program Configuration App",
             "id": "QbYqOgwk5fJ",
-            "displayName": "_App - Program Config App",
+            "displayName": "_App - Program Configuration App",
             "publicAccess": "rw------",
-            "description": "Program Config App access and required authorities for basic usage.",
+            "description": "Program Configuration App access and required authorities for basic usage.",
             "authorities": [
                 "F_PROGRAM_PRIVATE_ADD",
                 "F_VISUALIZATION_PUBLIC_ADD",
@@ -186,7 +186,7 @@
             "id": "akI7EzBaRaJ",
             "displayName": "PCA - Administrator",
             "publicAccess": "rw------",
-            "description": "Program Config App additional authorities for installing metadata.",
+            "description": "Program Configuration App additional authorities for installing metadata.",
             "authorities": [
                 "F_ATTRIBUTE_PUBLIC_ADD",
                 "F_TRACKED_ENTITY_ADD",
@@ -200,7 +200,7 @@
             "id": "JDmJ4ADTaDq",
             "displayName": "PCA - Users Sharing Management",
             "publicAccess": "rw------",
-            "description": "Users view authorities for the Sharing Settings in the Program Config App",
+            "description": "Users view authorities for the Sharing Settings in the Program Configuration App",
             "authorities": [
                 "F_USER_VIEW"
             ]

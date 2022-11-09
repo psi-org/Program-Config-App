@@ -189,7 +189,6 @@ const H2Convert = ({
     });
     const { data: haQuery } = useDataQuery(queryHealthAreas);
 
-    const [useCompetency, setUseCompetency] = useState(false);
     const [healthArea, setHealthArea] = useState("");
     const [healthAreaOptions, setHealthAreaOptions] = useState(undefined);
 
@@ -644,6 +643,7 @@ const H2Convert = ({
             });
 
             let pcaMetadataVal = h2SettingsRef.current.saveMetaData();
+            let useCompetency = pcaMetadataVal?.useCompetencyClass === 'Yes';
             /*
             pcaMetadataVal.useCompetencyClass = useCompetency ? "Yes" : "No";
             pcaMetadataVal.healthArea = healthArea;
@@ -719,11 +719,19 @@ const H2Convert = ({
                 criticalSteps.dataElements.splice(indexB, 1);
             }
 
+            assessmentStage.programStageDataElements = program_programStageDataElements.map((psde) => {
+                psde.programStage = { id: assessmentId };
+                return psde;
+            });
+
             assessmentStage.programStageDataElements =
-                program_programStageDataElements.map((psde) => {
-                    psde.programStage = { id: assessmentId };
-                    return psde;
-                });
+                assessmentStage.programStageDataElements.concat(criticalSteps.dataElements.map((de, index) => ({
+                    sortOrder: index + assessmentStage.programStageDataElements.length + 1,
+                    compulsory: false,
+                    displayInReports: false,
+                    programStage: { id: assessmentStage.id },
+                    dataElement: de
+                })));
 
             programStages = [assessmentStage, actionPlanStage];
             programStageSections = newSections.concat(criticalSteps, scores);

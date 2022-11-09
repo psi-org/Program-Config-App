@@ -108,7 +108,7 @@ export function truncateString(strVal, characters = 50,useEllipsis=true) {
 }
 
 export function formatAlert(text) {
-    return text?.split('\\n').map(elem => <p>{elem}</p>)
+    return text?.split('\\n').map((elem, index) => <p key={index}>{elem}</p>)
 }
 
 export function extractMetadataPermissions(permissions){

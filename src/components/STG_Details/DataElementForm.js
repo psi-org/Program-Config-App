@@ -313,6 +313,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
         // Save new values in local variable de
         let data = JSON.parse(JSON.stringify(de))
+        
         let attributeValues = []
         let metadata = JSON.parse(de?.attributeValues?.find(att => att.attribute.id === METADATA)?.value || '{}')
 
@@ -322,6 +323,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
         // Value Type
         data.valueType = valueType
+        data.aggregationType = aggType
         // Option Set
         if (optionSet) {
             data.optionSetValue = true
@@ -805,9 +807,8 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                                     This number will generate the feedback hierarchy in the app, while also grouping the scores to calculate the composite scores.<br /><br />
                                     <strong>There cannot exist gaps in the Compositive indicators!</strong> The existence of gaps will be validated through the Config App before Setting up the program.<br /><br />
                                     <strong>Keep in mind the following:</strong><br /><br />
-                                    - Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc.
-                                    - Feedback Order gaps will result in logic errors.<br />
-                                    Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.<br /><br />
+                                    - Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc.<br />
+                                    - Feedback Order gaps will result in logic errors. Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.<br /><br />
                                     - Questions are not required to be grouped together to belong to the same level of the compositive indicator, for example: <br />
                                     Having [ 1, 1.1, 1.2, 1.3, 2, 2.1, 2.2, 1.4 ] is a valid configuration as there are no gaps in the same level of the compositive indicator.
                                 </p>

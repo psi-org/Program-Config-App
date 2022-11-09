@@ -1,7 +1,7 @@
 const config = {
     type: 'app',
-    title: 'Program Config App',
-    short_name:"Program Config App",
+    title: 'Program Configuration App',
+    short_name:"Program Configuration App",
     description:"Tracker Programs management tool",
     entryPoints: {
         app: './src/App.js',

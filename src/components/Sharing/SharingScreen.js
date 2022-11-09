@@ -29,6 +29,7 @@ import {
     FormGroup, FormControlLabel, Checkbox, Tooltip
 } from "@mui/material";
 import ObjectSharing from "./ObjectSharing";
+import { ACTION_PLAN_ACTION, ACTION_PLAN_DUE_DATE, ACTION_PLAN_RESPONSIBLE, COMPETENCY_CLASS, CRITICAL_STEPS, NON_CRITICAL_STEPS } from "../../configs/Constants";
 
 const sharingQuery = {
     results: {
@@ -369,7 +370,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     const apply = (level) => {
         setContent('loading');
 
-        const programTypeId = metadata.attributes?.filter((attribute) => {
+        const programTypeId = metadata?.attributes?.filter((attribute) => {
             return attribute.code === "PROGRAM_TYPE"
         })[0]?.id;
         const programType = programTypeId ? (metadata.programs[0].attributeValues?.filter((av) => { return av.attribute.id === programTypeId })[0]?.value || 'Tracker') : 'Tracker';
@@ -386,7 +387,8 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
         payloadMetadata.programIndicators = metadata.programIndicators;
         switch (level) {
             case 2:
-                payloadMetadata.dataElements = metadata.dataElements;
+                let exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS, ACTION_PLAN_ACTION, ACTION_PLAN_DUE_DATE, ACTION_PLAN_RESPONSIBLE];
+                payloadMetadata.dataElements = metadata.dataElements.filter(de => !exclusionsDEs.includes(de.id));
             case 1:
                 payloadMetadata.programStages = metadata.programStages;
                 break;
@@ -404,8 +406,9 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                         severity: 'success'
                     })
                 } else {
+                    
                     setNotification({
-                        message: parseErrors(response),
+                        message: parseErrorsJoin(response, '\\n'),
                         severity: 'error'
                     })
                 }
