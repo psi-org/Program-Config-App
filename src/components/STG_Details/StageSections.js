@@ -39,7 +39,7 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
-import { DeepCopy, formatAlert, truncateString } from "../../configs/Utils";
+import { DeepCopy, extractMetadataPermissions, formatAlert, truncateString } from "../../configs/Utils";
 import { isEmptyObject } from "jquery";
 
 const createMutation = {
@@ -176,7 +176,7 @@ const queryProgramSettings = {
         resource: 'programs',
         id: ({ programId }) => programId,
         params: {
-            fields: ['*']
+            fields: ['lastUpdated', 'id', 'href', 'created', 'name', 'shortName', 'publicAccess', 'ignoreOverdueEvents', 'skipOffline', 'enrollmentDateLabel', 'onlyEnrollOnce', 'version', 'displayFormName', 'displayEnrollmentDateLabel', 'selectIncidentDatesInFuture', 'maxTeiCountToReturn', 'selectEnrollmentDatesInFuture', 'registration', 'openDaysAfterCoEndDate', 'favorite', 'useFirstStageDuringRegistration', 'displayName', 'completeEventsExpiryDays', 'displayShortName', 'externalAccess', 'withoutRegistration', 'minAttributesRequiredToSearch', 'displayFrontPageList', 'programType', 'accessLevel', 'displayIncidentDate', 'expiryDays', 'categoryCombo', 'sharing', 'access', 'trackedEntityType', 'createdBy', 'user', 'programIndicators', 'translations', 'userGroupAccesses', 'attributeValues', 'userRoles', 'userAccesses', 'favorites', 'programRuleVariables', 'programTrackedEntityAttributes', 'notificationTemplates', 'organisationUnits', 'programSections', 'programStages']
         }
     },
 }
@@ -410,6 +410,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
 
 
+  
+
     useEffect(() => {
         const programIndicatorsAmount = 3 + 2;
         const visualizationsAmount = 3 + 5;
@@ -517,7 +519,19 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         setProgressSteps(1);
         let programConfig = programAttributes.data?.results?.programs[0]
         let pcaMetadata = JSON.parse(programConfig?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}")
+        let sharingSettings = programConfig?.sharing
+        sharingSettings.public = extractMetadataPermissions(sharingSettings.public)
+        Object.keys(sharingSettings.users).forEach(key => {
+            let access = sharingSettings.users[key]
+            access.access = extractMetadataPermissions(access.access)
+        })
+        Object.keys(sharingSettings.userGroups).forEach(key => {
+            let access = sharingSettings.userGroups[key]
+            access.access = extractMetadataPermissions(access.access)
+        })
 
+        console.log(sharingSettings)
+        
         // Set flag to enable/disable actions (buttons)
         setSaveAndBuild('Run');
 
@@ -578,8 +592,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
                         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
                         const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
-                        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass, programConfig.sharing.owner, programConfig.sharing.external, programConfig.sharing.public);
-                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, programConfig.sharing.owner, programConfig.sharing.external, programConfig.sharing.public, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap);
+                        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass, sharingSettings);
+                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, sharingSettings, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap);
                         const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports };
 
                         // IV. Delete old metadata
