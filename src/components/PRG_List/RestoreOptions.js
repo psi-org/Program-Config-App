@@ -6,16 +6,6 @@ import { DeepCopy, parseErrorsJoin } from '../../configs/Utils';
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
 
-const programQuery = {
-    results: {
-        resource: 'programs',
-        id: ({ id }) => id,
-        params: {
-            fields: ['id', 'organisationUnits']
-        }
-    }
-}
-
 const metadataMutation = {
     resource: 'metadata',
     type: 'create',
@@ -46,6 +36,12 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const RestoreOptions = props => {
+    const programMetadata = {
+        results: {
+            resource: `programs/${props.backup.metadata.programs[0].id}/metadata.json`
+        }
+    }
+
     let metadataPayload = {};
     
     const [checkedState, setCheckedState] = useState(
@@ -57,8 +53,7 @@ const RestoreOptions = props => {
     const [isLoading, setIsLoading] = useState(false);
     const [validationResult, setValidationResult] = useState(false);
     const [importStatus, setImportStatus] = useState({});
-
-    const { loading: programLoading, data: program, error: programErrors } = useDataQuery(programQuery, { variables: { id: props.backup.metadata.programs[0].id } });
+    const { loading: loadingMetadata, error: errorMetadata, data: progMetaData } = useDataQuery(programMetadata);
     const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             props.setNotification({
@@ -133,7 +128,7 @@ const RestoreOptions = props => {
         if (checkedState[0]) { //Program Checked
             metadataPayload.programs = DeepCopy(props.backup.metadata.programs);
             if (ouOption === "keepOUnits") {
-                metadataPayload.programs[0].organisationUnits = DeepCopy(program.results?.organisationUnits);
+                metadataPayload.programs[0].organisationUnits = DeepCopy(progMetaData.results?.program?.organisationUnits);
             }
             metadataPayload.attributes = DeepCopy(props.backup.metadata.attributes);
             if (checkedState[2]) { //ProgramRule CHecked
@@ -152,25 +147,29 @@ const RestoreOptions = props => {
                 metadataPayload.optionSets = DeepCopy(props.backup.metadata.optionSets);
             }
             if (sharingOption === "keepSharing") {
-                delete metadataPayload.programs[0].sharing;
+                metadataPayload.programs[0].sharing = DeepCopy(progMetaData.results?.program?.sharing);
                 if(metadataPayload.attributes?.length > 0) {
                     metadataPayload.attributes.forEach((attribute) => {
-                        delete attribute.sharing;
+                        let match = progMetaData.results?.attributes.filter(param => param.id === attribute.id)
+                        attribute.sharing = DeepCopy(match[0].sharing)
                     });
                 }
                 if (checkedState[3]) { //TE Types 
                     metadataPayload.trackedEntityTypes.forEach((tei) => {
-                        delete tei.sharing;
+                        let match = progMetaData.results?.trackedEntityTypes.filter(param => param.id === tei.id)
+                        tei.sharing = DeepCopy(match[0].sharing)
                     })
                 }
                 if (checkedState[4]) { //TE Attributes
                     metadataPayload.trackedEntityAttributes.forEach((tea) => {
-                        delete tea.sharing;
+                        let match = progMetaData.results?.trackedEntityAttributes.filter(param => param.id === tea.id)
+                        tea.sharing = DeepCopy(match[0].sharing)
                     });
                 }
                 if (checkedState[1]) { //Option Set
                     metadataPayload.optionSets.forEach((optionSet) => {
-                        delete optionSet.sharing;
+                        let match = progMetaData.results?.optionSets.filter(param => param.id === optionSet.id)
+                        optionSet.sharing = DeepCopy(match[0].sharing)
                     });
                 }
             }
@@ -178,7 +177,8 @@ const RestoreOptions = props => {
                 metadataPayload.programStages = DeepCopy(props.backup.metadata.programStages);
                 if (sharingOption === "keepSharing") {
                     metadataPayload?.programStages.forEach((ps) => {
-                        delete ps.sharing;
+                        let match = progMetaData.results?.programStages.filter(param => param.id === ps.id)
+                        ps.sharing = DeepCopy(match[0].sharing)
                     });
                 }
                 if (checkedState[7]) //Program Stage Section
@@ -189,7 +189,8 @@ const RestoreOptions = props => {
                         metadataPayload.dataElements = DeepCopy(props.backup.metadata.dataElements);
                         if (sharingOption === "keepSharing") {
                             metadataPayload?.dataElements.forEach((de) => {
-                                delete de.sharing;
+                                let match = progMetaData.results?.dataElements.filter(param => param.id === de.id)
+                                de.sharing = DeepCopy(match[0].sharing)
                             })
                         }
                     }
