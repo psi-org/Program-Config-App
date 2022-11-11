@@ -437,11 +437,21 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     };
 
     const onDragEnd = (result) => {
+        console.log({result})
         // Dropped outside of Droppable
         if (!result.destination) return;
 
         // Copy of sections from state
         let newSections = sections;
+
+        // Section droppped in same place
+        if(result.type === 'SECTION' && result.source.index === result.destination.index) return;
+
+        // Section droppped in same place
+        if(result.type === 'DATA_ELEMENT' && result.source.droppableId === result.destination.droppableId  && result.source.index === result.destination.index) return;
+
+        // Clear Chips Highlights
+        setAddedSection(undefined)
 
         switch (result.type) {
             case 'SECTION':
