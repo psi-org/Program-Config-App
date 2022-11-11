@@ -76,7 +76,7 @@ const Exporter = (props) => {
   };
 
   const addCreator = wb => {
-    wb.creator = 'Utsav Ashish Koju';
+    wb.creator = 'KnowTechTure';
     wb.created = new Date();
   };
 
