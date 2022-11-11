@@ -1,10 +1,43 @@
-import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { useState, useRef, useEffect } from "react";
-import { DialogActions, DialogContent, DialogContentText, Divider, Grid, Typography, FormGroup, FormLabel, FormControl, FormControlLabel, RadioGroup, Radio, Checkbox, Button, RadioButton, Box, CircularProgress, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import {useDataMutation, useDataQuery} from "@dhis2/app-runtime";
+import {useState} from "react";
+import {
+    Box,
+    Button,
+    Checkbox,
+    CircularProgress,
+    DialogActions,
+    DialogContent,
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    Paper,
+    Radio,
+    RadioGroup,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
+} from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { DeepCopy, parseErrorsJoin } from '../../configs/Utils';
-import { styled } from '@mui/material/styles';
-import { tableCellClasses } from '@mui/material/TableCell';
+import {DeepCopy, parseErrorsJoin} from '../../configs/Utils';
+import {styled} from '@mui/material/styles';
+import {tableCellClasses} from '@mui/material/TableCell';
+import {
+    ACTION_PLAN_ACTION,
+    ACTION_PLAN_DUE_DATE,
+    ACTION_PLAN_RESPONSIBLE,
+    ASSESSMENT_DATE_ATTRIBUTE,
+    COMPETENCY_ATTRIBUTE,
+    COMPETENCY_CLASS,
+    CRITICAL_STEPS,
+    GLOBAL_SCORE_ATTRIBUTE,
+    HEALTH_AREA_ATTRIBUTE,
+    NON_CRITICAL_STEPS,
+    ORGANISATION_UNIT_ATTRIBUTE
+} from "../../configs/Constants";
 
 const metadataMutation = {
     resource: 'metadata',
@@ -53,7 +86,7 @@ const RestoreOptions = props => {
     const [isLoading, setIsLoading] = useState(false);
     const [validationResult, setValidationResult] = useState(false);
     const [importStatus, setImportStatus] = useState({});
-    const { loading: loadingMetadata, error: errorMetadata, data: progMetaData } = useDataQuery(programMetadata);
+    const { data: progMetaData } = useDataQuery(programMetadata);
     const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             props.setNotification({
@@ -96,7 +129,7 @@ const RestoreOptions = props => {
     }
 
     const onCheckBoxHandler = (position) => {
-        let changeState = [0, 6, 8].includes(position) && childrenChecked(position) ? false : true;
+        let changeState = !([0, 6, 8].includes(position) && childrenChecked(position));
         if (changeState) {
             const updatedCheckedState = checkedState.map((item, index) =>
                 index === position ? !item : item
@@ -123,15 +156,18 @@ const RestoreOptions = props => {
     }
 
     const restoreHandler = (dryRun) => {
+        const hnqis_attributes = [ORGANISATION_UNIT_ATTRIBUTE, HEALTH_AREA_ATTRIBUTE, ASSESSMENT_DATE_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, COMPETENCY_ATTRIBUTE]
+        const hnqis_elements = [ACTION_PLAN_RESPONSIBLE, ACTION_PLAN_DUE_DATE, ACTION_PLAN_ACTION, NON_CRITICAL_STEPS, CRITICAL_STEPS, COMPETENCY_CLASS]
+
         setValidationResult(false);
         setIsLoading(true);
         if (checkedState[0]) { //Program Checked
             metadataPayload.programs = DeepCopy(props.backup.metadata.programs);
             if (ouOption === "keepOUnits") {
-                metadataPayload.programs[0].organisationUnits = DeepCopy(progMetaData.results?.program?.organisationUnits);
+                metadataPayload.programs[0].organisationUnits = DeepCopy(progMetaData.results?.programs[0]?.organisationUnits);
             }
             metadataPayload.attributes = DeepCopy(props.backup.metadata.attributes);
-            if (checkedState[2]) { //ProgramRule CHecked
+            if (checkedState[2]) { //ProgramRule CHecked This checkbox has already been removed as we don't want any rules to be restored.
                 metadataPayload.programRules = DeepCopy(props.backup.metadata.programRules);
                 metadataPayload.programRuleActions = DeepCopy(props.backup.metadata.programRuleActions);
                 metadataPayload.programRuleVariables = DeepCopy(props.backup.metadata.programRuleVariables);
@@ -141,13 +177,13 @@ const RestoreOptions = props => {
             if (checkedState[3]) //TETypes Checked
                 metadataPayload.trackedEntityTypes = DeepCopy(props.backup.metadata.trackedEntityTypes);
             if (checkedState[4]) //Tracked Entity Attributes
-                metadataPayload.trackedEntityAttributes = DeepCopy(props.backup.metadata.trackedEntityAttributes);
+                metadataPayload.trackedEntityAttributes = DeepCopy(filterComponent(props.backup.metadata.trackedEntityAttributes, hnqis_attributes));
             if (checkedState[1]) { //Option Sets
                 metadataPayload.options = DeepCopy(props.backup.metadata.options);
                 metadataPayload.optionSets = DeepCopy(props.backup.metadata.optionSets);
             }
             if (sharingOption === "keepSharing") {
-                metadataPayload.programs[0].sharing = DeepCopy(progMetaData.results?.program?.sharing);
+                metadataPayload.programs[0].sharing = DeepCopy(progMetaData.results?.programs[0]?.sharing);
                 if(metadataPayload.attributes?.length > 0) {
                     metadataPayload.attributes.forEach((attribute) => {
                         let match = progMetaData.results?.attributes.filter(param => param.id === attribute.id)
@@ -183,10 +219,10 @@ const RestoreOptions = props => {
                 }
                 if (checkedState[7]) //Program Stage Section
                     metadataPayload.programStageSections = DeepCopy(props.backup.metadata.programStageSections);
-                if (checkedState[8]) { //Program Stage Data ELement
+                if (checkedState[8]) { //Program Stage Data EElement
                     metadataPayload.programStageDataElements = DeepCopy(props.backup.metadata.programStageDataElements);
-                    if (checkedState[9]) { //Data ELement
-                        metadataPayload.dataElements = DeepCopy(props.backup.metadata.dataElements);
+                    if (checkedState[9]) { //Data Element
+                        metadataPayload.dataElements = DeepCopy(filterComponent(props.backup.metadata.dataElements, hnqis_elements));
                         if (sharingOption === "keepSharing") {
                             metadataPayload?.dataElements.forEach((de) => {
                                 let match = progMetaData.results?.dataElements.filter(param => param.id === de.id)
@@ -210,8 +246,8 @@ const RestoreOptions = props => {
                 }
                 else {
                     if (dryRun) {
+                        setImportStatus(response?.response.stats);
                         setValidationResult(true);
-                        setImportStatus(response.stats);
                     } else {
                         props.setNotification({
                             message: `Program Restored successfully.`,
@@ -221,6 +257,16 @@ const RestoreOptions = props => {
                     }
                 }
             });
+    }
+
+    const filterComponent = (elements, filterList) => {
+        let results = [];
+        elements?.forEach((element) => {
+            if(!filterList.includes(element.id)) {
+                results.push(element)
+            }
+        })
+        return results;
     }
 
     const programStageDEChildren = (
@@ -240,7 +286,7 @@ const RestoreOptions = props => {
     const programChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
             <FormControlLabel label="Options (Options + Optionsets)" control={<Checkbox checked={checkedState[1]} onChange={() => onCheckBoxHandler(1)} />} />
-            <FormControlLabel label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox checked={checkedState[2]} onChange={() => onCheckBoxHandler(2)} />} />
+            {/*<FormControlLabel label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox checked={checkedState[2]} onChange={() => onCheckBoxHandler(2)} />} />*/}
             <FormControlLabel label="Tracked Entity Types" control={<Checkbox checked={checkedState[3]} onChange={() => onCheckBoxHandler(3)} />} />
             <FormControlLabel label="Tracked Entity Attributes" control={<Checkbox checked={checkedState[4]} onChange={() => onCheckBoxHandler(4)} />} />
             <FormControlLabel label="Program Tracked Entity Attributes" control={<Checkbox checked={checkedState[5]} onChange={() => onCheckBoxHandler(5)} />} />
@@ -282,11 +328,11 @@ const RestoreOptions = props => {
                                         </TableHead>
                                         <TableBody>
                                             <TableRow>
-                                                <TableCell align="center">{importStatus.created}</TableCell>
-                                                <TableCell align="center">{importStatus.updated}</TableCell>
-                                                <TableCell align="center">{importStatus.deleted}</TableCell>
-                                                <TableCell align="center">{importStatus.ignored}</TableCell>
-                                                <TableCell align="center">{importStatus.total}</TableCell>
+                                                <TableCell align="center">{importStatus?.created}</TableCell>
+                                                <TableCell align="center">{importStatus?.updated}</TableCell>
+                                                <TableCell align="center">{importStatus?.deleted}</TableCell>
+                                                <TableCell align="center">{importStatus?.ignored}</TableCell>
+                                                <TableCell align="center">{importStatus?.total}</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
