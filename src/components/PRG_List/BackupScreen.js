@@ -15,7 +15,8 @@ import {
     GLOBAL_SCORE_ATTRIBUTE,
     HEALTH_AREA_ATTRIBUTE,
     NON_CRITICAL_STEPS,
-    ORGANISATION_UNIT_ATTRIBUTE
+    ORGANISATION_UNIT_ATTRIBUTE,
+    ASSESSMENT_TET
 } from "../../configs/Constants";
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 
@@ -168,6 +169,7 @@ const BackupScreen = (props) => {
     const processMetadata = metadata => {
         const hnqis_attributes = [ORGANISATION_UNIT_ATTRIBUTE, HEALTH_AREA_ATTRIBUTE, ASSESSMENT_DATE_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, COMPETENCY_ATTRIBUTE]
         const hnqis_elements = [ACTION_PLAN_RESPONSIBLE, ACTION_PLAN_DUE_DATE, ACTION_PLAN_ACTION, NON_CRITICAL_STEPS, CRITICAL_STEPS, COMPETENCY_CLASS]
+        const hnqis_tet_exception = [ASSESSMENT_TET]
         if (metaData) {
             delete metadata.date;
             delete metadata.categories;
@@ -233,13 +235,10 @@ const BackupScreen = (props) => {
 
             metadata.dataElements = DeepCopy(filterComponent(metadata.dataElements, hnqis_elements))
 
+            metadata.trackedEntityTypes = DeepCopy(filterComponent(metadata?.trackedEntityTypes, hnqis_tet_exception));
+
+
             metadata.trackedEntityTypes?.forEach(tet => {
-
-                delete tet.created;
-                delete tet.createdBy;
-                delete tet.lastUpdated;
-                delete tet.lastUpdatedBy;
-
                 tet.trackedEntityTypeAttributes?.forEach(tea => {
                     delete tea.created;
                     delete tea.createdBy;

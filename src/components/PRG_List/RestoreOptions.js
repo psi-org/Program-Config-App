@@ -36,7 +36,8 @@ import {
     GLOBAL_SCORE_ATTRIBUTE,
     HEALTH_AREA_ATTRIBUTE,
     NON_CRITICAL_STEPS,
-    ORGANISATION_UNIT_ATTRIBUTE
+    ORGANISATION_UNIT_ATTRIBUTE,
+    ASSESSMENT_TET
 } from "../../configs/Constants";
 
 const metadataMutation = {
@@ -158,6 +159,7 @@ const RestoreOptions = props => {
     const restoreHandler = (dryRun) => {
         const hnqis_attributes = [ORGANISATION_UNIT_ATTRIBUTE, HEALTH_AREA_ATTRIBUTE, ASSESSMENT_DATE_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, COMPETENCY_ATTRIBUTE]
         const hnqis_elements = [ACTION_PLAN_RESPONSIBLE, ACTION_PLAN_DUE_DATE, ACTION_PLAN_ACTION, NON_CRITICAL_STEPS, CRITICAL_STEPS, COMPETENCY_CLASS]
+        const hnqis_tet_exception = [ASSESSMENT_TET]
 
         setValidationResult(false);
         setIsLoading(true);
@@ -175,7 +177,7 @@ const RestoreOptions = props => {
             if (checkedState[5]) //Program Tracked Entity Attributes
                 metadataPayload.programTrackedEntityAttributes = DeepCopy(props.backup.metadata.programTrackedEntityAttributes);
             if (checkedState[3]) //TETypes Checked
-                metadataPayload.trackedEntityTypes = DeepCopy(props.backup.metadata.trackedEntityTypes);
+                metadataPayload.trackedEntityTypes = DeepCopy(filterComponent(props.backup.metadata.trackedEntityTypes, hnqis_tet_exception));
             if (checkedState[4]) //Tracked Entity Attributes
                 metadataPayload.trackedEntityAttributes = DeepCopy(filterComponent(props.backup.metadata.trackedEntityAttributes, hnqis_attributes));
             if (checkedState[1]) { //Option Sets
