@@ -79,12 +79,13 @@ const RestoreOptions = props => {
     let metadataPayload = {};
     
     const [checkedState, setCheckedState] = useState(
-        new Array(10).fill(false)
+        new Array(11).fill(false)
     );
     const [ouOption, setOUOption] = useState('keepOUnits');
     const [sharingOption, setSharingOption] = useState('keepSharing');
     const [content, setContent] = useState('form');
     const [isLoading, setIsLoading] = useState(false);
+    const [isInvalid, setIsInvalid] = useState(true);
     const [validationResult, setValidationResult] = useState(false);
     const [importStatus, setImportStatus] = useState({});
     const { data: progMetaData } = useDataQuery(programMetadata);
@@ -137,18 +138,26 @@ const RestoreOptions = props => {
             );
 
             if (updatedCheckedState[position]) {
-                if (!updatedCheckedState[0])
+                if (!updatedCheckedState[0]) {
                     updatedCheckedState[0] = true;
+                }
 
                 if ([7, 8, 9].includes(position))
                     updatedCheckedState[6] = true;
 
                 if (position === 9)
+                {
                     updatedCheckedState[8] = true;
+                    updatedCheckedState[2] = true;
+                }
             }
-
             setCheckedState(updatedCheckedState);
+            togglRestoreValidation(updatedCheckedState[0])
         }
+    }
+
+    const togglRestoreValidation = (rootState) => {
+        setIsInvalid(!rootState)
     }
 
     const childrenChecked = (position) => {
@@ -169,7 +178,7 @@ const RestoreOptions = props => {
                 metadataPayload.programs[0].organisationUnits = DeepCopy(progMetaData.results?.programs[0]?.organisationUnits);
             }
             metadataPayload.attributes = DeepCopy(props.backup.metadata.attributes);
-            if (checkedState[2]) { //ProgramRule CHecked This checkbox has already been removed as we don't want any rules to be restored.
+            if (checkedState[2]) { //ProgramRule CHecked
                 metadataPayload.programRules = DeepCopy(props.backup.metadata.programRules);
                 metadataPayload.programRuleActions = DeepCopy(props.backup.metadata.programRuleActions);
                 metadataPayload.programRuleVariables = DeepCopy(props.backup.metadata.programRuleVariables);
@@ -183,6 +192,9 @@ const RestoreOptions = props => {
             if (checkedState[1]) { //Option Sets
                 metadataPayload.options = DeepCopy(props.backup.metadata.options);
                 metadataPayload.optionSets = DeepCopy(props.backup.metadata.optionSets);
+            }
+            if (checkedState[10]) { //Program Indicators
+                metadataPayload.programIndicators = DeepCopy(props.backup.metadata.programIndicators);
             }
             if (sharingOption === "keepSharing") {
                 metadataPayload.programs[0].sharing = DeepCopy(progMetaData.results?.programs[0]?.sharing);
@@ -210,6 +222,12 @@ const RestoreOptions = props => {
                         optionSet.sharing = DeepCopy(match[0].sharing)
                     });
                 }
+                if (checkedState[10]) {
+                    metadataPayload.programIndicators.forEach((pi) => {
+                        let match = progMetaData.results?.programIndicators.filter(param => param.id === pi.id)
+                        pi.sharing = DeepCopy(match[0].sharing)
+                    })
+                }
             }
             if (checkedState[6]) { //Program Stage
                 metadataPayload.programStages = DeepCopy(props.backup.metadata.programStages);
@@ -234,31 +252,31 @@ const RestoreOptions = props => {
                     }
                 }
             }
+            let request = (dryRun) ? validateRequest : metadataRequest;
+            request.mutate({ data: metadataPayload })
+                    .then(response => {
+                        setIsLoading(false);
+                        if (response.status !== 'OK') {
+                            props.setNotification({
+                                message: `Something went wrong while Restoring Program. Please try again later.`,
+                                severity: 'error'
+                            })
+                            hideFormHandler();
+                        }
+                        else {
+                            if (dryRun) {
+                                setImportStatus(response?.response.stats);
+                                setValidationResult(true);
+                            } else {
+                                props.setNotification({
+                                    message: `Program Restored successfully.`,
+                                    severity: 'success'
+                                })
+                                hideFormHandler();
+                            }
+                        }
+                    });
         }
-        let request = (dryRun) ? validateRequest : metadataRequest;
-        request.mutate({ data: metadataPayload })
-            .then(response => {
-                setIsLoading(false);
-                if (response.status !== 'OK') {
-                    props.setNotification({
-                        message: `Something went wrong while Restoring Program. Please try again later.`,
-                        severity: 'error'
-                    })
-                    hideFormHandler();
-                }
-                else {
-                    if (dryRun) {
-                        setImportStatus(response?.response.stats);
-                        setValidationResult(true);
-                    } else {
-                        props.setNotification({
-                            message: `Program Restored successfully.`,
-                            severity: 'success'
-                        })
-                        hideFormHandler();
-                    }
-                }
-            });
     }
 
     const filterComponent = (elements, filterList) => {
@@ -273,32 +291,34 @@ const RestoreOptions = props => {
 
     const programStageDEChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel label="Data Elements" control={<Checkbox checked={checkedState[9]} onChange={() => onCheckBoxHandler(9)} />} />
+            <FormControlLabel key={9} label="Data Elements" control={<Checkbox checked={checkedState[9]} onChange={() => onCheckBoxHandler(9)} />} />
         </Box>
     )
 
     const programStageChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel label="Program Stage Sections" control={<Checkbox checked={checkedState[7]} onChange={() => onCheckBoxHandler(7)} />} />
-            <FormControlLabel label="Program Stage Data Elements" control={<Checkbox checked={checkedState[8]} onChange={() => onCheckBoxHandler(8)} />} />
+            <FormControlLabel key={7} label="Program Stage Sections" control={<Checkbox checked={checkedState[7]} onChange={() => onCheckBoxHandler(7)} />} />
+            <FormControlLabel key={8} label="Program Stage Data Elements" control={<Checkbox checked={checkedState[8]} onChange={() => onCheckBoxHandler(8)} />} />
             {programStageDEChildren}
         </Box>
     )
 
     const programChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel label="Options (Options + Optionsets)" control={<Checkbox checked={checkedState[1]} onChange={() => onCheckBoxHandler(1)} />} />
-            {/*<FormControlLabel label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox checked={checkedState[2]} onChange={() => onCheckBoxHandler(2)} />} />*/}
-            <FormControlLabel label="Tracked Entity Types" control={<Checkbox checked={checkedState[3]} onChange={() => onCheckBoxHandler(3)} />} />
-            <FormControlLabel label="Tracked Entity Attributes" control={<Checkbox checked={checkedState[4]} onChange={() => onCheckBoxHandler(4)} />} />
-            <FormControlLabel label="Program Tracked Entity Attributes" control={<Checkbox checked={checkedState[5]} onChange={() => onCheckBoxHandler(5)} />} />
-            <FormControlLabel label="Program Stages" control={<Checkbox checked={checkedState[6]} onChange={() => onCheckBoxHandler(6)} />} />
+            <FormControlLabel key={1} label="Options (Options + Optionsets)" control={<Checkbox checked={checkedState[1]} onChange={() => onCheckBoxHandler(1)} />} />
+            <FormControlLabel key={2} label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox checked={checkedState[2]} onChange={() => onCheckBoxHandler(2)} />} />
+            <FormControlLabel key={10} label="Program Indicators" control={<Checkbox checked={checkedState[10]} onChange={() => onCheckBoxHandler(10)} />} />
+            <FormControlLabel key={3} label="Tracked Entity Types" control={<Checkbox checked={checkedState[3]} onChange={() => onCheckBoxHandler(3)} />} />
+            <FormControlLabel key={4} label="Tracked Entity Attributes" control={<Checkbox checked={checkedState[4]} onChange={() => onCheckBoxHandler(4)} />} />
+            <FormControlLabel key={5} label="Program Tracked Entity Attributes" control={<Checkbox checked={checkedState[5]} onChange={() => onCheckBoxHandler(5)} />} />
+            <FormControlLabel key={6} label="Program Stages" control={<Checkbox checked={checkedState[6]} onChange={() => onCheckBoxHandler(6)} />} />
             {programStageChildren}
         </Box>
     )
 
     const setSelectAll = (value) => {
-        setCheckedState(new Array(10).fill(value));
+        setCheckedState(new Array(11).fill(value));
+        togglRestoreValidation(value)
     }
 
     return (
@@ -349,7 +369,7 @@ const RestoreOptions = props => {
                                     <Button onClick={() => setSelectAll(false)} color='primary' variant="outlined">Select None</Button>
                                 </div>
                             </div>
-                            <FormControlLabel control={<Checkbox checked={checkedState[0]} onChange={() => onCheckBoxHandler(0)} />} label="Program" />
+                            <FormControlLabel key={0} control={<Checkbox checked={checkedState[0]} onChange={() => onCheckBoxHandler(0)} />} label="Program" />
                             {programChildren}
                         </FormControl>
                         <br />
@@ -377,8 +397,8 @@ const RestoreOptions = props => {
                     <DialogActions style={{ padding: '1em', display: 'flex', flexDirection: 'column', alignItems: 'end' }}>
                         <div style={{ display: 'flex', gap: '0.75em' }}>
                             <Button onClick={hideFormHandler} color={"error"} variant="outlined">Cancel</Button>
-                            <LoadingButton onClick={() => restoreHandler(true)} disabled={isLoading} loading={isLoading} color={"primary"} variant="contained"> Dry Run</LoadingButton>
-                            <LoadingButton onClick={() => restoreHandler(false)} disabled={isLoading} loading={isLoading} color={"primary"} variant="outlined"> Restore</LoadingButton>
+                            <LoadingButton onClick={() => restoreHandler(true)} disabled={isLoading || isInvalid} loading={isLoading} color={"primary"} variant="contained"> Dry Run</LoadingButton>
+                            <LoadingButton onClick={() => restoreHandler(false)} disabled={isLoading || isInvalid} loading={isLoading} color={"primary"} variant="outlined"> Restore</LoadingButton>
                         </div>
                         <label style={{ fontSize: '0.8em', paddingTop: '0.8em' }}><em>A dry run tests the import settings without importing any data</em></label>
                     </DialogActions>

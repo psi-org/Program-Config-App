@@ -1,13 +1,14 @@
-import { useState, useRef, useEffect } from "react";
-import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
+import {useState} from "react";
+import {useDataQuery} from "@dhis2/app-runtime";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
-import { DialogActions, DialogContent, Alert, Box, CircularProgress, Button, List, Divider } from "@mui/material";
-import { BACKUPS_NAMESPACE } from "../../configs/Constants";
+import {Alert, Box, Button, CircularProgress, DialogActions, DialogContent, Divider, List} from "@mui/material";
+import {BACKUPS_NAMESPACE} from "../../configs/Constants";
 
 import RestoreItem from "./RestoreItem";
 import RestoreOptions from "./RestoreOptions";
-import { truncateString } from "../../configs/Utils";
+import {truncateString} from "../../configs/Utils";
+
 ``
 const RestoreScreen = (props) => {
 
@@ -36,7 +37,7 @@ const RestoreScreen = (props) => {
 
     return <>
                 <CustomMUIDialog open={true} maxWidth="md" fullWidth={true}>
-                    {loading && <Box sx={{ display: 'inline-flex', margin: "50px", display: 'flex' }}><CircularProgress /></Box>}
+                    {loading && <Box sx={{ display: 'inline-flex', margin: "50px" }}><CircularProgress /></Box>}
                     {!loading &&
                         <>
                             <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_restore_dialog_title"}>

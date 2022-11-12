@@ -177,10 +177,6 @@ const BackupScreen = (props) => {
             delete metadata.categoryOptions;
             delete metadata.categoryOptionCombos;
 
-            delete metadata.programRuleVariables;
-            delete metadata.programRules;
-            delete metadata.programRuleActions;
-
             metadata.programs?.forEach(program => {
                 delete program.created;
                 delete program.createdBy;
