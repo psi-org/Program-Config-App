@@ -1,11 +1,26 @@
-import { useState, useRef, useEffect } from "react";
-import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
+import {useRef, useState} from "react";
+import {useDataMutation, useDataQuery} from "@dhis2/app-runtime";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
-import { DialogActions, DialogContent, TextField, Button, Box, CircularProgress } from "@mui/material";
-import { BACKUPS_NAMESPACE } from "../../configs/Constants";
+import {Box, Button, CircularProgress, DialogActions, DialogContent, TextField} from "@mui/material";
+import {
+    ACTION_PLAN_ACTION,
+    ACTION_PLAN_DUE_DATE,
+    ACTION_PLAN_RESPONSIBLE,
+    ASSESSMENT_DATE_ATTRIBUTE,
+    BACKUPS_NAMESPACE,
+    COMPETENCY_ATTRIBUTE,
+    COMPETENCY_CLASS,
+    CRITICAL_STEPS,
+    GLOBAL_SCORE_ATTRIBUTE,
+    HEALTH_AREA_ATTRIBUTE,
+    NON_CRITICAL_STEPS,
+    ORGANISATION_UNIT_ATTRIBUTE,
+    ASSESSMENT_TET
+} from "../../configs/Constants";
 import SaveAsIcon from '@mui/icons-material/SaveAs';
-import { truncateString } from "../../configs/Utils";
+
+import {DeepCopy, truncateString} from "../../configs/Utils";
 
 const BackupScreen = (props) => {
     const programMetadata = {
@@ -62,7 +77,7 @@ const BackupScreen = (props) => {
     let commentInput = useRef();
 
     const { loading: dsLoading, data: dsData } = useDataQuery(queryDataStore);
-    const { loading: loadingMetadata, error: errorMetadata, data: metaData } = useDataQuery(programMetadata);
+    const { loading: loadingMetadata, data: metaData } = useDataQuery(programMetadata);
 
     const dsCreateDM = useDataMutation(dsCreateMutation, {
         onError: (err) => {
@@ -130,10 +145,11 @@ const BackupScreen = (props) => {
             "metadata": processMetadata(metaData.results)
         };
         dsBackups.backups.push(backup);
+        console.log("backup: ", backup.metadata)
         let backupToDatastore = !dsData?.results ? dsCreateRequest : dsUpdateRequest
         backupToDatastore.mutate({ data: dsBackups })
             .then(response => {
-                if (response.status != 'OK') {
+                if (response.status !== 'OK') {
                     props.setNotification({
                         message: `Some errors occured while backing up your Program. Please contact the administrator.`,
                         severity: 'error'
@@ -151,6 +167,9 @@ const BackupScreen = (props) => {
     }
 
     const processMetadata = metadata => {
+        const hnqis_attributes = [ORGANISATION_UNIT_ATTRIBUTE, HEALTH_AREA_ATTRIBUTE, ASSESSMENT_DATE_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, COMPETENCY_ATTRIBUTE]
+        const hnqis_elements = [ACTION_PLAN_RESPONSIBLE, ACTION_PLAN_DUE_DATE, ACTION_PLAN_ACTION, NON_CRITICAL_STEPS, CRITICAL_STEPS, COMPETENCY_CLASS]
+        const hnqis_tet_exception = [ASSESSMENT_TET]
         if (metaData) {
             delete metadata.date;
             delete metadata.categories;
@@ -173,12 +192,6 @@ const BackupScreen = (props) => {
                 });
             });
 
-            metadata.programRuleVariables?.forEach(prv => {
-                delete prv.created;
-                delete prv.lastUpdated;
-                delete prv.lastUpdatedBy;
-            });
-
             metadata.programStageSections?.forEach(stageSection => {
                 delete stageSection.created;
                 delete stageSection.lastUpdated;
@@ -186,7 +199,6 @@ const BackupScreen = (props) => {
             });
 
             metadata.programStages?.forEach(stage => {
-
                 delete stage.created;
                 delete stage.createdBy;
                 delete stage.lastUpdated;
@@ -205,7 +217,7 @@ const BackupScreen = (props) => {
                 delete option.lastUpdated;
             });
 
-            metadata.attributes?.forEach(att => {
+            metadata.attributes?.forEach((att) => {
                 delete att.created;
                 delete att.createdBy;
                 delete att.lastUpdated;
@@ -217,27 +229,12 @@ const BackupScreen = (props) => {
                 delete ptea.lastUpdated;
             });
 
-            metadata.programRules?.forEach(pr => {
-                delete pr.created;
-                delete pr.lastUpdated;
-                delete pr.lastUpdatedBy;
-            });
+            metadata.dataElements = DeepCopy(filterComponent(metadata.dataElements, hnqis_elements))
 
-            metadata.dataElements?.forEach(de => {
-                delete de.created;
-                delete de.createdBy;
-                delete de.lastUpdated;
-                delete de.lastUpdatedBy;
-                delete de.categoryCombo;
-            });
+            metadata.trackedEntityTypes = DeepCopy(filterComponent(metadata?.trackedEntityTypes, hnqis_tet_exception));
+
 
             metadata.trackedEntityTypes?.forEach(tet => {
-
-                delete tet.created;
-                delete tet.createdBy;
-                delete tet.lastUpdated;
-                delete tet.lastUpdatedBy;
-
                 tet.trackedEntityTypeAttributes?.forEach(tea => {
                     delete tea.created;
                     delete tea.createdBy;
@@ -247,22 +244,11 @@ const BackupScreen = (props) => {
 
             });
 
-            metadata.trackedEntityAttributes?.forEach(tea => {
-                delete tea.created;
-                delete tea.createdBy;
-                delete tea.lastUpdated;
-                delete tea.lastUpdatedBy;
-            });
+            metadata.trackedEntityAttributes = DeepCopy(filterComponent(metadata.trackedEntityAttributes, hnqis_attributes))
 
             metadata.programStageDataElements?.forEach(psde => {
                 delete psde.created;
                 delete psde.lastUpdated;
-            });
-
-            metadata.programRuleActions?.forEach(pra => {
-                delete pra.created;
-                delete pra.lastUpdated;
-                delete pra.lastUpdatedBy;
             });
 
             metadata.optionSets?.forEach(optionSet => {
@@ -277,9 +263,25 @@ const BackupScreen = (props) => {
         return null;
     }
 
+    const filterComponent = (elements, filterList) => {
+        let results = []
+        elements?.forEach((element) => {
+            if(!filterList.includes(element.id)) {
+                delete element.created;
+                delete element.createdBy;
+                delete element.lastUpdated;
+                delete element.lastUpdatedBy;
+                delete element?.categoryCombo;
+
+                results.push(element)
+            }
+        })
+        return results;
+    }
+
     return <>
         <CustomMUIDialog open={true} maxWidth="md" fullWidth={true}>
-            {(loadingMetadata || processing) && <Box sx={{ display: 'inline-flex', margin: "50px", display: 'flex' }}><CircularProgress /></Box>}
+            {(loadingMetadata || processing) && <Box sx={{ display: 'inline-flex', margin: "50px" }}><CircularProgress /></Box>}
             {!(loadingMetadata || processing) &&
                 <>
                     <CustomMUIDialogTitle onClose={hideFormHandler} id={"program_backup_dialog_title"}>Create Backup
