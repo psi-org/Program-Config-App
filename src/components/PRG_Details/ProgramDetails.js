@@ -106,7 +106,7 @@ const ProgramDetails = () => {
                     }
                 </div>
             </div>
-            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent:'start'}}>
+            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent:'start', alignItems: 'center'}}>
                 <span style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',

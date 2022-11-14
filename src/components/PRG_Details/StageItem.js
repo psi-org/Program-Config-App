@@ -11,11 +11,9 @@ import { useRef, useState } from "react";
 
 // *** IMAGES ***
 import stg_svg from './../../images/i-drag_black.svg';
-import warning_svg from './../../images/i-warning.svg';
-import error_svg from './../../images/i-error.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
-import expand_left_svg from './../../images/i-expand-left_black.svg';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
 
 import Chip from '@mui/material/Chip';
 
@@ -39,8 +37,8 @@ const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editSta
     }
     return (
         <div className="ml_item" style={{ color: "#333333", backgroundColor: "#c5e3fc", border: "0.5px solid #D5DDE5", borderRadius: "4px" }}>
-            <div className="ml_list-icon"> {/* REMOVED ml_item-icon ... ml_item-icon TO delete cursor:move */}
-                <img className="ml_list-img" alt="prg" src={stg_svg} />
+            <div className="ml_list-icon" style={{ display: 'flex', alignItems: 'center' }}> 
+                <HorizontalSplitIcon />
             </div>
             <div className="ml_item-title" style={{
                 overflow: 'hidden'
@@ -51,7 +49,8 @@ const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editSta
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
                         maxWidth: '100%',
-                        width: '100%'
+                        width: '100%',
+                        verticalAlign: 'middle'
                     }}>{stage.displayName}</span>
                 </Tooltip>
                 {editStatus && <Chip label={editStatus.toUpperCase()} color="success" className="blink-opacity-2" style={{ marginLeft: '1em' }} />}

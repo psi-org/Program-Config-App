@@ -236,21 +236,21 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
         let response = true;
 
-        if (valueType === '') {
+        if (valueType.trim() === '') {
             response = false
             validationErrors.valueType = 'A Value Type or Option Set must be specified'
         } else {
             validationErrors.valueType = undefined
         }
 
-        if (aggType === '') {
+        if (aggType.trim() === '') {
             response = false
             validationErrors.aggType = 'This field is required'
         } else {
             validationErrors.aggType = undefined
         }
 
-        if (formName === '') {
+        if (formName.trim() === '') {
             response = false
             validationErrors.formName = 'This field is required'
         } else if (formName.length < MIN_NAME_LENGTH || formName.length > MAX_DATA_ELEMENT_NAME_LENGTH) {
@@ -260,7 +260,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
             validationErrors.formName = undefined
         }
 
-        if (numerator !== '' && denominator === '') {
+        if (numerator.trim() !== '' && denominator.trim() === '') {
             response = false
             validationErrors.denominator = 'This field is also required'
         } else if (denominator === '0') {
@@ -270,14 +270,14 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
             validationErrors.denominator = undefined
         }
 
-        if (numerator === '' && denominator !== '') {
+        if (numerator.trim() === '' && denominator.trim() !== '') {
             response = false
             validationErrors.numerator = 'This field is also required'
         } else {
             validationErrors.numerator = undefined
         }
 
-        if ((numerator !== '' || denominator !== '') && feedbackOrder === '') {
+        if ((numerator.trim() !== '' || denominator.trim() !== '') && feedbackOrder.trim() === '') {
             response = false
             validationErrors.feedbackOrder = 'This field is also required'
         } else {
