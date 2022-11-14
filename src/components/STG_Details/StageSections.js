@@ -410,9 +410,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
 
 
-  
-
-    useEffect(() => {
+    const getUIDs = () => {
         const programIndicatorsAmount = 3 + 2;
         const visualizationsAmount = 3 + 5;
         const androidSettingsAmount = 1;
@@ -426,6 +424,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 setUidPool(data.results.codes)
             }
         })
+    }
+
+    useEffect(() => {
+        getUIDs()
     }, [sections]);
 
     const reorder = (list, startIndex, endIndex) => {
@@ -615,7 +617,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                         let visualizationsDel = visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id }));
                         let eventReportsDel = eventReportDQ.data.results.eventReports.map(er => ({ id: er.id }));
                         let mapsDel = mapsDQ.data.results.maps.map(mp => ({ id: mp.id }));
-
+                        
                         const oldMetadata = {
                             programRules: programRulesDel.length > 0 ? programRulesDel : undefined,
                             programRuleVariables: programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined,
@@ -639,7 +641,13 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
                                         prDQ.refetch();
                                         prvDQ.refetch();
+                                        pIndDQ.refetch();
+                                        visualizationsDQ.refetch();
+                                        eventReportDQ.refetch();
+                                        mapsDQ.refetch();
+
                                         setProgressSteps(7);
+                                        getUIDs();
 
                                         // VI. Enable in-app analytics
 

@@ -200,41 +200,41 @@ const RestoreOptions = props => {
                 metadataPayload.programs[0].sharing = DeepCopy(progMetaData.results?.programs[0]?.sharing);
                 if(metadataPayload.attributes?.length > 0) {
                     metadataPayload.attributes.forEach((attribute) => {
-                        let match = progMetaData.results?.attributes.filter(param => param.id === attribute.id)
-                        attribute.sharing = DeepCopy(match[0].sharing)
+                        let match = progMetaData.results?.attributes?.filter(param => param.id === attribute.id)
+                        if (match && match.length>0) attribute.sharing = DeepCopy(match[0].sharing)
                     });
                 }
                 if (checkedState[3]) { //TE Types 
                     metadataPayload.trackedEntityTypes.forEach((tei) => {
-                        let match = progMetaData.results?.trackedEntityTypes.filter(param => param.id === tei.id)
-                        tei.sharing = DeepCopy(match[0].sharing)
+                        let match = progMetaData.results?.trackedEntityTypes?.filter(param => param.id === tei.id)
+                        if (match && match.length>0) tei.sharing = DeepCopy(match[0].sharing)
                     })
                 }
                 if (checkedState[4]) { //TE Attributes
                     metadataPayload.trackedEntityAttributes.forEach((tea) => {
-                        let match = progMetaData.results?.trackedEntityAttributes.filter(param => param.id === tea.id)
-                        tea.sharing = DeepCopy(match[0].sharing)
+                        let match = progMetaData.results?.trackedEntityAttributes?.filter(param => param.id === tea.id)
+                        if (match && match.length>0) tea.sharing = DeepCopy(match[0].sharing)
                     });
                 }
                 if (checkedState[1]) { //Option Set
-                    metadataPayload.optionSets.forEach((optionSet) => {
-                        let match = progMetaData.results?.optionSets.filter(param => param.id === optionSet.id)
-                        optionSet.sharing = DeepCopy(match[0].sharing)
+                    metadataPayload.optionSets?.forEach((optionSet) => {
+                        let match = progMetaData.results?.optionSets?.filter(param => param.id === optionSet.id)
+                        if (match && match.length>0) optionSet.sharing = DeepCopy(match[0].sharing)
                     });
                 }
                 if (checkedState[10]) {
-                    metadataPayload.programIndicators.forEach((pi) => {
-                        let match = progMetaData.results?.programIndicators.filter(param => param.id === pi.id)
-                        pi.sharing = DeepCopy(match[0].sharing)
+                    metadataPayload.programIndicators?.forEach((pi) => {
+                        let match = progMetaData.results?.programIndicators?.filter(param => param.id === pi.id)
+                        if (match && match.length>0) pi.sharing = DeepCopy(match[0].sharing)
                     })
                 }
             }
             if (checkedState[6]) { //Program Stage
                 metadataPayload.programStages = DeepCopy(props.backup.metadata.programStages);
                 if (sharingOption === "keepSharing") {
-                    metadataPayload?.programStages.forEach((ps) => {
+                    metadataPayload?.programStages?.forEach((ps) => {
                         let match = progMetaData.results?.programStages.filter(param => param.id === ps.id)
-                        ps.sharing = DeepCopy(match[0].sharing)
+                        if (match && match.length > 0) ps.sharing = DeepCopy(match[0].sharing)
                     });
                 }
                 if (checkedState[7]) //Program Stage Section
@@ -244,15 +244,18 @@ const RestoreOptions = props => {
                     if (checkedState[9]) { //Data Element
                         metadataPayload.dataElements = DeepCopy(filterComponent(props.backup.metadata.dataElements, hnqis_elements));
                         if (sharingOption === "keepSharing") {
-                            metadataPayload?.dataElements.forEach((de) => {
-                                let match = progMetaData.results?.dataElements.filter(param => param.id === de.id)
-                                de.sharing = DeepCopy(match[0].sharing)
+                            metadataPayload?.dataElements?.forEach((de) => {
+                                let match = progMetaData.results?.dataElements?.filter(param => param.id === de.id)
+                                if (match && match.length > 0) de.sharing = DeepCopy(match[0].sharing)
                             })
                         }
                     }
                 }
             }
             let request = (dryRun) ? validateRequest : metadataRequest;
+
+            //TODO: Delete PRs and PRVs
+
             request.mutate({ data: metadataPayload })
                     .then(response => {
                         setIsLoading(false);
