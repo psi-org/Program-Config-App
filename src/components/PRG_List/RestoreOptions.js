@@ -58,6 +58,15 @@ const metadataValidation = {
     }
 }
 
+const programRulesNVariableMutation = {
+    resource: 'metadata',
+    type: 'create',
+    data: ({ data }) => data,
+    params: {
+        importStrategy: 'DELETE',
+    },
+}
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: "#2c6693",
@@ -107,6 +116,15 @@ const RestoreOptions = props => {
             hideFormHandler();
         }
     });
+    const deletePRnPV = useDataMutation(programRulesNVariableMutation, {
+        onError: (err) => {
+            props.setNotification({
+                message: parseErrorsJoin(err.details, '\\n'),
+                severity: "error",
+            });
+            hideFormHandler();
+        }
+    })
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,
@@ -116,6 +134,12 @@ const RestoreOptions = props => {
         mutate: validateDM[0],
         loading: validateDM[1].loading,
         data: validateDM[1].data
+    }
+
+    const deletePRnPVRequest = {
+        mutate: deletePRnPV[0],
+        loading: deletePRnPV[1].loading,
+        data: deletePRnPV[1].data
     }
 
     const onOUOptionChangeHandler = (e) => {
@@ -178,7 +202,7 @@ const RestoreOptions = props => {
                 metadataPayload.programs[0].organisationUnits = DeepCopy(progMetaData.results?.programs[0]?.organisationUnits);
             }
             metadataPayload.attributes = DeepCopy(props.backup.metadata.attributes);
-            if (checkedState[2]) { //ProgramRule CHecked
+            if (checkedState[9]) { //ProgramRule CHecked
                 metadataPayload.programRules = DeepCopy(props.backup.metadata.programRules);
                 metadataPayload.programRuleActions = DeepCopy(props.backup.metadata.programRuleActions);
                 metadataPayload.programRuleVariables = DeepCopy(props.backup.metadata.programRuleVariables);
@@ -254,7 +278,23 @@ const RestoreOptions = props => {
             }
             let request = (dryRun) ? validateRequest : metadataRequest;
 
-            //TODO: Delete PRs and PRVs
+            if (checkedState[9] && !dryRun) {
+                let deleteList = {}
+                deleteList['programRules'] = progMetaData.results?.programRules ? arraySubset(progMetaData.results?.programRules, 'id') : [];
+                deleteList['programRuleVariables'] = progMetaData.results?.programRuleVariables ? arraySubset(progMetaData.results?.programRuleVariables, 'id'): [];
+
+                deletePRnPVRequest.mutate({data: deleteList})
+                    .then(response => {
+                        if (response.status !== 'OK') {
+                            props.setNotification({
+                                message: `Something went wrong while Restoring Program. Please try again later.`,
+                                severity: 'error'
+                            })
+                            hideFormHandler();
+                        }
+                    })
+            }
+           
 
             request.mutate({ data: metadataPayload })
                     .then(response => {
@@ -292,9 +332,24 @@ const RestoreOptions = props => {
         return results;
     }
 
+    const arraySubset = (arrayObject, key) => {
+        let result = [];
+        arrayObject.forEach((obj) => {
+            result.push(getObjectProperties(obj, key))
+        });
+        return result;
+    }
+
+    const getObjectProperties = (_obj, ...args) => {
+        let newObj = {};
+        args.forEach(key => newObj[key] = _obj[key])
+        return newObj;
+    }
+
+
     const programStageDEChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel key={9} label="Data Elements" control={<Checkbox checked={checkedState[9]} onChange={() => onCheckBoxHandler(9)} />} />
+            <FormControlLabel key={9} label="Data Elements + Program Rules + Program Variable" control={<Checkbox checked={checkedState[9]} onChange={() => onCheckBoxHandler(9)} />} />
         </Box>
     )
 
@@ -309,7 +364,7 @@ const RestoreOptions = props => {
     const programChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
             <FormControlLabel key={1} label="Options (Options + Optionsets)" control={<Checkbox checked={checkedState[1]} onChange={() => onCheckBoxHandler(1)} />} />
-            <FormControlLabel key={2} label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox checked={checkedState[2]} onChange={() => onCheckBoxHandler(2)} />} />
+            {/*<FormControlLabel key={2} label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox checked={checkedState[2]} onChange={() => onCheckBoxHandler(2)} />} />*/}
             <FormControlLabel key={10} label="Program Indicators" control={<Checkbox checked={checkedState[10]} onChange={() => onCheckBoxHandler(10)} />} />
             <FormControlLabel key={3} label="Tracked Entity Types" control={<Checkbox checked={checkedState[3]} onChange={() => onCheckBoxHandler(3)} />} />
             <FormControlLabel key={4} label="Tracked Entity Attributes" control={<Checkbox checked={checkedState[4]} onChange={() => onCheckBoxHandler(4)} />} />
