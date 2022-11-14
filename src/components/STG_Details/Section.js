@@ -30,6 +30,7 @@ import UpIcon from '@mui/icons-material/ArrowUpward';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import SegmentIcon from '@mui/icons-material/Segment';
 
 import Chip from '@mui/material/Chip';
 import { Tooltip } from "@mui/material";
@@ -94,8 +95,8 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                     <div className={"ml_item section-header" + (openMenu?' section-selected':'') + classNames}>
-                        <div className="ml_item-icon">
-                            <img className="ml_list-img" alt="sec" src={sec_svg} />
+                        <div className="ml_item-icon" style={{display: 'flex', alignItems: 'center'}}>
+                            <SegmentIcon />
                         </div>
                         <div className="ml_item-title" style={{
                             overflow: 'hidden'

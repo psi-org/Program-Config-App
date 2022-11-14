@@ -25,6 +25,9 @@ import EditOffIcon from '@mui/icons-material/EditOff';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
+import LabelIcon from "@mui/icons-material/LabelImportant";
+import QuizIcon from "@mui/icons-material/Quiz";
+import DEIcon from '@mui/icons-material/Dns';
 
 import Chip from '@mui/material/Chip';
 
@@ -42,8 +45,7 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
 
     let classNames = '';
     
-    let metadata = dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value;
-    if(metadata) metadata=JSON.parse(metadata);
+    let metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || '{}');
     let renderFormName = metadata?.labelFormName;
 
     classNames+= (metadata?.labelFormName) ? " ml_item" : " ml_item";
@@ -73,8 +75,8 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                     <div id={"de_"+dataElement.id} className={'data-element-header '+(openMenu?'data-element-selected ':'')+classNames}>
-                        <div className="ml_item-icon">
-                            <img className="ml_list-img" alt="de" src={de_svg} />
+                        <div className="ml_item-icon" style={{display: 'flex', alignItems: 'center'}}>
+                            { !hnqisMode?<DEIcon/>:(metadata.elemType==='label'?<LabelIcon/>:<QuizIcon/>)}
                         </div>
                         <div className="ml_item-title"> 
                             {deImportStatus}

@@ -520,6 +520,16 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             createMetadata.mutate({ data: { programs: [res.results] } }).then(response => {
                 if (response.status == 'OK') {
                     setProgressSteps(8)
+                    setSaveAndBuild('Completed');
+                    setSavedAndValidated(false);
+
+                    prDQ.refetch();
+                    prvDQ.refetch();
+                    pIndDQ.refetch();
+                    visualizationsDQ.refetch();
+                    eventReportDQ.refetch();
+                    mapsDQ.refetch();
+                    getUIDs();
                 }
             })
         })
@@ -541,8 +551,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             let access = sharingSettings.userGroups[key]
             access.access = extractMetadataPermissions(access.access)
         })
-
-        console.log(sharingSettings)
         
         // Set flag to enable/disable actions (buttons)
         setSaveAndBuild('Run');
@@ -636,18 +644,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 createMetadata.mutate({ data: metadata }).then(response => {
 
                                     if (response.status == 'OK') {
-                                        setSaveAndBuild('Completed');
-                                        setSavedAndValidated(false);
-
-                                        prDQ.refetch();
-                                        prvDQ.refetch();
-                                        pIndDQ.refetch();
-                                        visualizationsDQ.refetch();
-                                        eventReportDQ.refetch();
-                                        mapsDQ.refetch();
-
                                         setProgressSteps(7);
-                                        getUIDs();
 
                                         // VI. Enable in-app analytics
 
@@ -733,7 +730,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 </div>
             </div>
             {hnqisMode && importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
-            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', margin: '0' }}>
+            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', margin: '0', alignItems: 'center' }}>
                 <span style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -759,7 +756,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 </AlertStack>
             }
 
-            {createMetadata.data && createMetadata.data.status == "OK" &&
+            {createMetadata.data && progressSteps === 8 && createMetadata.data.status == "OK" &&
                 <AlertStack>
                     <AlertBar>
                         {"Process completed successfully"}
