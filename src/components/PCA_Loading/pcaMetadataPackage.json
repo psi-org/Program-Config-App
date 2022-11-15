@@ -148,7 +148,6 @@
         {
             "name": "_App - Program Configuration App",
             "id": "QbYqOgwk5fJ",
-            "displayName": "_App - Program Configuration App",
             "publicAccess": "rw------",
             "description": "Program Configuration App access and required authorities for basic usage.",
             "authorities": [
