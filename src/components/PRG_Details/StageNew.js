@@ -152,7 +152,7 @@ const StageNew = (props) => {
             validationErrors.stageName = undefined
         }
 
-        if (scheduledDaysStart.trim() === '') {
+        if (String(scheduledDaysStart).trim() === '') {
             response = false
             validationErrors.scheduledDaysStart = 'This field is required'
         } else if (scheduledDaysStart < 0) {

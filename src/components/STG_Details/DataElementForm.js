@@ -260,7 +260,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
             validationErrors.formName = undefined
         }
 
-        if (numerator.trim() !== '' && denominator.trim() === '') {
+        if (String(numerator).trim() !== '' && String(denominator).trim() === '') {
             response = false
             validationErrors.denominator = 'This field is also required'
         } else if (denominator === '0') {
@@ -270,14 +270,14 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
             validationErrors.denominator = undefined
         }
 
-        if (numerator.trim() === '' && denominator.trim() !== '') {
+        if (String(numerator).trim() === '' && String(denominator).trim() !== '') {
             response = false
             validationErrors.numerator = 'This field is also required'
         } else {
             validationErrors.numerator = undefined
         }
 
-        if ((numerator.trim() !== '' || denominator.trim() !== '') && feedbackOrder.trim() === '') {
+        if ((String(numerator).trim() !== '' || String(denominator).trim() !== '') && feedbackOrder.trim() === '') {
             response = false
             validationErrors.feedbackOrder = 'This field is also required'
         } else {
