@@ -138,7 +138,7 @@
         },
         {
             "code": "HIV",
-            "name": "Human Inmunodeficiency Virus",
+            "name": "Human Immunodeficiency Virus",
             "id": "c8qOHzSbhWM",
             "sortOrder": 16,
             "optionSet": {"id": "y752HEwvCGi"},
@@ -615,25 +615,6 @@
                     "trackedEntityType": {"id": "oNwpeWkfoWc"}
                 },
                 {
-                    "id": "B9oWR52xFT5",
-                    "name": "Assessment HNQIS HNQIS - Competency Class",
-                    "externalAccess": false,
-                    "valueType": "TEXT",
-                    "searchable": false,
-                    "displayInList": true,
-                    "favorite": false,
-                    "access": {
-                        "read": true,
-                        "update": true,
-                        "externalize": true,
-                        "delete": true,
-                        "write": true,
-                        "manage": true
-                    },
-                    "trackedEntityAttribute": {"id": "ulU9KKgSLYe"},
-                    "trackedEntityType": {"id": "oNwpeWkfoWc"}
-                },
-                {
                     "id": "MWI76z3SUQM",
                     "name": "Assessment HNQIS HNQIS - Global Score",
                     "externalAccess": false,
@@ -746,6 +727,13 @@
                 {
                     "id": "hN8Or3Zmi84",
                     "name": "Fail_FAIL",
+                    "publicAccess": "rw------",
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {},
+                        "public": "rw------"
+                    },
                     "endValue": 0.5,
                     "color": "#F69E9E",
                     "displayName": "Fail_FAIL",
@@ -762,6 +750,13 @@
                 {
                     "id": "hk1wEH55DQZ",
                     "name": "Pass",
+                    "publicAccess": "rw------",
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {},
+                        "public": "rw------"
+                    },
                     "endValue": 10,
                     "color": "#8EBE76",
                     "displayName": "Pass",
@@ -828,6 +823,51 @@
                         "write": true,
                         "manage": true
                     }
+                }
+            ]
+        },
+        {
+            "id": "nvVrBnbud3L",
+            "name": "Red - Yellow - Green (<80%, 80-89%, >89%)",
+            "publicAccess": "rw------",
+            "sharing": {
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "access": {
+                "read": true,
+                "update": true,
+                "externalize": true,
+                "delete": true,
+                "write": true,
+                "manage": true
+            },
+            "legends": [
+                {
+                    "id": "g1MTyUNLnn8",
+                    "name": "80 - 89",
+                    "endValue": 89.0,
+                    "color": "#FAF74C",
+                    "displayName": "80 - 89",
+                    "startValue": 79.0
+                },
+                {
+                    "id": "ttoNjYjysdK",
+                    "name": "< 80",
+                    "endValue": 79.0,
+                    "color": "#EE4747",
+                    "displayName": "< 80",
+                    "startValue": 0.0
+                },
+                {
+                    "id": "uyMbZRV3IHn",
+                    "name": "> 89",
+                    "endValue": 1000.0,
+                    "color": "#39A62D",
+                    "displayName": "> 89",
+                    "startValue": 89.0
                 }
             ]
         }

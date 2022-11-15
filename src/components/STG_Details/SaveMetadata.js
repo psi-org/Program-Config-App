@@ -52,11 +52,12 @@ const getParentUid = (parentName, dataElements) => {
 };
 
 const parseErrors = (e) => {
-    let data = e.typeReports.map(tr => {
+    let errors = e.response || e;
+    let data = errors.typeReports.map(tr => {
         let type = tr.klass.split('.').pop()
         return tr.objectReports.map(or => or.errorReports.map(er => ({ type, uid: or.uid, errorCode: er.errorCode, message: er.message })))
     })
-    return data.flat().flat()
+    return data.flat(2)
 }
 
 const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, refetchProgramStage }) => {
@@ -67,7 +68,11 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
     const [typeReports, setTypeReports] = useState({});
 
     // Create Mutation
-    let metadataDM = useDataMutation(metadataMutation);
+    let metadataDM = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            gotResponseError(err.details);
+        }
+    });
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,
@@ -83,6 +88,13 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
     // Get Ids for new Data Elements
     const idsQuery = useDataQuery(queryId, { variables: { n: newDEQty + 5 } });
     const uidPool = idsQuery.data?.results.codes;
+
+    const gotResponseError = (response) => {
+        setErrorStatus(true);
+        setTypeReports(parseErrors(response));
+        setCompleted(true);
+        setErrorReports(parseErrors(response))
+    };
 
     if (uidPool && programPayload && !completed && !metadataRequest.called /* && !programRequest.called */) {
 
@@ -104,6 +116,8 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
          * Prepare new data elements (payloads)
          * Get program stage data elements for each question
          */
+
+        let psdeSortOrder = 1
         importedSections.forEach((section, secIdx) => { //v1.4.0 WORK
 
             if (section.importStatus == 'new') section.id = uidPool.shift();
@@ -151,9 +165,10 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
                 new_programStageDataElements.push({
                     compulsory: (DE_metadata.isCompulsory == 'Yes' && !DE_metadata.parentQuestion), // True: mandatory is Yes and has no parents.
                     displayInReports: dataElement.displayInReports,
-                    sortOrder: deIdx + 1,
+                    sortOrder: psdeSortOrder,
                     dataElement: { id: dataElement.id }
                 });
+                psdeSortOrder+=1
                 delete dataElement.displayInReports;
 
                 if(!hnqisMode) ['isCritical','elemType','labelFormName','varName','parentQuestion','parentValue'].forEach(key => delete DE_metadata[key])
@@ -288,13 +303,19 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
         if(hnqisMode){
             new_programMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
             new_programMetadata.healthArea = programMetadata.healthArea;
+            new_programMetadata.buildVersion = programMetadata.buildVersion;
         }
-        new_programMetadata.buildVersion = BUILD_VERSION;
+        new_programMetadata.saveVersion = BUILD_VERSION;
 
-        programPayload.attributeValues[programMetadataIdx] = {
+        let metadataObject = {
             attribute: { id: METADATA },
             value: JSON.stringify(new_programMetadata)
         };
+        if(programMetadataIdx >= 0){
+            programPayload.attributeValues[programMetadataIdx] = metadataObject;
+        }else{
+            programPayload.attributeValues.push(metadataObject)
+        }
 
         // PROGRAM TRACKED ENTITY ATTRIBUTES
         let currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE);
@@ -316,12 +337,6 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
             programStageDataElements: programStage.programStageDataElements
         };
         // ========================================================== //
-        const gotResponseError = (response) => {
-            setErrorStatus(true);
-            setTypeReports(response);
-            setCompleted(true);
-            setErrorReports(parseErrors(response))
-        };
 
         /**
          * CALL METADATA REQUESTS - POST DHIS2
@@ -337,7 +352,9 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
                     gotResponseError(response);
                     return;
                 }
-
+                /*refetchProgramStage().then(res=>{
+                    
+                })*/
                 setCompleted(true);
                 setSuccessStatus(true);
                 setSavedAndValidated(true);

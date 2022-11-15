@@ -3,14 +3,9 @@ import $ from 'jquery';
 import {useEffect, useState} from 'react';
 
 // *** IMAGES ***
-import sec_svg from './../../images/i-drag_black.svg';
 import scores_svg from './../../images/scores.svg';
-import de_svg from './../../images/i-drag_black.svg';
-import warning_svg from './../../images/i-warning.svg';
-import error_svg from './../../images/i-error.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
-import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import BadgeWarnings from "./BadgeWarnings";
 import BadgeErrors from "./BadgeErrors";
 import ValidationMessages from "./ValidationMessages";
@@ -23,6 +18,8 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import ProgramRulesList from '../UIElements/ProgramRulesList';
+import Tooltip from '@mui/material/Tooltip';
+import PercentIcon from '@mui/icons-material/Percent';
 
 
 const FEEDBACK_ORDER = "LP171jpctBm";
@@ -44,19 +41,19 @@ const Scores = ({ stageSection, program, index }) => {
         <div>
             <div className="ml_item" style={{color:"#333333" , backgroundColor: "#B2DFDB", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
                 <div className="ml_list-icon">
-                    <img className="ml_list-img" alt="sec" src={scores_svg} />
+                    {/*<img className="ml_list-img" alt="sec" src={scores_svg} />*/}
+                    <PercentIcon />
                 </div>
                 <div className="ml_item-title">
                     {stageSection.displayName}
                 </div>
-                <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div></div>
+                <div className="ml_item-desc"><div>{stageSection.dataElements.length} Data Elements</div></div>
                 <div className="ml_item-warning_error " onClick={()=>showIssues(stageSection.dataElements)}>
                     {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
                     {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                 </div>
                 <div className="ml_item-cta">
-                    <img src={move_vert_svg} alt="menu" />
-                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
+                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} style={{ cursor: 'pointer' }} />
                 </div>
             </div>
             <div className="section_cont" >
@@ -66,8 +63,9 @@ const Scores = ({ stageSection, program, index }) => {
                         let compositiveIndicator = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
                         return (
                             <div id={"de_" + dataElement.id} className={classNames} key={i}>
-                                <div className="ml_item-icon">
-                                    <img className="ml_list-img" alt="de" src={scores_svg} />
+                                <div className="ml_item-icon" style={{display: 'flex', alignItems: 'center'}}>
+                                    {/*<img className="ml_list-img" alt="de" src={scores_svg} />*/}
+                                    <PercentIcon />
                                 </div>
                                 <div className="ml_item-title">
                                     {`[ ${compositiveIndicator} ] ${dataElement.formName}`}
@@ -77,13 +75,17 @@ const Scores = ({ stageSection, program, index }) => {
                                     {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length}/> }
                                 </div>
                                 <div className="ml_item-cta">
-                                    <IconButton aria-label="Rules" color="success" onClick={()=>setScoreRules(dataElement)}>
-                                        <RuleIcon />
-                                    </IconButton>
-                                    <a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id} style={{textDecoration:'none',color:'black'}}>
-                                        <IconButton>
-                                            <LaunchIcon/>
+                                    <Tooltip title="View Program Rules" placement="top">
+                                        <IconButton aria-label="Rules" color="success" onClick={()=>setScoreRules(dataElement)}>
+                                            <RuleIcon />
                                         </IconButton>
+                                    </Tooltip>
+                                    <a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id} style={{textDecoration:'none',color:'black'}}>
+                                        <Tooltip title="Open in Maintenance App" placement="top">
+                                            <IconButton>
+                                                <LaunchIcon/>
+                                            </IconButton>
+                                        </Tooltip>
                                     </a>
                                 </div>
                             </div>

@@ -17,6 +17,7 @@ import SendIcon from '@mui/icons-material/Send';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import SelectOptions from '../UIElements/SelectOptions';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { parseErrorsJoin } from '../../configs/Utils';
 
 //const { Form, Field } = ReactFinalForm
 
@@ -35,7 +36,16 @@ const metadataMutation = {
 
 const StageNew = (props) => {
     // Create Mutation
-    let metadataDM = useDataMutation(metadataMutation);
+    let metadataDM = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            console.error(err.details);
+            props.setNotification({
+                message: parseErrorsJoin(err.details, '\\n'),
+                severity: 'error'
+            });
+            props.setShowStageForm(false);
+        }
+    });
     const metadataRequest = {
         mutate: metadataDM[0],
         loading: metadataDM[1].loading,
@@ -132,7 +142,7 @@ const StageNew = (props) => {
 
         let response = true;
 
-        if (stageName === '') {
+        if (stageName.trim() === '') {
             response = false
             validationErrors.stageName = 'This field is required'
         }else if (stageName.length > MAX_STAGE_NAME_LENGTH) {
@@ -142,9 +152,12 @@ const StageNew = (props) => {
             validationErrors.stageName = undefined
         }
 
-        if (scheduledDaysStart === '') {
+        if (scheduledDaysStart.trim() === '') {
             response = false
             validationErrors.scheduledDaysStart = 'This field is required'
+        } else if (scheduledDaysStart < 0) {
+            response = false
+            validationErrors.scheduledDaysStart = 'This field must be equal or greater than 0'
         } else {
             validationErrors.scheduledDaysStart = undefined
         }
@@ -182,7 +195,7 @@ const StageNew = (props) => {
             stage.periodType = periodType
             stage.displayGenerateEventBox = displayGenerateEventBox
             stage.autoGenerateEvent = autoGenerate
-            stage.openAfterEnrollment = openFormAfterEnroll
+            if (openFormAfterEnroll) stage.openAfterEnrollment = openFormAfterEnroll
             if (openFormAfterEnroll) stage.reportDateToUse = reportDateToUse
             stage.remindCompleted = askCompleteProgram
             stage.allowGenerateNextVisit = askCreateEvent
@@ -204,7 +217,7 @@ const StageNew = (props) => {
             metadataRequest.mutate({ data: metadata }).then(response => {
                 if (response.status != 'OK') {
                     props.setNotification({
-                        message: response.typeReports[0].objectReports[0].errorReports.map(er => er.message).join(' | '),
+                        message: parseErrorsJoin(response, '\\n'),
                         severity: 'error'
                     });
                     props.setShowStageForm(false);
@@ -222,12 +235,12 @@ const StageNew = (props) => {
         let metaDataArray = attributeValues.filter(av => av.attribute.id === METADATA);
         if (metaDataArray.length > 0) {
             let metaData_value = JSON.parse(metaDataArray[0].value);
-            metaData_value.buildVersion = BUILD_VERSION;
+            metaData_value.saveVersion = BUILD_VERSION;
             metaDataArray[0].value = JSON.stringify(metaData_value);
         }
         else {
             let attr = { id: METADATA };
-            let val = { buildVersion: BUILD_VERSION };
+            let val = { saveVersion: BUILD_VERSION };
             let attributeValue = { attribute: attr, value: JSON.stringify(val) }
             attributeValues.push(attributeValue);
         }
@@ -237,7 +250,7 @@ const StageNew = (props) => {
     return <>
         <CustomMUIDialog open={true} maxWidth='md' fullWidth={true} >
             <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
-                Create New Program Stage in {props.programName}
+                {props.data?('Edit Program Stage '+props.data.name):('Create New Program Stage in Program '+props.programName)}
             </CustomMUIDialogTitle >
             <DialogContent dividers style={{ padding: '1em 2em' }}>
                 <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -252,6 +265,7 @@ const StageNew = (props) => {
                         fullWidth
                         variant="standard"
                         autoComplete='off'
+                        inputProps={{ maxLength: MAX_STAGE_NAME_LENGTH }}
                         value={stageName}
                         onChange={handleChangeStageName}
                     />
@@ -262,7 +276,7 @@ const StageNew = (props) => {
                         id="scheduledDaysStart"
                         label="Scheduled Days From Start (*)"
                         type="number"
-                        InputProps={{ inputProps: { min: 0 } }}
+                        inputProps={{ min: 0 }}
                         sx={{ width: '30%' }}
                         fullWidth
                         variant="standard"

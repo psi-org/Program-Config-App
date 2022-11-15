@@ -29,10 +29,11 @@ const ValidateMetadata = (props) => {
             hasVarName: { enable: true, title: "Parent Name not valid", errorMsg: { code: "EXW110", text: "The specified question does not have a valid Parent Name." } },
             hasBothNumeratorDenominator: { enable: true, title: "Numerator or Denominator missing", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (Numerator or Denominator)" } },
             validAggregationType: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW104", text: "The expected Aggregation Operator for the label Data Element is NONE" } },
-            validAggregationQuestion: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW105", text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for numeric types and NONE for text inputs)" } },
+            validAggregationQuestion: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW105", text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for Integer and Number types, and NONE for text inputs)" } },
             isNumeratorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW105", text: "The specified question Numerator is not numeric" } },
             isDenominatorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW108", text: "The specified question Denominator is not numeric" } },
-            hasParentQuestionNAnswerValue: { enable: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } }
+            hasParentQuestionNAnswerValue: { enable: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } },
+            matchesScore: { enable: true, title: "Score container not found", errorMsg: { code: "EXW110", text: "The specified question has been assigned to a score that is not defined." } }
         },
         scores: {
             enable: true,
@@ -157,7 +158,8 @@ const ValidateMetadata = (props) => {
                         let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
 
                         let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
-                        dataElement.errors = dataElement.errors ? dataElement.errors.push(deErrs) : [deErrs];
+
+                        dataElement.errors ? dataElement.errors.push(deErrs) : dataElement.errors = [deErrs];
                     }
 
                     if (dataElement.errors) {
@@ -179,7 +181,9 @@ const ValidateMetadata = (props) => {
                     let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
 
                     let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
-                    dataElement.errors = dataElement.errors ? dataElement.errors.push(deErrs) : [deErrs];
+
+                    dataElement.errors ? dataElement.errors.push(deErrs) : dataElement.errors = [deErrs];
+
                 }
 
                 if (dataElement.errors) {
@@ -216,7 +220,7 @@ const ValidateMetadata = (props) => {
                         return true;
                     }
                 }
-                setValidationMessage("Programs Name and Id doesn't exist or is not valid. Please check the details again");
+                setValidationMessage("Program Name and ID doesn't exist or is not valid. Please check the details again");
                 return false;
             }
             return true;
@@ -228,6 +232,7 @@ const ValidateMetadata = (props) => {
                 let errors = [];
                 let warnings = [];
                 let metaData = getHNQISMetadata(dataElement);
+                dataElement.labelFormName = metaData.labelFormName;
                 if (programDetailsValidationSettings.checkHasFormName.enable && !checkHasFormName(metaData, dataElement)) errors.push(programDetailsValidationSettings.checkHasFormName.errorMsg);
                 if (programDetailsValidationSettings.checkFormNameLength.enable && !checkFormNameLength(metaData, dataElement)) errors.push(programDetailsValidationSettings.checkFormNameLength.errorMsg);
                 if (programDetailsValidationSettings.structureMatchesValue.enable && !structureMatchesValue(metaData, dataElement, "label", "LONG_TEXT")) errors.push(programDetailsValidationSettings.structureMatchesValue.errorMsg);
@@ -239,6 +244,7 @@ const ValidateMetadata = (props) => {
                 if (programDetailsValidationSettings.isNumeratorNumeric.enable && !isNumeric(metaData, "scoreNum")) errors.push(programDetailsValidationSettings.isNumeratorNumeric.errorMsg);
                 if (programDetailsValidationSettings.isDenominatorNumeric.enable && !isNumeric(metaData, "scoreDen")) errors.push(programDetailsValidationSettings.isDenominatorNumeric.errorMsg);
                 if (programDetailsValidationSettings.hasParentQuestionNAnswerValue.enable && !hasBothParentQuestionNAnswerValue(metaData)) errors.push(programDetailsValidationSettings.hasParentQuestionNAnswerValue.errorMsg);
+                if (programDetailsValidationSettings.matchesScore.enable && !questionMatchesScore(dataElement)) errors.push(programDetailsValidationSettings.matchesScore.errorMsg);
                 if (errors.length > 0) dataElement.errors = errors;
             }
         }
@@ -321,7 +327,7 @@ const ValidateMetadata = (props) => {
 
         function checkHasFormName(metaData, dataElement) {
             if (metaData.elem !== "") {
-                if (metaData.elemType === "label") return (!isBlank(dataElement.name));
+                if (metaData.elemType === "label") return (!isBlank(dataElement.labelFormName));
                 return (!isBlank(dataElement.formName)); //displayname ? formName
 
             }
@@ -329,8 +335,9 @@ const ValidateMetadata = (props) => {
         }
 
         function checkFormNameLength(metaData, dataElement) {
+            let formName = dataElement.labelFormName || dataElement.formName;
             if (metaData.elem !== "") {
-                return (dataElement.formName.length <= (MAX_DATA_ELEMENT_NAME_LENGTH+5) && dataElement.formName.length >= MIN_DATA_ELEMENT_NAME_LENGTH)
+                return (formName.replace(' [C]', '').length <= (MAX_DATA_ELEMENT_NAME_LENGTH) && formName.replace(' [C]', '').length >= MIN_DATA_ELEMENT_NAME_LENGTH)
             }
             return true;
         }
@@ -374,6 +381,15 @@ const ValidateMetadata = (props) => {
             return true;
         }
 
+        function questionMatchesScore(dataElement){
+            let feedbackOrder = dataElement.attributeValues.find(attributeValue => attributeValue.attribute.id === FEEDBACK_ORDER)?.value;
+            if(!feedbackOrder) return true
+
+            feedbackOrder = feedbackOrder.split('.').slice(0,-1).join('.')
+            let compositeScores = props.importedScores.dataElements.map(score => score.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value);
+            return compositeScores.includes(feedbackOrder)
+        }
+
         function getHNQISMetadata(dataElement) {
             let jsonData = dataElement.attributeValues.filter(attributeValue => attributeValue.attribute.id === METADATA);
             return (jsonData.length > 0) ? JSON.parse(jsonData[0].value) : '';
@@ -391,8 +407,16 @@ const ValidateMetadata = (props) => {
 
         function validAggregationQuestion(metaData, dataElement) {
             if (metaData.elemType === "question") {
-                if (dataElement.valueType === "NUMBER") return (dataElement.aggregationType === "SUM" || dataElement.aggregationType === "AVERAGE");
-                else if (dataElement.valueType === "LONG_TEXT") return (dataElement.aggregationType === "NONE");
+                if (
+                    dataElement.valueType === "NUMBER" ||
+                    dataElement.valueType === "INTEGER"
+                )
+                    return (
+                        dataElement.aggregationType === "SUM" ||
+                        dataElement.aggregationType === "AVERAGE"
+                    );
+                else if (dataElement.valueType === "LONG_TEXT")
+                    return dataElement.aggregationType === "NONE";
                 return true;
             }
             return true;

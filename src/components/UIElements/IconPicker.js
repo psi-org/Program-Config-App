@@ -128,7 +128,8 @@ const IconPicker = ({parentIcon, setParentIcon}) => {
                     <Button onClick={() => hideForm()} color="error" > Cancel </Button>
                     <Button
                         onClick={() => {setParentIcon(selectedIcon); hideForm()}}
-                        variant='outlined'>
+                        variant='outlined'
+                        disabled={selectedIcon===''}>
                         Select Icon
                     </Button>
                 </DialogActions>
