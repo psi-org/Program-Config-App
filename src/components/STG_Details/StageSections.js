@@ -188,8 +188,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const { data: androidSettings } = useDataQuery(queryAndroidSettings);
     const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings, {
         onError: (err) => {
-            setAndroidSettingsError(err)
-            console.error(err)
+            setAndroidSettingsError(err.details || err)
         }
     });
     const [androidSettingsError, setAndroidSettingsError] = useState(undefined);
@@ -864,7 +863,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 {progressSteps !== 7 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 7 && !androidSettings && <IconWarning24 color={'#ffbb00'} />}
                                 {progressSteps !== 7 && androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p style={{ maxWidth: '90%' }}> Enabling in-app analytics {!androidSettings ? "(Android Settings app not enabled)" : (androidSettingsError ? '(Error: ' + androidSettingsError.message + ')' : "")}</p>
+                                <p style={{ maxWidth: '90%' }}> Enabling in-app analytics {!androidSettings ? "(Android Settings app not enabled)" : (androidSettingsError ? '(Error: ' + (androidSettingsError.httpStatus === 'Forbidden' ? 'You don\'t have permissions to update the Android Settings in this server' : androidSettingsError.message) + ')' : "")}</p>
                             </div>
                         }
                         {(progressSteps > 7) && !programSettingsError &&

@@ -349,7 +349,7 @@ const RestoreOptions = props => {
 
     const programStageDEChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel key={9} label="Data Elements + Program Rules + Program Variable" control={<Checkbox checked={checkedState[9]} onChange={() => onCheckBoxHandler(9)} />} />
+            <FormControlLabel key={9} label="Data Elements + Program Rules & Variables" control={<Checkbox checked={checkedState[9]} onChange={() => onCheckBoxHandler(9)} />} />
         </Box>
     )
 
@@ -363,7 +363,7 @@ const RestoreOptions = props => {
 
     const programChildren = (
         <Box sx={{ display: 'flex', flexDirection: 'column', ml: 3 }}>
-            <FormControlLabel key={1} label="Options (Options + Optionsets)" control={<Checkbox checked={checkedState[1]} onChange={() => onCheckBoxHandler(1)} />} />
+            <FormControlLabel key={1} label="Options (Options + Option Sets)" control={<Checkbox checked={checkedState[1]} onChange={() => onCheckBoxHandler(1)} />} />
             {/*<FormControlLabel key={2} label="Program Rules ( Program Rules + Action + Variable)" control={<Checkbox checked={checkedState[2]} onChange={() => onCheckBoxHandler(2)} />} />*/}
             <FormControlLabel key={10} label="Program Indicators" control={<Checkbox checked={checkedState[10]} onChange={() => onCheckBoxHandler(10)} />} />
             <FormControlLabel key={3} label="Tracked Entity Types" control={<Checkbox checked={checkedState[3]} onChange={() => onCheckBoxHandler(3)} />} />
