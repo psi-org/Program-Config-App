@@ -266,7 +266,7 @@ const ProgramList = () => {
                 </div>
             </div>
             <div>
-                <div className="title" style={{ padding: '1.5em 1em 0' }}>List of programs</div>
+                <div className="title" style={{ padding: '1.5em 1em 0' }}>List of Programs</div>
                 <div style={{ display: "flex", alignItems: "center", padding: '0 1.2em' }}>
                     <TextField
                         margin="dense"

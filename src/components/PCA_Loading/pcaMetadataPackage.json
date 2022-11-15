@@ -169,7 +169,7 @@
                 "F_METADATA_IMPORT",
                 "F_PROGRAM_INDICATOR_PRIVATE_ADD",
                 "F_SECTION_ADD",
-                "M_programconfigapp",
+                "M_programconfiguration",
                 "M_dhis-web-maintenance",
                 "M_dhis-web-dashboard",
                 "F_PROGRAM_RULE_MANAGEMENT",
