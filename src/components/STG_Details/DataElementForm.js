@@ -65,7 +65,7 @@ const queryId = {
     }
 };
 
-const DataElementForm = ({ program, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisMode }) => {
+const DataElementForm = ({ program, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisMode, setSaveStatus }) => {
 
     const de = programStageDataElement.dataElement
 
@@ -236,21 +236,21 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
         let response = true;
 
-        if (valueType === '') {
+        if (valueType.trim() === '') {
             response = false
             validationErrors.valueType = 'A Value Type or Option Set must be specified'
         } else {
             validationErrors.valueType = undefined
         }
 
-        if (aggType === '') {
+        if (aggType.trim() === '') {
             response = false
             validationErrors.aggType = 'This field is required'
         } else {
             validationErrors.aggType = undefined
         }
 
-        if (formName === '') {
+        if (formName.trim() === '') {
             response = false
             validationErrors.formName = 'This field is required'
         } else if (formName.length < MIN_NAME_LENGTH || formName.length > MAX_DATA_ELEMENT_NAME_LENGTH) {
@@ -260,7 +260,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
             validationErrors.formName = undefined
         }
 
-        if (numerator !== '' && denominator === '') {
+        if (numerator.trim() !== '' && denominator.trim() === '') {
             response = false
             validationErrors.denominator = 'This field is also required'
         } else if (denominator === '0') {
@@ -270,14 +270,14 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
             validationErrors.denominator = undefined
         }
 
-        if (numerator === '' && denominator !== '') {
+        if (numerator.trim() === '' && denominator.trim() !== '') {
             response = false
             validationErrors.numerator = 'This field is also required'
         } else {
             validationErrors.numerator = undefined
         }
 
-        if ((numerator !== '' || denominator !== '') && feedbackOrder === '') {
+        if ((numerator.trim() !== '' || denominator.trim() !== '') && feedbackOrder.trim() === '') {
             response = false
             validationErrors.feedbackOrder = 'This field is also required'
         } else {
@@ -301,21 +301,29 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         })
     }
 
+    const buildStyle = () => {
+        let auxstyle = {};
+        if (deIcon) auxstyle.icon = deIcon;
+        if (deColor) auxstyle.color = deColor;
+
+        return (Object.keys(auxstyle).length > 0)?auxstyle:undefined
+    }
+
     const callSave = () => {
 
         // Save new values in local variable de
         let data = JSON.parse(JSON.stringify(de))
+        
         let attributeValues = []
         let metadata = JSON.parse(de?.attributeValues?.find(att => att.attribute.id === METADATA)?.value || '{}')
 
-        data.style = {}
-        if(deIcon) data.style.icon = deIcon
-        if(deColor) data.style.color = deColor
+        data.style = buildStyle()
 
         data.displayInReports = displayInReports
 
         // Value Type
         data.valueType = valueType
+        data.aggregationType = aggType
         // Option Set
         if (optionSet) {
             data.optionSetValue = true
@@ -356,6 +364,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         stageDataElement.dataElement.attributeValues = attributeValues
 
         save(de.id, section, stageDataElement)
+        if (hnqisMode) setSaveStatus('Validate & Save');
 
     }
 
@@ -449,12 +458,14 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                         optionSetValue: optionSetValue!==undefined,
                         attributeValues: attributes,
                         legendSets: legendSetsValue,
-                        legendSet : legendSetsValue[0]
+                        legendSet: legendSetsValue[0],
+                        style: buildStyle()
                     }
                 }
                 save(newCreatedDe)
             }
             setSaveFlag(false)
+            if (hnqisMode) setSaveStatus('Validate & Save');
         }
     }, [saveFlag])
     //End New DE
@@ -796,9 +807,8 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                                     This number will generate the feedback hierarchy in the app, while also grouping the scores to calculate the composite scores.<br /><br />
                                     <strong>There cannot exist gaps in the Compositive indicators!</strong> The existence of gaps will be validated through the Config App before Setting up the program.<br /><br />
                                     <strong>Keep in mind the following:</strong><br /><br />
-                                    - Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc.
-                                    - Feedback Order gaps will result in logic errors.<br />
-                                    Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.<br /><br />
+                                    - Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc.<br />
+                                    - Feedback Order gaps will result in logic errors. Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.<br /><br />
                                     - Questions are not required to be grouped together to belong to the same level of the compositive indicator, for example: <br />
                                     Having [ 1, 1.1, 1.2, 1.3, 2, 2.1, 2.2, 1.4 ] is a valid configuration as there are no gaps in the same level of the compositive indicator.
                                 </p>

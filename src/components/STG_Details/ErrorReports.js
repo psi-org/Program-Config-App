@@ -53,7 +53,6 @@ const ErrorReports = ({ errors }) => {
                 <div className="ml_item-desc"></div>
                 <div className="ml_item-warning_error "></div>
                 <div className="ml_item-cta">
-                    <img src={move_vert_svg} alt="menu" />
                     <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
                 </div>
             </div>

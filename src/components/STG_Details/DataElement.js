@@ -6,14 +6,11 @@ import { Draggable } from "react-beautiful-dnd";
 import DataElementForm from "./DataElementForm";
 import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { Tooltip } from "@mui/material";
 import { METADATA } from "../../configs/Constants";
 
 // *** IMAGES ***
 import de_svg from './../../images/i-drag_black.svg';
-import warning_svg from './../../images/i-warning.svg';
-import error_svg from './../../images/i-error.svg';
-import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import open_external_svg from './../../images/open_external.svg';
 import {FlyoutMenu, MenuItem, Popper, Layer, colors,IconAdd16,IconDelete16,IconEdit16, Tag } from '@dhis2/ui';
 
 import BadgeWarnings from "./BadgeWarnings";
@@ -28,10 +25,13 @@ import EditOffIcon from '@mui/icons-material/EditOff';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
+import LabelIcon from "@mui/icons-material/LabelImportant";
+import QuizIcon from "@mui/icons-material/Quiz";
+import DEIcon from '@mui/icons-material/Dns';
 
 import Chip from '@mui/material/Chip';
 
-const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode, deStatus, isSectionMode}) => {
+const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode, deStatus, isSectionMode, readOnly, setSaveStatus}) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -45,8 +45,7 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
 
     let classNames = '';
     
-    let metadata = dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value;
-    if(metadata) metadata=JSON.parse(metadata);
+    let metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || '{}');
     let renderFormName = metadata?.labelFormName;
 
     classNames+= (metadata?.labelFormName) ? " ml_item" : " ml_item";
@@ -72,15 +71,28 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
 
     return (
         <>
-        <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined || DEActions.deToEdit!=='' || !isSectionMode}>
+        <Draggable key={dataElement.id || index} draggableId={dataElement.id || dataElement.formName.slice(-15)} index={index} isDragDisabled={dataElement.importStatus!=undefined || DEActions.deToEdit!=='' || !isSectionMode || readOnly}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                     <div id={"de_"+dataElement.id} className={'data-element-header '+(openMenu?'data-element-selected ':'')+classNames}>
-                        <div className="ml_item-icon">
-                            <img className="ml_list-img" alt="de" src={de_svg} />
+                        <div className="ml_item-icon" style={{display: 'flex', alignItems: 'center'}}>
+                            { !hnqisMode?<DEIcon/>:(metadata.elemType==='label'?<LabelIcon/>:<QuizIcon/>)}
                         </div>
                         <div className="ml_item-title"> 
-                            {deImportStatus} { renderFormName || dataElement.formName}
+                            {deImportStatus}
+                            { 
+                                renderFormName?renderFormName:
+                                (
+                                    (dataElement.formName && dataElement.formName?.replaceAll(' ','')!=='')?
+                                        dataElement.formName:
+                                        <span style={{display: 'flex', alignItems: 'center'}}>
+                                            <em style={{marginRight: '0.5em'}}>{dataElement.name}</em>
+                                            <Tooltip title="No Form Name provided" placement="right" color="warning">
+                                                <WarningAmberIcon fontSize="small"/>
+                                            </Tooltip>
+                                        </span>
+                                )
+                            }
                         </div>
                         <div className="ml_item-warning_error" onClick={()=>setShowValidationMessage(!showValidationMessage)}>
                             {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length}/> }
@@ -88,8 +100,8 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
                         </div>
                         <div className="ml_item-cta">
                             {deStatus && <Chip label={deStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{marginLeft:'1em'}} />}
-                            {isSectionMode && <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>}
-                            {openMenu &&
+                                {isSectionMode && !readOnly && <img src={move_vert_svg} alt="menu" id={'menu'+dataElement.id} onClick={()=>{setRef(document.getElementById('menu'+dataElement.id)); toggle()}} style={{cursor:'pointer'}}/>}
+                            {openMenu && 
                                 <Layer onClick={toggle}>
                                     <Popper reference={ref} placement="bottom-end">
                                         <FlyoutMenu>
@@ -112,6 +124,7 @@ const DraggableDataElement = ({program, dataElement, stageDE, DEActions, updateD
                             setDeToEdit={DEActions.setEdit}
                             save={DEActions.update}
                             hnqisMode={hnqisMode}
+                            setSaveStatus={setSaveStatus}
                         /> 
                     }
                     { showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} /> }

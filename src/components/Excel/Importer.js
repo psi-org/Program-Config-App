@@ -215,7 +215,13 @@ const Importer = (props) => {
         setCurrentTask(task.name);
         let status = true;
         validWorksheets.forEach((worksheet, index) => {
-            if (worksheet !== workbook.getWorksheet(index + 1).name) {
+            try {
+                if (worksheet !== workbook.getWorksheet(index + 1).name) {
+                    task.status = "error";
+                    status = false;
+                    setNotificationError(true);
+                }
+            } catch (e) {
                 task.status = "error";
                 status = false;
                 setNotificationError(true);

@@ -15,13 +15,15 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import MuiChip from '@mui/material/Chip';
+import { formatAlert, truncateString } from "../../configs/Utils";
 
 const query = {
     results: {
         resource: 'programs',
         id: ({ program }) => program,
         params: {
-            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues','programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements']
+            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', 'programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements]', 'withoutRegistration']
         }
     },
 };
@@ -58,7 +60,7 @@ const ProgramDetails = () => {
 
     if (!program) return (
         <NoticeBox title="Missing Program ID" error>
-            No program ID was given, please try again! <Link to="/">Go to programs list</Link>
+            No program ID was provided, please try again! <Link to="/">Go to programs list</Link>
         </NoticeBox>
     )
 
@@ -78,7 +80,7 @@ const ProgramDetails = () => {
     if(hnqisMode && !h2Ready) return (
         <div style={{margin:'2em'}}>
             <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
-                <span>First go to <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue</span>
+                <span>First go to the <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue.</span>
             </NoticeBox>
         </div>
     )
@@ -88,11 +90,11 @@ const ProgramDetails = () => {
             <div className="sub_nav">
                 <div className="cnt_p">
                     <Link to={'/'}><Chip>Home</Chip></Link>/
-                    <Chip>Program: {data.results.displayName}</Chip>
+                    <Chip>{'Program: '+truncateString(data.results.displayName)}</Chip>
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns">
-                    {!hnqisMode &&
+                    {!hnqisMode && !data.results.withoutRegistration &&
                         <MuiButton
                             variant="outlined"
                             color='inherit'
@@ -104,8 +106,22 @@ const ProgramDetails = () => {
                     }
                 </div>
             </div>
-            <div className="wrapper">
-                <div className="title">Program Stages for Program {data.results.displayName}</div>
+            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent:'start', alignItems: 'center'}}>
+                <span style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                }}>
+                    {!data.results.withoutRegistration ? 'Program Stages for Program ' : 'Event Program '}
+                    <strong style={{ maxWidth: '100%' }}>
+                        {data.results.displayName}
+                    </strong>
+                </span>
+                {data.results.withoutRegistration &&
+                    <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
+                }
+            </div>
+            <div className="wrapper" style={{ padding: '1em 1.2em 0' }}>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
                         {
@@ -121,6 +137,7 @@ const ProgramDetails = () => {
                                         setNewStage={setNewStage}
                                         editStatus={newStage?.stage===programStage.id && newStage?.mode }
                                         hnqisMode={hnqisMode}
+                                        eventMode={data.results.withoutRegistration}
                                     />
                                 )
                             })
@@ -136,7 +153,7 @@ const ProgramDetails = () => {
                     open={notification !== undefined}
                     key={'topcenter'}>
                     <Alert onClose={() => setNotification(undefined)} severity={notification?.severity || snackSeverity} sx={{ width: '100%' }}>
-                        {notification?.message}
+                        {formatAlert(notification?.message)}
                     </Alert>
                 </Snackbar>
             </div>

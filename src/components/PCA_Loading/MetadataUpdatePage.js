@@ -49,20 +49,12 @@ const MetadataErrorPage = () => {
 
     const { data: pcaMetadataData } = useDataQuery(queryDataStore);
 
-    const [dataStoreCreate] = useDataMutation(dataStoreMutation, {
-        onError: (err) => {
-            setSentData(false);
-            setError(err.details)
-        }
-    });
     const [dataStoreUpdate] = useDataMutation(dataStoreMutationUpdate, {
         onError: (err) => {
             setSentData(false);
             setError(err.details)
         }
     });
-    
-
 
     const [error, setError] = useState(false)
     const [sentData, setSentData] = useState(false)
@@ -78,8 +70,7 @@ const MetadataErrorPage = () => {
                     version:PCA_METADATA_VERSION,
                     date: new Date()
                 }
-                let sendToDataStore = !pcaMetadataData?.results ? dataStoreCreate : dataStoreUpdate
-                sendToDataStore({data:dsData}).then(res => {
+                dataStoreUpdate({data:dsData}).then(res => {
                     if(res.status!= 'OK') setError(res)
                     else window.location.reload()
                 })
@@ -98,8 +89,8 @@ const MetadataErrorPage = () => {
             </div>
             <div className="wrapper">
                 <div style={{width: '500px', margin: 'auto', display: 'flex', flexDirection:'column', paddingTop: '1em'}}>
-                    {!error && <NoticeBox title="Missing Required Metadata">
-                        <p>The server lacks the necessary Metadata package needed to work correctly.</p>
+                    {!error && <NoticeBox title="Outdated Metadata Package">
+                        <p>A new version of the PCA Metadata Package has been released. Please update it before proceeding.</p>
                     </NoticeBox>}
 
                     {!error && <LoadingButton
@@ -108,13 +99,13 @@ const MetadataErrorPage = () => {
                         style={{width: '100%', marginTop: '1em'}}
                         startIcon={<InstallDesktopIcon />}
                         onClick={() => installMetadata()}>
-                        Install necessary metadata
+                        Update PCA metadata
                     </LoadingButton>}
 
                     {error &&
                     <NoticeBox error={true} title="Install Error">
-                        <p>The Metadata Package could not be installed.</p>
-                        <br/>{parseErrorsUL(error)}
+                        <p>The Metadata Package could not be updated.</p>
+                        {parseErrorsULrrorsUL(error)}
                     </NoticeBox>}
                 </div>
             </div>

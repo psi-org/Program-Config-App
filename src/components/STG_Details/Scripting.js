@@ -1,9 +1,6 @@
-const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
-    FEEDBACK_TEXT = "yhKEe6BLEer",
-    CRITICAL_QUESTION = "NPwvdTt0Naj",
-    METADATA = "haUflNqP85K",
-    SCORE_DEN = "l7WdLDhE3xW",
-    SCORE_NUM = "Zyr7rlDOJy8";
+import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND } from "../../configs/Constants";
+import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../configs/AnalyticsTemplates";
+import { DeepCopy } from "../../configs/Utils";
 
 /**
  * 
@@ -47,7 +44,7 @@ const buildScores = (branch) => {
             if (a.prgVarName) {
                 let num = `#{${a.prgVarName}}*${a.scoreNum}`;
                 let den = `d2:countIfZeroPos('${a.prgVarName}')*${a.scoreDen}`;
-                if (a.isCritical=="Yes") {
+                if (a.isCritical == "Yes") {
                     numC.push(num);
                     denC.push(den);
                 } else {
@@ -155,7 +152,7 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
                 name: name,
                 description: "_Scripted",
                 program: { id: programId },
-                programStage : {id : stageId},
+                programStage: { id: stageId },
                 condition: `d2:hasValue('_CV${composite.prgVarName}')`,
                 programRuleActions: [{ id: actionId }]
             };
@@ -183,7 +180,7 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
                 name: name,
                 description: "_Scripted",
                 program: { id: programId },
-                programStage : {id : stageId},
+                programStage: { id: stageId },
                 condition: "true",
                 programRuleActions: [{ id: actionId }]
             };
@@ -256,7 +253,7 @@ const buildCriticalScore = (branch, stageId, programId, uidPool) => {
         name,
         description: "_Scripted",
         program: { id: programId },
-        programStage : {id : stageId},
+        programStage: { id: stageId },
         condition: `d2:hasValue('_CV_CriticalQuestions')`,
         programRuleActions: [{ id: actionId }]
     };
@@ -329,7 +326,7 @@ const buildNonCriticalScore = (branch, stageId, programId, uidPool) => {
         name,
         description: "_Scripted",
         program: { id: programId },
-        programStage : {id : stageId},
+        programStage: { id: stageId },
         condition: `d2:hasValue('_CV_NonCriticalQuestions')`,
         programRuleActions: [{ id: actionId }]
     };
@@ -401,7 +398,7 @@ const buildCompetencyRules = (programId, stageId, uidPool) => {
 
         rule.id = programRuleUid;
         rule.program.id = programId;
-        rule.programStage = { id : stageId }
+        rule.programStage = { id: stageId }
 
         let actions = rule.programRuleActions;
         rule.programRuleActions = [];
@@ -548,7 +545,7 @@ const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass =
  * @param {Array} scores : Data Elements linked to Scores section
  * @returns {Object} uniqueScores:Boolean , compositeScores:<Array>, duplicatedScores:<Array>
  */
-const checkScores = (scores) => {
+export const checkScores = (scores) => {
     let compositeScores = scores.map(score => score.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value);
     let duplicatedScores = compositeScores.filter((composite, index) => compositeScores.indexOf(composite) !== index);
     return {
@@ -558,7 +555,7 @@ const checkScores = (scores) => {
     };
 }
 
-const readQuestionComposites = (sections) => {
+export const readQuestionComposites = (sections) => {
     var questionCompositeScores = [];
     sections.forEach(section => {
         section.dataElements.forEach(de => {
@@ -589,12 +586,12 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
             let programRuleUid = uidPool.shift();
             let name = `PR - Show/Hide - Show when ${parentCode} is ${answer}`;
 
-            conditionValue = ["0","1"].includes(String(answer)) ? answer : `"${answer.replaceAll("'","")}"`
+            conditionValue = ["0", "1"].includes(String(answer)) ? answer : `"${answer.replaceAll("'", "")}"`
 
             const pr = {
                 id: programRuleUid,
                 name,
-                description:'_Scripted',
+                description: '_Scripted',
                 program: { id: programId },
                 condition: `!d2:hasValue(#{${parentCode}}) || (#{${parentCode}}!=${conditionValue})`,
                 programRuleActions: []
@@ -607,7 +604,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
             const pr_mfm = {
                 id: mfm_uid,
                 name: mfm_name,
-                description:'_Scripted',
+                description: '_Scripted',
                 program: { id: programId },
                 condition: `d2:hasValue(#{${parentCode}}) && (#{${parentCode}}==${conditionValue})`,
                 programRuleActions: []
@@ -653,15 +650,15 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
 }
 
 const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
-    var labelsRules = [] , labelsActions = [];
+    var labelsRules = [], labelsActions = [];
 
     hideShowLabels.forEach(hsRule => {
         let programRuleUid = uidPool.shift();
 
         var pr = {
             id: programRuleUid,
-            name:undefined,
-            description:'_Scripted',
+            name: undefined,
+            description: '_Scripted',
             program: { id: programId },
             condition: undefined,
             programRuleActions: []
@@ -672,7 +669,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
             pr.condition = `'true'`;
         } else {
             pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
-            let conditionValue = ["0","1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'","")}"`
+            let conditionValue = ["0", "1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'", "")}"`
             pr.condition = `d2:hasValue(#{${hsRule.parent}}) && (#{${hsRule.parent}}==${conditionValue})`;
         }
 
@@ -682,7 +679,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
             const pra = {
                 id: actionId,
                 programRuleActionType: "ASSIGN",
-                data: action.text,
+                data: "'" + action.text.replaceAll(/'/g, "’") + "'",
                 dataElement: { id: action.id },
                 programRule: { id: programRuleUid }
             };
@@ -694,7 +691,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
         labelsRules.push(pr);
     });
 
-    return {labelsRules, labelsActions};
+    return { labelsRules, labelsActions };
 };
 
 /**
@@ -705,7 +702,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
  * @param {String} useCompetencyClass: Flag to include or not the competency class realated items
  * @returns {Array} programRuleVariables: <Array>{name,programRuleVariableSourceType,useCodeForOptionSet,program,|dataElement|}
  */
-const buildProgramRuleVariables = (sections, compositeScores, programId, useCompetencyClass = "Yes") => {
+export const buildProgramRuleVariables = (sections, compositeScores, programId, useCompetencyClass = "Yes") => {
     // const criticalStepCalculations = sections.find(s => s.name == "Critical Step Calculations");
     // const scores = sections.find(s => s.name == "Scores");
     // sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
@@ -778,7 +775,7 @@ const buildProgramRuleVariables = (sections, compositeScores, programId, useComp
     return programRuleVariables.concat(criticalVariables)
 }
 
-const buildProgramRules = (sections, stageId, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea="FP", scoreMap = { childs: [] }) => {
+export const buildProgramRules = (sections, stageId, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea = "FP", scoreMap = { childs: [] }) => {
 
     var programRules = [];
     var programRuleActions = [];
@@ -787,7 +784,7 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
 
     const varNameRef = sections.map(sec => sec.dataElements.map(de => {
         let metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || "{}")
-        return { id:de.id , varName:metadata.varName }
+        return { id: de.id, varName: metadata.varName }
     })).flat();
 
     //Create Tree Object for Scoring PRs
@@ -810,7 +807,7 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
             }
 
             // Get parents hide/show logic
-            if (metadata.parentQuestion!==undefined && metadata.parentValue!==undefined) {
+            if (metadata.parentQuestion !== undefined && metadata.parentValue !== undefined) {
                 let parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
                 let parentValue = String(metadata.parentValue);
 
@@ -829,10 +826,10 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
                         });
                         hsIdx = hideShowLabels.length - 1;
                     }
-                    hideShowLabels[hsIdx].actions.push({id:dataElement.id, text: metadata.labelFormName.replaceAll("\"","'")});
+                    hideShowLabels[hsIdx].actions.push({ id: dataElement.id, text: metadata.labelFormName.replaceAll("\"", "'") });
                 }
             } else if (metadata.labelFormName) {
-                hideShowLabels[0].actions.push({id:dataElement.id, text: metadata.labelFormName.replaceAll("\"","'")});
+                hideShowLabels[0].actions.push({ id: dataElement.id, text: metadata.labelFormName.replaceAll("\"", "'") });
             }
         });
     });
@@ -864,7 +861,7 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
 
     // Attributes
 
-    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, scoreMap, useCompetencyClass,healthArea); //Define: useCompetencyClass & healthArea
+    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, scoreMap, useCompetencyClass, healthArea); //Define: useCompetencyClass & healthArea
 
     // Hide/Show Logic
 
@@ -895,9 +892,304 @@ const buildProgramRules = (sections, stageId, programId, compositeValues, scores
     return { programRules, programRuleActions }
 }
 
-module.exports = {
+export const buildProgramIndicators = (programId, programShortName, uidPool, useCompetency, sharingSettings) => {
+
+    // This sectin is for the local analytics
+    const indicatorValues = useCompetency === "Yes" ? [
+        { name: 'C', condition: `A{${COMPETENCY_ATTRIBUTE}} == "competent"` },
+        { name: 'CNI', condition: `A{${COMPETENCY_ATTRIBUTE}} == "improvement"` },
+        { name: 'NC', condition: `A{${COMPETENCY_ATTRIBUTE}} == "notcompetent"` }
+    ] : [
+        { name: 'A', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} >= 80.0` },
+        { name: 'B', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} < 80.0 && A{${GLOBAL_SCORE_ATTRIBUTE}} >= 50.0` },
+        { name: 'C', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} < 50.0` }
+    ];
+    const nameComp = useCompetency === "Yes" ? "Competency" : "QoC";
+
+    let indicatorIDs = []
+
+    let programIndicators = indicatorValues.map(value => {
+        let result = DeepCopy(ProgramIndicatorTemplate)
+        result.id = uidPool.shift()
+        indicatorIDs.push(result.id)
+        result.name = programShortName + " - " + nameComp + " - " + value.name
+        result.shortName = programShortName.slice(0, 50-(value.name.length + 3)) + " - " + value.name
+        result.program.id = programId
+        result.sharing = sharingSettings
+        result.analyticsPeriodBoundaries[0].sharing = sharingSettings
+        result.analyticsPeriodBoundaries[1].sharing = sharingSettings
+        result.filter = value.condition
+        return result
+    })
+
+    // Global  Analytics - Number of Assesments
+    const indicatorNoA = [
+        { name: 'Number of Assessments' }
+    ];
+
+    programIndicators = programIndicators.concat(indicatorNoA.map(value => {
+        let AnalyticNoA = DeepCopy(ProgramIndicatorTemplateNoA)
+        AnalyticNoA.id = uidPool.shift()
+        indicatorIDs.push(AnalyticNoA.id)
+        AnalyticNoA.name = programShortName + " - " + value.name
+        AnalyticNoA.shortName = programShortName.slice(0, 50 - (value.name.length + 3)) + " - " + value.name
+        AnalyticNoA.program.id = programId
+        AnalyticNoA.sharing = sharingSettings
+        AnalyticNoA.analyticsPeriodBoundaries[0].sharing = sharingSettings
+        AnalyticNoA.analyticsPeriodBoundaries[1].sharing = sharingSettings
+        return AnalyticNoA
+    }))
+
+    // Global  Analytics - Global Score
+    const indicatorGS = [
+        { name: 'Global Score' }
+    ];
+
+    programIndicators = programIndicators.concat(indicatorGS.map(value => {
+        let AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
+        AnalyticGS.id = uidPool.shift()
+        indicatorIDs.push(AnalyticGS.id)
+        AnalyticGS.name = programShortName + " - " + value.name
+        AnalyticGS.shortName = programShortName.slice(0, 50 - (value.name.length + 3)) + " - " + value.name
+        AnalyticGS.program.id = programId
+        AnalyticGS.sharing = sharingSettings
+        AnalyticGS.analyticsPeriodBoundaries[0].sharing = sharingSettings
+        AnalyticGS.analyticsPeriodBoundaries[1].sharing = sharingSettings
+        return AnalyticGS
+    }))
+
+    //Return
+    return { programIndicators, indicatorIDs }
+}
+
+export const buildH2BaseVisualizations = (programId, programShortName, indicatorIDs, uidPool, useCompetency, currentDashboardId, userOU, ouRoot, stageId, sharingSettings, visualizationLevel, mapLevel) => {
+    let series = []
+    let dataDimensionItems = []
+    let visualizations = []
+    let eventReports = []
+    let androidSettingsVisualizations = []
+    let maps = []
+    let dashboardItems = []
+    let dashboards = []
+
+    let columnDimensions = []
+    columnDimensions[0] = "pe"
+    columnDimensions[1] = "ou"
+    columnDimensions[2] = GLOBAL_SCORE_ATTRIBUTE
+    columnDimensions[3] = ACTION_PLAN_ACTION
+
+    const timestamp = new Date().toISOString();
+    const nameComp = useCompetency === "Yes" ? "Competency Classes" : "Quality of Care";
+
+    indicatorIDs.forEach(indicator => {
+        series.push({
+            "dimensionItem": indicator,
+            "axis": 0
+        })
+        dataDimensionItems.push({
+            "dataDimensionItemType": "PROGRAM_INDICATOR",
+            "programIndicator": { "id": indicator }
+        })
+    })
+
+    //Competency Classes Pie Chart - (Last 6 months)
+    let chart1 = DeepCopy(compLastSixMonthsPie)
+    chart1.id = uidPool.shift()
+    chart1.name = programShortName + " - " + nameComp + " Pie Chart - (Last 6 months)"
+    chart1.code = programId + "_Scripted2"
+    chart1.publicAccess = sharingSettings.public
+    chart1.sharing = sharingSettings
+    chart1.series = series.slice(0, 3)
+    chart1.dataDimensionItems = dataDimensionItems.slice(0, 3)
+    visualizations.push(chart1)
+    androidSettingsVisualizations.push({
+        id: chart1.id,
+        name: chart1.name,
+        timestamp
+    })
+
+    //Competency Classes - (Last 6 months by Org Units)
+    let table1 = DeepCopy(compLastSixMonthsByOUTable)
+    table1.id = uidPool.shift()
+    table1.name = programShortName + " - " + nameComp + " - (Last 6 months by Org Units)"
+    table1.code = programId + "_Scripted1"
+    table1.publicAccess = sharingSettings.public
+    table1.sharing = sharingSettings
+    table1.series = series.slice(0, 3)
+    table1.dataDimensionItems = dataDimensionItems.slice(0, 3)
+    visualizations.push(table1)
+    androidSettingsVisualizations.push({
+        id: table1.id,
+        name: table1.name,
+        timestamp
+    })
+
+    //Competency Classes - (Last 6 months)
+    let table2 = DeepCopy(compLastSixMonthsTable)
+    table2.id = uidPool.shift()
+    table2.name = programShortName + " - " + nameComp + " - (Last 6 months)"
+    table2.code = programId + "_Scripted3"
+    table2.publicAccess = sharingSettings.public
+    table2.sharing = sharingSettings
+    table2.series = series.slice(0, 3)
+    table2.dataDimensionItems = dataDimensionItems.slice(0, 3)
+    visualizations.push(table2)
+    androidSettingsVisualizations.push({
+        id: table2.id,
+        name: table2.name,
+        timestamp
+    })
+
+    //! Average Score by District from last 12 months
+    let avergeScorebyTable = DeepCopy(AverageScoreByDistrictByPivotTable)
+    avergeScorebyTable.id = uidPool.shift()
+    avergeScorebyTable.name = programShortName + " - Average Score by District from last 12 months"
+    avergeScorebyTable.code = programId + "_Scripted4"
+    avergeScorebyTable.publicAccess = sharingSettings.public
+    avergeScorebyTable.sharing = sharingSettings
+    avergeScorebyTable.series = [series.at(4)]
+    avergeScorebyTable.dataDimensionItems = [dataDimensionItems.at(4)]
+    avergeScorebyTable.organisationUnits[0].id = ouRoot
+    avergeScorebyTable.organisationUnitLevels = [visualizationLevel]
+    avergeScorebyTable.legendSet.id = VISUALIZATIONS_LEGEND
+    visualizations.push(avergeScorebyTable)
+    // Dashboard - Tables
+    let avergeScorebyTableDash1 = DeepCopy(dashVisualization)
+    avergeScorebyTableDash1.id = uidPool.shift()
+    avergeScorebyTableDash1.type = "REPORT_TABLE"
+    avergeScorebyTableDash1.sharing = sharingSettings
+    avergeScorebyTableDash1.visualization.id = avergeScorebyTable.id
+    dashboardItems.push(avergeScorebyTableDash1)
+
+    //!Average Global Score by checklist from last 12 months
+    let AverageGlobalScorebyColumn = DeepCopy(AverageGlobalScoreByColumn)
+    AverageGlobalScorebyColumn.id = uidPool.shift()
+    AverageGlobalScorebyColumn.name = programShortName + " - Average Global Score by checklist from last 12 months"
+    AverageGlobalScorebyColumn.code = programId + "_Scripted5"
+    AverageGlobalScoreByColumn.publicAccess = sharingSettings.public
+    AverageGlobalScorebyColumn.sharing = sharingSettings
+    AverageGlobalScorebyColumn.userOrganisationUnit = userOU
+    AverageGlobalScorebyColumn.dataDimensionItems = [dataDimensionItems.at(4)]
+    AverageGlobalScorebyColumn.organisationUnits[0].id = ouRoot
+    visualizations.push(AverageGlobalScorebyColumn)
+    // Dashboard - Chart
+    let avergeScorebyChartDash1 = DeepCopy(dashVisualization)
+    avergeScorebyChartDash1.id = uidPool.shift()
+    avergeScorebyChartDash1.sharing = sharingSettings
+    avergeScorebyChartDash1.type = "CHART"
+    avergeScorebyChartDash1.visualization.id = AverageGlobalScorebyColumn.id
+    dashboardItems.push(avergeScorebyChartDash1)
+
+    //!Number and Percentage of Assessment by Competency Class (last 4 quarters)
+    let AssessmentByCompetencybyColumn = DeepCopy(AssessmentByCompetencyByColumn)
+    AssessmentByCompetencybyColumn.id = uidPool.shift()
+    AssessmentByCompetencybyColumn.name = programShortName + " - Number and Percentage of Assessments by Competency Class (last 4 quarters)"
+    AssessmentByCompetencybyColumn.code = programId + "_Scripted6"
+    AssessmentByCompetencybyColumn.publicAccess = sharingSettings.public
+    AssessmentByCompetencybyColumn.sharing = sharingSettings
+    AssessmentByCompetencybyColumn.userOrganisationUnit = userOU
+    AssessmentByCompetencybyColumn.series = series.slice(0, 3)
+    AssessmentByCompetencybyColumn.dataDimensionItems = dataDimensionItems.slice(0, 3)
+    AssessmentByCompetencybyColumn.organisationUnits[0].id = ouRoot
+    visualizations.push(AssessmentByCompetencybyColumn)
+    // Dashboard - Chart
+    let avergeScorebyChartDash2 = DeepCopy(dashVisualization)
+    avergeScorebyChartDash2.id = uidPool.shift()
+    avergeScorebyChartDash2.type = "CHART"
+    avergeScorebyChartDash2.sharing = sharingSettings
+    avergeScorebyChartDash2.visualization.id = AssessmentByCompetencybyColumn.id
+    dashboardItems.push(avergeScorebyChartDash2)
+
+    //! Number of Assessment by checklist (last 12 months)
+    let NumberOfAssessmentbyTable = DeepCopy(NumberOfAssessmentByPivotTable)
+    NumberOfAssessmentbyTable.id = uidPool.shift()
+    NumberOfAssessmentbyTable.name = programShortName + " - Number of Assessments by checklist (last 12 months)"
+    NumberOfAssessmentbyTable.code = programId + "_Scripted7"
+    NumberOfAssessmentbyTable.publicAccess = sharingSettings.public
+    NumberOfAssessmentbyTable.sharing = sharingSettings
+    NumberOfAssessmentbyTable.userOrganisationUnit = userOU
+    NumberOfAssessmentbyTable.series = [series.at(3)]
+    NumberOfAssessmentbyTable.dataDimensionItems = [dataDimensionItems.at(3)]
+    NumberOfAssessmentbyTable.organisationUnits[0].id = ouRoot
+    visualizations.push(NumberOfAssessmentbyTable)
+    // Dashboard - Tables
+    let avergeScorebyTableDash2 = DeepCopy(dashVisualization)
+    avergeScorebyTableDash2.id = uidPool.shift()
+    avergeScorebyTableDash2.type = "REPORT_TABLE"
+    avergeScorebyTableDash2.sharing = sharingSettings
+    avergeScorebyTableDash2.visualization.id = NumberOfAssessmentbyTable.id
+    dashboardItems.push(avergeScorebyTableDash2)
+
+    //! Global Score Map
+    let GlobalScorebyMap = DeepCopy(GlobalScoreByMap)
+    GlobalScorebyMap.id = uidPool.shift()
+    GlobalScorebyMap.name = programShortName + " - Global Score Map"
+    GlobalScorebyMap.code = programId + "_Scripted8"
+    GlobalScorebyMap.publicAccess = sharingSettings.public
+    GlobalScorebyMap.sharing = sharingSettings
+    GlobalScorebyMap.mapViews[0].sharing = sharingSettings
+    GlobalScorebyMap.mapViews[0].organisationUnitLevels = [mapLevel]
+    GlobalScorebyMap.mapViews[0].organisationUnits[0].id = ouRoot
+    GlobalScorebyMap.mapViews[1].sharing = sharingSettings
+    GlobalScorebyMap.mapViews[1].program.id = programId
+    GlobalScorebyMap.mapViews[1].dataDimensionItems = [dataDimensionItems.at(4)]
+    GlobalScorebyMap.mapViews[1].organisationUnitLevels = [mapLevel]
+    GlobalScorebyMap.mapViews[1].organisationUnits[0].id = ouRoot
+    GlobalScorebyMap.mapViews[1].legendSet.id = VISUALIZATIONS_LEGEND
+    maps.push(GlobalScorebyMap)
+    //Dashboard - Map
+    let GlobalScorebyMap1 = DeepCopy(dashMap)
+    GlobalScorebyMap1.id = uidPool.shift()
+    GlobalScorebyMap1.type = "MAP"
+    GlobalScorebyMap1.sharing = sharingSettings
+    GlobalScorebyMap1.map.id = GlobalScorebyMap.id
+    dashboardItems.push(GlobalScorebyMap1)
+
+    //! Global Score Line List    
+    let LineListScore = DeepCopy(LineListGlobalScore)
+    LineListScore.id = uidPool.shift()
+    LineListScore.name = programShortName + " - Global Score"
+    LineListScore.code = programId + "_Scripted9"
+    LineListScore.publicAccess = sharingSettings.public
+    LineListScore.program.id = programId
+    LineListScore.sharing = sharingSettings
+    LineListScore.programStage.id = stageId
+    LineListScore.columnDimensions = columnDimensions
+    LineListScore.dataElementDimensions[0].programStage.id = stageId
+    LineListScore.dataElementDimensions[0].dataElement.id = ACTION_PLAN_ACTION
+    LineListScore.attributeDimensions[0].attribute.id = GLOBAL_SCORE_ATTRIBUTE
+    LineListScore.organisationUnits[0].id = ouRoot
+    LineListScore.organisationUnitLevels = [visualizationLevel]
+    eventReports.push(LineListScore)
+    //Dashboard - Event Report
+    let GlobalScorebyEventReport1 = DeepCopy(dashEventReport)
+    GlobalScorebyEventReport1.id = uidPool.shift()
+    GlobalScorebyEventReport1.type = "EVENT_REPORT"
+    GlobalScorebyEventReport1.sharing = sharingSettings
+    GlobalScorebyEventReport1.eventReport.id = LineListScore.id
+    dashboardItems.push(GlobalScorebyEventReport1)
+
+    //!Dashboard
+    let dashboardsGA = DeepCopy(dashboardsTemplate)
+    dashboardsGA.id = currentDashboardId || uidPool.shift()
+    dashboardsGA.name = programShortName
+    dashboardsGA.code = programId
+    dashboardsGA.sharing = sharingSettings
+    dashboardsGA.dashboardItems = [...dashboardItems]
+    dashboards.push(dashboardsGA)
+
+    //Return
+    return { visualizations, maps, androidSettingsVisualizations, dashboards, eventReports }
+}
+
+
+
+/*module.exports = {
     checkScores,
     readQuestionComposites,
     buildProgramRuleVariables,
-    buildProgramRules
-};
+    buildProgramRules,
+    buildProgramIndicators,
+    buildH2BaseVisualizations
+};*/
+

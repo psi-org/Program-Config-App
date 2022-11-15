@@ -26,7 +26,7 @@ const About = (props) => {
     return (
         <CustomMUIDialog open={props.aboutModal} maxWidth='md' fullWidth={true} onClose={() => props.setAboutModal(false)}>
             <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => props.setAboutModal(false)}>
-                About <strong><em>Program Config App</em></strong>
+                About <strong><em>Program Configuration App</em></strong>
             </CustomMUIDialogTitle >
             <DialogContent dividers style={{padding: '1em 2em', display: 'grid', gridTemplateColumns: '3fr 2fr' }}>
                 <div style={{width:"80%", display: 'flex', flexDirection:'column', gap: '1em' }}>
@@ -34,13 +34,13 @@ const About = (props) => {
                     <div><strong>Version Build date</strong> : {BUILD_DATE}</div>
                     <div><strong>DHIS2 Server version</strong> : {localStorage.getItem('SERVER_VERSION')}</div>
                     <div>
-                        <span><strong>Program Config App metadata</strong> {!pcaMetadata?.results && <span style={{ color: 'red' }}>Not Found</span>}</span>
+                        <span><strong>Program Configuration App metadata</strong> {!pcaMetadata?.results && <span style={{ color: 'red' }}>Not Found</span>}</span>
                         {pcaMetadata?.results && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1em', margin: '0.5em 0 0 1em' }}>
                                 <div>
                                     <em>Version: {pcaMetadata.results.version} </em>
                                     {pcaMetadata.results.version < PCA_METADATA_VERSION
-                                        ? <span style={{ color: 'red' }}>Your installed version is outdated. Last version is: {PCA_METADATA_VERSION}</span>
+                                        ? <span style={{ color: 'red' }}>Your installed version is outdated. Latest version is: {PCA_METADATA_VERSION}</span>
                                         : <span style={{ color: 'green' }}>You are up to date!</span>
                                     }
                                 </div>
@@ -55,7 +55,7 @@ const About = (props) => {
                                 <div>
                                     <em>Version: {hnqis2Metadata.results.version} </em>
                                     {hnqis2Metadata.results.version < H2_METADATA_VERSION
-                                        ? <span style={{ color: 'red' }}>Your installed version is outdated. Last version is: {H2_METADATA_VERSION}</span>
+                                        ? <span style={{ color: 'red' }}>Your installed version is outdated. Latest version is: {H2_METADATA_VERSION}</span>
                                         : <span style={{ color: 'green' }}>You are up to date!</span>
                                     }
                                 </div>

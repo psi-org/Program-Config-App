@@ -40,13 +40,30 @@ const queryHNQIS2Metadata = {
 
 const H2Metadata = (props) => {
 
+    const h2Ready = localStorage.getItem('h2Ready') === 'true'
+
     const [sending,setSending] = useState(false)
     const [error,setError] = useState(undefined)
     const [success,setSuccess] = useState(undefined)
     const { data: hnqis2Metadata, refetch: hnqis2MetadataRefetch } = useDataQuery(queryHNQIS2Metadata);
-    const [metadataMutate] = useDataMutation(metadataMutation)
-    const [dataStoreUpdate] = useDataMutation(updateDataStoreMutation)
-    const [dataStoreCreate] = useDataMutation(dataStoreMutation)
+    const [metadataMutate] = useDataMutation(metadataMutation, {
+        onError: (err) => {
+            setSending(false);
+            setError(err.details)
+        }
+    });
+    const [dataStoreUpdate] = useDataMutation(updateDataStoreMutation, {
+        onError: (err) => {
+            setSending(false);
+            setError(err.details)
+        }
+    });
+    const [dataStoreCreate] = useDataMutation(dataStoreMutation, {
+        onError: (err) => {
+            setSending(false);
+            setError(err.details)
+        }
+    });
 
     const install = () => {
         setSending(true)
@@ -81,12 +98,21 @@ const H2Metadata = (props) => {
             <DialogContent dividers style={{ padding: '1em 2em', display:'flex', flexDirection:'column', gap:'1em' }}>
                 <div style={{display:'flex', flexDirection:'column', gap:'1.5em'}}>
                     <h3>HNQIS 2.0 Metadata Details</h3>
+                    <div><strong>Latest Metadata Package Version: </strong>{H2_METADATA_VERSION}</div>
                     <div>
-                        <strong>Installed Version: </strong>{hnqis2Metadata?.results?.version ?? "Not Found"}<br/>
-                        {!hnqis2Metadata?.results && <div style={{display:'flex', alignItems:'center', gap:'1em', color:"#ba000d", marginLeft:'1em'}}><WarningIcon/><em>The HNQIS 2.0 metadata package is required in order to enable HNQIS features</em></div>}
+                        <div><strong>Current Installed Version: </strong>{hnqis2Metadata?.results?.version ?? "Not Found"}</div>
+                        {!hnqis2Metadata?.results && 
+                            <div style={{display:'flex', alignItems:'center', gap:'1em', color:"#ba000d", marginLeft:'1em'}}><WarningIcon/><em>The HNQIS 2.0 metadata package is required in order to enable HNQIS features</em></div>
+                        }
                     </div>
-                    {hnqis2Metadata?.results && <p><strong>Installed on: </strong>{new Date(hnqis2Metadata.results.date).toLocaleString("en-US",DATE_FORMAT_OPTIONS)} </p>}
-                    <div><strong>Latest Version: </strong>{H2_METADATA_VERSION}</div>
+                    {hnqis2Metadata?.results && 
+                        <>
+                            <p><strong>Installation date: </strong>{new Date(hnqis2Metadata.results.date).toLocaleString("en-US",DATE_FORMAT_OPTIONS)} </p>
+                            <NoticeBox error={!h2Ready || hnqis2Metadata?.results?.version<H2_METADATA_VERSION} title="Minimum Metadata Package Status">
+                                <p>{h2Ready?(hnqis2Metadata?.results?.version<H2_METADATA_VERSION?"The required Metadata Package is outdated, please install the newest version.":"The required Metadata Package is available."):"The required Metadata Package is incomplete or corrupted, please reinstall it."}</p>
+                            </NoticeBox>
+                        </>
+                    }
                 </div>
                 {success &&
                 <NoticeBox title="Installation Completed">
@@ -99,8 +125,9 @@ const H2Metadata = (props) => {
             </DialogContent>
             <DialogActions style={{ padding: '1em' }}>
                 <Button color={'error'} variant={'outlined'} onClick={() => props.setH2Modal(false)}>Close</Button>
-                <LoadingButton onClick={install} endIcon={<InstallDesktopIcon />} loading={sending} loadingPosition="end" variant="outlined" loadingIndicator="Installing..." >
-                    Install Metadata
+                <LoadingButton onClick={install} endIcon={<InstallDesktopIcon />} loading={sending} loadingPosition="end" variant="outlined" >
+                    {!sending && `Install Metadata (version ${H2_METADATA_VERSION})`}
+                    {sending && `Installing...`}
                 </LoadingButton>
             </DialogActions>
         </CustomMUIDialog>

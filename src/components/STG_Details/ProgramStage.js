@@ -22,7 +22,7 @@ const query = {
         id: ({programStage}) => programStage,
         params: {
             fields:[
-                'id','name','allowGenerateNextVisit','publicAccess','reportDateToUse','formType','generatedByEnrollmentDate','displayFormName','sortOrder','hideDueDate','enableUserAssignment','minDaysFromStart','favorite','executionDateLabel','preGenerateUID','displayName','externalAccess','openAfterEnrollment','repeatable','remindCompleted','displayGenerateEventBox','validationStrategy','autoGenerateEvent','blockEntryForm','program[id,name,shortName,attributeValues]','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
+                'id', 'name', 'allowGenerateNextVisit', 'publicAccess', 'reportDateToUse', 'formType', 'generatedByEnrollmentDate', 'displayFormName', 'sortOrder', 'hideDueDate', 'enableUserAssignment', 'minDaysFromStart', 'favorite', 'executionDateLabel', 'preGenerateUID', 'displayName', 'externalAccess', 'openAfterEnrollment', 'repeatable', 'remindCompleted', 'displayGenerateEventBox', 'validationStrategy', 'autoGenerateEvent', 'blockEntryForm','program[id,name,shortName,attributeValues,withoutRegistration]','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
                 'programStageDataElements[id,name,compulsory,displayInReports,programStage,dataElement[id,name,shortName,style,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName],sortOrder]',
                 'programStageSections[id,name,displayName,sortOrder,dataElements[id,name,shortName,style,code,description,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName]]'
             ]
@@ -47,7 +47,7 @@ const ProgramStage = () => {
     if(!programStage){
         return (
             <NoticeBox title="Missing Program Stage ID" error>
-                No program stage ID was given, please try again! <Link to="/program">Go to program stages</Link>
+                No program stage ID was provided, please try again! <Link to="/program">Go to program stages</Link>
             </NoticeBox>
         )
     }
@@ -72,18 +72,19 @@ const ProgramStage = () => {
 
     if(data){
         const hnqisMode = !!data.results.program.attributeValues.find(av=>av.value==="HNQIS2")
+        const readOnly = !!data.results.program.attributeValues.find(av => av.value === "HNQIS")
 
         if(hnqisMode && !h2Ready) return (
             <div style={{margin:'2em'}}>
                 <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
-                    <span>First go to <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue</span>
+                    <span>First go to the <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue.</span>
                 </NoticeBox>
             </div>
         )
 
         let programStageData = DeepCopy({...data.results})
 
-        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisMode={hnqisMode}/>
+        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisMode={hnqisMode} readOnly={readOnly}/>
     }
 
     return <span><CircularLoader /></span> 

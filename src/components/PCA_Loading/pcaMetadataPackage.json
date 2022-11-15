@@ -106,7 +106,7 @@
         },
         {
             "id": "haUflNqP85K",
-            "name": "PCA Metadata",
+            "name": "PCA Metadata (Do NOT change)",
             "shortName": "PCA Metadata",
             "code": "PCA Metadata",
             "indicatorAttribute": false,
@@ -146,29 +146,52 @@
     ],
     "userRoles": [
         {
-            "name": "_App - Program Config App",
+            "name": "_App - Program Configuration App",
             "id": "QbYqOgwk5fJ",
-            "displayName": "_App - Program Config App",
             "publicAccess": "rw------",
-            "description": "Program Config App",
+            "description": "Program Configuration App access and required authorities for basic usage.",
             "authorities": [
-                "F_METADATA_IMPORT",
-                "F_SECTION_ADD",
-                "M_programconfigapp",
-                "F_PROGRAM_PUBLIC_ADD",
-                "M_dhis-web-maintenance",
-                "F_DATAELEMENT_PUBLIC_ADD",
-                "M_dhis-web-dashboard",
-                "F_PROGRAM_RULE_MANAGEMENT",
+                "F_PROGRAM_PRIVATE_ADD",
+                "F_VISUALIZATION_PUBLIC_ADD",
+                "F_OPTIONSET_PUBLIC_ADD",
+                "F_LEGEND_SET_PRIVATE_ADD",
+                "F_MAP_PUBLIC_ADD",
+                "F_OPTIONSET_PRIVATE_ADD",
                 "F_PROGRAM_RULE_DELETE",
                 "F_PROGRAMSTAGE_DELETE",
-                "F_METADATA_EXPORT",
                 "F_PROGRAM_RULE_ADD",
-                "M_dhis-web-cache-cleaner",
                 "M_dhis-web-tracker-capture",
+                "F_LEGEND_SET_PUBLIC_ADD",
                 "F_SECTION_DELETE",
                 "F_PROGRAMSTAGE_ADD",
-                "F_PROGRAM_DELETE"
+                "F_PROGRAM_DELETE",
+                "F_DASHBOARD_PUBLIC_ADD",
+                "F_METADATA_IMPORT",
+                "F_PROGRAM_INDICATOR_PRIVATE_ADD",
+                "F_SECTION_ADD",
+                "M_programconfiguration",
+                "M_dhis-web-maintenance",
+                "M_dhis-web-dashboard",
+                "F_PROGRAM_RULE_MANAGEMENT",
+                "F_METADATA_EXPORT",
+                "M_dhis-web-cache-cleaner",
+                "F_PROGRAM_INDICATOR_DELETE",
+                "F_DATAELEMENT_PRIVATE_ADD",
+                "M_dhis-web-datastore"
+            ]
+        },
+        {
+            "name": "PCA - Administrator",
+            "id": "akI7EzBaRaJ",
+            "displayName": "PCA - Administrator",
+            "publicAccess": "rw------",
+            "description": "Program Configuration App additional authorities for installing metadata.",
+            "authorities": [
+                "F_ATTRIBUTE_PUBLIC_ADD",
+                "F_TRACKED_ENTITY_ADD",
+                "F_TRACKED_ENTITY_ATTRIBUTE_PUBLIC_ADD",
+                "F_USERGROUP_PUBLIC_ADD",
+                "F_USERROLE_PUBLIC_ADD"
             ]
         },
         {
@@ -176,7 +199,7 @@
             "id": "JDmJ4ADTaDq",
             "displayName": "PCA - Users Sharing Management",
             "publicAccess": "rw------",
-            "description": "Users view authorities for the Sharing Settings in the Program Config App",
+            "description": "Users view authorities for the Sharing Settings in the Program Configuration App",
             "authorities": [
                 "F_USER_VIEW"
             ]

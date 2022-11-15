@@ -47,14 +47,13 @@ const Scores = ({ stageSection, program, index }) => {
                 <div className="ml_item-title">
                     {stageSection.displayName}
                 </div>
-                <div className="ml_item-desc"><div>{stageSection.dataElements.length} data elements</div></div>
+                <div className="ml_item-desc"><div>{stageSection.dataElements.length} Data Elements</div></div>
                 <div className="ml_item-warning_error " onClick={()=>showIssues(stageSection.dataElements)}>
                     {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
                     {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
                 </div>
                 <div className="ml_item-cta">
-                    <img src={move_vert_svg} alt="menu" />
-                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
+                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} style={{ cursor: 'pointer' }} />
                 </div>
             </div>
             <div className="section_cont" >
