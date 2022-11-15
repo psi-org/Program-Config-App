@@ -2,6 +2,8 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { NAMESPACE, DATASTORE_PCA_METADATA, DATASTORE_H2_METADATA, BUILD_VERSION, BUILD_DATE, DATE_FORMAT_OPTIONS, PCA_METADATA_VERSION, H2_METADATA_VERSION } from "../../configs/Constants";
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import Button from '@mui/material/Button';
+import DescriptionIcon from '@mui/icons-material/Description';
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import LogoUrl from "./../../images/PCA-logo.png"
@@ -28,8 +30,8 @@ const About = (props) => {
             <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => props.setAboutModal(false)}>
                 About <strong><em>Program Configuration App</em></strong>
             </CustomMUIDialogTitle >
-            <DialogContent dividers style={{padding: '1em 2em', display: 'grid', gridTemplateColumns: '3fr 2fr' }}>
-                <div style={{width:"80%", display: 'flex', flexDirection:'column', gap: '1em' }}>
+            <DialogContent dividers style={{ padding: '1em 2em', display: 'grid', gridTemplateColumns: '3fr 2fr' }}>
+                <div style={{ width: "80%", display: 'flex', flexDirection: 'column', gap: '1em' }}>
                     <div><strong>Version</strong> : {BUILD_VERSION}</div>
                     <div><strong>Version Build date</strong> : {BUILD_DATE}</div>
                     <div><strong>DHIS2 Server version</strong> : {localStorage.getItem('SERVER_VERSION')}</div>
@@ -64,11 +66,14 @@ const About = (props) => {
                         )}
                     </div>
                 </div>
-                <div style={{display:'flex', alignItems:'center', justifyContent:'center'}}>
-                    <img src={LogoUrl} alt="Logo" style={{maxWidth:'100%'}}/>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src={LogoUrl} alt="Logo" style={{ maxWidth: '100%' }} />
                 </div>
             </DialogContent>
-            <DialogActions style={{ padding: '1em' }}></DialogActions>
+            <DialogActions style={{ display: 'flex', justifyContent: 'space-between', padding: '1em' }}>
+                <span><Button variant='text' target='_blank' href='https://psi.atlassian.net/wiki/spaces/PCA/overview?homepageId=37716432' startIcon={<DescriptionIcon/>}>Check the PCA documentation</Button></span>
+                <Button color={'error'} variant={'outlined'} onClick={() => props.setAboutModal(false)}>Close</Button>
+            </DialogActions>
         </CustomMUIDialog>
     )
 }
