@@ -2,7 +2,7 @@
 import { ButtonStrip, AlertBar, AlertStack, ComponentCover, CircularLoader, Chip, IconCheckmarkCircle24, IconWarning24, IconCross24, NoticeBox } from "@dhis2/ui";
 
 // React Hooks
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DraggableSection from "./Section";
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
@@ -39,6 +39,16 @@ import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
+
+import ButtonGroup from '@mui/material/ButtonGroup';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Grow from '@mui/material/Grow';
+import Paper from '@mui/material/Paper';
+import Popper from '@mui/material/Popper';
+import MenuItem from '@mui/material/MenuItem';
+import MenuList from '@mui/material/MenuList';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
@@ -193,6 +203,9 @@ const queryCurrentUser = {
     },
 }
 
+const optionsSetUp = ['SET UP PROGRAM', 'SET UP ANDROID SETTINGS'];
+const optionsTemplate = ['DOWNLOAD TEMPLATE', 'IMPORT TEMPLATE'];
+
 const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     // Globals
     const programId = programStage.program.id;
@@ -234,6 +247,15 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
     const [uidPool, setUidPool] = useState([]);
     const [allAuth, setAllAuth] = useState(false);
+    const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+    const [open, setOpen] = useState(false);
+    const anchorRef = useRef(null);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    const [openTemplateBtn, setOpenTemplateBtn] = useState(false);
+    const anchorRefTemplate = useRef(null);
+    const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
 
     useEffect(() => {
         if (currentUser) {
@@ -717,6 +739,68 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         return data.flat().flat()
     }
 
+    const handleClick = () => {
+        switch (selectedIndex) {
+            case 0:
+                allAuth ? run() : setShowDisclaimer(true)
+                break;
+            case 1:
+                //TODO: Enable Analytics only
+                break;
+            default:
+                break;
+        }
+        //console.info(`You clicked ${options[selectedIndex]}`);
+    };
+
+    const handleMenuItemClick = (event, index, btn) => {
+        setSelectedIndex(index);
+        setOpen(false);
+    };
+
+    const handleToggle = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleClose = (event) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+            return;
+        }
+
+        setOpen(false);
+    };
+
+    const handleClickTemplate = (event) => {
+        switch (selectedIndexTemplate) {
+            case 0:
+                configuration_download(event)
+                break;
+            case 1:
+                setImporterEnabled(true)
+                break;
+            default:
+                break;
+        }
+    };
+
+
+    const handleMenuItemClickTemplate = (event, index) => {
+        setSelectedIndexTemplate(index);
+        setOpenTemplateBtn(false);
+    };
+
+    const handleToggleTemplate = () => {
+        setOpenTemplateBtn((prevOpen) => !prevOpen);
+    };
+
+    const handleCloseTemplate = (event) => {
+        if (anchorRefTemplate.current && anchorRefTemplate.current.contains(event.target)) {
+            return;
+        }
+
+        setOpenTemplateBtn(false);
+    };
+
     return (
         <div className="cont_stage">
             <div className="sub_nav align-items-center">
@@ -730,26 +814,192 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     <Chip>Stage: {truncateString(programStage.displayName)}</Chip>
                 </div>
                 <div className="c_srch"></div>
-                <div className="c_btns" style={{ color: '#444444' }}>
+                <div style={{ color: '#444444', paddingRight: '1em' }}>
 
-                    <Box >
-                        <ButtonStrip>
-                            {isSectionMode && !readOnly &&
-                                <Button color='inherit' size='small' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
-                            }
-                            {hnqisMode && isSectionMode &&
-                                <Button variant='contained' size='small' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
-                            }
-                            {hnqisMode && isSectionMode && <Button color='inherit' size='small' variant='outlined' startIcon={!exportToExcel ? <FileDownloadIcon /> : <CircularLoader small />} name="generator"
-                                onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
-                            }
-                            {hnqisMode && isSectionMode &&
-                                <Button color='inherit' size='small' variant='outlined' startIcon={<PublishIcon />} name="importer"
-                                    onClick={() => setImporterEnabled(true)}>Import Template</Button>
-                            }
-                            <Tooltip title="Reload" arrow><IconButton size='small' name="Reload" color="inherit" onClick={() => { window.location.reload() }}><RefreshIcon /></IconButton></Tooltip>
-                        </ButtonStrip>
-                    </Box>
+
+                    <ButtonStrip>
+                        {isSectionMode && !readOnly &&
+                            <Button
+                                color='inherit'
+                                size='small'
+                                variant='outlined'
+                                startIcon={<CheckCircleOutlineIcon />}
+                                disabled={createMetadata.loading}
+                                onClick={() => commit()}
+                            > {saveStatus}</Button>
+                        }
+                        {/*hnqisMode && isSectionMode &&
+                            <Button
+                                variant='contained'
+                                size='small'
+                                startIcon={<ConstructionIcon />}
+                                disabled={!savedAndValidated}
+                                onClick={() => allAuth ? run() : setShowDisclaimer(true)}
+                            >Set up program</Button>
+                        */}
+                        {hnqisMode && isSectionMode &&
+                            <>
+                                <ButtonGroup disableElevation color='primary' variant="contained" ref={anchorRef} aria-label="split button">
+                                    <Button
+                                        onClick={handleClick}
+                                        startIcon={<ConstructionIcon />}
+                                        size='small'
+                                        disabled={!savedAndValidated}
+                                    >{optionsSetUp[selectedIndex]}</Button>
+                                    {allAuth &&
+                                        <Button
+                                            size="small"
+                                            aria-controls={open ? 'split-button-menu' : undefined}
+                                            aria-expanded={open ? 'true' : undefined}
+                                            aria-label="select merge strategy"
+                                            aria-haspopup="menu"
+                                            onClick={handleToggle}
+                                            disabled={!savedAndValidated}
+                                        >
+                                            <ArrowDropDownIcon />
+                                        </Button>
+                                    }
+                                </ButtonGroup>
+                                <Popper
+                                    sx={{
+                                        zIndex: 1
+                                    }}
+
+                                    open={open}
+                                    anchorEl={anchorRef.current}
+                                    role={undefined}
+                                    transition
+                                    disablePortal
+                                >
+                                    {({ TransitionProps, placement }) => (
+                                        <Grow
+                                            {...TransitionProps}
+                                            style={{
+                                                transformOrigin:
+                                                    placement === 'bottom' ? 'center top' : 'center bottom',
+                                            }}
+                                        >
+                                            <Paper>
+                                                <ClickAwayListener onClickAway={handleClose}>
+                                                    <MenuList id="split-button-menu" autoFocusItem>
+                                                        {optionsSetUp.map((option, index) => (
+                                                            <MenuItem
+                                                                key={option}
+                                                                disabled={index === 1 && !allAuth}
+                                                                selected={index === selectedIndex}
+                                                                onClick={(event) => handleMenuItemClick(event, index)}
+                                                            >
+                                                                {option}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </MenuList>
+                                                </ClickAwayListener>
+                                            </Paper>
+                                        </Grow>
+                                    )}
+                                </Popper>
+                            </>
+                        }
+                        {hnqisMode && isSectionMode &&
+                            <>
+                                <ButtonGroup disableElevation ref={anchorRefTemplate} aria-label="split button">
+                                    <LoadingButton
+                                        onClick={handleClickTemplate}
+                                        startIcon={selectedIndexTemplate === 0 ? <FileDownloadIcon /> : <PublishIcon />}
+                                        size='small'
+                                        variant="contained"
+                                        color="success" 
+                                        disabled={exportToExcel}
+                                        loadingPosition="start"
+                                        loading={exportToExcel}
+                                    >{optionsTemplate[selectedIndexTemplate]}</LoadingButton>
+                                    <Button
+                                        size="small"
+                                        variant="contained"
+                                        color="success" 
+                                        aria-controls={openTemplateBtn ? 'split-button-menu' : undefined}
+                                        aria-expanded={openTemplateBtn ? 'true' : undefined}
+                                        aria-label="select merge strategy"
+                                        aria-haspopup="menu"
+                                        disabled={exportToExcel}
+                                        onClick={handleToggleTemplate}
+                                    >
+                                        <ArrowDropDownIcon />
+                                    </Button>
+                                </ButtonGroup>
+                                <Popper
+                                    sx={{
+                                        zIndex: 1
+                                    }}
+
+                                    open={openTemplateBtn}
+                                    anchorEl={anchorRefTemplate.current}
+                                    role={undefined}
+                                    transition
+                                    disablePortal
+                                >
+                                    {({ TransitionProps, placement }) => (
+                                        <Grow
+                                            {...TransitionProps}
+                                            style={{
+                                                transformOrigin:
+                                                    placement === 'bottom' ? 'center top' : 'center bottom',
+                                            }}
+                                        >
+                                            <Paper>
+                                                <ClickAwayListener onClickAway={handleCloseTemplate}>
+                                                    <MenuList id="split-button-menu" autoFocusItem>
+                                                        {optionsTemplate.map((option, index) => (
+                                                            <MenuItem
+                                                                key={option}
+                                                                selected={index === selectedIndexTemplate}
+                                                                onClick={(event) => handleMenuItemClickTemplate(event, index)}
+                                                            >
+                                                                {option}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </MenuList>
+                                                </ClickAwayListener>
+                                            </Paper>
+                                        </Grow>
+                                    )}
+                                </Popper>
+                            </>
+                        }
+                        {/*
+                        {hnqisMode && isSectionMode &&
+                            <Button
+                                color='inherit'
+                                size='small'
+                                variant='outlined'
+                                startIcon={!exportToExcel ? <FileDownloadIcon /> : <CircularLoader small />}
+                                name="generator"
+                                onClick={() => configuration_download(event)}
+                                disabled={exportToExcel}
+                            >{exportStatus}</Button>
+                        }
+                        {hnqisMode && isSectionMode &&
+                            <Button
+                                color='inherit'
+                                size='small'
+                                variant='outlined'
+                                startIcon={<PublishIcon />}
+                                name="importer"
+                                onClick={() => setImporterEnabled(true)}
+                            >Import Template</Button>
+                        }*/}
+                        <Tooltip title="Reload" arrow>
+                            <IconButton
+                                size='small'
+                                name="Reload"
+                                color="inherit"
+                                onClick={() => { window.location.reload() }}
+                            >
+                                <RefreshIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </ButtonStrip>
+
 
                     {/*<ButtonStrip>
                     {isSectionMode && !readOnly &&
@@ -809,6 +1059,26 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                         {"Process ended with error. Please check Errors Summary section for more details."}
                     </AlertBar>
                 </AlertStack>
+            }
+            {showDisclaimer &&
+                <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
+                    <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => setShowDisclaimer(false)}>
+                        Warning!
+                    </CustomMUIDialogTitle >
+                    <DialogContent dividers style={{ padding: '1em 2em' }}>
+                        <p>Your User does not have the authorities required by the Android Settings App to enable In-app Analytics for HNQIS 2.0.</p>
+                        <p style={{margin: '1em 0'}}>You are still able to Set Up the program, however, the Android App Dashboard won't be updated.</p>
+                        <NoticeBox title="Please Note">
+                            <p>To enable In-app Analytics for this Program please contact your System Administrator.</p>
+                        </NoticeBox>
+                    </DialogContent>
+
+                    <DialogActions style={{ padding: '1em' }}>
+                        <Button variant='outlined' color='error' onClick={() => setShowDisclaimer(false)}> Cancel </Button>
+                        <Button variant='outlined' color='warning' onClick={() => { setShowDisclaimer(false); run() }} startIcon={<ConstructionIcon />}> Set up Anyway </Button>
+                    </DialogActions>
+
+                </CustomMUIDialog>
             }
             {hnqisMode && saveAndBuild &&
 
