@@ -50,6 +50,7 @@ import {
     COMPETENCY_ATTRIBUTE,
     COMPETENCY_CLASS,
     FEEDBACK_TEXT,
+    LEGEND_YES_NO,
 } from "../../configs/Constants";
 import {
     Program,
@@ -500,7 +501,7 @@ const H2Convert = ({
                             parseFloat(de.metadata[SCORE_DEN_ATTRIBUTE]) ||
                             undefined,
                     };
-
+                    
                     // Element Type is Label
                     if (de.metadata[QUESTION_TYPE_ATTRIBUTE] === "7") {
                         pcaMetadata.elemType = "label";
@@ -516,6 +517,10 @@ const H2Convert = ({
                         dataElement.valueType = "LONG_TEXT"
                         dataElement.aggregationType = "NONE";
                         labelsQtty += 1;
+                    }
+
+                    if (pcaMetadata.scoreNum && pcaMetadata.scoreDen) {
+                        dataElement.legendSets = [{ "id": LEGEND_YES_NO }]
                     }
 
                     let pcaMetadataIndex =
@@ -667,6 +672,7 @@ const H2Convert = ({
             prgrm.sharing = programOld.sharing;
 
             assessmentStage = DeepCopy(PS_AssessmentStage);
+            assessmentStage.sharing = programOld.sharing;
             assessmentStage.id = assessmentId;
             assessmentStage.name = "Assessment [" + programId + "]"; //! Not adding the ID may result in an error
 
@@ -686,6 +692,7 @@ const H2Convert = ({
             actionPlanStage.name = "Action Plan [" + programId + "]"; //! Not adding the ID may result in an error
             actionPlanStage.id = actionPlanId;
             actionPlanStage.program.id = programId;
+            actionPlanStage.sharing = programOld.sharing;
 
             criticalSteps = DeepCopy(PSS_CriticalSteps);
             criticalSteps.id = stepsSectionId;

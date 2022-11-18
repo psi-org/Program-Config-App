@@ -20,30 +20,25 @@ import ValidateMetadata from "./ValidateMetadata";
 import Errors from "./Errors";
 import ErrorReports from "./ErrorReports";
 
-import CachedIcon from '@mui/icons-material/Cached';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import PublishIcon from '@mui/icons-material/Publish';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import AddBoxIcon from '@mui/icons-material/AddBox';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
 
 import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
+import IconButton from '@mui/material/IconButton'
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-import Grow from '@mui/material/Grow';
-import Paper from '@mui/material/Paper';
-import Popper from '@mui/material/Popper';
-import MenuItem from '@mui/material/MenuItem';
-import MenuList from '@mui/material/MenuList';
+import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
@@ -189,11 +184,21 @@ const queryProgramSettings = {
     },
 }
 
+const queryCurrentUser = {
+    results: {
+        resource: 'me',
+        params: {
+            fields: ['id', 'authorities']
+        }
+    },
+}
+
 const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     // Globals
     const programId = programStage.program.id;
     const [isSectionMode, setIsSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0)
     const { data: androidSettings } = useDataQuery(queryAndroidSettings);
+    const { data: currentUser } = useDataQuery(queryCurrentUser);
     const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings, {
         onError: (err) => {
             setAndroidSettingsError(err.details || err)
@@ -228,6 +233,13 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const pushNotification = (content, severity = "success") => setSnackParams({ content, severity })
 
     const [uidPool, setUidPool] = useState([]);
+    const [allAuth, setAllAuth] = useState(false);
+
+    useEffect(() => {
+        if (currentUser) {
+            setAllAuth(currentUser.results.authorities.includes('ALL'))
+        }
+    }, [currentUser])
 
     useEffect(() => {
         if (importerEnabled) {
@@ -446,7 +458,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     };
 
     const onDragEnd = (result) => {
-        console.log({result})
+        console.log({ result })
         // Dropped outside of Droppable
         if (!result.destination) return;
 
@@ -454,10 +466,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         let newSections = sections;
 
         // Section droppped in same place
-        if(result.type === 'SECTION' && result.source.index === result.destination.index) return;
+        if (result.type === 'SECTION' && result.source.index === result.destination.index) return;
 
         // Section droppped in same place
-        if(result.type === 'DATA_ELEMENT' && result.source.droppableId === result.destination.droppableId  && result.source.index === result.destination.index) return;
+        if (result.type === 'DATA_ELEMENT' && result.source.droppableId === result.destination.droppableId && result.source.index === result.destination.index) return;
 
         // Clear Chips Highlights
         setAddedSection(undefined)
@@ -558,7 +570,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             let access = sharingSettings.userGroups[key]
             access.access = extractMetadataPermissions(access.access)
         })
-        
+
         // Set flag to enable/disable actions (buttons)
         setSaveAndBuild('Run');
 
@@ -632,7 +644,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                         let visualizationsDel = visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id }));
                         let eventReportsDel = eventReportDQ.data.results.eventReports.map(er => ({ id: er.id }));
                         let mapsDel = mapsDQ.data.results.maps.map(mp => ({ id: mp.id }));
-                        
+
                         const oldMetadata = {
                             programRules: programRulesDel.length > 0 ? programRulesDel : undefined,
                             programRuleVariables: programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined,
@@ -719,21 +731,41 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns" style={{ color: '#444444' }}>
-                    <ButtonStrip>
-                        {isSectionMode && !readOnly &&
-                            <Button color='inherit' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
+
+                    <Box >
+                        <ButtonStrip>
+                            {isSectionMode && !readOnly &&
+                                <Button color='inherit' size='small' variant='outlined' startIcon={<CheckCircleOutlineIcon />} disabled={createMetadata.loading} onClick={() => commit()}> {saveStatus}</Button>
+                            }
+                            {hnqisMode && isSectionMode &&
+                                <Button variant='contained' size='small' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
+                            }
+                            {hnqisMode && isSectionMode && <Button color='inherit' size='small' variant='outlined' startIcon={!exportToExcel ? <FileDownloadIcon /> : <CircularLoader small />} name="generator"
+                                onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
+                            }
+                            {hnqisMode && isSectionMode &&
+                                <Button color='inherit' size='small' variant='outlined' startIcon={<PublishIcon />} name="importer"
+                                    onClick={() => setImporterEnabled(true)}>Import Template</Button>
+                            }
+                            <Tooltip title="Reload" arrow><IconButton size='small' name="Reload" color="inherit" onClick={() => { window.location.reload() }}><RefreshIcon /></IconButton></Tooltip>
+                        </ButtonStrip>
+                    </Box>
+
+                    {/*<ButtonStrip>
+                    {isSectionMode && !readOnly &&
+                            <IconButton color='inherit' variant='outlined'  disabled={createMetadata.loading} onClick={() => commit()}> <CheckCircleOutlineIcon /></IconButton>
                         }
                         {hnqisMode && isSectionMode &&
                             <>
-                                <Button variant='contained' startIcon={<ConstructionIcon />} disabled={!savedAndValidated} onClick={() => run()}>Set up program</Button>
-                                <Button color='inherit' variant='outlined' startIcon={!exportToExcel ? <FileDownloadIcon /> : <CircularLoader small />} name="generator"
-                                    onClick={() => configuration_download(event)} disabled={exportToExcel}>{exportStatus}</Button>
-                                <Button color='inherit' variant='outlined' startIcon={<PublishIcon />} name="importer"
-                                    onClick={() => setImporterEnabled(true)}>Import Template</Button>
+                                <IconButton variant='contained' disabled={!savedAndValidated} onClick={() => run()}><ConstructionIcon /></IconButton>
+                                <IconButton color='inherit' variant='outlined' name="generator"
+                                    onClick={() => configuration_download(event)} disabled={exportToExcel}>{!exportToExcel ? <FileDownloadIcon /> : <CircularLoader small />}</IconButton>
+                                <IconButton color='inherit' variant='outlined' name="importer"
+                                    onClick={() => setImporterEnabled(true)}><PublishIcon /></IconButton>
                             </>
                         }
-                        <Button color='inherit' name="Reload" variant='outlined' startIcon={<CachedIcon />} onClick={() => { window.location.reload() }}>Reload</Button>
-                    </ButtonStrip>
+                        <IconButton color='inherit' name="Reload" variant='outlined' onClick={() => { window.location.reload() }}><CachedIcon /></IconButton>
+                    </ButtonStrip>*/}
                 </div>
             </div>
             {hnqisMode && importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}

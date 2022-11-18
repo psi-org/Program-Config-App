@@ -405,6 +405,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                                 resetSearch();
                                                             }}
                                                             style={{ marginRight: "0.5em" }}
+                                                            disabled={filterLoading}
                                                         >
                                                             <ClearIcon />
                                                         </IconButton>
