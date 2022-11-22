@@ -312,8 +312,8 @@ const H2Convert = ({
                         (score) =>
                             score.dataElement.attributeValues.find(
                                 (att) =>
-                                    att.attribute.id === QUESTION_TYPE_ATTRIBUTE
-                            )?.value === "2" &&
+                                    att.attribute.id === DE_TYPE_ATTRIBUTE
+                            )?.value === "93" &&
                             score.dataElement.attributeValues.find(
                                 (att) =>
                                     att.attribute.id ===

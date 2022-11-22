@@ -16,7 +16,7 @@ const MIN_VERSION = "2.36"
 const MAX_VERSION = "2.38.1.1"
 
 const PCA_METADATA_VERSION = "1.1.0"
-const H2_METADATA_VERSION = "1.1.0"
+const H2_METADATA_VERSION = "1.1.1"
 
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI","haUflNqP85K"]
 const PCA_OPTION_SETS = ["TOcCuCN2CLm"]

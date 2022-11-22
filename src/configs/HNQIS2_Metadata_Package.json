@@ -22,6 +22,14 @@
             "id": "WuIjp1ZkvuQ",
             "sortOrder": 1,
             "optionSet": {"id": "v6QYyj8ihWn"},
+            "attributeValues": [
+                {
+                    "value": "1",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
+            ],
             "translations": []
         },
         {
@@ -46,6 +54,14 @@
             "id": "mWUrJ69gb1b",
             "sortOrder": 2,
             "optionSet": {"id": "v6QYyj8ihWn"},
+            "attributeValues": [
+                {
+                    "value": "0",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
+            ],
             "translations": []
         },
         {
@@ -78,6 +94,14 @@
             "id": "RkmOTEsXYPS",
             "sortOrder": 3,
             "optionSet": {"id": "z4FEFQRtjhM"},
+            "attributeValues": [
+                {
+                    "value": "0",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
+            ],
             "translations": []
         },
         {
@@ -94,6 +118,14 @@
             "id": "AMCMDap5FR6",
             "sortOrder": 4,
             "optionSet": {"id": "z4FEFQRtjhM"},
+            "attributeValues": [
+                {
+                    "value": "1",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
+            ],
             "translations": []
         },
         {

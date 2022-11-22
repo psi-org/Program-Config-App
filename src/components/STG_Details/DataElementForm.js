@@ -578,6 +578,8 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                                     The Value Type will define the type of data that the data element will record.
                                     <br />If an Option Set is selected,
                                     the Value Type will be assigned automatically to match the Option Set.
+                                    <br /><br />
+                                    If the current program is a HNQIS2 program, only Option Sets that include "HNQIS" in the name will be displayed.
                                 </p>
                             }
                         />
@@ -599,7 +601,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                             id="optionSetsSelect"
                             disabled={structure === 'label'}
                             options={
-                                serverOptionSets?.results.optionSets.filter(os => !hnqisMode || os.name.includes("HNQIS")).map(os =>
+                                serverOptionSets?.results.optionSets.filter(os => !hnqisMode || os.name?.toLowerCase().includes("hnqis")).map(os =>
                                     ({ label: os.name, id: os.id, valueType: os.valueType })
                                 ) || []
                             }
@@ -681,7 +683,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                         id="legendSetSelect"
                         disabled={structure === 'label'}
                         sx={{ minWidth: '100%', marginRight: '0.5em' }}
-                        options={serverLegendSets?.results.legendSets.filter(ls => !hnqisMode || ls.name.includes("HNQIS")).map(ls => ({ label: ls.name, id: ls.id }))/* .concat({label: 'None', id: ''}) */ || [/* {label: 'None', id: ''} */]}
+                        options={serverLegendSets?.results.legendSets.filter(ls => !hnqisMode || ls.name?.toLowerCase().includes("hnqis")).map(ls => ({ label: ls.name, id: ls.id }))/* .concat({label: 'None', id: ''}) */ || [/* {label: 'None', id: ''} */]}
                         renderInput={(params) => <TextField {...params} label="Legend Set" />}
                         value={legendSet}
                         onChange={legendSetChange}
@@ -704,6 +706,8 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                             <p>
                                 Legend Sets are color categories based on number ranges.<br />
                                 The selected legend will be applied to the Data Element during data entry and information display of any kind.
+                                <br /><br />
+                                If the current program is a HNQIS2 program, only Legend Sets that include "HNQIS" in the name will be displayed.
                             </p>
                         }
                         margin='0 0 0 0.5em'

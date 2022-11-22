@@ -49,11 +49,11 @@ import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import LoadingButton from '@mui/lab/LoadingButton';
+import InsightsIcon from '@mui/icons-material/Insights';
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
-import { DeepCopy, extractMetadataPermissions, formatAlert, truncateString } from "../../configs/Utils";
-import { isEmptyObject } from "jquery";
+import { DeepCopy, extractMetadataPermissions, truncateString } from "../../configs/Utils";
 
 const createMutation = {
     resource: 'metadata',
@@ -210,7 +210,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     // Globals
     const programId = programStage.program.id;
     const [isSectionMode, setIsSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0)
-    const { data: androidSettings } = useDataQuery(queryAndroidSettings);
+    const { data: androidSettings, refetch: refreshAndroidSettings } = useDataQuery(queryAndroidSettings);
     const { data: currentUser } = useDataQuery(queryCurrentUser);
     const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings, {
         onError: (err) => {
@@ -688,38 +688,39 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                         setProgressSteps(7);
 
                                         // VI. Enable in-app analytics
+                                        refreshAndroidSettings().then(settings => { 
+                                            if (settings?.results) {
 
-                                        if (androidSettings?.results) {
+                                                if (!settings.results.dhisVisualizations) settings.results.dhisVisualizations = {
+                                                    "dataSet": {},
+                                                    "home": [],
+                                                    "program": {}
+                                                }
 
-                                            if (!androidSettings.results.dhisVisualizations) androidSettings.results.dhisVisualizations = {
-                                                "dataSet": {},
-                                                "home": [],
-                                                "program": {}
-                                            }
+                                                if (!settings.results.dhisVisualizations.home) settings.results.dhisVisualizations.home = []
 
-                                            if (!androidSettings.results.dhisVisualizations.home) androidSettings.results.dhisVisualizations.home = []
+                                                settings.results.dhisVisualizations.home = settings.results.dhisVisualizations.home.filter(setting =>
+                                                    setting.program !== programId
+                                                )
 
-                                            androidSettings.results.dhisVisualizations.home = androidSettings.results.dhisVisualizations.home.filter(setting =>
-                                                setting.program !== programId
-                                            )
+                                                settings.results.dhisVisualizations.home.push({
+                                                    id: uidPool.shift(),
+                                                    name: programStage.program.name,
+                                                    program: programId,
+                                                    visualizations: androidSettingsVisualizations
+                                                })
 
-                                            androidSettings.results.dhisVisualizations.home.push({
-                                                id: uidPool.shift(),
-                                                name: programStage.program.name,
-                                                program: programId,
-                                                visualizations: androidSettingsVisualizations
-                                            })
+                                                settings.results.lastUpdated = new Date().toISOString()
 
-                                            androidSettings.results.lastUpdated = new Date().toISOString()
+                                                androidSettingsUpdate({ data: settings.results }).then(res => {
+                                                    if (res.status === 'OK') setAndroidSettingsError(undefined);
+                                                    updateProgramBuildVersion(programId)
+                                                })
 
-                                            androidSettingsUpdate({ data: androidSettings.results }).then(res => {
-                                                if (res.status === 'OK') setAndroidSettingsError(undefined);
+                                            } else {
                                                 updateProgramBuildVersion(programId)
-                                            })
-
-                                        } else {
-                                            updateProgramBuildVersion(programId)
-                                        }
+                                            }
+                                        })
 
                                     }
                                 });
@@ -842,7 +843,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 <ButtonGroup disableElevation color='primary' variant="contained" ref={anchorRef} aria-label="split button">
                                     <Button
                                         onClick={handleClick}
-                                        startIcon={<ConstructionIcon />}
+                                    startIcon={selectedIndex === 0 ? <ConstructionIcon /> : <InsightsIcon />}
                                         size='small'
                                         disabled={!savedAndValidated}
                                     >{optionsSetUp[selectedIndex]}</Button>
