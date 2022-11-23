@@ -126,12 +126,12 @@ const H2Metadata = (props) => {
             </DialogContent>
             <DialogActions style={{ padding: '1em', display: 'flex', justifyContent: 'space-between'}}>
                 <div>
-                    <span><Button variant='text' target='_blank' href='https://psi.atlassian.net/wiki/spaces/PCA/overview?homepageId=37716432' startIcon={<DescriptionIcon />}>Check HNQIS2 documentation</Button></span>
+                    <span><Button variant='text' target='_blank' href='https://psi.atlassian.net/wiki/spaces/PCA/overview?homepageId=37716432' startIcon={<DescriptionIcon />}>Check the HNQIS 2.0 documentation</Button></span>
                 </div>
                 <div>
                     <Button color={'error'} variant={'outlined'} style={{marginRight: '1em'}} onClick={() => props.setH2Modal(false)}>Close</Button>
                     <LoadingButton onClick={install} endIcon={<InstallDesktopIcon />} loading={sending} loadingPosition="end" variant="outlined" >
-                        {!sending && `Install Metadata (v${H2_METADATA_VERSION})`}
+                        {!sending && `${hnqis2Metadata?.results?.version === H2_METADATA_VERSION?'Repair':'Install'} Metadata (v${H2_METADATA_VERSION})`}
                         {sending && `Installing...`}
                     </LoadingButton>
                 </div>

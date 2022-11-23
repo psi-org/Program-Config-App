@@ -203,8 +203,19 @@ const queryCurrentUser = {
     },
 }
 
-const optionsSetUp = ['SET UP PROGRAM', 'SET UP ANDROID SETTINGS'];
-const optionsTemplate = ['DOWNLOAD TEMPLATE', 'IMPORT TEMPLATE'];
+const queryExistingLocalAnalytics = {
+    results: {
+        resource: 'visualizations',
+        params: ({ programId }) => ({
+            fields: ['id', 'name'],
+            filter: [`code:in:[${programId}_Scripted1,${programId}_Scripted2,${programId}_Scripted3]`]
+        })
+    }
+};
+
+
+const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
+const optionsTemplate = ['IMPORT TEMPLATE', 'DOWNLOAD TEMPLATE'];
 
 const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     // Globals
@@ -221,6 +232,12 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [programSettingsError, setProgramSettingsError] = useState(undefined);
     const { data: OrganizationLevel, refetch: setOuLevel } = useDataQuery(queryOrganizationsUnit, { lazy: true, variables: { ouLevel: undefined } });
     const { refetch: getProgramSettings } = useDataQuery(queryProgramSettings, { lazy: true, variables: { programId } });
+    
+    
+    
+    //const { data: existingLocalAnalytics } = useDataQuery(queryExistingLocalAnalytics, { variables: { programId } });
+
+
 
     // Flags
     const [saveStatus, setSaveStatus] = useState(hnqisMode ? 'Validate' : 'Save Changes');
@@ -576,6 +593,30 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         })
     }
 
+    const buildAndroidSettings = (settings, newUID, androidSettingsVisualizations) => {
+        if (!settings.results.dhisVisualizations) settings.results.dhisVisualizations = {
+            "dataSet": {},
+            "home": [],
+            "program": {}
+        }
+
+        if (!settings.results.dhisVisualizations.home) settings.results.dhisVisualizations.home = []
+
+        settings.results.dhisVisualizations.home = settings.results.dhisVisualizations.home.filter(setting =>
+            setting.program !== programId
+        )
+
+        settings.results.dhisVisualizations.home.push({
+            id: newUID,
+            name: programStage.program.name,
+            program: programId,
+            visualizations: androidSettingsVisualizations
+        })
+
+        settings.results.lastUpdated = new Date().toISOString()
+        return settings
+    }
+
     const run = () => {
         if (!savedAndValidated) return;
         //--------------------- NEW METADATA --------------------//
@@ -688,30 +729,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                         setProgressSteps(7);
 
                                         // VI. Enable in-app analytics
-                                        refreshAndroidSettings().then(settings => { 
-                                            if (settings?.results) {
+                                        refreshAndroidSettings().then(androidSettings => {
+                                            if (androidSettings?.results) {
 
-                                                if (!settings.results.dhisVisualizations) settings.results.dhisVisualizations = {
-                                                    "dataSet": {},
-                                                    "home": [],
-                                                    "program": {}
-                                                }
-
-                                                if (!settings.results.dhisVisualizations.home) settings.results.dhisVisualizations.home = []
-
-                                                settings.results.dhisVisualizations.home = settings.results.dhisVisualizations.home.filter(setting =>
-                                                    setting.program !== programId
-                                                )
-
-                                                settings.results.dhisVisualizations.home.push({
-                                                    id: uidPool.shift(),
-                                                    name: programStage.program.name,
-                                                    program: programId,
-                                                    visualizations: androidSettingsVisualizations
-                                                })
-
-                                                settings.results.lastUpdated = new Date().toISOString()
-
+                                                let settings = buildAndroidSettings(androidSettings, uidPool.shift(), androidSettingsVisualizations)
                                                 androidSettingsUpdate({ data: settings.results }).then(res => {
                                                     if (res.status === 'OK') setAndroidSettingsError(undefined);
                                                     updateProgramBuildVersion(programId)
@@ -743,10 +764,18 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const handleClick = () => {
         switch (selectedIndex) {
             case 0:
-                allAuth ? run() : setShowDisclaimer(true)
+                allAuth ? run() : setShowDisclaimer(true);
                 break;
             case 1:
                 //TODO: Enable Analytics only
+                const timestamp = new Date().toISOString();
+                /*let androidSettings =
+                    existingLocalAnalytics?.results?.visualizations.map(visualization => ({
+                        id: visualization.id,
+                        name: visualization.name,
+                        timestamp
+                    }));*/
+                
                 break;
             default:
                 break;
@@ -774,10 +803,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const handleClickTemplate = (event) => {
         switch (selectedIndexTemplate) {
             case 0:
-                configuration_download(event)
+                setImporterEnabled(true)
                 break;
             case 1:
-                setImporterEnabled(true)
+                configuration_download(event)
                 break;
             default:
                 break;
@@ -843,7 +872,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 <ButtonGroup disableElevation color='primary' variant="contained" ref={anchorRef} aria-label="split button">
                                     <Button
                                         onClick={handleClick}
-                                    startIcon={selectedIndex === 0 ? <ConstructionIcon /> : <InsightsIcon />}
+                                        startIcon={selectedIndex === 0 ? <ConstructionIcon /> : <InsightsIcon />}
                                         size='small'
                                         disabled={!savedAndValidated}
                                     >{optionsSetUp[selectedIndex]}</Button>
@@ -886,7 +915,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                                         {optionsSetUp.map((option, index) => (
                                                             <MenuItem
                                                                 key={option}
-                                                                disabled={index === 1 && !allAuth}
+                                                                disabled={index === 1 /*&& (!allAuth || !(existingLocalAnalytics?.results?.visualizations.length > 0))*/}
                                                                 selected={index === selectedIndex}
                                                                 onClick={(event) => handleMenuItemClick(event, index)}
                                                             >
@@ -906,10 +935,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 <ButtonGroup disableElevation ref={anchorRefTemplate} aria-label="split button">
                                     <LoadingButton
                                         onClick={handleClickTemplate}
-                                        startIcon={selectedIndexTemplate === 0 ? <FileDownloadIcon /> : <PublishIcon />}
+                                        startIcon={selectedIndexTemplate === 1 ? <FileDownloadIcon /> : <PublishIcon />}
                                         size='small'
                                         variant="contained"
-                                        color="success" 
+                                        color="success"
                                         disabled={exportToExcel}
                                         loadingPosition="start"
                                         loading={exportToExcel}
@@ -917,7 +946,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                     <Button
                                         size="small"
                                         variant="contained"
-                                        color="success" 
+                                        color="success"
                                         aria-controls={openTemplateBtn ? 'split-button-menu' : undefined}
                                         aria-expanded={openTemplateBtn ? 'true' : undefined}
                                         aria-label="select merge strategy"
@@ -967,28 +996,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 </Popper>
                             </>
                         }
-                        {/*
-                        {hnqisMode && isSectionMode &&
-                            <Button
-                                color='inherit'
-                                size='small'
-                                variant='outlined'
-                                startIcon={!exportToExcel ? <FileDownloadIcon /> : <CircularLoader small />}
-                                name="generator"
-                                onClick={() => configuration_download(event)}
-                                disabled={exportToExcel}
-                            >{exportStatus}</Button>
-                        }
-                        {hnqisMode && isSectionMode &&
-                            <Button
-                                color='inherit'
-                                size='small'
-                                variant='outlined'
-                                startIcon={<PublishIcon />}
-                                name="importer"
-                                onClick={() => setImporterEnabled(true)}
-                            >Import Template</Button>
-                        }*/}
                         <Tooltip title="Reload" arrow>
                             <IconButton
                                 size='small'
@@ -1000,26 +1007,9 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                             </IconButton>
                         </Tooltip>
                     </ButtonStrip>
-
-
-                    {/*<ButtonStrip>
-                    {isSectionMode && !readOnly &&
-                            <IconButton color='inherit' variant='outlined'  disabled={createMetadata.loading} onClick={() => commit()}> <CheckCircleOutlineIcon /></IconButton>
-                        }
-                        {hnqisMode && isSectionMode &&
-                            <>
-                                <IconButton variant='contained' disabled={!savedAndValidated} onClick={() => run()}><ConstructionIcon /></IconButton>
-                                <IconButton color='inherit' variant='outlined' name="generator"
-                                    onClick={() => configuration_download(event)} disabled={exportToExcel}>{!exportToExcel ? <FileDownloadIcon /> : <CircularLoader small />}</IconButton>
-                                <IconButton color='inherit' variant='outlined' name="importer"
-                                    onClick={() => setImporterEnabled(true)}><PublishIcon /></IconButton>
-                            </>
-                        }
-                        <IconButton color='inherit' name="Reload" variant='outlined' onClick={() => { window.location.reload() }}><CachedIcon /></IconButton>
-                    </ButtonStrip>*/}
                 </div>
             </div>
-            {hnqisMode && importerEnabled && <Importer displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
+            {hnqisMode && importerEnabled && <Importer setSavedAndValidated={setSavedAndValidated} displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
             <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', margin: '0', alignItems: 'center' }}>
                 <span style={{
                     overflow: 'hidden',
@@ -1068,7 +1058,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     </CustomMUIDialogTitle >
                     <DialogContent dividers style={{ padding: '1em 2em' }}>
                         <p>Your User does not have the authorities required by the Android Settings App to enable In-app Analytics for HNQIS 2.0.</p>
-                        <p style={{margin: '1em 0'}}>You are still able to Set Up the program, however, the Android App Dashboard won't be updated.</p>
+                        <p style={{ margin: '1em 0' }}>You are still able to Set Up the program, however, the Android App Dashboard won't be updated.</p>
                         <NoticeBox title="Please Note">
                             <p>To enable In-app Analytics for this Program please contact your System Administrator.</p>
                         </NoticeBox>
