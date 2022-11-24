@@ -20,7 +20,7 @@ import {
 } from "../../configs/Constants";
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 
-import {DeepCopy, truncateString} from "../../configs/Utils";
+import {DeepCopy, parseErrorsJoin, truncateString} from "../../configs/Utils";
 
 const BackupScreen = (props) => {
     const programMetadata = {
@@ -77,7 +77,16 @@ const BackupScreen = (props) => {
     let commentInput = useRef();
 
     const { loading: dsLoading, data: dsData } = useDataQuery(queryDataStore);
-    const { loading: loadingMetadata, data: metaData } = useDataQuery(programMetadata);
+    const { loading: loadingMetadata, data: metaData } = useDataQuery(programMetadata, {
+        onError: (err) => {
+            props.setNotification({
+                message: parseErrorsJoin(err.details, '\\n'),
+                severity: "error",
+            });
+            setProcessing(false);
+            hideFormHandler();
+        }
+    });
 
     const dsCreateDM = useDataMutation(dsCreateMutation, {
         onError: (err) => {
@@ -145,7 +154,6 @@ const BackupScreen = (props) => {
             "metadata": processMetadata(metaData.results)
         };
         dsBackups.backups.push(backup);
-        console.log("backup: ", backup.metadata)
         let backupToDatastore = !dsData?.results ? dsCreateRequest : dsUpdateRequest
         backupToDatastore.mutate({ data: dsBackups })
             .then(response => {

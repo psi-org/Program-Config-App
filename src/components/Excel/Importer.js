@@ -91,9 +91,11 @@ const Importer = (props) => {
                                             setImportSummary(importSummaryValues);
                                             props.setImportResults(importSummaryValues);
                                             props.setSaveStatus('Validate & Save');
+                                            props.setSavedAndValidated(false);
 
                                             var newScoresSection = props.previous.scoresSection;
                                             newScoresSection.dataElements = importedScores;
+                                            delete newScoresSection.errors;
 
                                             props.previous.setSections(importedSections);
                                             props.previous.setScoresSection(newScoresSection);

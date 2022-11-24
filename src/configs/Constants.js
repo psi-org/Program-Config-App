@@ -10,13 +10,13 @@ import NumberIcon from '@mui/icons-material/Numbers';
 import DateIcon from '@mui/icons-material/CalendarToday';
 import TimeIcon from '@mui/icons-material/AccessTime';
 
-const BUILD_VERSION = "1.6.0"
-const BUILD_DATE = "November 14th, 2022"
+const BUILD_VERSION = "1.6.1"
+const BUILD_DATE = "November 23th, 2022"
 const MIN_VERSION = "2.36"
 const MAX_VERSION = "2.38.1.1"
 
 const PCA_METADATA_VERSION = "1.1.0"
-const H2_METADATA_VERSION = "1.1.0"
+const H2_METADATA_VERSION = "1.1.1"
 
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI","haUflNqP85K"]
 const PCA_OPTION_SETS = ["TOcCuCN2CLm"]
@@ -41,6 +41,15 @@ const ACTION_PLAN_RESPONSIBLE = "nswci5V4j0d"
 // *H2 Tracked Entity Type
 const ASSESSMENT_TET = "oNwpeWkfoWc"
 
+// *H2 Option Sets
+const OPTION_SET_COMPETENCY = "NDfZ129owtz"
+const OPTION_SET_HEALTH_AREAS = "y752HEwvCGi"
+
+// *H2 Legend Sets
+const LEGEND_YES_NO = "RXxPYFwtgf4"
+const LEGEND_YES_PARTIAL_NO = "kqQjtHIc7II"
+const VISUALIZATIONS_LEGEND = "nvVrBnbud3L"
+
 // *H1 Control Data Elements
 const H1_OVERALL_SCORE = "Y8Nmpp7RhXw"
 const H1_COMPETENCY_CLASS = "KesgQ5NHkQW"
@@ -64,9 +73,6 @@ const H1_ACTION_PLAN_OLD = "Im5C86I2ObV"    // ?Interpreted as Action 1
 const H1_ACTION1_OLD = "ibpjjNJLn44"        // ?Interpreted as Action 2
 const H1_ACTION2_OLD = "bwwyHVzxnTZ"        // ?Interpreted as Action 3
 
-
-const VISUALIZATIONS_LEGEND = "nvVrBnbud3L"
-
 const H2_REQUIRED = {
     dataElements: [
         COMPETENCY_CLASS,
@@ -76,7 +82,7 @@ const H2_REQUIRED = {
         ACTION_PLAN_DUE_DATE,
         ACTION_PLAN_RESPONSIBLE,
     ],
-    optionSets: ["NDfZ129owtz", "y752HEwvCGi"],
+    optionSets: [OPTION_SET_COMPETENCY, OPTION_SET_HEALTH_AREAS],
     options: [
         "BNjofUBvlJ8",
         "Ox6VQNmvuS3",
@@ -109,7 +115,7 @@ const H2_REQUIRED = {
         COMPETENCY_ATTRIBUTE,
     ],
     attributes: ["LP171jpctBm", "yhKEe6BLEer"],
-    legendSets: ["RXxPYFwtgf4", "nvVrBnbud3L"],
+    legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND],
 };
 
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'numeric',minute:'numeric',second:'numeric',hour12:false }
@@ -277,5 +283,9 @@ export {
     H1_ACTION_PLAN_OLD,
     H1_ACTION1_OLD,
     H1_ACTION2_OLD, 
-    VISUALIZATIONS_LEGEND
+    VISUALIZATIONS_LEGEND,
+    LEGEND_YES_NO,
+    LEGEND_YES_PARTIAL_NO,
+    OPTION_SET_COMPETENCY,
+    OPTION_SET_HEALTH_AREAS
 };

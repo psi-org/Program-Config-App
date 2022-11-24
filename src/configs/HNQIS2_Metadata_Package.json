@@ -22,6 +22,9 @@
             "id": "WuIjp1ZkvuQ",
             "sortOrder": 1,
             "optionSet": {"id": "v6QYyj8ihWn"},
+            "attributeValues": [
+
+            ],
             "translations": []
         },
         {
@@ -46,6 +49,9 @@
             "id": "mWUrJ69gb1b",
             "sortOrder": 2,
             "optionSet": {"id": "v6QYyj8ihWn"},
+            "attributeValues": [
+
+            ],
             "translations": []
         },
         {
@@ -78,6 +84,9 @@
             "id": "RkmOTEsXYPS",
             "sortOrder": 3,
             "optionSet": {"id": "z4FEFQRtjhM"},
+            "attributeValues": [
+
+            ],
             "translations": []
         },
         {
@@ -94,6 +103,9 @@
             "id": "AMCMDap5FR6",
             "sortOrder": 4,
             "optionSet": {"id": "z4FEFQRtjhM"},
+            "attributeValues": [
+
+            ],
             "translations": []
         },
         {
@@ -717,6 +729,44 @@
             "dataElementGroupSetAttribute": false,
             "organisationUnitGroupSetAttribute": false,
             "optionAttribute": false
+        },
+        {
+            "id": "DVzuBdj9kli",
+            "name": "OptionFactor",
+            "code": "OF",
+            "indicatorAttribute": false,
+            "indicatorGroupAttribute": false,
+            "userGroupAttribute": false,
+            "dataElementAttribute": false,
+            "constantAttribute": false,
+            "valueType": "NUMBER",
+            "categoryOptionAttribute": false,
+            "optionSetAttribute": false,
+            "sqlViewAttribute": false,
+            "legendSetAttribute": false,
+            "trackedEntityAttributeAttribute": false,
+            "organisationUnitAttribute": false,
+            "dataSetAttribute": false,
+            "documentAttribute": false,
+            "unique": false,
+            "validationRuleGroupAttribute": false,
+            "dataElementGroupAttribute": false,
+            "sectionAttribute": false,
+            "trackedEntityTypeAttribute": false,
+            "userAttribute": false,
+            "mandatory": false,
+            "categoryOptionGroupAttribute": false,
+            "programStageAttribute": false,
+            "programAttribute": false,
+            "categoryAttribute": false,
+            "categoryOptionComboAttribute": false,
+            "categoryOptionGroupSetAttribute": false,
+            "validationRuleAttribute": false,
+            "programIndicatorAttribute": false,
+            "organisationUnitGroupAttribute": false,
+            "dataElementGroupSetAttribute": false,
+            "organisationUnitGroupSetAttribute": false,
+            "optionAttribute": true
         }
     ],
     "legendSets": [
