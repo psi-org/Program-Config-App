@@ -75,9 +75,10 @@ const PS_AssessmentStage = {
     "program": {"id": "programId"},
     "programStageDataElements": [],
     "programStageSections": [],
-    "publicAccess": "rwrw----", //! Remove?
     "remindCompleted": true,
     "repeatable": false,
+    "displayGenerateEventBox": false, 
+    "allowGenerateNextVisit": false,
     "reportDateToUse": "enrollmentDate",
     "sortOrder": 1,
     "style": {
@@ -118,7 +119,6 @@ const PS_ActionPlanStage = {
         }
     ],
     "programStageSections": [],
-    "publicAccess": "rwrw----", //! Remove?
     "remindCompleted": false,
     "repeatable": true,
     "sortOrder": 2,

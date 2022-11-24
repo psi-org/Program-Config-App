@@ -1,6 +1,6 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 
-import { CircularLoader } from "@dhis2/ui";
+import { CircularLoader, NoticeBox } from "@dhis2/ui";
 import Button from "@mui/material/Button";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -72,6 +72,7 @@ const queryProgramMetadata = {
                 "name",
                 "attributeValues",
                 "programStages[id,name,programStageDataElements[compulsory,dataElement[id,attributeValues]]]",
+                "organisationUnits"
             ],
             filter: [`id:eq:${program}`],
         }),
@@ -104,7 +105,7 @@ const queryEventList = {
         resource: "events",
         params: ({ program }) => ({
             program,
-            fields: ["event"],
+            fields: ["event", "orgUnit"],
             skipPaging: true,
             filter: [],
         }),
@@ -190,6 +191,7 @@ const H2Transfer = ({
     const [statusModal, setStatusModal] = useState(false);
     const [conversionError, setConversionError] = useState(undefined);
     const [requestsData, setRequestsData] = useState(undefined);
+    const [failedData, setFailedData] = useState(undefined);
 
     const [progressValue, setProgressValue] = useState(0);
     const cancelTransfer = useRef(false);
@@ -465,8 +467,14 @@ const H2Transfer = ({
                     )*/
                     !dsData?.results[event.event]
             );
+        
+            const result = convertEvents.reduce((res, event) => {
+                res[h2Program.organisationUnits.map(ou=>ou.id).includes(event.orgUnit) ? 'valid' : 'invalid'].push(event);
+                return res;
+            }, { valid: [], invalid: [] })
 
-            setRequestsData(convertEvents);
+            setRequestsData(result.valid);
+            setFailedData(result.invalid);
             setLoading(false);
         }
     }, [h2Program]);
@@ -710,6 +718,13 @@ const H2Transfer = ({
                             </Card>
                         </div>
                     )}
+                    {failedData?.length > 0 &&
+                        <div style={{ marginTop: '2em' }}>
+                            <NoticeBox error={true} title="The target Program lacks some Organisation Units from the transfer data">
+                                <p>A total of <strong>{failedData.length} Assessment{failedData?.length > 1 ? 's were' : ' was'} ignored</strong> because the Program <strong>{h2Program.name}</strong> has not been assigned to the following Organisation Units: {failedData.map(ev => ev.orgUnit).filter((item, i, ar) => ar.indexOf(item) === i).join(', ')}.</p>
+                            </NoticeBox>
+                        </div>
+                    }
                 </DialogContent>
 
                 <DialogActions style={{ padding: "1em" }}>

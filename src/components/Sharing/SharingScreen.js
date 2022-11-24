@@ -1,7 +1,7 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { CircularLoader, Modal, ModalContent, ModalTitle, NoticeBox, ModalActions, ButtonStrip, CenteredContent } from "@dhis2/ui";
 import SharingItem from './SharingItem';
-import { DeepCopy, parseErrors, parseErrorsJoin, truncateString } from '../../configs/Utils';
+import { DeepCopy, parseErrors, parseErrorsJoin, parseErrorsUL, truncateString } from '../../configs/Utils';
 
 import EditIcon from '@mui/icons-material/Edit';
 import { useRef, useState, useEffect } from "react";
@@ -155,10 +155,15 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     const [restrictedDEs, setRestrictedDEs] = useState([]);
     const [runAdditionalSharing, setRunAdditionalSharing] = useState(false);
     const [additionalElements, setAdditionalElements] = useState([]);
+    const [fetchErrors, setFetchErrors] = useState(undefined);
 
     const { loading, error, data } = useDataQuery(sharingQuery, { variables: { element: element, id: id } });
     const { loading: entityLoading, data: entities, error: entityErrors } = useDataQuery(entitiesQuery);
-    const { loading: metadataLoading, data: prgMetaData } = useDataQuery(programMetadata);
+    const { loading: metadataLoading, data: prgMetaData } = useDataQuery(programMetadata, {
+        onError: (err) => {
+            setFetchErrors(parseErrorsUL(err.details));
+        }
+    });
     const { loading: prgDELoading, data: prgDEData } = useDataQuery(psDataElementAccess, { variables: { id: id } });
     const { loading: visualizerLoading, data: vData } = useDataQuery(visualizationQuery, { variables: { id: id } });
     const mapsDQ = useDataQuery(queryMaps, { variables: { programId: id } });
@@ -406,7 +411,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                         severity: 'success'
                     })
                 } else {
-                    
+
                     setNotification({
                         message: parseErrorsJoin(response, '\\n'),
                         severity: 'error'
@@ -502,19 +507,28 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                     {content === 'form' && <div>
                         <h2 style={{ fontSize: 24, fontWeight: 300, margin: 0 }}>{truncateString(data.results?.object.displayName, 40)}</h2>
                         <div>Created by: {data.results?.object.user.name}</div>
-                        {restrictions.length > 0 && <Alert severity="error" style={{ marginTop: "10px", maxHeight: "100px", overflow: 'auto' }}>Limited Access:
-                            <ul>
-                                {restrictions.map((restriction, index) => {
-                                    return <li key={index}>{restriction}</li>
-                                })}
-                            </ul>
-                            {restrictedDEs.length > 0 &&
-                                <ul style={{ marginLeft: "25px" }}>
-                                    {restrictedDEs.map((de, index) => {
-                                        return <li key={index}>{de.name}</li>
+                        {restrictions.length > 0 &&
+                            <Alert severity="error" style={{ marginTop: "10px", maxHeight: "100px", overflow: 'auto' }}>Limited Access:
+                                <ul>
+                                    {restrictions.map((restriction, index) => {
+                                        return <li key={index}>{restriction}</li>
                                     })}
-                                </ul>}
-                        </Alert>}
+                                </ul>
+                                {restrictedDEs.length > 0 &&
+                                    <ul style={{ marginLeft: "25px" }}>
+                                        {restrictedDEs.map((de, index) => {
+                                            return <li key={index}>{de.name}</li>
+                                        })}
+                                    </ul>
+                                }
+                            </Alert>
+                        }
+                        {fetchErrors &&
+                            <Alert severity="error" style={{ marginTop: "10px", maxHeight: "100px", overflow: 'auto' }}>
+                                <p>Sharing Settings disabled due to the following errors:</p>
+                                {fetchErrors}
+                            </Alert>
+                        }
                         <div style={{ boxSizing: "border-box", fontSize: 14, paddingLeft: 16, marginTop: 30, color: 'rgba(0, 0, 0, 0.54)', lineHeight: "48px" }}>Who has access</div>
                         <hr style={{ marginTop: -1, height: 1, border: "none", backgroundColor: "#bdbdbd" }} />
                         <div style={{ height: "240px", overflowY: "scroll" }}>
@@ -584,7 +598,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                         <ButtonStrip end>
                             {/*<Button onClick={()=>hideForm()} variant="outlined" startIcon={<CloseIcon />}>Close</Button>*/}
                             <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
-                                <Button onClick={handleClick} disabled={readOnly}>{btnOptions[selectedIndex]}</Button>
+                                <Button onClick={handleClick} disabled={readOnly || !!fetchErrors}>{btnOptions[selectedIndex]}</Button>
                                 <Button
                                     size="small"
                                     aria-controls={open ? 'split-button-menu' : undefined}
@@ -592,7 +606,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                                     aria-label="select merge strategy"
                                     aria-haspopup="menu"
                                     onClick={handleToggle}
-                                    disabled={readOnly}
+                                    disabled={readOnly || !!fetchErrors}
                                 >
                                     <ArrowDropDownIcon />
                                 </Button>

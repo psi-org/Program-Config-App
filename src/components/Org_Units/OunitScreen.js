@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
 import {
+    Alert,
     Box,
     Button,
     ButtonGroup,
@@ -22,7 +23,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
-import { parseErrorsJoin, truncateString } from "../../configs/Utils";
+import { parseErrorsJoin, parseErrorsUL, truncateString } from "../../configs/Utils";
 
 const orgUnitsQuery = {
     userOrgUnits: {
@@ -122,6 +123,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const [orgUnitExpanded, setOrgUnitExpanded] = useState([]);
     const [filterValue, setFilterValue] = useState('');
     const [filterLoading, setFilterLoading] = useState(false);
+    const [fetchErrors, setFetchErrors] = useState(undefined);
 
     const { loading: ouMetadataLoading, data: ouMetadata } =
         useDataQuery(orgUnitsQuery);
@@ -135,7 +137,11 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
         variables: { filterString: filterString },
     });
     const { loading: metadataLoading, data: prgMetaData } =
-        useDataQuery(programMetadata);
+        useDataQuery(programMetadata, {
+            onError: (err) => {
+                setFetchErrors(parseErrorsUL(err.details));
+            }
+        });
     const { loading: poLoading, data: prgOrgUnitData } = useDataQuery(
         programOrgUnitsQuery,
         { variables: { id: id } }
@@ -405,6 +411,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                                 resetSearch();
                                                             }}
                                                             style={{ marginRight: "0.5em" }}
+                                                            disabled={filterLoading}
                                                         >
                                                             <ClearIcon />
                                                         </IconButton>
@@ -631,6 +638,12 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                 <p>Total: {importStatus.total}</p>
                             </div>
                         )}
+                        {fetchErrors &&
+                            <Alert severity="error" style={{ marginTop: "10px", maxHeight: "100px", overflow: 'auto' }}>
+                                <p>Assign Organisation Units feature  disabled due to the following errors:</p>
+                                {fetchErrors}
+                            </Alert>
+                        }
                     </DialogContent>
                 }
                 <DialogActions style={{ padding: "1em" }}>
@@ -641,6 +654,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                         <Button
                             onClick={orgUnitAssignmentHandler}
                             color={"primary"}
+                            disabled={!!fetchErrors}
                         >
                             Apply
                         </Button>
