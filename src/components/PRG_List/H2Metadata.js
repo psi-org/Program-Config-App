@@ -126,7 +126,7 @@ const H2Metadata = (props) => {
             </DialogContent>
             <DialogActions style={{ padding: '1em', display: 'flex', justifyContent: 'space-between'}}>
                 <div>
-                    <span><Button variant='text' target='_blank' href='https://psi.atlassian.net/wiki/spaces/PCA/overview?homepageId=37716432' startIcon={<DescriptionIcon />}>Check the HNQIS 2.0 documentation</Button></span>
+                    <span><Button variant='text' target='_blank' href='https://psi.atlassian.net/wiki/spaces/HNQIS/overview?homepageId=36536495' startIcon={<DescriptionIcon />}>Check the HNQIS 2.0 documentation</Button></span>
                 </div>
                 <div>
                     <Button color={'error'} variant={'outlined'} style={{marginRight: '1em'}} onClick={() => props.setH2Modal(false)}>Close</Button>
