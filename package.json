@@ -2,7 +2,7 @@
     "name": "program_configuration",
     "title": "Program Configuration",
     "author": "KnowTechTure SL",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "description": "Tracker Programs management tool",
     "license": "CC-BY-4.0",
     "private": true,
