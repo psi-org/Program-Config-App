@@ -497,7 +497,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     };
 
     const onDragEnd = (result) => {
-        console.log({ result })
         // Dropped outside of Droppable
         if (!result.destination) return;
 
@@ -1009,7 +1008,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     </ButtonStrip>
                 </div>
             </div>
-            {hnqisMode && importerEnabled && <Importer setSavedAndValidated={setSavedAndValidated} displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} />}
+            {hnqisMode && importerEnabled && <Importer setSavedAndValidated={setSavedAndValidated} displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} currentSectionsData={programStage.programStageSections} />}
             <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', margin: '0', alignItems: 'center' }}>
                 <span style={{
                     overflow: 'hidden',

@@ -82,8 +82,7 @@ const Importer = (props) => {
                                             setCurrentTask(null);
 
                                             // Start import reading
-                                            let { importedSections, importedScores, importSummaryValues } = readTemplateData(templateData, props.previous, programDetails.dePrefix, mappingDetails.optionSets, mappingDetails.legendSets);
-
+                                            let { importedSections, importedScores, importSummaryValues } = readTemplateData(templateData, props.previous, programDetails.dePrefix, mappingDetails.optionSets, mappingDetails.legendSets, props.currentSectionsData);
                                             importSummaryValues.program = programDetails;
                                             importSummaryValues.mapping = mappingDetails;
 
