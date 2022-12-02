@@ -87,7 +87,7 @@ const mapImportedDE = (data, programPrefix, type, optionSets, legendSets, dataEl
         parentName: data[importMap.parentName]?.result,
         sharing: existingDe?.sharing,
         attributeValues: (existingDe?.attributeValues.filter(att =>
-            ![FEEDBACK_ORDER, FEEDBACK_TEXT].includes(att.attribute.id)
+            ![FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA].includes(att.attribute.id)
         ) || [])
     };
 
