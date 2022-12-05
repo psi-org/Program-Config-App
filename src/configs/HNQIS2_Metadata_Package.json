@@ -6,6 +6,14 @@
             "id": "IYJvvyCDyO5",
             "sortOrder": 1,
             "optionSet": {"id": "DfyWt0mZIhj"},
+            "attributeValues": [
+                {
+                    "value": "1",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
+            ],
             "translations": []
         },
         {
@@ -23,7 +31,12 @@
             "sortOrder": 1,
             "optionSet": {"id": "v6QYyj8ihWn"},
             "attributeValues": [
-
+                {
+                    "value": "1",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
             ],
             "translations": []
         },
@@ -33,6 +46,14 @@
             "id": "TJnqFStXuck",
             "sortOrder": 2,
             "optionSet": {"id": "DfyWt0mZIhj"},
+            "attributeValues": [
+                {
+                    "value": "0.5",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
+            ],
             "translations": []
         },
         {
@@ -50,7 +71,12 @@
             "sortOrder": 2,
             "optionSet": {"id": "v6QYyj8ihWn"},
             "attributeValues": [
-
+                {
+                    "value": "0",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
             ],
             "translations": []
         },
@@ -68,6 +94,14 @@
             "id": "BP3p9vx47VX",
             "sortOrder": 3,
             "optionSet": {"id": "DfyWt0mZIhj"},
+            "attributeValues": [
+                {
+                    "value": "0",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
+            ],
             "translations": []
         },
         {
@@ -85,7 +119,12 @@
             "sortOrder": 3,
             "optionSet": {"id": "z4FEFQRtjhM"},
             "attributeValues": [
-
+                {
+                    "value": "0",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
             ],
             "translations": []
         },
@@ -104,7 +143,12 @@
             "sortOrder": 4,
             "optionSet": {"id": "z4FEFQRtjhM"},
             "attributeValues": [
-
+                {
+                    "value": "1",
+                    "attribute": {
+                        "id": "DVzuBdj9kli"
+                    }
+                }
             ],
             "translations": []
         },
