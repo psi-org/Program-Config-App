@@ -40,7 +40,7 @@ const getLegendSetId = (legendSetName,legendSets)=>{
 };
 
 //Question
-const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
+const mapImportedDE = (data, programPrefix, type, optionSets, legendSets, dataElementsPool) => {
     let code = "";
 
     let aggType;
@@ -70,6 +70,8 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
     const FIXED_VALUES = 5;
     const formNameMaxLength = 230 - code.length - FIXED_VALUES;
 
+    let existingDe = dataElementsPool[data[importMap.dataElementId]]
+
     const parsedDE = {
         id: data[importMap.dataElementId] || undefined,
         name: code + '_' + data[importMap.formName]?.slice(0,formNameMaxLength),
@@ -82,8 +84,11 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
         domainType: 'TRACKER',
         valueType: data[importMap.valueType],
         aggregationType: aggType,
-        attributeValues: [],
-        parentName: data[importMap.parentName]?.result
+        parentName: data[importMap.parentName]?.result,
+        sharing: existingDe?.sharing,
+        attributeValues: (existingDe?.attributeValues.filter(att =>
+            ![FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA].includes(att.attribute.id)
+        ) || [])
     };
 
     if(data[importMap.optionSet] && data[importMap.optionSet] !== ""){
@@ -141,11 +146,15 @@ const mapImportedDE = (data,programPrefix,type,optionSets,legendSets) => {
     return parsedDE;
 };
 
-const readTemplateData = (templateData, currentData, programPrefix='Prefix', optionSets, legendSets) => {
+const readTemplateData = (templateData, currentData, programPrefix='Prefix', optionSets, legendSets, currentSectionsData) => {
 
     let sectionIndex = -1;
     let importedSections = [];
     let importedScores = [];
+    let dataElementsPool = currentSectionsData.map(section => section.dataElements).flat().reduce((acu, cur) => {
+        acu[cur.id] = { sharing: cur.sharing, attributeValues: cur.attributeValues };
+        return acu;
+    }, {})
 
     let importSummaryValues = {
         questions:{new:0,updated:0,removed:0},
@@ -170,10 +179,10 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
                 break;
             case 'question':
             case 'label':
-                importedSections[sectionIndex].dataElements.push(mapImportedDE(row,programPrefix,row.Structure,optionSets,legendSets));
+                importedSections[sectionIndex].dataElements.push(mapImportedDE(row, programPrefix, row.Structure, optionSets, legendSets, dataElementsPool));
                 break;
             case 'score':
-                importedScores.push(mapImportedDE(row,programPrefix,'score',optionSets,legendSets));
+                importedScores.push(mapImportedDE(row, programPrefix, 'score', optionSets, legendSets, dataElementsPool));
                 //importedScores.push(row);
                 break;
         }

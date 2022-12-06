@@ -1,45 +1,6 @@
-This project was bootstrapped with [DHIS2 Application Platform](https://github.com/dhis2/app-platform).
+# PROGRAM CONFIGURATION APP
 
-## Available Scripts
+This app can be used by anyone who wants to configure Tracker programs easily, providing many configuration tools in one place. The workflow has been redesigned to make it easier for users to set up programs from scratch without worrying about missing program components (such as Data Elements, Option Sets, etc.). Also, the app supports the creation of HNQIS 2.0 programs, providing several tools for the countries to develop Assessment checklists. The app interacts directly with the DHIS2 API, ensuring the integrity of the data that is consumed/provided by the users. A vast amount of validations has been implemented to avoid conflicts with the DHIS2 core and the app constantly syncs with the available metadata in the server. It mainly requires a constant connection to the internet and can be installed in any DHIS2 server with version 2.36 or later.
 
-In the project directory, you can run:
 
-### `yarn start`
-
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner and runs all available tests found in `/src`.<br />
-
-See the section about [running tests](https://platform.dhis2.nu/#/scripts/test) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-A deployable `.zip` file can be found in `build/bundle`!
-
-See the section about [building](https://platform.dhis2.nu/#/scripts/build) for more information.
-
-### `yarn deploy`
-
-Deploys the built app in the `build` folder to a running DHIS2 instance.<br />
-This command will prompt you to enter a server URL as well as the username and password of a DHIS2 user with the App Management authority.<br/>
-You must run `yarn build` before running `yarn deploy`.<br />
-
-See the section about [deploying](https://platform.dhis2.nu/#/scripts/deploy) for more information.
-
-## Learn More
-
-You can learn more about the platform in the [DHIS2 Application Platform Documentation](https://platform.dhis2.nu/).
-
-You can learn more about the runtime in the [DHIS2 Application Runtime Documentation](https://runtime.dhis2.nu/).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+*[Current Version: v1.4.0 (pre-release)](https://github.com/psi-org/hnqis2/releases/tag/v1.4.0-alpha)*
