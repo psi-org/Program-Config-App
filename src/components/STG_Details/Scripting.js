@@ -913,7 +913,7 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
         result.id = uidPool.shift()
         indicatorIDs.push(result.id)
         result.name = programShortName + " - " + nameComp + " - " + value.name
-        result.shortName = programShortName.slice(0, 50-(value.name.length + 3)) + " - " + value.name
+        result.shortName = nameComp + ' - ' + value.name + ' [' + programId + ']'
         result.program.id = programId
         result.sharing = sharingSettings
         result.analyticsPeriodBoundaries[0].sharing = sharingSettings
@@ -922,41 +922,30 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
         return result
     })
 
-    // Global  Analytics - Number of Assesments
-    const indicatorNoA = [
-        { name: 'Number of Assessments' }
-    ];
+    // Global  Analytics - Number of Assesments & Global Score
 
-    programIndicators = programIndicators.concat(indicatorNoA.map(value => {
-        let AnalyticNoA = DeepCopy(ProgramIndicatorTemplateNoA)
-        AnalyticNoA.id = uidPool.shift()
-        indicatorIDs.push(AnalyticNoA.id)
-        AnalyticNoA.name = programShortName + " - " + value.name
-        AnalyticNoA.shortName = programShortName.slice(0, 50 - (value.name.length + 3)) + " - " + value.name
-        AnalyticNoA.program.id = programId
-        AnalyticNoA.sharing = sharingSettings
-        AnalyticNoA.analyticsPeriodBoundaries[0].sharing = sharingSettings
-        AnalyticNoA.analyticsPeriodBoundaries[1].sharing = sharingSettings
-        return AnalyticNoA
-    }))
+    let AnalyticNoA = DeepCopy(ProgramIndicatorTemplateNoA)
+    AnalyticNoA.id = uidPool.shift()
+    indicatorIDs.push(AnalyticNoA.id)
+    AnalyticNoA.name = programShortName + ' - Number of Assessments'
+    AnalyticNoA.shortName = 'Number of Assessments [' + programId + ']'
+    AnalyticNoA.program.id = programId
+    AnalyticNoA.sharing = sharingSettings
+    AnalyticNoA.analyticsPeriodBoundaries[0].sharing = sharingSettings
+    AnalyticNoA.analyticsPeriodBoundaries[1].sharing = sharingSettings
 
-    // Global  Analytics - Global Score
-    const indicatorGS = [
-        { name: 'Global Score' }
-    ];
 
-    programIndicators = programIndicators.concat(indicatorGS.map(value => {
-        let AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
-        AnalyticGS.id = uidPool.shift()
-        indicatorIDs.push(AnalyticGS.id)
-        AnalyticGS.name = programShortName + " - " + value.name
-        AnalyticGS.shortName = programShortName.slice(0, 50 - (value.name.length + 3)) + " - " + value.name
-        AnalyticGS.program.id = programId
-        AnalyticGS.sharing = sharingSettings
-        AnalyticGS.analyticsPeriodBoundaries[0].sharing = sharingSettings
-        AnalyticGS.analyticsPeriodBoundaries[1].sharing = sharingSettings
-        return AnalyticGS
-    }))
+    let AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
+    AnalyticGS.id = uidPool.shift()
+    indicatorIDs.push(AnalyticGS.id)
+    AnalyticGS.name = programShortName + ' - Global Score'
+    AnalyticGS.shortName = 'Global Score [' + programId + ']'
+    AnalyticGS.program.id = programId
+    AnalyticGS.sharing = sharingSettings
+    AnalyticGS.analyticsPeriodBoundaries[0].sharing = sharingSettings
+    AnalyticGS.analyticsPeriodBoundaries[1].sharing = sharingSettings
+
+    programIndicators = programIndicators.concat([AnalyticNoA, AnalyticGS])
 
     //Return
     return { programIndicators, indicatorIDs }
@@ -1181,15 +1170,3 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     //Return
     return { visualizations, maps, androidSettingsVisualizations, dashboards, eventReports }
 }
-
-
-
-/*module.exports = {
-    checkScores,
-    readQuestionComposites,
-    buildProgramRuleVariables,
-    buildProgramRules,
-    buildProgramIndicators,
-    buildH2BaseVisualizations
-};*/
-
