@@ -461,8 +461,6 @@ const SharingScreen = ({element, id, setSharingProgramId, type, setType, readOnl
                 element.sharing.users = {};
             }
             // END BUFIX for 2.36.13.2
-            console.log('-------------element-------------');
-            console.log(element);
             if (!exclusionDataElements.includes(element.id)) {
                 if (meta === "dataElements" && overwrite) //Overwrite all the permission for dataElements if checked
                 {
@@ -482,11 +480,7 @@ const SharingScreen = ({element, id, setSharingProgramId, type, setType, readOnl
                             } //Add user with permission if doesn't exist
                         }
                     })
-                    console.log('-------------payload-------------');
-                    console.log(payload);
                     payload.object.userGroupAccesses.forEach((userGroup) => {
-                        console.log('-------------usergroup-------------');
-                        console.log(userGroup);
                         if (element.sharing.userGroups.hasOwnProperty(userGroup.id) && overwrite) {
                             element.sharing.userGroups[userGroup.id].access = (meta === 'dataElements' || meta === 'programIndicators') ? dePermission(userGroup.access) : userGroup.access;
                         } else {
