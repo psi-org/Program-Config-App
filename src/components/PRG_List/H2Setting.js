@@ -140,6 +140,8 @@ const H2Setting = forwardRef((props, ref) => {
                         setOrgUnitPathSelected([data.result.path])
                         setOULevels(ouLevels);
                     }
+                }).catch(err => {
+                    console.log(err);
                 });
             }
             else {
