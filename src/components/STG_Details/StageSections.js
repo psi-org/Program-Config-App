@@ -624,6 +624,18 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         let pcaMetadata = JSON.parse(programConfig?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}")
         let sharingSettings = programConfig?.sharing
         sharingSettings.public = extractMetadataPermissions(sharingSettings.public)
+
+        //Sharing Settings fix for 2.36
+        //------------
+        if (!sharingSettings.users) {
+            sharingSettings.users = {}
+        }
+
+        if (!sharingSettings.userGroups) {
+            sharingSettings.userGroups = {}
+        }
+        //------------
+
         Object.keys(sharingSettings.users).forEach(key => {
             let access = sharingSettings.users[key]
             access.access = extractMetadataPermissions(access.access)
