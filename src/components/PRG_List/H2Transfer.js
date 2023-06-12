@@ -737,7 +737,7 @@ const H2Transfer = ({
                                 submission();
                             }}
                             variant="outlined"
-                            disabled={!programData?.results}
+                            disabled={!programData?.results || requestsData?.length == 0}
                             startIcon={<MoveDownIcon />}
                         >
                             Begin Data Transfer

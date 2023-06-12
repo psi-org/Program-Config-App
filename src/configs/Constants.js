@@ -10,12 +10,12 @@ import NumberIcon from '@mui/icons-material/Numbers';
 import DateIcon from '@mui/icons-material/CalendarToday';
 import TimeIcon from '@mui/icons-material/AccessTime';
 
-const BUILD_VERSION = "1.6.2"
-const BUILD_DATE = "December 5th, 2022"
+const BUILD_VERSION = "1.6.3"
+const BUILD_DATE = "March 3rd, 2023"
 const MIN_VERSION = "2.36"
-const MAX_VERSION = "2.38.1.1"
+const MAX_VERSION = "2.38.5"
 
-const PCA_METADATA_VERSION = "1.1.0"
+const PCA_METADATA_VERSION = "1.1.1"
 const H2_METADATA_VERSION = "1.1.2"
 
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI","haUflNqP85K"]
