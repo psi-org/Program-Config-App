@@ -9,7 +9,7 @@ import TextIcon from '@mui/icons-material/TextFields';
 import NumberIcon from '@mui/icons-material/Numbers';
 import DateIcon from '@mui/icons-material/CalendarToday';
 import TimeIcon from '@mui/icons-material/AccessTime';
-import { PlaylistAddCheck } from '@mui/icons-material';
+import { ArrowDownward, ArrowUpward, PlaylistAddCheck, StackedLineChart } from '@mui/icons-material';
 
 const BUILD_VERSION = "1.7.0"
 const BUILD_DATE = "June, 2023"
@@ -202,7 +202,7 @@ const AGG_TYPES = [
     { value: 'NONE', label: 'None', icon: <BlockIcon /> },
     { value: 'SUM', label: 'Sum', icon: <FunctionsIcon /> },
     { value: 'AVERAGE', label: 'Average', icon: <TimelineIcon /> },
-    { value: 'AVERAGE_SUM_ORG_UNIT', label: 'Average/Sum in org unit hierarchy', icon: <TimelineIcon /> },
+    { value: 'AVERAGE_SUM_ORG_UNIT', label: 'Average (Sum in Org Unit Hierarchy)', icon: <TimelineIcon /> },
     { value: 'COUNT', label: 'Count', icon: <NumberIcon /> },
     { value: 'STDDEV', label: 'Standard deviation', icon: <SsidChartIcon /> },
     { value: 'VARIANCE', label: 'Variance', icon: <SsidChartIcon /> },
@@ -210,7 +210,18 @@ const AGG_TYPES = [
     { value: 'MAX', label: 'Max', icon: <AddIcon /> }
 ]
 
-const AGG_TYPES_H2_PI = [{ label: 'Average', value: 'AVERAGE', icon: <TimelineIcon /> }, { label: 'Last', value: 'LAST', icon: <PlaylistAddCheck /> }];
+const AGG_TYPES_H2_PI = [
+    { label: 'Average', value: 'AVERAGE', icon: <TimelineIcon /> },
+    { label: 'Average (Sum in Org Unit Hierarchy)', value: 'AVERAGE_SUM_ORG_UNIT', icon: <TimelineIcon /> },
+    { label: 'Last (Sum in Org Unit Hierarchy)', value: 'LAST', icon: <PlaylistAddCheck /> },
+    { label: 'Last (Average in Org Unit Hierarchy)', value: 'LAST_AVERAGE_ORG_UNIT', icon: <PlaylistAddCheck /> },
+    { label: 'Last value in period (Sum in Org Unit Hierarchy)', value: 'LAST_IN_PERIOD', icon: <PlaylistAddCheck /> },
+    { label: 'Last value in period (Average in Org Unit Hierarchy)', value: 'LAST_IN_PERIOD_AVERAGE_ORG_UNIT', icon: <PlaylistAddCheck /> },
+    { label: 'Standard Deviation', value: 'STDDEV', icon: <StackedLineChart /> },
+    { label: 'Variance', value: 'VARIANCE', icon: <StackedLineChart /> },
+    { label: 'Min', value: 'MIN', icon: <ArrowDownward /> },
+    { label: 'Max', value: 'MAX', icon: <ArrowUpward /> },
+];
 
 export {
     ACTION_PLAN_ACTION,

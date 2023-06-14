@@ -3,7 +3,6 @@ import Messages from "./Messages";
 
 
 const ValidationMessages = (props) => {
-    console.log(props.dataElements)
     return  <Modal>
                 <ModalTitle>Validation Messages</ModalTitle>
                 <ModalContent>

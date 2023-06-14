@@ -314,7 +314,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             res.results?.programs[0]?.attributeValues.forEach(av => {
                 if (av.attribute.id === METADATA) {
                     setProgramMetadata(JSON.parse(av.value || "{}"))
-                    console.warn(JSON.parse(av.value || "{}"))
                 }
             })
         })
