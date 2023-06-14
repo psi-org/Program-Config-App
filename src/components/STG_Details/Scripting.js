@@ -892,7 +892,7 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
     return { programRules, programRuleActions }
 }
 
-export const buildProgramIndicators = (programId, programShortName, uidPool, useCompetency, sharingSettings) => {
+export const buildProgramIndicators = (programId, programShortName, uidPool, useCompetency, sharingSettings, PIAggregationType) => {
 
     // This sectin is for the local analytics
     const indicatorValues = useCompetency === "Yes" ? [
@@ -944,6 +944,7 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
     AnalyticGS.sharing = sharingSettings
     AnalyticGS.analyticsPeriodBoundaries[0].sharing = sharingSettings
     AnalyticGS.analyticsPeriodBoundaries[1].sharing = sharingSettings
+    AnalyticGS.aggregationType = (PIAggregationType && PIAggregationType !== 'AVERAGE') ? PIAggregationType : 'AVERAGE'
 
     programIndicators = programIndicators.concat([AnalyticNoA, AnalyticGS])
 

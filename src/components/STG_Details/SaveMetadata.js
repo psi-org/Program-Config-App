@@ -1,6 +1,6 @@
 import { CircularLoader, NoticeBox, Tag } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -66,6 +66,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
     const [errorStatus, setErrorStatus] = useState(false);
     const [successStatus, setSuccessStatus] = useState(false);
     const [typeReports, setTypeReports] = useState({});
+    const [programPayload, setProgramPayload] = useState();
 
     // Create Mutation
     let metadataDM = useDataMutation(metadataMutation, {
@@ -82,8 +83,8 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
     };
 
     // Get Program payload
-    const programQuery = useDataQuery(queryProgram, { variables: { id: programStage.program.id } });
-    let programPayload = programQuery.data?.results;
+    const { data: programQuery, refetch: getProgramPayload } = useDataQuery(queryProgram, { variables: { id: programStage.program.id } });
+    //let programPayload = programQuery.data?.results;
 
     // Get Ids for new Data Elements
     const idsQuery = useDataQuery(queryId, { variables: { n: newDEQty + 5 } });
@@ -95,6 +96,13 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
         setCompleted(true);
         setErrorReports(parseErrors(response))
     };
+
+    useEffect(() => {
+        getProgramPayload({ id: programStage.program.id }).then(payload => {
+            setProgramPayload(payload?.results)
+        })
+    }, [])
+    
 
     if (uidPool && programPayload && !completed && !metadataRequest.called /* && !programRequest.called */) {
 
@@ -298,7 +306,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
          */
         // ATTRIBUTE VALUES
         let programMetadataIdx = programPayload.attributeValues.findIndex(att => att.attribute.id === METADATA);
-        let new_programMetadata = JSON.parse(programPayload.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
+        let new_programMetadata = JSON.parse(programPayload.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
         new_programMetadata.dePrefix = programMetadata.dePrefix;
         if(hnqisMode){
             new_programMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
