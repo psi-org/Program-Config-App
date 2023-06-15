@@ -114,3 +114,33 @@ export function formatAlert(text) {
 export function extractMetadataPermissions(permissions){
     return permissions.slice(0, 2) + '------';
 }
+
+export function getUniqueKeys(arrayOfObjects) {
+    const uniqueKeys = new Set();
+
+    for (const obj of arrayOfObjects) {
+        const keys = Object.keys(obj);
+        keys.forEach(key => uniqueKeys.add(key));
+    }
+
+    return Array.from(uniqueKeys).sort();
+}
+
+/*Returns an object with:
+    * key = value -> Last value
+    * value = object -> Object with more objects
+    * value = array -> Object with array of objects (the array is a list of all the unique keys)
+*/
+export function getJSONKeyTree(obj) {
+    let res = {}
+    for (const key in obj) {
+        if (!!obj[key] && obj[key].constructor !== Array && obj[key].constructor === Object) {
+            res[key] = getJSONKeyTree(obj[key])
+        } else if (Array.isArray(obj[key])) {
+            res[key] = getUniqueKeys(obj[key])
+        } else {
+            res[key] = [key]
+        }
+    }
+    return res
+}

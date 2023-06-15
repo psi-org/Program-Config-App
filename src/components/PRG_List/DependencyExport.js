@@ -8,11 +8,15 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-
+import Tabs, { tabsClasses } from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
 
 // *** Routing ***
 import { useState } from "react";
-import { truncateString } from "../../configs/Utils";
+import { getJSONKeyTree, truncateString } from "../../configs/Utils";
+import { DHIS2_KEY_MAP } from "../../configs/Constants";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 
@@ -44,6 +48,13 @@ const DependencyExport = ({ program, setExportProgramId }) => {
     const [documentReady, setDocumentReady] = useState(false)
     const [downloading, setDownloading] = useState(false)
     const [cleanMetadata, setCleanMetadata] = useState(undefined)
+    const [tabValue, setTabValue] = useState(0)
+    const [jsonKeyTree, setJsonKeyTree] = useState()
+    const [jsonHeaders, setJsonHeaders] = useState([])
+
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+    };
 
     const hideForm = () => {
         setDocumentReady(false)
@@ -51,152 +62,27 @@ const DependencyExport = ({ program, setExportProgramId }) => {
     }
 
     if (programMetadata && !documentReady) {
-        delete programMetadata.date;
-        delete programMetadata.categories;
-        delete programMetadata.categoryCombos;
-        delete programMetadata.categoryOptions;
-        delete programMetadata.categoryOptionCombos;
-
-        programMetadata.programs?.forEach(program => {
-
-            program.organisationUnits = []
-
-            delete program.created;
-            delete program.createdBy;
-            delete program.lastUpdated;
-            delete program.lastUpdatedBy;
-            delete program.categoryCombo;
-
-            program.programTrackedEntityAttributes?.forEach(tea => {
-                delete tea.created;
-                delete tea.createdBy;
-                delete tea.lastUpdated;
-                delete tea.access;
-            });
-
-        });
-
-        programMetadata.programRuleVariables?.forEach(prv => {
-            delete prv.created;
-            delete prv.lastUpdated;
-            delete prv.lastUpdatedBy;
-        });
-
-        programMetadata.programStageSections?.forEach(stageSection => {
-            delete stageSection.created;
-            delete stageSection.lastUpdated;
-            delete stageSection.lastUpdatedBy;
-        });
-
-        programMetadata.programStages?.forEach(stage => {
-
-            delete stage.created;
-            delete stage.createdBy;
-            delete stage.lastUpdated;
-            delete stage.lastUpdatedBy;
-
-            stage.programStageDataElements?.forEach(psde => {
-                delete psde.created;
-                delete psde.lastUpdated;
-                delete psde.access;
-            });
-
-        });
-
-        programMetadata.options?.forEach(option => {
-            delete option.created;
-            delete option.lastUpdated;
-        });
-
-        programMetadata.attributes?.forEach(att => {
-            delete att.created;
-            delete att.createdBy;
-            delete att.lastUpdated;
-            delete att.lastUpdatedBy;
-        });
-
-        programMetadata.programTrackedEntityAttributes?.forEach(ptea => {
-            delete ptea.created;
-            delete ptea.lastUpdated;
-        });
-
         let programRuleActionsDict = {}
-
         programMetadata.programRules?.forEach(pr => {
-            delete pr.created;
-            delete pr.lastUpdated;
-            delete pr.lastUpdatedBy;
             pr.programRuleActions.forEach(pra => {
                 programRuleActionsDict[pra.id] = pr.id
             })
         });
-
-        programMetadata.dataElements?.forEach(de => {
-            delete de.created;
-            delete de.createdBy;
-            delete de.lastUpdated;
-            delete de.lastUpdatedBy;
-            delete de.categoryCombo;
-        });
-
-        programMetadata.trackedEntityTypes?.forEach(tet => {
-
-            delete tet.created;
-            delete tet.createdBy;
-            delete tet.lastUpdated;
-            delete tet.lastUpdatedBy;
-
-            tet.trackedEntityTypeAttributes?.forEach(tea => {
-                delete tea.created;
-                delete tea.createdBy;
-                delete tea.lastUpdated;
-                delete tea.access;
-            });
-
-        });
-
-        programMetadata.trackedEntityAttributes?.forEach(tea => {
-            delete tea.created;
-            delete tea.createdBy;
-            delete tea.lastUpdated;
-            delete tea.lastUpdatedBy;
-        });
-
-        programMetadata.programStageDataElements?.forEach(psde => {
-            delete psde.created;
-            delete psde.lastUpdated;
-        });
-
         programMetadata.programRuleActions?.forEach(pra => {
-            delete pra.created;
-            delete pra.lastUpdated;
-            delete pra.lastUpdatedBy;
             pra.programRule = {
                 id: programRuleActionsDict[pra.id]
             }
         });
-
-        programMetadata.optionSets?.forEach(optionSet => {
-            delete optionSet.created;
-            delete optionSet.createdBy;
-            delete optionSet.lastUpdated;
-            delete optionSet.lastUpdatedBy;
-        });
-
-        programMetadata.programIndicators?.forEach(pInd => {
-            delete pInd.created;
-            delete pInd.createdBy;
-            delete pInd.lastUpdated;
-            delete pInd.lastUpdatedBy;
-        });
-
-        setCleanMetadata(programMetadata)
-        if (!documentReady) setDocumentReady(true);
+        let keyTree = getJSONKeyTree(programMetadata)
+        console.log(keyTree)
+        setJsonKeyTree(keyTree)
+        setJsonHeaders(Object.keys(keyTree))
+        setDocumentReady(true);
     }
 
     const downloadFile = () => {
         //https://theroadtoenterprise.com/blog/how-to-download-csv-and-json-files-in-react
-        let metadata = cleanMetadata;
+        let metadata = programMetadata;
 
         let legendSets = []
 
@@ -288,7 +174,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     return (
         <>
-            <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
+            <CustomMUIDialog open={true} maxWidth='lg' fullWidth={true} >
                 <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
                     Download Metadata With Dependencies
                 </CustomMUIDialogTitle >
@@ -305,21 +191,45 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                         </div>
                     }
 
-                    {documentReady && cleanMetadata && legends && !exportError &&
-                        <div style={{ lineHeight: '1.5em' }}>
-                            <p><strong>Your file is ready!</strong></p>
-                            <p>You can now download the metadata related to the program by clicking "Download Now".</p>
-                            <p><br /><strong>Program:</strong> <em>{truncateString(programMetadata.programs[0].name)}</em></p>
-                            <hr style={{ margin: '8px 0' }} />
-                            <p>Please consider that all of the metadata is downloaded without any sharing settings. Remember to assign sharings once you import the metadata and assign Org Units to the program.</p>
+                    {documentReady && programMetadata && legends && !exportError && getJSONKeyTree &&
+                        <Box sx={{ width: '100%' }}>
+                            <div style={{ lineHeight: '1.5em' }}>
+                                <p><strong>Your file is ready!</strong></p>
+                                <p>You can now download the metadata related to the program by clicking "Download Now".</p>
+                                <p><br /><strong>Program:</strong> <em>{programMetadata.programs[0].name}</em></p>
+                                <p><br />Before downloading you can customize the JSON Metadata file by changing the settings below.</p>
+                                <hr style={{ margin: '8px 0' }} />
+                            </div>
+
+                            <Tabs
+                                value={tabValue}
+                                onChange={handleTabChange}
+                                variant="scrollable"
+                                scrollButtons
+                                allowScrollButtonsMobile
+                                sx={{
+                                    [`& .${tabsClasses.scrollButtons}`]: {
+                                        '&.Mui-disabled': { opacity: 0.3 },
+                                    }
+                                }}
+                                style={{ marginBottom: '1em', marginTop: '1em' }}
+                                
+                            >
+                                {jsonHeaders.map(key => <Tab label={DHIS2_KEY_MAP[key]} value={key}/>)}
+                            </Tabs>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))'}}>
+                                {tabValue !== 0 && jsonKeyTree[tabValue].map(elem => <FormControlLabel control={<Checkbox defaultChecked />} label={elem} />)}
+                            </div>
+
                             <p style={{ color: '#2c6693' }}><br /><strong>NOTE: </strong>Keep in mind that any <em>Option Groups</em> or <em>Option Group Sets</em> related to the program are <strong>NOT</strong> included in the downloaded file.</p>
-                        </div>
+                        </Box>
                     }
                 </DialogContent>
 
                 <DialogActions style={{ padding: '1em' }}>
                     <Button onClick={() => hideForm()} color="error" > Close </Button>
-                    {documentReady && cleanMetadata && legends &&
+                    {documentReady && programMetadata && legends &&
                         <Button onClick={() => downloadFile()} variant='outlined' disabled={downloading} startIcon={<FileDownloadIcon />}> Download Now </Button>
                     }
                 </DialogActions>
