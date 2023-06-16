@@ -123,7 +123,7 @@ export function getUniqueKeys(arrayOfObjects) {
         keys.forEach(key => uniqueKeys.add(key));
     }
 
-    return Array.from(uniqueKeys).sort();
+    return Array.from(uniqueKeys).sort().map(key => ({key, selected: true}));
 }
 
 /*Returns an object with:
@@ -131,16 +131,52 @@ export function getUniqueKeys(arrayOfObjects) {
     * value = object -> Object with more objects
     * value = array -> Object with array of objects (the array is a list of all the unique keys)
 */
-export function getJSONKeyTree(obj) {
+export function getJSONKeyTree(obj, level=1, index=0) {
     let res = {}
     for (const key in obj) {
-        if (!!obj[key] && obj[key].constructor !== Array && obj[key].constructor === Object) {
-            res[key] = getJSONKeyTree(obj[key])
+        if (!!obj[key] && obj[key].constructor !== Array && obj[key].constructor === Object && index<level) {
+            res[key] = getJSONKeyTree(obj[key],level,index+1)
         } else if (Array.isArray(obj[key])) {
             res[key] = getUniqueKeys(obj[key])
         } else {
-            res[key] = [key]
+            res[key] = [{ key, selected:true }]
         }
     }
     return res
+}
+
+export function changeAttributeValue(obj, attribute, newValue) {
+    if (Array.isArray(obj)) {
+        for (let i = 0; i < obj.length; i++) {
+            changeAttributeValue(obj[i], attribute, newValue);
+        }
+    } else if (typeof obj === 'object') {
+        for (let key in obj) {
+            if (key === attribute) {
+                obj[key] = newValue;
+            } else {
+                changeAttributeValue(obj[key], attribute, newValue);
+            }
+        }
+    }
+}
+
+export function removeKey(obj, key) {
+    if (typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        obj.forEach((item) => removeKey(item, key));
+    } else {
+        Object.keys(obj).forEach((k) => {
+            if (k === key) {
+                delete obj[k];
+            } else {
+                removeKey(obj[k], key);
+            }
+        });
+    }
+
+    return obj;
 }

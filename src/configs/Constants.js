@@ -327,6 +327,76 @@ const DHIS2_KEY_MAP = {
     "visualizations": "Visualization",
 }
 
+const PROGRAM_TYPE_OPTIONS = [
+    {
+        "code": "HNQIS",
+        "name": "HNQIS",
+        "id": "Ip3IqzzqgLN",
+        "sortOrder": 1,
+        "optionSet": { "id": "TOcCuCN2CLm" },
+        "translations": []
+    },
+    {
+        "code": "HNQIS2",
+        "name": "HNQIS 2.0",
+        "id": "Jz4YKD15lnK",
+        "sortOrder": 2,
+        "optionSet": { "id": "TOcCuCN2CLm" },
+        "translations": []
+    },
+    {
+        "code": "RDQA",
+        "name": "RDQA",
+        "id": "QR0HHcQri91",
+        "sortOrder": 3,
+        "optionSet": { "id": "TOcCuCN2CLm" },
+        "translations": []
+    },
+    {
+        "code": "EDS",
+        "name": "EDS",
+        "id": "v9XPATv6G3N",
+        "sortOrder": 4,
+        "optionSet": { "id": "TOcCuCN2CLm" },
+        "translations": []
+    }
+];
+
+const PROGRAM_TYPE_OPTION_SET = {
+    "name": "DB - Program Type",
+    "id": "TOcCuCN2CLm",
+    "version": 7,
+    "valueType": "TEXT",
+    "attributeValues": [],
+    "translations": [],
+    "options": [
+        { "id": "Ip3IqzzqgLN" },
+        { "id": "Jz4YKD15lnK" },
+        { "id": "QR0HHcQri91" },
+        { "id": "v9XPATv6G3N" }
+    ]
+};
+
+const DHIS2_PRIMARY_COLOR = "#2c6693";
+
+const EXPORT_PRESETS = [
+    { value: 'local', label: 'Local Import'},
+    { value: 'external', label: 'External Import' },
+    { value: 'h2External', label: 'HNQIS2 to HNQIS2-Enabled Server'}
+]
+
+const EXTERNAL_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions'];
+
+const H2_ATTRIBUTES_TO_KEEP = ['haUflNqP85K', 'LP171jpctBm', 'yB5tFAAN7bI', 'DVzuBdj9kli', 'yhKEe6BLEer'];
+
+const JSON_ATTRIBUTE_SETTINGS = [
+    { key: 'sharings', label: 'Remove Sharing Settings', selected: false, affects: ['sharing'] },
+    { key: 'ous', label: 'Remove Organisation Units', selected: false, affects: ['organisationUnits'] },
+    { key: 'redates', label: 'Remove all "Date", "Last Updated" and "Created" fields', selected: false, affects: ['date', 'lastUpdated', 'created'] },
+    { key: 'reuser', label: 'Remove all "Created By" and "Last Updated By" fields', selected: false, affects: ['createdBy', 'lastUpdatedBy'] },
+    { key: 'recats', label: 'Remove every field related to "Categories"', selected: false, affects: ['category', 'categoryCombo', 'categoryOptionCombo', 'categoryOption', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions'] },
+]
+
 export {
     PERIOD_TYPES,
     FEATURE_TYPES,
@@ -406,5 +476,12 @@ export {
     LEGEND_YES_PARTIAL_NO,
     OPTION_SET_COMPETENCY,
     OPTION_SET_HEALTH_AREAS,
-    DHIS2_KEY_MAP
+    DHIS2_KEY_MAP,
+    PROGRAM_TYPE_OPTIONS,
+    PROGRAM_TYPE_OPTION_SET,
+    DHIS2_PRIMARY_COLOR,
+    EXPORT_PRESETS,
+    EXTERNAL_IMPORT_REMOVE_KEYS,
+    H2_ATTRIBUTES_TO_KEEP,
+    JSON_ATTRIBUTE_SETTINGS
 };
