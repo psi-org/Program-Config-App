@@ -46,11 +46,11 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     const prgExportQuery = useDataQuery(queryProgramMetadata);
     const exportError = prgExportQuery.error?.details;
-    const programMetadata = prgExportQuery.data?.results;
+    const prgMetadata = prgExportQuery.data?.results;
 
     const [documentReady, setDocumentReady] = useState(false)
     const [downloading, setDownloading] = useState(false)
-    const [cleanMetadata, setCleanMetadata] = useState(undefined)
+    const [programMetadata, setProgramMetadata] = useState(undefined)
     const [tabValue, setTabValue] = useState(0)
     const [jsonKeyTree, setJsonKeyTree] = useState()
     const [downloadOriginal, setDownloadOriginal] = useState(false)
@@ -68,19 +68,36 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         setExportProgramId(undefined)
     }
 
-    if (programMetadata && !documentReady) {
+    if (prgMetadata && legends && !documentReady) {
         let programRuleActionsDict = {}
-        programMetadata.programRules?.forEach(pr => {
+        prgMetadata.programRules?.forEach(pr => {
             pr.programRuleActions.forEach(pra => {
                 programRuleActionsDict[pra.id] = pr.id
             })
         });
-        programMetadata.programRuleActions?.forEach(pra => {
+        prgMetadata.programRuleActions?.forEach(pra => {
             pra.programRule = {
                 id: programRuleActionsDict[pra.id]
             }
         });
-        let keyTree = getJSONKeyTree(programMetadata)
+
+        let legendSets = []
+
+        legends.forEach(legend => {
+            if (prgMetadata.dataElements?.find(de => de.legendSets?.find(l => l.id == legend.id))) {
+                legendSets.push(legend)
+            }
+        })
+
+        prgMetadata.legendSets = legendSets
+        prgMetadata.optionSets = prgMetadata.optionSets ?? []
+        prgMetadata.optionSets.push(PROGRAM_TYPE_OPTION_SET);
+
+        prgMetadata.options = prgMetadata.options ?? [];
+        prgMetadata.options = prgMetadata.options.concat(PROGRAM_TYPE_OPTIONS);
+        
+        setProgramMetadata(prgMetadata)
+        let keyTree = getJSONKeyTree(prgMetadata)
         let tabsList = Object.keys(keyTree).map(key => ({ key, selected: true }))
 
         setTabValue(tabsList[0].key)
@@ -101,21 +118,6 @@ const DependencyExport = ({ program, setExportProgramId }) => {
             if (setting.selected)
                 globalAttributesToRemove = globalAttributesToRemove.concat(setting.affects)
         })
-
-        let legendSets = []
-
-        legends.forEach(legend => {
-            if (metadata.dataElements?.find(de => de.legendSets?.find(l => l.id == legend.id))) {
-                legendSets.push(legend)
-            }
-        })
-
-        metadata.legendSets = legendSets
-        metadata.optionSets = metadata.optionSets ?? []
-        metadata.optionSets.push(PROGRAM_TYPE_OPTION_SET);
-
-        metadata.options = metadata.options ?? [];
-        metadata.options = metadata.options.concat(PROGRAM_TYPE_OPTIONS);
 
         let keep = []
         let remove = []
@@ -174,13 +176,11 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         //REMOVE GLOBAL ATTRIBUTES
         globalAttributesToRemove.forEach(key => removeKey(cleanMetadata, key))
 
-        console.error(programMetadata, cleanMetadata)
-
         setDownloading(true);
 
-        /*const blob = new Blob([JSON.stringify(metadata)], { type: 'text/json' });
+        const blob = new Blob([JSON.stringify(cleanMetadata)], { type: 'text/json' });
         const a = document.createElement('a');
-        a.download = (metadata.programs[0].name) + '.json';
+        a.download = (cleanMetadata.programs[0].name) + '.json';
         a.href = window.URL.createObjectURL(blob);
 
         const clickEvt = new MouseEvent('click', {
@@ -190,7 +190,23 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         });
 
         a.dispatchEvent(clickEvt);
-        a.remove();*/
+        a.remove();
+
+        if (downloadOriginal) {
+            const blob2 = new Blob([JSON.stringify(programMetadata)], { type: 'text/json' });
+            const a2 = document.createElement('a');
+            a2.download = (programMetadata.programs[0].name) + ' [RAW].json';
+            a2.href = window.URL.createObjectURL(blob2);
+
+            const clickEvt2 = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true,
+            });
+
+            a2.dispatchEvent(clickEvt2);
+            a2.remove();
+        }
 
         setDownloading(false);
         hideForm();
@@ -226,6 +242,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                 changeAttributeSettingsByKey('redates', false)
                 changeAttributeSettingsByKey('reuser', false)
                 changeAttributeSettingsByKey('recats', false)
+                changeAttributeSettingsByKey('relegends', false)
                 break
             case 'external':
                 changeAttributeSettingsByKey('sharings', true)
@@ -233,6 +250,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                 changeAttributeSettingsByKey('redates', true)
                 changeAttributeSettingsByKey('reuser', true)
                 changeAttributeSettingsByKey('recats', false)
+                changeAttributeSettingsByKey('relegends', false)
                 break
             case 'h2External':
                 changeAttributeSettingsByKey('sharings', true)
@@ -240,6 +258,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                 changeAttributeSettingsByKey('redates', true)
                 changeAttributeSettingsByKey('reuser', true)
                 changeAttributeSettingsByKey('recats', true)
+                changeAttributeSettingsByKey('relegends', true)
                 EXTERNAL_IMPORT_REMOVE_KEYS.forEach(key => {
                     changeSelectedHeader(key, false);
                 })
@@ -277,14 +296,14 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                         </div>
                     }
 
-                    {documentReady && programMetadata && legends && !exportError && jsonKeyTree && jsonHeaders &&
+                    {documentReady && prgMetadata && legends && !exportError && jsonKeyTree && jsonHeaders &&
                         <Box sx={{ width: '100%' }}>
                             <div style={{ lineHeight: '1.5em' }}>
                                 <p><strong>Your file is ready!</strong></p>
                                 <p>You can now download the metadata related to the program by clicking "Download Now".</p>
 
                                 <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <p><strong>Program:</strong> <em>{programMetadata.programs[0].name}</em></p>
+                                    <p><strong>Program:</strong> <em>{prgMetadata.programs[0].name}</em></p>
                                     <SelectOptions
                                         label={"Export Preset and Routines"}
                                         useError={false}
@@ -421,7 +440,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                     />
                         <div>
                         <Button onClick={() => hideForm()} color="error" > Close </Button>
-                        {documentReady && programMetadata && legends &&
+                        {documentReady && prgMetadata && legends &&
                             <Button onClick={() => downloadFile()} variant='outlined' disabled={downloading} startIcon={<FileDownloadIcon />}> Download Now {selectedPreset!=''?'with Selected Preset':''}</Button>
                         }
                     </div>

@@ -395,6 +395,7 @@ const JSON_ATTRIBUTE_SETTINGS = [
     { key: 'redates', label: 'Remove all "Date", "Last Updated" and "Created" fields', selected: false, affects: ['date', 'lastUpdated', 'created'] },
     { key: 'reuser', label: 'Remove all "Created By" and "Last Updated By" fields', selected: false, affects: ['createdBy', 'lastUpdatedBy'] },
     { key: 'recats', label: 'Remove every field related to "Categories"', selected: false, affects: ['category', 'categoryCombo', 'categoryOptionCombo', 'categoryOption', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions'] },
+    { key: 'relegends', label: 'Remove Legend Sets', selected: false, affects: ['legends', 'legendSets', 'legend', 'legendSet'] },
 ]
 
 export {
