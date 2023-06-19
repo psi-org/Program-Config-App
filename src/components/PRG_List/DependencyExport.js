@@ -236,6 +236,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         let preset = event.target.value
         changeSelected(true, jsonHeaders, setJsonHeaders)
         switch (preset) {
+            case '':
             case 'local':
                 changeAttributeSettingsByKey('sharings', false)
                 changeAttributeSettingsByKey('ous', false)
