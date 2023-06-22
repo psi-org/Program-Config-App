@@ -72,24 +72,21 @@ const mapImportedDE = (data, programPrefix, type, optionSets, legendSets, dataEl
 
     let existingDe = dataElementsPool[data[importMap.dataElementId]]
 
-    const parsedDE = {
-        id: data[importMap.dataElementId] || undefined,
-        name: code + '_' + data[importMap.formName]?.slice(0,formNameMaxLength),
-        shortName: (code + '_' + data[importMap.formName])?.slice(0,50),
-        code,
-        description: data[importMap.description],
-        formName: type=='label'?
-                    '     ':
-                    data[importMap.formName]?(data[importMap.formName] + (data[importMap.isCritical]=='Yes'?' [C]':'')):'',
-        domainType: 'TRACKER',
-        valueType: data[importMap.valueType],
-        aggregationType: aggType,
-        parentName: data[importMap.parentName]?.result,
-        sharing: existingDe?.sharing,
-        attributeValues: (existingDe?.attributeValues.filter(att =>
-            ![FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA].includes(att.attribute.id)
+    const parsedDE = JSON.parse(JSON.stringify(existingDe || {}))
+
+    parsedDE.id= data[importMap.dataElementId] || undefined,
+    parsedDE.name= code + '_' + data[importMap.formName]?.slice(0,formNameMaxLength),
+    parsedDE.shortName= (code + '_' + data[importMap.formName])?.slice(0,50),
+    parsedDE.code,
+    parsedDE.description= data[importMap.description],
+    parsedDE.formName= type=='label'?'     ':data[importMap.formName]?(data[importMap.formName] + (data[importMap.isCritical]=='Yes'?' [C]':'')):'',
+    parsedDE.domainType= 'TRACKER',
+    parsedDE.valueType= data[importMap.valueType],
+    parsedDE.aggregationType= aggType,
+    parsedDE.parentName= data[importMap.parentName]?.result,
+    parsedDE.attributeValues= (existingDe?.attributeValues.filter(att =>
+        ![FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA].includes(att.attribute.id)
         ) || [])
-    };
 
     if(data[importMap.optionSet] && data[importMap.optionSet] !== ""){
         parsedDE.optionSet = { id: getOptionSetId(data[importMap.optionSet],optionSets) };
@@ -152,7 +149,7 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
     let importedSections = [];
     let importedScores = [];
     let dataElementsPool = currentSectionsData.map(section => section.dataElements).flat().reduce((acu, cur) => {
-        acu[cur.id] = { sharing: cur.sharing, attributeValues: cur.attributeValues };
+        acu[cur.id] = { sharing: cur.sharing, attributeValues: cur.attributeValues, style: cur.style, categoryCombo: cur.categoryCombo };
         return acu;
     }, {})
 
