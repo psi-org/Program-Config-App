@@ -95,7 +95,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
         prgMetadata.options = prgMetadata.options ?? [];
         prgMetadata.options = prgMetadata.options.concat(PROGRAM_TYPE_OPTIONS);
-        
+
         setProgramMetadata(prgMetadata)
         let keyTree = getJSONKeyTree(prgMetadata)
         let tabsList = Object.keys(keyTree).map(key => ({ key, selected: true }))
@@ -141,7 +141,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         if (selectedPreset === 'h2External') {
             //DELETE HNQIS 1.6 ATTRIBUTES NOT NEEDED
             let attributes = cleanMetadata.attributes
-            
+
             //Because splice changes the array length, using forEach is not possible
             for (let i = attributes.length - 1; i >= 0; i--) {
                 if (!H2_ATTRIBUTES_TO_KEEP.includes(attributes[i].id)) {
@@ -152,7 +152,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
             //DELETE DE ATTRIBUTEVALUES ASSOCIATED WITH THE ONES REMOVED IN PREVIOUS STEP
 
             let de = cleanMetadata.dataElements;
-            de.forEach((element) => {
+            de?.forEach((element) => {
 
                 let attrValues = element.attributeValues;
 
@@ -167,20 +167,20 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         }
 
         //REMOVE SELECTED ATTRIBUTES ON EACH OBJECT
-        keep.forEach(objectKey =>
+        keep?.forEach(objectKey =>
             jsonKeyTree[objectKey].forEach(attributeKey => {
                 if (!attributeKey.selected) removeKey(cleanMetadata[objectKey], attributeKey.key)
             })
         )
 
         //REMOVE GLOBAL ATTRIBUTES
-        globalAttributesToRemove.forEach(key => removeKey(cleanMetadata, key))
+        globalAttributesToRemove?.forEach(key => removeKey(cleanMetadata, key))
 
         setDownloading(true);
 
         const blob = new Blob([JSON.stringify(cleanMetadata)], { type: 'text/json' });
         const a = document.createElement('a');
-        a.download = (cleanMetadata.programs[0].name) + '.json';
+        a.download = (programMetadata?.programs[0].name) + '.json';
         a.href = window.URL.createObjectURL(blob);
 
         const clickEvt = new MouseEvent('click', {
@@ -217,7 +217,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         setJsonKeyTree(DeepCopy(jsonKeyTree))
     }
 
-    const changeSelectedHeader = (key, value ) => {
+    const changeSelectedHeader = (key, value) => {
         for (let i = 0; i < jsonHeaders.length; i++) {
             if (jsonHeaders[i].key === key) {
                 jsonHeaders[i].selected = value
@@ -313,7 +313,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                                         value={selectedPreset}
                                         styles={{ width: '35%' }}
                                         defaultOption="No Preset"
-                                        helperText={['h2External'].includes(selectedPreset)?"This option performs special modifications to the file":""}
+                                        helperText={['h2External'].includes(selectedPreset) ? "This option performs special modifications to the file" : ""}
                                     />
                                 </div>
 
@@ -369,10 +369,10 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                                             control={
                                                 <Switch checked={elem.selected} onChange={() => changeAttributeSettings(index, !elem.selected)} name="" />
                                             }
-                                            label={ elem.label }
+                                            label={elem.label}
                                         />
-                                    )}
-                                    </FormGroup>   
+                                        )}
+                                    </FormGroup>
                                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1em' }}>
 
                                         <label><strong>NOTE: </strong>These settings are prioritized over what's selected below.</label>
@@ -381,7 +381,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                                 </AccordionDetails>
                             </Accordion>
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1em', alignItems:'center' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1em', alignItems: 'center' }}>
                                 <h4>JSON Attributes by Object</h4>
                                 <ButtonGroup variant="outlined">
                                     <Button onClick={() => changeSelected(true, jsonKeyTree, setJsonKeyTree)}>Select All</Button>
@@ -432,17 +432,19 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                     }
                 </DialogContent>
 
-                <DialogActions style={{ padding: '1em', display: 'flex', justifyContent:'space-between', alignItems: 'center' }}>
-                    <FormControlLabel
-                        control={<Checkbox checked={downloadOriginal}
-                            onChange={() => setDownloadOriginal(!downloadOriginal)}
-                        />}
-                        label="Download both Original and Modified files"
-                    />
-                        <div>
+                <DialogActions style={{ padding: '1em', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {documentReady && prgMetadata && legends &&
+                        <FormControlLabel
+                            control={<Checkbox checked={downloadOriginal}
+                                onChange={() => setDownloadOriginal(!downloadOriginal)}
+                            />}
+                            label="Download both Original and Modified files"
+                        />
+                    }
+                    <div>
                         <Button onClick={() => hideForm()} color="error" > Close </Button>
                         {documentReady && prgMetadata && legends &&
-                            <Button onClick={() => downloadFile()} variant='outlined' disabled={downloading} startIcon={<FileDownloadIcon />}> Download Now {selectedPreset!=''?'with Selected Preset':''}</Button>
+                            <Button onClick={() => downloadFile()} variant='outlined' disabled={downloading} startIcon={<FileDownloadIcon />}> Download Now {selectedPreset != '' ? 'with Selected Preset' : ''}</Button>
                         }
                     </div>
                 </DialogActions>
