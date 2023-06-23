@@ -114,7 +114,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         let cleanMetadata = {}
         let globalAttributesToRemove = []
 
-        attributeSettings.forEach(setting => {
+        attributeSettings?.forEach(setting => {
             if (setting.selected)
                 globalAttributesToRemove = globalAttributesToRemove.concat(setting.affects)
         })
@@ -122,7 +122,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         let keep = []
         let remove = []
 
-        jsonHeaders.forEach(header => {
+        jsonHeaders?.forEach(header => {
             if (header.selected) {
                 keep.push(header.key)
             } else {
@@ -131,7 +131,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         })
 
         //IGNORE PARENT KEYS NOT NEEDED
-        Object.keys(metadata).forEach((key) => {
+        Object.keys(metadata)?.forEach((key) => {
             if (!remove.includes(key)) {
                 cleanMetadata[key] = metadata[key];
             }
@@ -143,7 +143,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
             let attributes = cleanMetadata.attributes
 
             //Because splice changes the array length, using forEach is not possible
-            for (let i = attributes.length - 1; i >= 0; i--) {
+            for (let i = (attributes?.length || 0) - 1; i >= 0; i--) {
                 if (!H2_ATTRIBUTES_TO_KEEP.includes(attributes[i].id)) {
                     attributes.splice(attributes.findIndex(a => a.id === attributes[i].id), 1);
                 }
@@ -168,7 +168,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
         //REMOVE SELECTED ATTRIBUTES ON EACH OBJECT
         keep?.forEach(objectKey =>
-            jsonKeyTree[objectKey].forEach(attributeKey => {
+            jsonKeyTree[objectKey]?.forEach(attributeKey => {
                 if (!attributeKey.selected) removeKey(cleanMetadata[objectKey], attributeKey.key)
             })
         )
@@ -432,7 +432,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                     }
                 </DialogContent>
 
-                <DialogActions style={{ padding: '1em', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <DialogActions style={{ padding: '1em', display: 'flex', justifyContent: (documentReady && prgMetadata && legends)?'space-between':'end', alignItems: 'center' }}>
                     {documentReady && prgMetadata && legends &&
                         <FormControlLabel
                             control={<Checkbox checked={downloadOriginal}
@@ -442,9 +442,9 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                         />
                     }
                     <div>
-                        <Button onClick={() => hideForm()} color="error" > Close </Button>
+                        <Button onClick={() => hideForm()} color="error"> Close </Button>
                         {documentReady && prgMetadata && legends &&
-                            <Button onClick={() => downloadFile()} variant='outlined' disabled={downloading} startIcon={<FileDownloadIcon />}> Download Now {selectedPreset != '' ? 'with Selected Preset' : ''}</Button>
+                            <Button onClick={() => downloadFile()} variant='outlined' style={{ marginLeft: '1em' }} disabled={downloading} startIcon={<FileDownloadIcon />}> Download Now {selectedPreset != '' ? 'with Selected Preset' : ''}</Button>
                         }
                     </div>
                 </DialogActions>
