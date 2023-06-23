@@ -209,6 +209,195 @@ const AGG_TYPES = [
     { value: 'MAX', label: 'Max', icon: <AddIcon /> }
 ]
 
+const DHIS2_KEY_MAP = {
+    "accesses": "Access",
+    "analyticsPeriodBoundaries": "Analytics Period Boundary",
+    "analyticsTableHooks": "Analytics Table Hook",
+    "apiToken": "Api Token",
+    "attributes": "Attribute",
+    "attributeValues": "Attribute Value",
+    "categories": "Category",
+    "categoryCombos": "Category Combo",
+    "categoryDimensions": "Category Dimension",
+    "categoryOptionCombos": "Category Option Combo",
+    "categoryOptionGroups": "Category Option Group",
+    "categoryOptionGroupSetDimensions": "Category Option Group Set Dimension",
+    "categoryOptionGroupSets": "Category Option Group Set",
+    "categoryOptions": "Category Option",
+    "constants": "Constant",
+    "dashboardItems": "Dashboard Item",
+    "dashboards": "Dashboard",
+    "dataApprovalLevels": "Data Approval Level",
+    "dataApprovalWorkflows": "Data Approval Workflow",
+    "dataElementDimensions": "Tracked Entity Program Indicator Dimension",
+    "dataElementGroups": "Data Element Group",
+    "dataElementGroupSetDimensions": "Data Element Group Set Dimension",
+    "dataElementGroupSets": "Data Element Group Set",
+    "dataElementOperands": "Data Element Operand",
+    "dataElements": "Data Element",
+    "dataEntryForms": "Data Entry Form",
+    "dataInputPeriods": "Data Input Period",
+    "dataSetElements": "Data Set Element",
+    "dataSetNotificationTemplates": "Data Set Notification Template",
+    "dataSets": "Data Set",
+    "dataStores": "Datastore Entry",
+    "date": "Date",
+    "documents": "Document",
+    "eventCharts": "Event Chart",
+    "eventFilters": "Program Stage Instance Filter",
+    "eventReports": "Event Report",
+    "eventVisualizations": "Event Visualization",
+    "expressions": "Expression",
+    "externalFileResources": "External File Resource",
+    "externalMapLayers": "External Map Layer",
+    "fileResources": "File Resource",
+    "icons": "Icon",
+    "indicatorGroups": "Indicator Group",
+    "indicatorGroupSets": "Indicator Group Set",
+    "indicators": "Indicator",
+    "indicatorTypes": "Indicator Type",
+    "interpretationComments": "Interpretation Comment",
+    "interpretations": "Interpretation",
+    "jobConfigurations": "Job Configuration",
+    "legends": "Legend",
+    "legendSets": "Legend Set",
+    "maps": "Map",
+    "mapViews": "Map View",
+    "messageConversations": "Message Conversation",
+    "metadataVersions": "Metadata Version",
+    "minMaxDataElements": "Min Max Data Element",
+    "oAuth2Clients": "O Auth2 Client",
+    "objectStyles": "Object Style",
+    "optionGroups": "Option Group",
+    "optionGroupSets": "Option Group Set",
+    "options": "Option",
+    "optionSets": "Option Set",
+    "organisationUnitGroups": "Organisation Unit Group",
+    "organisationUnitGroupSetDimensions": "Organisation Unit Group Set Dimension",
+    "organisationUnitGroupSets": "Organisation Unit Group Set",
+    "organisationUnitLevels": "Organisation Unit Level",
+    "organisationUnits": "Organisation Unit",
+    "predictorGroups": "Predictor Group",
+    "predictors": "Predictor",
+    "programDataElements": "Program Data Element Dimension Item",
+    "programIndicatorGroups": "Program Indicator Group",
+    "programIndicators": "Program Indicator",
+    "programInstances": "Program Instance",
+    "programNotificationTemplates": "Program Notification Template",
+    "programRuleActions": "Program Rule Action",
+    "programRules": "Program Rule",
+    "programRuleVariables": "Program Rule Variable",
+    "programs": "Program",
+    "programSections": "Program Section",
+    "programStageDataElements": "Program Stage Data Element",
+    "programStageInstances": "Program Stage Instance",
+    "programStages": "Program Stage",
+    "programStageSections": "Program Stage Section",
+    "programTrackedEntityAttributeDimensionItems": "Program Tracked Entity Attribute Dimension Item",
+    "programTrackedEntityAttributeGroups": "Program Tracked Entity Attribute Group",
+    "programTrackedEntityAttributes": "Program Tracked Entity Attribute",
+    "proposals": "Metadata Proposal",
+    "pushAnalysis": "Push Analysis",
+    "relationshipConstraints": "Relationship Constraint",
+    "relationshipItems": "Relationship Item",
+    "relationships": "Relationship",
+    "relationshipTypes": "Relationship Type",
+    "reportingRates": "Reporting Rate",
+    "reports": "Report",
+    "sections": "Section",
+    "smsCommands": "S M S Command",
+    "sqlViews": "Sql View",
+    "trackedEntityAttributes": "Tracked Entity Attribute",
+    "trackedEntityAttributeValues": "Tracked Entity Attribute Value",
+    "trackedEntityDataElementDimensions": "Tracked Entity Data Element Dimension",
+    "trackedEntityInstanceFilters": "Tracked Entity Instance Filter",
+    "trackedEntityInstances": "Tracked Entity Instance",
+    "trackedEntityTypeAttributes": "Tracked Entity Type Attribute",
+    "trackedEntityTypes": "Tracked Entity Type",
+    "userAccesses": "User Access",
+    "userCredentials": "User Credentials Dto",
+    "userGroupAccesses": "User Group Access",
+    "userGroups": "User Group",
+    "userRoles": "User Role",
+    "users": "User",
+    "validationNotificationTemplates": "Validation Notification Template",
+    "validationResults": "Validation Result",
+    "validationRuleGroups": "Validation Rule Group",
+    "validationRules": "Validation Rule",
+    "visualizations": "Visualization",
+}
+
+const PROGRAM_TYPE_OPTIONS = [
+    {
+        "code": "HNQIS",
+        "name": "HNQIS",
+        "id": "Ip3IqzzqgLN",
+        "sortOrder": 1,
+        "optionSet": { "id": "TOcCuCN2CLm" },
+        "translations": []
+    },
+    {
+        "code": "HNQIS2",
+        "name": "HNQIS 2.0",
+        "id": "Jz4YKD15lnK",
+        "sortOrder": 2,
+        "optionSet": { "id": "TOcCuCN2CLm" },
+        "translations": []
+    },
+    {
+        "code": "RDQA",
+        "name": "RDQA",
+        "id": "QR0HHcQri91",
+        "sortOrder": 3,
+        "optionSet": { "id": "TOcCuCN2CLm" },
+        "translations": []
+    },
+    {
+        "code": "EDS",
+        "name": "EDS",
+        "id": "v9XPATv6G3N",
+        "sortOrder": 4,
+        "optionSet": { "id": "TOcCuCN2CLm" },
+        "translations": []
+    }
+];
+
+const PROGRAM_TYPE_OPTION_SET = {
+    "name": "DB - Program Type",
+    "id": "TOcCuCN2CLm",
+    "version": 7,
+    "valueType": "TEXT",
+    "attributeValues": [],
+    "translations": [],
+    "options": [
+        { "id": "Ip3IqzzqgLN" },
+        { "id": "Jz4YKD15lnK" },
+        { "id": "QR0HHcQri91" },
+        { "id": "v9XPATv6G3N" }
+    ]
+};
+
+const DHIS2_PRIMARY_COLOR = "#2c6693";
+
+const EXPORT_PRESETS = [
+    { value: 'local', label: 'Local Import'},
+    { value: 'external', label: 'External Import' },
+    { value: 'h2External', label: 'HNQIS2 to HNQIS2-Enabled Server'}
+]
+
+const EXTERNAL_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions'];
+
+const H2_ATTRIBUTES_TO_KEEP = ['haUflNqP85K', 'LP171jpctBm', 'yB5tFAAN7bI', 'DVzuBdj9kli', 'yhKEe6BLEer'];
+
+const JSON_ATTRIBUTE_SETTINGS = [
+    { key: 'sharings', label: 'Remove Sharing Settings', selected: false, affects: ['sharing'] },
+    { key: 'ous', label: 'Remove Organisation Units', selected: false, affects: ['organisationUnits'] },
+    { key: 'redates', label: 'Remove all "Date", "Last Updated" and "Created" fields', selected: false, affects: ['date', 'lastUpdated', 'created'] },
+    { key: 'reuser', label: 'Remove all "Created By" and "Last Updated By" fields', selected: false, affects: ['createdBy', 'lastUpdatedBy'] },
+    { key: 'recats', label: 'Remove every field related to "Categories"', selected: false, affects: ['category', 'categoryCombo', 'categoryOptionCombo', 'categoryOption', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions'] },
+    { key: 'relegends', label: 'Remove Legend Sets', selected: false, affects: ['legends', 'legendSets', 'legend', 'legendSet'] },
+]
+
 export {
     PERIOD_TYPES,
     FEATURE_TYPES,
@@ -287,5 +476,13 @@ export {
     LEGEND_YES_NO,
     LEGEND_YES_PARTIAL_NO,
     OPTION_SET_COMPETENCY,
-    OPTION_SET_HEALTH_AREAS
+    OPTION_SET_HEALTH_AREAS,
+    DHIS2_KEY_MAP,
+    PROGRAM_TYPE_OPTIONS,
+    PROGRAM_TYPE_OPTION_SET,
+    DHIS2_PRIMARY_COLOR,
+    EXPORT_PRESETS,
+    EXTERNAL_IMPORT_REMOVE_KEYS,
+    H2_ATTRIBUTES_TO_KEEP,
+    JSON_ATTRIBUTE_SETTINGS
 };

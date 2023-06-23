@@ -114,3 +114,69 @@ export function formatAlert(text) {
 export function extractMetadataPermissions(permissions){
     return permissions.slice(0, 2) + '------';
 }
+
+export function getUniqueKeys(arrayOfObjects) {
+    const uniqueKeys = new Set();
+
+    for (const obj of arrayOfObjects) {
+        const keys = Object.keys(obj);
+        keys.forEach(key => uniqueKeys.add(key));
+    }
+
+    return Array.from(uniqueKeys).sort().map(key => ({key, selected: true}));
+}
+
+/*Returns an object with:
+    * key = value -> Last value
+    * value = object -> Object with more objects
+    * value = array -> Object with array of objects (the array is a list of all the unique keys)
+*/
+export function getJSONKeyTree(obj, level=1, index=0) {
+    let res = {}
+    for (const key in obj) {
+        if (!!obj[key] && obj[key].constructor !== Array && obj[key].constructor === Object && index<level) {
+            res[key] = getJSONKeyTree(obj[key],level,index+1)
+        } else if (Array.isArray(obj[key])) {
+            res[key] = getUniqueKeys(obj[key])
+        } else {
+            res[key] = [{ key, selected:true }]
+        }
+    }
+    return res
+}
+
+export function changeAttributeValue(obj, attribute, newValue) {
+    if (Array.isArray(obj)) {
+        for (let i = 0; i < obj.length; i++) {
+            changeAttributeValue(obj[i], attribute, newValue);
+        }
+    } else if (typeof obj === 'object') {
+        for (let key in obj) {
+            if (key === attribute) {
+                obj[key] = newValue;
+            } else {
+                changeAttributeValue(obj[key], attribute, newValue);
+            }
+        }
+    }
+}
+
+export function removeKey(obj, key) {
+    if (typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        obj.forEach((item) => removeKey(item, key));
+    } else {
+        Object.keys(obj).forEach((k) => {
+            if (k === key) {
+                delete obj[k];
+            } else {
+                removeKey(obj[k], key);
+            }
+        });
+    }
+
+    return obj;
+}
