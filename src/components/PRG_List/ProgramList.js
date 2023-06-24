@@ -57,7 +57,12 @@ const query = {
                 filter: []
             }
 
-            if (token !== "") paramsObject.filter.push(`identifiable:token:${token}`)
+            if (token !== "") {
+                paramsObject.filter.push(`name:$ilike:${token}`)
+                paramsObject.filter.push(`identifiable:token:${token}`)
+                paramsObject.rootJunction = 'OR'
+            }
+            //Original: if (token !== "") paramsObject.filter.push(`identifiable:token:${token}`)
 
             return paramsObject
         }

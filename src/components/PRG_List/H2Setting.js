@@ -1,15 +1,15 @@
-import {Alert, FormLabel} from "@mui/material";
+import { Alert, FormLabel } from "@mui/material";
 import FormHelperText from "@mui/material/FormHelperText";
 import FormControl from "@mui/material/FormControl";
-import {AlertBar, OrganisationUnitTree} from "@dhis2/ui";
+import { AlertBar, OrganisationUnitTree } from "@dhis2/ui";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import SelectOptions from "../UIElements/SelectOptions";
-import React, {useEffect, useState, forwardRef, useImperativeHandle} from "react";
-import {useDataQuery} from "@dhis2/app-runtime";
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import { useDataQuery } from "@dhis2/app-runtime";
 import LinearProgress from "@mui/material/LinearProgress";
 import Box from "@mui/material/Box";
-import { BUILD_VERSION } from "../../configs/Constants";
+import { AGG_TYPES_H2_PI, BUILD_VERSION } from "../../configs/Constants";
 
 const query = {
     results: {
@@ -62,6 +62,7 @@ const H2Setting = forwardRef((props, ref) => {
     const [orgUnitPathSelected, setOrgUnitPathSelected] = useState([]);
     const [haOptions, setHaOptions] = useState();
     const [ouLevels, setOULevels] = useState();
+    const [aggregationType, setAggregationType] = useState(props.pcaMetadata?.programIndicatorsAggType || 'AVERAGE');
     const [useCompetency, setUseCompetency] = useState(props.pcaMetadata?.useCompetencyClass === "Yes");
 
     const [useUserOrgUnit, setUseUserOrgUnit] = useState(props.pcaMetadata?.useUserOrgUnit === "Yes");
@@ -74,7 +75,8 @@ const H2Setting = forwardRef((props, ref) => {
         healthArea: undefined,
         ouTableRow: undefined,
         ouMapPolygon: undefined,
-        orgUnitRoot: undefined
+        orgUnitRoot: undefined,
+        aggregationType: undefined
     })
 
     useEffect(() => {
@@ -111,6 +113,12 @@ const H2Setting = forwardRef((props, ref) => {
         setOUMapPolygon(event.target.value);
     };
 
+    const aggregationTypeChange = (event) => {
+        validationErrors.aggregationType = undefined;
+        setValidationErrors({ ...validationErrors });
+        setAggregationType(event.target.value);
+    };
+
     let healthAreaOptions = [];
     let ouLevelOptions = [];
 
@@ -130,7 +138,7 @@ const H2Setting = forwardRef((props, ref) => {
         );
     }
 
-    useEffect( () => {
+    useEffect(() => {
         if (!ouMetadataLoading) {
             if (props.pcaMetadata?.ouRoot) {
                 setSelectedOrgUnits([props.pcaMetadata?.ouRoot])
@@ -150,7 +158,7 @@ const H2Setting = forwardRef((props, ref) => {
         }
     }, [ouMetadata]);
 
-    useEffect(()=> {
+    useEffect(() => {
         if (!ouLevelLoading && orgUnitPathSelected.length > 0) {
             ouTreeNLevelInit(ouMetadata)
         }
@@ -159,12 +167,12 @@ const H2Setting = forwardRef((props, ref) => {
     let ouTreeNLevelInit = () => {
         setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
         setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
-        
+
         setorgUnitTreeRootLoaded(true)
     }
 
-    useEffect(()=>{
-        if (orgUnitTreeRoot.length > 0){
+    useEffect(() => {
+        if (orgUnitTreeRoot.length > 0) {
             props.setButtonDisabled(false)
         }
     }, [orgUnitTreeRoot])
@@ -192,12 +200,13 @@ const H2Setting = forwardRef((props, ref) => {
     };
 
     useImperativeHandle(ref, () => ({
-        handleFormValidation(){
+        handleFormValidation() {
             let response = true;
             if (
                 healthArea === "" ||
                 ouTableRow === "" ||
                 ouMapPolygon === "" ||
+                aggregationType === "" ||
                 selectedOrgUnits.length === 0
             )
                 response = false;
@@ -211,10 +220,12 @@ const H2Setting = forwardRef((props, ref) => {
                 selectedOrgUnits.length === 0
                     ? "This field is required"
                     : undefined;
+            validationErrors.aggregationType =
+                aggregationType === "" ? "This field is required" : undefined;
             return response;
         },
 
-        saveMetaData(){
+        saveMetaData() {
             let data = {};
             data.saveVersion = BUILD_VERSION;
             data.buildVersion = props.pcaMetadata?.buildVersion;
@@ -224,6 +235,7 @@ const H2Setting = forwardRef((props, ref) => {
             data.useUserOrgUnit = useUserOrgUnit ? "Yes" : "No";
             data.ouLevelTable = ouTableRow;
             data.ouLevelMap = ouMapPolygon;
+            data.programIndicatorsAggType = aggregationType;
             return data;
         }
     }))
@@ -246,59 +258,101 @@ const H2Setting = forwardRef((props, ref) => {
                         alignItems: "center",
                         justifyContent: "space-between",
                     }}
+                >
+                    <div
+                        style={{
+                            width: "40%",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignSelf: "stretch",
+                        }}
                     >
-                        <div
+                        <FormLabel
+                            sx={
+                                validationErrors.orgUnitRoot !== undefined
+                                    ? { color: "#d32f2f", marginTop: "0.5em" }
+                                    : { marginTop: "0.5em" }
+                            }
+                        >
+                            Organisation Unit Root for Global Analytics
+                            (*)
+                        </FormLabel>
+                        <FormHelperText sx={{ color: "#d32f2f" }}>
+                            {validationErrors.orgUnitRoot}
+                        </FormHelperText>
+                        <FormControl
+                            variant={"standard"}
+                            error={
+                                validationErrors.orgUnitRoot !==
+                                undefined
+                            }
                             style={{
-                                width: "40%",
-                                display: "flex",
-                                flexDirection: "column",
-                                alignSelf: "stretch",
+                                overflow: "auto",
+                                border: "1px solid #bdbdbd",
+                                borderRadius: "3px",
+                                padding: "4px",
+                                marginTop: "0.8em",
+                                height: "400px",
+                                maxHeight: "400px"
                             }}
                         >
-                            <FormLabel
-                                sx={
-                                    validationErrors.orgUnitRoot !== undefined
-                                        ? { color: "#d32f2f", marginTop: "0.5em" }
-                                        : { marginTop: "0.5em" }
-                                }
-                            >
-                                Organisation Unit Root for Global Analytics
-                                (*)
-                            </FormLabel>
-                            <FormHelperText sx={{ color: "#d32f2f" }}>
-                                {validationErrors.orgUnitRoot}
-                            </FormHelperText>
-                            <FormControl
-                                variant={"standard"}
-                                error={
-                                    validationErrors.orgUnitRoot !==
-                                    undefined
-                                }
-                                style={{
-                                    overflow: "auto",
-                                    border: "1px solid #bdbdbd",
-                                    borderRadius: "3px",
-                                    padding: "4px",
-                                    marginTop: "0.8em",
-                                    height: "300px",
-                                    maxHeight: "300px"
-                                }}
-                            >
-                                <OrganisationUnitTree
-                                    name={"Root org unit"}
-                                    roots={orgUnitTreeRoot}
-                                    onChange={orgUnitSelectionHandler}
-                                    selected={orgUnitPathSelected}
-                                    initiallyExpanded={orgUnitPathSelected}
-                                    singleSelection
-                                />
-                            </FormControl>
-                        </div>
-                        <div
+                            <OrganisationUnitTree
+                                name={"Root org unit"}
+                                roots={orgUnitTreeRoot}
+                                onChange={orgUnitSelectionHandler}
+                                selected={orgUnitPathSelected}
+                                initiallyExpanded={orgUnitPathSelected}
+                                singleSelection
+                            />
+                        </FormControl>
+                    </div>
+                    <div
+                        style={{
+                            width: "55%",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <SelectOptions
+                            useError={
+                                validationErrors.ouTableRow !==
+                                undefined
+                            }
+                            helperText={validationErrors.ouTableRow}
+                            label={
+                                "Org Unit Level for the Dashboard Visualizations (*)"
+                            }
+                            items={ouLevelOptions}
+                            handler={ouTableRowChange}
+                            styles={{ width: "100%" }}
+                            value={ouTableRow}
+                            defaultOption={
+                                "Select Org Unit Level"
+                            }
+                        />
+                        <SelectOptions
+                            useError={
+                                validationErrors.ouMapPolygon !==
+                                undefined
+                            }
+                            helperText={validationErrors.ouMapPolygon}
+                            label={
+                                "Org Unit Level for the Dashboard Maps (*)"
+                            }
+                            items={ouLevelOptions}
+                            handler={ouMapPolygonChange}
+                            styles={{ width: "100%" }}
+                            value={ouMapPolygon}
+                            defaultOption={
+                                "Select Org Unit Level"
+                            }
+                        />
+                        <fieldset
                             style={{
-                                width: "55%",
-                                flexDirection: "column",
-                                justifyContent: "space-between",
+                                borderRadius: "0.5em",
+                                padding: "10px",
+                                border: "1px solid rgb(189, 189, 189)",
+                                marginTop: '1em'
                             }}
                         >
                             <FormControlLabel
@@ -313,73 +367,57 @@ const H2Setting = forwardRef((props, ref) => {
                             />
                             <SelectOptions
                                 useError={
-                                    validationErrors.ouTableRow !==
+                                    validationErrors.aggregationType !==
                                     undefined
                                 }
-                                helperText={validationErrors.ouTableRow}
+                                helperText={validationErrors.aggregationType}
                                 label={
-                                    "Organisation Unit Level for the Dashboard Visualizations (*)"
+                                    "Agg Type for Program Indicators (*)"
                                 }
-                                items={ouLevelOptions}
-                                handler={ouTableRowChange}
+                                items={AGG_TYPES_H2_PI}
+                                handler={aggregationTypeChange}
                                 styles={{ width: "100%" }}
-                                value={ouTableRow}
+                                value={aggregationType}
                                 defaultOption={
-                                    "Select Organisation Unit Level"
+                                    "Select Aggregation Type"
                                 }
+                            />
+                        </fieldset>
+                        <fieldset
+                            style={{
+                                borderRadius: "0.5em",
+                                padding: "10px",
+                                border: "1px solid rgb(189, 189, 189)",
+                                marginTop: '1em'
+                            }}
+                        >
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={useCompetency}
+                                        onChange={handleChangeComp}
+                                        name="competency"
+                                    />
+                                }
+                                label="Use Competency Class"
                             />
                             <SelectOptions
                                 useError={
-                                    validationErrors.ouMapPolygon !==
+                                    validationErrors.healthArea !==
                                     undefined
                                 }
-                                helperText={validationErrors.ouMapPolygon}
-                                label={
-                                    "Organisation Unit Level for the Dashboard Maps (*)"
-                                }
-                                items={ouLevelOptions}
-                                handler={ouMapPolygonChange}
+                                helperText={validationErrors.healthArea}
+                                label={"Program Health Area (*)"}
+                                items={healthAreaOptions}
+                                handler={healthAreaChange}
                                 styles={{ width: "100%" }}
-                                value={ouMapPolygon}
-                                defaultOption={
-                                    "Select Organisation Unit Level"
-                                }
+                                value={healthArea}
+                                defaultOption="Select Health Area"
                             />
-                            <fieldset
-                                style={{
-                                    borderRadius: "0.5em",
-                                    padding: "10px",
-                                    border: "1px solid rgb(189, 189, 189)",
-                                    marginTop: '1em'
-                                }}
-                            >
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={useCompetency}
-                                            onChange={handleChangeComp}
-                                            name="competency"
-                                        />
-                                    }
-                                    label="Use Competency Class"
-                                />
-                                <SelectOptions
-                                    useError={
-                                        validationErrors.healthArea !==
-                                        undefined
-                                    }
-                                    helperText={validationErrors.healthArea}
-                                    label={"Program Health Area (*)"}
-                                    items={healthAreaOptions}
-                                    handler={healthAreaChange}
-                                    styles={{ width: "100%" }}
-                                    value={healthArea}
-                                    defaultOption="Select Health Area"
-                                />
-                            </fieldset>
-                        </div>
+                        </fieldset>
                     </div>
-                )
+                </div>
+            )
             }
         </>
     )

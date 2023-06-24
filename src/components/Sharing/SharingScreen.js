@@ -422,7 +422,7 @@ const SharingScreen = ({element, id, setSharingProgramId, type, setType, readOnl
         switch (level) {
             case 2:
                 let exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS, ACTION_PLAN_ACTION, ACTION_PLAN_DUE_DATE, ACTION_PLAN_RESPONSIBLE];
-                payloadMetadata.dataElements = metadata.dataElements.filter(de => !exclusionsDEs.includes(de.id));
+                payloadMetadata.dataElements = metadata.dataElements?.filter(de => !exclusionsDEs.includes(de.id))||[];
             case 1:
                 payloadMetadata.programStages = metadata.programStages;
                 break;

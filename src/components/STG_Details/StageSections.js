@@ -189,7 +189,7 @@ const queryProgramSettings = {
         resource: 'programs',
         id: ({ programId }) => programId,
         params: {
-            fields: ['lastUpdated', 'id', 'href', 'created', 'name', 'shortName', 'publicAccess', 'ignoreOverdueEvents', 'skipOffline', 'enrollmentDateLabel', 'onlyEnrollOnce', 'version', 'displayFormName', 'displayEnrollmentDateLabel', 'selectIncidentDatesInFuture', 'maxTeiCountToReturn', 'selectEnrollmentDatesInFuture', 'registration', 'openDaysAfterCoEndDate', 'favorite', 'useFirstStageDuringRegistration', 'displayName', 'completeEventsExpiryDays', 'displayShortName', 'externalAccess', 'withoutRegistration', 'minAttributesRequiredToSearch', 'displayFrontPageList', 'programType', 'accessLevel', 'displayIncidentDate', 'expiryDays', 'categoryCombo', 'sharing', 'access', 'trackedEntityType', 'createdBy', 'user', 'programIndicators', 'translations', 'userGroupAccesses', 'attributeValues', 'userRoles', 'userAccesses', 'favorites', 'programRuleVariables', 'programTrackedEntityAttributes', 'notificationTemplates', 'organisationUnits', 'programSections', 'programStages']
+            fields: ['lastUpdated', 'id', 'href', 'created', 'name', 'shortName', 'publicAccess', 'ignoreOverdueEvents', 'skipOffline', 'enrollmentDateLabel', 'onlyEnrollOnce', 'version', 'displayFormName', 'displayEnrollmentDateLabel', 'selectIncidentDatesInFuture', 'maxTeiCountToReturn', 'selectEnrollmentDatesInFuture', 'registration', 'openDaysAfterCoEndDate', 'favorite', 'useFirstStageDuringRegistration', 'displayName', 'completeEventsExpiryDays', 'displayShortName', 'externalAccess', 'withoutRegistration', 'minAttributesRequiredToSearch', 'displayFrontPageList', 'programType', 'accessLevel', 'displayIncidentDate', 'expiryDays', 'categoryCombo', 'sharing', 'access', 'trackedEntityType', 'createdBy', 'user', 'programIndicators', 'translations', 'userGroupAccesses', 'attributeValues', 'userRoles', 'userAccesses', 'favorites', 'programRuleVariables', 'programTrackedEntityAttributes', 'notificationTemplates', 'organisationUnits', 'programSections', 'programStages', 'style']
         }
     },
 }
@@ -232,9 +232,9 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [programSettingsError, setProgramSettingsError] = useState(undefined);
     const { data: OrganizationLevel, refetch: setOuLevel } = useDataQuery(queryOrganizationsUnit, { lazy: true, variables: { ouLevel: undefined } });
     const { refetch: getProgramSettings } = useDataQuery(queryProgramSettings, { lazy: true, variables: { programId } });
-    
-    
-    
+
+
+
     //const { data: existingLocalAnalytics } = useDataQuery(queryExistingLocalAnalytics, { variables: { programId } });
 
 
@@ -297,22 +297,34 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
     const [criticalSection, setCriticalSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations") });
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
-    const [programMetadata, setProgramMetadata] = useState(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"));
+    const [programMetadata, setProgramMetadata] = useState();
     const [errorReports, setErrorReports] = useState(undefined)
 
     const [addedSection, setAddedSection] = useState()
 
     useEffect(() => {
+        getProgramMetadata()
         return (() => {
             setCriticalSection(undefined)
         })
     }, [])
+
+    const getProgramMetadata = () => {
+        getProgramAttributes({ programId }).then(res => {
+            res.results?.programs[0]?.attributeValues.forEach(av => {
+                if (av.attribute.id === METADATA) {
+                    setProgramMetadata(JSON.parse(av.value || "{}"))
+                }
+            })
+        })
+    }
 
 
     // REFETCH STAGE
     const refetchProgramStage = (params = {}) => {
         stageRefetch({ variables: { programStage: programStage.id } }).then(data => {
             let programStage = data.results
+            setProgramMetadata(undefined)
             setOriginalProgramStageDataElements(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
             setSections((isSectionMode)
                 ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
@@ -321,7 +333,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             setScoresSection({ ...programStage.programStageSections.find(s => hnqisMode && (isSectionMode) && s.name === "Scores") })
             setCriticalSection({ ...programStage.programStageSections.find(s => hnqisMode && (isSectionMode) && s.name === "Critical Steps Calculations") })
             setProgramStageDataElements([...programStage.programStageDataElements])
-            setProgramMetadata(JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}"))
+            getProgramMetadata()
         })
     }
 
@@ -464,7 +476,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const dashboardsDQ = useDataQuery(queryDashboards, { variables: { programId: programStage.program.id } });
 
     // Fetch Metadata from Program
-    const programAttributes = useDataQuery(queryPCAMetadata, { variables: { programId: programStage.program.id } });
+    const { data: programAttributes, refetch: getProgramAttributes } = useDataQuery(queryPCAMetadata, { variables: { programId: programStage.program.id } });
 
 
 
@@ -620,7 +632,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         if (!savedAndValidated) return;
         //--------------------- NEW METADATA --------------------//
         setProgressSteps(1);
-        let programConfig = programAttributes.data?.results?.programs[0]
+        let programConfig = programAttributes.results?.programs[0]
         let pcaMetadata = JSON.parse(programConfig?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}")
         let sharingSettings = programConfig?.sharing
         sharingSettings.public = extractMetadataPermissions(sharingSettings.public)
@@ -705,7 +717,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
                         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
                         const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
-                        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass, sharingSettings);
+                        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass, sharingSettings, programMetadata.programIndicatorsAggType);
                         const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, sharingSettings, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap);
                         const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports };
 
@@ -786,7 +798,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                         name: visualization.name,
                         timestamp
                     }));*/
-                
+
                 break;
             default:
                 break;
@@ -865,7 +877,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 size='small'
                                 variant='outlined'
                                 startIcon={<CheckCircleOutlineIcon />}
-                                disabled={createMetadata.loading}
+                                disabled={createMetadata.loading || !programMetadata}
                                 onClick={() => commit()}
                             > {saveStatus}</Button>
                         }
