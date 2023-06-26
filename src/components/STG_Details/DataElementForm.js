@@ -386,6 +386,13 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         data.description = description
         // Form Name
         data.formName = structure === 'question' ? formName : "   "
+        
+        if (!autoNaming) {
+            data.name = elementName;
+            data.displayName = elementName;
+            data.shortName = shortName;
+            data.code = elementCode;
+        }
 
 
         // METADATA
@@ -396,6 +403,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         if (numerator) metadata.scoreNum = numerator
         if (denominator) metadata.scoreDen = denominator
         if (structure === 'label') metadata.labelFormName = formName
+        metadata.autoNaming = autoNaming ? 'Yes' : 'No';
 
         attributeValues.push({ attribute: { id: METADATA }, value: JSON.stringify(metadata) })
 
