@@ -14,7 +14,7 @@ import { ArrowDownward, ArrowUpward, PlaylistAddCheck, StackedLineChart } from '
 const BUILD_VERSION = "1.7.0"
 const BUILD_DATE = "June, 2023"
 const MIN_VERSION = "2.36"
-const MAX_VERSION = "2.38.5"
+const MAX_VERSION = "2.40"
 
 const PCA_METADATA_VERSION = "1.1.1"
 const H2_METADATA_VERSION = "1.1.2"
@@ -443,7 +443,7 @@ export {
     H1_ACTION_PLAN_OLD,
     H1_ACTION1_OLD,
     H1_ACTION1,
-    H1_ACTION2_OLD, 
+    H1_ACTION2_OLD,
     H1_ACTION2,
     H1_ACTION3,
     H1_COMPETENCY_CLASS,

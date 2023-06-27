@@ -12,6 +12,7 @@ import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
 import { useState, useEffect } from "react";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -43,7 +44,7 @@ const ProgramDetails = () => {
     const [newStage,setNewStage] = useState()
 
     useEffect(()=>{
-        
+
     },[newStage])
 
     useEffect(() => {
@@ -95,14 +96,29 @@ const ProgramDetails = () => {
                 <div className="c_srch"></div>
                 <div className="c_btns">
                     {!hnqisMode && !data.results.withoutRegistration &&
-                        <MuiButton
-                            variant="outlined"
-                            color='inherit'
-                            startIcon={<AddCircleOutlineIcon />}
-                            onClick={() => setShowStageForm(true)}
-                            disabled={showStageForm}>
-                            Add Program Stage
-                        </MuiButton>
+                        <>
+                            <MuiButton
+                                variant="outlined"
+                                color='inherit'
+                                startIcon={<AddCircleOutlineIcon />}
+                                onClick={() => setShowStageForm(true)}
+                                disabled={showStageForm}>
+                                Add Program Stage
+                            </MuiButton>
+                        </>
+                    }
+                    {
+                        !hnqisMode &&
+                        <>
+                            <MuiButton
+                                variant="outlined"
+                                color='inherit'
+                                startIcon={<CloudUploadIcon />}
+                                onClick={() => {} }
+                                disabled={showStageForm}>
+                                Import Template
+                            </MuiButton>
+                        </>
                     }
                 </div>
             </div>
@@ -125,7 +141,7 @@ const ProgramDetails = () => {
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
                         {
-                            data.results.programStages.sort((stageA, stageB) => 
+                            data.results.programStages.sort((stageA, stageB) =>
                                 (stageA.name > stageB.name)? 1 : ((stageA.name < stageB.name)? -1 : 0)
                             ).map((programStage) => {
                                 return (
