@@ -18,6 +18,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
 import { formatAlert, truncateString } from "../../configs/Utils";
+import TrackerImporter from "../Excel/TrackerImporter";
 
 const query = {
     results: {
@@ -42,6 +43,10 @@ const ProgramDetails = () => {
     const [notification, setNotification] = useState(undefined);
     const [snackSeverity, setSnackSeverity] = useState(undefined);
     const [newStage,setNewStage] = useState()
+
+    // IMPORT TEMPLATE SCOPE
+    const [importDialog,setImportDialog] = useState(false);
+    // 
 
     useEffect(()=>{
 
@@ -114,7 +119,7 @@ const ProgramDetails = () => {
                                 variant="outlined"
                                 color='inherit'
                                 startIcon={<CloudUploadIcon />}
-                                onClick={() => {} }
+                                onClick={() => setImportDialog(true) }
                                 disabled={showStageForm}>
                                 Import Template
                             </MuiButton>
@@ -172,6 +177,7 @@ const ProgramDetails = () => {
                         {formatAlert(notification?.message)}
                     </Alert>
                 </Snackbar>
+                {importDialog && <TrackerImporter onClose={()=>setImportDialog(false)} process={(file)=>console.log(file)} />}
             </div>
         </div>
     );
