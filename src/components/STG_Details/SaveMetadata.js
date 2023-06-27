@@ -160,9 +160,11 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
 
                 DE_metadata.varName = newVarName;
 
-                dataElement.name = name
-                dataElement.shortName = shortName
-                dataElement.code = newCode
+                if (DE_metadata.autoNaming !== 'No') {
+                    dataElement.name = name
+                    dataElement.shortName = shortName
+                    dataElement.code = newCode
+                }
 
                 // Check if new DE
                 if (dataElement.importStatus == 'new') {
@@ -360,13 +362,12 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
                     gotResponseError(response);
                     return;
                 }
-                /*refetchProgramStage().then(res=>{
-                    
-                })*/
+
                 setCompleted(true);
                 setSuccessStatus(true);
                 setSavedAndValidated(true);
                 setImportResults(false);
+                
             });
         });
     }

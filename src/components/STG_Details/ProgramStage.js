@@ -23,7 +23,7 @@ const query = {
         params: {
             fields:[
                 'id', 'name', 'allowGenerateNextVisit', 'publicAccess', 'reportDateToUse', 'formType', 'generatedByEnrollmentDate', 'displayFormName', 'sortOrder', 'hideDueDate', 'enableUserAssignment', 'minDaysFromStart', 'favorite', 'executionDateLabel', 'preGenerateUID', 'displayName', 'externalAccess', 'openAfterEnrollment', 'repeatable', 'remindCompleted', 'displayGenerateEventBox', 'validationStrategy', 'autoGenerateEvent', 'blockEntryForm','program[id,name,shortName,attributeValues,withoutRegistration]','style','access','user','translations','userGroupAccesses','attributeValues','userAccesses','favorites','notificationTemplates',
-                'programStageDataElements[id,name,compulsory,displayInReports,programStage,dataElement[id,name,shortName,style,code,description,sharing,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName],sortOrder]',
+                'programStageDataElements[id,name,compulsory,displayInReports,programStage,dataElement[id,name,shortName,style,code,description,sharing,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName],sortOrder,style,categoryCombo]',
                 'programStageSections[id,name,displayName,sortOrder,dataElements[id,name,shortName,style,code,description,sharing,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName]]'
             ]
         }
@@ -69,7 +69,7 @@ const ProgramStage = () => {
     /* if (loading) {
         
     } */
-
+    
     if(data){
         const hnqisMode = !!data.results.program.attributeValues.find(av=>av.value==="HNQIS2")
         const readOnly = !!data.results.program.attributeValues.find(av => av.value === "HNQIS")

@@ -2,7 +2,7 @@
 import { useDataQuery } from '@dhis2/app-runtime';
 import { TextField, Select, MenuItem, FormControl, InputLabel, FormControlLabel, Switch, Autocomplete, Grid, FormLabel, Button } from '@mui/material';
 import { useEffect, useState } from "react"
-import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES, AGG_TYPES } from '../../configs/Constants';
+import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES, AGG_TYPES, MAX_SHORT_NAME_LENGTH } from '../../configs/Constants';
 import RowRadioButtonsGroup from './RowRadioButtonsGroup';
 
 import FilterNoneIcon from '@mui/icons-material/FilterNone';
@@ -97,7 +97,10 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
     const [valueType, setValueType] = useState(de?.valueType || '')
     const [aggType, setAggType] = useState(de?.aggregationType || 'NONE')
     const [formName, setFormName] = useState((metadata.elemType === 'label' ? metadata.labelFormName : de?.formName)?.replace(' [C]', '') || '')
-    const [compulsory, setCompulsory] = useState(hnqisMode? metadata.isCompulsory === 'Yes' : programStageDataElement.compulsory)  // metadata.isCompulsory : ['Yes','No']
+    const [elementName, setElementName] = useState(de?.name || '')
+    const [shortName, setShortName] = useState(de?.shortName || '')
+    const [elementCode, setElementCode] = useState(de?.code || '')
+    const [compulsory, setCompulsory] = useState((hnqisMode? metadata.isCompulsory === 'Yes' : programStageDataElement.compulsory) ?? false)  // metadata.isCompulsory : ['Yes','No']
     const [displayInReports, setDisplayInReports] = useState(programStageDataElement.displayInReports ?? false)
     const [optionSet, setOptionSet] = useState(de?.optionSet ? { label: de.optionSet.name, id: de.optionSet.id } : null)
     const [legendSet, setLegendSet] = useState(de?.legendSet ? { label: de.legendSet.name, id: de.legendSet.id } : null)
@@ -113,6 +116,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
     const [feedbackText, setFeedbackText] = useState(de?.attributeValues.find(att => att.attribute.id === FEEDBACK_TEXT)?.value || '');
 
     const [dialogStatus, setDialogStatus] = useState(false)
+    const [autoNaming, setAutoNaming] = useState(metadata.autoNaming === 'No'?false:true)
 
     // Handlers
     const elemTypeChange = (e) => {
@@ -131,6 +135,9 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
             valueType: undefined,
             aggType: undefined,
             formName: undefined,
+            elementName: undefined,
+            shortName: undefined,
+            elementCode: undefined,
             numerator: undefined,
             denominator: undefined,
             feedbackOrder: undefined
@@ -147,31 +154,19 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         setValidationErrors({ ...validationErrors })
         switch (valueType) {
             case 'NUMBER':
-                setAggType('SUM')
-                break;
             case 'INTEGER':
-                setAggType('SUM')
-                break;
             case 'INTEGER_POSITIVE':
-                setAggType('SUM')
-                break;
             case 'INTEGER_ZERO_OR_POSITIVE':
                 setAggType('SUM')
                 break;
             case 'TEXT':
-                setAggType('NONE')
-                break;
             case 'LONG_TEXT':
+            case 'DATE':
+            case 'TIME':
                 setAggType('NONE')
                 break;
             case 'PERCENTAGE':
                 setAggType('AVERAGE')
-                break;
-            case 'DATE':
-                setAggType('NONE')
-                break;
-            case 'TIME':
-                setAggType('NONE')
                 break;
             default:
                 setAggType('')
@@ -193,6 +188,8 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
     const compulsoryChange = (data) => setCompulsory(data.target.checked)
 
+    const autoNamingChange = (data) => setAutoNaming(data.target.checked)
+
     const displayInReportsChange = (data) => setDisplayInReports(data.target.checked)
 
     const optionSetChange = (event, value) => {
@@ -205,6 +202,23 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
     }
 
     const legendSetChange = (event, value) => setLegendSet(value)
+
+    const elementNameChange = (data) => {
+        validationErrors.elementName = undefined
+        setValidationErrors({ ...validationErrors })
+        setElementName(data.target.value)
+    }
+    const shortNameChange = (data) => {
+        validationErrors.shortName = undefined
+        setValidationErrors({ ...validationErrors })
+        setShortName(data.target.value)
+    }
+
+    const elementCodeChange = (data) => {
+        validationErrors.elementCode = undefined
+        setValidationErrors({ ...validationErrors })
+        setElementCode(data.target.value)
+    }
 
     const descriptionChange = (data) => setDescription(data.target.value)
 
@@ -258,6 +272,39 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
             validationErrors.formName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters`
         } else {
             validationErrors.formName = undefined
+        }
+
+        if (!autoNaming) {
+            if (elementName.trim() === '') {
+                response = false
+                validationErrors.elementName = 'This field is required'
+            } else if (elementName.length < MIN_NAME_LENGTH || elementName.length > MAX_DATA_ELEMENT_NAME_LENGTH) {
+                response = false
+                validationErrors.elementName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters`
+            } else {
+                validationErrors.elementName = undefined
+            }
+
+            if (shortName.trim() === '') {
+                response = false
+                validationErrors.shortName = 'This field is required'
+            } else if (shortName.length < MIN_NAME_LENGTH || shortName.length > MAX_SHORT_NAME_LENGTH) {
+                response = false
+                validationErrors.shortName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_SHORT_NAME_LENGTH} characters`
+            } else {
+                validationErrors.shortName = undefined
+            }
+
+            if (code.length > MAX_SHORT_NAME_LENGTH) {
+                response = false
+                validationErrors.code = `This field must contain less than  ${MAX_SHORT_NAME_LENGTH} characters`
+            } else {
+                validationErrors.code = undefined
+            }
+        } else {
+            validationErrors.elementName = undefined
+            validationErrors.shortName = undefined
+            validationErrors.code = undefined
         }
 
         if (String(numerator).trim() !== '' && String(denominator).trim() === '') {
@@ -339,6 +386,13 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         data.description = description
         // Form Name
         data.formName = structure === 'question' ? formName : "   "
+        
+        if (!autoNaming) {
+            data.name = elementName;
+            data.displayName = elementName;
+            data.shortName = shortName;
+            data.code = elementCode;
+        }
 
 
         // METADATA
@@ -349,6 +403,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         if (numerator) metadata.scoreNum = numerator
         if (denominator) metadata.scoreDen = denominator
         if (structure === 'label') metadata.labelFormName = formName
+        metadata.autoNaming = autoNaming ? 'Yes' : 'No';
 
         attributeValues.push({ attribute: { id: METADATA }, value: JSON.stringify(metadata) })
 
@@ -414,6 +469,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                         varName: '_S0Q0'
                     }
                 }
+                pcaMetadata.autoNaming = autoNaming ? 'Yes' : 'No';
 
                 attributes.push({
                     value: JSON.stringify(pcaMetadata),
@@ -440,27 +496,36 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                     })
                 }
 
+                let dataElement = {
+                    name: newDeId + "_" + formName,
+                    id: newDeId,
+                    shortName: (newDeId + "_" + formName).slice(0, 50),
+                    aggregationType: aggType,
+                    domainType: "TRACKER",
+                    displayName: newDeId + "_" + formName,
+                    formName: (structure === 'label') ? '   ' : formName,
+                    description,
+                    valueType: valueType,
+                    optionSet: optionSetValue,
+                    optionSetValue: optionSetValue !== undefined,
+                    attributeValues: attributes,
+                    legendSets: legendSetsValue,
+                    legendSet: legendSetsValue[0],
+                    style: buildStyle()
+                }
+
+                if (!autoNaming) {
+                    dataElement.name = elementName;
+                    dataElement.displayName = elementName;
+                    dataElement.shortName = shortName;
+                    dataElement.code = elementCode;
+                }
+
                 let newCreatedDe = {
                     type:'created',
                     displayInReports: displayInReports,
                     compulsory: compulsory,
-                    dataElement: {
-                        name: newDeId + "_" + formName,
-                        id: newDeId,
-                        shortName: (newDeId + "_" + formName).slice(0, 50),
-                        aggregationType: aggType,
-                        domainType: "TRACKER",
-                        displayName: newDeId + "_" + formName,
-                        formName: (structure==='label')?'   ':formName,
-                        description,
-                        valueType: valueType,
-                        optionSet: optionSetValue,
-                        optionSetValue: optionSetValue!==undefined,
-                        attributeValues: attributes,
-                        legendSets: legendSetsValue,
-                        legendSet: legendSetsValue[0],
-                        style: buildStyle()
-                    }
+                    dataElement
                 }
                 save(newCreatedDe)
             }
@@ -648,12 +713,62 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                     message={
                         <p>
                             This is the text that will be displayed in the form to represent this Data Element.<br /><br />
-                            The Name and Short Name properties of the Data Element will be generated automatically using the Form Name.
+                            In HNQIS Mode, The Name, Short Name and Code properties of the Data Element will be generated automatically using the Form Name.<br /><br />
+                            The automatic naming can be disabled in base Tracker Programs.
                         </p>
                     }
-                    margin='0 0 0 0.5em'
+                    margin='0 1em 0 0.5em'
+                />
+                <FormControlLabel
+                    disabled={hnqisMode}
+                    control={
+                        <Switch
+                            checked={autoNaming || hnqisMode}
+                            onChange={autoNamingChange}
+                        />}
+                    label="Automatic Name, Short Name and Code"
                 />
             </div>
+            {!autoNaming && <>
+                <TextField
+                    error={validationErrors.elementName !== undefined}
+                    helperText={validationErrors.elementName}
+                    id="name"
+                    autoComplete='off'
+                    fullWidth
+                    margin="normal"
+                    label="Data Element Name (*)"
+                    variant="standard"
+                    value={elementName}
+                    onChange={elementNameChange}
+                />
+                <div style={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
+                    <TextField
+                        error={validationErrors.shortName !== undefined}
+                        helperText={validationErrors.shortName}
+                        id="shortName"
+                        autoComplete='off'
+                        sx={{width: '65%'}}
+                        margin="normal"
+                        label="Data Element Short Name (*)"
+                        variant="standard"
+                        value={shortName}
+                        onChange={shortNameChange}
+                    />
+                    <TextField
+                        error={validationErrors.elementCode !== undefined}
+                        helperText={validationErrors.elementCode}
+                        id="code"
+                        autoComplete='off'
+                        sx={{ width: '30%' }}
+                        margin="normal"
+                        label="Data Element Code"
+                        variant="standard"
+                        value={elementCode}
+                        onChange={elementCodeChange}
+                    />
+                </div>
+            </>}
             <div style={{ display: 'flex' }}>
                 <TextField
                     id="description"
