@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { useDataQuery } from '@dhis2/app-runtime'
 import { arrayObjectToStringConverter } from '../../configs/Utils';
 import Exporter from "./Exporter";
+import { METADATA } from '../../configs/Constants';
 
 const optionSetQuery = {
     results: {
@@ -33,7 +34,7 @@ const teasQuery = {
     }
 }
 
-const dePropertiesQuery = { //TODO: Filter valueType and aggregationType  TyProperty
+const dePropertiesQuery = {
     results: {
         resource: 'schemas/dataElement',
         params: {
@@ -43,129 +44,137 @@ const dePropertiesQuery = { //TODO: Filter valueType and aggregationType  TyProp
     }
 }
 
-const DataProcessor = (props) => {
-    const programStage = props.ps;
+// /api/programs/sC4L2NNx3VA.json?fields=id,name,shortName,attributeValues,withoutRegistration,trackedEntityType[id,name],categoryCombo[id,name],programStages[id,name,description,programStageDataElements,programStageSections[*,dataElements[*]]]
+const currentProgramQuery = {    
+    results: {
+        resource: 'programs',
+        id: ({ programId }) => programId,
+        params: {
+            fields: ['id', 'name', 'shortName', 'attributeValues', 'withoutRegistration', 'trackedEntityType[id, name]', 'categoryCombo[id, name]', 'programStages[id, name, description, programStageDataElements, programStageSections[*, dataElements[*]]]','programTrackedEntityAttributes','programSections[*]']
+        }
+    },
+}
+
+const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
+
+    const { data: currentProgram } = useDataQuery(currentProgramQuery, { variables: { programId } });
+    const { data: optionSets } = useDataQuery(optionSetQuery);
+    const { data: legendSets } = useDataQuery(legendSetsQuery);
+    const { data: trackedEntityAttributes } = useDataQuery(teasQuery);
+    const { data: deProperties } = useDataQuery(dePropertiesQuery);
+    
     let programMetadata = "";
+
+    //* Instructions Tab Data
     let programPrefix = "";
-    let useCompetencyClass = "";
-    let programHealthArea = "";
     let programName = "";
     let programShortName = "";
-    if(typeof programStage.program !== "undefined")
-    {
-        programName = programStage.program.name;
-        programShortName = programStage.program.shortName;
-        programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
-        programPrefix = programMetadata?.dePrefix || programStage.program.id;
-        programHealthArea = programMetadata?.healthArea || "FP";
-        useCompetencyClass = programMetadata?.useCompetencyClass || "Yes";
-    }
+    let programTET = "";
+    let programCatCombo = "";
+    let programType = "";
 
-    const [ isDownloaded, setIsDownloaded] = useState(false);
-    const [ exportFlag, setExportFlag] = useState(true);
-    const { data: data} = useDataQuery(optionSetQuery);
-    const { data: haData } = useDataQuery(healthAreasQuery);
-    const { data: lsData } = useDataQuery(legendSetsQuery);
-    const { data: progData } = useDataQuery(programsQuery);
-
-    let Configures = [];
+    //* Map Data
+    let configurations = {};
     let optionData = [];
-    let healthAreaData = [];
     let legendSetData = [];
+    let trackedEntityAttributesData = [];
+    let valueTypes = [];
+    let aggTypes = [];
     let programData = [];
 
-    let optionPool = data?.results.optionSets;
-    if (optionPool)
-    {
-        optionData = optionPool.map(op=>{
-            return {"Option Sets": op.name, UID: op.id, Options: arrayObjectToStringConverter(op.options, "name")}
-        })
-    }
+    const [isDownloaded, setIsDownloaded] = useState(false);
+    const [exportFlag, setExportFlag] = useState(true);
 
-    let haPools = haData?.results.optionSets[0].options;
-    if (haPools)
-    {
-        healthAreaData = haPools.map(hp=>{
-            return {code: hp.code, "Health Area": hp.name}
-        });
-    }
+    useEffect(() => {
+        if (currentProgram?.results && optionSets && legendSets && trackedEntityAttributes && deProperties) {
+            console.log(currentProgram)
+            //* Program Settings
+            programMetadata = JSON.parse(currentProgram.results.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
+            programPrefix = programMetadata.dePrefix;
+            programName = currentProgram.results.name;
+            programShortName = currentProgram.results.shortName;
+            programTET = currentProgram.results.trackedEntityType?.name || 'N/A';
+            programCatCombo = currentProgram.results.categoryCombo.name;
+            programType = (currentProgram.results.withoutRegistration ? 'Event' : 'Tracker') + ' Program';
+            
+            //* Options Map
+            optionData = optionSets.results?.optionSets || [];
 
-    let legendPool = lsData?.results.legendSets;
-    if (legendPool)
-    {
-        legendSetData = legendPool.map(lp => {
-            return {"Legend Set": lp.name, UID: lp.id}
-        });
-    }
+            //* Legends Map
+            legendSetData = legendSets.results?.legendSets || [];
 
-    let prgPool = progData?.results.programs;
-    if (prgPool)
-    {
-        programData = prgPool.map(pp=>{
-            return {Program: pp.name, UID: pp.id}
-        });
-    }
+            //* Legends Map
+            trackedEntityAttributesData = trackedEntityAttributes.results.trackedEntityAttributes || [];
 
-    const initialize = () => {
+            //* valueType and aggregationType Properties
+            deProperties.results.properties?.forEach(property => {
+                if (property.name == 'aggregationType')
+                    aggTypes = property.constants
+                
+                if (property.name == 'valueType')
+                    valueTypes = property.constants
+            })
+
+            compile_report();
+
+            isLoading(false); //TODO: Move it
+        }
+    }, [currentProgram, optionSets, legendSets, trackedEntityAttributes, deProperties]);
+
+
+
+    /*const initialize = () => {
         if(typeof programStage.program !== "undefined") compile_report();
         setTimeout(function() {
             setIsDownloaded(true);
         }, 2000);
-    }
+    }*/
 
     const compile_report = () => {
-        let program_stage_id = programStage.id;
 
-        programStage.programStageSections.forEach((programSection) => {
-            let criticalStepsDataElements = ['NAaHST5ZDTE','VqBfZjZhKkU','pzWDtDUorBt'];
+        currentProgram.results?.programStages?.forEach(programStage => {
 
-            let program_section_id = programSection.id;
+            let program_stage_id = programStage.id;
+            configurations[program_stage_id] = []
 
-            // Skip 'Critical Steps Calculations' Section
-            if(programSection.dataElements.find(de => criticalStepsDataElements.includes(de.id))) return;
+            programStage.programStageSections.forEach((programSection) => {
 
-            let row = {};
-            row.structure = "Section";
-            row.form_name = programSection.displayName;
-            row.program_stage_id = program_stage_id;
-            row.program_section_id = program_section_id;
-            Configures.push(row);
+                let program_section_id = programSection.id;
 
-            programSection.dataElements.forEach((dataElement) => {
                 let row = {};
-
-                row.form_name = dataElement.formName.replaceAll(' [C]','');
-                row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : '';
-                row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
-                row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
-                row.description = dataElement.description;
-
+                row.structure = "Section";
+                row.form_name = programSection.displayName;
                 row.program_stage_id = program_stage_id;
                 row.program_section_id = program_section_id;
-                row.data_element_id = dataElement.id;
+                configurations[program_stage_id].push(row);
 
-                let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === "haUflNqP85K");
-                let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
-                row.parentValue = '';
-                row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
-                if(row.structure == 'label') row.form_name = metaData.labelFormName || '';
-                row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: '';
-                row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
-                row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion) : '';
-                row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : '';
-                row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: '';
-                row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: '';
+                programSection.dataElements.forEach((dataElement) => {
+                    let row = {};
 
-                let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === "LP171jpctBm");
-                row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : '';
+                    row.value_type = (typeof dataElement.valueType !== 'undefined') ? dataElement.valueType : '';
+                    row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
+                    row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
+                    row.description = dataElement.description;
 
-                let feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === "yhKEe6BLEer");
-                row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : '';
+                    row.program_stage_id = program_stage_id;
+                    row.program_section_id = program_section_id;
+                    row.data_element_id = dataElement.id;
 
-                //row.isCompulsory = getCompulsoryStatusForDE(dataElement.id);
-                Configures.push(row);
+                    let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
+                    let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
+                    row.parentValue = '';
+                    row.structure = 'Data Element';
+                    row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion) : '';
+                    row.answer_value = '';
+                    row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure != 'score') ? metaData.isCompulsory : '';
+
+                    //row.isCompulsory = getCompulsoryStatusForDE(dataElement.id);
+                    configurations[program_stage_id].push(row);
+                });
             });
         });
+
+        console.log(configurations);
     };
 
     const getCompulsoryStatusForDE = (dataElement_id) => {
@@ -175,17 +184,15 @@ const DataProcessor = (props) => {
 
     const getVarNameFromParentUid = (parentUid) =>{
         let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
-        let deMetadata = JSON.parse(parentDe.attributeValues.find(av => av.attribute.id === "haUflNqP85K")?.value || "{}");
+        let deMetadata = JSON.parse(parentDe.attributeValues.find(av => av.attribute.id === METADATA)?.value || "{}");
         return deMetadata.varName;
     }
 
-    initialize();
-
     return (
         <>
-            {isDownloaded && exportFlag && <Exporter programName={props.programName} flag={exportFlag} setFlag={setExportFlag} Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
+            {/*isDownloaded && exportFlag && <Exporter programName={props.programName} flag={exportFlag} setFlag={setExportFlag} configurations={configurations}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={isLoading} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={setStatus}/>*/}
         </>
     );
 }
 
-export default DataProcessor;
+export default DataProcessorTracker;

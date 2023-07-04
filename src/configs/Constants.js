@@ -424,6 +424,60 @@ const JSON_ATTRIBUTE_SETTINGS = [
     { key: 'relegends', label: 'Remove Legend Sets', selected: false, affects: ['legends', 'legendSets', 'legend', 'legendSet'] },
 ];
 
+const DHIS2_VALUE_TYPES_MAP = {
+    "TEXT": "Text",
+    "LONG_TEXT": "Long Text",
+    "LETTER": "Letter",
+    "PHONE_NUMBER": "Phone Number",
+    "EMAIL": "Email",
+    "BOOLEAN": "Yes/No",
+    "TRUE_ONLY": "Yes only",
+    "DATE": "Date",
+    "DATETIME": "Date & Time",
+    "TIME": "Time",
+    "NUMBER": "Number",
+    "UNIT_INTERVAL": "Unit Interval",
+    "PERCENTAGE": "Percentage",
+    "INTEGER": "Integer",
+    "INTEGER_POSITIVE": "Positive Integer",
+    "INTEGER_NEGATIVE": "Negative Integer",
+    "INTEGER_ZERO_OR_POSITIVE": "Positive or Zero Integer",
+    "COORDINATE": "Coordinate",
+    "ORGANISATION_UNIT": "Orgnisation Unit",
+    "REFERENCE": "Reference",
+    "AGE": "Age",
+    "URL": "URL",
+    "FILE_RESOURCE": "File",
+    "IMAGE": "Image",
+    "GEOJSON": "GeoJSON"
+};
+
+const DHIS2_AGG_OPERATORS_MAP = {
+    "SUM": "Sum", 
+    "AVERAGE": "Average", 
+    "AVERAGE_SUM_ORG_UNIT": "Average (Sum in Org Unit hierarchy)", 
+    "LAST": "Last value (Sum in Org Unit hierarchy)", 
+    "LAST_AVERAGE_ORG_UNIT": "Last value (Average in Org Unit hierarchy)", 
+
+    "LAST_LAST_ORG_UNIT": "** last_last_org_unit **",  //! WHAT
+    
+    "LAST_IN_PERIOD": "Last value in period (Sum in Org Unit hierarchy)", 
+    "LAST_IN_PERIOD_AVERAGE_ORG_UNIT": "Last value in period (Average in Org Unit hierarchy)", 
+    "FIRST": "First value (Sum in Org Unit hierarchy)", 
+    "FIRST_AVERAGE_ORG_UNIT": "First value (Average in Org Unit hierarchy)", 
+
+    "FIRST_FIRST_ORG_UNIT": "** first_first_org_unit ", //! WHAT
+
+    "COUNT": "Count", 
+    "STDDEV": "Standard Deviation", 
+    "VARIANCE": "Variance", 
+    "MIN": "Min", 
+    "MAX": "Max", 
+    "NONE": "None", 
+    "CUSTOM": "Custom", 
+    "DEFAULT": "Default"
+}
+
 export {
     ACTION_PLAN_ACTION,
     ACTION_PLAN_DUE_DATE,
@@ -443,8 +497,10 @@ export {
     DATASTORE_PCA_METADATA,
     DATE_FORMAT_OPTIONS,
     DE_TYPE_ATTRIBUTE,
+    DHIS2_AGG_OPERATORS_MAP,
     DHIS2_KEY_MAP,
     DHIS2_PRIMARY_COLOR,
+    DHIS2_VALUE_TYPES_MAP,
     ELEM_TYPES,
     EXPORT_PRESETS,
     EXTERNAL_IMPORT_REMOVE_KEYS,
@@ -506,6 +562,7 @@ export {
     QUESTION_PARENT_ATTRIBUTE,
     QUESTION_PARENT_OPTIONS_ATTRIBUTE,
     QUESTION_TYPE_ATTRIBUTE,
+    RENDER_TYPES,
     REPORT_DATE_TO_USE,
     SCORE_DEN_ATTRIBUTE,
     SCORE_NUM_ATTRIBUTE,
