@@ -74,7 +74,8 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
     let programType = "";
 
     //* Map Data
-    let configurations = {};
+    let stagesConfigurations = [];
+    let teaConfigurations = [];
     let optionData = [];
     let legendSetData = [];
     let trackedEntityAttributesData = [];
@@ -87,7 +88,6 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
     useEffect(() => {
         if (currentProgram?.results && optionSets && legendSets && trackedEntityAttributes && deProperties) {
-            console.log(currentProgram)
             //* Program Settings
             programMetadata = JSON.parse(currentProgram.results.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
             programPrefix = programMetadata.dePrefix;
@@ -103,7 +103,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
             //* Legends Map
             legendSetData = legendSets.results?.legendSets || [];
 
-            //* Legends Map
+            //* TEAs Map
             trackedEntityAttributesData = trackedEntityAttributes.results.trackedEntityAttributes || [];
 
             //* valueType and aggregationType Properties
@@ -115,27 +115,29 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
                     valueTypes = property.constants
             })
 
-            compile_report();
+            setStagesContents();
+            console.log(stagesConfigurations);
+            if (currentProgram?.results.withoutRegistration === false) {
+                setTEAContents();
+                console.log(teaConfigurations);
+            }
 
             isLoading(false); //TODO: Move it
         }
     }, [currentProgram, optionSets, legendSets, trackedEntityAttributes, deProperties]);
 
+    const setStagesContents = () => {
 
-
-    /*const initialize = () => {
-        if(typeof programStage.program !== "undefined") compile_report();
-        setTimeout(function() {
-            setIsDownloaded(true);
-        }, 2000);
-    }*/
-
-    const compile_report = () => {
-
-        currentProgram.results?.programStages?.forEach(programStage => {
+        currentProgram.results?.programStages?.sort(
+            (stageA, stageB) => {
+                if (stageA.name > stageB.name) return 1;
+                if (stageA.name < stageB.name) return -1;
+                return 0;
+            }
+        ).forEach((programStage, index) => {
 
             let program_stage_id = programStage.id;
-            configurations[program_stage_id] = []
+            let currentConfigurations = [];
 
             programStage.programStageSections.forEach((programSection) => {
 
@@ -144,45 +146,91 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
                 let row = {};
                 row.structure = "Section";
                 row.form_name = programSection.displayName;
-                row.program_stage_id = program_stage_id;
                 row.program_section_id = program_section_id;
-                configurations[program_stage_id].push(row);
+                currentConfigurations.push(row);
 
                 programSection.dataElements.forEach((dataElement) => {
                     let row = {};
+                    let metadataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
+                    let metadata = (metadataString.length > 0) ? JSON.parse(metadataString[0].value) : '';
 
-                    row.value_type = (typeof dataElement.valueType !== 'undefined') ? dataElement.valueType : '';
-                    row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
-                    row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
+                    row.structure = 'Data Element';
+                    row.use_auto_naming = metadata.autoNaming || 'No';
+
+                    row.name = dataElement.name;
+                    row.shortName = dataElement.shortName;
+                    row.code = dataElement.code;
+
+                    row.form_name = dataElement.formName;
                     row.description = dataElement.description;
 
-                    row.program_stage_id = program_stage_id;
+                    row.compulsory = (typeof metadata.isCompulsory !== 'undefined') ? metadata.isCompulsory : '';
+                    row.value_type = (typeof dataElement.valueType !== 'undefined') ? dataElement.valueType : '';
+                    row.agg_operator = dataElement.aggregationType;
+
+                    row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
+                    row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
                     row.program_section_id = program_section_id;
                     row.data_element_id = dataElement.id;
 
-                    let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
-                    let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
-                    row.parentValue = '';
-                    row.structure = 'Data Element';
-                    row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion) : '';
-                    row.answer_value = '';
-                    row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure != 'score') ? metaData.isCompulsory : '';
+                    //row.parentValue = '';
+                    //row.parent_question = (typeof metadata.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metadata.parentQuestion) : '';
+                    //row.answer_value = (typeof metadata.parentValue !== 'undefined') ? metadata.parentValue : '';
 
                     //row.isCompulsory = getCompulsoryStatusForDE(dataElement.id);
-                    configurations[program_stage_id].push(row);
+                    currentConfigurations.push(row);
                 });
             });
+
+            stagesConfigurations.push({
+                stageId: program_stage_id,
+                stageName: programStage.name,
+                configurations: currentConfigurations
+            })
         });
 
-        console.log(configurations);
     };
+
+    const setTEAContents = () => {
+        let teaMap = {};
+        currentProgram.results?.programTrackedEntityAttributes?.forEach(
+            tea => teaMap[tea.trackedEntityAttribute.id] = tea
+        );
+        currentProgram.results?.programSections?.forEach(teaSection => {
+            let row = {};
+            row.structure = "Section";
+            row.form_name = teaSection.name;
+            row.id = teaSection.id;
+            teaConfigurations.push(row);
+
+            teaSection.trackedEntityAttributes.forEach(tea => {
+
+                let teaData = teaMap[tea.id];
+                let row = {};
+
+                row.structure = "TEA";
+                row.id = teaData.id;
+                row.name = teaData.name;
+                row.mandatory = teaData.mandatory ? 'Yes' : 'No';
+                row.searchable = teaData.searchable ? 'Yes' : 'No';
+                row.display_in_list = teaData.displayInList ? 'Yes' : 'No';
+                row.allow_future_date = teaData.allowFutureDate ? 'Yes' : 'No';
+                row.mobile_render_type = teaData.renderType?.MOBILE?.type || '';
+                row.desktop_render_type = teaData.renderType?.DESKTOP?.type || '';
+
+                teaConfigurations.push(row);
+
+            });
+
+        })
+    }
 
     const getCompulsoryStatusForDE = (dataElement_id) => {
         let de = programStage.programStageDataElements.filter( psde => psde.dataElement.id === dataElement_id);
         return (de.length > 0) ? de[0].compulsory : false;
     }
 
-    const getVarNameFromParentUid = (parentUid) =>{
+    const getVarNameFromParentUid = (parentUid, programStage) =>{
         let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
         let deMetadata = JSON.parse(parentDe.attributeValues.find(av => av.attribute.id === METADATA)?.value || "{}");
         return deMetadata.varName;
