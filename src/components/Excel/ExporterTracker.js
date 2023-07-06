@@ -31,17 +31,16 @@ import {
     addReleaseNotes,
     addCreator
 } from "../../configs/ExcelUtils";
-import { ReleaseNotes } from "../../configs/ReleaseNotes";
+import { ReleaseNotesTracker } from "../../configs/ReleaseNotes";
 
 const MAX_FORM_NAME_LENGTH = 200;
 const MIN_FORM_NAME_LENGTH = 2;
 
-const Exporter = (props) => {
+const Exporter = ({
+    programPrefix, programName, programShortName, programTET, programCatCombo, programType, flag, stagesConfigurations, teaConfigurations, optionData, legendSetData, trackedEntityAttributesData, valueTypes, aggTypes, programData, isLoading, setFlag, setStatus
+ }) => {
 
     const password = template_password;
-    const initialize = () => {
-        generate();
-    };
 
     const generate = () => {
         const workbook = new ExcelJS.Workbook();
@@ -49,40 +48,177 @@ const Exporter = (props) => {
         const instructionWS = workbook.addWorksheet("Instructions", {
             views: [{
                 showGridLines: false
-            }]
-        }
-        );
-        instructionWS.properties.defaultColWidth = 30;
-        instructionWS.properties.defaultRowHeight = 20;
-        instructionWS.properties.alignment = { vertical: "middle" };
-        const templateWS = workbook.addWorksheet("Template", {
-            views: [{
-                showGridLines: false,
-                state: 'frozen',
-                xSplit: 3,
-                ySplit: 2
-            }]
+            }],
+            properties: { tabColor: { argb: '0070C0' } }
         });
+
+        instructionWS.properties.defaultColWidth = 12;
+        instructionWS.properties.defaultRowHeight = 15;
+        instructionWS.properties.alignment = { vertical: "middle" };
+        addInstructions(instructionWS);
+
+        if (programType === 'Tracker Program') {
+            const teasWS = workbook.addWorksheet("TEAs", {
+                views: [{
+                    showGridLines: false
+                }],
+                properties: { tabColor: { argb: 'FDE49B' } }
+            });
+        }
+
+        let stagesArray = [];
+        stagesConfigurations.forEach(configuration => {
+            let worksheet = workbook.addWorksheet(configuration.stageName, {
+                views: [{
+                    showGridLines: false,
+                    state: 'frozen',
+                    xSplit: 3,
+                    ySplit: 2
+                }],
+                properties: { tabColor: { argb: 'D1F1DA' } }
+            });
+            stagesArray.push(worksheet);
+            //addConfigurations(worksheet);
+            //hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
+            //addProtection(templateWS,3,3000,password);
+        })
+
+        const realeaseNotesWS = workbook.addWorksheet("Release Notes", {
+            views: [{
+                showGridLines: false
+            }],
+            properties: { tabColor: { argb: 'D9E7FD' } }
+        });
+        addReleaseNotes(realeaseNotesWS, ReleaseNotesTracker, password);
+
         const mappingWS = workbook.addWorksheet("Mapping", {
             views: [{
                 showGridLines: false
-            }]
+            }],
+            properties: { tabColor: { argb: 'FBDAD7' } }
         });
-        const realeaseNotesWS = workbook.addWorksheet("Release Notes");
         workbook.views = [{
-            activeTab: activeTabNumber
+            activeTab: 0,
         }];
         addMapping(mappingWS);
-        addInstructions(instructionWS);
-        addConfigurations(templateWS);
-        addReleaseNotes(realeaseNotesWS, ReleaseNotes, password);
-        hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
-        addProtection(templateWS,3,3000,password);
-        writeWorkbook(workbook, props.programName, props.setStatus, props.isLoading);
+        
+        writeWorkbook(workbook, programName, setStatus, isLoading);
     };
 
+    
     const addInstructions = async (ws) => {
-        ws.getColumn("A").width = 5;
+        ws.getCell("B2").value = "PROGRAM CONFIGURATION APP";
+        ws.getCell("B2").style = { font: { size: 12, bold: true } };
+        ws.getCell("B3").value = "TRACKER AND EVENT PROGRAMS CONFIGURATION TEMPLATE";
+        ws.getCell("B3").style = { font: { size: 12, bold: true } };
+
+        ws.mergeCells('B5:L5');
+        ws.getCell("B5").value = "Instructions";
+        ws.getCell("B5").style = { font: { bold: true } };
+        fillBackgroundToRange(ws, "B5:L5", "BDD7EE");
+        ws.getCell("B6").value = "This template has been designed for editing standard Tracker and Event Programs using the Program Configuration App (v1.7.0 and above).";
+        ws.getCell("B7").value = "Please read carefully all the instructions contained in this file to avoid issues and unexpected results when importing it to a DHIS2 server.";
+        ws.getCell("B8").value = "Please keep in mind that this Template can only be used to edit existing DHIS2 Programs; Program creation is not supported.";
+        ws.getCell("B8").style = { font: { color: { argb: 'FFC00000' } } };
+
+        ws.getCell("B10").value = "This template uses a color scheme to differentiate editable and read-only fields and columns:";
+        ws.getCell("B10").style = { font: { bold: true } };
+
+        fillBackgroundToRange(ws, "B12:B12", "BDD7EE");
+        fillBackgroundToRange(ws, "C12:C12", "BFBFBF");
+        applyBorderToRange(ws, 1, 12, 2, 12);
+        fillBackgroundToRange(ws, "H12:H12", "E2EFDA");
+        fillBackgroundToRange(ws, "I12:I12", "A6E3B7");
+        applyBorderToRange(ws, 7, 12, 8, 12);
+
+        ws.getCell("D12").value = "Automatically filled or read-only";
+        ws.getCell("J12").value = "Editable or enabled for user input";
+
+        ws.mergeCells('B14:L14');
+        ws.getCell("B14").value = "Configurations";
+        ws.getCell("B14").style = { font: { bold: true } };
+        fillBackgroundToRange(ws, "B14:L14", "BDD7EE");
+
+        ws.mergeCells('B16:F16');
+        ws.getCell("B16").value = "SERVER INFO";
+        ws.getCell("B16").alignment = { horizontal: "center" }; //TODO: Not working
+        ws.getCell("B16").style = { font: { bold: true } };
+
+        ws.mergeCells('B17:C17');
+        ws.getCell("B17").value = "DHIS2 Server URL";
+        ws.getCell("B17").style = { font: { bold: true } };
+        ws.mergeCells('D17:F17');
+        ws.getCell("D17").value = location.origin;
+        ws.mergeCells('B18:C18');
+        ws.getCell("B18").value = "DHIS2 Server Version";
+        ws.getCell("B18").style = { font: { bold: true } };
+        ws.mergeCells('D18:F18');
+        ws.getCell("D18").value = localStorage.getItem('SERVER_VERSION');
+        fillBackgroundToRange(ws, "B16:B18", "BDD7EE");
+
+        ws.mergeCells('B19:F20');
+        ws.getCell("B19").value = "The information displayed here corresponds to the server from which this Template was downloaded";
+        ws.getCell("B19").style = { font: { color: { argb: 'FFC00000' } } };
+        ws.getCell('B19').alignment = { wrapText: true };
+        applyBorderToRange(ws, 1, 16, 5, 20);
+
+        ws.getCell("H16").alignment = { vertical: 'middle', horizontal: 'center' };
+        ws.mergeCells('H16:L16');
+        ws.getCell("H16").value = "PROGRAM SETTINGS";
+        ws.getCell("H16").style = { font: { bold: true } };
+
+        ws.mergeCells('H17:I17');
+        ws.getCell("H17").value = "Data Element Prefix";
+        ws.getCell("H17").style = { font: { bold: true } };
+        ws.mergeCells('J17:L17');
+        ws.getCell("J17").value = programPrefix;
+        ws.mergeCells('H18:I18');
+        ws.getCell("H18").value = "Program";
+        ws.getCell("H18").style = { font: { bold: true } };
+        ws.mergeCells('J18:L18');
+        ws.getCell("J18").value = programName;
+        ws.mergeCells('H19:I19');
+        ws.getCell("H19").value = "Program Short Name";
+        ws.getCell("H19").style = { font: { bold: true } };
+        ws.mergeCells('J19:L19');
+        ws.getCell("J19").value = programShortName;
+        ws.mergeCells('H20:I20');
+        ws.getCell("H20").value = "Tracked Entity Type";
+        ws.getCell("H20").style = { font: { bold: true } };
+        ws.mergeCells('J20:L20');
+        ws.getCell("J20").value = programTET;
+        ws.mergeCells('H21:I21');
+        ws.getCell("H21").value = "Category Combination";
+        ws.getCell("H21").style = { font: { bold: true } };
+        ws.mergeCells('J21:L21');
+        ws.getCell("J21").value = programCatCombo;
+        ws.mergeCells('H22:I22');
+        ws.getCell("H22").value = "Program Type";
+        ws.getCell("H22").style = { font: { bold: true } };
+        ws.mergeCells('J22:L22');
+        ws.getCell("J22").value = programType;
+        fillBackgroundToRange(ws, "H16:H22", "BDD7EE");
+        applyBorderToRange(ws, 7, 16, 11, 22);
+
+        ws.getColumn("N").width = 70;
+        ws.getCell("N16").value = "HELP";
+        ws.getCell("N16").style = { font: { bold: true } };
+        fillBackgroundToRange(ws, "N16:N16", "D9D9D9");
+        ws.getCell("N17").value = "The prefix that the PCA automatically adds to the Program Data Elements";
+        ws.getCell("N18").value = "The Name of the Program that's being edited";
+        ws.getCell("N19").value = "The Short Name of the Program that's being edited";
+        ws.getCell("N20").value = "Tracked Entity Type linked to the Program";
+        ws.getCell("N21").value = "Category Combination of the Program that's being edited";
+        ws.getCell("N22").value = "Program Type: Event/Tracker Program";
+        fillBackgroundToRange(ws, "N17:N22", "F2F2F2");
+        applyBorderToRange(ws, 13, 16, 13, 22);
+
+        ws.mergeCells('B24:L24');
+        ws.getCell("B24").value = "Template Contents";
+        ws.getCell("B24").style = { font: { bold: true } };
+        fillBackgroundToRange(ws, "B24:L24", "BDD7EE");
+        
+        /*ws.getColumn("A").width = 5;
         ws.getCell("B2").value = "Welcome to DHIS2 Configuration Template";
         ws.getCell("B2").style = { font: { bold: true } };
         ws.getCell("B4").value = "By using this spreadsheet you'll be able to configure the structure of the DHIS2 checklist. Make sure you understand how to work with the tools integrated in this spreadsheet before you continue working.";
@@ -370,10 +506,11 @@ const Exporter = (props) => {
         applyBorderToRange(ws, 1, 26, 2, 40);
         applyBorderToRange(ws, 1, 47, 4, 61);
         instructionValidations(ws);
-        enableCellEditing(ws, ['C12', 'D12', 'C13', 'C14', 'C15', 'C16']);
+        enableCellEditing(ws, ['C12', 'D12', 'C13', 'C14', 'C15', 'C16']);*/
         await ws.protect(password);
     };
-
+    
+    /*
     const instructionValidations = (ws) => {
         ws.addConditionalFormatting({
             ref: '$C$12',
@@ -749,33 +886,37 @@ const Exporter = (props) => {
             applyBorderToRange(ws, 0, 3, 14, dataRow - 1);
         }
     };
-
+    */
     const addMapping = async (ws) => {
-        printArray2Column(ws, valueType, "Value Type", "B2", "b6d7a8");
-        printArray2Column(ws, renderType, "Render Type", "D2", "b6d7a8");
-        printArray2Column(ws, aggOperator, "Agg. Operator", "F2", "a2c4c9");
-        printObjectArray(ws, props.optionData, "H2", "d5a6bd");
-        printObjectArray(ws, props.healthAreaData, "L2", "d5a6bd")
-        printObjectArray(ws, props.legendSetData, "O2", "9fc5e8");
-        printObjectArray(ws, props.programData, "R2", "9fc5e8");
+        let optionSetData = optionData.map(od => {
+            od.url = `${location.origin}/api/optionSets/${od.id}.json?fields=id,name,options[id,code,name]`;
+            return od
+        })
+        printObjectArray(ws, trackedEntityAttributesData, "B2", "bdd7ee");
+        defineName(ws, `B3:F${trackedEntityAttributesData.length + 2}`, "Tracked_Entity_Attributes_Data");
 
-        defineName(ws, `B3:B${valueType.length + 2}`, "Value_Type");
-        defineName(ws, `D3:D${renderType.length + 2}`, "Render_Type");
-        defineName(ws, `F3:F${aggOperator.length + 2}`, "Agg_Operator");
-        defineName(ws, `H2:J${props.optionData.length + 2}`, "Option_Sets_Data");
-        defineName(ws, `H3:H${props.optionData.length + 2}`, "Option_Sets_option");
-        defineName(ws, `L2:M${props.healthAreaData.length + 2}`, "Health_Area_Data");
-        defineName(ws, `M3:M${props.healthAreaData.length + 2}`, "Health_Area_Option");
-        defineName(ws, `O2:P${props.legendSetData.length + 2}`, "Legend_Set_Data");
-        defineName(ws, `O3:O${props.legendSetData.length + 2}`, "Legend_Set_Option");
-        defineName(ws, `R2:S${props.programData.length + 2}`, "Program_Data");
+        printObjectArray(ws, optionSetData, "H2", "bdd7ee");
+        defineName(ws, `H3:K${optionSetData.length + 2}`, "Option_Sets_Data");
+
+        printObjectArray(ws, legendSetData, "M2", "bdd7ee");
+        defineName(ws, `M3:N${legendSetData.length + 2}`, "Legend_Set_Data");
+
+        printObjectArray(ws, valueTypes, "P2", "bdd7ee");
+        defineName(ws, `P3:Q${valueTypes.length + 2}`, "Value_Type");
+
+        printArray2Column(ws, renderType, "Render Type", "S2", "bdd7ee");
+        defineName(ws, `S3:S${renderType.length + 2}`, "Render_Type");
+
+        printObjectArray(ws, aggTypes, "U2", "bdd7ee");
+        defineName(ws, `U3:V${aggTypes.length + 2}`, "Agg_Operator");
+        
         await ws.protect(password);
     };
-
+    
     useEffect(() => {
-        if (props.flag) {
-            initialize()
-            props.setFlag(!props.flag)
+        if (flag) {
+            generate()
+            setFlag(!flag)
         }
     }, [])
 

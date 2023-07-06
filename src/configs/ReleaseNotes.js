@@ -21,3 +21,12 @@ export const ReleaseNotes = [
         "description": "Fixed dropdown validations for Critical Step, Compulsory, Value Type, Option Set and Legend columns."
     }
 ]
+
+// EXCEL TEMPLATE RELEASE NOTES
+export const ReleaseNotesTracker = [
+    {
+        "version": "v1.0",
+        "date": "2023-07-31",
+        "description": "Initial Release"
+    }
+]

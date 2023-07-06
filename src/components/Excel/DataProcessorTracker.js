@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDataQuery } from '@dhis2/app-runtime'
 import { arrayObjectToStringConverter } from '../../configs/Utils';
 import Exporter from "./Exporter";
-import { METADATA } from '../../configs/Constants';
+import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, METADATA } from '../../configs/Constants';
+import ExporterTracker from './ExporterTracker';
 
 const optionSetQuery = {
     results: {
@@ -19,7 +20,7 @@ const legendSetsQuery = {
         resource: 'legendSets',
         params: {
             paging: false,
-            fields: ['id','name']
+            fields: ['id', 'name']
         }
     }
 }
@@ -29,7 +30,7 @@ const teasQuery = {
         resource: 'trackedEntityAttributes',
         params: {
             paging: false,
-            fields: ['id','name', 'shortName', 'valueType', 'aggregationType']
+            fields: ['id', 'name', 'shortName', 'valueType', 'aggregationType']
         }
     }
 }
@@ -45,12 +46,12 @@ const dePropertiesQuery = {
 }
 
 // /api/programs/sC4L2NNx3VA.json?fields=id,name,shortName,attributeValues,withoutRegistration,trackedEntityType[id,name],categoryCombo[id,name],programStages[id,name,description,programStageDataElements,programStageSections[*,dataElements[*]]]
-const currentProgramQuery = {    
+const currentProgramQuery = {
     results: {
         resource: 'programs',
         id: ({ programId }) => programId,
         params: {
-            fields: ['id', 'name', 'shortName', 'attributeValues', 'withoutRegistration', 'trackedEntityType[id, name]', 'categoryCombo[id, name]', 'programStages[id, name, description, programStageDataElements, programStageSections[*, dataElements[*]]]','programTrackedEntityAttributes','programSections[*]']
+            fields: ['id', 'name', 'shortName', 'attributeValues', 'withoutRegistration', 'trackedEntityType[id, name]', 'categoryCombo[id, name]', 'programStages[id, name, description, programStageDataElements, programStageSections[*, dataElements[*]]]', 'programTrackedEntityAttributes', 'programSections[*]']
         }
     },
 }
@@ -62,7 +63,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
     const { data: legendSets } = useDataQuery(legendSetsQuery);
     const { data: trackedEntityAttributes } = useDataQuery(teasQuery);
     const { data: deProperties } = useDataQuery(dePropertiesQuery);
-    
+
     let programMetadata = "";
 
     //* Instructions Tab Data
@@ -85,6 +86,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
     const [isDownloaded, setIsDownloaded] = useState(false);
     const [exportFlag, setExportFlag] = useState(true);
+    const [exportProps, setExportProps] = useState(undefined);
 
     useEffect(() => {
         if (currentProgram?.results && optionSets && legendSets && trackedEntityAttributes && deProperties) {
@@ -96,7 +98,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
             programTET = currentProgram.results.trackedEntityType?.name || 'N/A';
             programCatCombo = currentProgram.results.categoryCombo.name;
             programType = (currentProgram.results.withoutRegistration ? 'Event' : 'Tracker') + ' Program';
-            
+
             //* Options Map
             optionData = optionSets.results?.optionSets || [];
 
@@ -109,22 +111,49 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
             //* valueType and aggregationType Properties
             deProperties.results.properties?.forEach(property => {
                 if (property.name == 'aggregationType')
-                    aggTypes = property.constants
-                
+                    aggTypes = property.constants.map(at => (
+                        { name: DHIS2_AGG_OPERATORS_MAP[at] || at, value: at }
+                    ))
+
                 if (property.name == 'valueType')
-                    valueTypes = property.constants
+                    valueTypes = property.constants.map(vt => (
+                        { name: DHIS2_VALUE_TYPES_MAP[vt] || vt, value: vt }
+                    ))
             })
 
             setStagesContents();
-            console.log(stagesConfigurations);
             if (currentProgram?.results.withoutRegistration === false) {
                 setTEAContents();
-                console.log(teaConfigurations);
-            }
+            }         
 
-            isLoading(false); //TODO: Move it
+            setExportProps({
+                programPrefix,
+                programName,
+                programShortName,
+                programTET,
+                programCatCombo,
+                programType,
+                flag: exportFlag ,
+                stagesConfigurations,
+                teaConfigurations,
+                optionData,
+                legendSetData,
+                trackedEntityAttributesData,
+                valueTypes,
+                aggTypes,
+                programData,
+                isLoading,
+                setFlag: setExportFlag,
+                setStatus
+            })
         }
     }, [currentProgram, optionSets, legendSets, trackedEntityAttributes, deProperties]);
+
+    useEffect(() => {
+        setTimeout(function () {
+            setIsDownloaded(true);
+        }, 1000);
+    }, [])
 
     const setStagesContents = () => {
 
@@ -226,11 +255,11 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
     }
 
     const getCompulsoryStatusForDE = (dataElement_id) => {
-        let de = programStage.programStageDataElements.filter( psde => psde.dataElement.id === dataElement_id);
+        let de = programStage.programStageDataElements.filter(psde => psde.dataElement.id === dataElement_id);
         return (de.length > 0) ? de[0].compulsory : false;
     }
 
-    const getVarNameFromParentUid = (parentUid, programStage) =>{
+    const getVarNameFromParentUid = (parentUid, programStage) => {
         let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
         let deMetadata = JSON.parse(parentDe.attributeValues.find(av => av.attribute.id === METADATA)?.value || "{}");
         return deMetadata.varName;
@@ -238,7 +267,11 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
     return (
         <>
-            {/*isDownloaded && exportFlag && <Exporter programName={props.programName} flag={exportFlag} setFlag={setExportFlag} configurations={configurations}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={isLoading} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={setStatus}/>*/}
+            {isDownloaded && exportFlag && exportProps &&
+                <ExporterTracker
+                    {...exportProps}
+                />
+            }
         </>
     );
 }

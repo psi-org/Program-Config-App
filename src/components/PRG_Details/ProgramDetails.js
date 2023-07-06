@@ -55,8 +55,7 @@ const ProgramDetails = () => {
     // 
 
     useEffect(()=>{
-
-    },[newStage])
+    }, [exportToExcel, setExportStatus])
 
     useEffect(() => {
         if (notification) setSnackSeverity(notification.severity)

@@ -449,7 +449,9 @@ const DHIS2_VALUE_TYPES_MAP = {
     "URL": "URL",
     "FILE_RESOURCE": "File",
     "IMAGE": "Image",
-    "GEOJSON": "GeoJSON"
+    "GEOJSON": "GeoJSON",
+    "USERNAME": "Username",
+    "TRACKER_ASSOCIATE": "Tracker Associate"
 };
 
 const DHIS2_AGG_OPERATORS_MAP = {
