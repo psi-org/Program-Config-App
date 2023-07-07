@@ -67,6 +67,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
     let programMetadata = "";
 
     //* Instructions Tab Data
+    let programID = "";
     let programPrefix = "";
     let programName = "";
     let programShortName = "";
@@ -92,6 +93,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
         if (currentProgram?.results && optionSets && legendSets && trackedEntityAttributes && deProperties) {
             //* Program Settings
             programMetadata = JSON.parse(currentProgram.results.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
+            programID = currentProgram.results.id;
             programPrefix = programMetadata.dePrefix;
             programName = currentProgram.results.name;
             programShortName = currentProgram.results.shortName;
@@ -127,6 +129,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
             }         
 
             setExportProps({
+                programID,
                 programPrefix,
                 programName,
                 programShortName,

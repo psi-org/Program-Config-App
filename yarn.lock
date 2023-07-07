@@ -7163,7 +7163,7 @@ evp_bytestokey@^1.0.0, evp_bytestokey@^1.0.3:
     md5.js "^1.3.4"
     safe-buffer "^5.1.1"
 
-exceljs@^4.2.1:
+exceljs@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/exceljs/-/exceljs-4.3.0.tgz#939bc0d4c59c200acadb7051be34d25c109853c4"
   integrity sha512-hTAeo5b5TPvf8Z02I2sKIT4kSfCnOO2bCxYX8ABqODCdAjppI3gI9VYiGCQQYVcBaBSKlFDMKlAQRqC+kV9O8w==

@@ -1,4 +1,4 @@
-import { splitPosition, character2Number, number2Character, columnCharacters } from "./Utils";
+import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy } from "./Utils";
 import { saveAs } from 'file-saver';
 import { thinBorder } from "./TemplateConstants";
 
@@ -52,12 +52,12 @@ export function printObjectArray(sheet, datas, position, headerBgColor) {
     });
     applyBorderToRange(sheet, character2Number(excelColumns.at(0)), headerRow, character2Number(excelColumns.at(-1)), parseInt(row) - 1);
 }
-export function applyBorderToRange(sheet, startCol, startRow, endCol, endRow) {
+export function applyBorderToRange(sheet, startCol, startRow, endCol, endRow, border = thinBorder) {
     for (let i = startRow; i <= endRow; i++) {
         for (let j = startCol; j <= endCol; j++) {
             const colChar = number2Character(j);
             const cellAxis = colChar + i.toString();
-            sheet.getCell(cellAxis).border = thinBorder;
+            sheet.getCell(cellAxis).border = DeepCopy( border );
         }
     }
 }
@@ -205,3 +205,25 @@ export const addCreator = wb => {
     wb.creator = 'KnowTechTure Ltd';
     wb.created = new Date();
 };
+
+export const buildCellObject = (ws, cell) => ({
+    cell: ws.getCell(cell),
+    ref: cell
+})
+
+export const generateBorderObject = (borderSchema, style = "thin") => {
+    let result = {};
+
+    while (borderSchema.length < 4) {
+        borderSchema = borderSchema+"0";
+    }
+
+    borderSchema = borderSchema.substring(0, 4);
+
+    if (borderSchema[0] === "1") result.top = { style }
+    if (borderSchema[1] === "1") result.right = { style }
+    if (borderSchema[2] === "1") result.bottom = { style }
+    if (borderSchema[3] === "1") result.left = { style }
+
+    return result;
+}
