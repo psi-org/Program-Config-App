@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDataQuery } from '@dhis2/app-runtime'
-import { arrayObjectToStringConverter } from '../../configs/Utils';
+import { DeepCopy, arrayObjectToStringConverter } from '../../configs/Utils';
 import Exporter from "./Exporter";
 import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, METADATA } from '../../configs/Constants';
 import ExporterTracker from './ExporterTracker';
@@ -51,7 +51,7 @@ const currentProgramQuery = {
         resource: 'programs',
         id: ({ programId }) => programId,
         params: {
-            fields: ['id', 'name', 'shortName', 'attributeValues', 'withoutRegistration', 'trackedEntityType[id, name]', 'categoryCombo[id, name]', 'programStages[id, name, description, programStageDataElements, programStageSections[*, dataElements[*]]]', 'programTrackedEntityAttributes', 'programSections[*]']
+            fields: ['id', 'name', 'shortName', 'attributeValues', 'withoutRegistration', 'trackedEntityType[id, name]', 'categoryCombo[id, name]', 'programStages[id, name, description, programStageDataElements, programStageSections[*, dataElements[*]]]', 'programTrackedEntityAttributes[*,trackedEntityAttribute[id,name]]', 'programSections[*]']
         }
     },
 }
@@ -102,13 +102,17 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
             programType = (currentProgram.results.withoutRegistration ? 'Event' : 'Tracker') + ' Program';
 
             //* Options Map
-            optionData = optionSets.results?.optionSets || [];
+            optionData = optionSets.results?.optionSets?.map(os => {
+                return { ref: os.name, ...os }
+            }) || [];
 
             //* Legends Map
             legendSetData = legendSets.results?.legendSets || [];
 
             //* TEAs Map
-            trackedEntityAttributesData = trackedEntityAttributes.results.trackedEntityAttributes || [];
+            trackedEntityAttributesData = trackedEntityAttributes.results.trackedEntityAttributes?.map(tea => {
+                return {ref:tea.name, ...tea}
+            }) || [];
 
             //* valueType and aggregationType Properties
             deProperties.results.properties?.forEach(property => {
@@ -223,16 +227,29 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
     };
 
-    const setTEAContents = () => {
+    const setTEAContents = () => { //TODO: Add support for programs with basic form and TEAs not in form.
         let teaMap = {};
-        currentProgram.results?.programTrackedEntityAttributes?.forEach(
-            tea => teaMap[tea.trackedEntityAttribute.id] = tea
-        );
-        currentProgram.results?.programSections?.forEach(teaSection => {
+        let allTEAs = []
+        currentProgram.results?.programTrackedEntityAttributes?.forEach(tea => {
+            teaMap[tea.trackedEntityAttribute.id] = tea;
+            allTEAs.push({ id: tea.trackedEntityAttribute.id })
+        });
+        
+        let programSections = currentProgram.results?.programSections;
+
+        if (programSections.length == 0) {
+            programSections = [{
+                id: "basic-form",
+                name: "Basic Form",
+                trackedEntityAttributes: allTEAs
+            }];
+        }
+
+        programSections.forEach(teaSection => {
             let row = {};
             row.structure = "Section";
             row.form_name = teaSection.name;
-            row.id = teaSection.id;
+            row.program_section_id = teaSection.id;
             teaConfigurations.push(row);
 
             teaSection.trackedEntityAttributes.forEach(tea => {
@@ -241,14 +258,15 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
                 let row = {};
 
                 row.structure = "TEA";
-                row.id = teaData.id;
-                row.name = teaData.name;
+                row.name = teaData.trackedEntityAttribute.name;
                 row.mandatory = teaData.mandatory ? 'Yes' : 'No';
                 row.searchable = teaData.searchable ? 'Yes' : 'No';
                 row.display_in_list = teaData.displayInList ? 'Yes' : 'No';
                 row.allow_future_date = teaData.allowFutureDate ? 'Yes' : 'No';
                 row.mobile_render_type = teaData.renderType?.MOBILE?.type || '';
                 row.desktop_render_type = teaData.renderType?.DESKTOP?.type || '';
+                row.program_tea_id = teaData.id;
+                row.program_section_id = teaSection.id;
 
                 teaConfigurations.push(row);
 

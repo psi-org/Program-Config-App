@@ -7,7 +7,8 @@ import {
     aggOperator,
     middleCenter,
     template_password,
-    structureValidator,
+    teaStructureValidator,
+    trackerStructureValidator,
     yesNoValidator,
     conditionalError,
     conditionalDisable,
@@ -63,7 +64,9 @@ const Exporter = ({
         if (programType === 'Tracker Program') {
             const teasWS = workbook.addWorksheet("TEAs", {
                 views: [{
-                    showGridLines: false
+                    showGridLines: false,
+                    state: 'frozen',
+                    ySplit: 1
                 }],
                 properties: { tabColor: { argb: 'FDE49B' } }
             });
@@ -483,68 +486,310 @@ const Exporter = ({
     };
 
     const addTEAConfigurations = ws => {
-        ws.columns = [{
+        let cols = [{
             header: "Structure",
             key: "structure",
-            width: 15
+            width: 15,
+            style: { font: { bold: true } }
         }, {
             header: "UID",
             key: "uid",
-            width: 15
+            width: 15,
+            style: { font: { bold: true } }
         }, {
             header: "Name",
             key: "name",
-            width: 45
-        }, {
-            header: "Form name",
-            key: "form_name",
-            width: 45
-        }, {
+            width: 60,
+            style: { font: { bold: true } }
+        },  {
             header: "Short Name",
             key: "short_name",
-            width: 30
-        }, {
-            header: "Description",
-            key: "description",
-            width: 30
+            width: 30,
+            style: { font: { bold: true } }
         }, {
             header: "Value Type",
             key: "value_type",
-            width: 15
+            width: 30,
+            style: { font: { bold: true } }
         }, {
             header: "Aggregation Type",
             key: "aggregation_type",
-            width: 30
+            width: 30,
+            style: { font: { bold: true } }
         }, {
             header: "Mandatory",
             key: "mandatory",
-            width: 15
+            width: 15,
+            style: { font: { bold: true } }
         }, {
             header: "Searchable",
             key: "searchable",
-            width: 15
+            width: 15,
+            style: { font: { bold: true } }
         }, {
             header: "Display in List",
             key: "display_in_list",
-            width: 15
+            width: 15,
+            style: { font: { bold: true } }
         }, {
             header: "Allow Future Date",
             key: "allow_future_date",
-            width: 15
+            width: 15,
+            style: { font: { bold: true } }
         }, {
             header: "Program Section Id",
             key: "program_section_id",
             width: 1
+        }, {
+            header: "Program TEA Id",
+            key: "program_tea_id",
+            width: 1
         }];
+
+        ws.columns = cols;
+
         fillBackgroundToRange(ws, "A1:A1", "E2EFDA");
         fillBackgroundToRange(ws, "B1:B1", "BDD7EE");
         fillBackgroundToRange(ws, "C1:C1", "E2EFDA");
-        fillBackgroundToRange(ws, "D1:H1", "BDD7EE");
-        fillBackgroundToRange(ws, "I1:N1", "E2EFDA");
-        applyBorderToRange(ws, 0, 0, 12, 2);
-        //addValidation(ws);
-        //addConditionalFormatting(ws);
-        //populateConfiguration(ws);
+        fillBackgroundToRange(ws, "D1:F1", "BDD7EE");
+        fillBackgroundToRange(ws, "G1:J1", "E2EFDA");
+        //applyBorderToRange(ws, 0, 0, 12, 2);
+
+
+        addValidationTEA(ws);
+        addConditionalFormattingTEA(ws);
+        populateConfigurationTEA(ws);
+
+        /*let teaTable = ws.addTable({
+            name: "Tracked_Entity_Attributes_Configuration",
+            ref: 'A1',
+            headerRow: true,
+            style: {
+                showRowStripes: false,
+                showColumnStripes: false
+            },
+            columns: cols.map(col => ({ name: col.header, filterButton: false })),
+            rows: populateConfigurationTEA(cols.map(col => col.key))
+        });*/
+        applyBorderToRange(ws, 0, 0, 9, teaConfigurations.length+1);
+    };
+
+    const addValidationTEA = (ws) => {
+        dataValidation(ws, "A2:A3000", {
+            type: 'list',
+            allowBlank: false,
+            error: 'Please select a valid value from the dropdown',
+            errorTitle: 'Invalid Selection',
+            showErrorMessage: true,
+            formulae: teaStructureValidator
+        });
+        dataValidation(ws, "C2:C3000", {
+            type: 'list',
+            allowBlank: false,
+            errorTitle: 'Invalid Selection',
+            formulae: ['Tracked_Entity_Attributes_Data']
+        });
+        dataValidation(ws, "G2:J3000", {
+            type: 'list',
+            allowBlank: true,
+            error: 'Please select the valid value from the dropdown',
+            errorTitle: 'Invalid Selection',
+            showErrorMessage: true,
+            formulae: yesNoValidator
+        });
+    }
+
+    const addConditionalFormattingTEA = (ws) => {
+        ws.addConditionalFormatting({
+            ref: 'A2:A3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND(ISBLANK($A2),NOT(ISBLANK($C2)))'],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Structure not selected',
+            prompt: 'A Structure has not been defined for the specified element.'
+        });
+        ws.addConditionalFormatting({
+            ref: 'C2:C3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['COUNTIF($C$2:$C$3000,C2)>1'],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Duplicated value',
+            prompt: 'A duplicated TEA has been found.'
+        });
+        ws.addConditionalFormatting({
+            ref: 'C2:C3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND(ISBLANK($C2),NOT(ISBLANK($A2)))'],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Name not defined',
+            prompt: 'The Section/TEA Name was not defined.'
+        });
+        ws.addConditionalFormatting({
+            ref: 'A2:J3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['$A2 = "Section"'],
+                    style: sectionHighlighting
+                },
+                {
+                    type: 'expression',
+                    formulae: ['$A2 = "TEA"'],
+                    style: questionHighlighting
+                }
+            ]
+        });
+        /*
+        
+        //conditional formatting for form name out of range
+        ws.addConditionalFormatting({
+            ref: 'C3:C3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: [`AND(NOT(ISBLANK($B3)),OR(LEN($C3)<${MIN_FORM_NAME_LENGTH},LEN($C3)>${MAX_FORM_NAME_LENGTH}))`],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Form name is too long',
+            prompt: `Given form name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`
+        });
+        //conditional formatting for structure=label
+        ws.addConditionalFormatting({
+            ref: 'F3:F3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['$B3="label"'],
+                    style: conditionalDisable
+                }
+            ]
+        });
+        //conditional formatting for structure=scores
+        ws.addConditionalFormatting({
+            ref: 'F3:F3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['$B3="score"'],
+                    style: conditionalDisable
+                }
+            ]
+        });
+        //conditional formatting for structure=scores and compositive indicator is empty
+        //or
+        //conditional formatting checking Feedback order if either score (numerator or denominator is available)
+        ws.addConditionalFormatting({
+            ref: 'K3:K3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['OR(AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3)), AND($B3="score", ISBLANK($K3)))'],
+                    style: conditionalError
+                }
+            ]
+        });
+        //Conditional formatting checking incomplete scoring
+        ws.addConditionalFormatting({
+            ref: 'I3:J3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['OR(AND($I3<>"",$J3=""), AND($I3="",$J3<>""))'],
+                    style: conditionalError
+                }
+            ]
+        });
+        //Conditional formatting checking incomplete parent and answer
+        ws.addConditionalFormatting({
+            ref: 'L3:M3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['OR(AND($L3<>"", $M3=""), AND($L3="", $M3<>""))'],
+                    style: conditionalError
+                }
+            ]
+        })
+        ws.addConditionalFormatting({
+            ref: 'A3:R3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['$B3 = "Section"'],
+                    style: sectionHighlighting
+                },
+                {
+                    type: 'expression',
+                    formulae: ['$B3 = "question"'],
+                    style: questionHighlighting
+                },
+                {
+                    type: 'expression',
+                    formulae: ['$B3 = "label"'],
+                    style: labelHighlighting
+                }
+            ]
+        });
+        ws.addConditionalFormatting({
+            ref: 'L4:L3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['$A4=$L4'],
+                    style: conditionalError,
+                }
+            ]
+        });*/
+    }
+
+    const populateConfigurationTEA = (ws) => {
+        let dataRow = 2;
+        //let rows = [];
+        if (teaConfigurations.length > 0) {
+            console.log(teaConfigurations);
+            teaConfigurations.forEach((configure, index) => {
+                if (configure.structure === "Section") {
+                    configure.name = configure.form_name;
+                    configure.form_name = '';
+                }
+
+                let autoColumns = ['uid', 'short_name', 'aggregation_type', 'value_type'];
+                autoColumns.forEach((col, index) => { 
+                    configure[col] = {
+                        formula: `=IF(AND(NOT(ISBLANK(A${dataRow})),A${dataRow}="TEA"),VLOOKUP(C${dataRow}, selected_TEA_Data,${2 + index},FALSE),"")`
+                    }
+                })               
+
+                ws.getRow(dataRow).values = configure;
+                if (configure.structure === "Section") {
+                    fillBackgroundToRange(ws, "A" + dataRow + ":J" + dataRow, "f8c291")
+                }
+                if (configure.structure === "TEA") {
+                    fillBackgroundToRange(ws, "A" + dataRow + ":J" + dataRow, "FFFFFF")
+                }
+
+                dataRow = dataRow + 1;
+
+                /*let row = [];
+                order.forEach(o => row.push(configure[o] || ''))
+                rows.push(row)*/
+            });
+            //return rows;
+            return dataRow
+        }
     };
 
     /*
@@ -930,22 +1175,23 @@ const Exporter = ({
             return od
         })
         printObjectArray(ws, trackedEntityAttributesData, "B2", "bdd7ee");
-        defineName(ws, `B3:F${trackedEntityAttributesData.length + 2}`, "Tracked_Entity_Attributes_Data");
+        defineName(ws, `B3:B${trackedEntityAttributesData.length + 2}`, "Tracked_Entity_Attributes_Data");
+        defineName(ws, `C3:G${trackedEntityAttributesData.length + 2}`, "selected_TEA_Data");
 
-        printObjectArray(ws, optionSetData, "H2", "bdd7ee");
-        defineName(ws, `H3:K${optionSetData.length + 2}`, "Option_Sets_Data");
+        printObjectArray(ws, optionSetData, "I2", "bdd7ee");
+        defineName(ws, `I3:I${optionSetData.length + 2}`, "Option_Sets_Data");
 
-        printObjectArray(ws, legendSetData, "M2", "bdd7ee");
-        defineName(ws, `M3:N${legendSetData.length + 2}`, "Legend_Set_Data");
+        printObjectArray(ws, legendSetData, "O2", "bdd7ee");
+        defineName(ws, `O3:O${legendSetData.length + 2}`, "Legend_Set_Data");
 
-        printObjectArray(ws, valueTypes, "P2", "bdd7ee");
-        defineName(ws, `P3:Q${valueTypes.length + 2}`, "Value_Type");
+        printObjectArray(ws, valueTypes, "S2", "bdd7ee");
+        defineName(ws, `S3:S${valueTypes.length + 2}`, "Value_Type");
 
-        printArray2Column(ws, renderType, "Render Type", "S2", "bdd7ee");
-        defineName(ws, `S3:S${renderType.length + 2}`, "Render_Type");
+        printArray2Column(ws, renderType, "Render Type", "V2", "bdd7ee");
+        defineName(ws, `V3:V${renderType.length + 2}`, "Render_Type");
 
-        printObjectArray(ws, aggTypes, "U2", "bdd7ee");
-        defineName(ws, `U3:V${aggTypes.length + 2}`, "Agg_Operator");
+        printObjectArray(ws, aggTypes, "X2", "bdd7ee");
+        defineName(ws, `X3:X${aggTypes.length + 2}`, "Agg_Operator");
 
         await ws.protect(password);
     };

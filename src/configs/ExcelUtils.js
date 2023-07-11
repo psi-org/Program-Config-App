@@ -30,6 +30,7 @@ export function printObjectArray(sheet, datas, position, headerBgColor) {
     keys.forEach((key, index) => {
         let cell = sheet.getCell(excelColumns[index] + headerRow);
         cell.value = key;
+        cell.alignment = { wrapText: true };
         cell.font = {
             size: 12,
             bold: true
