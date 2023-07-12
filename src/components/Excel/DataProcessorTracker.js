@@ -229,21 +229,16 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
     const setTEAContents = () => { //TODO: Add support for programs with basic form and TEAs not in form.
         let teaMap = {};
-        let allTEAs = []
+        let allTEAs = [];
+        let unusedTEAs = [];
+
         currentProgram.results?.programTrackedEntityAttributes?.forEach(tea => {
             teaMap[tea.trackedEntityAttribute.id] = tea;
             allTEAs.push({ id: tea.trackedEntityAttribute.id })
         });
+
         
         let programSections = currentProgram.results?.programSections;
-
-        if (programSections.length == 0) {
-            programSections = [{
-                id: "basic-form",
-                name: "Basic Form",
-                trackedEntityAttributes: allTEAs
-            }];
-        }
 
         programSections.forEach(teaSection => {
             let row = {};
@@ -253,26 +248,45 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
             teaConfigurations.push(row);
 
             teaSection.trackedEntityAttributes.forEach(tea => {
-
-                let teaData = teaMap[tea.id];
-                let row = {};
-
-                row.structure = "TEA";
-                row.name = teaData.trackedEntityAttribute.name;
-                row.mandatory = teaData.mandatory ? 'Yes' : 'No';
-                row.searchable = teaData.searchable ? 'Yes' : 'No';
-                row.display_in_list = teaData.displayInList ? 'Yes' : 'No';
-                row.allow_future_date = teaData.allowFutureDate ? 'Yes' : 'No';
-                row.mobile_render_type = teaData.renderType?.MOBILE?.type || '';
-                row.desktop_render_type = teaData.renderType?.DESKTOP?.type || '';
-                row.program_tea_id = teaData.id;
-                row.program_section_id = teaSection.id;
-
-                teaConfigurations.push(row);
-
+                teaConfigurations.push(teaRowBuilder(teaMap, tea, teaSection.id));
             });
 
-        })
+        });
+        
+        unusedTEAs = allTEAs.filter(tea => !teaConfigurations.find(elem => elem.id === tea.id));
+        if (unusedTEAs.length > 0) {
+
+            let additionalConfigs = [{
+                structure: "Section",
+                form_name: programSections.length == 0?"Basic Form":"Available TEAs not in Form",
+                program_section_id: "unused"
+            }];
+
+            unusedTEAs.forEach(tea => {
+                additionalConfigs.push(teaRowBuilder(teaMap, tea,));
+            });
+
+            teaConfigurations = additionalConfigs.concat(teaConfigurations);
+        }
+    }
+
+    const teaRowBuilder = (teaMap, tea, teaSectionId = 'unused') => {
+        let teaData = teaMap[tea.id];
+        let row = {};
+
+        row.structure = "TEA";
+        row.name = teaData.trackedEntityAttribute.name;
+        row.mandatory = teaData.mandatory ? 'Yes' : 'No';
+        row.searchable = teaData.searchable ? 'Yes' : 'No';
+        row.display_in_list = teaData.displayInList ? 'Yes' : 'No';
+        row.allow_future_date = teaData.allowFutureDate ? 'Yes' : 'No';
+        row.mobile_render_type = teaData.renderType?.MOBILE?.type || '';
+        row.desktop_render_type = teaData.renderType?.DESKTOP?.type || '';
+        row.program_tea_id = teaData.id;
+        row.program_section_id = teaSectionId;
+        row.id = tea.id;
+
+        return row;
     }
 
     const getCompulsoryStatusForDE = (dataElement_id) => {

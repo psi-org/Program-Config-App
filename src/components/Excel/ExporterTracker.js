@@ -14,7 +14,7 @@ import {
     conditionalDisable,
     sectionHighlighting,
     questionHighlighting,
-    labelHighlighting,
+    otherHighlighting,
     verticalMiddle
 } from "../../configs/TemplateConstants";
 import {
@@ -71,6 +71,8 @@ const Exporter = ({
                 properties: { tabColor: { argb: 'FDE49B' } }
             });
             addTEAConfigurations(teasWS);
+            hideColumns(teasWS, ['program_section_id', 'program_tea_id']);
+            addProtection(teasWS, 2, 3000, password);
         }
 
         let stagesArray = [];
@@ -489,53 +491,43 @@ const Exporter = ({
         let cols = [{
             header: "Structure",
             key: "structure",
-            width: 15,
-            style: { font: { bold: true } }
+            width: 10,
         }, {
             header: "UID",
             key: "uid",
-            width: 15,
-            style: { font: { bold: true } }
+            width: 20,
         }, {
             header: "Name",
             key: "name",
             width: 60,
-            style: { font: { bold: true } }
         },  {
             header: "Short Name",
             key: "short_name",
             width: 30,
-            style: { font: { bold: true } }
         }, {
             header: "Value Type",
             key: "value_type",
             width: 30,
-            style: { font: { bold: true } }
         }, {
             header: "Aggregation Type",
             key: "aggregation_type",
             width: 30,
-            style: { font: { bold: true } }
         }, {
             header: "Mandatory",
             key: "mandatory",
-            width: 15,
-            style: { font: { bold: true } }
+            width: 20,
         }, {
             header: "Searchable",
             key: "searchable",
-            width: 15,
-            style: { font: { bold: true } }
+            width: 20,
         }, {
             header: "Display in List",
             key: "display_in_list",
-            width: 15,
-            style: { font: { bold: true } }
+            width: 20,
         }, {
             header: "Allow Future Date",
             key: "allow_future_date",
-            width: 15,
-            style: { font: { bold: true } }
+            width: 20,
         }, {
             header: "Program Section Id",
             key: "program_section_id",
@@ -547,13 +539,13 @@ const Exporter = ({
         }];
 
         ws.columns = cols;
+        ws.getRow(1).font = { bold: true };
 
         fillBackgroundToRange(ws, "A1:A1", "E2EFDA");
         fillBackgroundToRange(ws, "B1:B1", "BDD7EE");
         fillBackgroundToRange(ws, "C1:C1", "E2EFDA");
         fillBackgroundToRange(ws, "D1:F1", "BDD7EE");
         fillBackgroundToRange(ws, "G1:J1", "E2EFDA");
-        //applyBorderToRange(ws, 0, 0, 12, 2);
 
 
         addValidationTEA(ws);
@@ -641,7 +633,12 @@ const Exporter = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['$A2 = "Section"'],
+                    formulae: ['AND($A2 = "Section",$K2 = "unused")'],
+                    style: otherHighlighting
+                },
+                {
+                    type: 'expression',
+                    formulae: ['AND($A2 = "Section",$K2 <> "unused")'],
                     style: sectionHighlighting
                 },
                 {
