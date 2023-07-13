@@ -1,6 +1,6 @@
 // Hooks
 import {useState,useEffect} from 'react';
-import { useDataQuery } from "@dhis2/app-runtime";
+import { useDataQuery,useDataMutation } from "@dhis2/app-runtime";
 
 // DIALOG
 import DialogActions from '@mui/material/DialogActions';
@@ -41,6 +41,7 @@ import { DHIS2_PRIMARY_COLOR } from '../../configs/Constants';
 import InputModal from './InputModal';
 import AssignedAttributes from './TEAEditor/AssignedAttributes';
 import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 // Queries
 const queryProgram = {
@@ -48,12 +49,34 @@ const queryProgram = {
         resource: 'programs',
         id: ({ programId }) => programId,
         params: {
-            fields: ['id', 'displayName',
-            'programSections[id,name,trackedEntityAttributes,sortOrder,renderType]',
-            'programTrackedEntityAttributes[id,name,displayInList,sortOrder,mandatory,allowFutureDate,renderOptionAsRadio,searchable,valueType,trackedEntityAttribute[id,name],renderType],trackedEntityType[trackedEntityTypeAttributes[trackedEntityAttribute[id]]]'
+            fields: ['*','id', 'displayName',
+            'programSections[id,name,trackedEntityAttributes,sortOrder,program,renderType]',
+            'programTrackedEntityAttributes[id,name,displayInList,sortOrder,mandatory,allowFutureDate,renderOptionAsRadio,searchable,valueType,trackedEntityAttribute[id,name],renderType],trackedEntityType[id,trackedEntityTypeAttributes[trackedEntityAttribute[id]]]'
             ]
         }
     },
+};
+
+const queryIds = {
+    results: {
+        resource: 'system/id.json',
+        params: ({ n }) => ({
+            limit: n
+        })
+    }
+};
+
+const updateMutation = {
+    type: 'update',
+    resource: 'programs',
+    id: ({id})=>id,
+    data: ({data})=>data
+}
+
+const createMutation = {
+    resource: 'metadata',
+    type: 'create',
+    data: ({ data }) => data
 };
 
 const queryTEA = {
@@ -69,12 +92,15 @@ const queryTEA = {
 
 const TEAEditor = ({programId,onClose}) => {
 
+    // * Data Queries
     const { refetch:programRefetch } = useDataQuery(queryProgram, { variables: { programId }, lazy:true });
     const { refetch:teaRefetch } = useDataQuery(queryTEA, {lazy:true});
+    const [updateProgram,{loading:isUpdatingProgram}] = useDataMutation(updateMutation,{lazy:true, variables:{id:programId}});
+    const [updateMetadata,{loading:isUpdating}] = useDataMutation(createMutation,{lazy:true})
+    const { refetch:getIds } = useDataQuery(queryIds, { lazy: true });
+
 
     const [activeStep, setActiveStep] = useState(0);
-
-    const [isLoading, setIsLoading] = useState(false);
 
     const [exitDisclaimer,setExitDisclaimer] = useState(false);
     const [inputModalOpened,setInputModalOpened] = useState(false);
@@ -93,6 +119,12 @@ const TEAEditor = ({programId,onClose}) => {
     const [formSections,setFormSections] = useState([])
 
     useEffect(() => {
+        loadProgramData()
+    }, [])
+
+    // --------- Atts Behaviour ------------
+
+    const loadProgramData = () =>{
         teaRefetch().then(teaResults =>{
             programRefetch({programId}).then(programResults => {
 
@@ -148,7 +180,7 @@ const TEAEditor = ({programId,onClose}) => {
                         section => section.trackedEntityAttributes.map(tea => tea.id)
                     ).flat().includes(teaId)
                 ).map(
-                    assignedTea => availableTEAs.find(
+                    assignedTea => teaOptions.available.find(
                         tea => tea.trackedEntityAttribute.id === assignedTea
                     )
                 )
@@ -163,9 +195,7 @@ const TEAEditor = ({programId,onClose}) => {
 
             })
         })
-    }, [])
-
-    // --------- Atts Behaviour ------------
+    }
 
     const handleTransferChange = (e) => {
 
@@ -219,13 +249,17 @@ const TEAEditor = ({programId,onClose}) => {
         return ({
             sectionName: '',
             onSave: (name) => {
-                formSections.push({
-                    name,
-                    trackedEntityAttributes:[],
-                    isNewSection:true
+                getIds({n:1}).then(results => {
+                    const id = results.results.codes[0]
+                    formSections.push({
+                        id,
+                        name,
+                        program: { id: programId },
+                        trackedEntityAttributes:[]
+                    })
+                    setFormSections([...formSections])
+                    setInputModalOpened(false)
                 })
-                setFormSections([...formSections])
-                setInputModalOpened(false)
             }
         })
     }
@@ -242,6 +276,16 @@ const TEAEditor = ({programId,onClose}) => {
 
         setFormSections([...formSections])
         setAssignedAttributes([...assignedAttributes])
+    }
+
+    const removeSection = (sectionIndex) => {
+        formSections[sectionIndex].trackedEntityAttributes.forEach( teaId =>{
+            assignedAttributes.push(teaOptions.available.find(tea => tea.trackedEntityAttribute.id === teaId.id))
+        })   
+        setAssignedAttributes([...assignedAttributes])
+
+        formSections.splice(sectionIndex,1)
+        setFormSections([...formSections])
     }
 
     // --------- END OF : Atts Behaviour ------------
@@ -397,7 +441,7 @@ const TEAEditor = ({programId,onClose}) => {
                         width:'100%', 
                         padding:'5px',
                         display:'grid',
-                        gridTemplateColumns:'50px auto 50px',
+                        gridTemplateColumns:'50px auto 50px 50px',
                         rowGap:'0.5rem',
                         alignItems:'center'
                     }}>
@@ -408,6 +452,9 @@ const TEAEditor = ({programId,onClose}) => {
                             setInputModalActions({...modalActions})
                             setInputModalOpened(true)
                         }}><EditIcon/></div>
+                        <div style={{cursor:'pointer'}} onClick={()=>removeSection(idx)}>
+                            <DeleteIcon/>
+                        </div>
                     </div>
                 </AccordionSummary>
                 <AccordionDetails style={{padding:'8px'}}>
@@ -523,6 +570,44 @@ const TEAEditor = ({programId,onClose}) => {
     }
 
     // --------- END OF : Drag and Drop ------------
+
+    const onSubmit = () => {
+        programRefetch({programId}).then(programResults => {
+
+            let data = {programs:[], programSections:[]}
+
+            let program = programResults.results
+            program.programTrackedEntityAttributes = teaOptions.selected.map(
+                (teaId,idx) => {
+                    let t = teaOptions.available.find(tea => tea.trackedEntityAttribute.id === teaId)
+                    t.sortOrder = idx
+                    return t
+                }
+            )
+
+            if(useSections){
+                data.programSections = formSections.map((section,idx) => {
+                    section.sortOrder = idx
+                    return section
+                })
+            }
+
+            program.programSections = data.programSections.map(section => ({id:section.id}) )
+
+            data.programs.push(program)
+            
+
+            updateMetadata({data}).then(results => {
+                // TODO: Use Snackbar   
+                alert('Done')
+                loadProgramData()
+            }).catch(error => {
+                alert('Error')
+            })
+
+        })
+
+    }
     
     // COMPONENT RENDER //
     return (
@@ -535,7 +620,7 @@ const TEAEditor = ({programId,onClose}) => {
 
                     <Stepper nonLinear activeStep={activeStep} orientation='vertical'>
                         <Step>
-                            <StepButton color='inherit' onClick={()=>setActiveStep(0)}>Choose Tracked Entity Attributes</StepButton>
+                            <StepButton color='inherit' onClick={()=>setActiveStep(0)}>Select Tracked Entity Attributes</StepButton>
                             <StepContent>
                                 <Transfer
                                     filterable
@@ -588,8 +673,9 @@ const TEAEditor = ({programId,onClose}) => {
                 <DialogActions style={{ padding: '1em' }}>
                     <Button onClick={() => setExitDisclaimer(true)} color="error" > Close </Button>
                     <LoadingButton
-                        onClick={() => {}}
-                        loading={isLoading}
+                        onClick={() => onSubmit()}
+                        loading={isUpdating}
+                        disabled={isUpdating}
                         variant='outlined'
                         loadingPosition="start"
                         startIcon={<SendIcon />} >
