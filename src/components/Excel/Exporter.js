@@ -10,7 +10,7 @@ import {
     structureValidator,
     yesNoValidator,
     conditionalError,
-    conditionalDisable,
+    disabledHighlighting,
     sectionHighlighting,
     questionHighlighting,
     labelHighlighting
@@ -605,6 +605,7 @@ const Exporter = (props) => {
     }
 
     const addConditionalFormatting = (ws) => {
+        //Highlight when Parent Name is not defined for Questions and Labels
         ws.addConditionalFormatting({
             ref: 'A3:A3000',
             rules: [
@@ -617,6 +618,7 @@ const Exporter = (props) => {
             promptTitle: 'Parent name not defined',
             prompt: 'A parent name was not defined for the specified element.'
         });
+        //Highlight when the Form Name is not defined and a Structure is selected
         ws.addConditionalFormatting({
             ref: 'C3:C3000',
             rules: [
@@ -629,7 +631,7 @@ const Exporter = (props) => {
             promptTitle: 'Form name not defined',
             prompt: 'A form name was not defined for the specified element.'
         });
-        //conditional formatting for form name out of range
+        //Form name out of range
         ws.addConditionalFormatting({
             ref: 'C3:C3000',
             rules: [
@@ -639,8 +641,19 @@ const Exporter = (props) => {
                     style: conditionalError,
                 }
             ],
-            promptTitle: 'Form name is too long',
-            prompt: `Given form name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`
+            promptTitle: 'Form Name out of range',
+            prompt: `Given Form Name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`
+        });
+        //Disable Value Type when Option Set is selected
+        ws.addConditionalFormatting({
+            ref: 'F3:F3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['NOT(ISBLANK($G3))'],
+                    style: disabledHighlighting
+                }
+            ]
         });
         //conditional formatting for structure=label
         ws.addConditionalFormatting({
@@ -649,18 +662,40 @@ const Exporter = (props) => {
                 {
                     type: 'expression',
                     formulae: ['$B3="label"'],
-                    style: conditionalDisable
+                    style: disabledHighlighting
                 }
             ]
         });
-        //conditional formatting for structure=scores
+        //conditional formatting for structure=scores (1)
         ws.addConditionalFormatting({
-            ref: 'F3:F3000',
+            ref: 'A3:A3000',
             rules: [
                 {
                     type: 'expression',
                     formulae: ['$B3="score"'],
-                    style: conditionalDisable
+                    style: disabledHighlighting
+                }
+            ]
+        });
+        //conditional formatting for structure=scores (2)
+        ws.addConditionalFormatting({
+            ref: 'D3:J3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['$B3="score"'],
+                    style: disabledHighlighting
+                }
+            ]
+        });
+        //conditional formatting for structure=scores (3)
+        ws.addConditionalFormatting({
+            ref: 'L3:O3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['$B3="score"'],
+                    style: disabledHighlighting
                 }
             ]
         });
@@ -699,6 +734,19 @@ const Exporter = (props) => {
                 }
             ]
         })
+        //Parent question is the same as the Parent Name of the current Question
+        ws.addConditionalFormatting({
+            ref: 'L4:L3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND($A4<>"",$A4=$L4)'],
+                    style: conditionalError,
+                }
+            ]
+        });
+
+        //Row highlighting for Sections, Questions and Labels
         ws.addConditionalFormatting({
             ref: 'A3:R3000',
             rules: [
@@ -716,16 +764,6 @@ const Exporter = (props) => {
                     type: 'expression',
                     formulae: ['$B3 = "label"'],
                     style: labelHighlighting
-                }
-            ]
-        });
-        ws.addConditionalFormatting({
-            ref: 'L4:L3000',
-            rules: [
-                {
-                    type: 'expression',
-                    formulae: ['$A4=$L4'],
-                    style: conditionalError,
                 }
             ]
         });

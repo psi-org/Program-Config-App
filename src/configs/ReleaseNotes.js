@@ -19,6 +19,11 @@ export const ReleaseNotes = [
         "version": "v1.3",
         "date": "2022-09-12",
         "description": "Fixed dropdown validations for Critical Step, Compulsory, Value Type, Option Set and Legend columns."
+    },
+    {
+        "version": "v1.4",
+        "date": "2023-07-31",
+        "description": "Improved and fixed some Conditional Format Rules."
     }
 ]
 

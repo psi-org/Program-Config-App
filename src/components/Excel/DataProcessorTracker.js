@@ -10,7 +10,7 @@ const optionSetQuery = {
         resource: 'optionSets',
         params: {
             paging: false,
-            fields: ['id', 'name', 'valueType']
+            fields: ['id', 'name', 'valueType', 'href']
         }
     }
 };
@@ -103,7 +103,14 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
             //* Options Map
             optionData = optionSets.results?.optionSets?.map(os => {
-                return { ref: os.name, ...os }
+                let origin = os.href.split('api')[0];
+                return {
+                    ref: os.name,
+                    name: os.name,
+                    id: os.id,
+                    valueType: os.valueType,
+                    url: `${origin}api/optionSets/${os.id}?fields=id,name,options[id,code,name]`
+                }
             }) || [];
 
             //* Legends Map
@@ -208,8 +215,9 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
                     row.legend_set = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : undefined;
                     row.program_section_id = program_section_id;
                     row.data_element_id = dataElement.id;
-                    row.parent_question = (typeof metadata.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metadata.parentQuestion) : undefined;
+                    row.parent_question = (typeof metadata.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metadata.parentQuestion, programStage) : undefined;
                     row.answer_value = (typeof metadata.parentValue !== 'undefined') ? metadata.parentValue : undefined;
+                    row.program_stage_id = programStage.id
 
                     currentConfigurations.push(row);
                 });

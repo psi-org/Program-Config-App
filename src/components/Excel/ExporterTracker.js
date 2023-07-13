@@ -15,7 +15,8 @@ import {
     sectionHighlighting,
     questionHighlighting,
     otherHighlighting,
-    verticalMiddle
+    verticalMiddle,
+    disabledHighlighting
 } from "../../configs/TemplateConstants";
 import {
     fillBackgroundToRange,
@@ -36,9 +37,7 @@ import {
     generateBorderObject
 } from "../../configs/ExcelUtils";
 import { ReleaseNotesTracker } from "../../configs/ReleaseNotes";
-
-const MAX_FORM_NAME_LENGTH = 200;
-const MIN_FORM_NAME_LENGTH = 2;
+import { MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../../configs/Constants';
 
 const Exporter = ({
     programID, programPrefix, programName, programShortName, programTET, programCatCombo, programType, flag, stagesConfigurations, teaConfigurations, optionData, legendSetData, trackedEntityAttributesData, valueTypes, aggTypes, programData, isLoading, setFlag, setStatus
@@ -88,8 +87,8 @@ const Exporter = ({
             });
             stagesArray.push(worksheet);
             addConfigurations(worksheet, configuration);
-            //hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
-            //addProtection(templateWS,3,3000,password);
+            hideColumns(worksheet, ['program_stage_id', 'program_section_id', 'data_element_id']);
+            addProtection(worksheet,3,3000,password);
         })
 
         const realeaseNotesWS = workbook.addWorksheet("Release Notes", {
@@ -537,6 +536,18 @@ const Exporter = ({
             key: "program_tea_id",
             width: 1
         }];
+        
+        ['B1', 'D1', 'E1', 'F1'].forEach(cellValue => ws.getCell(cellValue).note = {
+            texts: [{ text: "If the cell is not automatically filled, drag the formula from another cell in this column." }],
+            margins: {
+                insetmode: 'custom',
+                inset: [0.25, 0.25, 0.35, 0.35]
+            },
+            protection: {
+                locked: true,
+                lockText: true
+            },
+        })
 
         ws.columns = cols;
         ws.getRow(1).font = { bold: true };
@@ -580,6 +591,7 @@ const Exporter = ({
     }
 
     const addConditionalFormattingTEA = (ws) => {
+        //Structure not selected
         ws.addConditionalFormatting({
             ref: 'A2:A3000',
             rules: [
@@ -592,6 +604,7 @@ const Exporter = ({
             promptTitle: 'Structure not selected',
             prompt: 'A Structure has not been defined for the specified element.'
         });
+        //Duplicated TEA found
         ws.addConditionalFormatting({
             ref: 'C2:C3000',
             rules: [
@@ -604,6 +617,7 @@ const Exporter = ({
             promptTitle: 'Duplicated value',
             prompt: 'A duplicated TEA has been found.'
         });
+        //TEA/Section Name not defined
         ws.addConditionalFormatting({
             ref: 'C2:C3000',
             rules: [
@@ -616,30 +630,33 @@ const Exporter = ({
             promptTitle: 'Name not defined',
             prompt: 'The Section/TEA Name was not defined.'
         });
+        //Selected TEA does not exist (1)
         ws.addConditionalFormatting({
             ref: 'B2:B3000',
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['OR($B2 = "Not Found", $D2 = "Not Found", $E2 = "Not Found", $F2 = "Not Found")'],
+                    formulae: ['OR(ISBLANK($B2), $B2 = "Not Found", ISBLANK($D2), $D2 = "Not Found", ISBLANK($E2), $E2 = "Not Found", ISBLANK($F2), $F2 = "Not Found")'],
                     style: conditionalError,
                 }
             ],
             promptTitle: 'TEA not found',
             prompt: 'The specified TEA is not available.'
         });
+        //Selected TEA does not exist (2)
         ws.addConditionalFormatting({
             ref: 'D2:F3000',
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['OR($B2 = "Not Found", $D2 = "Not Found", $E2 = "Not Found", $F2 = "Not Found")'],
+                    formulae: ['OR(ISBLANK($B2), $B2 = "Not Found", ISBLANK($D2), $D2 = "Not Found", ISBLANK($E2), $E2 = "Not Found", ISBLANK($F2), $F2 = "Not Found")'],
                     style: conditionalError,
                 }
             ],
             promptTitle: 'TEA not found',
             prompt: 'The specified TEA is not available.'
         });
+        //Row highlighting for TEA/Section
         ws.addConditionalFormatting({
             ref: 'A2:J3000',
             rules: [
@@ -707,7 +724,7 @@ const Exporter = ({
             }, {
                 header: "Use Auto Naming",
                 key: "use_auto_naming",
-                width: 20
+                width: 15
             }, {
                 header: "Form Name",
                 key: "form_name",
@@ -792,13 +809,13 @@ const Exporter = ({
         ws.getRow(1).height = 35;
         ws.getRow(1).alignment = middleCenter;
         ws.getRow(2).values = {
-            correlative: "Automatic PCA Identifier for the Data Element",
             structure: "Defines what is being configured in the row",
-            auto_naming: "If 'Yes', Full Name, Short Name and Code are generated automatically\n\n[Default is 'Yes']",
+            correlative: "Automatic PCA Identifier for the Data Element",
+            use_auto_naming: "If 'Yes', Full Name, Short Name and Code are generated automatically\n[Default is 'Yes']",
             form_name: "Text that will be displayed in the Data Entry Form for each Data Element",
-            name: "",
-            short_name: "",
-            code: "",
+            name: "Data Elements Only\n\n[Disabled if 'Use Auto Naming' is 'Yes']",
+            short_name: "Data Elements Only\n\n[Disabled if 'Use Auto Naming' is 'Yes']",
+            code: "Data Elements Only\n\n[Disabled if 'Use Auto Naming' is 'Yes']",
             description: "Helper text displayed to the users during data entry",
             compulsory: "A compulsory Data Element must be answered to complete an Event",
             value_type: "Determines the type of input if there's no Option Set selected",
@@ -811,12 +828,34 @@ const Exporter = ({
             stage_id: configuration.stageId,
             stage_name: configuration.stageName
         };
+        ws.getCell("B2").note = {
+            texts: [{ text: "If the correlative is not generated, drag the formula from another cell in this column." }],
+            margins: {
+                insetmode: 'custom',
+                inset: [0.25, 0.25, 0.35, 0.35]
+            },
+            protection: {
+                locked: true,
+                lockText: true
+            },
+        };
+        ws.getCell("M2").note = {
+            texts: [{ text: "If the [Click Here] text does not appear after selecting an Option Set, drag the formula from another cell in this column." }],
+            margins: {
+                insetmode: 'custom',
+                inset: [0.25, 0.25, 0.35, 0.35]
+            },
+            protection: {
+                locked: true,
+                lockText: true
+            },
+        };
         fillBackgroundToRange(ws, "A2:R2", "D9D9D9");
         ws.getRow(2).height = 100;
         ws.getRow(2).alignment = middleCenter;
         applyBorderToRange(ws, 0, 0, 17, 2);
         addValidation(ws);
-        //addConditionalFormatting(ws);
+        addConditionalFormatting(ws);
         populateConfiguration(ws, configuration.configurations);
     };
 
@@ -879,146 +918,132 @@ const Exporter = ({
         });
     }
 
-    /*
-    
-        const addConditionalFormatting = (ws) => {
-            ws.addConditionalFormatting({
-                ref: 'A3:A3000',
-                rules: [
-                    {
-                        type: 'expression',
-                        formulae: ['AND(ISBLANK($A3),OR($B3="question",$B3="label"))'],
-                        style: conditionalError,
-                    }
-                ],
-                promptTitle: 'Parent name not defined',
-                prompt: 'A parent name was not defined for the specified element.'
-            });
-            ws.addConditionalFormatting({
-                ref: 'C3:C3000',
-                rules: [
-                    {
-                        type: 'expression',
-                        formulae: ['AND(ISBLANK($C3),NOT(ISBLANK($B3)))'],
-                        style: conditionalError,
-                    }
-                ],
-                promptTitle: 'Form name not defined',
-                prompt: 'A form name was not defined for the specified element.'
-            });
-            //conditional formatting for form name out of range
-            ws.addConditionalFormatting({
-                ref: 'C3:C3000',
-                rules: [
-                    {
-                        type: 'expression',
-                        formulae: [`AND(NOT(ISBLANK($B3)),OR(LEN($C3)<${MIN_FORM_NAME_LENGTH},LEN($C3)>${MAX_FORM_NAME_LENGTH}))`],
-                        style: conditionalError,
-                    }
-                ],
-                promptTitle: 'Form name is too long',
-                prompt: `Given form name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`
-            });
-            //conditional formatting for structure=label
-            ws.addConditionalFormatting({
-                ref: 'F3:F3000',
-                rules: [
-                    {
-                        type: 'expression',
-                        formulae: ['$B3="label"'],
-                        style: conditionalDisable
-                    }
-                ]
-            });
-            //conditional formatting for structure=scores
-            ws.addConditionalFormatting({
-                ref: 'F3:F3000',
-                rules: [
-                    {
-                        type: 'expression',
-                        formulae: ['$B3="score"'],
-                        style: conditionalDisable
-                    }
-                ]
-            });
-            //conditional formatting for structure=scores and compositive indicator is empty
-            //or
-            //conditional formatting checking Feedback order if either score (numerator or denominator is available)
-            ws.addConditionalFormatting({
-                ref: 'K3:K3000',
-                rules: [
-                    {
-                        type: 'expression',
-                        formulae: ['OR(AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3)), AND($B3="score", ISBLANK($K3)))'],
-                        style: conditionalError
-                    }
-                ]
-            });
-            //Conditional formatting checking incomplete scoring
-            ws.addConditionalFormatting({
-                ref: 'I3:J3000',
-                rules: [
-                    {
-                        type: 'expression',
-                        formulae: ['OR(AND($I3<>"",$J3=""), AND($I3="",$J3<>""))'],
-                        style: conditionalError
-                    }
-                ]
-            });
-            //Conditional formatting checking incomplete parent and answer
-            ws.addConditionalFormatting({
-                ref: 'L3:M3000',
-                rules: [
-                    {
-                        type: 'expression',
-                        formulae: ['OR(AND($L3<>"", $M3=""), AND($L3="", $M3<>""))'],
-                        style: conditionalError
-                    }
-                ]
-            })
-            ws.addConditionalFormatting({
-                ref: 'A3:R3000',
-                rules: [
-                    {
-                        type: 'expression',
-                        formulae: ['$B3 = "Section"'],
-                        style: sectionHighlighting
-                    },
-                    {
-                        type: 'expression',
-                        formulae: ['$B3 = "question"'],
-                        style: questionHighlighting
-                    },
-                    {
-                        type: 'expression',
-                        formulae: ['$B3 = "label"'],
-                        style: labelHighlighting
-                    }
-                ]
-            });
-            ws.addConditionalFormatting({
-                ref: 'L4:L3000',
-                rules: [
-                    {
-                        type: 'expression',
-                        formulae: ['$A4=$L4'],
-                        style: conditionalError,
-                    }
-                ]
-            });
-        }
-    
-        
-        */
+    const addConditionalFormatting = (ws) => {
+        //Correlative is not defined
+        ws.addConditionalFormatting({
+            ref: 'B3:B3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND(ISBLANK($B3),$A3="Data Element")'],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Correlative not defined',
+            prompt: 'A correlative was not defined for the specified element.'
+        });
+        //Form Name not defined if Structure is selected
+        ws.addConditionalFormatting({
+            ref: 'D3:D3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND(ISBLANK($D3),NOT(ISBLANK($A3)))'],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Form name not defined',
+            prompt: 'A form name was not defined for the specified element.'
+        });
+        //Structure not selected if Form Name is defined
+        ws.addConditionalFormatting({
+            ref: 'A3:A3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND(ISBLANK($A3),NOT(ISBLANK($D3)))'],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Form name not defined',
+            prompt: 'A form name was not defined for the specified element.'
+        });
+        //conditional formatting for form name out of range
+        ws.addConditionalFormatting({
+            ref: 'D3:D3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: [`AND(NOT(ISBLANK($A3)),OR(LEN($D3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($D3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Form Name length out of range',
+            prompt: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+        });
+        //Disabled Full Name, Short Name, Code
+        ws.addConditionalFormatting({
+            ref: 'E3:G3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND($A3 = "Data Element",$C3 <> "No")'],
+                    style: disabledHighlighting,
+                }
+            ],
+            promptTitle: 'Auto Naming Enabled',
+            prompt: 'The Full Name, Short Name and Code are generated automatically.'
+        });
+        ws.addConditionalFormatting({
+            ref: 'J3:J3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND($A3 = "Data Element",NOT(ISBLANK($L3)))'],
+                    style: disabledHighlighting,
+                }
+            ],
+            promptTitle: 'Option Set Selected',
+            prompt: 'The Value Type is inherited from the Option Set.'
+        });
+        //Checking incomplete parent and answer
+        ws.addConditionalFormatting({
+            ref: 'O3:P3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['OR(AND($O3<>"", $P3=""), AND($O3="", $P3<>""))'],
+                    style: conditionalError
+                }
+            ]
+        })
+
+        //Parent Name is the same as current Data Element Correlative
+        ws.addConditionalFormatting({
+            ref: 'O4:O3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND($B4<>"",$B4=$O4)'],
+                    style: conditionalError,
+                }
+            ]
+        });
+
+        //Highlight color for Section or Data Element row
+        ws.addConditionalFormatting({
+            ref: 'A3:P3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['$A3 = "Section"'],
+                    style: sectionHighlighting
+                },
+                {
+                    type: 'expression',
+                    formulae: ['$A3 = "Data Element"'],
+                    style: questionHighlighting
+                }
+            ]
+        });
+    }
 
     const populateConfiguration = async (ws, configurations) => {
         let dataRow = 3;
-        configurations.concat(new Array(2998 - configurations.length).fill({
-            form_name: ""
-        })).forEach((configure) => {
+        configurations.concat(new Array(2998 - configurations.length).fill({})).forEach((configure) => {
             configure.correlative = { formula: '=_xlfn.IF(OR(INDIRECT(_xlfn.CONCAT("A",ROW()))="Section",ISBLANK(INDIRECT(_xlfn.CONCAT("A",ROW())))),"",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("A1:A",ROW())),"Section"),"E",ROW()-ROW($A$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("A1:A",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("A1:A",ROW())))))+1))' };
             configure.option_set_details = {
-                formula: `=IF(NOT(ISBLANK(L${dataRow})),IF(ISNA(VLOOKUP(L${dataRow}, selected_Option_Set_Data,4,FALSE)),"Not Found",VLOOKUP(L${dataRow}, selected_Option_Set_Data,4,FALSE)),"")`
+                formula: `=IF(NOT(ISBLANK(L${dataRow})),IF(ISNA(VLOOKUP(L${dataRow}, selected_Option_Set_Data,4,FALSE)),"Not Found",HYPERLINK(VLOOKUP(L${dataRow}, selected_Option_Set_Data,4,FALSE),"[Click Here]")),"")`,
             }
             ws.getRow(dataRow).values = configure;
             if (configure.structure === "Section") {
@@ -1034,17 +1059,13 @@ const Exporter = ({
     };
 
     const addMapping = async (ws) => {
-        let optionSetData = optionData.map(od => {
-            od.url = `${location.origin}/api/optionSets/${od.id}.json?fields=id,name,options[id,code,name]`;
-            return od
-        })
         printObjectArray(ws, trackedEntityAttributesData, "B2", "bdd7ee");
         defineName(ws, `B3:B${trackedEntityAttributesData.length + 2}`, "Tracked_Entity_Attributes_Data");
         defineName(ws, `C3:G${trackedEntityAttributesData.length + 2}`, "selected_TEA_Data");
 
-        printObjectArray(ws, optionSetData, "I2", "bdd7ee");
-        defineName(ws, `I3:I${optionSetData.length + 2}`, "Option_Sets_Data");
-        defineName(ws, `J3:M${optionSetData.length + 2}`, "selected_Option_Set_Data");
+        printObjectArray(ws, optionData, "I2", "bdd7ee");
+        defineName(ws, `I3:I${optionData.length + 2}`, "Option_Sets_Data");
+        defineName(ws, `J3:M${optionData.length + 2}`, "selected_Option_Set_Data");
 
         printObjectArray(ws, legendSetData, "O2", "bdd7ee");
         defineName(ws, `O3:O${legendSetData.length + 2}`, "Legend_Sets_Data");

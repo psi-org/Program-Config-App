@@ -32,6 +32,7 @@ export const sectionHighlighting = { fill: { type: 'pattern', pattern: 'solid', 
 export const questionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'ffffff' } } };
 export const labelHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'c6e0b4' } } };
 export const otherHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: '99dcff' } } };
+export const disabledHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: '808080' } } };
 export const valueType = ['NUMBER', 'INTEGER', 'INTEGER_POSITIVE', 'INTEGER_ZERO_OR_POSITIVE', 'TEXT', 'LONG_TEXT', 'PERCENTAGE', 'DATE', 'TIME'];
 export const renderType = ['DEFAULT', 'DROPDOWN', 'VERTICAL_RADIOBUTTONS', 'HORIZONTAL_RADIOBUTTONS', 'VERTICAL_CHECKBOXES', 'HORIZONTAL_CHECKBOXES', 'VALUE'];
 export const aggOperator = ['NONE', 'SUM', 'AVERAGE', 'COUNT'];
