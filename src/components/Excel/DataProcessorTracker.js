@@ -188,32 +188,29 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
                 programSection.dataElements.forEach((dataElement) => {
                     let row = {};
                     let metadataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
-                    let metadata = (metadataString.length > 0) ? JSON.parse(metadataString[0].value) : '';
+                    let metadata = (metadataString.length > 0) ? JSON.parse(metadataString[0].value) : {};
 
                     row.structure = 'Data Element';
-                    row.use_auto_naming = metadata.autoNaming || 'No';
+                    row.use_auto_naming = metadata.autoNaming || 'Yes';
 
                     row.name = dataElement.name;
-                    row.shortName = dataElement.shortName;
+                    row.short_name = dataElement.shortName;
                     row.code = dataElement.code;
 
                     row.form_name = dataElement.formName;
                     row.description = dataElement.description;
 
-                    row.compulsory = (typeof metadata.isCompulsory !== 'undefined') ? metadata.isCompulsory : '';
-                    row.value_type = (typeof dataElement.valueType !== 'undefined') ? dataElement.valueType : '';
-                    row.agg_operator = dataElement.aggregationType;
+                    row.compulsory = (typeof metadata.isCompulsory !== 'undefined') ? metadata.isCompulsory : 'No';
+                    row.value_type = (typeof dataElement.valueType !== 'undefined') ? dataElement.valueType : undefined;
+                    row.agg_type = dataElement.aggregationType;
 
-                    row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
-                    row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
+                    row.option_set = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : undefined;
+                    row.legend_set = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : undefined;
                     row.program_section_id = program_section_id;
                     row.data_element_id = dataElement.id;
+                    row.parent_question = (typeof metadata.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metadata.parentQuestion) : undefined;
+                    row.answer_value = (typeof metadata.parentValue !== 'undefined') ? metadata.parentValue : undefined;
 
-                    //row.parentValue = '';
-                    //row.parent_question = (typeof metadata.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metadata.parentQuestion) : '';
-                    //row.answer_value = (typeof metadata.parentValue !== 'undefined') ? metadata.parentValue : '';
-
-                    //row.isCompulsory = getCompulsoryStatusForDE(dataElement.id);
                     currentConfigurations.push(row);
                 });
             });
@@ -287,11 +284,6 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
         row.id = tea.id;
 
         return row;
-    }
-
-    const getCompulsoryStatusForDE = (dataElement_id) => {
-        let de = programStage.programStageDataElements.filter(psde => psde.dataElement.id === dataElement_id);
-        return (de.length > 0) ? de[0].compulsory : false;
     }
 
     const getVarNameFromParentUid = (parentUid, programStage) => {

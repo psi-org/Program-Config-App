@@ -165,16 +165,10 @@ const DataProcessor = (props) => {
                 let feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === "yhKEe6BLEer");
                 row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : '';
 
-                //row.isCompulsory = getCompulsoryStatusForDE(dataElement.id);
                 Configures.push(row);
             });
         });
     };
-
-    const getCompulsoryStatusForDE = (dataElement_id) => {
-        let de = programStage.programStageDataElements.filter( psde => psde.dataElement.id === dataElement_id);
-        return (de.length > 0) ? de[0].compulsory : false;
-    }
 
     const getVarNameFromParentUid = (parentUid) =>{
         let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
