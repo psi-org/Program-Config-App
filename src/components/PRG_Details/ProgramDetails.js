@@ -19,6 +19,8 @@ import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
 import { formatAlert, truncateString } from "../../configs/Utils";
 import TrackerImporter from "../Excel/TrackerImporter";
+import ImportDownloadButton from "../UIElements/ImportDownloadButton";
+import DataProcessorTracker from "../Excel/DataProcessorTracker";
 
 const query = {
     results: {
@@ -42,15 +44,18 @@ const ProgramDetails = () => {
     const [showStageForm, setShowStageForm] = useState(false);
     const [notification, setNotification] = useState(undefined);
     const [snackSeverity, setSnackSeverity] = useState(undefined);
-    const [newStage,setNewStage] = useState()
+    const [newStage, setNewStage] = useState();
+    const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
+    const [importerEnabled, setImporterEnabled] = useState(false);
+    const [exportToExcel, setExportToExcel] = useState(false);
+    const [exportStatus, setExportStatus] = useState("Download Template");
 
     // IMPORT TEMPLATE SCOPE
     const [importDialog,setImportDialog] = useState(false);
     // 
 
     useEffect(()=>{
-
-    },[newStage])
+    }, [exportToExcel, setExportStatus])
 
     useEffect(() => {
         if (notification) setSnackSeverity(notification.severity)
@@ -99,7 +104,7 @@ const ProgramDetails = () => {
                     <Chip>{'Program: '+truncateString(data.results.displayName)}</Chip>
                 </div>
                 <div className="c_srch"></div>
-                <div className="c_btns">
+                <div className="c_btns" style={{display: 'flex', alignItems: 'center'}}>
                     {!hnqisMode && !data.results.withoutRegistration &&
                         <>
                             <MuiButton
@@ -115,14 +120,20 @@ const ProgramDetails = () => {
                     {
                         !hnqisMode &&
                         <>
-                            <MuiButton
-                                variant="outlined"
-                                color='inherit'
-                                startIcon={<CloudUploadIcon />}
-                                onClick={() => setImportDialog(true) }
-                                disabled={showStageForm}>
-                                Import Template
-                            </MuiButton>
+                            <ImportDownloadButton
+                                value={selectedIndexTemplate}
+                                setValue={setSelectedIndexTemplate}
+                                disabled={exportToExcel}
+                                setStatus={setExportStatus}
+                                setImporterEnabled={setImporterEnabled}
+                                setExportToExcel={setExportToExcel}
+                            />
+                            {!hnqisMode && exportToExcel &&
+                                <DataProcessorTracker
+                                    programId={program}
+                                    isLoading={setExportToExcel}
+                                    setStatus={setExportStatus}
+                                />}
                         </>
                     }
                 </div>
@@ -177,7 +188,7 @@ const ProgramDetails = () => {
                         {formatAlert(notification?.message)}
                     </Alert>
                 </Snackbar>
-                {importDialog && <TrackerImporter onClose={()=>setImportDialog(false)} process={(file)=>console.log(file)} />}
+                {importerEnabled && <TrackerImporter onClose={()=>setImporterEnabled(false)} process={(file)=>console.log(file)} />}
             </div>
         </div>
     );

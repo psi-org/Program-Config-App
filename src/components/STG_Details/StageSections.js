@@ -21,8 +21,6 @@ import Errors from "./Errors";
 import ErrorReports from "./ErrorReports";
 
 import RefreshIcon from '@mui/icons-material/Refresh';
-import PublishIcon from '@mui/icons-material/Publish';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -54,6 +52,7 @@ import InsightsIcon from '@mui/icons-material/Insights';
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
 import { DeepCopy, extractMetadataPermissions, truncateString } from "../../configs/Utils";
+import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 
 const createMutation = {
     resource: 'metadata',
@@ -215,7 +214,6 @@ const queryExistingLocalAnalytics = {
 
 
 const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
-const optionsTemplate = ['IMPORT TEMPLATE', 'DOWNLOAD TEMPLATE'];
 
 const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     // Globals
@@ -269,9 +267,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [open, setOpen] = useState(false);
     const anchorRef = useRef(null);
     const [selectedIndex, setSelectedIndex] = useState(0);
-
-    const [openTemplateBtn, setOpenTemplateBtn] = useState(false);
-    const anchorRefTemplate = useRef(null);
+    
     const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
 
     useEffect(() => {
@@ -563,15 +559,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         return;
     };
 
-    const configuration_download = (e) => {
-        e.preventDefault();
-        setExportToExcel(true);
-        setExportStatus("Generating Configuration File...")
-    };
-
-    const configuration_import = () => {
-        setImporterEnabled(true);
-    };
+    
 
     useEffect(() => {
         if (androidSettingsError) updateProgramBuildVersion(programId);
@@ -823,36 +811,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         setOpen(false);
     };
 
-    const handleClickTemplate = (event) => {
-        switch (selectedIndexTemplate) {
-            case 0:
-                setImporterEnabled(true)
-                break;
-            case 1:
-                configuration_download(event)
-                break;
-            default:
-                break;
-        }
-    };
+    
 
 
-    const handleMenuItemClickTemplate = (event, index) => {
-        setSelectedIndexTemplate(index);
-        setOpenTemplateBtn(false);
-    };
-
-    const handleToggleTemplate = () => {
-        setOpenTemplateBtn((prevOpen) => !prevOpen);
-    };
-
-    const handleCloseTemplate = (event) => {
-        if (anchorRefTemplate.current && anchorRefTemplate.current.contains(event.target)) {
-            return;
-        }
-
-        setOpenTemplateBtn(false);
-    };
+    
 
     return (
         <div className="cont_stage">
@@ -954,70 +916,15 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                             </>
                         }
                         {hnqisMode && isSectionMode &&
-                            <>
-                                <ButtonGroup disableElevation ref={anchorRefTemplate} aria-label="split button">
-                                    <LoadingButton
-                                        onClick={handleClickTemplate}
-                                        startIcon={selectedIndexTemplate === 1 ? <FileDownloadIcon /> : <PublishIcon />}
-                                        size='small'
-                                        variant="contained"
-                                        color="success"
-                                        disabled={exportToExcel}
-                                        loadingPosition="start"
-                                        loading={exportToExcel}
-                                    >{optionsTemplate[selectedIndexTemplate]}</LoadingButton>
-                                    <Button
-                                        size="small"
-                                        variant="contained"
-                                        color="success"
-                                        aria-controls={openTemplateBtn ? 'split-button-menu' : undefined}
-                                        aria-expanded={openTemplateBtn ? 'true' : undefined}
-                                        aria-label="select merge strategy"
-                                        aria-haspopup="menu"
-                                        disabled={exportToExcel}
-                                        onClick={handleToggleTemplate}
-                                    >
-                                        <ArrowDropDownIcon />
-                                    </Button>
-                                </ButtonGroup>
-                                <Popper
-                                    sx={{
-                                        zIndex: 1
-                                    }}
-
-                                    open={openTemplateBtn}
-                                    anchorEl={anchorRefTemplate.current}
-                                    role={undefined}
-                                    transition
-                                    disablePortal
-                                >
-                                    {({ TransitionProps, placement }) => (
-                                        <Grow
-                                            {...TransitionProps}
-                                            style={{
-                                                transformOrigin:
-                                                    placement === 'bottom' ? 'center top' : 'center bottom',
-                                            }}
-                                        >
-                                            <Paper>
-                                                <ClickAwayListener onClickAway={handleCloseTemplate}>
-                                                    <MenuList id="split-button-menu" autoFocusItem>
-                                                        {optionsTemplate.map((option, index) => (
-                                                            <MenuItem
-                                                                key={option}
-                                                                selected={index === selectedIndexTemplate}
-                                                                onClick={(event) => handleMenuItemClickTemplate(event, index)}
-                                                            >
-                                                                {option}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </MenuList>
-                                                </ClickAwayListener>
-                                            </Paper>
-                                        </Grow>
-                                    )}
-                                </Popper>
-                            </>
+                            <ImportDownloadButton
+                                value={selectedIndexTemplate}
+                                setValue={setSelectedIndexTemplate}
+                                disabled={exportToExcel}
+                                setStatus={setExportStatus}
+                                setImporterEnabled={setImporterEnabled}
+                                setExportToExcel={setExportToExcel}
+                                size="small"
+                            />
                         }
                         <Tooltip title="Reload" arrow>
                             <IconButton
@@ -1154,7 +1061,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 {progressSteps === 3 && <CircularLoader small />}
                                 {progressSteps === 3 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p style={{ maxWidth: '90%' }}> Reading assesment's questions</p>
+                                <p style={{ maxWidth: '90%' }}> Reading assessment's questions</p>
                             </div>
                         }
                         {(progressSteps > 3) && !programSettingsError &&
