@@ -530,9 +530,11 @@ const TEAEditor = ({programId,onClose}) => {
                             display:'grid', 
                             gridTemplateColumns:'50px 2fr repeat(4, 1fr) 50px',
                             alignItems:'center',
-                            backgroundColor:'whitesmoke'
+                            backgroundColor:'whitesmoke',
+                            border:'solid 1px lightgray',
+                            borderRadius:'5px'
                         }}>
-                            <div>
+                            <div style={{textAlign:'center'}}>
                                 <DragHandleIcon/>
                             </div>
                             <div>

@@ -39,6 +39,8 @@ const AssignedAttributes = ({attributes,isDropDisabled=true}) => {
                                                 alignItems:'center',
                                                 backgroundColor:'whitesmoke',
                                                 padding:'0.5rem',
+                                                border:'1px solid lightgray',   
+                                                borderRadius:'5px'
                                             }}>
                                                 <div><DragHandleIcon/></div>
                                                 <div>{tea.trackedEntityAttribute.name}</div>
