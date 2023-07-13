@@ -51,7 +51,7 @@ const currentProgramQuery = {
         resource: 'programs',
         id: ({ programId }) => programId,
         params: {
-            fields: ['id', 'name', 'shortName', 'attributeValues', 'withoutRegistration', 'trackedEntityType[id, name]', 'categoryCombo[id, name]', 'programStages[id, name, description, programStageDataElements, programStageSections[*, dataElements[*]]]', 'programTrackedEntityAttributes[*,trackedEntityAttribute[id,name]]', 'programSections[*]']
+            fields: ['id', 'name', 'shortName', 'attributeValues', 'withoutRegistration', 'trackedEntityType[id, name]', 'categoryCombo[id, name]', 'programStages[id, name, description, programStageDataElements[*,dataElement[*,optionSet[id,name]]], formType, programStageSections[*, dataElements[*,optionSet[id,name]]]]', 'programTrackedEntityAttributes[*,trackedEntityAttribute[id,name]]', 'programSections[*]']
         }
     },
 }
@@ -181,6 +181,14 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
             let program_stage_id = programStage.id;
             let currentConfigurations = [];
+
+            if (programStage.formType === 'DEFAULT') {
+                programStage.programStageSections = [{
+                    id: 'basic-form',
+                    displayName: 'Basic Form',
+                    dataElements: programStage.programStageDataElements?.map(psde => psde.dataElement)
+                }]
+            }
 
             programStage.programStageSections.forEach((programSection) => {
 

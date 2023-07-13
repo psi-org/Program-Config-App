@@ -1026,7 +1026,11 @@ const Exporter = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['$A3 = "Section"'],
+                    formulae: ['AND($A3 = "Section",$T3 = "basic-form")'],
+                    style: otherHighlighting
+                }, {
+                    type: 'expression',
+                    formulae: ['AND($A3 = "Section",$T3 <> "basic-form")'],
                     style: sectionHighlighting
                 },
                 {
