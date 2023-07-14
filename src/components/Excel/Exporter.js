@@ -23,7 +23,6 @@ import {
     printObjectArray,
     applyStyleToRange,
     defineName,
-    formatDate,
     writeWorkbook,
     enableCellEditing,
     hideColumns,
@@ -32,9 +31,7 @@ import {
     addCreator
 } from "../../configs/ExcelUtils";
 import { ReleaseNotes } from "../../configs/ReleaseNotes";
-
-const MAX_FORM_NAME_LENGTH = 200;
-const MIN_FORM_NAME_LENGTH = 2;
+import { MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../../configs/Constants';
 
 const Exporter = (props) => {
 
@@ -637,12 +634,12 @@ const Exporter = (props) => {
             rules: [
                 {
                     type: 'expression',
-                    formulae: [`AND(NOT(ISBLANK($B3)),OR(LEN($C3)<${MIN_FORM_NAME_LENGTH},LEN($C3)>${MAX_FORM_NAME_LENGTH}))`],
+                    formulae: [`AND(NOT(ISBLANK($B3)),OR(LEN($C3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`],
                     style: conditionalError,
                 }
             ],
             promptTitle: 'Form Name out of range',
-            prompt: `Given Form Name length is out of the accepted range (Between ${MIN_FORM_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`
+            prompt: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
         });
         //Disable Value Type when Option Set is selected
         ws.addConditionalFormatting({
