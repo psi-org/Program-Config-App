@@ -209,7 +209,8 @@ export const addCreator = wb => {
 
 export const buildCellObject = (ws, cell) => ({
     cell: ws.getCell(cell),
-    ref: cell
+    ref: cell,
+    merge: () => ws.mergeCells(cell)
 })
 
 export const generateBorderObject = (borderSchema, style = "thin") => {

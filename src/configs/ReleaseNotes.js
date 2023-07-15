@@ -13,7 +13,7 @@ export const ReleaseNotes = [
     {
         "version": "v1.2",
         "date": "2022-04-01",
-        "description": " - Use of defined Names instead of static range.\n - Added Conditional Validation to Check 'Parent Question' and 'Parent Name'."
+        "description": "- Use of defined Names instead of static range.\n- Added Conditional Validation to Check 'Parent Question' and 'Parent Name'."
     },
     {
         "version": "v1.3",
@@ -23,7 +23,7 @@ export const ReleaseNotes = [
     {
         "version": "v1.4",
         "date": "2023-07-31",
-        "description": "Improved and fixed some Conditional Format Rules."
+        "description": "- Improved and fixed some Conditional Format Rules.\n- Improved Template design.\n - Added Server Information to the Instructions Tab.\n- Improved overall grammar."
     }
 ]
 

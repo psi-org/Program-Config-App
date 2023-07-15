@@ -1,33 +1,33 @@
 import { useEffect } from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import {
-    renderType,
-    middleCenter,
-    template_password,
-    teaStructureValidator,
-    trackerStructureValidator,
-    yesNoValidator,
     conditionalError,
-    sectionHighlighting,
-    questionHighlighting,
+    disabledHighlighting,
+    middleCenter,
     otherHighlighting,
+    questionHighlighting,
+    renderType,
+    sectionHighlighting,
+    teaStructureValidator,
+    template_password,
+    trackerStructureValidator,
     verticalMiddle,
-    disabledHighlighting
+    yesNoValidator
 } from "../../configs/TemplateConstants";
 import {
-    fillBackgroundToRange,
-    printArray2Column,
-    applyBorderToRange,
-    dataValidation,
-    printObjectArray,
-    defineName,
-    writeWorkbook,
-    hideColumns,
+    addCreator,
     addProtection,
     addReleaseNotes,
-    addCreator,
+    applyBorderToRange,
     buildCellObject,
-    generateBorderObject
+    dataValidation,
+    defineName,
+    fillBackgroundToRange,
+    generateBorderObject,
+    hideColumns,
+    printArray2Column,
+    printObjectArray,
+    writeWorkbook
 } from "../../configs/ExcelUtils";
 import { ReleaseNotesTracker } from "../../configs/ReleaseNotes";
 import { MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../../configs/Constants';
@@ -39,19 +39,22 @@ const Exporter = ({
     const password = template_password;
 
     const generate = () => {
+
         const workbook = new ExcelJS.Workbook();
         addCreator(workbook);
+
+
         const instructionWS = workbook.addWorksheet("Instructions", {
             views: [{
                 showGridLines: false
             }],
             properties: { tabColor: { argb: '0070C0' } }
         });
-
         instructionWS.properties.defaultColWidth = 12;
         instructionWS.properties.defaultRowHeight = 15;
         instructionWS.properties.alignment = { vertical: "middle" };
         addInstructions(instructionWS);
+
 
         if (programType === 'Tracker Program') {
             const teasWS = workbook.addWorksheet("TEAs", {
@@ -67,6 +70,7 @@ const Exporter = ({
             addProtection(teasWS, 2, 3000, password);
         }
 
+
         let stagesArray = [];
         stagesConfigurations.forEach(configuration => {
             let worksheet = workbook.addWorksheet(configuration.stageName, {
@@ -81,16 +85,18 @@ const Exporter = ({
             stagesArray.push(worksheet);
             addConfigurations(worksheet, configuration);
             hideColumns(worksheet, ['program_stage_id', 'program_section_id', 'data_element_id']);
-            addProtection(worksheet,3,3000,password);
-        })
+            addProtection(worksheet, 3, 3000, password);
+        });
 
-        const realeaseNotesWS = workbook.addWorksheet("Release Notes", {
+
+        const releaseNotesWS = workbook.addWorksheet("Release Notes", {
             views: [{
                 showGridLines: false
             }],
             properties: { tabColor: { argb: 'D9E7FD' } }
         });
-        addReleaseNotes(realeaseNotesWS, ReleaseNotesTracker, password);
+        addReleaseNotes(releaseNotesWS, ReleaseNotesTracker, password);
+
 
         const mappingWS = workbook.addWorksheet("Mapping", {
             views: [{
@@ -103,7 +109,9 @@ const Exporter = ({
         }];
         addMapping(mappingWS);
 
+
         writeWorkbook(workbook, programName, setStatus, isLoading);
+
     };
 
 
@@ -120,7 +128,7 @@ const Exporter = ({
 
 
         editingCell = buildCellObject(ws, "B5:L5");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Instructions";
         editingCell.cell.style = { font: { bold: true } };
         fillBackgroundToRange(ws, editingCell.ref, "BDD7EE");
@@ -149,114 +157,120 @@ const Exporter = ({
 
 
         editingCell = buildCellObject(ws, "B14:L14");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Configurations";
         editingCell.cell.style = { font: { bold: true } };
         fillBackgroundToRange(ws, editingCell.ref, "BDD7EE");
 
 
         editingCell = buildCellObject(ws, "B16:F16");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "SERVER INFO";
         editingCell.cell.style = { font: { bold: true } };
         editingCell.cell.alignment = middleCenter;
 
 
         editingCell = buildCellObject(ws, "B17:C17");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "DHIS2 Server URL";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "D17:F17");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = location.origin;
 
         editingCell = buildCellObject(ws, "B18:C18");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "DHIS2 Server Version";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "D18:F18");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = localStorage.getItem('SERVER_VERSION');
-        fillBackgroundToRange(ws, "B16:B18", "BDD7EE");
 
 
         editingCell = buildCellObject(ws, "B19:F20");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "The information displayed here corresponds to the server from which this Template was downloaded";
-        editingCell.cell.style = { font: { color: { argb: 'FFC00000' } } };
         editingCell.cell.alignment = middleCenter;
         applyBorderToRange(ws, 1, 16, 5, 20);
+        fillBackgroundToRange(ws, "B16:B20", "BDD7EE");
+
+        editingCell = buildCellObject(ws, "B21:F23");
+        editingCell.merge();
+        editingCell.cell.value = "Please note: This Template can only be imported to the same server from which it was downloaded. Do NOT use this template to transfer the current Program to another server.";
+        editingCell.cell.style = { font: { bold: true, color: { argb: 'FFC00000' } } };
+        editingCell.cell.alignment = middleCenter;
+        applyBorderToRange(ws, 1, 21, 5, 23);
 
 
         editingCell = buildCellObject(ws, "H16:L16");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "PROGRAM SETTINGS";
         editingCell.cell.style = { font: { bold: true } };
         editingCell.cell.alignment = middleCenter;
 
         editingCell = buildCellObject(ws, "H17:I17");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Program ID";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "J17:L17");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = programID;
 
         editingCell = buildCellObject(ws, "H18:I18");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Data Element Prefix";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "J18:L18");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = programPrefix;
 
         editingCell = buildCellObject(ws, "H19:I19");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Program";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "J19:L19");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = programName;
 
         editingCell = buildCellObject(ws, "H20:I20");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Program Short Name";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "J20:L20");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = programShortName;
 
         editingCell = buildCellObject(ws, "H21:I21");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Tracked Entity Type";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "J21:L21");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = programTET;
 
         editingCell = buildCellObject(ws, "H22:I22");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Category Combination";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "J22:L22");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = programCatCombo;
 
         editingCell = buildCellObject(ws, "H23:I23");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Program Type";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "J23:L23");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = programType;
         fillBackgroundToRange(ws, "H16:H23", "BDD7EE");
         applyBorderToRange(ws, 7, 16, 11, 23);
@@ -279,29 +293,29 @@ const Exporter = ({
 
 
         editingCell = buildCellObject(ws, "B25:L25");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Template Contents";
         editingCell.cell.style = { font: { bold: true } };
         fillBackgroundToRange(ws, editingCell.ref, "BDD7EE");
 
 
         editingCell = buildCellObject(ws, "B27:C27");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Tab Name";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "D27:F27");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Description";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "G27:I27");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "Purpose";
         editingCell.cell.style = { font: { bold: true } };
 
         editingCell = buildCellObject(ws, "J27:L27");
-        ws.mergeCells(editingCell.ref);
+        editingCell.merge();
         editingCell.cell.value = "How and when to use it";
         editingCell.cell.style = { font: { bold: true } };
 
@@ -587,6 +601,7 @@ const Exporter = ({
         //Structure not selected
         ws.addConditionalFormatting({
             ref: 'A2:A3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -600,6 +615,7 @@ const Exporter = ({
         //Duplicated TEA found
         ws.addConditionalFormatting({
             ref: 'C2:C3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -613,6 +629,7 @@ const Exporter = ({
         //TEA/Section Name not defined
         ws.addConditionalFormatting({
             ref: 'C2:C3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -626,6 +643,7 @@ const Exporter = ({
         //Selected TEA does not exist (1)
         ws.addConditionalFormatting({
             ref: 'B2:B3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -639,6 +657,7 @@ const Exporter = ({
         //Selected TEA does not exist (2)
         ws.addConditionalFormatting({
             ref: 'D2:F3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -652,6 +671,7 @@ const Exporter = ({
         //Row highlighting for TEA/Section
         ws.addConditionalFormatting({
             ref: 'A2:J3000',
+            priority: 2,
             rules: [
                 {
                     type: 'expression',
@@ -915,6 +935,7 @@ const Exporter = ({
         //Correlative is not defined
         ws.addConditionalFormatting({
             ref: 'B3:B3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -928,6 +949,7 @@ const Exporter = ({
         //Form Name not defined if Structure is selected
         ws.addConditionalFormatting({
             ref: 'D3:D3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -941,6 +963,7 @@ const Exporter = ({
         //Structure not selected if Form Name is defined
         ws.addConditionalFormatting({
             ref: 'A3:A3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -954,6 +977,7 @@ const Exporter = ({
         //conditional formatting for form name out of range
         ws.addConditionalFormatting({
             ref: 'D3:D3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -967,6 +991,7 @@ const Exporter = ({
         //Disabled Full Name, Short Name, Code
         ws.addConditionalFormatting({
             ref: 'E3:G3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -979,6 +1004,7 @@ const Exporter = ({
         });
         ws.addConditionalFormatting({
             ref: 'J3:J3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -992,6 +1018,7 @@ const Exporter = ({
         //Checking incomplete parent and answer
         ws.addConditionalFormatting({
             ref: 'O3:P3000',
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -1003,6 +1030,7 @@ const Exporter = ({
 
         //Parent Name is the same as current Data Element Correlative
         ws.addConditionalFormatting({
+            priority: 1,
             ref: 'O4:O3000',
             rules: [
                 {
@@ -1016,6 +1044,7 @@ const Exporter = ({
         //Highlight color for Section or Data Element row
         ws.addConditionalFormatting({
             ref: 'A3:P3000',
+            priority: 2,
             rules: [
                 {
                     type: 'expression',
