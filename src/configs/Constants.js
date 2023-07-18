@@ -119,7 +119,8 @@ const H2_REQUIRED = {
     legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND],
 };
 
-const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false };
+const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false, localeMatcher: 'best fit', };
+const SHORT_DATE_FORMAT_OPTIONS = { localeMatcher: 'best fit', hour12: false, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }
 
 const NAMESPACE = "programconfigapp";
 const BACKUPS_NAMESPACE = `${NAMESPACE}_backups`;
@@ -570,5 +571,6 @@ export {
     SCORE_NUM_ATTRIBUTE,
     TRANSFERRED_EVENTS_NAMESPACE,
     VALUE_TYPES,
-    VISUALIZATIONS_LEGEND
+    VISUALIZATIONS_LEGEND,
+    SHORT_DATE_FORMAT_OPTIONS
 };

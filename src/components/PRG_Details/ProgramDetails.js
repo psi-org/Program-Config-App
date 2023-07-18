@@ -27,7 +27,7 @@ const query = {
         resource: 'programs',
         id: ({ program }) => program,
         params: {
-            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', 'programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements]', 'withoutRegistration']
+            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', 'programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements,sortOrder]', 'withoutRegistration']
         }
     },
 };
@@ -158,7 +158,7 @@ const ProgramDetails = () => {
                     <div className="list-ml_item">
                         {
                             data.results.programStages.sort((stageA, stageB) =>
-                                (stageA.name > stageB.name)? 1 : ((stageA.name < stageB.name)? -1 : 0)
+                                (stageA.sortOrder > stageB.sortOrder)? 1 : ((stageA.sortOrder < stageB.sortOrder)? -1 : 0)
                             ).map((programStage) => {
                                 return (
                                     <StageItem

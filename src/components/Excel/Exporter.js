@@ -375,9 +375,9 @@ const Exporter = (props) => {
 
         applyBorderToRange(ws, 1, 26, 2, 40);
 
-        ws.getCell("B42").value = `Every row in the "Template" tab starting from row 3 will generate the necessary components for the program when this file gets imported to the server. `;
-        ws.getCell("B43").value = `The template will highlight in red some cells automatically while you're working on it, this means that there's a validation error in that cell and you must fix it before importing.`;
-        ws.getCell("B44").value = `Also, keep in mind that this file is protected so you can only modify some specific cell ranges (most of the unlocked cells are in the "Template" tab).`;
+        ws.getCell("B42").value = `Every row in the 'Template' Tab starting from row 3 will generate the necessary components for the program when this file gets imported to the server. `;
+        ws.getCell("B43").value = `The template will highlight in red some cells automatically while you are working on it, this means that there is a validation error in that cell and you must fix it before importing.`;
+        ws.getCell("B44").value = `Also, keep in mind that this file is protected so you can only modify some specific cell ranges (most of the unlocked cells are in the 'Template' Tab).`;
 
 
         editingCell = buildCellObject(ws, "B46:H46");

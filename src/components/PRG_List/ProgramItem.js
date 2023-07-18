@@ -358,7 +358,7 @@ const ProgramItem = ({
                     <p>
                         <strong>Created</strong>
                         <br />
-                        {new Date(program.created).toLocaleString(
+                        {new Date(program.created + 'Z').toLocaleString(
                             "en-US",
                             DATE_FORMAT_OPTIONS
                         )}
@@ -366,7 +366,7 @@ const ProgramItem = ({
                     <p>
                         <strong>Last Updated</strong>
                         <br />
-                        {new Date(program.lastUpdated).toLocaleString(
+                        {new Date(program.lastUpdated + 'Z').toLocaleString(
                             "en-US",
                             DATE_FORMAT_OPTIONS
                         )}

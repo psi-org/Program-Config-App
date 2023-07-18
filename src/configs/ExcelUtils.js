@@ -1,6 +1,7 @@
 import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy } from "./Utils";
 import { saveAs } from 'file-saver';
 import { thinBorder } from "./TemplateConstants";
+import { DATE_FORMAT_OPTIONS, SHORT_DATE_FORMAT_OPTIONS } from "./Constants";
 
 export function printArray2Column(sheet, array, header, startPosition, headerBgColor) {
     let coordinates = splitPosition(startPosition);
@@ -133,15 +134,18 @@ function validateRange(sheet, range, validationRule) {
 }
 
 export const formatDate = (date) => {
-    let d = date.split('.')[0].split('T')
-    let dateYMD = d[0]
-    let dateHMS = d[1].split(":")
+    let formattedDate = date.toLocaleString("en-US", SHORT_DATE_FORMAT_OPTIONS).split(', ');
+
+    /*let d = date.split('.')[0].split('T')
+    */
+    let dateYMD = formattedDate[0].replaceAll('/', '-');
+    let dateHMS = formattedDate[1].split(":")
     return `${dateYMD} [${dateHMS[0]}h ${dateHMS[1]}m]`
 }
 
 export const writeWorkbook = async (wb, name, setStatus, isLoading) => {
     const buf = await wb.xlsx.writeBuffer();
-    saveAs(new Blob([buf]), `${name} - ${formatDate(new Date().toISOString())}.xlsx`);
+    saveAs(new Blob([buf]), `${name} - ${formatDate(new Date())}.xlsx`);
 
     setStatus("Download Template");
     isLoading(false);

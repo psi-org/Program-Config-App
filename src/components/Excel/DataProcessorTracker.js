@@ -173,8 +173,8 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
         currentProgram.results?.programStages?.sort(
             (stageA, stageB) => {
-                if (stageA.name > stageB.name) return 1;
-                if (stageA.name < stageB.name) return -1;
+                if (stageA.sortOrder > stageB.sortOrder) return 1;
+                if (stageA.sortOrder < stageB.sortOrder) return -1;
                 return 0;
             }
         ).forEach((programStage, index) => {
