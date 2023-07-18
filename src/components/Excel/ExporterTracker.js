@@ -61,13 +61,13 @@ const Exporter = ({
                 views: [{
                     showGridLines: false,
                     state: 'frozen',
-                    ySplit: 1
+                    ySplit: 2
                 }],
                 properties: { tabColor: { argb: 'FDE49B' } }
             });
             addTEAConfigurations(teasWS);
             hideColumns(teasWS, ['program_section_id', 'program_tea_id']);
-            addProtection(teasWS, 2, 3000, password);
+            addProtection(teasWS, 3, 3000, password);
         }
 
 
@@ -497,7 +497,7 @@ const Exporter = ({
         let cols = [{
             header: "Structure",
             key: "structure",
-            width: 10,
+            width: 15,
         }, {
             header: "UID",
             key: "uid",
@@ -558,6 +558,21 @@ const Exporter = ({
 
         ws.columns = cols;
         ws.getRow(1).font = { bold: true };
+        ws.getRow(2).values = {
+            structure: "Defines what is being configured in the row",
+            uid: "The UID of the selected TEA (Used to verify that the TEA exists)",
+            name: "Name of the Form Section or the selected TEA",
+            short_name: "The Short Name of the selected TEA (Used to verify that the TEA exists)",
+            value_type: "The Value Type of the selected TEA (Used to verify that the TEA exists)",
+            aggregation_type: "The Aggregation Type of the selected TEA (Used to verify that the TEA exists)",
+            mandatory: "If 'Yes', the TEA must be filled to complete the event.\n[Default is 'No']",
+            searchable: "If 'Yes', allows the TEA to be used as a search filter in the Tracked Entity Instances list.\n[Default is 'No']",
+            display_in_list: "If 'Yes', the value of the selected TEA will be displayed in the Tracked Entity Instances list.\n[Default is 'No']",
+            allow_future_date: "If 'Yes', the TEA will allow to select a date in future (DATE TEAs only).\n[Default is 'No']"
+        };
+        fillBackgroundToRange(ws, "A2:J2", "D9D9D9");
+        ws.getRow(2).height = 100;
+        ws.getRow(2).alignment = middleCenter;
 
         fillBackgroundToRange(ws, "A1:A1", "E2EFDA");
         fillBackgroundToRange(ws, "B1:B1", "BDD7EE");
@@ -569,11 +584,11 @@ const Exporter = ({
         addValidationTEA(ws);
         addConditionalFormattingTEA(ws);
         populateConfigurationTEA(ws);
-        applyBorderToRange(ws, 0, 0, 9, 101);
+        applyBorderToRange(ws, 0, 0, 9, 102);
     };
 
     const addValidationTEA = (ws) => {
-        dataValidation(ws, "A2:A3000", {
+        dataValidation(ws, "A3:A3000", {
             type: 'list',
             allowBlank: false,
             error: 'Please select a valid value from the dropdown',
@@ -581,13 +596,13 @@ const Exporter = ({
             showErrorMessage: true,
             formulae: teaStructureValidator
         });
-        dataValidation(ws, "C2:C3000", {
+        dataValidation(ws, "C3:C3000", {
             type: 'list',
             allowBlank: false,
             errorTitle: 'Invalid Selection',
             formulae: ['Tracked_Entity_Attributes_Data']
         });
-        dataValidation(ws, "G2:J3000", {
+        dataValidation(ws, "G3:J3000", {
             type: 'list',
             allowBlank: true,
             error: 'Please select the valid value from the dropdown',
@@ -600,12 +615,12 @@ const Exporter = ({
     const addConditionalFormattingTEA = (ws) => {
         //Structure not selected
         ws.addConditionalFormatting({
-            ref: 'A2:A3000',
+            ref: 'A3:A102',
             priority: 1,
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($A2),NOT(ISBLANK($C2)))'],
+                    formulae: ['AND(ISBLANK($A3),NOT(ISBLANK($C3)))'],
                     style: conditionalError,
                 }
             ],
@@ -614,12 +629,12 @@ const Exporter = ({
         });
         //Duplicated TEA found
         ws.addConditionalFormatting({
-            ref: 'C2:C3000',
+            ref: 'C3:C102',
             priority: 1,
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['COUNTIF($C$2:$C$3000,C2)>1'],
+                    formulae: ['COUNTIF($C$3:$C$102,C3)>1'],
                     style: conditionalError,
                 }
             ],
@@ -628,12 +643,12 @@ const Exporter = ({
         });
         //TEA/Section Name not defined
         ws.addConditionalFormatting({
-            ref: 'C2:C3000',
+            ref: 'C3:C102',
             priority: 1,
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($C2),NOT(ISBLANK($A2)))'],
+                    formulae: ['AND(ISBLANK($C3),NOT(ISBLANK($A3)))'],
                     style: conditionalError,
                 }
             ],
@@ -642,12 +657,12 @@ const Exporter = ({
         });
         //Selected TEA does not exist (1)
         ws.addConditionalFormatting({
-            ref: 'B2:B3000',
+            ref: 'B3:B102',
             priority: 1,
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['OR(ISBLANK($B2), $B2 = "Not Found", ISBLANK($D2), $D2 = "Not Found", ISBLANK($E2), $E2 = "Not Found", ISBLANK($F2), $F2 = "Not Found")'],
+                    formulae: ['OR(ISBLANK($B3), $B3 = "Not Found", ISBLANK($D3), $D3 = "Not Found", ISBLANK($E3), $E3 = "Not Found", ISBLANK($F3), $F3 = "Not Found")'],
                     style: conditionalError,
                 }
             ],
@@ -656,13 +671,27 @@ const Exporter = ({
         });
         //Selected TEA does not exist (2)
         ws.addConditionalFormatting({
-            ref: 'D2:F3000',
+            ref: 'D3:F102',
             priority: 1,
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['OR(ISBLANK($B2), $B2 = "Not Found", ISBLANK($D2), $D2 = "Not Found", ISBLANK($E2), $E2 = "Not Found", ISBLANK($F2), $F2 = "Not Found")'],
+                    formulae: ['OR(ISBLANK($B3), $B3 = "Not Found", ISBLANK($D3), $D3 = "Not Found", ISBLANK($E3), $E3 = "Not Found", ISBLANK($F3), $F3 = "Not Found")'],
                     style: conditionalError,
+                }
+            ],
+            promptTitle: 'TEA not found',
+            prompt: 'The specified TEA is not available.'
+        });
+        //Disable future date if Value Type != DATE
+        ws.addConditionalFormatting({
+            ref: 'J3:J102',
+            priority: 1,
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND($A3 = "TEA", OR(ISBLANK($E3), AND($E3 <> "DATE", $E3 <> "DATETIME")))'],
+                    style: disabledHighlighting,
                 }
             ],
             promptTitle: 'TEA not found',
@@ -670,22 +699,22 @@ const Exporter = ({
         });
         //Row highlighting for TEA/Section
         ws.addConditionalFormatting({
-            ref: 'A2:J3000',
+            ref: 'A3:J102',
             priority: 2,
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND($A2 = "Section",$K2 = "unused")'],
+                    formulae: ['AND($A3 = "Section",$K3 = "unused")'],
                     style: otherHighlighting
                 },
                 {
                     type: 'expression',
-                    formulae: ['AND($A2 = "Section",$K2 <> "unused")'],
+                    formulae: ['AND($A3 = "Section",$K3 <> "unused")'],
                     style: sectionHighlighting
                 },
                 {
                     type: 'expression',
-                    formulae: ['$A2 = "TEA"'],
+                    formulae: ['$A3 = "TEA"'],
                     style: questionHighlighting
                 }
             ]
@@ -693,7 +722,7 @@ const Exporter = ({
     }
 
     const populateConfigurationTEA = (ws) => {
-        let dataRow = 2;
+        let dataRow = 3;
         teaConfigurations.concat(new Array(100 - teaConfigurations.length).fill({
             form_name: "",
             program_section_id: "",
