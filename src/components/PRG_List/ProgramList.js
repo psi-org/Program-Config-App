@@ -97,26 +97,26 @@ const ProgramList = () => {
 
     const [filterValue, setFilterValue] = useState('')
 
-    const [settingsMenu,setSettingsMenu] = useState(false)
+    const [settingsMenu, setSettingsMenu] = useState(false)
     const [ref, setRef] = useState();
 
-    const [aboutModal,setAboutModal] = useState(false);
-    const [H2Modal,setH2Modal] = useState(false);
+    const [aboutModal, setAboutModal] = useState(false);
+    const [H2Modal, setH2Modal] = useState(false);
 
     useEffect(() => {
         if (notification) setSnackSeverity(notification.severity)
     }, [notification])
 
     const prgTypeQuery = useDataQuery(queryProgramType);
-    const prgTypeId = prgTypeQuery.data?.results.attributes[0].id;
+    const prgTypeId = prgTypeQuery.data?.results?.attributes[0]?.id;
 
     const downloadMetadata = (program) => {
         setExportProgramId(program)
     }
 
     const shareProgram = (program, prgType) => {
-        let prg = data.results.programs.filter(p => { return p.id === program});
-        setReadOnlyPermission(!prg[0].access.update);
+        let prg = data.results?.programs?.filter(p => { return p.id === program });
+        setReadOnlyPermission(!prg[0]?.access?.update);
         setSharingProgramId(program)
         setSharingProgramType(prgType)
     }
@@ -272,6 +272,7 @@ const ProgramList = () => {
             </div>
             <div>
                 <div className="title" style={{ padding: '1.5em 1em 0' }}>List of Programs</div>
+
                 <div style={{ display: "flex", alignItems: "center", padding: '0 1.2em' }}>
                     <TextField
                         margin="dense"
@@ -319,11 +320,16 @@ const ProgramList = () => {
                         }}
                     />
                 </div>
+
             </div>
+
             <div className="wrapper" style={{ padding: '1em  1.2em 0' }}>
                 <div className="layout_prgms_stages">
+                    {data.results?.programs?.length === 0 &&
+                        <div className="title" style={{ padding: '1.5em', display: 'flex', justifyContent: 'center' }}>No Programs Found</div>
+                    }
                     <div className="list-ml_item">
-                        {data.results.programs.map((program) => {
+                        {data.results?.programs?.map((program) => {
                             return (
                                 <ProgramItem
                                     program={program}
@@ -346,23 +352,25 @@ const ProgramList = () => {
                     </div>
                 </div>
             </div>
-            <div className="wrapper" style={{ padding: '0 1.2em' }}>
-                <Pagination
-                    page={data.results.pager.page}
-                    pageSize={data.results.pager.pageSize}
-                    pageCount={data.results.pager.pageCount}
-                    total={data.results.pager.pageCount}
-                    pageSizes={["5", "10", "15", "20", "25", "50", "100"]}
-                    onPageSizeChange={(pageSize) => {
-                        setPageSize(pageSize);
-                        refetch({ pageSize, page: 1 });
-                    }}
-                    onPageChange={(page) => {
-                        setCurrentPage(page);
-                        refetch({ page, pageSize });
-                    }}
-                />
-            </div>
+            {data.results?.programs?.length > 0 &&
+                <div className="wrapper" style={{ padding: '0 1.2em' }}>
+                    <Pagination
+                        page={data.results?.pager?.page}
+                        pageSize={data.results?.pager?.pageSize}
+                        pageCount={data.results?.pager?.pageCount}
+                        total={data.results?.pager?.pageCount}
+                        pageSizes={["5", "10", "15", "20", "25", "50", "100"]}
+                        onPageSizeChange={(pageSize) => {
+                            setPageSize(pageSize);
+                            refetch({ pageSize, page: 1 });
+                        }}
+                        onPageChange={(page) => {
+                            setCurrentPage(page);
+                            refetch({ page, pageSize });
+                        }}
+                    />
+                </div>
+            }
             {showProgramForm && (
                 <ProgramNew
                     setShowProgramForm={setShowProgramForm}

@@ -118,7 +118,14 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
             //* TEAs Map
             trackedEntityAttributesData = trackedEntityAttributes.results.trackedEntityAttributes?.map(tea => {
-                return {ref:tea.name, ...tea}
+                return {
+                    ref: tea.name,
+                    name: tea.name,
+                    id: tea.id,
+                    shortName: tea.shortName,
+                    aggregationType: tea.aggregationType,
+                    valueType: tea.valueType,
+                }
             }) || [];
 
             //* valueType and aggregationType Properties
