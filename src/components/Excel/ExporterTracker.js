@@ -118,6 +118,10 @@ const Exporter = ({
     const addInstructions = async (ws) => {
         let editingCell;
 
+        editingCell = buildCellObject(ws, "A1");
+        editingCell.cell.value = "I";
+        editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
+
         editingCell = buildCellObject(ws, "B2");
         editingCell.cell.value = "PROGRAM CONFIGURATION APP";
         editingCell.cell.style = { font: { size: 12, bold: true } };
@@ -1114,6 +1118,11 @@ const Exporter = ({
     };
 
     const addMapping = async (ws) => {
+
+        let editingCell = buildCellObject(ws, "A1");
+        editingCell.cell.value = "M";
+        editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
+
         printObjectArray(ws, trackedEntityAttributesData, "B2", "bdd7ee");
         defineName(ws, `B3:B${trackedEntityAttributesData.length + 2}`, "Tracked_Entity_Attributes_Data");
         defineName(ws, `C3:G${trackedEntityAttributesData.length + 2}`, "selected_TEA_Data");

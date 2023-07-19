@@ -8,7 +8,7 @@ const FEEDBACK_ORDER = "LP171jpctBm", //COMPOSITE_SCORE
 const importMap = {
     parentName:"Parent Name",
     structure:"Structure",
-    formName:"Form name",
+    formName:"Form Name",
     isCritical: "Critical Step",
     isCompulsory:"Compulsory",
     valueType:"Value Type",
@@ -17,8 +17,8 @@ const importMap = {
     scoreNum:"Score Numerator",
     scoreDen:"Score Denominator",
     feedbackOrder:"Compositive Indicator (Feedback Order)",
-    parentQuestion:"Parent question",
-    parentValue:"Answer value",
+    parentQuestion:"Parent Question",
+    parentValue:"Answer Value",
     feedbackText:"Feedback Text",
     description:"Description",
     programStage:"Program Stage Id",
@@ -162,12 +162,12 @@ const readTemplateData = (templateData, currentData, programPrefix='Prefix', opt
     templateData.forEach(row => {
         switch (row.Structure) {
             case 'Section':
-                if(row["Form name"]=="Critical Steps Calculations" || row["Form name"]=="Scores") break;
+                if(row["Form Name"]=="Critical Steps Calculations" || row["Form Name"]=="Scores") break;
                 sectionIndex++;
                 importedSections[sectionIndex] = {
                     id: row[importMap.programSection] || undefined,//null,
-                    name: row["Form name"],
-                    displayName: row["Form name"],
+                    name: row["Form Name"],
+                    displayName: row["Form Name"],
                     sortOrder: sectionIndex + 1,
                     dataElements: [],
                     importStatus: row[importMap.programSection] ? 'update' : 'new'

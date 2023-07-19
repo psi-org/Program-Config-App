@@ -1,10 +1,10 @@
 import { CircularLoader } from "@dhis2/ui";
 
 const RunningTask = (props) => {
-    return <div style={{position: 'relative', width: '100%'}}>
-                <span style={{position: 'absolute', top: '0px', left: '20px'}}>{props.task}</span>
-                <CircularLoader extrasmall />
-            </div>
+    return <div style={{ width: '100%', display: 'flex', alignItems: 'center', margin: '0.5em 0' }}>
+        <CircularLoader extrasmall />
+        <span style={{ marginLeft: '0.5em' }}>{props.task}</span>
+    </div>
 }
 
 export default RunningTask;

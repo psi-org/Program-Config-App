@@ -11,6 +11,7 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import { ReleaseNotes } from "../../configs/ReleaseNotes";
 
 
 const Importer = (props) => {
@@ -24,6 +25,8 @@ const Importer = (props) => {
     const [importSummary, setImportSummary] = useState(false);
 
     const setFile = (files) => {
+        setNotificationError(false);
+        setExecutedTasks([]);
         setFileName(files[0].name);
         setSelectedFile(files[0]);
     }
@@ -51,61 +54,64 @@ const Importer = (props) => {
                     reader.onload = () => {
                         const buffer = reader.result;
                         workbook.xlsx.load(buffer).then(workbook => {
-                            workbookValidation(workbook, function (status) {
+                            workbookValidation(workbook, function (status, worksheets) {
                                 if (status) {
-                                    const templateWS = workbook.getWorksheet('Template');
-                                    const instructionWS = workbook.getWorksheet('Instructions');
-                                    const mappingWS = workbook.getWorksheet('Mapping');
+                                    const templateWS = worksheets.templateWS;
+                                    const instructionWS = worksheets.instructionWS;
+                                    const mappingWS = worksheets.mappingWS;
                                     const mappingDetails = getMappingList(mappingWS);
                                     const programDetails = getProgramDetails(instructionWS, mappingDetails);
-
-                                    const headers = templateWS.getRow(1).values;
-                                    headers.shift();
-                                    worksheetValidation(headers, function (status) {
+                                    serverAndVersionValidation(instructionWS, function (status) {
                                         if (status) {
-                                            var task = { step: 4, name: "Extracting data from XLSX", status: "success" };
-                                            setCurrentTask(task.name);
-                                            let templateData = [];
-                                            let dataRow = 3;
-                                            templateWS.eachRow((row, rowIndex) => {
-                                                if (rowIndex >= dataRow) {
-                                                    let dataRow = {};
-                                                    let rowVals = row.values;
-                                                    validTemplateHeader.forEach((header, index) => {
-                                                        /* dataRow[header] = (isObject(rowVals[index+1]) && rowVals[index+1].hasOwnProperty('result')) ? rowVals[index+1].result : rowVals[index+1]; */
-                                                        dataRow[header] = rowVals[index + 1]
-                                                    })
-                                                    templateData.push(dataRow);
+                                            const headers = templateWS.getRow(1).values;
+                                            headers.shift();
+                                            worksheetValidation(headers, function (status) {
+                                                if (status) {
+                                                    var task = { step: 5, name: "Extracting data from XLSX", status: "success" };
+                                                    setCurrentTask(task.name);
+                                                    let templateData = [];
+                                                    let dataRow = 3;
+                                                    templateWS.eachRow((row, rowIndex) => {
+                                                        if (rowIndex >= dataRow) {
+                                                            let dataRow = {};
+                                                            let rowVals = row.values;
+                                                            validTemplateHeader.forEach((header, index) => {
+                                                                /* dataRow[header] = (isObject(rowVals[index+1]) && rowVals[index+1].hasOwnProperty('result')) ? rowVals[index+1].result : rowVals[index+1]; */
+                                                                dataRow[header] = rowVals[index + 1]
+                                                            })
+                                                            templateData.push(dataRow);
+                                                        }
+                                                    });
+                                                    addExecutedTask(task);
+                                                    setCurrentTask(null);
+
+                                                    // Start import reading
+                                                    let { importedSections, importedScores, importSummaryValues } = readTemplateData(templateData, props.previous, programDetails.dePrefix, mappingDetails.optionSets, mappingDetails.legendSets, props.currentSectionsData);
+                                                    importSummaryValues.program = programDetails;
+                                                    importSummaryValues.mapping = mappingDetails;
+
+                                                    // Set new sections & questions
+                                                    setImportSummary(importSummaryValues);
+                                                    props.setImportResults(importSummaryValues);
+                                                    props.setSaveStatus('Validate & Save');
+                                                    props.setSavedAndValidated(false);
+
+                                                    var newScoresSection = props.previous.scoresSection;
+                                                    newScoresSection.dataElements = importedScores;
+                                                    delete newScoresSection.errors;
+
+                                                    props.previous.setSections(importedSections);
+                                                    props.previous.setScoresSection(newScoresSection);
+
+                                                    let programMetadata_new = props.programMetadata.programMetadata;
+                                                    programMetadata_new.dePrefix = programDetails.dePrefix;
+                                                    programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
+                                                    programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
+                                                    props.programMetadata.setProgramMetadata(programMetadata_new);
                                                 }
-                                            });
-                                            addExecutedTask(task);
-                                            setCurrentTask(null);
-
-                                            // Start import reading
-                                            let { importedSections, importedScores, importSummaryValues } = readTemplateData(templateData, props.previous, programDetails.dePrefix, mappingDetails.optionSets, mappingDetails.legendSets, props.currentSectionsData);
-                                            importSummaryValues.program = programDetails;
-                                            importSummaryValues.mapping = mappingDetails;
-
-                                            // Set new sections & questions
-                                            setImportSummary(importSummaryValues);
-                                            props.setImportResults(importSummaryValues);
-                                            props.setSaveStatus('Validate & Save');
-                                            props.setSavedAndValidated(false);
-
-                                            var newScoresSection = props.previous.scoresSection;
-                                            newScoresSection.dataElements = importedScores;
-                                            delete newScoresSection.errors;
-
-                                            props.previous.setSections(importedSections);
-                                            props.previous.setScoresSection(newScoresSection);
-
-                                            let programMetadata_new = props.programMetadata.programMetadata;
-                                            programMetadata_new.dePrefix = programDetails.dePrefix;
-                                            programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
-                                            programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
-                                            props.programMetadata.setProgramMetadata(programMetadata_new);
+                                            })
                                         }
-                                    })
+                                    });
                                 }
 
                             })
@@ -211,30 +217,73 @@ const Importer = (props) => {
         callback(status);
     }
 
-    const workbookValidation = (workbook, callback) => {
-        var task = { step: 2, name: "Validating worksheet in the workbook", status: "success" };
+    const serverAndVersionValidation = (instructionsWS, callback) => {
+        var task = { step: 2, name: "Validating Template version and origin server", status: "error" };
         setCurrentTask(task.name);
-        let status = true;
-        validWorksheets.forEach((worksheet, index) => {
-            try {
-                if (worksheet !== workbook.getWorksheet(index + 1).name) {
-                    task.status = "error";
-                    status = false;
-                    setNotificationError(true);
-                }
-            } catch (e) {
-                task.status = "error";
-                status = false;
+        let status = false;
+        const templateVersion = instructionsWS.getCell("D13").value;
+        if (templateVersion === ReleaseNotes.at(-1).version) {
+            const originServer = instructionsWS.getCell("D20").value;
+            if (originServer === location.origin) {
+                task.status = "success";
+                status = true;
+            } else {
+                task.name = "The Template has been exported from a different server"
                 setNotificationError(true);
             }
-        });
+        } else {
+            task.name = "The Template is outdated"
+            setNotificationError(true);
+        }
+
         addExecutedTask(task);
         setCurrentTask(null);
         callback(status);
     }
 
+    const workbookValidation = (workbook, callback) => {
+        var task = { step: 3, name: "Validating worksheets in the workbook", status: "success" };
+        setCurrentTask(task.name);
+        let status = true;
+
+        let templateWS;
+        let instructionWS;
+        let mappingWS;
+        workbook.eachSheet((worksheet, sheetId) => {
+            let id = worksheet.getCell("A1").value;
+            switch (id) {
+                case 'I':
+                    instructionWS = worksheet;
+                    break;
+                case 'Parent Name':
+                    templateWS = worksheet;
+                    break;
+                case 'M':
+                    mappingWS = worksheet;
+                    break;
+                default:
+                    break;
+            }
+        });
+        
+        let errorsArray = [];
+        if (!instructionWS) errorsArray.push('Instructions');
+        if (!templateWS) errorsArray.push('Template');
+        if (!mappingWS) errorsArray.push('Mapping');
+        if ( errorsArray.length > 0 ) {
+            task.status = "error";
+            status = false;
+            task.name = `Missing te following tab(s): ${errorsArray.join(', ')}.`
+            setNotificationError(true);
+        }
+
+        addExecutedTask(task);
+        setCurrentTask(null);
+        callback(status, {templateWS,instructionWS,mappingWS});
+    }
+
     const worksheetValidation = (headers, callback) => {
-        var task = { step: 3, name: "Validating worksheet columns", status: "success" };
+        var task = { step: 4, name: "Validating worksheet columns", status: "success" };
         setCurrentTask(task.name);
         let status = true;
         headers.forEach((value, key) => {
@@ -268,25 +317,25 @@ const Importer = (props) => {
             }
             {(importSummary) &&
                 <NoticeBox title='Import Summary'>
-                    <div style={{ display: 'flex', alignContent: 'center', width: '20rem' }}>
-                        <div style={{ flexGrow: 1 }}><strong>Questions</strong></div>
-                        <div style={{ flexGrow: 1 }}><Tag positive>{'New: ' + importSummary.questions.new}</Tag></div>
-                        <div style={{ flexGrow: 1 }}><Tag neutral>{'Updated: ' + importSummary.questions.updated}</Tag></div>
-                        <div style={{ flexGrow: 1 }}><Tag negative>{'Removed: ' + importSummary.questions.removed}</Tag></div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', alignContent: 'center', width: '100%', gridGap: '1em' }}>
+                        <strong>Questions</strong>
+                        <Tag positive>{'Added: ' + importSummary.questions.new}</Tag>
+                        <Tag neutral>{'Updated: ' + importSummary.questions.updated}</Tag>
+                        <Tag negative>{'Removed: ' + importSummary.questions.removed}</Tag>
                     </div>
                     <br />
-                    <div style={{ display: 'flex', alignContent: 'center', width: '20rem' }}>
-                        <div style={{ flexGrow: 1 }}><strong>Sections</strong></div>
-                        <div style={{ flexGrow: 1 }}><Tag positive>{'New: ' + importSummary.sections.new}</Tag></div>
-                        <div style={{ flexGrow: 1 }}><Tag neutral>{'Updated: ' + importSummary.sections.updated}</Tag></div>
-                        <div style={{ flexGrow: 1 }}><Tag negative>{'Removed: ' + importSummary.sections.removed}</Tag></div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', alignContent: 'center', width: '100%', gridGap: '1em' }}>
+                        <strong>Sections</strong>
+                        <Tag positive>{'Added: ' + importSummary.sections.new}</Tag>
+                        <Tag neutral>{'Updated: ' + importSummary.sections.updated}</Tag>
+                        <Tag negative>{'Removed: ' + importSummary.sections.removed}</Tag>
                     </div>
                     <br />
-                    <div style={{ display: 'flex', alignContent: 'center', width: '20rem' }}>
-                        <div style={{ flexGrow: 1 }}><strong>Scores</strong></div>
-                        <div style={{ flexGrow: 1 }}><Tag positive>{'New: ' + importSummary.scores.new}</Tag></div>
-                        <div style={{ flexGrow: 1 }}><Tag neutral>{'Updated: ' + importSummary.scores.updated}</Tag></div>
-                        <div style={{ flexGrow: 1 }}><Tag negative>{'Removed: ' + importSummary.scores.removed}</Tag></div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', alignContent: 'center', width: '100%', gridGap: '1em' }}>
+                        <strong>Scores</strong>
+                        <Tag positive>{'Added: ' + importSummary.scores.new}</Tag>
+                        <Tag neutral>{'Updated: ' + importSummary.scores.updated}</Tag>
+                        <Tag negative>{'Removed: ' + importSummary.scores.removed}</Tag>
                     </div>
 
                 </NoticeBox>

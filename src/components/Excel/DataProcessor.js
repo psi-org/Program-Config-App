@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { useDataQuery } from '@dhis2/app-runtime'
 import { arrayObjectToStringConverter } from '../../configs/Utils';
 import Exporter from "./Exporter";
+import { COMPETENCY_CLASS, CRITICAL_STEPS, FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA, NON_CRITICAL_STEPS } from '../../configs/Constants';
 
 const optionSetQuery = {
     results: {
@@ -58,7 +59,7 @@ const DataProcessor = (props) => {
     {
         programName = programStage.program.name;
         programShortName = programStage.program.shortName;
-        programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == "haUflNqP85K")?.value || "{}");
+        programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
         programPrefix = programMetadata?.dePrefix || programStage.program.id;
         programHealthArea = programMetadata?.healthArea || "FP";
         useCompetencyClass = programMetadata?.useCompetencyClass || "Yes";
@@ -120,7 +121,7 @@ const DataProcessor = (props) => {
         let program_stage_id = programStage.id;
 
         programStage.programStageSections.forEach((programSection) => {
-            let criticalStepsDataElements = ['NAaHST5ZDTE','VqBfZjZhKkU','pzWDtDUorBt'];
+            let criticalStepsDataElements = [COMPETENCY_CLASS, CRITICAL_STEPS, NON_CRITICAL_STEPS];
 
             let program_section_id = programSection.id;
 
@@ -147,7 +148,7 @@ const DataProcessor = (props) => {
                 row.program_section_id = program_section_id;
                 row.data_element_id = dataElement.id;
 
-                let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === "haUflNqP85K");
+                let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
                 let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
                 row.parentValue = '';
                 row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
@@ -159,10 +160,10 @@ const DataProcessor = (props) => {
                 row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: '';
                 row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: '';
 
-                let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === "LP171jpctBm");
+                let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_ORDER);
                 row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : '';
 
-                let feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === "yhKEe6BLEer");
+                let feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_TEXT);
                 row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : '';
 
                 Configures.push(row);
@@ -172,7 +173,7 @@ const DataProcessor = (props) => {
 
     const getVarNameFromParentUid = (parentUid) =>{
         let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
-        let deMetadata = JSON.parse(parentDe.attributeValues.find(av => av.attribute.id === "haUflNqP85K")?.value || "{}");
+        let deMetadata = JSON.parse(parentDe.attributeValues.find(av => av.attribute.id === METADATA)?.value || "{}");
         return deMetadata.varName;
     }
 

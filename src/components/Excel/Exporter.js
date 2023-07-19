@@ -90,6 +90,10 @@ const Exporter = (props) => {
 
         ws.getColumn("A").width = 5;
 
+        editingCell = buildCellObject(ws, "A1");
+        editingCell.cell.value = "I";
+        editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
+
         editingCell = buildCellObject(ws, "B2");
         editingCell.cell.value = "HNQIS 2.0 CONFIGURATION TEMPLATE";
         editingCell.cell.style = { font: { size: 12, bold: true } };
@@ -133,6 +137,10 @@ const Exporter = (props) => {
         ws.getCell("C15").value = props.programPrefix;
         let healthAreaFound = props.healthAreaData.find(ha => ha["code"] == props.programHealthArea);
         ws.getCell("C16").value = healthAreaFound ? healthAreaFound["Health Area"] : "Family Planning";
+        editingCell = buildCellObject(ws, "D13:D16");
+        editingCell.merge();
+        editingCell.cell.value = ReleaseNotes.at(-1).version;
+        editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
         fillBackgroundToRange(ws, "C12:C16", "cfe2f3");
 
         applyBorderToRange(ws, 1, 11, 2, 16);
@@ -999,6 +1007,11 @@ const Exporter = (props) => {
     };
 
     const addMapping = async (ws) => {
+
+        let editingCell = buildCellObject(ws, "A1");
+        editingCell.cell.value = "M";
+        editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
+
         printArray2Column(ws, valueType, "Value Type", "B2", "b6d7a8");
         printArray2Column(ws, renderType, "Render Type", "D2", "b6d7a8");
         printArray2Column(ws, aggOperator, "Agg. Operator", "F2", "a2c4c9");
