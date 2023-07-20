@@ -29,7 +29,7 @@ const readFile = file => {
                                 if (rowIndex >= dataRow) {
                                     let dataRow = {};
                                     let rowVals = row.values;
-                                    validTemplateHeader.forEach((header, index) => {
+                                    HNQIS2_TEMPLATE_HEADERS.forEach((header, index) => {
                                         /* dataRow[header] = (isObject(rowVals[index+1]) && rowVals[index+1].hasOwnProperty('result')) ? rowVals[index+1].result : rowVals[index+1]; */
                                         dataRow[header] = rowVals[index + 1]
                                     })
@@ -99,7 +99,7 @@ const worksheetValidation = (headers, callback) => {
     setCurrentTask(task.name);
     let status = true;
     headers.forEach((value, key) => {
-        if (value !== validTemplateHeader[key]) {
+        if (value !== HNQIS2_TEMPLATE_HEADERS[key]) {
             status = false;
             task.status = "error";
             setNotificationError(true);

@@ -37,10 +37,11 @@ export const renderType = ['DEFAULT', 'DROPDOWN', 'VERTICAL_RADIOBUTTONS', 'HORI
 export const aggOperator = ['NONE', 'SUM', 'AVERAGE', 'COUNT'];
 
 export const validWorksheets = ['Instructions', 'Template', 'Release Notes', 'Mapping'];
-export const validTemplateHeader = ['Parent Name', 'Structure', 'Form Name', 'Critical Step', 'Compulsory', 'Value Type', 'Option Set', 'Legend', 'Score Numerator', 'Score Denominator', 'Compositive Indicator (Feedback Order)', 'Parent Question', 'Answer Value', 'Feedback Text', 'Description', 'Program Stage Id', 'Program Section Id', 'Data Element Id'];
 
 export const structureValidator = ['"Section,label,question,score"'];
 export const teaStructureValidator = ['"Section,TEA"'];
 export const trackerStructureValidator = ['"Section,Data Element"'];
 export const yesNoValidator = ['"Yes,No"'];
 export const template_password = "TOyNrNrH8fNT8W%Au&4A";
+
+export const HNQIS2_TEMPLATE_HEADERS = ['Parent Name', 'Structure', 'Form Name', 'Critical Step', 'Compulsory', 'Value Type', 'Option Set', 'Legend', 'Score Numerator', 'Score Denominator', 'Compositive Indicator (Feedback Order)', 'Parent Question', 'Answer Value', 'Feedback Text', 'Description', 'Program Stage Id', 'Program Section Id', 'Data Element Id'];

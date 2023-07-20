@@ -233,3 +233,28 @@ export const generateBorderObject = (borderSchema, style = "thin") => {
 
     return result;
 }
+
+export const getMappedValues = (ws, startRow, refColumn, dataMap) => {
+    let i = startRow;
+    let mappedValues = [];
+
+    while (ws.getCell(refColumn + i).value !== null) {
+        let value = {};
+        for (const [key, column] of Object.entries(dataMap)) {
+            value[key] = ws.getCell(column + i).value
+        }
+        mappedValues.push(value);
+        i++;
+    }
+
+    return mappedValues;
+}
+
+export const getHNQIS2MappingList = (ws) => {
+    return {
+        optionSets: getMappedValues(ws, 3, "I", { id: 'I', optionSet: 'H' }),
+        legendSets: getMappedValues(ws, 3, "P", { id: 'P', legendSet: 'O' }),
+        healthAreas: getMappedValues(ws, 3, "L", { code: 'L', name: 'M' }),
+        programs: getMappedValues(ws, 3, "R", { id: 'S', name: 'R' })
+    };
+}

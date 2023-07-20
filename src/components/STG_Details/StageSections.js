@@ -939,7 +939,16 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     </ButtonStrip>
                 </div>
             </div>
-            {hnqisMode && importerEnabled && <Importer setSavedAndValidated={setSavedAndValidated} displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} currentSectionsData={programStage.programStageSections} />}
+            {hnqisMode && importerEnabled &&
+                <Importer
+                    setSavedAndValidated = {setSavedAndValidated}
+                    displayForm = {setImporterEnabled}
+                    previous = {{ sections, setSections, scoresSection, setScoresSection }}
+                    setSaveStatus = {setSaveStatus}
+                    setImportResults = {setImportResults}
+                    programMetadata = {{ programMetadata, setProgramMetadata }}
+                    currentSectionsData = {programStage.programStageSections}
+                />}
             <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', margin: '0', alignItems: 'center' }}>
                 <span style={{
                     overflow: 'hidden',

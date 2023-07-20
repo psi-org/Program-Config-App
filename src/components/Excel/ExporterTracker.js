@@ -126,6 +126,18 @@ const Exporter = ({
         editingCell.cell.value = "PROGRAM CONFIGURATION APP";
         editingCell.cell.style = { font: { size: 12, bold: true } };
 
+        editingCell = buildCellObject(ws, "J2:K2");
+        editingCell.merge();
+        editingCell.cell.value = "Template Version";
+        editingCell.cell.style = { font: { bold: true } };
+
+        editingCell = buildCellObject(ws, "L2");
+        editingCell.cell.value = ReleaseNotesTracker.at(-1).version;
+        editingCell.cell.alignment = middleCenter;
+
+        fillBackgroundToRange(ws, "J2:K2", "BDD7EE");
+        applyBorderToRange(ws, 9, 2, 11, 2);
+
         editingCell = buildCellObject(ws, "B3");
         editingCell.cell.value = "TRACKER AND EVENT PROGRAMS CONFIGURATION TEMPLATE";
         editingCell.cell.style = { font: { size: 12, bold: true } };
@@ -197,15 +209,15 @@ const Exporter = ({
         editingCell.merge();
         editingCell.cell.value = "The information displayed here corresponds to the server from which this Template was downloaded";
         editingCell.cell.alignment = middleCenter;
-        applyBorderToRange(ws, 1, 16, 5, 20);
-        fillBackgroundToRange(ws, "B16:B20", "BDD7EE");
 
+        fillBackgroundToRange(ws, "B16:B20", "BDD7EE");
+        
         editingCell = buildCellObject(ws, "B21:F23");
         editingCell.merge();
         editingCell.cell.value = "Please note: This Template can only be imported to the same server from which it was downloaded. Do NOT use this template to transfer the current Program to another server.";
         editingCell.cell.style = { font: { bold: true, color: { argb: 'FFC00000' } } };
         editingCell.cell.alignment = middleCenter;
-        applyBorderToRange(ws, 1, 21, 5, 23);
+        applyBorderToRange(ws, 1, 16, 5, 23);
 
 
         editingCell = buildCellObject(ws, "H16:L16");

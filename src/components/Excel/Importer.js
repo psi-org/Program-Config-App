@@ -1,8 +1,7 @@
 import { useState } from "react";
 import ExcelJS from "exceljs/dist/es5/exceljs.browser";
-import NoticesBox from "../UIElements/NoticesBox";
-import { NoticeBox, Tag } from "@dhis2/ui";
-import { validWorksheets, validTemplateHeader } from "../../configs/TemplateConstants";
+import ImportStatusBox from "../UIElements/ImportStatusBox";
+import { HNQIS2_TEMPLATE_HEADERS } from "../../configs/TemplateConstants";
 import { readTemplateData } from '../STG_Details/importReader';
 
 import Button from '@mui/material/Button';
@@ -12,9 +11,14 @@ import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { ReleaseNotes } from "../../configs/ReleaseNotes";
+import ImportSummary from "../UIElements/ImportSummary";
+import { getHNQIS2MappingList } from "../../configs/ExcelUtils";
+import { HNQIS2_ORIGIN_SERVER_CELL, HNQIS2_TEMPLATE_VERSION_CELL } from "../../configs/Constants";
+import FileSelector from "../UIElements/FileSelector";
 
 
-const Importer = (props) => {
+const Importer = ({ setSavedAndValidated, displayForm, previous, setSaveStatus, setImportResults, programMetadata, currentSectionsData }) => {
+    
     const [selectedFile, setSelectedFile] = useState(undefined);
     const [currentTask, setCurrentTask] = useState(undefined);
     const [executedTasks, setExecutedTasks] = useState([]);
@@ -36,90 +40,91 @@ const Importer = (props) => {
     }
 
     function hideForm() {
-        props.displayForm(false);
+        displayForm(false);
     }
 
     const startImportProcess = () => {
         setExecutedTasks([]);
         setButtonDisabled(true);
-        //1. Form Validation
         if (typeof selectedFile !== 'undefined') {
-            //2. Validated File Type
-            fileValidation(function (status) {
-                if (status) {
-                    const workbook = new ExcelJS.Workbook();
-                    const reader = new FileReader();
+            if (!tasksHandler(1, 'Validating Template format (XLSX)', false, fileValidation)) return;
 
-                    reader.readAsArrayBuffer(selectedFile)
-                    reader.onload = () => {
-                        const buffer = reader.result;
-                        workbook.xlsx.load(buffer).then(workbook => {
-                            workbookValidation(workbook, function (status, worksheets) {
-                                if (status) {
-                                    const templateWS = worksheets.templateWS;
-                                    const instructionWS = worksheets.instructionWS;
-                                    const mappingWS = worksheets.mappingWS;
-                                    const mappingDetails = getMappingList(mappingWS);
-                                    const programDetails = getProgramDetails(instructionWS, mappingDetails);
-                                    serverAndVersionValidation(instructionWS, function (status) {
-                                        if (status) {
-                                            const headers = templateWS.getRow(1).values;
-                                            headers.shift();
-                                            worksheetValidation(headers, function (status) {
-                                                if (status) {
-                                                    var task = { step: 5, name: "Extracting data from XLSX", status: "success" };
-                                                    setCurrentTask(task.name);
-                                                    let templateData = [];
-                                                    let dataRow = 3;
-                                                    templateWS.eachRow((row, rowIndex) => {
-                                                        if (rowIndex >= dataRow) {
-                                                            let dataRow = {};
-                                                            let rowVals = row.values;
-                                                            validTemplateHeader.forEach((header, index) => {
-                                                                /* dataRow[header] = (isObject(rowVals[index+1]) && rowVals[index+1].hasOwnProperty('result')) ? rowVals[index+1].result : rowVals[index+1]; */
-                                                                dataRow[header] = rowVals[index + 1]
-                                                            })
-                                                            templateData.push(dataRow);
-                                                        }
-                                                    });
-                                                    addExecutedTask(task);
-                                                    setCurrentTask(null);
+            const workbook = new ExcelJS.Workbook();
+            const reader = new FileReader();
 
-                                                    // Start import reading
-                                                    let { importedSections, importedScores, importSummaryValues } = readTemplateData(templateData, props.previous, programDetails.dePrefix, mappingDetails.optionSets, mappingDetails.legendSets, props.currentSectionsData);
-                                                    importSummaryValues.program = programDetails;
-                                                    importSummaryValues.mapping = mappingDetails;
+            reader.readAsArrayBuffer(selectedFile);
+            reader.onload = async () => {
 
-                                                    // Set new sections & questions
-                                                    setImportSummary(importSummaryValues);
-                                                    props.setImportResults(importSummaryValues);
-                                                    props.setSaveStatus('Validate & Save');
-                                                    props.setSavedAndValidated(false);
+                const buffer = reader.result;
+                let loadedWorkbook = await workbook.xlsx.load(buffer)
+                let worksheets = tasksHandler(
+                    2,
+                    'Validating worksheets in the workbook',
+                    true,
+                    workbookValidation,
+                    { workbook: loadedWorkbook }
+                );
 
-                                                    var newScoresSection = props.previous.scoresSection;
-                                                    newScoresSection.dataElements = importedScores;
-                                                    delete newScoresSection.errors;
+                if (!worksheets.status) return;
 
-                                                    props.previous.setSections(importedSections);
-                                                    props.previous.setScoresSection(newScoresSection);
+                const templateWS = worksheets.templateWS;
+                const instructionsWS = worksheets.instructionsWS;
+                const mappingWS = worksheets.mappingWS;
+                const mappingDetails = getHNQIS2MappingList(mappingWS);
+                const programDetails = getProgramDetails(instructionsWS, mappingDetails);
 
-                                                    let programMetadata_new = props.programMetadata.programMetadata;
-                                                    programMetadata_new.dePrefix = programDetails.dePrefix;
-                                                    programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
-                                                    programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
-                                                    props.programMetadata.setProgramMetadata(programMetadata_new);
-                                                }
-                                            })
-                                        }
-                                    });
-                                }
-
-                            })
-                        });
+                if (!tasksHandler(
+                    3,
+                    'Validating Template version and origin server',
+                    false,
+                    serverAndVersionValidation,
+                    {
+                        instructionsWS,
+                        templateVersionCell: HNQIS2_TEMPLATE_VERSION_CELL,
+                        originServerCell: HNQIS2_ORIGIN_SERVER_CELL
                     }
-                }
+                )) return;
 
-            });
+                const headers = templateWS.getRow(1).values;
+                headers.shift();
+
+                if (!tasksHandler(4, 'Validating worksheet columns', true, worksheetValidation, { headers, templateHeadersList: HNQIS2_TEMPLATE_HEADERS })) return;
+
+                let templateData = tasksHandler(5, 'Extracting data from the Template', true, getTemplateData, { templateWS, templateHeadersList: HNQIS2_TEMPLATE_HEADERS });
+                if (!templateData.status) return;
+
+                // Start import reading
+                let { importedSections, importedScores, importSummaryValues } = readTemplateData(
+                    templateData.data,
+                    previous,
+                    programDetails.dePrefix,
+                    mappingDetails.optionSets,
+                    mappingDetails.legendSets,
+                    currentSectionsData
+                );
+
+                importSummaryValues.program = programDetails;
+                importSummaryValues.mapping = mappingDetails;
+
+                // Set new sections & questions
+                setImportSummary(importSummaryValues);
+                setImportResults(importSummaryValues);
+                setSaveStatus('Validate & Save');
+                setSavedAndValidated(false);
+
+                let newScoresSection = previous.scoresSection;
+                newScoresSection.dataElements = importedScores;
+                delete newScoresSection.errors;
+
+                previous.setSections(importedSections);
+                previous.setScoresSection(newScoresSection);
+
+                let programMetadata_new = programMetadata.programMetadata;
+                programMetadata_new.dePrefix = programDetails.dePrefix;
+                programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
+                programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
+                programMetadata.setProgramMetadata(programMetadata_new);
+            }
         }
         setButtonDisabled(false);
     }
@@ -137,93 +142,34 @@ const Importer = (props) => {
         return program;
     }
 
-    const getMappingList = (ws) => {
-        let mapping = {};
-        mapping.optionSets = [];
-        mapping.legendSets = [];
-        mapping.programs = [];
-
-        mapping.optionSets = getOptionSets(ws);
-        mapping.legendSets = getLegendSets(ws);
-        mapping.healthAreas = getHealthAreas(ws);
-        mapping.programs = getProgramsMap(ws);
-        return mapping;
-    }
-
-    const getOptionSets = (ws) => {
-        let i = 3;
-        let optionSets = [];
-        while (ws.getCell("I" + i).value !== null) {
-            let option = {};
-            option.id = ws.getCell("I" + i).value;
-            option.optionSet = ws.getCell("H" + i).value;
-            optionSets.push(option);
-            i++;
-        }
-        return optionSets;
-    }
-
-    const getHealthAreas = (ws) => {
-        let i = 3;
-        let healthAreas = [];
-        while (ws.getCell("L" + i).value !== null) {
-            let healthArea = {};
-            healthArea.code = ws.getCell("L" + i).value;
-            healthArea.name = ws.getCell("M" + i).value;
-            healthAreas.push(healthArea);
-            i++;
-        }
-        return healthAreas;
-    }
-
-    const getLegendSets = (ws) => {
-        let i = 3;
-        let legendSets = [];
-        while (ws.getCell("P" + i).value !== null) {
-            let legend = {};
-            legend.id = ws.getCell("P" + i).value;
-            legend.legendSet = ws.getCell("O" + i).value;
-            legendSets.push(legend);
-            i++;
-        }
-        return legendSets
-    }
-
-    const getProgramsMap = (ws) => {
-        let i = 3;
-        let programs = [];
-        while (ws.getCell("R" + i).value !== null) {
-            let program = {};
-            program.id = ws.getCell("S" + i).value;
-            program.name = ws.getCell("R" + i).value;
-            programs.push(program);
-            i++;
-        }
-        return programs
-    }
-
-    const fileValidation = (callback) => {
-        var task = { step: 1, name: "Validating File Type - XLSX", status: "error" };
+    const tasksHandler = (step, message, initialStatus, actionFunction, params = {}) => {
+        let task = { step, name: message, status: initialStatus ? 'success' : 'error' };
         setCurrentTask(task.name);
-        let status = false;
+
+        let result = actionFunction(initialStatus, task, params);
+
+        addExecutedTask(task);
+        setCurrentTask(null);
+        return result;
+    }
+
+    const fileValidation = (status, task, { }) => {
+
         if (selectedFile.name.endsWith('xlsx')) {
             task.status = "success";
             status = true;
         } else {
+            task.name = "The provided file format is not XLSX";
             setNotificationError(true);
         }
-        addExecutedTask(task);
-        setCurrentTask(null);
-        callback(status);
+        return status;
+
     }
 
-    const serverAndVersionValidation = (instructionsWS, callback) => {
-        var task = { step: 2, name: "Validating Template version and origin server", status: "error" };
-        setCurrentTask(task.name);
-        let status = false;
-        const templateVersion = instructionsWS.getCell("D13").value;
+    const serverAndVersionValidation = (status, task, { instructionsWS, templateVersionCell, originServerCell }) => {
+        const templateVersion = instructionsWS.getCell(templateVersionCell).value;
         if (templateVersion === ReleaseNotes.at(-1).version) {
-            const originServer = instructionsWS.getCell("D20").value;
+            const originServer = instructionsWS.getCell(originServerCell).value;
             if (originServer === location.origin) {
                 task.status = "success";
                 status = true;
@@ -236,24 +182,19 @@ const Importer = (props) => {
             setNotificationError(true);
         }
 
-        addExecutedTask(task);
-        setCurrentTask(null);
-        callback(status);
+        return status;
     }
 
-    const workbookValidation = (workbook, callback) => {
-        var task = { step: 3, name: "Validating worksheets in the workbook", status: "success" };
-        setCurrentTask(task.name);
-        let status = true;
+    const workbookValidation = (status, task, { workbook }) => {
 
         let templateWS;
-        let instructionWS;
+        let instructionsWS;
         let mappingWS;
         workbook.eachSheet((worksheet, sheetId) => {
             let id = worksheet.getCell("A1").value;
             switch (id) {
                 case 'I':
-                    instructionWS = worksheet;
+                    instructionsWS = worksheet;
                     break;
                 case 'Parent Name':
                     templateWS = worksheet;
@@ -265,97 +206,78 @@ const Importer = (props) => {
                     break;
             }
         });
-        
+
         let errorsArray = [];
-        if (!instructionWS) errorsArray.push('Instructions');
+        if (!instructionsWS) errorsArray.push('Instructions');
         if (!templateWS) errorsArray.push('Template');
         if (!mappingWS) errorsArray.push('Mapping');
-        if ( errorsArray.length > 0 ) {
+        if (errorsArray.length > 0) {
             task.status = "error";
             status = false;
-            task.name = `Missing te following tab(s): ${errorsArray.join(', ')}.`
+            task.name = `Missing the following tab(s): ${errorsArray.join(', ')}.`
             setNotificationError(true);
         }
 
-        addExecutedTask(task);
-        setCurrentTask(null);
-        callback(status, {templateWS,instructionWS,mappingWS});
+        return { status, templateWS, instructionsWS, mappingWS };
     }
 
-    const worksheetValidation = (headers, callback) => {
-        var task = { step: 4, name: "Validating worksheet columns", status: "success" };
-        setCurrentTask(task.name);
-        let status = true;
+    const worksheetValidation = (status, task, { headers, templateHeadersList }) => {
         headers.forEach((value, key) => {
-            if (value !== validTemplateHeader[key]) {
+            if (value !== templateHeadersList[key]) {
                 status = false;
                 task.status = "error";
+                task.name = 'Some Template columns are missing or misplaced.';
                 setNotificationError(true);
             }
         });
-        addExecutedTask(task);
-        setCurrentTask(null);
-        callback(status);
+        return status;
     }
 
-    function isObject(val) {
-        if (val === null) { return false; }
-        return ((typeof val === 'function') || (typeof val === 'object'));
+    const getTemplateData = (status, task, { templateWS, templateHeadersList }) => {
+
+        let templateData = [];
+        let dataRow = 3;
+
+        templateWS.eachRow((row, rowIndex) => {
+            if (rowIndex >= dataRow) {
+                let dataRow = {};
+                let rowVals = row.values;
+                templateHeadersList.forEach((header, index) => {
+                    dataRow[header] = rowVals[index + 1]
+                })
+                templateData.push(dataRow);
+            }
+        });
+
+        return { status, data: templateData };
     }
 
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
-            Select Configuration File
+            Template Importer
         </CustomMUIDialogTitle >
         <DialogContent dividers style={{ padding: '1em 2em' }}>
 
-            {(currentTask || executedTasks.length > 0) && 
-                <>
-                    <NoticesBox currentTask={currentTask} executedTasks={executedTasks} isError={isNotificationError} />
-                    <br/>
-                </>
+            {(currentTask || executedTasks.length > 0) &&
+                <div style={{ width: '100%', marginBottom: '1em' }}>
+                    <ImportStatusBox
+                        title='HNQIS Configuration - Import Status'
+                        currentTask={currentTask}
+                        executedTasks={executedTasks}
+                        isError={isNotificationError}
+                    />
+                </div>
             }
             {(importSummary) &&
-                <NoticeBox title='Import Summary'>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', alignContent: 'center', width: '100%', gridGap: '1em' }}>
-                        <strong>Questions</strong>
-                        <Tag positive>{'Added: ' + importSummary.questions.new}</Tag>
-                        <Tag neutral>{'Updated: ' + importSummary.questions.updated}</Tag>
-                        <Tag negative>{'Removed: ' + importSummary.questions.removed}</Tag>
-                    </div>
-                    <br />
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', alignContent: 'center', width: '100%', gridGap: '1em' }}>
-                        <strong>Sections</strong>
-                        <Tag positive>{'Added: ' + importSummary.sections.new}</Tag>
-                        <Tag neutral>{'Updated: ' + importSummary.sections.updated}</Tag>
-                        <Tag negative>{'Removed: ' + importSummary.sections.removed}</Tag>
-                    </div>
-                    <br />
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', alignContent: 'center', width: '100%', gridGap: '1em' }}>
-                        <strong>Scores</strong>
-                        <Tag positive>{'Added: ' + importSummary.scores.new}</Tag>
-                        <Tag neutral>{'Updated: ' + importSummary.scores.updated}</Tag>
-                        <Tag negative>{'Removed: ' + importSummary.scores.removed}</Tag>
-                    </div>
-
-                </NoticeBox>
+                <ImportSummary title='Import Summary' importCategories={[
+                    { name: 'Questions', content: importSummary.questions },
+                    { name: 'Sections', content: importSummary.sections },
+                    { name: 'Scores', content: importSummary.scores }
+                ]} />
             }
 
             {!importSummary &&
-                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <Button variant="contained" component="label" style={{width: '30%', maxWidth: '30%', minWidth: '30%'}}>
-                        Select File
-                        <input
-                            type="file"
-                            accept=".xlsx"
-                            hidden
-                            onChange={(e) => setFile(e.target.files)}
-                        />
-                    </Button>
-                    <span style={{width: '65%', maxWidth: '65%', minWidth: '65%', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}>{fileName}</span>
-                    {/*<input type="file" accept=".xlsx" onChange={(e) => setFile(e.target.files)} />*/}
-                </div>
-
+                <FileSelector fileName={fileName} setFile={setFile} acceptedFiles={".xlsx"}/>
             }
 
         </DialogContent>
