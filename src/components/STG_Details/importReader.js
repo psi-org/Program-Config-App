@@ -204,17 +204,6 @@ const readTemplateData = (templateData, currentData, programPrefix = 'Prefix', o
         })
     });
 
-    /*
-    importedSections.map(section => {
-        let resultsCount = section.dataElements.reduce((acc,de)=>{
-            return de.importStatus=='new' ?[acc[0]+1,acc[1]]:[acc[0],acc[1]+1]
-        },[0,0])
-        section.newDataElements = resultsCount[0];
-        section.updatedDataElements = resultsCount[1];
-        return section
-    })
-     */
-
     // Compare previous questions with imported data -> Get removed data
     var removedQuestions = currentData.sections.map(sec => {
         // Section removed -> Increase counter

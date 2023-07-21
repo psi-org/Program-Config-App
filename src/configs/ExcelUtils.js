@@ -1,12 +1,16 @@
 import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy } from "./Utils";
 import { saveAs } from 'file-saver';
 import { thinBorder } from "./TemplateConstants";
-import { DATE_FORMAT_OPTIONS, SHORT_DATE_FORMAT_OPTIONS } from "./Constants";
+import { SHORT_DATE_FORMAT_OPTIONS } from "./Constants";
 
 export function printArray2Column(sheet, array, header, startPosition, headerBgColor) {
     let coordinates = splitPosition(startPosition);
     sheet.getColumn(coordinates[0]).width = 20;
     sheet.getCell(startPosition).value = header;
+    sheet.getCell(startPosition).font = {
+        size: 12,
+        bold: true
+    };
     sheet.getCell(startPosition).fill = {
         type: "pattern",
         pattern: "solid",
@@ -248,6 +252,14 @@ export const getMappedValues = (ws, startRow, refColumn, dataMap) => {
     }
 
     return mappedValues;
+}
+
+export const getTrackerMappingList = (ws) => {
+    return {
+        trackedEntityAttributes: getMappedValues(ws, 3, "D", { id: 'D', tea: 'C', aggType: 'F', valueType: 'G' }),
+        optionSets: getMappedValues(ws, 3, "K", { id: 'K', optionSet: 'J', valueType: 'L' }),
+        legendSets: getMappedValues(ws, 3, "P", { id: 'P', legendSet: 'O' })
+    };
 }
 
 export const getHNQIS2MappingList = (ws) => {

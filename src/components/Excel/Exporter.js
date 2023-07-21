@@ -1,18 +1,17 @@
 import { useEffect } from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import {
-    activeTabNumber,
-    aggOperator,
+    HNQIS2_AGG_OPERATORS,
     conditionalError,
     disabledHighlighting,
     labelHighlighting,
     middleCenter,
     questionHighlighting,
-    renderType,
+    RENDER_TYPES,
     sectionHighlighting,
     structureValidator,
-    template_password,
-    valueType,
+    TEMPLATE_PASSWORD,
+    HNQIS2_VALUE_TYPES,
     verticalMiddle,
     yesNoValidator
 } from "../../configs/TemplateConstants";
@@ -37,7 +36,7 @@ import { MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../.
 
 const Exporter = (props) => {
 
-    const password = template_password;
+    const password = TEMPLATE_PASSWORD;
 
     const generate = () => {
         const workbook = new ExcelJS.Workbook();
@@ -74,7 +73,7 @@ const Exporter = (props) => {
             properties: { tabColor: { argb: 'FBDAD7' } }
         });
         workbook.views = [{
-            activeTab: activeTabNumber
+            activeTab: 1
         }];
         addMapping(mappingWS);
         addInstructions(instructionWS);
@@ -1012,17 +1011,17 @@ const Exporter = (props) => {
         editingCell.cell.value = "M";
         editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
 
-        printArray2Column(ws, valueType, "Value Type", "B2", "b6d7a8");
-        printArray2Column(ws, renderType, "Render Type", "D2", "b6d7a8");
-        printArray2Column(ws, aggOperator, "Agg. Operator", "F2", "a2c4c9");
+        printArray2Column(ws, HNQIS2_VALUE_TYPES, "Value Type", "B2", "b6d7a8");
+        printArray2Column(ws, RENDER_TYPES, "Render Type", "D2", "b6d7a8");
+        printArray2Column(ws, HNQIS2_AGG_OPERATORS, "Agg. Operator", "F2", "a2c4c9");
         printObjectArray(ws, props.optionData, "H2", "d5a6bd");
         printObjectArray(ws, props.healthAreaData, "L2", "d5a6bd")
         printObjectArray(ws, props.legendSetData, "O2", "9fc5e8");
         printObjectArray(ws, props.programData, "R2", "9fc5e8");
 
-        defineName(ws, `B3:B${valueType.length + 2}`, "Value_Type");
-        defineName(ws, `D3:D${renderType.length + 2}`, "Render_Type");
-        defineName(ws, `F3:F${aggOperator.length + 2}`, "Agg_Operator");
+        defineName(ws, `B3:B${HNQIS2_VALUE_TYPES.length + 2}`, "Value_Type");
+        defineName(ws, `D3:D${RENDER_TYPES.length + 2}`, "Render_Type");
+        defineName(ws, `F3:F${HNQIS2_AGG_OPERATORS.length + 2}`, "Agg_Operator");
         defineName(ws, `H2:J${props.optionData.length + 2}`, "Option_Sets_Data");
         defineName(ws, `H3:H${props.optionData.length + 2}`, "Option_Sets_option");
         defineName(ws, `L2:M${props.healthAreaData.length + 2}`, "Health_Area_Data");

@@ -1,6 +1,6 @@
 import { useDataQuery } from "@dhis2/app-runtime";
 import { useSelector } from "react-redux";
-import { Button, Chip, CircularLoader, NoticeBox } from '@dhis2/ui';
+import { Chip, CircularLoader, NoticeBox } from '@dhis2/ui';
 
 // ------------------
 import { Link, useParams } from "react-router-dom";
@@ -12,15 +12,14 @@ import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
 import { useState, useEffect } from "react";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
 import { formatAlert, truncateString } from "../../configs/Utils";
-import TrackerImporter from "../Excel/TrackerImporter";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 import DataProcessorTracker from "../Excel/DataProcessorTracker";
+import Importer from "../Excel/Importer";
 
 const query = {
     results: {
@@ -49,6 +48,7 @@ const ProgramDetails = () => {
     const [importerEnabled, setImporterEnabled] = useState(false);
     const [exportToExcel, setExportToExcel] = useState(false);
     const [exportStatus, setExportStatus] = useState("Download Template");
+    const [importResults, setImportResults] = useState();
 
     // IMPORT TEMPLATE SCOPE
     const [importDialog,setImportDialog] = useState(false);
@@ -188,7 +188,14 @@ const ProgramDetails = () => {
                         {formatAlert(notification?.message)}
                     </Alert>
                 </Snackbar>
-                {importerEnabled && <TrackerImporter onClose={()=>setImporterEnabled(false)} process={(file)=>console.log(file)} />}
+                {!hnqisMode && importerEnabled &&
+                    <Importer
+                        displayForm={setImporterEnabled}
+                        setImportResults={setImportResults}
+                        importType='TRACKER'
+                        previous={/*{ sections, setSections, scoresSection, setScoresSection }*/{}}
+                    />
+                }
             </div>
         </div>
     );

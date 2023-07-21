@@ -6,10 +6,10 @@ import {
     middleCenter,
     otherHighlighting,
     questionHighlighting,
-    renderType,
+    RENDER_TYPES,
     sectionHighlighting,
     teaStructureValidator,
-    template_password,
+    TEMPLATE_PASSWORD,
     trackerStructureValidator,
     verticalMiddle,
     yesNoValidator
@@ -30,13 +30,13 @@ import {
     writeWorkbook
 } from "../../configs/ExcelUtils";
 import { ReleaseNotesTracker } from "../../configs/ReleaseNotes";
-import { MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../../configs/Constants';
+import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../../configs/Constants';
 
 const Exporter = ({
     programID, programPrefix, programName, programShortName, programTET, programCatCombo, programType, flag, stagesConfigurations, teaConfigurations, optionData, legendSetData, trackedEntityAttributesData, valueTypes, aggTypes, programData, isLoading, setFlag, setStatus
 }) => {
 
-    const password = template_password;
+    const password = TEMPLATE_PASSWORD;
 
     const generate = () => {
 
@@ -574,6 +574,7 @@ const Exporter = ({
 
         ws.columns = cols;
         ws.getRow(1).font = { bold: true };
+        ws.getRow(1).alignment = middleCenter;
         ws.getRow(2).values = {
             structure: "Defines what is being configured in the row",
             uid: "The UID of the selected TEA (Used to verify that the TEA exists)",
@@ -865,6 +866,7 @@ const Exporter = ({
         fillBackgroundToRange(ws, "N1:P1", "E2EFDA");
         fillBackgroundToRange(ws, "Q1:R1", "BDD7EE");
         ws.getRow(1).height = 35;
+        ws.getRow(1).font = { bold: true };
         ws.getRow(1).alignment = middleCenter;
         ws.getRow(2).values = {
             structure: "Defines what is being configured in the row",
@@ -1116,6 +1118,8 @@ const Exporter = ({
             configure.option_set_details = {
                 formula: `=IF(NOT(ISBLANK(L${dataRow})),IF(ISNA(VLOOKUP(L${dataRow}, selected_Option_Set_Data,4,FALSE)),"Not Found",HYPERLINK(VLOOKUP(L${dataRow}, selected_Option_Set_Data,4,FALSE),"[Click Here]")),"")`,
             }
+            configure.value_type = DHIS2_VALUE_TYPES_MAP[configure.value_type];
+            configure.agg_type = DHIS2_AGG_OPERATORS_MAP[configure.agg_type];
             ws.getRow(dataRow).values = configure;
             if (configure.structure === "Section") {
                 fillBackgroundToRange(ws, "A" + dataRow + ":P" + dataRow, "F8C291")
@@ -1146,14 +1150,14 @@ const Exporter = ({
         printObjectArray(ws, legendSetData, "O2", "bdd7ee");
         defineName(ws, `O3:O${legendSetData.length + 2}`, "Legend_Sets_Data");
 
-        printObjectArray(ws, valueTypes, "S2", "bdd7ee");
-        defineName(ws, `S3:S${valueTypes.length + 2}`, "Value_Type");
+        printObjectArray(ws, valueTypes, "R2", "bdd7ee");
+        defineName(ws, `R3:R${valueTypes.length + 2}`, "Value_Type");
 
-        printArray2Column(ws, renderType, "Render Type", "V2", "bdd7ee");
-        defineName(ws, `V3:V${renderType.length + 2}`, "Render_Type");
+        printArray2Column(ws, RENDER_TYPES, "Render Type", "U2", "bdd7ee");
+        defineName(ws, `U3:U${RENDER_TYPES.length + 2}`, "Render_Type");
 
-        printObjectArray(ws, aggTypes, "X2", "bdd7ee");
-        defineName(ws, `X3:X${aggTypes.length + 2}`, "Agg_Operator");
+        printObjectArray(ws, aggTypes, "W2", "bdd7ee");
+        defineName(ws, `W3:W${aggTypes.length + 2}`, "Agg_Operator");
 
         await ws.protect(password);
     };

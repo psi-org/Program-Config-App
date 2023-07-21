@@ -267,7 +267,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [open, setOpen] = useState(false);
     const anchorRef = useRef(null);
     const [selectedIndex, setSelectedIndex] = useState(0);
-    
+
     const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
 
     useEffect(() => {
@@ -559,7 +559,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         return;
     };
 
-    
+
 
     useEffect(() => {
         if (androidSettingsError) updateProgramBuildVersion(programId);
@@ -811,10 +811,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         setOpen(false);
     };
 
-    
 
 
-    
+
+
 
     return (
         <div className="cont_stage">
@@ -843,15 +843,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 onClick={() => commit()}
                             > {saveStatus}</Button>
                         }
-                        {/*hnqisMode && isSectionMode &&
-                            <Button
-                                variant='contained'
-                                size='small'
-                                startIcon={<ConstructionIcon />}
-                                disabled={!savedAndValidated}
-                                onClick={() => allAuth ? run() : setShowDisclaimer(true)}
-                            >Set up program</Button>
-                        */}
                         {hnqisMode && isSectionMode &&
                             <>
                                 <ButtonGroup disableElevation color='primary' variant="contained" ref={anchorRef} aria-label="split button">
@@ -941,14 +932,16 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             </div>
             {hnqisMode && importerEnabled &&
                 <Importer
-                    setSavedAndValidated = {setSavedAndValidated}
-                    displayForm = {setImporterEnabled}
-                    previous = {{ sections, setSections, scoresSection, setScoresSection }}
-                    setSaveStatus = {setSaveStatus}
-                    setImportResults = {setImportResults}
-                    programMetadata = {{ programMetadata, setProgramMetadata }}
-                    currentSectionsData = {programStage.programStageSections}
-                />}
+                    displayForm={setImporterEnabled}
+                    setImportResults={setImportResults}
+                    importType='H2'
+                    previous={{ sections, setSections, scoresSection, setScoresSection }}
+                    setSaveStatus={setSaveStatus}
+                    programMetadata={{ programMetadata, setProgramMetadata }}
+                    currentSectionsData={programStage.programStageSections}
+                    setSavedAndValidated={setSavedAndValidated}
+                />
+            }
             <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', margin: '0', alignItems: 'center' }}>
                 <span style={{
                     overflow: 'hidden',
