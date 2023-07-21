@@ -136,9 +136,12 @@ const Exporter = (props) => {
         ws.getCell("C15").value = props.programPrefix;
         let healthAreaFound = props.healthAreaData.find(ha => ha["code"] == props.programHealthArea);
         ws.getCell("C16").value = healthAreaFound ? healthAreaFound["Health Area"] : "Family Planning";
-        editingCell = buildCellObject(ws, "D13:D16");
-        editingCell.merge();
+        editingCell = buildCellObject(ws, "D13");
         editingCell.cell.value = ReleaseNotes.at(-1).version;
+        editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
+        editingCell = buildCellObject(ws, "D14:D16");
+        editingCell.merge();
+        editingCell.cell.value = 'HNQIS2';
         editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
         fillBackgroundToRange(ws, "C12:C16", "cfe2f3");
 

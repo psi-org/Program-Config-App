@@ -51,10 +51,10 @@ const ProgramDetails = () => {
     const [importResults, setImportResults] = useState();
 
     // IMPORT TEMPLATE SCOPE
-    const [importDialog,setImportDialog] = useState(false);
+    const [importDialog, setImportDialog] = useState(false);
     // 
 
-    useEffect(()=>{
+    useEffect(() => {
     }, [exportToExcel, setExportStatus])
 
     useEffect(() => {
@@ -86,10 +86,10 @@ const ProgramDetails = () => {
     }
     if (loading) { return <span><CircularLoader /></span> }
 
-    const hnqisMode = !!data.results.attributeValues.find(av=>av.value==="HNQIS2")
+    const hnqisMode = !!data.results.attributeValues.find(av => av.value === "HNQIS2")
 
-    if(hnqisMode && !h2Ready) return (
-        <div style={{margin:'2em'}}>
+    if (hnqisMode && !h2Ready) return (
+        <div style={{ margin: '2em' }}>
             <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
                 <span>First go to the <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue.</span>
             </NoticeBox>
@@ -101,10 +101,10 @@ const ProgramDetails = () => {
             <div className="sub_nav">
                 <div className="cnt_p">
                     <Link to={'/'}><Chip>Home</Chip></Link>/
-                    <Chip>{'Program: '+truncateString(data.results.displayName)}</Chip>
+                    <Chip>{'Program: ' + truncateString(data.results.displayName)}</Chip>
                 </div>
                 <div className="c_srch"></div>
-                <div className="c_btns" style={{display: 'flex', alignItems: 'center'}}>
+                <div className="c_btns" style={{ display: 'flex', alignItems: 'center' }}>
                     {!hnqisMode && !data.results.withoutRegistration &&
                         <>
                             <MuiButton
@@ -138,7 +138,7 @@ const ProgramDetails = () => {
                     }
                 </div>
             </div>
-            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent:'start', alignItems: 'center'}}>
+            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', alignItems: 'center' }}>
                 <span style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -158,7 +158,7 @@ const ProgramDetails = () => {
                     <div className="list-ml_item">
                         {
                             data.results.programStages.sort((stageA, stageB) =>
-                                (stageA.sortOrder > stageB.sortOrder)? 1 : ((stageA.sortOrder < stageB.sortOrder)? -1 : 0)
+                                (stageA.sortOrder > stageB.sortOrder) ? 1 : ((stageA.sortOrder < stageB.sortOrder) ? -1 : 0)
                             ).map((programStage) => {
                                 return (
                                     <StageItem
@@ -167,7 +167,7 @@ const ProgramDetails = () => {
                                         setNotification={setNotification}
                                         stagesRefetch={refetch}
                                         setNewStage={setNewStage}
-                                        editStatus={newStage?.stage===programStage.id && newStage?.mode }
+                                        editStatus={newStage?.stage === programStage.id && newStage?.mode}
                                         hnqisMode={hnqisMode}
                                         eventMode={data.results.withoutRegistration}
                                     />
@@ -175,11 +175,11 @@ const ProgramDetails = () => {
                             })
                         }
                         {data.results.programStages.length === 0 &&
-                            <div className="title" style={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2em'}}>There are currently no Stages in this Program</div>
+                            <div className="title" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2em' }}>There are currently no Stages in this Program</div>
                         }
                     </div>
                 </div>
-                {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName} setNewStage={setNewStage}/>}
+                {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName} setNewStage={setNewStage} />}
                 <Snackbar
                     anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                     open={notification !== undefined}
@@ -193,6 +193,7 @@ const ProgramDetails = () => {
                         displayForm={setImporterEnabled}
                         setImportResults={setImportResults}
                         importType='TRACKER'
+                        specificType={(data.results.withoutRegistration ? 'Event' : 'Tracker')+' Program'}
                         previous={/*{ sections, setSections, scoresSection, setScoresSection }*/{}}
                     />
                 }

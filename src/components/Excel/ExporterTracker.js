@@ -573,6 +573,7 @@ const Exporter = ({
         })
 
         ws.columns = cols;
+        ws.getRow(1).height = 35;
         ws.getRow(1).font = { bold: true };
         ws.getRow(1).alignment = middleCenter;
         ws.getRow(2).values = {

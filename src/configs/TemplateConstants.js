@@ -47,8 +47,10 @@ export const TEMPLATE_PASSWORD = "TOyNrNrH8fNT8W%Au&4A";
 
 export const HNQIS2_TEMPLATE_HEADERS = ['Parent Name', 'Structure', 'Form Name', 'Critical Step', 'Compulsory', 'Value Type', 'Option Set', 'Legend', 'Score Numerator', 'Score Denominator', 'Compositive Indicator (Feedback Order)', 'Parent Question', 'Answer Value', 'Feedback Text', 'Description', 'Program Stage Id', 'Program Section Id', 'Data Element Id'];
 export const HNQIS2_TEMPLATE_VERSION_CELL = "D13";
+export const HQNIS2_PROGRAM_TYPE_CELL = "D14";
 export const HNQIS2_ORIGIN_SERVER_CELL = "D20";
 
+export const TRACKER_TEA_HEADERS = ['Structure', 'UID', 'Name', 'Short Name', 'Value Type', 'Aggregation Type', 'Mandatory', 'Searchable', 'Display in List', 'Allow Future Date', 'Program Section Id', 'Program TEA Id'];
 export const TRACKER_TEMPLATE_HEADERS = ['Structure', 'Correlative', 'Use Auto Naming', 'Form Name', 'Full Name', 'Short Name', 'Code', 'Description', 'Compulsory', 'Value Type', 'Agg Operator', 'Option Set', 'Option Set Details', 'Legend Set', 'Parent Question', 'Answer Value', 'Stage ID', 'Stage Name', 'Program Stage Id', 'Program Section Id', 'Data Element Id'];
 export const TRACKER_TEMPLATE_VERSION_CELL = "L2";
 export const TRACKER_ORIGIN_SERVER_CELL = "D17";
