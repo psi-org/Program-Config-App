@@ -20,6 +20,7 @@ import { formatAlert, truncateString } from "../../configs/Utils";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 import DataProcessorTracker from "../Excel/DataProcessorTracker";
 import Importer from "../Excel/Importer";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants";
 
 const query = {
     results: {
@@ -193,7 +194,7 @@ const ProgramDetails = () => {
                         displayForm={setImporterEnabled}
                         setImportResults={setImportResults}
                         importType='TRACKER'
-                        specificType={(data.results.withoutRegistration ? 'Event' : 'Tracker')+' Program'}
+                        programSpecificType={data.results.withoutRegistration ? TEMPLATE_PROGRAM_TYPES.event : TEMPLATE_PROGRAM_TYPES.tracker}
                         previous={/*{ sections, setSections, scoresSection, setScoresSection }*/{}}
                     />
                 }

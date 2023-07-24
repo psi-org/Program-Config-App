@@ -15,7 +15,7 @@ const ImportTask = ({ type, name }) => {
                     : <IconError24 color={colors.red500} />
                 )
             }
-            <span style={{ marginLeft: '0.5em' }}>{name}</span>
+            <span style={{ marginLeft: '0.5em', maxWidth: '85%', width: '85%', minWidth: '85%', textAlign: 'justify', display: 'block'}}>{name}</span>
         </div>
     )
 }

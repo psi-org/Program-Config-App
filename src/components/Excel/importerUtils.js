@@ -1,5 +1,6 @@
 import { ReleaseNotes, ReleaseNotesTracker } from "../../configs/ReleaseNotes";
-import { HQNIS2_PROGRAM_TYPE_CELL, TRACKER_PROGRAM_TYPE_CELL } from "../../configs/TemplateConstants";
+import { HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL } from "../../configs/TemplateConstants";
+import { getKeyByValue } from "../../configs/Utils";
 
 export const getProgramDetailsHNQIS2 = (ws, mappingDetails) => {
     let program = {};
@@ -37,36 +38,18 @@ export const serverAndVersionValidation = (status, task, { setNotificationError,
             task.status = "success";
             status = true;
         } else {
-            task.name = "The Template has been exported from a different server"
+            task.name = `The Template has been exported from a different server (${originServer.toString()}). Please Import a template downloaded from the current server (${location.origin})`
             setNotificationError(true);
         }
     } else {
-        task.name = "The Template is outdated"
+        task.name = `The selected Template is no longer supported by the PCA. Please download a new Template using this version of the app.`
         setNotificationError(true);
     }
 
     return status;
 }
 
-export const templateTypeValidation = (status, task, { setNotificationError, instructionsWS, isTracker, specificType }) => {
-
-    const providedTemplate = isTracker
-        ? instructionsWS.getCell(TRACKER_PROGRAM_TYPE_CELL)
-        : instructionsWS.getCell(HQNIS2_PROGRAM_TYPE_CELL);
-
-    if (providedTemplate.value === specificType) {
-        task.status = "success";
-        status = true;
-    } else {
-        task.name = `The provided Template cannot be imported in the current Program`
-        setNotificationError(true);
-    }
-
-    return status;
-}
-
-//! Check how Tracer/Event is defined, use specificType?
-export const workbookValidation = (status, task, { setNotificationError, workbook, isTracker }) => {
+export const workbookValidation = (status, task, { setNotificationError, workbook, isTracker, programSpecificType }) => {
 
     let templateWS = [];
     let teasWS;
@@ -84,7 +67,7 @@ export const workbookValidation = (status, task, { setNotificationError, workboo
                 case 'I':
                     instructionsWS = worksheet;
                     if (isTracker) {
-                        isEvent = worksheet.getCell(TRACKER_PROGRAM_TYPE_CELL).value === 'Event Program';
+                        isEvent = worksheet.getCell(TRACKER_PROGRAM_TYPE_CELL).value === TEMPLATE_PROGRAM_TYPES.event;
                     }
                     break;
                 case 'M':
@@ -101,6 +84,24 @@ export const workbookValidation = (status, task, { setNotificationError, workboo
         }
     });
 
+    const templateIsHNQIS = instructionsWS.getCell(HQNIS2_PROGRAM_TYPE_CELL).value === TEMPLATE_PROGRAM_TYPES.hnqis2;
+    const templateTracker = getKeyByValue(TEMPLATE_PROGRAM_TYPES, instructionsWS.getCell(TRACKER_PROGRAM_TYPE_CELL).value);
+    const templateType = (templateIsHNQIS || !templateTracker)
+        ? TEMPLATE_PROGRAM_TYPES.hnqis2
+        : instructionsWS.getCell(TRACKER_PROGRAM_TYPE_CELL).value;
+
+    if (
+        (templateIsHNQIS && programSpecificType !== TEMPLATE_PROGRAM_TYPES.hnqis2) ||
+        (!templateIsHNQIS && programSpecificType !== TEMPLATE_PROGRAM_TYPES[templateTracker])
+    ) {
+        task.status = "error";
+        task.name = `The provided Template (${templateType}) cannot be imported in the current Program (${programSpecificType})`
+        status = false;
+        setNotificationError(true);
+    }
+
+    if (!status) return false;
+    
     let errorsArray = [];
     if (!instructionsWS) errorsArray.push('Instructions');
     if (isTracker && !teasWS && !isEvent) errorsArray.push('TEAs');
@@ -109,7 +110,7 @@ export const workbookValidation = (status, task, { setNotificationError, workboo
     if (errorsArray.length > 0) {
         task.status = "error";
         status = false;
-        task.name = `Missing the following tab(s): ${errorsArray.join(', ')}.`;
+        task.name = `Missing the following required Tab(s): ${errorsArray.join(', ')}.`;
         setNotificationError(true);
     }
 
@@ -163,7 +164,7 @@ export const handleWorksheetReading = (tasksHandler, currentWorksheet, setNotifi
 
     return tasksHandler(
         startingIndex + 1,
-        `Extracting data from ${currentWorksheet.name}`,
+        `Extracting data from '${currentWorksheet.name}'`,
         true,
         getWorksheetData,
         {

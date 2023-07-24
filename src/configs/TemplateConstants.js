@@ -60,3 +60,9 @@ export const HNQIS2_VALUE_TYPES = ['NUMBER', 'INTEGER', 'INTEGER_POSITIVE', 'INT
 export const HNQIS2_AGG_OPERATORS = ['NONE', 'SUM', 'AVERAGE', 'COUNT'];
 
 export const RENDER_TYPES = ['DEFAULT', 'DROPDOWN', 'VERTICAL_RADIOBUTTONS', 'HORIZONTAL_RADIOBUTTONS', 'VERTICAL_CHECKBOXES', 'HORIZONTAL_CHECKBOXES', 'VALUE'];
+
+export const TEMPLATE_PROGRAM_TYPES = {
+    hnqis2: 'HNQIS2',
+    tracker: 'Tracker Program',
+    event: 'Event Program'
+}

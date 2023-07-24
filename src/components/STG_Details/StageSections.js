@@ -53,6 +53,7 @@ import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
 import { DeepCopy, extractMetadataPermissions, truncateString } from "../../configs/Utils";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants";
 
 const createMutation = {
     resource: 'metadata',
@@ -935,6 +936,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     displayForm={setImporterEnabled}
                     setImportResults={setImportResults}
                     importType='H2'
+                    programSpecificType={TEMPLATE_PROGRAM_TYPES.hnqis2}
                     previous={{ sections, setSections, scoresSection, setScoresSection }}
                     setSaveStatus={setSaveStatus}
                     programMetadata={{ programMetadata, setProgramMetadata }}

@@ -71,7 +71,7 @@ const ProgramItem = ({
     const typeTag = {
         HNQIS2: { color: "#03a9f4", text: "HNQIS 2.0" },
         HNQIS: { color: "#00deff", text: "HNQIS 1.X" },
-        RDQA: { color: "#00acc1", text: "RDQA PRG" },
+        RDQA: { color: "#00acc1", text: "RDQA" },
         EDS: { color: "#607d8b", text: "EDS" },
         Tracker: { color: "#2c6693", text: "TRACKER" },
         Event: { color: "#6e8ea6", text: "EVENT" },

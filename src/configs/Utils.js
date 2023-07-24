@@ -180,3 +180,7 @@ export function removeKey(obj, key) {
 
     return obj;
 }
+
+export function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+}

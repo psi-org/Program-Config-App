@@ -13,9 +13,9 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ImportSummary from "../UIElements/ImportSummary";
 import { getHNQIS2MappingList, getTrackerMappingList } from "../../configs/ExcelUtils";
 import FileSelector from "../UIElements/FileSelector";
-import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, templateTypeValidation } from "./importerUtils";
+import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading } from "./importerUtils";
 
-//* Tracker Only: currentStagesData, specificType
+//* Tracker Only: currentStagesData
 //* HNQIS Only: setSaveStatus, programMetadata, currentSectionsData, setSavedAndValidated
 const Importer = (
     {
@@ -23,8 +23,8 @@ const Importer = (
         setImportResults,
         importType,
         previous,
-        specificType,
         currentStagesData,
+        programSpecificType,
         setSaveStatus,
         programMetadata,
         currentSectionsData,
@@ -87,7 +87,7 @@ const Importer = (
                     'Validating worksheets in the workbook',
                     true,
                     workbookValidation,
-                    { setNotificationError, workbook: loadedWorkbook, isTracker }
+                    { setNotificationError, workbook: loadedWorkbook, isTracker, programSpecificType }
                 );
 
                 if (!worksheets.status) return;
@@ -101,23 +101,10 @@ const Importer = (
                     : getHNQIS2MappingList(mappingWS);
                 let programDetails;
 
-                if (!tasksHandler(
-                    3,
-                    'Validating Template Type',
-                    false,
-                    templateTypeValidation,
-                    {
-                        setNotificationError,
-                        instructionsWS,
-                        isTracker,
-                        specificType: specificType || 'HNQIS2'
-                    }
-                )) return;
-
                 if (!isTracker) programDetails = getProgramDetailsHNQIS2(instructionsWS, mappingDetails);
 
                 if (!tasksHandler(
-                    4,
+                    3,
                     'Validating Template version and origin server',
                     false,
                     serverAndVersionValidation,
@@ -132,7 +119,7 @@ const Importer = (
 
                 let teaData;
                 if (teasWS) {
-                    indexModifier += 2;
+                    indexModifier = 2;
 
                     const headers = teasWS.getRow(1).values;
                     headers.shift();
@@ -143,37 +130,37 @@ const Importer = (
                         setNotificationError,
                         headers,
                         TRACKER_TEA_HEADERS,
-                        5 + indexModifier
+                        4
                     ).data
                 }
+
+                let templateData = [];
 
                 templateWS.forEach((currentTemplate, index) => {
 
                     const headers = currentTemplate.getRow(1).values;
                     headers.shift();
 
-                    let templateData = handleWorksheetReading(
+                    let currentTemplateData = handleWorksheetReading(
                         tasksHandler,
                         currentTemplate,
                         setNotificationError,
                         headers,
                         (isTracker ? TRACKER_TEMPLATE_HEADERS : HNQIS2_TEMPLATE_HEADERS),
-                        5 + (2 * index) + indexModifier
+                        (4 + (2 * index) + indexModifier)
                     )
 
-                    if (!templateData.status) return;
-
-                    
-
-                    if (isTracker) {
-                        console.log(teaData, templateData.data);
-                    } else {
-                        console.log(templateData.data);
-                        importReadingHNQIS(templateData.data, programDetails, mappingDetails)
-                    }
-                    // Start import reading
+                    if (!currentTemplateData.status) return;
+                    templateData.push(currentTemplateData);
                     
                 });
+
+                if (isTracker) {
+                    console.log(teaData, templateData);
+                } else {
+                    console.log(templateData);
+                    importReadingHNQIS(templateData[0].data, programDetails, mappingDetails)
+                }
             }
         }
         setButtonDisabled(false);
