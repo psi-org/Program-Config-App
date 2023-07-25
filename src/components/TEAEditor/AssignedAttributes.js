@@ -1,7 +1,7 @@
 // IMPORTS
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import DragHandleIcon from '@mui/icons-material/DragHandle';
-import { DHIS2_PRIMARY_COLOR } from "../../../configs/Constants";
+import { DHIS2_PRIMARY_COLOR } from "../../configs/Constants";
 
 // END OF IMPORTS
 

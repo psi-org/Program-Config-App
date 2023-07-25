@@ -19,7 +19,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
 import { formatAlert, truncateString } from "../../configs/Utils";
-import TEAEditor from "./TEAEditor";
+import AttributesModal from "./AttributesModal";
 
 const query = {
     results: {
@@ -166,7 +166,7 @@ const ProgramDetails = () => {
                 </div>
                 {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName} setNewStage={setNewStage}/>}
                 {showTEAEditor && 
-                    <TEAEditor 
+                    <AttributesModal 
                         programId={program}
                         onClose={()=>setShowTEAEditor(false)} 
                     />
