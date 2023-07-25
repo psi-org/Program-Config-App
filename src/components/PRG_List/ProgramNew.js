@@ -43,7 +43,7 @@ import Select from "@mui/material/Select";
 import SendIcon from "@mui/icons-material/Send";
 import FormHelperText from "@mui/material/FormHelperText";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { FormLabel, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
+import {  FormLabel,  Slide, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
 import StyleManager from "../UIElements/StyleManager";
 import { DeepCopy, parseErrorsJoin, truncateString } from "../../configs/Utils";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -148,8 +148,15 @@ const ProgramNew = (props) => {
     // * STEPPER * //
 
     const [activeStep, setActiveStep] = useState(0);
+    let previousStep = 0;
     const [basicValidated, setBasicValidated] = useState(true);
     const [hnqisValidated, setHnqisValidated] = useState(true);
+
+    const containerRef = useRef(null);
+    const changeStep = (step) => {
+        previousStep = activeStep;
+        setActiveStep(step);
+    }
 
     // * END OF STEPPER * //
 
@@ -892,25 +899,25 @@ const ProgramNew = (props) => {
                         ? ("Edit Program " + truncateString(props.data.name))
                         : "Create New Program"}
                 </CustomMUIDialogTitle>
-                <DialogContent dividers style={{ padding: "1em 2em", height:'65vh', maxHeight:'65vh' }}>
-                    <div style={{marginBottom:'1rem'}}>
+                <DialogContent dividers style={{ padding: "1em 2em", height:'65vh', maxHeight:'65vh', overflowX:'hidden' }}>
+                    <div style={{marginBottom:'2rem'}}>
                         <Stepper alternativeLabel nonLinear activeStep={activeStep}>
-                            <Step style={{cursor:'pointer'}}>
-                                <StepLabel error={!basicValidated} onClick={()=>setActiveStep(0)}>Basic Settings</StepLabel>
+                            <Step style={{cursor:'pointer'}} container={containerRef.current}>
+                                <StepLabel error={!basicValidated} onClick={()=>changeStep(0)}>Basic Settings</StepLabel>
                             </Step>
                             {pgrTypePCA === 'hnqis' &&
-                                <Step style={{cursor:'pointer'}}>
-                                    <StepLabel error={!hnqisValidated} onClick={()=>setActiveStep(1)} >HNQIS2 Settings</StepLabel>
+                                <Step style={{cursor:'pointer'}} container={containerRef.current}>
+                                    <StepLabel error={!hnqisValidated} onClick={()=>changeStep(1)} >HNQIS2 Settings</StepLabel>
                                 </Step>
                             }
                             {pgrTypePCA === 'tracker' &&
-                                <Step style={{cursor:'pointer'}}>
-                                    <StepLabel onClick={()=>setActiveStep(1)}>Tracker Program Settings</StepLabel>
+                                <Step style={{cursor:'pointer'}} container={containerRef.current}>
+                                    <StepLabel onClick={()=>changeStep(1)}>Tracker Program Settings</StepLabel>
                                 </Step>
                             }
                             {pgrTypePCA === 'tracker' &&
-                                <Step style={{cursor:'pointer'}}>
-                                    <StepLabel onClick={()=>setActiveStep(2)}>Tracked Entity Attributes Form</StepLabel>
+                                <Step style={{cursor:'pointer'}} container={containerRef.current}>
+                                    <StepLabel onClick={()=>changeStep(2)}>Tracked Entity Attributes Form</StepLabel>
                                 </Step>
                             }
                             
@@ -918,259 +925,268 @@ const ProgramNew = (props) => {
                     </div>
                     <div className="stepperContent">
                         {/* BASIC SETTINGS */}
-                        <div style={{display:  activeStep === 0 ? 'inherit' : 'none'}}>
-                            <div style={{ display: "flex", flexDirection:'column', justifyContent: "space-between"}}>
-                                <FormControl sx={{ maxWidth: "30%" }} error={validationErrors.pgrType !== undefined}>
-                                    <InputLabel id="label-prgType">Program Type (*)</InputLabel>
-                                    <Select
-                                        labelId="label-prgType"
-                                        id="prgTypePCA"
-                                        value={pgrTypePCA}
-                                        disabled={props.programType !== undefined}
-                                        onChange={handleChangePgrType}
-                                        label="Program Type (*)"
-                                    >
-                                        <MenuItem value="">
-                                            <em>None</em>
-                                        </MenuItem>
-                                        <MenuItem value={"tracker"}>
-                                            Tracker Program
-                                        </MenuItem>
-                                        <MenuItem
-                                            disabled={
-                                                !h2Ready ||
-                                                hnqis2Metadata?.results?.version <
-                                                H2_METADATA_VERSION
-                                            }
-                                            value={"hnqis"}
+                        <Slide in={activeStep === 0} direction={activeStep > previousStep ? 'left' : 'right'}>
+                            <div style={{display:activeStep === 0 ? 'inherit' : 'none'}}>
+                                <div style={{ display: "flex", flexDirection:'column', justifyContent: "space-between"}}>
+                                    <FormControl sx={{ maxWidth: "30%" }} error={validationErrors.pgrType !== undefined} style={{marginTop:'1rem'}}>
+                                        <InputLabel id="label-prgType">Program Type (*)</InputLabel>
+                                        <Select
+                                            labelId="label-prgType"
+                                            id="prgTypePCA"
+                                            value={pgrTypePCA}
+                                            disabled={props.programType !== undefined}
+                                            onChange={handleChangePgrType}
+                                            label="Program Type (*)"
                                         >
-                                            HNQIS 2.0{" "}
-                                            {hnqis2Metadata?.results?.version < H2_METADATA_VERSION && (
-                                                <span
-                                                    style={{
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        marginLeft: "8px",
-                                                    }}
-                                                >
-                                                    [Unavailable]{" "}
-                                                    <RemoveCircleOutlineIcon />
-                                                </span>
-                                            )}
-                                        </MenuItem>
-                                    </Select>
-                                    <FormHelperText>
-                                        {validationErrors.pgrType}
-                                    </FormHelperText>
-                                </FormControl>
-                                <FormControl sx={{ minWidth: "65%" }}>
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            <MenuItem value={"tracker"}>
+                                                Tracker Program
+                                            </MenuItem>
+                                            <MenuItem
+                                                disabled={
+                                                    !h2Ready ||
+                                                    hnqis2Metadata?.results?.version <
+                                                    H2_METADATA_VERSION
+                                                }
+                                                value={"hnqis"}
+                                            >
+                                                HNQIS 2.0{" "}
+                                                {hnqis2Metadata?.results?.version < H2_METADATA_VERSION && (
+                                                    <span
+                                                        style={{
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            marginLeft: "8px",
+                                                        }}
+                                                    >
+                                                        [Unavailable]{" "}
+                                                        <RemoveCircleOutlineIcon />
+                                                    </span>
+                                                )}
+                                            </MenuItem>
+                                        </Select>
+                                        <FormHelperText>
+                                            {validationErrors.pgrType}
+                                        </FormHelperText>
+                                    </FormControl>
+                                    <FormControl sx={{ minWidth: "65%" }}>
+                                        <TextField
+                                            error={validationErrors.prefix !== undefined}
+                                            helperText={validationErrors.prefix}
+                                            margin="normal"
+                                            id="prefix"
+                                            label="Program Data Element Prefix (*)"
+                                            type="text"
+                                            fullWidth
+                                            variant="standard"
+                                            autoComplete="off"
+                                            inputProps={{ maxLength: MAX_PREFIX_LENGTH }}
+                                            value={dePrefix}
+                                            onChange={handleChangeDePrefix}
+                                        />
+                                    </FormControl>
                                     <TextField
-                                        error={validationErrors.prefix !== undefined}
-                                        helperText={validationErrors.prefix}
+                                        error={validationErrors.programName !== undefined}
+                                        helperText={validationErrors.programName}
                                         margin="normal"
-                                        id="prefix"
-                                        label="Program Data Element Prefix (*)"
+                                        id="name"
+                                        label="Program Name (*)"
                                         type="text"
                                         fullWidth
                                         variant="standard"
                                         autoComplete="off"
-                                        inputProps={{ maxLength: MAX_PREFIX_LENGTH }}
-                                        value={dePrefix}
-                                        onChange={handleChangeDePrefix}
+                                        inputProps={{
+                                            maxLength:
+                                                MAX_PROGRAM_NAME_LENGTH /*- dePrefix.length*/,
+                                        }}
+                                        value={programName}
+                                        onChange={handleChangeProgramName}
                                     />
-                                </FormControl>
-                                <TextField
-                                    error={validationErrors.programName !== undefined}
-                                    helperText={validationErrors.programName}
-                                    margin="normal"
-                                    id="name"
-                                    label="Program Name (*)"
-                                    type="text"
-                                    fullWidth
-                                    variant="standard"
-                                    autoComplete="off"
-                                    inputProps={{
-                                        maxLength:
-                                            MAX_PROGRAM_NAME_LENGTH /*- dePrefix.length*/,
-                                    }}
-                                    value={programName}
-                                    onChange={handleChangeProgramName}
-                                />
-                                <TextField
-                                    error={validationErrors.shortName !== undefined}
-                                    helperText={validationErrors.shortName}
-                                    margin="normal"
-                                    id="shortName"
-                                    label="Program Short Name (*)"
-                                    type="text"
-                                    sx={{ width: "100%" }}
-                                    variant="standard"
-                                    autoComplete="off"
-                                    inputProps={{
-                                        maxLength:
-                                            MAX_SHORT_NAME_LENGTH /*- dePrefix.length*/,
-                                    }}
-                                    value={programShortName}
-                                    onChange={handleChangeProgramShortName}
-                                />
-                                <Autocomplete
-                                    id="tetSelect"
-                                    disabled={pgrTypePCA !== "tracker"}
-                                    options={
-                                        trackedEntityTypes?.map((tet) => ({
-                                            label: tet.name,
-                                            id: tet.id,
-                                        })) || [{ label: "", id: "" }]
-                                    }
-                                    sx={{ width: "100%" }}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            error={
-                                                validationErrors.programTET !==
-                                                undefined
-                                            }
-                                            label="Tracked Entity Type (*)"
-                                            margin="normal"
-                                            variant="standard"
-                                            helperText={validationErrors.programTET}
-                                        />
-                                    )}
-                                    value={programTET}
-                                    onChange={programTETChange}
-                                    getOptionLabel={(option) => option.label || ""}
-                                    isOptionEqualToValue={(option, value) =>
-                                        option.id === value.id
-                                    }
-                                    defaultValue={""}
-                                />
-                                <StyleManager
-                                    icon={programIcon}
-                                    setIcon={setProgramIcon}
-                                    color={programColor}
-                                    setColor={setProgramColor}
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "end",
-                                        width: "100%",
-                                        minHeight: "5em",
-                                        marginTop: "1em",
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        {/* HNQIS2 SETTINGS */}
-                        <div style={{display: (pgrTypePCA === 'hnqis' && activeStep === 1) ? 'inherit' : 'none'}}>
-                            <H2Setting
-                                pcaMetadata={props.pcaMetadata}
-                                ref={h2SettingsRef}
-                                setButtonDisabled={setButtonDisabled}
-                            />
-                        </div>
-                        {/* TRACKER PROGRAM SETTINGS */}
-                        <div style={{display: (pgrTypePCA === 'tracker' && activeStep === 1) ? 'inherit' : 'none'}}>
-                            <FormControl
-                                sx={{ minWidth: "100%" }}
-                                error={
-                                    validationErrors.categoryCombo !== undefined
-                                }
-                            >
-                                <Autocomplete
-                                    id="ccSelect"
-                                    disabled={pgrTypePCA !== "tracker"}
-                                    options={programCategoryCombos?.map(
-                                        (pcc) => ({
-                                            label: pcc.name,
-                                            id: pcc.id,
-                                        })
-                                    )}
-                                    sx={{ width: "100%" }}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            error={
-                                                validationErrors.categoryCombo !==
-                                                undefined
-                                            }
-                                            label="Category Combination"
-                                            variant="standard"
-                                            margin="dense"
-                                            helperText={
-                                                validationErrors.categoryCombo
-                                            }
-                                        />
-                                    )}
-                                    value={categoryCombo}
-                                    onChange={categoryComboChange}
-                                    getOptionLabel={(option) =>
-                                        option.label || ""
-                                    }
-                                    isOptionEqualToValue={(option, value) =>
-                                        option.id === value.id
-                                    }
-                                    defaultValue={"default"}
-                                />
-                            </FormControl>
-
-                            <div style={{ marginTop: "1.5em" , display:'flex', flexDirection:'column', gap:'1rem'}}>
-                                <FormLabel
-                                    style={{
-                                        display: "inline-block",
-                                        marginBottom: "8px",
-                                    }}
-                                >
-                                    Program Tracked Entity Attributes
-                                </FormLabel>
-                                <Transfer
-                                    filterable
-                                    onChange={handleChangeTEAs}
-                                    options={programTEAs.available.map(
-                                        (tea) => ({
-                                            label: tea.trackedEntityAttribute.name,
-                                            value: tea.trackedEntityAttribute.id,
-                                        })
-                                    )}
-                                    selected={programTEAs.selected}
-                                    optionsWidth="48%"
-                                    selectedWidth="48%"
-                                />
-                                
-                            </div>
-                        </div>
-                        {/* TRACKED ENTITY ATTRIBUTES FORM */}
-                        {programTEAs.available.length > 0 &&
-                        <div style={{display: (pgrTypePCA === 'tracker' && activeStep === 2) ? 'inherit' : 'none'}}>
-                            <div style={{display:'flex', justifyContent:'space-between', width:'100%', margin:'1rem 0', alignItems:'center'}}>
-                                <FormControlLabel 
-                                    control={
-                                        <Switch
-                                            checked={useSections}
-                                            onChange={(e)=>setUseSections(e.target.checked)}
-                                            inputProps={{ 'aria-label': 'controlled' }}
-                                        />
-                                    }
-                                    label="Use Form Sections"     
-                                />
-                                <div>
-                                    {useSections && <Button 
-                                        variant='contained' 
-                                        
-                                        startIcon={<AddCircleOutlineIcon/>}
-                                        onClick={()=>{setInputModalOpened(true)}}
-                                    >Add new section</Button>}
+                                    <TextField
+                                        error={validationErrors.shortName !== undefined}
+                                        helperText={validationErrors.shortName}
+                                        margin="normal"
+                                        id="shortName"
+                                        label="Program Short Name (*)"
+                                        type="text"
+                                        sx={{ width: "100%" }}
+                                        variant="standard"
+                                        autoComplete="off"
+                                        inputProps={{
+                                            maxLength:
+                                                MAX_SHORT_NAME_LENGTH /*- dePrefix.length*/,
+                                        }}
+                                        value={programShortName}
+                                        onChange={handleChangeProgramShortName}
+                                    />
+                                    <Autocomplete
+                                        id="tetSelect"
+                                        disabled={pgrTypePCA !== "tracker"}
+                                        options={
+                                            trackedEntityTypes?.map((tet) => ({
+                                                label: tet.name,
+                                                id: tet.id,
+                                            })) || [{ label: "", id: "" }]
+                                        }
+                                        sx={{ width: "100%" }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                error={
+                                                    validationErrors.programTET !==
+                                                    undefined
+                                                }
+                                                label="Tracked Entity Type (*)"
+                                                margin="normal"
+                                                variant="standard"
+                                                helperText={validationErrors.programTET}
+                                            />
+                                        )}
+                                        value={programTET}
+                                        onChange={programTETChange}
+                                        getOptionLabel={(option) => option.label || ""}
+                                        isOptionEqualToValue={(option, value) =>
+                                            option.id === value.id
+                                        }
+                                        defaultValue={""}
+                                    />
+                                    <StyleManager
+                                        icon={programIcon}
+                                        setIcon={setProgramIcon}
+                                        color={programColor}
+                                        setColor={setProgramColor}
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "end",
+                                            width: "100%",
+                                            minHeight: "5em",
+                                            marginTop: "1em",
+                                        }}
+                                    />
                                 </div>
                             </div>
-                            <AttributesEditor
-                                useSections={useSections}
-                                teaOptions={programTEAs}
-                                setTeaOptions={setProgramTEAs}
-                                attributesFormSections={attributesFormSections}
-                                setAttributesFormSections={setAttributesFormSections}
-                                assignedAttributes={assignedAttributes}
-                                setAssignedAttributes={setAssignedAttributes}
-                            />
-                        </div>
+                        </Slide>
+                        
+                        {/* HNQIS2 SETTINGS */}
+                        <Slide in={pgrTypePCA === 'hnqis' && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
+                            <div style={{ display: pgrTypePCA === 'hnqis' && activeStep === 1 ? 'inherit' : 'none'}}>
+                                <H2Setting
+                                    pcaMetadata={props.pcaMetadata}
+                                    ref={h2SettingsRef}
+                                    setButtonDisabled={setButtonDisabled}
+                                />
+                            </div>
+                        </Slide>
+                        {/* TRACKER PROGRAM SETTINGS */}
+                        <Slide in={pgrTypePCA === 'tracker' && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
+                            <div style={{display: (pgrTypePCA === 'tracker' && activeStep === 1) ? 'inherit' : 'none'}}>
+                                <FormControl
+                                    sx={{ minWidth: "100%" }}
+                                    error={
+                                        validationErrors.categoryCombo !== undefined
+                                    }
+                                >
+                                    <Autocomplete
+                                        id="ccSelect"
+                                        disabled={pgrTypePCA !== "tracker"}
+                                        options={programCategoryCombos?.map(
+                                            (pcc) => ({
+                                                label: pcc.name,
+                                                id: pcc.id,
+                                            })
+                                        )}
+                                        sx={{ width: "100%" }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                error={
+                                                    validationErrors.categoryCombo !==
+                                                    undefined
+                                                }
+                                                label="Category Combination"
+                                                variant="standard"
+                                                margin="dense"
+                                                helperText={
+                                                    validationErrors.categoryCombo
+                                                }
+                                            />
+                                        )}
+                                        value={categoryCombo}
+                                        onChange={categoryComboChange}
+                                        getOptionLabel={(option) =>
+                                            option.label || ""
+                                        }
+                                        isOptionEqualToValue={(option, value) =>
+                                            option.id === value.id
+                                        }
+                                        defaultValue={"default"}
+                                    />
+                                </FormControl>
+
+                                <div style={{ marginTop: "1.5em" , display:'flex', flexDirection:'column', gap:'1rem'}}>
+                                    <FormLabel
+                                        style={{
+                                            display: "inline-block",
+                                            marginBottom: "8px",
+                                        }}
+                                    >
+                                        Program Tracked Entity Attributes
+                                    </FormLabel>
+                                    <Transfer
+                                        filterable
+                                        onChange={handleChangeTEAs}
+                                        options={programTEAs.available.map(
+                                            (tea) => ({
+                                                label: tea.trackedEntityAttribute.name,
+                                                value: tea.trackedEntityAttribute.id,
+                                            })
+                                        )}
+                                        selected={programTEAs.selected}
+                                        optionsWidth="48%"
+                                        selectedWidth="48%"
+                                    />
+                                    
+                                </div>
+                            </div>
+                        </Slide>
+                        {/* TRACKED ENTITY ATTRIBUTES FORM */}
+                        {programTEAs.available.length > 0 &&
+                            <Slide in={pgrTypePCA === 'tracker' && activeStep === 2} direction={activeStep > previousStep ? 'left' : 'right'}>
+                                <div style={{display: (pgrTypePCA === 'tracker' && activeStep === 2) ? 'inherit' : 'none'}}>
+                                    <div style={{display:'flex', justifyContent:'space-between', width:'100%', margin:'1rem 0', alignItems:'center'}}>
+                                        <FormControlLabel 
+                                            control={
+                                                <Switch
+                                                    checked={useSections}
+                                                    onChange={(e)=>setUseSections(e.target.checked)}
+                                                    inputProps={{ 'aria-label': 'controlled' }}
+                                                />
+                                            }
+                                            label="Use Form Sections"     
+                                        />
+                                        <div>
+                                            {useSections && <Button 
+                                                variant='contained' 
+                                                
+                                                startIcon={<AddCircleOutlineIcon/>}
+                                                onClick={()=>{setInputModalOpened(true)}}
+                                            >Add new section</Button>}
+                                        </div>
+                                    </div>
+                                    <AttributesEditor
+                                        useSections={useSections}
+                                        teaOptions={programTEAs}
+                                        setTeaOptions={setProgramTEAs}
+                                        attributesFormSections={attributesFormSections}
+                                        setAttributesFormSections={setAttributesFormSections}
+                                        assignedAttributes={assignedAttributes}
+                                        setAssignedAttributes={setAssignedAttributes}
+                                    />
+                                </div>
+                            </Slide>
                         }   
                     </div>
                 </DialogContent>
