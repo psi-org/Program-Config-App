@@ -523,6 +523,15 @@ const ProgramNew = (props) => {
                     available:availableTEAs.concat(existingTEAs),
                     selected: existingTEAs.map(tea => tea.trackedEntityAttribute.id)
                 }
+
+                // ! Enforce Tracked Entity Type Attributes for existing programs
+                if(props.data && props.data.trackedEntityType){
+                    let tetAtts = trackedEntityTypes.find(
+                        tet => tet.id === props.data.trackedEntityType.id
+                    ).trackedEntityTypeAttributes.map(tea => tea.trackedEntityAttribute.id)
+                    teaOptions.selected = teaOptions.selected.concat(tetAtts.filter(teaId => !teaOptions.selected.includes(teaId)))
+                }
+
                 setProgramTEAs({...teaOptions})
                 
 
