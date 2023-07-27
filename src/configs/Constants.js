@@ -180,6 +180,7 @@ const MAX_PROGRAM_NAME_LENGTH = 230;
 const MAX_STAGE_NAME_LENGTH = 230;
 const MAX_SECTION_NAME_LENGTH = 230;
 const MAX_DATA_ELEMENT_NAME_LENGTH = 200;
+const MAX_FORM_NAME_LENGTH = 230;
 
 const MIN_NAME_LENGTH = 2;
 const MIN_DESCRIPTION_LENGTH = 2;
@@ -461,16 +462,12 @@ const DHIS2_AGG_OPERATORS_MAP = {
     "AVERAGE_SUM_ORG_UNIT": "Average (Sum in Org Unit hierarchy)", 
     "LAST": "Last value (Sum in Org Unit hierarchy)", 
     "LAST_AVERAGE_ORG_UNIT": "Last value (Average in Org Unit hierarchy)", 
-
-    "LAST_LAST_ORG_UNIT": "** last_last_org_unit **",  //! WHAT
-    
+    "LAST_LAST_ORG_UNIT": "** last_last_org_unit **", 
     "LAST_IN_PERIOD": "Last value in period (Sum in Org Unit hierarchy)", 
     "LAST_IN_PERIOD_AVERAGE_ORG_UNIT": "Last value in period (Average in Org Unit hierarchy)", 
     "FIRST": "First value (Sum in Org Unit hierarchy)", 
     "FIRST_AVERAGE_ORG_UNIT": "First value (Average in Org Unit hierarchy)", 
-
-    "FIRST_FIRST_ORG_UNIT": "** first_first_org_unit ", //! WHAT
-
+    "FIRST_FIRST_ORG_UNIT": "** first_first_org_unit ", 
     "COUNT": "Count", 
     "STDDEV": "Standard Deviation", 
     "VARIANCE": "Variance", 
@@ -572,5 +569,6 @@ export {
     TRANSFERRED_EVENTS_NAMESPACE,
     VALUE_TYPES,
     VISUALIZATIONS_LEGEND,
-    SHORT_DATE_FORMAT_OPTIONS
+    SHORT_DATE_FORMAT_OPTIONS,
+    MAX_FORM_NAME_LENGTH
 };

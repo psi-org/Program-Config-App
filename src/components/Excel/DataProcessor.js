@@ -9,7 +9,7 @@ const optionSetQuery = {
         resource: 'optionSets',
         params: {
             paging: false,
-            fields: ['id', 'name', 'options[name]'],
+            fields: ['id', 'name', 'valueType'],
             filter: ['name:ilike:HNQIS - ']
         }
     }
@@ -82,7 +82,7 @@ const DataProcessor = (props) => {
     if (optionPool)
     {
         optionData = optionPool.map(op=>{
-            return {"Option Sets": op.name, UID: op.id, Options: arrayObjectToStringConverter(op.options, "name")}
+            return {"Option Sets": op.name, UID: op.id, "Value Type": op.valueType}
         })
     }
 

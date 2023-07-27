@@ -1,7 +1,7 @@
-import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy } from "./Utils";
+import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy, getObjectIdByProperty } from "./Utils";
 import { saveAs } from 'file-saver';
-import { thinBorder } from "./TemplateConstants";
-import { SHORT_DATE_FORMAT_OPTIONS } from "./Constants";
+import { HNQIS2_TEMPLATE_MAP, thinBorder } from "./TemplateConstants";
+import { FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA, SHORT_DATE_FORMAT_OPTIONS } from "./Constants";
 
 export function printArray2Column(sheet, array, header, startPosition, headerBgColor) {
     let coordinates = splitPosition(startPosition);
@@ -264,7 +264,7 @@ export const getTrackerMappingList = (ws) => {
 
 export const getHNQIS2MappingList = (ws) => {
     return {
-        optionSets: getMappedValues(ws, 3, "I", { id: 'I', optionSet: 'H' }),
+        optionSets: getMappedValues(ws, 3, "I", { id: 'I', optionSet: 'H', valueType: 'J' }),
         legendSets: getMappedValues(ws, 3, "P", { id: 'P', legendSet: 'O' }),
         healthAreas: getMappedValues(ws, 3, "L", { code: 'L', name: 'M' }),
         programs: getMappedValues(ws, 3, "R", { id: 'S', name: 'R' })

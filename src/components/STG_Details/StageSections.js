@@ -51,7 +51,7 @@ import InsightsIcon from '@mui/icons-material/Insights';
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
-import { DeepCopy, extractMetadataPermissions, truncateString } from "../../configs/Utils";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, truncateString } from "../../configs/Utils";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants";
 
@@ -289,7 +289,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [originalProgramStageDataElements, setOriginalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
     const [sections, setSections] = useState((isSectionMode)
         ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
-        : [{ name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement)) }]
+        : [buildBasicFormStage(programStage.programStageDataElements)]
     );
     const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
     const [criticalSection, setCriticalSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations") });
@@ -325,7 +325,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             setOriginalProgramStageDataElements(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
             setSections((isSectionMode)
                 ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
-                : [{ name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement)) }]
+                : [buildBasicFormStage(programStage.programStageDataElements)]
             )
             setScoresSection({ ...programStage.programStageSections.find(s => hnqisMode && (isSectionMode) && s.name === "Scores") })
             setCriticalSection({ ...programStage.programStageSections.find(s => hnqisMode && (isSectionMode) && s.name === "Critical Steps Calculations") })
@@ -811,11 +811,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
         setOpen(false);
     };
-
-
-
-
-
 
     return (
         <div className="cont_stage">

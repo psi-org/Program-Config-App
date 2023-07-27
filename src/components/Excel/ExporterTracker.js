@@ -30,9 +30,9 @@ import {
     writeWorkbook
 } from "../../configs/ExcelUtils";
 import { ReleaseNotesTracker } from "../../configs/ReleaseNotes";
-import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../../configs/Constants';
+import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../../configs/Constants';
 
-const Exporter = ({
+const ExporterTracker = ({
     programID, programPrefix, programName, programShortName, programTET, programCatCombo, programType, flag, stagesConfigurations, teaConfigurations, optionData, legendSetData, trackedEntityAttributesData, valueTypes, aggTypes, programData, isLoading, setFlag, setStatus
 }) => {
 
@@ -808,7 +808,7 @@ const Exporter = ({
             }, {
                 header: "Compulsory",
                 key: "compulsory",
-                width: 15
+                width: 20
             }, {
                 header: "Value Type",
                 key: "value_type",
@@ -878,9 +878,9 @@ const Exporter = ({
             short_name: "Data Elements Only\n\n[Disabled if 'Use Auto Naming' is 'Yes']",
             code: "Data Elements Only\n\n[Disabled if 'Use Auto Naming' is 'Yes']",
             description: "Helper text displayed to the users during data entry",
-            compulsory: "A compulsory Data Element must be answered to complete an Event",
+            compulsory: "A compulsory Data Element must be answered to complete an Event\n[Default is 'No']",
             value_type: "Determines the type of input if there's no Option Set selected",
-            agg_type: "Aggregation type used in Analytics",
+            agg_type: "Aggregation type used in Analytics\n\n[Default is 'None']",
             option_set: "Option Set that defines the answers available for the current Data Element (forces Value Type)",
             option_set_details: "Link to details (options) of the selected Option Set",
             legend_set: "Legend that will be applied to the Data Element",
@@ -1008,6 +1008,34 @@ const Exporter = ({
             promptTitle: 'Form name not defined',
             prompt: 'A form name was not defined for the specified element.'
         });
+        //Name not defined if Structure is selected and No auto naming
+        ws.addConditionalFormatting({
+            ref: 'E3:E3000',
+            priority: 1,
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND(ISBLANK($E3),$A3 = "Data Element",$C3 = "No")'],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Name not defined',
+            prompt: 'A Name was not defined for the specified element.'
+        });
+        //Short Name not defined if Structure is selected and No auto naming
+        ws.addConditionalFormatting({
+            ref: 'F3:F3000',
+            priority: 1,
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND(ISBLANK($F3),$A3 = "Data Element",$C3 = "No")'],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Short Name not defined',
+            prompt: 'A Short Name was not defined for the specified element.'
+        });
         //Structure not selected if Form Name is defined
         ws.addConditionalFormatting({
             ref: 'A3:A3000',
@@ -1036,6 +1064,48 @@ const Exporter = ({
             promptTitle: 'Form Name length out of range',
             prompt: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
         });
+        //conditional formatting for Name out of range
+        ws.addConditionalFormatting({
+            ref: 'E3:E3000',
+            priority: 1,
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: [`AND($A3 = "Data Element",$C3 = "No",LEN($E3)>${MAX_DATA_ELEMENT_NAME_LENGTH})`],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Name length out of range',
+            prompt: `Given Name length is out of the accepted range (Less than ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+        });
+        //conditional formatting for Short Name out of range
+        ws.addConditionalFormatting({
+            ref: 'F3:F3000',
+            priority: 1,
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: [`AND($A3 = "Data Element",$C3 = "No",LEN($F3)>${MAX_SHORT_NAME_LENGTH})`],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Short Name length out of range',
+            prompt: `Given Short Name length is out of the accepted range (Less than ${MAX_SHORT_NAME_LENGTH} characters).`
+        });
+        //conditional formatting for Code out of range
+        ws.addConditionalFormatting({
+            ref: 'G3:G3000',
+            priority: 1,
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: [`AND($A3 = "Data Element",$C3 = "No",LEN($G3)>${MAX_SHORT_NAME_LENGTH})`],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Code length out of range',
+            prompt: `Given Code length is out of the accepted range (Less than ${MAX_SHORT_NAME_LENGTH} characters).`
+        });
         //Disabled Full Name, Short Name, Code
         ws.addConditionalFormatting({
             ref: 'E3:G3000',
@@ -1062,6 +1132,20 @@ const Exporter = ({
             ],
             promptTitle: 'Option Set Selected',
             prompt: 'The Value Type is inherited from the Option Set.'
+        });
+        //Value Type not defined if Structure is selected
+        ws.addConditionalFormatting({
+            ref: 'J3:J3000',
+            priority: 1,
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: ['AND(ISBLANK($J3),$A3 = "Data Element")'],
+                    style: conditionalError,
+                }
+            ],
+            promptTitle: 'Name not defined',
+            prompt: 'A Name was not defined for the specified element.'
         });
         //Checking incomplete parent and answer
         ws.addConditionalFormatting({
@@ -1173,4 +1257,4 @@ const Exporter = ({
     return null;
 };
 
-export default Exporter;
+export default ExporterTracker;

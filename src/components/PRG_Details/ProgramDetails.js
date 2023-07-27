@@ -22,12 +22,17 @@ import DataProcessorTracker from "../Excel/DataProcessorTracker";
 import Importer from "../Excel/Importer";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants";
 
+const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,description,displayName,domainType,formName,id,legendSet,legendSets[id,name],name,optionSet[id,name],optionSetValue,sharing,shortName,style,valueType';
+const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style`;
+const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder`;
+const stagesQuery = `id,name,displayName,formType,programStageSections[${stageSectionsQuery}],description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements[${stageDataElementsQuery}],sortOrder`
+
 const query = {
     results: {
         resource: 'programs',
         id: ({ program }) => program,
         params: {
-            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', 'programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements,sortOrder]', 'withoutRegistration']
+            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', `programStages[${stagesQuery}]`, 'withoutRegistration']
         }
     },
 };
@@ -194,8 +199,9 @@ const ProgramDetails = () => {
                         displayForm={setImporterEnabled}
                         setImportResults={setImportResults}
                         importType='TRACKER'
+                        currentStagesData={data.results.programStages}
                         programSpecificType={data.results.withoutRegistration ? TEMPLATE_PROGRAM_TYPES.event : TEMPLATE_PROGRAM_TYPES.tracker}
-                        previous={/*{ sections, setSections, scoresSection, setScoresSection }*/{}}
+                        previous={{ stages: data.results.programStages }}
                     />
                 }
             </div>

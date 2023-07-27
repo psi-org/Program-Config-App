@@ -184,3 +184,31 @@ export function removeKey(obj, key) {
 export function getKeyByValue(object, value) {
     return Object.keys(object).find(key => object[key] === value);
 }
+
+export const getObjectIdByProperty = (propertyValue, object, property) => {
+    return object.find(o => o[property] == propertyValue)?.id
+};
+
+export const getObjectByProperty = (propertyValue, object, property) => {
+    return object.find(o => o[property] == propertyValue)
+};
+
+export const buildAttributeValue = (attributeId, value) => ({
+    attribute: { id: attributeId },
+    value
+})
+
+export const buildBasicFormStage = (stageDataElements) => ({
+    id: 'basic-form',
+    name: "Basic Form",
+    displayName: "Basic Form",
+    sortOrder: '1',
+    dataElements: stageDataElements?.map(de => DeepCopy(de.dataElement)) || []
+})
+
+export const setUpProgramStageSections = (programStage) => {
+    if (programStage.formType === 'SECTION')
+        return programStage.programStageSections;
+    else
+        return [buildBasicFormStage(programStage.programStageDataElements)];
+}

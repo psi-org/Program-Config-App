@@ -1,6 +1,7 @@
+import { FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA } from "../../configs/Constants";
 import { ReleaseNotes, ReleaseNotesTracker } from "../../configs/ReleaseNotes";
-import { HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL } from "../../configs/TemplateConstants";
-import { getKeyByValue } from "../../configs/Utils";
+import { HNQIS2_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../../configs/TemplateConstants";
+import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty } from "../../configs/Utils";
 
 export const getProgramDetailsHNQIS2 = (ws, mappingDetails) => {
     let program = {};
@@ -12,6 +13,20 @@ export const getProgramDetailsHNQIS2 = (ws, mappingDetails) => {
     program.useCompetencyClass = ws.getCell("C14").value;
     program.dePrefix = ws.getCell("C15").value;
     program.healthArea = ws.getCell("C16").value;
+
+    return program;
+}
+
+export const getProgramDetailsTracker = (ws) => {
+    let program = {};
+
+    program.id = ws.getCell("J17").value;
+    program.dePrefix = ws.getCell("J18").value;
+    program.name = ws.getCell("J19").value;
+    program.shortName = ws.getCell("J20").value;
+    program.trackedEntityType = ws.getCell("J21").value;
+    program.catCombo = ws.getCell("J22").value;
+    program.type = ws.getCell("J23").value;
 
     return program;
 }
@@ -174,3 +189,187 @@ export const handleWorksheetReading = (tasksHandler, currentWorksheet, setNotifi
     );
 
 }
+
+const buildSummaryObject = () => ({ new: 0, updated: 0, removed: 0 });
+
+export const buildHNQIS2Summary = () => ({
+    questions: buildSummaryObject(),
+    sections: buildSummaryObject(),
+    scores: buildSummaryObject()
+})
+
+export const buildTrackerSummary = (mode, stages) => { 
+    console.warn(mode)
+    let result = { stages: [] };
+    for (let index = 0; index < stages; index++) {
+        result.stages.push({
+            sections: buildSummaryObject(),
+            dataElements: buildSummaryObject()
+        })
+    }
+    if (mode === TEMPLATE_PROGRAM_TYPES.tracker) {
+        result.teas = buildSummaryObject();
+    }
+    return result;
+}
+
+export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legendSets, dataElementsPool) => {
+    let code = "";
+
+    let aggType;
+    if (type == 'score') {
+        code = programPrefix + '_CS' + data[HNQIS2_TEMPLATE_MAP.feedbackOrder];
+        aggType = 'AVERAGE';
+        data[HNQIS2_TEMPLATE_MAP.valueType] = 'NUMBER';
+    } else {
+        if (type == 'label') data[HNQIS2_TEMPLATE_MAP.valueType] = 'LONG_TEXT';
+
+        code = programPrefix + '_' + (data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???');
+        switch (data[HNQIS2_TEMPLATE_MAP.valueType]) {
+            case 'TEXT':
+            case 'LONG_TEXT':
+                aggType = 'NONE';
+                break;
+            default:
+                aggType = 'SUM';
+        }
+    }
+
+    const existingDe = dataElementsPool[data[HNQIS2_TEMPLATE_MAP.dataElementId]] || {};
+
+    const parsedDE = JSON.parse(JSON.stringify(existingDe));
+
+    const criticalIdentifier = data[HNQIS2_TEMPLATE_MAP.isCritical] == 'Yes' ? ' [C]' : '';
+
+    parsedDE.id = data[HNQIS2_TEMPLATE_MAP.dataElementId] || undefined;
+    parsedDE.name = (code + '_' + data[HNQIS2_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH);
+    parsedDE.shortName = (code + '_' + data[HNQIS2_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH);
+    parsedDE.code = code;
+    parsedDE.description = data[HNQIS2_TEMPLATE_MAP.description];
+    parsedDE.formName = (type == 'label')
+        ? '     '
+        : data[HNQIS2_TEMPLATE_MAP.formName]
+            ? (data[HNQIS2_TEMPLATE_MAP.formName] + criticalIdentifier)
+            : '';
+    parsedDE.domainType = 'TRACKER';
+    parsedDE.valueType = data[HNQIS2_TEMPLATE_MAP.valueType];
+    parsedDE.aggregationType = aggType;
+    parsedDE.parentName = data[HNQIS2_TEMPLATE_MAP.parentName]?.result;
+    parsedDE.attributeValues = (existingDe?.attributeValues?.filter(att =>
+        ![FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA].includes(att.attribute.id)
+    ) || [])
+
+
+    if (data[HNQIS2_TEMPLATE_MAP.optionSet] && data[HNQIS2_TEMPLATE_MAP.optionSet] !== "") {
+        let os = getObjectByProperty(data[HNQIS2_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
+        parsedDE.optionSet = { id: os.id };
+        parsedDE.optionSetValue = true;
+        parsedDE.valueType = os.valueType;
+    }
+
+    if (data[HNQIS2_TEMPLATE_MAP.legend] && data[HNQIS2_TEMPLATE_MAP.legend] !== "") {
+        parsedDE.legendSet = { id: getObjectIdByProperty(data[HNQIS2_TEMPLATE_MAP.legend], legendSets, 'legendSet') };
+        parsedDE.legendSets = [
+            { id: getObjectIdByProperty(data[HNQIS2_TEMPLATE_MAP.legend], legendSets, 'legendSet') }
+        ];
+    }
+
+    if (data[HNQIS2_TEMPLATE_MAP.feedbackOrder] && data[HNQIS2_TEMPLATE_MAP.feedbackOrder] !== "")
+        parsedDE.attributeValues.push(buildAttributeValue(FEEDBACK_ORDER, String(data[HNQIS2_TEMPLATE_MAP.feedbackOrder])));
+
+    if (data[HNQIS2_TEMPLATE_MAP.feedbackText] && data[HNQIS2_TEMPLATE_MAP.feedbackText] !== "")
+        parsedDE.attributeValues.push(buildAttributeValue(FEEDBACK_TEXT, data[HNQIS2_TEMPLATE_MAP.feedbackText]));
+
+    const metadata = {
+        isCompulsory: data[HNQIS2_TEMPLATE_MAP.isCompulsory] || "No",
+        isCritical: data[HNQIS2_TEMPLATE_MAP.isCritical] || "No",
+        elemType: type,
+        varName: data[HNQIS2_TEMPLATE_MAP.parentName]?.result,
+        autoNaming: 'Yes'
+    };
+    if (data[HNQIS2_TEMPLATE_MAP.scoreNum] !== "") metadata.scoreNum = data[HNQIS2_TEMPLATE_MAP.scoreNum];
+    if (data[HNQIS2_TEMPLATE_MAP.scoreDen] !== "") metadata.scoreDen = data[HNQIS2_TEMPLATE_MAP.scoreDen];
+
+    if (data[HNQIS2_TEMPLATE_MAP.parentQuestion] !== "") {
+        metadata.parentQuestion = data[HNQIS2_TEMPLATE_MAP.parentQuestion];
+        parsedDE.parentQuestion = data[HNQIS2_TEMPLATE_MAP.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
+    }
+    if (data[HNQIS2_TEMPLATE_MAP.parentValue] !== "") metadata.parentValue = data[HNQIS2_TEMPLATE_MAP.parentValue];
+
+    if (type == 'label') metadata.labelFormName = data[HNQIS2_TEMPLATE_MAP.formName];
+
+    parsedDE.attributeValues.push(
+        {
+            attribute: { id: METADATA },
+            value: JSON.stringify(metadata)
+        }
+    );
+
+    return parsedDE;
+};
+
+export const mapImportedDE = (data, programPrefix, optionSets, legendSets, dataElementsPool) => {
+    
+    const autoNaming = data[TRACKER_TEMPLATE_MAP.autoNaming] === 'No' ? false : true;
+    const code = autoNaming
+        ? programPrefix + '_' + (data[TRACKER_TEMPLATE_MAP.correlative]?.result || '???')
+        : data[TRACKER_TEMPLATE_MAP.code];
+
+    const existingDe = dataElementsPool[data[TRACKER_TEMPLATE_MAP.dataElementId]] || {};
+    const parsedDE = JSON.parse(JSON.stringify(existingDe));
+
+
+    parsedDE.id = data[TRACKER_TEMPLATE_MAP.dataElementId] || undefined;
+    parsedDE.name = autoNaming
+        ? (code + '_' + data[TRACKER_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH)
+        : data[TRACKER_TEMPLATE_MAP.name];
+    parsedDE.shortName = autoNaming
+        ? (code + '_' + data[TRACKER_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH)
+        : data[TRACKER_TEMPLATE_MAP.shortName];
+    parsedDE.code = autoNaming ? code : data[TRACKER_TEMPLATE_MAP.code];
+    parsedDE.description = data[TRACKER_TEMPLATE_MAP.description];
+    parsedDE.formName = data[TRACKER_TEMPLATE_MAP.formName]
+    parsedDE.domainType = 'TRACKER';
+    parsedDE.valueType = getKeyByValue(data[TRACKER_TEMPLATE_MAP.valueType]);
+    parsedDE.aggregationType = getKeyByValue(data[TRACKER_TEMPLATE_MAP.aggOperator] || 'None');
+    parsedDE.parentName = data[TRACKER_TEMPLATE_MAP.parentName]?.result;
+    parsedDE.attributeValues = (existingDe?.attributeValues?.filter(att =>
+        ![METADATA].includes(att.attribute.id)
+    ) || [])
+
+
+    if (data[TRACKER_TEMPLATE_MAP.optionSet] && data[TRACKER_TEMPLATE_MAP.optionSet] !== "") {
+        let os = getObjectByProperty(data[TRACKER_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
+        parsedDE.optionSet = { id: os.id };
+        parsedDE.optionSetValue = true;
+        parsedDE.valueType = os.valueType;
+    }
+
+    if (data[TRACKER_TEMPLATE_MAP.legend] && data[TRACKER_TEMPLATE_MAP.legend] !== "") {
+        parsedDE.legendSet = { id: getObjectIdByProperty(data[TRACKER_TEMPLATE_MAP.legend], legendSets, 'legendSet') };
+        parsedDE.legendSets = [
+            { id: getObjectIdByProperty(data[TRACKER_TEMPLATE_MAP.legend], legendSets, 'legendSet') }
+        ];
+    }
+
+    const metadata = {
+        isCompulsory: data[TRACKER_TEMPLATE_MAP.isCompulsory] || "No",
+        varName: data[TRACKER_TEMPLATE_MAP.correlative]?.result,
+        autoNaming: autoNaming ? 'Yes' : 'No'
+    };
+
+    if (data[TRACKER_TEMPLATE_MAP.parentQuestion] !== "") {
+        metadata.parentQuestion = data[TRACKER_TEMPLATE_MAP.parentQuestion];
+        parsedDE.parentQuestion = data[TRACKER_TEMPLATE_MAP.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
+    }
+    if (data[TRACKER_TEMPLATE_MAP.parentValue] !== "") metadata.parentValue = data[TRACKER_TEMPLATE_MAP.parentValue];
+
+    parsedDE.attributeValues.push(
+        {
+            attribute: { id: METADATA },
+            value: JSON.stringify(metadata)
+        }
+    );
+
+    return parsedDE;
+};

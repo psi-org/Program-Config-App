@@ -45,13 +45,102 @@ export const yesNoValidator = ['"Yes,No"'];
 
 export const TEMPLATE_PASSWORD = "TOyNrNrH8fNT8W%Au&4A";
 
-export const HNQIS2_TEMPLATE_HEADERS = ['Parent Name', 'Structure', 'Form Name', 'Critical Step', 'Compulsory', 'Value Type', 'Option Set', 'Legend', 'Score Numerator', 'Score Denominator', 'Compositive Indicator (Feedback Order)', 'Parent Question', 'Answer Value', 'Feedback Text', 'Description', 'Program Stage Id', 'Program Section Id', 'Data Element Id'];
+export const HNQIS2_TEMPLATE_MAP = {
+    parentName: "Parent Name",
+    structure: "Structure",
+    formName: "Form Name",
+    isCritical: "Critical Step",
+    isCompulsory: "Compulsory",
+    valueType: "Value Type",
+    optionSet: "Option Set",
+    legend: "Legend",
+    scoreNum: "Score Numerator",
+    scoreDen: "Score Denominator",
+    feedbackOrder: "Compositive Indicator (Feedback Order)",
+    parentQuestion: "Parent Question",
+    parentValue: "Answer Value",
+    feedbackText: "Feedback Text",
+    description: "Description",
+    programStage: "Program Stage Id",
+    programSection: "Program Section Id",
+    dataElementId: "Data Element Id",
+};
+
+export const HNQIS2_TEMPLATE_HEADERS = [
+    HNQIS2_TEMPLATE_MAP.parentName,
+    HNQIS2_TEMPLATE_MAP.structure,
+    HNQIS2_TEMPLATE_MAP.formName,
+    HNQIS2_TEMPLATE_MAP.isCritical,
+    HNQIS2_TEMPLATE_MAP.isCompulsory,
+    HNQIS2_TEMPLATE_MAP.valueType,
+    HNQIS2_TEMPLATE_MAP.optionSet,
+    HNQIS2_TEMPLATE_MAP.legend,
+    HNQIS2_TEMPLATE_MAP.scoreNum,
+    HNQIS2_TEMPLATE_MAP.scoreDen,
+    HNQIS2_TEMPLATE_MAP.feedbackOrder,
+    HNQIS2_TEMPLATE_MAP.parentQuestion,
+    HNQIS2_TEMPLATE_MAP.parentValue,
+    HNQIS2_TEMPLATE_MAP.feedbackText,
+    HNQIS2_TEMPLATE_MAP.description,
+    HNQIS2_TEMPLATE_MAP.programStage,
+    HNQIS2_TEMPLATE_MAP.programSection,
+    HNQIS2_TEMPLATE_MAP.dataElementId
+];
+
 export const HNQIS2_TEMPLATE_VERSION_CELL = "D13";
 export const HQNIS2_PROGRAM_TYPE_CELL = "D14";
 export const HNQIS2_ORIGIN_SERVER_CELL = "D20";
 
 export const TRACKER_TEA_HEADERS = ['Structure', 'UID', 'Name', 'Short Name', 'Value Type', 'Aggregation Type', 'Mandatory', 'Searchable', 'Display in List', 'Allow Future Date', 'Program Section Id', 'Program TEA Id'];
-export const TRACKER_TEMPLATE_HEADERS = ['Structure', 'Correlative', 'Use Auto Naming', 'Form Name', 'Full Name', 'Short Name', 'Code', 'Description', 'Compulsory', 'Value Type', 'Agg Operator', 'Option Set', 'Option Set Details', 'Legend Set', 'Parent Question', 'Answer Value', 'Stage ID', 'Stage Name', 'Program Stage Id', 'Program Section Id', 'Data Element Id'];
+
+export const TRACKER_TEMPLATE_MAP = {
+    structure: 'Structure',
+    correlative: 'Correlative',
+    autoNaming: 'Use Auto Naming',
+    formName: 'Form Name',
+    name: 'Full Name',
+    shortName: 'Short Name',
+    code: 'Code',
+    description: 'Description',
+    isCompulsory: 'Compulsory',
+    valueType: 'Value Type',
+    aggOperator: 'Agg Operator',
+    optionSet: 'Option Set',
+    optionSetDetails: 'Option Set Details',
+    legend: 'Legend Set',
+    parentQuestion: 'Parent Question',
+    parentValue: 'Answer Value',
+    stageId: 'Stage ID',
+    stageName: 'Stage Name',
+    programStage: 'Program Stage Id',
+    programSection: 'Program Section Id',
+    dataElementId: 'Data Element Id'
+};
+
+export const TRACKER_TEMPLATE_HEADERS = [
+    TRACKER_TEMPLATE_MAP.structure,
+    TRACKER_TEMPLATE_MAP.correlative,
+    TRACKER_TEMPLATE_MAP.autoNaming,
+    TRACKER_TEMPLATE_MAP.formName,
+    TRACKER_TEMPLATE_MAP.name,
+    TRACKER_TEMPLATE_MAP.shortName,
+    TRACKER_TEMPLATE_MAP.code,
+    TRACKER_TEMPLATE_MAP.description,
+    TRACKER_TEMPLATE_MAP.isCompulsory,
+    TRACKER_TEMPLATE_MAP.valueType,
+    TRACKER_TEMPLATE_MAP.aggOperator,
+    TRACKER_TEMPLATE_MAP.optionSet,
+    TRACKER_TEMPLATE_MAP.optionSetDetails,
+    TRACKER_TEMPLATE_MAP.legend,
+    TRACKER_TEMPLATE_MAP.parentQuestion,
+    TRACKER_TEMPLATE_MAP.parentValue,
+    TRACKER_TEMPLATE_MAP.stageId,
+    TRACKER_TEMPLATE_MAP.stageName,
+    TRACKER_TEMPLATE_MAP.programStage,
+    TRACKER_TEMPLATE_MAP.programSection,
+    TRACKER_TEMPLATE_MAP.dataElementId
+];
+
 export const TRACKER_TEMPLATE_VERSION_CELL = "L2";
 export const TRACKER_ORIGIN_SERVER_CELL = "D17";
 export const TRACKER_PROGRAM_TYPE_CELL = "J23";
