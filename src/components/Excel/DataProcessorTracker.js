@@ -279,18 +279,18 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
             let additionalConfigs = [{
                 structure: "Section",
                 form_name: programSections.length == 0?"Basic Form":"Available TEAs not in Form",
-                program_section_id: "unused"
+                program_section_id: programSections.length == 0 ? "basic-form" : "unused"
             }];
 
             unusedTEAs.forEach(tea => {
-                additionalConfigs.push(teaRowBuilder(teaMap, tea,));
+                additionalConfigs.push(teaRowBuilder(teaMap, tea, programSections.length == 0 ? "basic-form" : "unused"));
             });
 
             teaConfigurations = additionalConfigs.concat(teaConfigurations);
         }
     }
 
-    const teaRowBuilder = (teaMap, tea, teaSectionId = 'unused') => {
+    const teaRowBuilder = (teaMap, tea, teaSectionId) => {
         let teaData = teaMap[tea.id];
         let row = {};
 

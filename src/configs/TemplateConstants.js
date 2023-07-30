@@ -27,8 +27,6 @@ export const horizontalCenter = {
     horizontal: 'center'
 };
 
-export const isTracker = (importType) => (importType === 'TRACKER');
-
 export const conditionalError = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'dc3545' } } };
 export const sectionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'f8c291' } } };
 export const questionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'ffffff' } } };
@@ -91,7 +89,35 @@ export const HNQIS2_TEMPLATE_VERSION_CELL = "D13";
 export const HQNIS2_PROGRAM_TYPE_CELL = "D14";
 export const HNQIS2_ORIGIN_SERVER_CELL = "D20";
 
-export const TRACKER_TEA_HEADERS = ['Structure', 'UID', 'Name', 'Short Name', 'Value Type', 'Aggregation Type', 'Mandatory', 'Searchable', 'Display in List', 'Allow Future Date', 'Program Section Id', 'Program TEA Id'];
+export const TRACKER_TEA_MAP = {
+    structure: 'Structure',
+    uid: 'UID',
+    name: 'Name',
+    shortName: 'Short Name',
+    valueType: 'Value Type',
+    aggType: 'Aggregation Type',
+    mandatory: 'Mandatory',
+    searchable: 'Searchable',
+    displayInList: 'Display in List',
+    allowFutureDate: 'Allow Future Date',
+    programSection: 'Program Section Id',
+    programTea: 'Program TEA Id'
+};
+
+export const TRACKER_TEA_HEADERS = [
+    TRACKER_TEA_MAP.structure,
+    TRACKER_TEA_MAP.uid,
+    TRACKER_TEA_MAP.name,
+    TRACKER_TEA_MAP.shortName,
+    TRACKER_TEA_MAP.valueType,
+    TRACKER_TEA_MAP.aggType,
+    TRACKER_TEA_MAP.mandatory,
+    TRACKER_TEA_MAP.searchable,
+    TRACKER_TEA_MAP.displayInList,
+    TRACKER_TEA_MAP.allowFutureDate,
+    TRACKER_TEA_MAP.programSection,
+    TRACKER_TEA_MAP.programTea
+];
 
 export const TRACKER_TEMPLATE_MAP = {
     structure: 'Structure',

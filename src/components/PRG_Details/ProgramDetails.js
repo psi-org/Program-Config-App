@@ -26,13 +26,14 @@ const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,
 const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style`;
 const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder`;
 const stagesQuery = `id,name,displayName,formType,programStageSections[${stageSectionsQuery}],description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements[${stageDataElementsQuery}],sortOrder`
+const programSectionsQuery = 'id,name,renderType,sortOrder,program,sharing,translations,attributeValues,trackedEntityAttributes';
 
 const query = {
     results: {
         resource: 'programs',
         id: ({ program }) => program,
         params: {
-            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', `programStages[${stagesQuery}]`, 'withoutRegistration']
+            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', `programStages[${stagesQuery}]`, 'withoutRegistration', `programSections[${programSectionsQuery}]`, 'programTrackedEntityAttributes']
         }
     },
 };
@@ -201,7 +202,7 @@ const ProgramDetails = () => {
                         importType='TRACKER'
                         currentStagesData={data.results.programStages}
                         programSpecificType={data.results.withoutRegistration ? TEMPLATE_PROGRAM_TYPES.event : TEMPLATE_PROGRAM_TYPES.tracker}
-                        previous={{ stages: data.results.programStages }}
+                        previous={{ stages: data.results.programStages, programSections: data.results.programSections, teas: data.results.programTrackedEntityAttributes }}
                     />
                 }
             </div>

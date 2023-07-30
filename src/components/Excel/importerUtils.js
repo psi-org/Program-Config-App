@@ -1,7 +1,9 @@
-import { FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA } from "../../configs/Constants";
+import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA } from "../../configs/Constants";
 import { ReleaseNotes, ReleaseNotesTracker } from "../../configs/ReleaseNotes";
 import { HNQIS2_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../../configs/TemplateConstants";
 import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty } from "../../configs/Utils";
+
+export const isTracker = (importType) => [TEMPLATE_PROGRAM_TYPES.tracker, TEMPLATE_PROGRAM_TYPES.event].includes(importType);
 
 export const getProgramDetailsHNQIS2 = (ws, mappingDetails) => {
     let program = {};
@@ -199,7 +201,6 @@ export const buildHNQIS2Summary = () => ({
 })
 
 export const buildTrackerSummary = (mode, stages) => { 
-    console.warn(mode)
     let result = { stages: [] };
     for (let index = 0; index < stages; index++) {
         result.stages.push({
@@ -208,7 +209,10 @@ export const buildTrackerSummary = (mode, stages) => {
         })
     }
     if (mode === TEMPLATE_PROGRAM_TYPES.tracker) {
-        result.teas = buildSummaryObject();
+        result.teaSummary = {
+            teas: buildSummaryObject(),
+            programSections: buildSummaryObject()
+        }
     }
     return result;
 }
@@ -287,6 +291,7 @@ export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legen
         varName: data[HNQIS2_TEMPLATE_MAP.parentName]?.result,
         autoNaming: 'Yes'
     };
+    
     if (data[HNQIS2_TEMPLATE_MAP.scoreNum] !== "") metadata.scoreNum = data[HNQIS2_TEMPLATE_MAP.scoreNum];
     if (data[HNQIS2_TEMPLATE_MAP.scoreDen] !== "") metadata.scoreDen = data[HNQIS2_TEMPLATE_MAP.scoreDen];
 
@@ -330,8 +335,8 @@ export const mapImportedDE = (data, programPrefix, optionSets, legendSets, dataE
     parsedDE.description = data[TRACKER_TEMPLATE_MAP.description];
     parsedDE.formName = data[TRACKER_TEMPLATE_MAP.formName]
     parsedDE.domainType = 'TRACKER';
-    parsedDE.valueType = getKeyByValue(data[TRACKER_TEMPLATE_MAP.valueType]);
-    parsedDE.aggregationType = getKeyByValue(data[TRACKER_TEMPLATE_MAP.aggOperator] || 'None');
+    parsedDE.valueType = getKeyByValue(DHIS2_VALUE_TYPES_MAP, data[TRACKER_TEMPLATE_MAP.valueType]);
+    parsedDE.aggregationType = getKeyByValue(DHIS2_AGG_OPERATORS_MAP, data[TRACKER_TEMPLATE_MAP.aggOperator] || 'None');
     parsedDE.parentName = data[TRACKER_TEMPLATE_MAP.parentName]?.result;
     parsedDE.attributeValues = (existingDe?.attributeValues?.filter(att =>
         ![METADATA].includes(att.attribute.id)
@@ -373,3 +378,50 @@ export const mapImportedDE = (data, programPrefix, optionSets, legendSets, dataE
 
     return parsedDE;
 };
+
+export const countChanges = (
+    {
+        sections,
+        sectionsSummary,
+        countObject,
+        summaryObject,
+        currentData,
+        objId = 'id',
+        impObjId = 'id',
+        sectionId = 'id',
+        impSectionId = 'id'
+    }
+) => {
+    sections.forEach(i_section => {
+        i_section.newValues = 0;
+        i_section.updatedValues = 0;
+
+        i_section[countObject].map(i_obj => {
+            if (i_obj[impObjId] == null) {
+                //New object
+                i_obj.importStatus = 'new';
+                summaryObject.new++;
+                i_section.newValues++;
+            } else {
+                //Updated object
+                i_obj.importStatus = 'update';
+                summaryObject.updated++;
+                i_section.updatedValues++;
+            }
+
+            return i_obj;
+        })
+    });
+
+    // Compare previous objects with imported data -> Get removed data
+    let removedObjects = currentData.map(sec => {
+        // Section removed -> Increase counter
+        if (!sections.find(i_sec => i_sec[impSectionId] == sec[sectionId])) sectionsSummary.removed++;
+        return sec[countObject].filter(obj =>
+            !sections.find(i_sec => i_sec[countObject].find(i_obj => i_obj[impObjId] == obj[objId]))
+        )
+    }).flat();
+
+    summaryObject.removed = removedObjects.length;
+    summaryObject.removedItems = removedObjects;
+}

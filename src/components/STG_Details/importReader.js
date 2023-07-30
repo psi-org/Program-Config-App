@@ -1,5 +1,5 @@
-const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP } = require("../../configs/TemplateConstants");
-const { mapImportedDEHNQIS2, mapImportedDE } = require("../Excel/importerUtils");
+const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, TRACKER_TEA_MAP } = require("../../configs/TemplateConstants");
+const { mapImportedDEHNQIS2, mapImportedDE, countChanges } = require("../Excel/importerUtils");
 
 const readTemplateData = (
     {
@@ -32,15 +32,16 @@ const readTemplateData = (
     templateData.forEach(row => {
         switch (row[templateMap.structure]) {
             case 'Section':
+                sectionIndex += 1;
                 if (isHNQIS && (row[HNQIS2_TEMPLATE_MAP.formName] == "Critical Steps Calculations" || row[HNQIS2_TEMPLATE_MAP.formName] == "Scores")) break;
-                sectionIndex++;
                 importedSections[sectionIndex] = {
                     id: row[templateMap.programSection] || undefined,
                     name: row[templateMap.formName],
                     displayName: row[templateMap.formName],
-                    sortOrder: sectionIndex + 1,
+                    sortOrder: sectionIndex,
                     dataElements: [],
-                    importStatus: row[templateMap.programSection] ? 'update' : 'new'
+                    importStatus: row[templateMap.programSection] ? 'update' : 'new',
+                    isBasicForm: row[templateMap.programSection] === 'basic-form'
                 }
                 row[templateMap.programSection] ? importSummaryValues.sections.updated++ : importSummaryValues.sections.new++;
                 break;
@@ -57,42 +58,13 @@ const readTemplateData = (
         }
     });
 
-    // Get new Data Elements (no uid)
-    
-    console.log(importedSections)
-
-    importedSections.forEach(i_section => {
-        i_section.newDataElements = 0;
-        i_section.updatedDataElements = 0;
-
-        i_section.dataElements.map(i_de => {
-            if (i_de.id == null) {
-                //New DE
-                i_de.importStatus = 'new';
-                importSummaryValues[dataElementsName].new++;
-                i_section.newDataElements++;
-            } else {
-                //Updated DE
-                i_de.importStatus = 'update';
-                importSummaryValues[dataElementsName].updated++;
-                i_section.updatedDataElements++;
-            }
-
-            return i_de;
-        })
-    });
-
-    // Compare previous questions with imported data -> Get removed data
-    var removedDataElements = currentData.sections.map(sec => {
-        // Section removed -> Increase counter
-        if (!importedSections.find(i_sec => i_sec.id == sec.id)) importSummaryValues.sections.removed++;
-        return sec.dataElements.filter(de =>
-            !importedSections.find(i_sec => i_sec.dataElements.find(i_de => i_de.id == de.id))
-        )
-    }).flat();
-
-    importSummaryValues[dataElementsName].removed = removedDataElements.length;
-    importSummaryValues[dataElementsName].removedItems = removedDataElements;
+    countChanges({
+        sections: importedSections,
+        sectionsSummary: importSummaryValues.sections,
+        countObject: 'dataElements',
+        summaryObject: importSummaryValues[dataElementsName],
+        currentData: currentData.sections
+    })
 
     if (mode === TEMPLATE_PROGRAM_TYPES.hnqis2) {
         // New scores
@@ -102,7 +74,7 @@ const readTemplateData = (
         });
 
         // Removed Scores
-        var removedScores = currentData.scoresSection.dataElements.filter(de =>
+        let removedScores = currentData.scoresSection.dataElements.filter(de =>
             !importedScores.find(i_score => i_score.id == de.id)
         );
         importSummaryValues.scores.removed = removedScores.length;
@@ -111,6 +83,8 @@ const readTemplateData = (
         return { importedSections, importedScores };
     }
 
+    
+
     return { importedSections };
 
 };
@@ -118,3 +92,29 @@ const readTemplateData = (
 module.exports = {
     readTemplateData
 };
+
+/*
+const existingTEAs = props.data ? 
+props.data.programTrackedEntityAttributes.map(tea => ({
+    trackedEntityAttribute: tea.trackedEntityAttribute,
+    valueType: tea.valueType,
+    allowFutureDate: tea.allowFutureDate,
+    displayInList: tea.displayInList,
+    mandatory: tea.mandatory,
+    searchable: tea.searchable,
+    renderType:tea.renderType
+})) : []
+
+const availableTEAs = data.results.trackedEntityAttributes.filter(
+    tea => !existingTEAs.map(tea => tea.trackedEntityAttribute.id).includes(tea.id)
+).map(
+    tea => ({
+        trackedEntityAttribute: { id: tea.id, name: tea.name },
+        valueType: tea.valueType,
+        allowFutureDate: false,
+        displayInList: false,
+        mandatory: false,
+        searchable: false 
+    })
+)
+*/

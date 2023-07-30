@@ -722,12 +722,12 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND($A3 = "Section",$K3 = "unused")'],
+                    formulae: ['AND($A3 = "Section",OR($K3 = "unused", $K3 = "basic-form"))'],
                     style: otherHighlighting
                 },
                 {
                     type: 'expression',
-                    formulae: ['AND($A3 = "Section",$K3 <> "unused")'],
+                    formulae: ['AND($A3 = "Section", $K3 <> "unused", $K3 <> "basic-form")'],
                     style: sectionHighlighting
                 },
                 {
