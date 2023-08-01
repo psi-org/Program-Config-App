@@ -11,7 +11,7 @@ export const getProgramDetailsHNQIS2 = (ws, mappingDetails) => {
     program.name = ws.getCell("C12").value;
     program.shortName = ws.getCell("C13").value;
     let result = mappingDetails.programs.filter(prog => prog.name === program.name);
-    program.id = result[0].id;
+    program.id = result[0]?.id;
     program.useCompetencyClass = ws.getCell("C14").value;
     program.dePrefix = ws.getCell("C15").value;
     program.healthArea = ws.getCell("C16").value;
@@ -146,13 +146,14 @@ const worksheetValidation = (status, task, { setNotificationError, sheetName, he
     return status;
 }
 
-const getWorksheetData = (status, task, { currentWorksheet, templateHeadersList }) => {
+const getWorksheetData = (status, task, { currentWorksheet, templateHeadersList, structureColumn }) => {
 
     let templateData = [];
     let dataRow = 3;
 
     currentWorksheet.eachRow((row, rowIndex) => {
-        if (rowIndex >= dataRow && row.values[1]) {
+        console.log(row.values)
+        if (rowIndex >= dataRow && row.values[structureColumn]) {
             let dataRow = {};
             let rowVals = row.values;
             templateHeadersList.forEach((header, index) => {
@@ -165,7 +166,7 @@ const getWorksheetData = (status, task, { currentWorksheet, templateHeadersList 
     return { status, data: templateData };
 }
 
-export const handleWorksheetReading = (tasksHandler, currentWorksheet, setNotificationError, headers, templateHeadersList, startingIndex) => {
+export const handleWorksheetReading = (tasksHandler, currentWorksheet, setNotificationError, headers, templateHeadersList, startingIndex,structureColumn) => {
     if (!tasksHandler(
         startingIndex,
         `${currentWorksheet.name}: Validating worksheet columns`,
@@ -186,7 +187,8 @@ export const handleWorksheetReading = (tasksHandler, currentWorksheet, setNotifi
         getWorksheetData,
         {
             currentWorksheet,
-            templateHeadersList
+            templateHeadersList,
+            structureColumn
         }
     );
 
@@ -221,6 +223,30 @@ export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legen
     let code = "";
 
     let aggType;
+    
+
+    const existingDe = dataElementsPool[data[HNQIS2_TEMPLATE_MAP.dataElementId]] || {};
+
+    const parsedDE = JSON.parse(JSON.stringify(existingDe));
+
+    const criticalIdentifier = data[HNQIS2_TEMPLATE_MAP.isCritical] == 'Yes' ? ' [C]' : '';
+
+    parsedDE.id = data[HNQIS2_TEMPLATE_MAP.dataElementId] || undefined;
+    parsedDE.description = data[HNQIS2_TEMPLATE_MAP.description];
+    parsedDE.formName = (type == 'label')
+        ? '     '
+        : data[HNQIS2_TEMPLATE_MAP.formName]
+            ? (data[HNQIS2_TEMPLATE_MAP.formName] + criticalIdentifier)
+            : '';
+    parsedDE.domainType = 'TRACKER';
+
+    if (data[HNQIS2_TEMPLATE_MAP.optionSet] && data[HNQIS2_TEMPLATE_MAP.optionSet] !== "") {
+        let os = getObjectByProperty(data[HNQIS2_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
+        parsedDE.optionSet = { id: os.id };
+        parsedDE.optionSetValue = true;
+        data[HNQIS2_TEMPLATE_MAP.valueType] = os.valueType;
+    }
+
     if (type == 'score') {
         code = programPrefix + '_CS' + data[HNQIS2_TEMPLATE_MAP.feedbackOrder];
         aggType = 'AVERAGE';
@@ -239,37 +265,16 @@ export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legen
         }
     }
 
-    const existingDe = dataElementsPool[data[HNQIS2_TEMPLATE_MAP.dataElementId]] || {};
-
-    const parsedDE = JSON.parse(JSON.stringify(existingDe));
-
-    const criticalIdentifier = data[HNQIS2_TEMPLATE_MAP.isCritical] == 'Yes' ? ' [C]' : '';
-
-    parsedDE.id = data[HNQIS2_TEMPLATE_MAP.dataElementId] || undefined;
+    parsedDE.code = code;
     parsedDE.name = (code + '_' + data[HNQIS2_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH);
     parsedDE.shortName = (code + '_' + data[HNQIS2_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH);
-    parsedDE.code = code;
-    parsedDE.description = data[HNQIS2_TEMPLATE_MAP.description];
-    parsedDE.formName = (type == 'label')
-        ? '     '
-        : data[HNQIS2_TEMPLATE_MAP.formName]
-            ? (data[HNQIS2_TEMPLATE_MAP.formName] + criticalIdentifier)
-            : '';
-    parsedDE.domainType = 'TRACKER';
     parsedDE.valueType = data[HNQIS2_TEMPLATE_MAP.valueType];
     parsedDE.aggregationType = aggType;
-    parsedDE.parentName = data[HNQIS2_TEMPLATE_MAP.parentName]?.result;
+
+    parsedDE.parentName = data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???';
     parsedDE.attributeValues = (existingDe?.attributeValues?.filter(att =>
         ![FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA].includes(att.attribute.id)
-    ) || [])
-
-
-    if (data[HNQIS2_TEMPLATE_MAP.optionSet] && data[HNQIS2_TEMPLATE_MAP.optionSet] !== "") {
-        let os = getObjectByProperty(data[HNQIS2_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
-        parsedDE.optionSet = { id: os.id };
-        parsedDE.optionSetValue = true;
-        parsedDE.valueType = os.valueType;
-    }
+    ) || []);
 
     if (data[HNQIS2_TEMPLATE_MAP.legend] && data[HNQIS2_TEMPLATE_MAP.legend] !== "") {
         parsedDE.legendSet = { id: getObjectIdByProperty(data[HNQIS2_TEMPLATE_MAP.legend], legendSets, 'legendSet') };
@@ -288,10 +293,10 @@ export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legen
         isCompulsory: data[HNQIS2_TEMPLATE_MAP.isCompulsory] || "No",
         isCritical: data[HNQIS2_TEMPLATE_MAP.isCritical] || "No",
         elemType: type,
-        varName: data[HNQIS2_TEMPLATE_MAP.parentName]?.result,
+        varName: data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???',
         autoNaming: 'Yes'
     };
-    
+
     if (data[HNQIS2_TEMPLATE_MAP.scoreNum] !== "") metadata.scoreNum = data[HNQIS2_TEMPLATE_MAP.scoreNum];
     if (data[HNQIS2_TEMPLATE_MAP.scoreDen] !== "") metadata.scoreDen = data[HNQIS2_TEMPLATE_MAP.scoreDen];
 

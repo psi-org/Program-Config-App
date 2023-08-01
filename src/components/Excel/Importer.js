@@ -129,7 +129,8 @@ const Importer = (
                         setNotificationError,
                         headers,
                         TRACKER_TEA_HEADERS,
-                        4
+                        4,
+                        1
                     ).data
                 }
 
@@ -146,9 +147,9 @@ const Importer = (
                         setNotificationError,
                         headers,
                         (isTracker ? TRACKER_TEMPLATE_HEADERS : HNQIS2_TEMPLATE_HEADERS),
-                        (4 + (2 * index) + indexModifier)
+                        (4 + (2 * index) + indexModifier),
+                        (isTracker ? 1 : 2)
                     )
-
                     if (!currentTemplateData.status) return;
                     templateData.push(currentTemplateData);
 
@@ -225,7 +226,6 @@ const Importer = (
             })
         })
 
-        //TODO: Reuse importReader content as much as possible
         let importedProgramSections = [];
         if (teaData) {
             let programSectionIndex = -1;
@@ -279,7 +279,7 @@ const Importer = (
                     currentTEAData.sections.push(previousPS)
                 })
             }
-            
+
             countChanges({
                 sections: importedProgramSections,
                 sectionsSummary: importSummaryValues.teaSummary.programSections,
@@ -291,20 +291,17 @@ const Importer = (
         }
 
 
-
-
-
         importSummaryValues.program = programDetails;
         importSummaryValues.mapping = mappingDetails;
-        importSummaryValues.importedProgramSections = importedProgramSections;
 
-        console.warn(importSummaryValues, importedStages)
+        console.warn(importSummaryValues, { teas: importedProgramSections, importedStages })
 
+        setImportSummary(importSummaryValues);
         /*
     
         console.log({ templateData, mappingDetails, importedSections, importedScores, importSummaryValues })
         // Set new sections & questions
-        setImportSummary(importSummaryValues);
+        
         setImportResults(importSummaryValues);
         setSaveStatus('Validate & Save');
         setSavedAndValidated(false);
@@ -323,39 +320,48 @@ const Importer = (
         programMetadata.setProgramMetadata(programMetadata_new);*/
     }
 
-    return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
+    return (<CustomMUIDialog open={true} maxWidth={isTracker(programSpecificType)?'lg':'sm'} fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
             Template Importer
         </CustomMUIDialogTitle >
-        <DialogContent dividers style={{ padding: '1em 2em' }}>
+        <DialogContent dividers style={{ display: 'flex', flexDirection: isTracker(programSpecificType) ?'row':'column', justifyContent: 'space-between', padding: '1em 2em' }}>
+            <div style={{ width: isTracker(programSpecificType) ? '49%' : '100%', maxHeight: '30rem', overflow: 'scroll', overflowX: 'hidden' }}>
+                {(currentTask || executedTasks.length > 0) &&
+                    <div style={{ width: '100%', marginBottom: '1em' }}>
+                        <ImportStatusBox
+                            title='HNQIS Configuration - Import Status'
+                            currentTask={currentTask}
+                            executedTasks={executedTasks}
+                            isError={isNotificationError}
+                        />
+                    </div>
+                }
+                {importSummary && programSpecificType === TEMPLATE_PROGRAM_TYPES.hnqis2 &&
+                    <ImportSummary title='Import Summary' importCategories={[
+                        { name: 'Questions', content: importSummary.questions },
+                        { name: 'Sections', content: importSummary.sections },
+                        { name: 'Scores', content: importSummary.scores }
+                    ]} />
+                }
 
-            {(currentTask || executedTasks.length > 0) &&
-                <div style={{ width: '100%', marginBottom: '1em' }}>
-                    <ImportStatusBox
-                        title='HNQIS Configuration - Import Status'
-                        currentTask={currentTask}
-                        executedTasks={executedTasks}
-                        isError={isNotificationError}
-                    />
-                </div>
-            }
-            {importSummary && programSpecificType === TEMPLATE_PROGRAM_TYPES.hnqis2 &&
-                <ImportSummary title='Import Summary' importCategories={[
-                    { name: 'Questions', content: importSummary.questions },
-                    { name: 'Sections', content: importSummary.sections },
-                    { name: 'Scores', content: importSummary.scores }
-                ]} />
-            }
+                {!importSummary &&
+                    <FileSelector fileName={fileName} setFile={setFile} acceptedFiles={".xlsx"} />
+                }
+            </div>
 
             {importSummary && isTracker(programSpecificType) &&
-                /*<ImportSummary title=`Import Summary - ${}` importCategories={[
-                    { name: 'Sections', content: importSummary.sections },
-                    { name: 'Data Elements', content: importSummary.questions }
-                ]} />*/<></>
-            }
-
-            {!importSummary &&
-                <FileSelector fileName={fileName} setFile={setFile} acceptedFiles={".xlsx"} />
+                <div style={{ width: '49%', maxHeight: '30rem', overflow: 'scroll', overflowX: 'hidden'}}>
+                    {importSummary.teaSummary && <ImportSummary title={`Import Summary - Tracked Entity Attributes`} importCategories={[
+                        { name: 'Sections', content: importSummary.teaSummary.programSections },
+                        { name: 'Tracked Entity Attributes', content: importSummary.teaSummary.teas }
+                    ]} />}
+                    {importSummary.stages.map((stage, index) => {
+                        return <ImportSummary key={stage.stageName+index} title={`Import Summary - ${stage.stageName}`} importCategories={[
+                            { name: 'Sections', content: stage.sections },
+                            { name: 'Stage Data Elements', content: stage.dataElements }
+                        ]} />
+                    })}
+                </div>
             }
 
         </DialogContent>

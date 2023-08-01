@@ -212,3 +212,25 @@ export const setUpProgramStageSections = (programStage) => {
     else
         return [buildBasicFormStage(programStage.programStageDataElements)];
 }
+
+export const hasAttributeValue = (json, key) => {
+    if (typeof json[key] !== 'undefined')
+        return (json[key] !== "");
+    return false;
+}
+
+export const isNum = (value) => {
+    return !isNaN(value);
+}
+
+export const isEmpty = (str) => {
+    return (!str || str.length === 0);
+}
+
+export const isBlank = (str) => {
+    return (!str || /^\s*$/.test(str));
+}
+
+export const isValidParentName = (json, key) => {
+    return (/_S\d+Q\d+/.test(json[key]))
+}
