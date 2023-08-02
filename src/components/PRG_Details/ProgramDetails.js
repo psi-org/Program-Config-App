@@ -1,4 +1,4 @@
-import { useDataQuery } from "@dhis2/app-runtime";
+import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useSelector } from "react-redux";
 import { Chip, CircularLoader, NoticeBox } from '@dhis2/ui';
 
@@ -21,6 +21,9 @@ import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 import DataProcessorTracker from "../Excel/DataProcessorTracker";
 import Importer from "../Excel/Importer";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants";
+import { Button } from "@mui/material";
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ConstructionIcon from '@mui/icons-material/Construction';
 
 const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,description,displayName,domainType,formName,id,legendSet,legendSets[id,name],name,optionSet[id,name],optionSetValue,sharing,shortName,style,valueType';
 const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style`;
@@ -38,13 +41,32 @@ const query = {
     },
 };
 
+const createMutation = {
+    resource: 'metadata',
+    type: 'create',
+    data: ({ data }) => data
+};
+
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 const ProgramDetails = () => {
 
-    const h2Ready = localStorage.getItem('h2Ready') === 'true'
+    const h2Ready = localStorage.getItem('h2Ready') === 'true';
+    
+    let metadataDM = useDataMutation(createMutation, {
+        onError: (err) => {
+            console.error(err)
+        }
+    });
+    
+    const createMetadata = {
+        mutate: metadataDM[0],
+        loading: metadataDM[1].loading,
+        error: metadataDM[1].error,
+        data: metadataDM[1].data
+    };
 
     const { id } = useParams();
     const [showStageForm, setShowStageForm] = useState(false);
@@ -55,11 +77,11 @@ const ProgramDetails = () => {
     const [importerEnabled, setImporterEnabled] = useState(false);
     const [exportToExcel, setExportToExcel] = useState(false);
     const [exportStatus, setExportStatus] = useState("Download Template");
+    const [saveStatus, setSaveStatus] = useState('Validate');
     const [importResults, setImportResults] = useState();
-
-    // IMPORT TEMPLATE SCOPE
-    const [importDialog, setImportDialog] = useState(false);
-    // 
+    const [savedAndValidated, setSavedAndValidated] = useState(false)
+    const [savingMetadata, setSavingMetadata] = useState(false);
+    const [addedSection, setAddedSection] = useState()
 
     useEffect(() => {
     }, [exportToExcel, setExportStatus])
@@ -103,6 +125,17 @@ const ProgramDetails = () => {
         </div>
     )
 
+    const commit = () => {
+        setAddedSection(undefined)
+        //TODO: Validate imported settings
+        //TODO: Save Changes after validation
+        /*if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
+        let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
+        setRemovedElements(removed)*/
+        setSavingMetadata(true);
+        return;
+    };
+
     return (
         <div>
             <div className="sub_nav">
@@ -127,6 +160,23 @@ const ProgramDetails = () => {
                     {
                         !hnqisMode &&
                         <>
+                            <Button
+                                color='inherit'
+                                size='medium'
+                                variant='outlined'
+                                startIcon={<CheckCircleOutlineIcon />}
+                                disabled={createMetadata.loading || !data?.results}
+                                onClick={() => commit()}
+                            > {saveStatus}</Button>
+
+                            <Button
+                                variant='contained'
+                                onClick={() => { }}
+                                startIcon={<ConstructionIcon />}
+                                size='medium'
+                                disabled={!savedAndValidated}
+                            >Set Up Program</Button>
+
                             <ImportDownloadButton
                                 value={selectedIndexTemplate}
                                 setValue={setSelectedIndexTemplate}
@@ -135,12 +185,13 @@ const ProgramDetails = () => {
                                 setImporterEnabled={setImporterEnabled}
                                 setExportToExcel={setExportToExcel}
                             />
+                            
                             {!hnqisMode && exportToExcel &&
                                 <DataProcessorTracker
                                     programId={program}
                                     isLoading={setExportToExcel}
                                     setStatus={setExportStatus}
-                                />}
+                            />}
                         </>
                     }
                 </div>
@@ -199,10 +250,11 @@ const ProgramDetails = () => {
                     <Importer
                         displayForm={setImporterEnabled}
                         setImportResults={setImportResults}
-                        importType='TRACKER'
+                        setSaveStatus={setSaveStatus}
                         currentStagesData={data.results.programStages}
                         programSpecificType={data.results.withoutRegistration ? TEMPLATE_PROGRAM_TYPES.event : TEMPLATE_PROGRAM_TYPES.tracker}
                         previous={{ stages: data.results.programStages, programSections: data.results.programSections, teas: data.results.programTrackedEntityAttributes }}
+                        setSavedAndValidated={setSavedAndValidated}
                     />
                 }
             </div>

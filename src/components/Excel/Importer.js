@@ -22,7 +22,6 @@ const Importer = (
     {
         displayForm,
         setImportResults,
-        importType,
         previous,
         currentStagesData,
         programSpecificType,
@@ -155,11 +154,16 @@ const Importer = (
 
                 });
 
-                if (isTracker) {
-                    importReadingTracker(teaData, templateData, programDetails, mappingDetails, programSpecificType);
-                } else {
-                    importReadingHNQIS(templateData, programDetails, mappingDetails)
-                }
+                let importSummaryValues =
+                    isTracker
+                        ?  importReadingTracker(teaData, templateData, programDetails, mappingDetails, programSpecificType)
+                        : importReadingHNQIS(templateData, programDetails, mappingDetails);
+                
+
+                setImportSummary(importSummaryValues);
+                setImportResults(importSummaryValues);
+                setSaveStatus('Validate & Save');
+                setSavedAndValidated(false);
             }
         }
         setButtonDisabled(false);
@@ -183,12 +187,6 @@ const Importer = (
 
         console.log({ templateData, importedSections, importedScores, importSummaryValues })
 
-        // Set new sections & questions
-        setImportSummary(importSummaryValues);
-        setImportResults(importSummaryValues);
-        setSaveStatus('Validate & Save');
-        setSavedAndValidated(false);
-
         let newScoresSection = previous.scoresSection;
         newScoresSection.dataElements = importedScores;
         delete newScoresSection.errors;
@@ -201,6 +199,7 @@ const Importer = (
         programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
         programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
         programMetadata.setProgramMetadata(programMetadata_new);
+        return importSummaryValues;
     }
 
     const importReadingTracker = (teaData, templateData, programDetails, mappingDetails, programSpecificType) => {
@@ -293,31 +292,10 @@ const Importer = (
 
         importSummaryValues.program = programDetails;
         importSummaryValues.mapping = mappingDetails;
+        importSummaryValues.configurations = { teas: importedProgramSections, importedStages };
 
-        console.warn(importSummaryValues, { teas: importedProgramSections, importedStages })
-
-        setImportSummary(importSummaryValues);
-        /*
-    
-        console.log({ templateData, mappingDetails, importedSections, importedScores, importSummaryValues })
-        // Set new sections & questions
-        
-        setImportResults(importSummaryValues);
-        setSaveStatus('Validate & Save');
-        setSavedAndValidated(false);
-    
-        let newScoresSection = previous.scoresSection;
-        newScoresSection.dataElements = importedScores;
-        delete newScoresSection.errors;
-    
-        previous.setSections(importedSections);
-        previous.setScoresSection(newScoresSection);
-    
-        let programMetadata_new = programMetadata.programMetadata;
-        programMetadata_new.dePrefix = programDetails.dePrefix;
-        programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
-        programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
-        programMetadata.setProgramMetadata(programMetadata_new);*/
+        console.warn(importSummaryValues)
+        return importSummaryValues;
     }
 
     return (<CustomMUIDialog open={true} maxWidth={isTracker(programSpecificType)?'lg':'sm'} fullWidth={true} >

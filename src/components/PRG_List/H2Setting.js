@@ -51,7 +51,7 @@ const ouUnitQuery = {
 const H2Setting = forwardRef((props, ref) => {
     let id;
     const { loading: ouMetadataLoading, data: ouMetadata } = useDataQuery(orgUnitsQuery);
-    const { loading: ouLevelLoading, data: getOuLevel, refetch: ouLevelRefetch } = useDataQuery(ouUnitQuery, { variables: { id: id } });
+    const { loading: ouLevelLoading, data: getOuLevel, refetch: ouLevelRefetch, error: noOULevelFound } = useDataQuery(ouUnitQuery, { variables: { id: id } });
 
     const { data: haQuery, refetch: findHealthAreas } = useDataQuery(query, {
         lazy: true,
@@ -143,6 +143,7 @@ const H2Setting = forwardRef((props, ref) => {
             if (props.pcaMetadata?.ouRoot) {
                 setSelectedOrgUnits([props.pcaMetadata?.ouRoot])
                 ouLevelRefetch({ id: props.pcaMetadata?.ouRoot }).then(data => {
+                    console.log(data)
                     if (typeof data.result !== "undefined") {
                         let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level >= data.result.level);
                         setOrgUnitPathSelected([data.result.path])

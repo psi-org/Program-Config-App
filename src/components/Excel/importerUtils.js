@@ -152,7 +152,6 @@ const getWorksheetData = (status, task, { currentWorksheet, templateHeadersList,
     let dataRow = 3;
 
     currentWorksheet.eachRow((row, rowIndex) => {
-        console.log(row.values)
         if (rowIndex >= dataRow && row.values[structureColumn]) {
             let dataRow = {};
             let rowVals = row.values;

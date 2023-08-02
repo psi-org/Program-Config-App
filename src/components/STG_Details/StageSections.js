@@ -930,7 +930,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 <Importer
                     displayForm={setImporterEnabled}
                     setImportResults={setImportResults}
-                    importType='H2'
                     programSpecificType={TEMPLATE_PROGRAM_TYPES.hnqis2}
                     previous={{ sections, setSections, scoresSection, setScoresSection }}
                     setSaveStatus={setSaveStatus}
@@ -1158,8 +1157,12 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 </div>
                             )}
                         </Droppable>
-                        {hnqisMode && (isSectionMode) && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection?.id || "crit"} />}
-                        {hnqisMode && (isSectionMode) && <Scores stageSection={scoresSection} index={0} key={scoresSection?.id || "scores"} program={programId} />}
+                        {hnqisMode && (isSectionMode) && 
+                            <>
+                                <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection?.id || "crit"} />
+                                <Scores stageSection={scoresSection} index={0} key={scoresSection?.id || "scores"} program={programId} />
+                            </>
+                        }
 
                     </div>
                 </div>
@@ -1184,8 +1187,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     importedScores={scoresSection}
                     criticalSection={criticalSection}
                     removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : removedElements /*[]*/}
-
-                    // createMetadata={createMetadata}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
                     previous={{ sections, setSections, scoresSection, setScoresSection }}
