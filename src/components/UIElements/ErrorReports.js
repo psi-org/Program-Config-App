@@ -1,62 +1,44 @@
-// *** Modules ***
-import $ from 'jquery';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 
 // *** IMAGES ***
-import sec_svg from './../../images/i-drag_black.svg';
-import scores_svg from './../../images/scores.svg';
-import de_svg from './../../images/i-drag_black.svg';
-import warning_svg from './../../images/i-warning.svg';
 import error_svg from './../../images/i-error.svg';
-import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import BadgeWarnings from "./BadgeWarnings";
-import BadgeErrors from "./BadgeErrors";
-import ValidationMessages from "./ValidationMessages";
-
-const FEEDBACK_ORDER = "LP171jpctBm";
-
 const ErrorReports = ({ errors }) => {
 
-    useEffect(() => {
-        $('img.bsct_cta').off().on("click", function (e) {
-            if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
-                $(this).attr('src', contracted_bottom_svg);
-                $(this).parent().parent().css({
-                    'margin': '8px 8px 0px 8px',
-                    'border-radius': '4px 4px 0 0'
-                });
-                $(this).parent().parent().next().css({
-                    'display': 'block'
-                });
-            } else {
-                $(this).attr('src', expanded_bottom_svg);
-                $(this).parent().parent().css({
-                    'margin': '0x',
-                    'border-radius': '4px'
-                });
-                $(this).parent().parent().next().css({
-                    'display': 'none'
-                });
-            }
-        });
-    }, []);
+    const [expanded, setExpanded] = useState(false)
 
     return (
         <div>
-            <div className="ml_item" style={{color:"#333333" , backgroundColor: "#ffe0b2", border: "0.5px solid #ffddc1", borderRadius: "4px"}}>
+            <div
+                className="ml_item"
+                style={{
+                    color: "#333333",
+                    backgroundColor: "#ffe0b2",
+                    border: "0.5px solid #ffddc1",
+                    borderRadius: expanded ? '4px 4px 0 0' : '4px',
+                    marginBottom: expanded ? '0' : '0.5em'
+                }}>
                 <div className="ml_list-icon">
                     <img className="ml_list-img" alt="sec" src={error_svg} />
                 </div>
-                <div className="ml_item-title">{'Errors Summary'}</div>
+                <div className="ml_item-title">
+                    <span>Errors Summary</span>
+                </div>
                 <div className="ml_item-desc"></div>
                 <div className="ml_item-warning_error "></div>
-                <div className="ml_item-cta">
-                    <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} />
+                <div className="ml_item-cta" onClick={() => setExpanded(!expanded)}>
+                    <img className="bsct_cta" alt="exp" src={expanded ? contracted_bottom_svg : expanded_bottom_svg} />
                 </div>
             </div>
-            <div className="section_cont" style={{backgroundColor:"#fff3e0"}}>
+            <div
+                className="section_cont"
+                style={{
+                    backgroundColor: "#fff3e0",
+                    padding: '16px 16px 8px',
+                    marginBottom: '0.5em',
+                    display: expanded ? 'block' : 'none'
+                }}>
                 <div className={"ml_item"} key={'errorsSummary_0'}>
                     <div className="ml_item-icon"></div>
                     <div className="ml_item-title">

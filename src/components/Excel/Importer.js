@@ -13,7 +13,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ImportSummary from "../UIElements/ImportSummary";
 import { getHNQIS2MappingList, getTrackerMappingList } from "../../configs/ExcelUtils";
 import FileSelector from "../UIElements/FileSelector";
-import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, getProgramDetailsTracker, buildHNQIS2Summary, buildTrackerSummary, isTracker, countChanges } from "./importerUtils";
+import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, getProgramDetailsTracker, buildHNQIS2Summary, buildTrackerSummary, isTracker, countChanges, getBasicForm } from "./importerUtils";
 import { setUpProgramStageSections } from "../../configs/Utils";
 
 //* Tracker Only: currentStagesData
@@ -70,6 +70,7 @@ const Importer = (
     const startImportProcess = (isTracker) => {
         setExecutedTasks([]);
         setButtonDisabled(true);
+        setImportResults(undefined);
         let indexModifier = 0;
         if (typeof selectedFile !== 'undefined') {
             if (!tasksHandler(1, 'Validating Template format (XLSX)', false, fileValidation, { setNotificationError, selectedFile })) return;
@@ -156,7 +157,7 @@ const Importer = (
 
                 let importSummaryValues =
                     isTracker
-                        ?  importReadingTracker(teaData, templateData, programDetails, mappingDetails, programSpecificType)
+                        ? importReadingTracker(teaData, templateData, programDetails, mappingDetails, programSpecificType)
                         : importReadingHNQIS(templateData, programDetails, mappingDetails);
                 
 
@@ -185,8 +186,6 @@ const Importer = (
         importSummaryValues.program = programDetails;
         importSummaryValues.mapping = mappingDetails;
 
-        console.log({ templateData, importedSections, importedScores, importSummaryValues })
-
         let newScoresSection = previous.scoresSection;
         newScoresSection.dataElements = importedScores;
         delete newScoresSection.errors;
@@ -199,6 +198,7 @@ const Importer = (
         programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
         programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
         programMetadata.setProgramMetadata(programMetadata_new);
+        
         return importSummaryValues;
     }
 
@@ -228,9 +228,12 @@ const Importer = (
         let importedProgramSections = [];
         if (teaData) {
             let programSectionIndex = -1;
+            let isBasicForm = false;
             teaData.forEach(row => {
                 switch (row[TRACKER_TEA_MAP.structure]) {
                     case 'Section':
+                        if (row[TRACKER_TEA_MAP.programSection] === 'basic-form' && programSectionIndex === -1) isBasicForm = true;
+                        if ((isBasicForm && importedProgramSections.length > 0)) break;
                         programSectionIndex += 1;
                         importedProgramSections[programSectionIndex] = {
                             id: row[TRACKER_TEA_MAP.programSection] || undefined,
@@ -238,11 +241,16 @@ const Importer = (
                             sortOrder: programSectionIndex,
                             trackedEntityAttributes: [],
                             importStatus: row[TRACKER_TEA_MAP.programSection] ? 'update' : 'new',
-                            isBasicForm: row[TRACKER_TEA_MAP.programSection] === 'basic-form'
+                            isBasicForm
                         }
                         row[TRACKER_TEA_MAP.programSection] ? importSummaryValues.teaSummary.programSections.updated++ : importSummaryValues.teaSummary.programSections.new++;
                         break;
                     case 'TEA':
+                        if (programSectionIndex === -1) {
+                            programSectionIndex += 1;
+                            isBasicForm = true;
+                            importedProgramSections[programSectionIndex] = getBasicForm('TEA');
+                        }
                         importedProgramSections[programSectionIndex].trackedEntityAttributes.push({
                             trackedEntityAttribute: { id: row[TRACKER_TEA_MAP.uid]?.result, name: row[TRACKER_TEA_MAP.name] },
                             valueType: row[TRACKER_TEA_MAP.valueType]?.result,
@@ -289,12 +297,10 @@ const Importer = (
             })
         }
 
-
         importSummaryValues.program = programDetails;
         importSummaryValues.mapping = mappingDetails;
         importSummaryValues.configurations = { teas: importedProgramSections, importedStages };
 
-        console.warn(importSummaryValues)
         return importSummaryValues;
     }
 

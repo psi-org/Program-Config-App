@@ -1,5 +1,5 @@
 const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, TRACKER_TEA_MAP } = require("../../configs/TemplateConstants");
-const { mapImportedDEHNQIS2, mapImportedDE, countChanges } = require("../Excel/importerUtils");
+const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm } = require("../Excel/importerUtils");
 
 const readTemplateData = (
     {
@@ -17,6 +17,7 @@ const readTemplateData = (
 
     const isHNQIS = mode === TEMPLATE_PROGRAM_TYPES.hnqis2;
     let sectionIndex = -1;
+    let isBasicForm = false;
     let importedSections = [];
     let importedScores = [];
     let dataElementsPool = currentSectionsData?.map(section => section.dataElements)
@@ -32,6 +33,8 @@ const readTemplateData = (
     templateData.forEach(row => {
         switch (row[templateMap.structure]) {
             case 'Section':
+                if (row[templateMap.programSection] === 'basic-form' && sectionIndex === -1) isBasicForm = true;
+                if ((isBasicForm && importedSections.length > 0)) break;
                 sectionIndex += 1;
                 if (isHNQIS && (row[HNQIS2_TEMPLATE_MAP.formName] == "Critical Steps Calculations" || row[HNQIS2_TEMPLATE_MAP.formName] == "Scores")) break;
                 importedSections[sectionIndex] = {
@@ -41,12 +44,17 @@ const readTemplateData = (
                     sortOrder: sectionIndex,
                     dataElements: [],
                     importStatus: row[templateMap.programSection] ? 'update' : 'new',
-                    isBasicForm: row[templateMap.programSection] === 'basic-form'
+                    isBasicForm
                 }
                 row[templateMap.programSection] ? importSummaryValues.sections.updated++ : importSummaryValues.sections.new++;
                 break;
             case 'Data Element':
-                importedSections[sectionIndex].dataElements.push(mapImportedDE(row, programPrefix, optionSets, legendSets, dataElementsPool));
+                if (sectionIndex === -1) {
+                    sectionIndex += 1;
+                    isBasicForm = true;
+                    importedSections[sectionIndex] = getBasicForm('DE');
+                }
+                importedSections[isBasicForm?0:sectionIndex].dataElements.push(mapImportedDE(row, programPrefix, optionSets, legendSets, dataElementsPool));
                 break;
             case 'question':
             case 'label':

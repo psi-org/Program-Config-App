@@ -24,6 +24,9 @@ import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants";
 import { Button } from "@mui/material";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
+import Removed from "../UIElements/Removed";
+import ValidateTracker from "../Excel/ValidateTracker";
+import Errors from "../UIElements/Errors";
 
 const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,description,displayName,domainType,formName,id,legendSet,legendSets[id,name],name,optionSet[id,name],optionSetValue,sharing,shortName,style,valueType';
 const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style`;
@@ -79,9 +82,11 @@ const ProgramDetails = () => {
     const [exportStatus, setExportStatus] = useState("Download Template");
     const [saveStatus, setSaveStatus] = useState('Validate');
     const [importResults, setImportResults] = useState();
-    const [savedAndValidated, setSavedAndValidated] = useState(false)
+    const [savedAndValidated, setSavedAndValidated] = useState(false);
     const [savingMetadata, setSavingMetadata] = useState(false);
-    const [addedSection, setAddedSection] = useState()
+    const [validationResults, setValidationResults] = useState(undefined);
+    const [errorReports, setErrorReports] = useState(undefined);
+    const [removedElements, setRemovedElements] = useState([]);
 
     useEffect(() => {
     }, [exportToExcel, setExportStatus])
@@ -126,11 +131,11 @@ const ProgramDetails = () => {
     )
 
     const commit = () => {
-        setAddedSection(undefined)
+        console.log(importResults)
         //TODO: Validate imported settings
         //TODO: Save Changes after validation
-        /*if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
-        let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
+        if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
+        /*let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
         setRemovedElements(removed)*/
         setSavingMetadata(true);
         return;
@@ -152,7 +157,7 @@ const ProgramDetails = () => {
                                 color='inherit'
                                 startIcon={<AddCircleOutlineIcon />}
                                 onClick={() => setShowStageForm(true)}
-                                disabled={showStageForm}>
+                                disabled={showStageForm || importResults !== undefined}>
                                 Add Program Stage
                             </MuiButton>
                         </>
@@ -175,7 +180,7 @@ const ProgramDetails = () => {
                                 startIcon={<ConstructionIcon />}
                                 size='medium'
                                 disabled={!savedAndValidated}
-                            >Set Up Program</Button>
+                            >Build Program Rules</Button>
 
                             <ImportDownloadButton
                                 value={selectedIndexTemplate}
@@ -214,27 +219,49 @@ const ProgramDetails = () => {
             <div className="wrapper" style={{ padding: '1em 1.2em 0' }}>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
-                        {
-                            data.results.programStages.sort((stageA, stageB) =>
-                                (stageA.sortOrder > stageB.sortOrder) ? 1 : ((stageA.sortOrder < stageB.sortOrder) ? -1 : 0)
-                            ).map((programStage) => {
-                                return (
-                                    <StageItem
-                                        stage={programStage}
-                                        key={programStage.id}
-                                        setNotification={setNotification}
-                                        stagesRefetch={refetch}
-                                        setNewStage={setNewStage}
-                                        editStatus={newStage?.stage === programStage.id && newStage?.mode}
-                                        hnqisMode={hnqisMode}
-                                        eventMode={data.results.withoutRegistration}
-                                    />
-                                )
-                            })
+                        {/*
+                            validationResults &&
+                            <Errors validationResults={validationResults} index={0} key={"validationSec"} />
+                        */}
+                        {importResults &&
+                            <Removed
+                            removedItems={
+                                (importResults.teaSummary
+                                    ? importResults.teaSummary.teas.removedItems
+                                    : []
+                                ).concat(importResults.stages.map(stage =>
+                                    stage.dataElements.removedItems
+                                ).flat())
+                            }
+                            index={0}
+                            key={"removedSec"}
+                            tagText='Object(s)'
+                            />
                         }
-                        {data.results.programStages.length === 0 &&
-                            <div className="title" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2em' }}>There are currently no Stages in this Program</div>
-                        }
+                        <div style={{width: '100%', padding: '0.5em 0'}}>
+                            {
+                                data.results.programStages.sort((stageA, stageB) =>
+                                    (stageA.sortOrder > stageB.sortOrder) ? 1 : ((stageA.sortOrder < stageB.sortOrder) ? -1 : 0)
+                                ).map((programStage) => {
+                                    return (
+                                        <StageItem
+                                            stage={programStage}
+                                            key={programStage.id}
+                                            setNotification={setNotification}
+                                            stagesRefetch={refetch}
+                                            setNewStage={setNewStage}
+                                            editStatus={newStage?.stage === programStage.id && newStage?.mode}
+                                            hnqisMode={hnqisMode}
+                                            eventMode={data.results.withoutRegistration}
+                                        />
+                                    )
+                                })
+                            }
+                            {data.results.programStages.length === 0 &&
+                                <div className="title" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2em' }}>There are currently no Stages in this Program</div>
+                            }
+                        </div>
+                        
                     </div>
                 </div>
                 {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName} setNewStage={setNewStage} />}
@@ -255,6 +282,20 @@ const ProgramDetails = () => {
                         programSpecificType={data.results.withoutRegistration ? TEMPLATE_PROGRAM_TYPES.event : TEMPLATE_PROGRAM_TYPES.tracker}
                         previous={{ stages: data.results.programStages, programSections: data.results.programSections, teas: data.results.programTrackedEntityAttributes }}
                         setSavedAndValidated={setSavedAndValidated}
+                    />
+                }
+                {
+                    savingMetadata &&
+                    <ValidateTracker
+                        importResults={importResults}
+                        setImportResults={setImportResults}
+                        programMetadata={data.results}
+                        programSpecificType={data.results.withoutRegistration ? TEMPLATE_PROGRAM_TYPES.event : TEMPLATE_PROGRAM_TYPES.tracker}
+                        setSavingMetadata={setSavingMetadata}
+                        setSavedAndValidated={setSavedAndValidated}
+                        setValidationResults={setValidationResults}
+                        setErrorReports={setErrorReports}
+                        refetchProgram={refetch}
                     />
                 }
             </div>

@@ -1,40 +1,51 @@
 import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
-import { hasAttributeValue, isBlank, isNum, isValidParentName } from "./Utils";
+import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isNum, isValidParentName } from "./Utils";
 
 export const HNQIS2_VALIDATION_SETTINGS = {
     programDetails: {
-        enable: true,
-        checkHasFormName: { enable: true, title: "Form name not defined for element", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
-        checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).` } },
+        enabled: true,
+        checkHasFormName: { enabled: true, title: "Element Form Name is not defined", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
+        checkFormNameLength: { enabled: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).` } },
         //Disabled validation EXW103
-        structureMatchesValue: { enable: false, title: "Label should be LONG_TEXT", errorMsg: { code: "EXW103", text: "The expected Value Type for the label Data Element is LONG_TEXT." } },
-        hasFeedbackOrder: { enable: true, title: "Missing Feedback Order", errorMsg: { code: "EXW107", text: "The specified question has Numerator and Denominator assigned but does not contribute to any score." } },
-        hasVarName: { enable: true, title: "Parent Name not valid", errorMsg: { code: "EXW110", text: "The specified question does not have a valid Parent Name." } },
-        hasBothNumeratorDenominator: { enable: true, title: "Numerator or Denominator missing", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (Numerator or Denominator)" } },
-        validAggregationType: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW104", text: "The expected Aggregation Operator for the label Data Element is NONE" } },
-        validAggregationQuestion: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW105", text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for Integer and Number types, and NONE for text inputs)" } },
-        isNumeratorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW105", text: "The specified question Numerator is not numeric" } },
-        isDenominatorNumeric: { enable: true, title: "Score is not numeric", errorMsg: { code: "EXW108", text: "The specified question Denominator is not numeric" } },
-        hasParentQuestionNAnswerValue: { enable: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } },
-        matchesScore: { enable: true, title: "Score container not found", errorMsg: { code: "EXW110", text: "The specified question has been assigned to a score that is not defined." } }
+        structureMatchesValue: { enabled: false, title: "Label should be LONG_TEXT", errorMsg: { code: "EXW103", text: "The expected Value Type for the label Data Element is LONG_TEXT." } },
+        hasFeedbackOrder: { enabled: true, title: "Missing Feedback Order", errorMsg: { code: "EXW107", text: "The specified question has Numerator and Denominator assigned but does not contribute to any score." } },
+        hasVarName: { enabled: true, title: "Parent Name not valid", errorMsg: { code: "EXW110", text: "The specified question does not have a valid Parent Name." } },
+        hasBothNumeratorDenominator: { enabled: true, title: "Numerator or Denominator missing", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (Numerator or Denominator)" } },
+        validAggregationType: { enabled: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW104", text: "The expected Aggregation Operator for the label Data Element is NONE" } },
+        validAggregationQuestion: { enabled: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW105", text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for Integer and Number types, and NONE for text inputs)" } },
+        isNumeratorNumeric: { enabled: true, title: "Score is not numeric", errorMsg: { code: "EXW105", text: "The specified question Numerator is not numeric" } },
+        isDenominatorNumeric: { enabled: true, title: "Score is not numeric", errorMsg: { code: "EXW108", text: "The specified question Denominator is not numeric" } },
+        hasParentQuestionNAnswerValue: { enabled: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } },
+        matchesScore: { enabled: true, title: "Score container not found", errorMsg: { code: "EXW110", text: "The specified question has been assigned to a score that is not defined." } }
     },
     scores: {
-        enable: true,
-        checkHasFormName: { enable: true, title: "Form name not defined for element", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
-        checkFormNameLength: { enable: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).` } },
+        enabled: true,
+        checkHasFormName: { enabled: true, title: "Element Form Name is not defined", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
+        checkFormNameLength: { enabled: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).` } },
         //Disabled validation EXW102
-        structureMatchesValue: { enable: false, title: "Score should be NUMBER", errorMsg: { code: "EXW102", text: "The expected Value Type for the score Data Element is NUMBER." } },
-        hasScoreFeedbackOrder: { enable: true, title: "Missing Feedback Order", errorMsg: { code: "EXW111", text: "The specified score Data Element lacks Feedback Order." } },
-        hasBothNumeratorDenominator: { enable: true, title: "Numerator or Denominator missing", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (Numerator or Denominator)" } },
-        validAggregationType: { enable: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW103", text: "The expected Aggregation Operator for the score Data Element is AVERAGE" } }
+        structureMatchesValue: { enabled: false, title: "Score should be NUMBER", errorMsg: { code: "EXW102", text: "The expected Value Type for the score Data Element is NUMBER." } },
+        hasScoreFeedbackOrder: { enabled: true, title: "Missing Feedback Order", errorMsg: { code: "EXW111", text: "The specified score Data Element lacks Feedback Order." } },
+        hasBothNumeratorDenominator: { enabled: true, title: "Numerator or Denominator missing", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (Numerator or Denominator)" } },
+        validAggregationType: { enabled: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW103", text: "The expected Aggregation Operator for the score Data Element is AVERAGE" } }
     },
     feedbackOrder: {
-        enable: true,
-        checkGaps: { enable: true, title: "Feedback Order gap found", errorMsg: { code: "EW106", text: "A Feedback Order Gap was found, was expecting one of the following values" } },
-        checkDuplicated: { enable: true, title: "Duplicated Feedback Order found", errorMsg: { code: "EW107", text: "The specified Feedback Order is shared by the Data Elements with the following codes" } },
+        enabled: true,
+        checkGaps: { enabled: true, title: "Feedback Order gap found", errorMsg: { code: "EW106", text: "A Feedback Order Gap was found, was expecting one of the following values" } },
+        checkDuplicated: { enabled: true, title: "Duplicated Feedback Order found", errorMsg: { code: "EW107", text: "The specified Feedback Order is shared by the Data Elements with the following codes" } },
         //Error Equivalents for Data Elements
-        duplicatedFO: { enable: true, title: "Duplicated Feedback Order found", errorMsg: { code: "EW107", text: "The specified Data Element contains a duplicated Feedback Order." } },
-        gapFO: { enable: true, title: "Feedback Order gap found", errorMsg: { code: "EW106", text: "The specified Data Element generates a gap in the Feedback Order sequence." } }
+        duplicatedFO: { enabled: true, title: "Duplicated Feedback Order found", errorMsg: { code: "EW107", text: "The specified Data Element contains a duplicated Feedback Order." } },
+        gapFO: { enabled: true, title: "Feedback Order gap found", errorMsg: { code: "EW106", text: "The specified Data Element generates a gap in the Feedback Order sequence." } }
+    }
+}
+
+export const TRACKER_VALIDATION_SETTINGS = {
+    dataElements: {
+        enabled: true,
+        checkHasFormName: { enabled: true, title: "Element Name is not defined", errorMsg: { code: "EXW100", text: "A Name was not defined for the specified element." } },
+    },
+    teas: {
+        enabled: true,
+        checkHasName: { enabled: true, title: "Element Form Name is not defined", errorMsg: { code: "EXW100", text: "A Name was not defined for the specified element." } },
     }
 }
 
@@ -126,18 +137,18 @@ export function validateFeedbacks(hnqisMode, sections) {
     let feedbacksWarnings = [];
 
     const feedbackOrderValidationSettings = HNQIS2_VALIDATION_SETTINGS.feedbackOrder;
-    if (feedbackOrderValidationSettings.enable) {
+    if (feedbackOrderValidationSettings.enabled) {
 
         let feedbackData = getFeedbackData(sections)
         let duplicatedFeedbacks = groupByKey(checkDuplicatedFeedbacks(hnqisMode, feedbackData), 'feedbackOrder')
 
-        if (feedbackOrderValidationSettings.checkDuplicated.enable) {
+        if (feedbackOrderValidationSettings.checkDuplicated.enabled) {
             duplicatedFeedbacks.forEach(df => {
                 feedbacksErrors.push({ msg: feedbackOrderValidationSettings.checkDuplicated.errorMsg, instance: df, elementError: feedbackOrderValidationSettings.duplicatedFO });
             })
         }
 
-        if (feedbackOrderValidationSettings.checkGaps.enable) {
+        if (feedbackOrderValidationSettings.checkGaps.enabled) {
             let index = 0
 
             while (index < feedbackData.length - 1) {
@@ -181,63 +192,63 @@ export function validateFeedbacks(hnqisMode, sections) {
     return { feedbacksErrors, feedbacksWarnings }
 }
 
-export const checkHasFormName = (metaData, dataElement) => {
-    if (metaData.elem !== "") {
-        if (metaData.elemType === "label") return (!isBlank(dataElement.labelFormName));
+export const checkHasFormName = ({ metadata, dataElement }) => {
+    if (metadata.elem !== "") {
+        if (metadata.elemType === "label") return (!isBlank(dataElement.labelFormName));
         return (!isBlank(dataElement.formName));
 
     }
     return true;
 }
 
-export const checkFormNameLength = (metaData, dataElement) => {
+export const checkFormNameLength = ({ metadata, dataElement }) => {
     let formName = dataElement.labelFormName || dataElement.formName;
-    if (metaData.elem !== "") {
+    if (metadata.elem !== "") {
         return (formName.replace(' [C]', '').length <= (MAX_DATA_ELEMENT_NAME_LENGTH) && formName.replace(' [C]', '').length >= MIN_DATA_ELEMENT_NAME_LENGTH)
     }
     return true;
 }
 
-export const structureMatchesValue = (metaData, dataElement, element, valueType) => {
-    if (metaData.elemType === element) return (dataElement.valueType === valueType);
+export const structureMatchesValue = ({ metadata, dataElement, element, valueType }) => {
+    if (metadata.elemType === element) return (dataElement.valueType === valueType);
     return true;
 }
 
-export const isNumeric = (metaData, type) => {
-    if (hasAttributeValue(metaData, type))
-        return isNum(metaData[type]);
+export const isNumeric = ({ metadata, property }) => {
+    if (hasAttributeValue(metadata, property))
+        return isNum(metadata[property]);
     return true;
 }
 
-export const hasFeedbackOrder = (metaData, dataElement) => {
-    if (hasAttributeValue(metaData, "scoreNum") && hasAttributeValue(metaData, "scoreDen"))
+export const hasFeedbackOrder = ({ metadata, dataElement }) => {
+    if (hasAttributeValue(metadata, "scoreNum") && hasAttributeValue(metadata, "scoreDen"))
         return (getFeedbackOrder(dataElement) !== "");
     return true;
 }
 
-export const hasScoreFeedbackOrder = (metaData, dataElement) => {
-    if (metaData.elemType === "score")
+export const hasScoreFeedbackOrder = ({ metadata, dataElement }) => {
+    if (metadata.elemType === "score")
         return (getFeedbackOrder(dataElement) !== "");
     return true;
 }
 
-export const hasVarName = (metaData, dataElement) => {
-    return hasAttributeValue(metaData, "varName") && isValidParentName(metaData, "varName")
+export const hasVarName = ({ metadata }) => {
+    return hasAttributeValue(metadata, "varName") && isValidParentName(metadata, "varName")
 }
 
-export const hasBothNumeratorDenominator = (metaData) => {
-    if (hasAttributeValue(metaData, "scoreNum")) return hasAttributeValue(metaData, "scoreDen");
-    else if (hasAttributeValue(metaData, "scoreDen")) return false;
+export const hasBothNumeratorDenominator = ({ metadata }) => {
+    if (hasAttributeValue(metadata, "scoreNum")) return hasAttributeValue(metadata, "scoreDen");
+    else if (hasAttributeValue(metadata, "scoreDen")) return false;
     return true;
 }
 
-export const hasBothParentQuestionNAnswerValue = (metaData) => {
-    if (hasAttributeValue(metaData, "parentQuestion")) return hasAttributeValue(metaData, "parentValue");
-    else if (hasAttributeValue(metaData, "parentValue")) return false;
+export const hasBothParentQuestionNAnswerValue = ({ metadata }) => {
+    if (hasAttributeValue(metadata, "parentQuestion")) return hasAttributeValue(metadata, "parentValue");
+    else if (hasAttributeValue(metadata, "parentValue")) return false;
     return true;
 }
 
-export const questionMatchesScore = (importedScores, dataElement) => {
+export const questionMatchesScore = ({ importedScores, dataElement }) => {
     let feedbackOrder = dataElement.attributeValues.find(attributeValue => attributeValue.attribute.id === FEEDBACK_ORDER)?.value;
     if (!feedbackOrder) return true
 
@@ -246,23 +257,18 @@ export const questionMatchesScore = (importedScores, dataElement) => {
     return compositeScores.includes(feedbackOrder)
 }
 
-export const getHNQISMetadata = (dataElement) => {
-    let jsonData = dataElement.attributeValues.filter(attributeValue => attributeValue.attribute.id === METADATA);
-    return (jsonData.length > 0) ? JSON.parse(jsonData[0].value) : '';
-}
-
 export const getFeedbackOrder = (dataElement) => {
     let feedbackOrder = dataElement.attributeValues.filter(attributeValue => attributeValue.attribute.id === FEEDBACK_ORDER);
     return (feedbackOrder.length > 0) ? feedbackOrder[0].value : '';
 }
 
-export const validAggregationType = (metaData, dataElement, element, aggregationOperation) => {
-    if (metaData.elemType === element) return (dataElement.aggregationType === aggregationOperation);
+export const validAggregationType = ({ metadata, dataElement, element, aggregationOperation }) => {
+    if (metadata.elemType === element) return (dataElement.aggregationType === aggregationOperation);
     return true;
 }
 
-export const validAggregationQuestion = (metaData, dataElement) => {
-    if (metaData.elemType === "question") {
+export const validAggregationQuestion = ({ metadata, dataElement }) => {
+    if (metadata.elemType === "question") {
         if (
             dataElement.valueType === "NUMBER" ||
             dataElement.valueType === "INTEGER"
@@ -278,41 +284,77 @@ export const validAggregationQuestion = (metaData, dataElement) => {
     return true;
 }
 
+export const checkHasProperty = ({ object, property }) => {
+    return (object[property] && !isBlank(object[property]));
+}
+
+const validate = (validation, validationFunction, params, errorsArray, negateResult = true) => {
+    let validationResult = validationFunction({ ...params });
+    if (negateResult) validationResult = !validationResult;
+    if (validation.enabled && validationResult)
+        errorsArray.push(validation.errorMsg);
+}
+
 export const validateSections = (importedScores, dataElement) => {
-    const programDetailsValidationSettings = HNQIS2_VALIDATION_SETTINGS.programDetails;
-    if (programDetailsValidationSettings.enable) {
+    const validations = HNQIS2_VALIDATION_SETTINGS.programDetails;
+    if (validations.enabled) {
         let errors = [];
-        let warnings = [];
-        let metaData = getHNQISMetadata(dataElement);
-        dataElement.labelFormName = metaData.labelFormName;
-        if (programDetailsValidationSettings.checkHasFormName.enable && !checkHasFormName(metaData, dataElement)) errors.push(programDetailsValidationSettings.checkHasFormName.errorMsg);
-        if (programDetailsValidationSettings.checkFormNameLength.enable && !checkFormNameLength(metaData, dataElement)) errors.push(programDetailsValidationSettings.checkFormNameLength.errorMsg);
-        if (programDetailsValidationSettings.structureMatchesValue.enable && !structureMatchesValue(metaData, dataElement, "label", "LONG_TEXT")) errors.push(programDetailsValidationSettings.structureMatchesValue.errorMsg);
-        if (programDetailsValidationSettings.hasFeedbackOrder.enable && !hasFeedbackOrder(metaData, dataElement)) errors.push(programDetailsValidationSettings.hasFeedbackOrder.errorMsg);
-        if (programDetailsValidationSettings.hasVarName.enable && !hasVarName(metaData, dataElement)) errors.push(programDetailsValidationSettings.hasVarName.errorMsg);
-        if (programDetailsValidationSettings.hasBothNumeratorDenominator.enable && !hasBothNumeratorDenominator(metaData)) errors.push(programDetailsValidationSettings.hasBothNumeratorDenominator.errorMsg);
-        if (programDetailsValidationSettings.validAggregationType.enable && !validAggregationType(metaData, dataElement, "label", "NONE")) errors.push(programDetailsValidationSettings.validAggregationType.errorMsg);
-        if (programDetailsValidationSettings.validAggregationQuestion.enable && !validAggregationQuestion(metaData, dataElement)) errors.push(programDetailsValidationSettings.validAggregationQuestion.errorMsg);
-        if (programDetailsValidationSettings.isNumeratorNumeric.enable && !isNumeric(metaData, "scoreNum")) errors.push(programDetailsValidationSettings.isNumeratorNumeric.errorMsg);
-        if (programDetailsValidationSettings.isDenominatorNumeric.enable && !isNumeric(metaData, "scoreDen")) errors.push(programDetailsValidationSettings.isDenominatorNumeric.errorMsg);
-        if (programDetailsValidationSettings.hasParentQuestionNAnswerValue.enable && !hasBothParentQuestionNAnswerValue(metaData)) errors.push(programDetailsValidationSettings.hasParentQuestionNAnswerValue.errorMsg);
-        if (programDetailsValidationSettings.matchesScore.enable && !questionMatchesScore(importedScores, dataElement)) errors.push(programDetailsValidationSettings.matchesScore.errorMsg);
+        let metadata = getPCAMetadataDE(dataElement);
+        dataElement.labelFormName = metadata.labelFormName;
+
+        validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errors);
+        validate(validations.checkFormNameLength, checkFormNameLength, { metadata, dataElement }, errors);
+        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element:'label', valueType: 'LONG_TEXT' }, errors);
+        validate(validations.hasFeedbackOrder, hasFeedbackOrder, { metadata, dataElement }, errors);
+        validate(validations.hasVarName, hasVarName, { metadata }, errors);
+        validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errors);
+        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'label', aggregationOperation: 'NONE'}, errors);
+        validate(validations.validAggregationQuestion, validAggregationQuestion, { metadata, dataElement }, errors);
+        validate(validations.isNumeratorNumeric, isNumeric, { metadata, property: 'scoreNum' }, errors);
+        validate(validations.isDenominatorNumeric, isNumeric, { metadata, property: 'scoreDen' }, errors);
+        validate(validations.hasParentQuestionNAnswerValue, hasBothParentQuestionNAnswerValue, { metadata }, errors);
+        validate(validations.matchesScore, questionMatchesScore, { importedScores, dataElement }, errors);
+
         if (errors.length > 0) dataElement.errors = errors;
     }
 }
 
 export const validateScores = (dataElement) => {
-    const scoreValidationSettings = HNQIS2_VALIDATION_SETTINGS.scores;
-    if (scoreValidationSettings.enable) {
+    const validations = HNQIS2_VALIDATION_SETTINGS.scores;
+    if (validations.enabled) {
         let errors = [];
-        let warnings = [];
-        let metaData = getHNQISMetadata(dataElement);
-        if (scoreValidationSettings.checkHasFormName.enable && !checkHasFormName(metaData, dataElement)) errors.push(scoreValidationSettings.checkHasFormName.errorMsg);
-        if (scoreValidationSettings.structureMatchesValue.enable && !structureMatchesValue(metaData, dataElement, "score", "NUMBER")) errors.push(scoreValidationSettings.structureMatchesValue.errorMsg);
-        if (scoreValidationSettings.hasScoreFeedbackOrder.enable && !hasScoreFeedbackOrder(metaData, dataElement)) errors.push(scoreValidationSettings.hasScoreFeedbackOrder.errorMsg);
-        if (scoreValidationSettings.hasBothNumeratorDenominator.enable && !hasBothNumeratorDenominator(metaData)) errors.push(scoreValidationSettings.hasBothNumeratorDenominator.errorMsg);
-        if (scoreValidationSettings.validAggregationType.enable && !validAggregationType(metaData, dataElement, "score", "AVERAGE")) errors.push(scoreValidationSettings.validAggregationType.errorMsg);
+        let metadata = getPCAMetadataDE(dataElement);
 
+        validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errors);
+        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element: 'score', valueType: 'NUMBER' }, errors);
+        validate(validations.hasScoreFeedbackOrder, hasScoreFeedbackOrder, { metadata, dataElement }, errors);
+        validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errors);
+        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'score', aggregationOperation: 'AVERAGE' }, errors);
+        
         if (errors.length > 0) dataElement.errors = errors;
     }
 }
+
+export const validateDataElement = (dataElement) => {
+    const validations = TRACKER_VALIDATION_SETTINGS.dataElements;
+    if (!validations.enabled) return;
+
+    let errors = [];
+    let metadata = getPCAMetadataDE(dataElement);
+    
+    if (errors.length > 0) dataElement.errors = errors;
+    
+}
+
+export const validateTEA = (tea, teaList) => {
+    const validations = TRACKER_VALIDATION_SETTINGS.teas;
+    if (!validations.enabled) return;
+
+    let errors = [];
+    validate(validations.checkHasName, checkHasProperty, { object: tea.trackedEntityAttribute, property: 'name' }, errors);
+    
+    if (errors.length > 0) tea.errors = errors;
+
+}
+
+export const getNewObjectsCount = (importResults) => extractAttributeValues(importResults, 'new').reduce((partialSum, a) => partialSum + a, 0)

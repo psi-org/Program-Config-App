@@ -1,4 +1,5 @@
 import { coerce, gte, lte } from 'semver';
+import { METADATA } from './Constants';
 
 export function splitPosition(position) {
     return position.split(/(\d+)/);
@@ -233,4 +234,24 @@ export const isBlank = (str) => {
 
 export const isValidParentName = (json, key) => {
     return (/_S\d+Q\d+/.test(json[key]))
+}
+
+export const extractAttributeValues = (obj, targetAttribute, resultList = []) => {
+    if (typeof obj === 'object' && obj !== null) {
+        if (obj[targetAttribute] !== undefined) {
+            resultList.push(obj[targetAttribute]);
+        }
+
+        for (const key in obj) {
+            if (typeof obj[key] === 'object' && obj[key] !== null) {
+                extractAttributeValues(obj[key], targetAttribute, resultList);
+            }
+        }
+    }
+    return resultList;
+}
+
+export const getPCAMetadataDE = (dataElement) => {
+    let jsonData = dataElement.attributeValues?.find(attributeValue => attributeValue.attribute.id === METADATA);
+    return jsonData ? JSON.parse(jsonData.value) : {};
 }

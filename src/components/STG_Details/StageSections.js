@@ -15,10 +15,10 @@ import DataProcessor from "../Excel/DataProcessor";
 import Importer from "../Excel/Importer";
 import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Scripting";
 import { Link } from "react-router-dom";
-import Removed from "./Removed";
+import Removed from "../UIElements/Removed";
 import ValidateMetadata from "./ValidateMetadata";
-import Errors from "./Errors";
-import ErrorReports from "./ErrorReports";
+import Errors from "../UIElements/Errors";
+import ErrorReports from "../UIElements/ErrorReports";
 
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -249,8 +249,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [importerEnabled, setImporterEnabled] = useState(false);
     const [importResults, setImportResults] = useState(false);
     const [progressSteps, setProgressSteps] = useState(0);
-    const [isValid, setIsValid] = useState(true);
-    const [validationResults, setValidationResults] = useState(false);
+    const [validationResults, setValidationResults] = useState();
 
     const [editSectionIndex, setEditSectionIndex] = useState(undefined);
     const [newSectionIndex, setNewSectionIndex] = useState(undefined);
@@ -280,7 +279,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     useEffect(() => {
         if (importerEnabled) {
             setErrorReports(undefined)
-            setValidationResults(false)
+            setValidationResults(undefined)
         }
     }, [importerEnabled])
 
@@ -1120,7 +1119,11 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                         }
                         {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
-                            <Removed importResults={importResults} index={0} key={"removedSec"} />
+                            <Removed
+                                removedItems={importResults.questions.removedItems.concat(importResults.scores.removedItems)}
+                                index={0}
+                                key={"removedSec"}
+                            />
                         }
                         {
                             validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0 || validationResults.feedbacks.length > 0) &&
@@ -1186,13 +1189,12 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     importedSections={sections}
                     importedScores={scoresSection}
                     criticalSection={criticalSection}
-                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : removedElements /*[]*/}
+                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : removedElements}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
                     previous={{ sections, setSections, scoresSection, setScoresSection }}
                     setImportResults={setImportResults}
                     importResults={importResults}
-                    setIsValid={setIsValid}
                     setValidationResults={setValidationResults}
                     programMetadata={programMetadata}
                     setErrorReports={setErrorReports}

@@ -14,7 +14,26 @@ import { validateFeedbacks, validateScores, validateSections, verifyProgramDetai
 
 
 
-const ValidateMetadata = (props) => {
+const ValidateMetadata = (
+    { 
+        hnqisMode,
+        newDEQty,
+        programStage,
+        importedSections,
+        importedScores,
+        criticalSection,
+        removedItems,
+        setSavingMetadata,
+        setSavedAndValidated,
+        previous,
+        setImportResults,
+        importResults,
+        setValidationResults,
+        programMetadata,
+        setErrorReports,
+        refetchProgramStage
+    }
+) => {
     let validationResults = {};
     const [processed, setProcessed] = useState(false);
     const [valid, setValid] = useState(false);
@@ -22,11 +41,12 @@ const ValidateMetadata = (props) => {
     const [validationMessage, setValidationMessage] = useState("Metadata validated. Please use the 'SAVE' button to persist your changes.");
 
     useEffect(() => {
-        const importedSections = props.importedSections;
-        const importedScore = props.importedScores;
+        const importedSectionsV = importedSections;
+        const importedScoresV = importedScores;
+        console.log(importedSections);
         let errorCounts = 0;
 
-        if (verifyProgramDetail(props.importResults, setValidationMessage)) {
+        if (verifyProgramDetail(importResults, setValidationMessage)) {
             let questions = [];
             let scores = [];
 
@@ -36,8 +56,8 @@ const ValidateMetadata = (props) => {
             let feedbacksErrors, feedbacksWarnings
 
             // CHECK FEEDBACK DATA
-            if (props.hnqisMode) {
-                let validateResults = validateFeedbacks(props.hnqisMode, importedSections.concat(importedScore))
+            if (hnqisMode) {
+                let validateResults = validateFeedbacks(hnqisMode, importedSectionsV.concat(importedScoresV))
                 feedbacksErrors = validateResults.feedbacksErrors
                 feedbacksWarnings = validateResults.feedbacksWarnings
                 
@@ -46,13 +66,13 @@ const ValidateMetadata = (props) => {
             }
 
             //ADD FEEDBACK ERRORS TO DATA ELEMENTS
-            if (props.hnqisMode) importedSections.forEach((section) => {
+            if (hnqisMode) importedSectionsV.forEach((section) => {
                 delete section.errors
                 let section_errors = 0;
                 section.dataElements.forEach((dataElement) => {
                     delete dataElement.errors
 
-                    validateSections(props.importedScores, dataElement);
+                    validateSections(importedScores, dataElement);
                     if (dataElement.errors) questions.push(dataElement);
 
                     if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {
@@ -72,8 +92,8 @@ const ValidateMetadata = (props) => {
             });
 
             let score_errors = 0;
-            delete importedScore.errors
-            if (props.hnqisMode) importedScore.dataElements.forEach((dataElement) => {
+            delete importedScoresV.errors
+            if (hnqisMode) importedScoresV.dataElements.forEach((dataElement) => {
                 delete dataElement.errors
                 validateScores(dataElement);
                 if (dataElement.errors) scores.push(dataElement);
@@ -93,19 +113,19 @@ const ValidateMetadata = (props) => {
                 }
 
             });
-            if (score_errors > 0) importedScore.errors = score_errors;
+            if (score_errors > 0) importedScoresV.errors = score_errors;
 
             // SUMMARY - RESULTS
             if (errorCounts === 0) {
                 setValid(true);
-                props.setValidationResults(false);
+                setValidationResults(false);
             } else {
                 setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
-                props.setSavingMetadata(false);
-                props.setValidationResults(validationResults);
+                setSavingMetadata(false);
+                setValidationResults(validationResults);
             }
-            props.previous.setSections(importedSections);
-            props.previous.setScoresSection(importedScore);
+            previous.setSections(importedSectionsV);
+            previous.setScoresSection(importedScoresV);
 
 
         } else {
@@ -115,37 +135,37 @@ const ValidateMetadata = (props) => {
     });
 
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
-        <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => props.setSavingMetadata(false)}>
-            {props.hnqisMode ? 'Assessment Validation' : 'Save changes into the server?'}
+        <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => setSavingMetadata(false)}>
+            {hnqisMode ? 'Assessment Validation' : 'Save changes into the server?'}
         </CustomMUIDialogTitle >
         <DialogContent dividers style={{ padding: '1em 2em' }}>
-            {props.hnqisMode &&
+            {hnqisMode &&
                 <NoticeBox error={!valid} title={processed ? "Sections and Scores Validated" : "Validating Sections and Scores"}>
                     {!processed && <CircularLoader small />}
                     {validationMessage}
                 </NoticeBox>
             }
-            {!props.hnqisMode && 'This action cannot be undone'}
+            {!hnqisMode && 'This action cannot be undone'}
         </DialogContent>
 
         <DialogActions style={{ padding: '1em' }}>
-            <Button color="error" disabled={!processed} onClick={() => props.setSavingMetadata(false)}> Close </Button>
+            <Button color="error" disabled={!processed} onClick={() => setSavingMetadata(false)}> Close </Button>
             <Button variant='outlined' startIcon={<SaveIcon />} disabled={!valid} onClick={() => setSave(true)}> Save </Button>
             {save &&
                 <SaveMetadata
-                    hnqisMode={props.hnqisMode}
-                    newDEQty={props.newDEQty}
-                    programStage={props.programStage}
-                    importedSections={props.importedSections}
-                    importedScores={props.importedScores}
-                    criticalSection={props.criticalSection}
-                    setSavingMetadata={props.setSavingMetadata}
-                    setSavedAndValidated={props.setSavedAndValidated}
-                    removedItems={props.removedItems}
-                    programMetadata={props.programMetadata}
-                    setImportResults={props.setImportResults}
-                    setErrorReports={props.setErrorReports}
-                    refetchProgramStage={props.refetchProgramStage}
+                    hnqisMode={hnqisMode}
+                    newDEQty={newDEQty}
+                    programStage={programStage}
+                    importedSections={importedSections}
+                    importedScores={importedScores}
+                    criticalSection={criticalSection}
+                    setSavingMetadata={setSavingMetadata}
+                    setSavedAndValidated={setSavedAndValidated}
+                    removedItems={removedItems}
+                    programMetadata={programMetadata}
+                    setImportResults={setImportResults}
+                    setErrorReports={setErrorReports}
+                    refetchProgramStage={refetchProgramStage}
                 />
             }
         </DialogActions>

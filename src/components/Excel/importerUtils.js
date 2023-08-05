@@ -429,3 +429,16 @@ export const countChanges = (
     summaryObject.removed = removedObjects.length;
     summaryObject.removedItems = removedObjects;
 }
+
+export const getBasicForm = (type) => {
+    let result = {
+        id: 'basic-form',
+        name: 'Basic Form',
+        sortOrder: 0,
+        importStatus: 'update',
+        isBasicForm: true
+    };
+    if (type === 'TEA') result.trackedEntityAttributes = [];
+    if (type === 'DE') result.dataElements = [];
+    return result;
+}

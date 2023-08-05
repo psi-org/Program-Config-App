@@ -29,9 +29,6 @@ const Scores = ({ stageSection, program, index }) => {
     const [ errors, setErrors ] = useState([]);
     const [scoreRules,setScoreRules] = useState(false)
 
-    useEffect(()=>{
-    },[scoreRules])
-
     const showIssues = function(dataElements) {
         setShowValidationMessage(true);
         setErrors(dataElements);
@@ -39,7 +36,13 @@ const Scores = ({ stageSection, program, index }) => {
 
     return (
         <div>
-            <div className="ml_item" style={{color:"#333333" , backgroundColor: "#B2DFDB", border: "0.5px solid #D5DDE5", borderRadius: "4px"}}>
+            <div className="ml_item"
+                style={{
+                    color: "#333333",
+                    backgroundColor: "#B2DFDB",
+                    border: "0.5px solid #D5DDE5",
+                    borderRadius: "4px"
+                }}>
                 <div className="ml_list-icon">
                     {/*<img className="ml_list-img" alt="sec" src={scores_svg} />*/}
                     <PercentIcon />
@@ -62,13 +65,23 @@ const Scores = ({ stageSection, program, index }) => {
                         let classNames = "ml_item" + ((dataElement.importStatus) ? ' import_' + dataElement.importStatus : '');
                         let compositiveIndicator = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
                         return (
-                            <div id={"de_" + dataElement.id} className={classNames} key={i}>
+                            <div
+                                id={"de_" + dataElement.id}
+                                className={classNames}
+                                key={i}
+                                style={{
+                                    backgroundColor: "#e0f2f1",
+                                    border: "0.5px solid #d5dde5",
+                                    borderRadius: "4px"
+                                }}
+                            >
                                 <div className="ml_item-icon" style={{display: 'flex', alignItems: 'center'}}>
                                     {/*<img className="ml_list-img" alt="de" src={scores_svg} />*/}
                                     <PercentIcon />
                                 </div>
-                                <div className="ml_item-title">
-                                    {`[ ${compositiveIndicator} ] ${dataElement.formName}`}
+                                <div className="ml_item-title" style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                                    <p style={{ minWidth: '4.5em', maxWidth: '4.5em', marginRight: '0.5em' }}><strong>[ {compositiveIndicator} ]</strong></p>
+                                    <p>{dataElement.formName}</p>
                                 </div>
                                 <div className="ml_item-warning_error" onClick={()=>showIssues([dataElement])}>
                                     {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length}/> }
@@ -76,14 +89,14 @@ const Scores = ({ stageSection, program, index }) => {
                                 </div>
                                 <div className="ml_item-cta">
                                     <Tooltip title="View Program Rules" placement="top">
-                                        <IconButton aria-label="Rules" color="success" onClick={()=>setScoreRules(dataElement)}>
-                                            <RuleIcon />
+                                        <IconButton aria-label="Rules" color="success" onClick={()=>setScoreRules(dataElement)} size='small'>
+                                            <RuleIcon fontSize='inherit'/>
                                         </IconButton>
                                     </Tooltip>
                                     <a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id} style={{textDecoration:'none',color:'black'}}>
                                         <Tooltip title="Open in Maintenance App" placement="top">
-                                            <IconButton>
-                                                <LaunchIcon/>
+                                            <IconButton size='small'>
+                                                <LaunchIcon fontSize='inherit' />
                                             </IconButton>
                                         </Tooltip>
                                     </a>
