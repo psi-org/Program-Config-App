@@ -1121,13 +1121,20 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
                             <Removed
                                 removedItems={importResults.questions.removedItems.concat(importResults.scores.removedItems)}
-                                index={0}
                                 key={"removedSec"}
                             />
                         }
                         {
                             validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0 || validationResults.feedbacks.length > 0) &&
-                            <Errors validationResults={validationResults} index={0} key={"validationSec"} />
+                            <Errors
+                                validationResults={
+                                    (
+                                        (validationResults.questions.concat(validationResults.scores))
+                                            .map(element => element.errors).flat()
+                                    ).concat(validationResults.feedbacks)
+                                }
+                                key={"validationSec"}
+                            />
                         }
                         {
                             errorReports && <ErrorReports errors={errorReports} />

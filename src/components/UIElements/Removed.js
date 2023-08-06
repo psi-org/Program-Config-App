@@ -9,7 +9,7 @@ import { METADATA } from '../../configs/Constants';
 import { IconButton, Tooltip } from '@mui/material';
 import LaunchIcon from '@mui/icons-material/Launch';
 
-const Removed = ({ removedItems, tagText = 'Data Element(s)', index }) => {
+const Removed = ({ removedItems, tagText = 'Data Element(s)' }) => {
 
     const [expanded, setExpanded] = useState(false)
 

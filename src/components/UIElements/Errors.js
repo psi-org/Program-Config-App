@@ -6,19 +6,14 @@ import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg'
 import ValidationMessages from "../STG_Details/ValidationMessages";
 import { METADATA } from '../../configs/Constants';
 import { ValidationErrorItem } from './ValidationErrorItem';
+import { extractAttributeValues } from '../../configs/Utils';
 
-const Errors = ({ validationResults, index }) => {
+const Errors = ({ validationResults }) => {
     const [showValidationMessage, setShowValidationMessage] = useState(false);
     const [errors, setErrors] = useState([]);
     const [expanded, setExpanded] = useState(false)
 
-    console.log(validationResults)
-
-    const showIssues = function (dataElements) {
-        setShowValidationMessage(true);
-        setErrors(dataElements);
-    }
-    //TODO: Generalize Errors component
+    //TODO: Errors are not displayed individually
     return (
         <>
             <div
@@ -34,7 +29,7 @@ const Errors = ({ validationResults, index }) => {
                     <img className="ml_list-img" alt="sec" src={error_svg} />
                 </div>
                 <div className="ml_item-title">
-                    <span>Validation Errors on {validationResults.questions.length + validationResults.scores.length + validationResults.feedbacks.reduce((acu, cur) => acu + cur.instance.elements.length, 0)} Data Elements</span>
+                    <span>Validation Errors [ Found {validationResults.length} Error(s) ]</span>
                 </div>
                 <div className="ml_item-warning_error "></div>
                 <div className="ml_item-cta" onClick={() => setExpanded(!expanded)}>
@@ -50,45 +45,16 @@ const Errors = ({ validationResults, index }) => {
                     display: expanded ? 'block' : 'none'
                 }}>
                 {
-                    validationResults.questions.map((question, i) => {
-                        let deMetadata = JSON.parse(question.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
-                        let labelFormName = deMetadata.labelFormName;
+                    validationResults.map((errorDetails, i) => {
+                        console.log(errorDetails)
                         return (
                             <ValidationErrorItem 
                                 key={i} 
-                                id={'de_' + question.id} 
-                                tagName={labelFormName ? '[ Label ]' : '[ Question ]'}
-                                errorTitle={labelFormName || question.formName}
-                                errorObject={question}
-                                setShowValidationMessage={setShowValidationMessage}
-                                setErrors={setErrors}
-                            />
-                        )
-                    })
-                }
-                {
-                    validationResults.scores.map((score, i) => {
-                        return (
-                            <ValidationErrorItem 
-                                key={i} 
-                                id={'cs_' + score.id} 
-                                tagName={'[ Score ]'}
-                                errorTitle={score.formName}
-                                errorObject={score}
-                                setShowValidationMessage={setShowValidationMessage}
-                                setErrors={setErrors}
-                            />
-                        )
-                    })
-                }
-                {
-                    validationResults.feedbacks.map((error, i) => {
-                        return (
-                            <ValidationErrorItem 
-                                key={i} 
-                                id={'f_' + i} 
-                                tagName={`[ Feedback Order ${error.instance.feedbackOrder} ]`}
-                                errorTitle={error.msg.text + ': ' + (!error.instance.expectedValues ? error.instance.elements.join(', ') : error.instance.expectedValues.join(' or ')) + '.'}
+                                id={'errorDetails_' + i} 
+                                tagName={errorDetails.tagName}
+                                errorTitle={errorDetails.title}
+                                errorObject={errorDetails}
+                                displayBadges={ errorDetails.displayBadges }
                                 setShowValidationMessage={setShowValidationMessage}
                                 setErrors={setErrors}
                             />

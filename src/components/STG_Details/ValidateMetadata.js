@@ -11,6 +11,7 @@ import {  FEEDBACK_ORDER } from "../../configs/Constants";
 import { useEffect, useState } from "react";
 import SaveMetadata from "./SaveMetadata";
 import { validateFeedbacks, validateScores, validateSections, verifyProgramDetail } from "../../configs/ImportValidatorUtils";
+import { getPCAMetadataDE } from "../../configs/Utils";
 
 
 
@@ -43,7 +44,6 @@ const ValidateMetadata = (
     useEffect(() => {
         const importedSectionsV = importedSections;
         const importedScoresV = importedScores;
-        console.log(importedSections);
         let errorCounts = 0;
 
         if (verifyProgramDetail(importResults, setValidationMessage)) {
@@ -64,15 +64,25 @@ const ValidateMetadata = (
                 errorCounts += feedbacksErrors.length
                 validationResults.feedbacks = feedbacksErrors;
             }
+            
 
             //ADD FEEDBACK ERRORS TO DATA ELEMENTS
             if (hnqisMode) importedSectionsV.forEach((section) => {
                 delete section.errors
                 let section_errors = 0;
                 section.dataElements.forEach((dataElement) => {
+
+                    let metadata = getPCAMetadataDE(dataElement);
+                    dataElement.labelFormName = metadata.labelFormName;
+
+                    const errorDetails = {
+                        title: dataElement.labelFormName || dataElement.formName,
+                        tagName: dataElement.labelFormName ? '[ Label ]' : '[ Question ]'
+                    }
+
                     delete dataElement.errors
 
-                    validateSections(importedScores, dataElement);
+                    validateSections(importedScores, dataElement, metadata, errorDetails);
                     if (dataElement.errors) questions.push(dataElement);
 
                     if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {
@@ -80,12 +90,17 @@ const ValidateMetadata = (
 
                         let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
 
-                        dataElement.errors ? dataElement.errors.push(deErrs) : dataElement.errors = [deErrs];
+                        dataElement.errors ? dataElement.errors.errors.push(deErrs) : dataElement.errors = {
+                            title: errorDetails.title,
+                            tagName: errorDetails.tagName,
+                            errors: [deErrs],
+                            displayBadges: true
+                        };
                     }
 
                     if (dataElement.errors) {
-                        errorCounts += dataElement.errors.length;
-                        section_errors += dataElement.errors.length;
+                        errorCounts += dataElement.errors.errors.length;
+                        section_errors += dataElement.errors.errors.length;
                     }
                 });
                 if (section_errors > 0) section.errors = section_errors;
@@ -94,8 +109,12 @@ const ValidateMetadata = (
             let score_errors = 0;
             delete importedScoresV.errors
             if (hnqisMode) importedScoresV.dataElements.forEach((dataElement) => {
+                const errorDetails = {
+                    title: dataElement.formName,
+                    tagName: '[ Score ]'
+                }
                 delete dataElement.errors
-                validateScores(dataElement);
+                validateScores(dataElement, errorDetails);
                 if (dataElement.errors) scores.push(dataElement);
 
                 if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {
@@ -103,13 +122,18 @@ const ValidateMetadata = (
 
                     let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
 
-                    dataElement.errors ? dataElement.errors.push(deErrs) : dataElement.errors = [deErrs];
+                    dataElement.errors ? dataElement.errors.errors.push(deErrs) : dataElement.errors = {
+                        title: errorDetails.title,
+                        tagName: errorDetails.tagName,
+                        errors: [deErrs],
+                        displayBadges: true
+                    };
 
                 }
 
                 if (dataElement.errors) {
-                    errorCounts += dataElement.errors.length;
-                    score_errors += dataElement.errors.length;
+                    errorCounts += dataElement.errors.errors.length;
+                    score_errors += dataElement.errors.errors.length;
                 }
 
             });

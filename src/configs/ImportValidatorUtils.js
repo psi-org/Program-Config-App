@@ -33,8 +33,12 @@ export const HNQIS2_VALIDATION_SETTINGS = {
         checkGaps: { enabled: true, title: "Feedback Order gap found", errorMsg: { code: "EW106", text: "A Feedback Order Gap was found, was expecting one of the following values" } },
         checkDuplicated: { enabled: true, title: "Duplicated Feedback Order found", errorMsg: { code: "EW107", text: "The specified Feedback Order is shared by the Data Elements with the following codes" } },
         //Error Equivalents for Data Elements
-        duplicatedFO: { enabled: true, title: "Duplicated Feedback Order found", errorMsg: { code: "EW107", text: "The specified Data Element contains a duplicated Feedback Order." } },
-        gapFO: { enabled: true, title: "Feedback Order gap found", errorMsg: { code: "EW106", text: "The specified Data Element generates a gap in the Feedback Order sequence." } }
+        duplicatedFO: {
+            enabled: true, title: "Duplicated Feedback Order found", errorMsg: { message: { code: "EW107", text: "The specified Data Element contains a duplicated Feedback Order." } }
+        },
+        gapFO: {
+            enabled: true, title: "Feedback Order gap found", errorMsg: { message: { code: "EW106", text: "The specified Data Element generates a gap in the Feedback Order sequence." } }
+        }
     }
 }
 
@@ -132,6 +136,18 @@ const checkDuplicatedFeedbacks = (hnqisMode, scores) => {
     return [];
 }
 
+const buildFeedbackErrorObject = (message, instance, elementError) => {
+    let errorObject = {
+        message,
+        instance,
+        elementError,
+        displayBadges: false
+    };
+    errorObject.title = errorObject.message.text + ': ' + (!errorObject.instance.expectedValues ? errorObject.instance.elements.join(', ') : errorObject.instance.expectedValues.join(' or ')) + '.'
+    errorObject.tagName = `[ Feedback Order ${errorObject.instance.feedbackOrder} ]`
+    return errorObject
+}
+
 export function validateFeedbacks(hnqisMode, sections) {
     let feedbacksErrors = [];
     let feedbacksWarnings = [];
@@ -141,10 +157,9 @@ export function validateFeedbacks(hnqisMode, sections) {
 
         let feedbackData = getFeedbackData(sections)
         let duplicatedFeedbacks = groupByKey(checkDuplicatedFeedbacks(hnqisMode, feedbackData), 'feedbackOrder')
-
         if (feedbackOrderValidationSettings.checkDuplicated.enabled) {
             duplicatedFeedbacks.forEach(df => {
-                feedbacksErrors.push({ msg: feedbackOrderValidationSettings.checkDuplicated.errorMsg, instance: df, elementError: feedbackOrderValidationSettings.duplicatedFO });
+                feedbacksErrors.push(buildFeedbackErrorObject(feedbackOrderValidationSettings.checkDuplicated.errorMsg, df, feedbackOrderValidationSettings.duplicatedFO));
             })
         }
 
@@ -178,9 +193,8 @@ export function validateFeedbacks(hnqisMode, sections) {
                         feedbackOrder: next.feedbackObject.feedbackOrder,
                         elements: [next.feedbackObject.code],
                         expectedValues: expected
-                    }
-
-                    feedbacksErrors.push({ msg: feedbackOrderValidationSettings.checkGaps.errorMsg, instance, elementError: feedbackOrderValidationSettings.gapFO });
+                    };
+                    feedbacksErrors.push(buildFeedbackErrorObject(feedbackOrderValidationSettings.checkGaps.errorMsg, instance, feedbackOrderValidationSettings.gapFO));
 
                 }
 
@@ -288,50 +302,60 @@ export const checkHasProperty = ({ object, property }) => {
     return (object[property] && !isBlank(object[property]));
 }
 
-const validate = (validation, validationFunction, params, errorsArray, negateResult = true) => {
+const validate = (validation, validationFunction, params, errorDetails, errorsArray, negateResult = true) => {
     let validationResult = validationFunction({ ...params });
     if (negateResult) validationResult = !validationResult;
     if (validation.enabled && validationResult)
-        errorsArray.push(validation.errorMsg);
+        errorsArray.push({
+            message: validation.errorMsg,
+        });
 }
 
-export const validateSections = (importedScores, dataElement) => {
+export const validateSections = (importedScores, dataElement, metadata, errorDetails) => {
     const validations = HNQIS2_VALIDATION_SETTINGS.programDetails;
     if (validations.enabled) {
         let errors = [];
-        let metadata = getPCAMetadataDE(dataElement);
-        dataElement.labelFormName = metadata.labelFormName;
 
-        validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errors);
-        validate(validations.checkFormNameLength, checkFormNameLength, { metadata, dataElement }, errors);
-        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element:'label', valueType: 'LONG_TEXT' }, errors);
-        validate(validations.hasFeedbackOrder, hasFeedbackOrder, { metadata, dataElement }, errors);
-        validate(validations.hasVarName, hasVarName, { metadata }, errors);
-        validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errors);
-        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'label', aggregationOperation: 'NONE'}, errors);
-        validate(validations.validAggregationQuestion, validAggregationQuestion, { metadata, dataElement }, errors);
-        validate(validations.isNumeratorNumeric, isNumeric, { metadata, property: 'scoreNum' }, errors);
-        validate(validations.isDenominatorNumeric, isNumeric, { metadata, property: 'scoreDen' }, errors);
-        validate(validations.hasParentQuestionNAnswerValue, hasBothParentQuestionNAnswerValue, { metadata }, errors);
-        validate(validations.matchesScore, questionMatchesScore, { importedScores, dataElement }, errors);
+        validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errorDetails, errors);
+        validate(validations.checkFormNameLength, checkFormNameLength, { metadata, dataElement }, errorDetails, errors);
+        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element:'label', valueType: 'LONG_TEXT' }, errorDetails, errors);
+        validate(validations.hasFeedbackOrder, hasFeedbackOrder, { metadata, dataElement }, errorDetails, errors);
+        validate(validations.hasVarName, hasVarName, { metadata }, errorDetails, errors);
+        validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errorDetails, errors);
+        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'label', aggregationOperation: 'NONE'}, errorDetails, errors);
+        validate(validations.validAggregationQuestion, validAggregationQuestion, { metadata, dataElement }, errorDetails, errors);
+        validate(validations.isNumeratorNumeric, isNumeric, { metadata, property: 'scoreNum' }, errorDetails, errors);
+        validate(validations.isDenominatorNumeric, isNumeric, { metadata, property: 'scoreDen' }, errorDetails, errors);
+        validate(validations.hasParentQuestionNAnswerValue, hasBothParentQuestionNAnswerValue, { metadata }, errorDetails, errors);
+        validate(validations.matchesScore, questionMatchesScore, { importedScores, dataElement }, errorDetails, errors);
 
-        if (errors.length > 0) dataElement.errors = errors;
+        if (errors.length > 0) dataElement.errors = {
+            title: errorDetails.title,
+            tagName: errorDetails.tagName,
+            errors,
+            displayBadges: true
+        };
     }
 }
 
-export const validateScores = (dataElement) => {
+export const validateScores = (dataElement, errorDetails) => {
     const validations = HNQIS2_VALIDATION_SETTINGS.scores;
     if (validations.enabled) {
         let errors = [];
         let metadata = getPCAMetadataDE(dataElement);
 
-        validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errors);
-        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element: 'score', valueType: 'NUMBER' }, errors);
-        validate(validations.hasScoreFeedbackOrder, hasScoreFeedbackOrder, { metadata, dataElement }, errors);
-        validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errors);
-        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'score', aggregationOperation: 'AVERAGE' }, errors);
+        validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errorDetails, errors);
+        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element: 'score', valueType: 'NUMBER' }, errorDetails, errors);
+        validate(validations.hasScoreFeedbackOrder, hasScoreFeedbackOrder, { metadata, dataElement }, errorDetails, errors);
+        validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errorDetails, errors);
+        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'score', aggregationOperation: 'AVERAGE' }, errorDetails, errors);
         
-        if (errors.length > 0) dataElement.errors = errors;
+        if (errors.length > 0) dataElement.errors = {
+            title: errorDetails.title,
+            tagName: errorDetails.tagName,
+            errors,
+            displayBadges: true
+        };
     }
 }
 
@@ -353,7 +377,12 @@ export const validateTEA = (tea, teaList) => {
     let errors = [];
     validate(validations.checkHasName, checkHasProperty, { object: tea.trackedEntityAttribute, property: 'name' }, errors);
     
-    if (errors.length > 0) tea.errors = errors;
+    /*if (errors.length > 0) tea.errors = {
+        title: errorDetails.title,
+        tagName: errorDetails.tagName,
+        errors,
+        displayBadges: true
+    };*/
 
 }
 

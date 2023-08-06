@@ -221,7 +221,7 @@ const ProgramDetails = () => {
                     <div className="list-ml_item">
                         {/*
                             validationResults &&
-                            <Errors validationResults={validationResults} index={0} key={"validationSec"} />
+                            <Errors validationResults={validationResults} key={"validationSec"} />
                         */}
                         {importResults &&
                             <Removed
@@ -233,7 +233,6 @@ const ProgramDetails = () => {
                                     stage.dataElements.removedItems
                                 ).flat())
                             }
-                            index={0}
                             key={"removedSec"}
                             tagText='Object(s)'
                             />
