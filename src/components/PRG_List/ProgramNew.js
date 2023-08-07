@@ -366,7 +366,6 @@ const ProgramNew = (props) => {
         let newAssignedAttributes = [];
         programTEAs.selected.forEach( teaId => {
             if(!attributesFormSections.map(section => section.trackedEntityAttributes.map(tea => tea.id)).flat().includes(teaId)){
-                console.log("Include "+teaId)
                 newAssignedAttributes.push(programTEAs.available.find(tea => tea.trackedEntityAttribute.id === teaId))
             }
         })
@@ -391,6 +390,14 @@ const ProgramNew = (props) => {
             programTEAs.selected = res.selected;
             setProgramTEAs(DeepCopy(programTEAs));
         }
+
+        // ! REMOVE form attributes not assigned to program
+        attributesFormSections.forEach(section => {
+            section.trackedEntityAttributes = section.trackedEntityAttributes.filter(
+                tea => programTEAs.selected.includes(tea.id)
+            )
+        })
+        setAttributesFormSections([...attributesFormSections])
 
         updateAssignedAttributes();
     };
@@ -485,6 +492,7 @@ const ProgramNew = (props) => {
     };
 
     const fetchTrackerMetadata = () => {
+        console.info("Fetching Tracker Metadata");
         findTEAttributes().then((data) => {
             if (data?.results?.trackedEntityAttributes) {
                 programTEAs.available = data.results.trackedEntityAttributes;
@@ -495,6 +503,7 @@ const ProgramNew = (props) => {
                 //setProgramTEAs({ ...programTEAs });
 
                 // ? Existing TEAs in the program
+
                 const existingTEAs = props.data ? 
                     props.data.programTrackedEntityAttributes.map(tea => ({
                         trackedEntityAttribute: tea.trackedEntityAttribute,
@@ -525,11 +534,14 @@ const ProgramNew = (props) => {
                 }
 
                 // ! Enforce Tracked Entity Type Attributes for existing programs
-                if(props.data && props.data.trackedEntityType){
-                    let tetAtts = trackedEntityTypes.find(
-                        tet => tet.id === props.data.trackedEntityType.id
-                    ).trackedEntityTypeAttributes.map(tea => tea.trackedEntityAttribute.id)
-                    teaOptions.selected = teaOptions.selected.concat(tetAtts.filter(teaId => !teaOptions.selected.includes(teaId)))
+                if(props?.data?.trackedEntityType?.trackedEntityTypeAttributes){
+                    teaOptions.selected = teaOptions.selected.concat(
+                        props.data.trackedEntityType.trackedEntityTypeAttributes.map(
+                            att => att.trackedEntityAttribute.id
+                        ).filter(
+                            id => !teaOptions.selected.includes(id)
+                        )
+                    )
                 }
 
                 setProgramTEAs({...teaOptions})
@@ -549,6 +561,14 @@ const ProgramNew = (props) => {
                 : [] ;
 
                 setAssignedAttributes(assignedAtts);
+
+                // ! REMOVE form attributes not assigned to program
+                attributesFormSections.forEach(section => {
+                    section.trackedEntityAttributes = section.trackedEntityAttributes.filter(
+                        tea => teaOptions.selected.includes(tea.id)
+                    )
+                })
+                setAttributesFormSections([...attributesFormSections])
             }
         });
 
@@ -786,22 +806,6 @@ const ProgramNew = (props) => {
                     }
         
                     prgrm.programSections = programSections.map(section => ({id:section.id}) )
-
-                    /*
-                    programTEAs.selected.forEach((selectedTEA, index) => {
-                        let newTEA = programTEAs.available.find(
-                            (tea) => tea.id === selectedTEA
-                        );
-                        prgrm.programTrackedEntityAttributes.push({
-                            trackedEntityAttribute: { id: newTEA.id },
-                            mandatory: false,
-                            valueType: newTEA.valueType,
-                            searchable: false,
-                            displayInList: true,
-                            sortOrder: index + 1,
-                        });
-                    });
-                    */
 
                     createOrUpdateMetaData(prgrm.attributeValues);
                 }
