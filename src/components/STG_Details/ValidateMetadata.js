@@ -76,7 +76,7 @@ const ValidateMetadata = (
                     dataElement.labelFormName = metadata.labelFormName;
 
                     const errorDetails = {
-                        title: dataElement.labelFormName || dataElement.formName,
+                        title: dataElement.labelFormName || dataElement.formName || dataElement.name,
                         tagName: dataElement.labelFormName ? '[ Label ]' : '[ Question ]'
                     }
 
@@ -110,7 +110,7 @@ const ValidateMetadata = (
             delete importedScoresV.errors
             if (hnqisMode) importedScoresV.dataElements.forEach((dataElement) => {
                 const errorDetails = {
-                    title: dataElement.formName,
+                    title: dataElement.formName || dataElement.name,
                     tagName: '[ Score ]'
                 }
                 delete dataElement.errors

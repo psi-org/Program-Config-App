@@ -1,6 +1,6 @@
 import error_svg from './../../images/i-error.svg';
-import BadgeWarnings from "../STG_Details/BadgeWarnings";
-import BadgeErrors from "../STG_Details/BadgeErrors";
+import BadgeWarnings from "./BadgeWarnings";
+import BadgeErrors from "./BadgeErrors";
 
 export const ValidationErrorItem = (
     {
@@ -16,7 +16,7 @@ export const ValidationErrorItem = (
 
     const showIssues = function (objects) {
         setShowValidationMessage(true);
-        setErrors(objects);
+        setErrors(objects.map(err => ({ errors: err })));
     }
 
     return (

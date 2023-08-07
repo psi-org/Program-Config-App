@@ -13,8 +13,8 @@ import { METADATA } from "../../configs/Constants";
 import de_svg from './../../images/i-drag_black.svg';
 import { FlyoutMenu, MenuItem, Popper, Layer, colors, IconAdd16, IconDelete16, IconEdit16, Tag } from '@dhis2/ui';
 
-import BadgeWarnings from "./BadgeWarnings";
-import BadgeErrors from "./BadgeErrors";
+import BadgeWarnings from "../UIElements/BadgeWarnings";
+import BadgeErrors from "../UIElements/BadgeErrors";
 import ValidationMessages from "./ValidationMessages";
 import { useState } from "react";
 
@@ -101,7 +101,7 @@ const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, update
                             </div>
                             <div className="ml_item-warning_error" onClick={() => setShowValidationMessage(!showValidationMessage)}>
                                 {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length} />}
-                                {dataElement.errors && dataElement.errors.length > 0 && <BadgeErrors counts={dataElement.errors.length} />}
+                                {dataElement.errors && dataElement.errors.errors.length > 0 && <BadgeErrors counts={dataElement.errors.errors.length} />}
                             </div>
                             <div className="ml_item-cta">
                                 {deStatus && <Chip label={deStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{ marginLeft: '1em' }} />}

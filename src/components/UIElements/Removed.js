@@ -5,7 +5,7 @@ import { useState } from 'react';
 import error_svg from './../../images/i-error.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import { METADATA } from '../../configs/Constants';
+import { METADATA, tagStyle } from '../../configs/Constants';
 import { IconButton, Tooltip } from '@mui/material';
 import LaunchIcon from '@mui/icons-material/Launch';
 
@@ -30,9 +30,9 @@ const Removed = ({ removedItems, tagText = 'Data Element(s)' }) => {
                 <div className="ml_item-title">
                     <span>Removed</span>
                 </div>
-                <div className="ml_item-desc"><div>{removedItems.length} {tagText}</div></div>
+                <div className="ml_item-desc"><div style={tagStyle}>{removedItems.length} {tagText}</div></div>
                 <div className="ml_item-warning_error "></div>
-                <div className="ml_item-cta" onClick={()=>setExpanded(!expanded)}>
+                <div className="ml_item-cta" onClick={() => setExpanded(!expanded)} style={{ cursor: 'pointer' }}>
                     <img className="bsct_cta" alt="exp" src={expanded ? contracted_bottom_svg : expanded_bottom_svg} />
                 </div>
             </div>

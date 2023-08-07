@@ -478,6 +478,10 @@ const DHIS2_AGG_OPERATORS_MAP = {
     "DEFAULT": "Default"
 }
 
+const tagStyle = { minWidth: '11em', maxWidth: '10em', display: 'flex', justifyContent: 'center' };
+const newTagStyle = { minWidth: '6em', maxWidth: '6em', display: 'flex', justifyContent: 'center' };
+const updatedTagStyle = { minWidth: '8em', maxWidth: '8em', display: 'flex', justifyContent: 'center' };
+
 export {
     ACTION_PLAN_ACTION,
     ACTION_PLAN_DUE_DATE,
@@ -570,5 +574,8 @@ export {
     VALUE_TYPES,
     VISUALIZATIONS_LEGEND,
     SHORT_DATE_FORMAT_OPTIONS,
-    MAX_FORM_NAME_LENGTH
+    MAX_FORM_NAME_LENGTH,
+    tagStyle,
+    newTagStyle,
+    updatedTagStyle
 };

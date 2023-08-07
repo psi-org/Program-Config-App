@@ -1,14 +1,14 @@
 import { NoticeBox } from "@dhis2/ui";
 
-const Messages = (props) => {
+const Messages = ({ title, error, warning,  messages }) => {
     return (
         <NoticeBox
-            error={props.error}
-            warning={props.warning}
-            title={(props.title) ? props.title : '_'}
+            error={error}
+            warning={warning}
+            title={(title) ? title : '_'}
             style={{ marginBottom: "5px !important" }}
         >
-                <ul>{props.messages.map(messageItem => <li key={messageItem.message.code}>{messageItem.message.text}</li> )}</ul>
+                <ul>{messages.map(messageItem => <li key={messageItem.message.code}>{messageItem.message.text}</li> )}</ul>
         </NoticeBox>
     )
 }

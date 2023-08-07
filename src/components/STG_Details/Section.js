@@ -1,26 +1,19 @@
+import { useState } from 'react';
+
 // *** DnD *** 
 import { Droppable, Draggable } from "react-beautiful-dnd";
 
 // *** Components ***
 import DraggableDataElement from "./DataElement";
 
-// *** Routing ***
-import { Link } from "react-router-dom";
-
-// *** Modules ***
-import $ from 'jquery';
-import {useEffect, useState} from 'react';
-
 // *** IMAGES ***
-
-import sec_svg from './../../images/i-drag_black.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 
 import {FlyoutMenu, MenuItem, Popper, Layer, Tag } from '@dhis2/ui';
-import BadgeWarnings from "./BadgeWarnings";
-import BadgeErrors from "./BadgeErrors";
+import BadgeWarnings from "../UIElements/BadgeWarnings";
+import BadgeErrors from "../UIElements/BadgeErrors";
 import ValidationMessages from "./ValidationMessages";
 
 import EditIcon from '@mui/icons-material/Edit';
@@ -34,40 +27,18 @@ import SegmentIcon from '@mui/icons-material/Segment';
 
 import Chip from '@mui/material/Chip';
 import { Tooltip } from "@mui/material";
+import { newTagStyle, tagStyle, updatedTagStyle } from '../../configs/Constants';
 
 const DraggableSection = ({ program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
-    const [openMenu, setOpenMenu] = useState(false)
-    const [sectionToRemove,setSectionToRemove] = useState(undefined)
+    const [openMenu, setOpenMenu] = useState(false);
+    const [sectionToRemove, setSectionToRemove] = useState(undefined);
+    const [expanded, setExpanded] = useState(false);
+    const [showValidationMessage, setShowValidationMessage] = useState(false);
 
     const toggle = () => setOpenMenu(!openMenu)
-
-    const [showValidationMessage, setShowValidationMessage] = useState(false);
-    useEffect(() => {
-        $('img.bsct_cta').off().on("click", function (e) {
-            if ($(this).attr('src').indexOf('i-expanded-bottom_black') > -1) {
-                $(this).attr('src', contracted_bottom_svg);
-                $(this).parent().parent().css({
-                    'margin': '8px 8px 0px 8px',
-                    'border-radius': '4px 4px 0 0'
-                });
-                $(this).parent().parent().next().css({
-                    'display': 'block'
-                });
-            } else {
-                $(this).attr('src', expanded_bottom_svg);
-                $(this).parent().parent().css({
-                    'margin': '0x',
-                    'border-radius': '4px'
-                });
-                $(this).parent().parent().next().css({
-                    'display': 'none'
-                });
-            }
-        });
-    }, []);
 
     // Import Values //
     var sectionImportStatus = undefined;
@@ -75,17 +46,21 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
     if (stageSection.importStatus) {
         switch (stageSection.importStatus) {
             case 'new':
-                sectionImportStatus = <Tag positive>New</Tag>;
+                sectionImportStatus = <div style={{minWidth: '4.5em', maxWidth: '4.5em'}}><Tag positive>New</Tag></div>;
                 break;
-            // case 'delete':
-            //     sectionImportStatus = <Tag negative>Removed</Tag>;
-            //     break;
             case 'update':
             default:
-                sectionImportStatus = <Tag neutral>Updated</Tag>;
+                sectionImportStatus = <div style={{minWidth: '4.5em', maxWidth: '4.5em'}}><Tag neutral>Updated</Tag></div>;
                 break;
         }
-        sectionImportSummary = <><Tag positive>{"New: "+stageSection.newDataElements}</Tag> <Tag neutral>{"Updated: "+stageSection.updatedDataElements}</Tag></>
+        sectionImportSummary = <>
+            <div style={newTagStyle}>
+                {"New: " + stageSection.newValues}
+            </div>
+            <div style={updatedTagStyle}>
+                {"Updated: " + stageSection.updatedValues}
+            </div>
+        </>;
     }
 
     var classNames = (stageSection.importStatus) ? ' import_' + stageSection.importStatus : '';
@@ -94,14 +69,20 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
         <Draggable key={stageSection.id || 'section' + index} draggableId={String(stageSection.id || index)} index={index} isDragDisabled={stageSection.importStatus != undefined || DEActions.deToEdit !== '' || !isSectionMode || readOnly}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
-                    <div className={"ml_item section-header" + (openMenu?' section-selected':'') + classNames}>
+                    <div
+                        className={"ml_item section-header" + (openMenu ? ' section-selected' : '') + classNames}
+                        style={{
+                            borderRadius: expanded ? '4px 4px 0 0' : '4px',
+                            marginBottom: expanded ? '0' : '0.5em'
+                        }}
+                    >
                         <div className="ml_item-icon" style={{display: 'flex', alignItems: 'center'}}>
                             <SegmentIcon />
                         </div>
                         <div className="ml_item-title" style={{
                             overflow: 'hidden'
                         }}>
-                            {sectionImportStatus}
+                            <div>{sectionImportStatus}</div>
                             <Tooltip title={stageSection.displayName} placement="bottom-start" arrow>
                                 <span style={{
                                     overflow: 'hidden',
@@ -113,7 +94,10 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
                             </Tooltip>
                             <div>{editStatus && <Chip label={editStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{marginLeft:'1em'}} /> }</div>
                         </div>
-                        <div className="ml_item-desc"><div>{stageSection.dataElements.length} Data Elements</div> {sectionImportSummary}</div>
+                        <div className="ml_item-desc">
+                            <div style={tagStyle}>{stageSection.dataElements.length} Data Elements</div>
+                            {sectionImportSummary}
+                        </div>
                         <div className="ml_item-warning_error " onClick={()=>setShowValidationMessage(!showValidationMessage)}>
                             {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
                             {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
@@ -133,12 +117,25 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
                                     </Popper>
                                 </Layer>
                             }
-                            <img className="bsct_cta" alt="exp" src={expanded_bottom_svg} style={{ cursor: 'pointer' }} />
+                            <img
+                                className="bsct_cta"
+                                alt="exp"
+                                src={expanded ? contracted_bottom_svg : expanded_bottom_svg}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => setExpanded(!expanded)}
+                            />
                         </div>
                     </div>
                     <Droppable droppableId={stageSection.id || 'dropSec' + index} type="DATA_ELEMENT">
                         {(provided, snapshot) => (
-                            <div {...provided.droppableProps} ref={provided.innerRef} className={"section_cont "} >
+                            <div {...provided.droppableProps} ref={provided.innerRef}
+                                className={"section_cont "}
+                                style={{
+                                    padding: '16px 16px 8px',
+                                    marginBottom: '0.5em',
+                                    display: expanded ? 'block' : 'none'
+                                }}
+                            >
                                 {
                                     stageSection.dataElements.map((de, i) => {
                                         return <DraggableDataElement

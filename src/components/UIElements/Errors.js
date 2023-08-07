@@ -4,14 +4,14 @@ import error_svg from './../../images/i-error.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import ValidationMessages from "../STG_Details/ValidationMessages";
-import { METADATA } from '../../configs/Constants';
+import { METADATA, tagStyle } from '../../configs/Constants';
 import { ValidationErrorItem } from './ValidationErrorItem';
 import { extractAttributeValues } from '../../configs/Utils';
 
 const Errors = ({ validationResults }) => {
     const [showValidationMessage, setShowValidationMessage] = useState(false);
     const [errors, setErrors] = useState([]);
-    const [expanded, setExpanded] = useState(false)
+    const [expanded, setExpanded] = useState(false);
 
     //TODO: Errors are not displayed individually
     return (
@@ -29,10 +29,11 @@ const Errors = ({ validationResults }) => {
                     <img className="ml_list-img" alt="sec" src={error_svg} />
                 </div>
                 <div className="ml_item-title">
-                    <span>Validation Errors [ Found {validationResults.length} Error(s) ]</span>
+                    <span>Validation Errors</span>
                 </div>
+                <div className="ml_item-desc"><div style={tagStyle}>{validationResults.length} Validation Error(s)</div></div>
                 <div className="ml_item-warning_error "></div>
-                <div className="ml_item-cta" onClick={() => setExpanded(!expanded)}>
+                <div className="ml_item-cta" onClick={() => setExpanded(!expanded)} style={{ cursor: 'pointer' }}>
                     <img className="bsct_cta" alt="exp" src={expanded ? contracted_bottom_svg : expanded_bottom_svg} />
                 </div>
             </div>
@@ -46,7 +47,6 @@ const Errors = ({ validationResults }) => {
                 }}>
                 {
                     validationResults.map((errorDetails, i) => {
-                        console.log(errorDetails)
                         return (
                             <ValidationErrorItem 
                                 key={i} 
