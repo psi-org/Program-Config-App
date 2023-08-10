@@ -21,7 +21,7 @@ const ColorPicker = props => {
             </IconButton>
         }   
         { displayColorPicker && 
-            <div style={{position: 'absolute',zIndex: '2', right:'0'}}>
+            <div style={{position: 'absolute',zIndex: '2', right:'50%', bottom:'100%'}}>
                 <div style={{position: 'fixed',top: '0px',right: '0px',bottom: '0px',left: '0px'} } onClick={()=>setDisplayColorPicker(false)}/>
                 <ChromePicker color={props.parentColor} onChangeComplete={(color,event)=>props.setParentColor(color.hex)} style={{width:'5rem'}} />
             </div> 

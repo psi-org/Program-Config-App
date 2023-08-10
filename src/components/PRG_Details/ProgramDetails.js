@@ -12,18 +12,24 @@ import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
 import { useState, useEffect } from "react";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import TuneIcon from '@mui/icons-material/Tune';
+
 import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
 import { formatAlert, truncateString } from "../../configs/Utils";
+import AttributesModal from "./AttributesModal";
 
 const query = {
     results: {
         resource: 'programs',
         id: ({ program }) => program,
         params: {
-            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', 'programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements]', 'withoutRegistration']
+            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', 'programStages[id,name,displayName,formType,programStageSections,description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements]', 'withoutRegistration',
+            //'programSections[id,name,trackedEntityAttributes,sortOrder,renderType]',
+            //'programTrackedEntityAttributes[id,name,displayInList,sortOrder,mandatory,allowFutureDate,renderOptionAsRadio,searchable,valueType,trackedEntityAttribute,renderType]'
+            ]
         }
     },
 };
@@ -38,6 +44,7 @@ const ProgramDetails = () => {
 
     const { id } = useParams();
     const [showStageForm, setShowStageForm] = useState(false);
+    const [showTEAEditor, setShowTEAEditor] = useState(false);
     const [notification, setNotification] = useState(undefined);
     const [snackSeverity, setSnackSeverity] = useState(undefined);
     const [newStage,setNewStage] = useState()
@@ -95,14 +102,24 @@ const ProgramDetails = () => {
                 <div className="c_srch"></div>
                 <div className="c_btns">
                     {!hnqisMode && !data.results.withoutRegistration &&
+                        <>
+                        <MuiButton
+                            variant="outlined"
+                            color='inherit'
+                            startIcon={<TuneIcon />}
+                            onClick={() => setShowTEAEditor(true)}
+                            disabled={showStageForm || showTEAEditor}>
+                            TEA Settings
+                        </MuiButton>
                         <MuiButton
                             variant="outlined"
                             color='inherit'
                             startIcon={<AddCircleOutlineIcon />}
                             onClick={() => setShowStageForm(true)}
-                            disabled={showStageForm}>
+                            disabled={showStageForm || showTEAEditor}>
                             Add Program Stage
                         </MuiButton>
+                        </>
                     }
                 </div>
             </div>
@@ -148,6 +165,12 @@ const ProgramDetails = () => {
                     </div>
                 </div>
                 {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName} setNewStage={setNewStage}/>}
+                {showTEAEditor && 
+                    <AttributesModal 
+                        programId={program}
+                        onClose={()=>setShowTEAEditor(false)} 
+                    />
+                }
                 <Snackbar
                     anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                     open={notification !== undefined}
