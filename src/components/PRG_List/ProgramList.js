@@ -215,7 +215,8 @@ const ProgramList = () => {
                     )}
                     {exportProgramId && (
                         <DependencyExport
-                            program={exportProgramId}
+                            program={exportProgramId.id}
+                            programType={exportProgramId.type}
                             setExportProgramId={setExportProgramId}
                         />
                     )}

@@ -7,7 +7,7 @@ const SelectOptions = ({label,items,value,disabled=false,useError=true, handler,
     <FormControl variant="standard" style={styles} margin="normal" error={useError && !value} disabled={disabled}>
         <InputLabel id={"select_"+label}>{label}</InputLabel>
         <Select labelId={"select_"+label} id={"id_"+label} value={value} onChange={handler} label={label}>
-            <MenuItem value=""> <em>{defaultOption}</em> </MenuItem>
+            {defaultOption && <MenuItem value=""> <em>{defaultOption}</em> </MenuItem> }
             {items.map(
                 (item,key)=> <MenuItem key={key} value={item.value} ><div style={{ display: 'flex', alignItems: 'center', justifyItems:'' }}>{item.icon} {item.label}</div></MenuItem> 
             )}

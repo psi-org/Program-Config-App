@@ -135,7 +135,8 @@ export function getJSONKeyTree(obj, level=1, index=0) {
     let res = {}
     for (const key in obj) {
         if (!!obj[key] && obj[key].constructor !== Array && obj[key].constructor === Object && index<level) {
-            res[key] = getJSONKeyTree(obj[key],level,index+1)
+            let subRes = getJSONKeyTree(obj[key], level, index+1)
+            res[key] = Object.keys(subRes).map(key => subRes[key][0])
         } else if (Array.isArray(obj[key])) {
             res[key] = getUniqueKeys(obj[key])
         } else {

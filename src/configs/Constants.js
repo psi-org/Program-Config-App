@@ -14,7 +14,7 @@ import { ArrowDownward, ArrowUpward, PlaylistAddCheck, StackedLineChart } from '
 const BUILD_VERSION = "1.7.0"
 const BUILD_DATE = "June, 2023"
 const MIN_VERSION = "2.36"
-const MAX_VERSION = "2.38.5"
+const MAX_VERSION = "2.40.0"
 
 const PCA_METADATA_VERSION = "1.1.1"
 const H2_METADATA_VERSION = "1.1.2"
@@ -321,6 +321,7 @@ const DHIS2_KEY_MAP = {
     "sections": "Section",
     "smsCommands": "S M S Command",
     "sqlViews": "Sql View",
+    "system": "System",
     "trackedEntityAttributes": "Tracked Entity Attribute",
     "trackedEntityAttributeValues": "Tracked Entity Attribute Value",
     "trackedEntityDataElementDimensions": "Tracked Entity Data Element Dimension",
@@ -394,9 +395,12 @@ const PROGRAM_TYPE_OPTION_SET = {
 const DHIS2_PRIMARY_COLOR = "#2c6693";
 
 const EXPORT_PRESETS = [
-    { value: 'local', label: 'Local Import'},
-    { value: 'external', label: 'External Import' },
-    { value: 'h2External', label: 'HNQIS2 to HNQIS2-Enabled Server'}
+    { value: 'local', label: 'Current Server'},
+    { value: 'external', label: 'Another Server' }
+]
+
+const EXPORT_HNQIS_PRESETS = [
+    { value: 'h2External', label: 'HNQIS2-Enabled Server'}
 ]
 
 const EXTERNAL_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions'];
@@ -435,6 +439,7 @@ export {
     DHIS2_PRIMARY_COLOR,
     ELEM_TYPES,
     EXPORT_PRESETS,
+    EXPORT_HNQIS_PRESETS,
     EXTERNAL_IMPORT_REMOVE_KEYS,
     FEATURE_TYPES,
     FEEDBACK_ORDER,
