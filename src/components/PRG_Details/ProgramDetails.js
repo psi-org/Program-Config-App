@@ -16,7 +16,7 @@ import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
-import { formatAlert, truncateString } from "../../configs/Utils";
+import { DeepCopy, formatAlert, truncateString } from "../../configs/Utils";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 import DataProcessorTracker from "../Excel/DataProcessorTracker";
 import Importer from "../Excel/Importer";
@@ -87,9 +87,7 @@ const ProgramDetails = () => {
     const [validationResults, setValidationResults] = useState(undefined);
     const [errorReports, setErrorReports] = useState(undefined);
     const [removedElements, setRemovedElements] = useState([]);
-
-    useEffect(() => {
-    }, [exportToExcel, setExportStatus])
+    const [backupData, setBackupData] = useState()
 
     useEffect(() => {
         if (notification) setSnackSeverity(notification.severity)
@@ -110,6 +108,20 @@ const ProgramDetails = () => {
     )
 
     const { loading, error, data, refetch } = useDataQuery(query, { variables: { program } });
+
+    const storeBackupdata = () => {
+        setBackupData({
+            programData: data.results
+        })
+    }
+
+    useEffect(() => {
+        if (data && !backupData) storeBackupdata();
+    }, [data])
+
+    useEffect(() => {
+        if (savedAndValidated) storeBackupdata();
+    }, [savedAndValidated])
 
     if (error) {
         return (
@@ -219,10 +231,14 @@ const ProgramDetails = () => {
             <div className="wrapper" style={{ padding: '1em 1.2em 0' }}>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
-                        {/*
-                            validationResults &&
-                            <Errors validationResults={validationResults} key={"validationSec"} />
-                        */}
+                        {
+                            validationResults && 
+                            <Errors validationResults={
+                                (validationResults.teas.sections.concat(validationResults.teas.teas))
+                                .concat(validationResults.stages.sections.concat(validationResults.stages.dataElements))
+                                .map(tea => tea.errors)
+                            } key={"validationSec"} />
+                        }
                         {importResults &&
                             <Removed
                             removedItems={
@@ -276,10 +292,11 @@ const ProgramDetails = () => {
                     <Importer
                         displayForm={setImporterEnabled}
                         setImportResults={setImportResults}
+                        setValidationResults={setValidationResults}
                         setSaveStatus={setSaveStatus}
-                        currentStagesData={data.results.programStages}
+                        currentStagesData={DeepCopy(backupData.programData.programStages)}
                         programSpecificType={data.results.withoutRegistration ? TEMPLATE_PROGRAM_TYPES.event : TEMPLATE_PROGRAM_TYPES.tracker}
-                        previous={{ stages: data.results.programStages, programSections: data.results.programSections, teas: data.results.programTrackedEntityAttributes }}
+                        previous={{ stages: DeepCopy(backupData.programData.programStages), programSections: DeepCopy(backupData.programData.programSections), teas: DeepCopy(backupData.programData.programTrackedEntityAttributes) }}
                         setSavedAndValidated={setSavedAndValidated}
                     />
                 }

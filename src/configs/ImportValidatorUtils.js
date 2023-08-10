@@ -2,6 +2,10 @@ import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMEN
 import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isNum, isValidParentName } from "./Utils";
 
 export const HNQIS2_VALIDATION_SETTINGS = {
+    sections: {
+        enabled: true,
+        checkHasName: { enabled: true, title: "Section Form Name is not defined", errorMsg: { code: "EXW113", text: "A Form Name was not defined for the specified Section." } }
+    },
     programDetails: {
         enabled: true,
         checkHasFormName: { enabled: true, title: "Element Form Name is not defined", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
@@ -43,13 +47,18 @@ export const HNQIS2_VALIDATION_SETTINGS = {
 }
 
 export const TRACKER_VALIDATION_SETTINGS = {
+    sections: {
+        enabled: true,
+        checkHasName: { enabled: true, title: "Section Name is not defined", errorMsg: { code: "EXWT100", text: "A Name was not defined for the specified section." } }
+    },
     dataElements: {
         enabled: true,
-        checkHasFormName: { enabled: true, title: "Element Name is not defined", errorMsg: { code: "EXW100", text: "A Name was not defined for the specified element." } },
+        checkHasFormName: { enabled: true, title: "Element Name is not defined", errorMsg: { code: "EXWT101", text: "A Name was not defined for the specified element." } },
     },
     teas: {
         enabled: true,
-        checkHasName: { enabled: true, title: "Element Form Name is not defined", errorMsg: { code: "EXW100", text: "A Name was not defined for the specified element." } },
+        checkHasName: { enabled: true, title: "Element Name is not defined", errorMsg: { code: "EXWT101", text: "A Name was not defined for the specified element." } },
+        checkDuplicated: { enabled: true, title: "Duplicated TEA", errorMsg: { code: "EXWT102", text: "The specified Tracked Entity Attribute is duplicated." } },
     }
 }
 
@@ -215,6 +224,9 @@ export const checkHasFormName = ({ metadata, dataElement }) => {
     return true;
 }
 
+export const checkSectionHasFormName = ({ section }) => !isBlank(section.name);
+
+
 export const checkFormNameLength = ({ metadata, dataElement }) => {
     let formName = dataElement.labelFormName || dataElement.formName;
     if (metadata.elem !== "") {
@@ -302,7 +314,11 @@ export const checkHasProperty = ({ object, property }) => {
     return (object[property] && !isBlank(object[property]));
 }
 
-const validate = (validation, validationFunction, params, errorDetails, errorsArray, negateResult = true) => {
+export const checkDuplicatedTEA = ({ tea, teaList }) => {
+    return tea !== 'Not Found' && teaList.filter(element => element === tea).length > 1;
+}
+
+const validate = (validation, validationFunction, params, errorsArray, negateResult = true) => {
     let validationResult = validationFunction({ ...params });
     if (negateResult) validationResult = !validationResult;
     if (validation.enabled && validationResult)
@@ -311,25 +327,57 @@ const validate = (validation, validationFunction, params, errorDetails, errorsAr
         });
 }
 
-export const validateSections = (importedScores, dataElement, metadata, errorDetails) => {
+export const validateQuestions = (importedScores, dataElement, metadata, errorDetails) => {
     const validations = HNQIS2_VALIDATION_SETTINGS.programDetails;
     if (validations.enabled) {
         let errors = [];
 
-        validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errorDetails, errors);
-        validate(validations.checkFormNameLength, checkFormNameLength, { metadata, dataElement }, errorDetails, errors);
-        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element:'label', valueType: 'LONG_TEXT' }, errorDetails, errors);
-        validate(validations.hasFeedbackOrder, hasFeedbackOrder, { metadata, dataElement }, errorDetails, errors);
-        validate(validations.hasVarName, hasVarName, { metadata }, errorDetails, errors);
-        validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errorDetails, errors);
-        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'label', aggregationOperation: 'NONE'}, errorDetails, errors);
-        validate(validations.validAggregationQuestion, validAggregationQuestion, { metadata, dataElement }, errorDetails, errors);
-        validate(validations.isNumeratorNumeric, isNumeric, { metadata, property: 'scoreNum' }, errorDetails, errors);
-        validate(validations.isDenominatorNumeric, isNumeric, { metadata, property: 'scoreDen' }, errorDetails, errors);
-        validate(validations.hasParentQuestionNAnswerValue, hasBothParentQuestionNAnswerValue, { metadata }, errorDetails, errors);
-        validate(validations.matchesScore, questionMatchesScore, { importedScores, dataElement }, errorDetails, errors);
+        validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errors);
+        validate(validations.checkFormNameLength, checkFormNameLength, { metadata, dataElement }, errors);
+        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element:'label', valueType: 'LONG_TEXT' }, errors);
+        validate(validations.hasFeedbackOrder, hasFeedbackOrder, { metadata, dataElement }, errors);
+        validate(validations.hasVarName, hasVarName, { metadata }, errors);
+        validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errors);
+        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'label', aggregationOperation: 'NONE'}, errors);
+        validate(validations.validAggregationQuestion, validAggregationQuestion, { metadata, dataElement }, errors);
+        validate(validations.isNumeratorNumeric, isNumeric, { metadata, property: 'scoreNum' }, errors);
+        validate(validations.isDenominatorNumeric, isNumeric, { metadata, property: 'scoreDen' }, errors);
+        validate(validations.hasParentQuestionNAnswerValue, hasBothParentQuestionNAnswerValue, { metadata }, errors);
+        validate(validations.matchesScore, questionMatchesScore, { importedScores, dataElement }, errors);
 
         if (errors.length > 0) dataElement.errors = {
+            title: errorDetails.title,
+            tagName: errorDetails.tagName,
+            errors,
+            displayBadges: true
+        };
+    }
+}
+
+export const validateSectionsHNQIS2 = (section, errorDetails) => {
+    const validations = HNQIS2_VALIDATION_SETTINGS.sections;
+    if (validations.enabled) {
+        let errors = [];
+
+        validate(validations.checkHasName, checkSectionHasFormName, { section }, errors);
+
+        if (errors.length > 0) section.errors = {
+            title: errorDetails.title,
+            tagName: errorDetails.tagName,
+            errors,
+            displayBadges: true
+        };
+    }
+}
+
+export const validateSections = (section, errorDetails) => {
+    const validations = TRACKER_VALIDATION_SETTINGS.sections;
+    if (validations.enabled) {
+        let errors = [];
+
+        validate(validations.checkHasName, checkSectionHasFormName, { section }, errors);
+
+        if (errors.length > 0) section.errors = {
             title: errorDetails.title,
             tagName: errorDetails.tagName,
             errors,
@@ -344,11 +392,11 @@ export const validateScores = (dataElement, errorDetails) => {
         let errors = [];
         let metadata = getPCAMetadataDE(dataElement);
 
-        validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errorDetails, errors);
-        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element: 'score', valueType: 'NUMBER' }, errorDetails, errors);
-        validate(validations.hasScoreFeedbackOrder, hasScoreFeedbackOrder, { metadata, dataElement }, errorDetails, errors);
-        validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errorDetails, errors);
-        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'score', aggregationOperation: 'AVERAGE' }, errorDetails, errors);
+        validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errors);
+        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element: 'score', valueType: 'NUMBER' }, errors);
+        validate(validations.hasScoreFeedbackOrder, hasScoreFeedbackOrder, { metadata, dataElement }, errors);
+        validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errors);
+        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'score', aggregationOperation: 'AVERAGE' }, errors);
         
         if (errors.length > 0) dataElement.errors = {
             title: errorDetails.title,
@@ -357,6 +405,23 @@ export const validateScores = (dataElement, errorDetails) => {
             displayBadges: true
         };
     }
+}
+
+export const validateTEA = (tea, teaList, errorDetails) => {
+    const validations = TRACKER_VALIDATION_SETTINGS.teas;
+    if (!validations.enabled) return;
+
+    let errors = [];
+    validate(validations.checkHasName, checkHasProperty, { object: tea.trackedEntityAttribute, property: 'name' }, errors);
+    validate(validations.checkDuplicated, checkDuplicatedTEA, { tea: tea.trackedEntityAttribute.id, teaList: [...teaList] }, errors, false);
+
+    if (errors.length > 0) tea.errors = {
+        title: errorDetails.title,
+        tagName: errorDetails.tagName,
+        errors,
+        displayBadges: true
+    };
+
 }
 
 export const validateDataElement = (dataElement) => {
@@ -368,22 +433,6 @@ export const validateDataElement = (dataElement) => {
     
     if (errors.length > 0) dataElement.errors = errors;
     
-}
-
-export const validateTEA = (tea, teaList) => {
-    const validations = TRACKER_VALIDATION_SETTINGS.teas;
-    if (!validations.enabled) return;
-
-    let errors = [];
-    validate(validations.checkHasName, checkHasProperty, { object: tea.trackedEntityAttribute, property: 'name' }, errors);
-    
-    /*if (errors.length > 0) tea.errors = {
-        title: errorDetails.title,
-        tagName: errorDetails.tagName,
-        errors,
-        displayBadges: true
-    };*/
-
 }
 
 export const getNewObjectsCount = (importResults) => extractAttributeValues(importResults, 'new').reduce((partialSum, a) => partialSum + a, 0)

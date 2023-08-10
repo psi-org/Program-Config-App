@@ -13,7 +13,6 @@ const Errors = ({ validationResults }) => {
     const [errors, setErrors] = useState([]);
     const [expanded, setExpanded] = useState(false);
 
-    //TODO: Errors are not displayed individually
     return (
         <>
             <div

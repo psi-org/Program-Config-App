@@ -14,7 +14,8 @@ const Removed = ({ removedItems, tagText = 'Data Element(s)' }) => {
     const [expanded, setExpanded] = useState(false)
 
     return (
-        <>
+        removedItems.length > 0 &&
+        <>  
             <div
                 className="ml_item"
                 style={{

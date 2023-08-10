@@ -97,7 +97,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
             programPrefix = programMetadata.dePrefix;
             programName = currentProgram.results.name;
             programShortName = currentProgram.results.shortName;
-            programTET = currentProgram.results.trackedEntityType?.name || 'N/A';
+            programTET = currentProgram.results.withoutRegistration ? 'Not Applicable for Event Programs' : (currentProgram.results.trackedEntityType?.name || 'N/A');
             programCatCombo = currentProgram.results.categoryCombo.name;
             programType = (currentProgram.results.withoutRegistration ? 'Event' : 'Tracker') + ' Program';
 

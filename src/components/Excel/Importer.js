@@ -14,7 +14,7 @@ import ImportSummary from "../UIElements/ImportSummary";
 import { getHNQIS2MappingList, getTrackerMappingList } from "../../configs/ExcelUtils";
 import FileSelector from "../UIElements/FileSelector";
 import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, getProgramDetailsTracker, buildHNQIS2Summary, buildTrackerSummary, isTracker, countChanges, getBasicForm } from "./importerUtils";
-import { setUpProgramStageSections } from "../../configs/Utils";
+import { buildBasicFormStage, setUpProgramStageSections } from "../../configs/Utils";
 
 //* Tracker Only: currentStagesData
 //* HNQIS Only: setSaveStatus, programMetadata, currentSectionsData, setSavedAndValidated
@@ -22,13 +22,14 @@ const Importer = (
     {
         displayForm,
         setImportResults,
+        setValidationResults,
         previous,
         currentStagesData,
         programSpecificType,
         setSaveStatus,
         programMetadata,
         currentSectionsData,
-        setSavedAndValidated
+        setSavedAndValidated,
     }
 ) => {
 
@@ -71,6 +72,7 @@ const Importer = (
         setExecutedTasks([]);
         setButtonDisabled(true);
         setImportResults(undefined);
+        setValidationResults(undefined);
         let indexModifier = 0;
         if (typeof selectedFile !== 'undefined') {
             if (!tasksHandler(1, 'Validating Template format (XLSX)', false, fileValidation, { setNotificationError, selectedFile })) return;

@@ -100,7 +100,7 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
                         </div>
                         <div className="ml_item-warning_error " onClick={()=>setShowValidationMessage(!showValidationMessage)}>
                             {stageSection.warnings && stageSection.warnings > 0 && <BadgeWarnings counts={stageSection.warnings}/> }
-                            {stageSection.errors && stageSection.errors > 0 && <BadgeErrors counts={stageSection.errors}/> }
+                            {stageSection.errorsCount && stageSection.errorsCount > 0 && <BadgeErrors counts={stageSection.errorsCount}/> }
                         </div>
                         <div className="ml_item-cta">
                             {isSectionMode && !readOnly && <img src={move_vert_svg} alt="menu" id={'menu'+stageSection.id} onClick={()=>{setRef(document.getElementById('menu'+stageSection.id)); toggle()}} style={{cursor:'pointer'}}/>}
@@ -158,7 +158,7 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
                             </div>
                         )}
                     </Droppable>
-                    {showValidationMessage && <ValidationMessages dataElements={stageSection.dataElements} showValidationMessage={setShowValidationMessage} /> }
+                    {showValidationMessage && <ValidationMessages dataElements={[stageSection].concat(stageSection.dataElements)} showValidationMessage={setShowValidationMessage} /> }
                     {!!sectionToRemove && <AlertDialogSlide
                         open={!!sectionToRemove} 
                         title={"Remove this Section from the Stage?"}

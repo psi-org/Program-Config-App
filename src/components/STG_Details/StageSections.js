@@ -235,9 +235,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
 
     //const { data: existingLocalAnalytics } = useDataQuery(queryExistingLocalAnalytics, { variables: { programId } });
-
-
-
     // Flags
     const [saveStatus, setSaveStatus] = useState(hnqisMode ? 'Validate' : 'Save Changes');
     const [saveAndBuild, setSaveAndBuild] = useState(false);
@@ -297,6 +294,24 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [errorReports, setErrorReports] = useState(undefined)
 
     const [addedSection, setAddedSection] = useState()
+    const [backupData, setBackupData] = useState()
+
+    const storeBackupdata = () => { 
+        setBackupData({
+            sections: sections,
+            scoresSection: scoresSection,
+            currentSectionsData: programStage.programStageSections
+        })
+    }
+
+    useEffect(() => {
+        if (sections && scoresSection && !backupData) storeBackupdata();
+    }, [sections, scoresSection])
+
+    useEffect(() => {
+        if (savedAndValidated) storeBackupdata();
+    }, [savedAndValidated])
+    
 
     useEffect(() => {
         getProgramMetadata()
@@ -924,16 +939,17 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                         </Tooltip>
                     </ButtonStrip>
                 </div>
-            </div>
+            </div>            
             {hnqisMode && importerEnabled &&
                 <Importer
                     displayForm={setImporterEnabled}
                     setImportResults={setImportResults}
+                    setValidationResults={setValidationResults}
                     programSpecificType={TEMPLATE_PROGRAM_TYPES.hnqis2}
-                    previous={{ sections, setSections, scoresSection, setScoresSection }}
+                    previous={{ sections: [...backupData.sections], setSections, scoresSection: DeepCopy(backupData.scoresSection), setScoresSection }}
                     setSaveStatus={setSaveStatus}
                     programMetadata={{ programMetadata, setProgramMetadata }}
-                    currentSectionsData={programStage.programStageSections}
+                    currentSectionsData={backupData.currentSectionsData}
                     setSavedAndValidated={setSavedAndValidated}
                 />
             }
@@ -1125,12 +1141,13 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                             />
                         }
                         {
-                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0 || validationResults.feedbacks.length > 0) &&
+                            validationResults && (validationResults.sections.length > 0 || validationResults.questions.length > 0 || validationResults.scores.length > 0 || validationResults.feedbacks.length > 0) &&
                             <Errors
                                 validationResults={
                                     (
-                                        (validationResults.questions.concat(validationResults.scores))
-                                            .map(element => element.errors).flat()
+                                        validationResults.sections.concat(
+                                            (validationResults.questions.concat(validationResults.scores))
+                                        ).map(element => element.errors).flat()
                                     ).concat(validationResults.feedbacks)
                                 }
                                 key={"validationSec"}

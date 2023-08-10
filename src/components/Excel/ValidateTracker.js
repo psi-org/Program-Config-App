@@ -8,7 +8,7 @@ import SaveIcon from '@mui/icons-material/Save';
 
 import { useEffect, useState } from "react";
 //import SaveMetadata from "./SaveMetadata";
-import { getNewObjectsCount, validateDataElement, validateFeedbacks, validateScores, validateSections, validateTEA, verifyProgramDetail } from "../../configs/ImportValidatorUtils";
+import { getNewObjectsCount, validateDataElement, validateFeedbacks, validateSections, validateTEA, verifyProgramDetail } from "../../configs/ImportValidatorUtils";
 
 
 //TODO: Work In Progress
@@ -27,8 +27,14 @@ const ValidateTracker = (
     }
 ) => {
     let validationResults = {
-        stages: {},
-        teas: []
+        stages: {
+            sections: [],
+            dataElements: []
+        },
+        teas: {
+            sections: [],
+            teas: []
+        }
     };
     const [processed, setProcessed] = useState(false);
     const [valid, setValid] = useState(false);
@@ -40,14 +46,33 @@ const ValidateTracker = (
             const importedStages = importResults.configurations.importedStages;
             const teas = importResults.configurations.teas;
             let errorCounts = 0;
+            let excelRow = 2;
             
             if (teas) {
                 const teaList = teas.map(section => section.trackedEntityAttributes.map(tea => tea.trackedEntityAttribute.id)).flat();
                 teas.forEach(section => {
+                    excelRow += 1;
+                    const sectionErrorDetails = {
+                        title: section.name || ('Section on row ' + excelRow),
+                        tagName: '[ Program TEA Section ]'
+                    }
+                    delete section.errors
+                    validateSections(section, sectionErrorDetails);
+
+                    if (section.errors) {
+                        validationResults.teas.sections.push(section);
+                        errorCounts += section.errors.errors.length;
+                    }
                     section.trackedEntityAttributes.forEach(tea => {
+                        excelRow += 1;
+                        const errorDetails = {
+                            title: tea?.trackedEntityAttribute?.name ? `${tea.trackedEntityAttribute.name} (Row ${excelRow})` : 'Tracked Entity Attribute on row '+excelRow,
+                            tagName: '[ Tracked Entity Attribute ]'
+                        }
                         delete tea.errors;
-                        validateTEA(tea, teaList);
-                        if (tea.errors?.length > 0) errorCounts += tea.errors.length;
+                        validateTEA(tea, teaList, errorDetails);
+                        if (tea.errors) validationResults.teas.teas.push(tea);
+                        if (tea.errors?.errors.length > 0) errorCounts += tea.errors.errors.length;
                     })
                 });
             }
@@ -73,6 +98,7 @@ const ValidateTracker = (
                 setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
                 setSavingMetadata(false);
                 setValidationResults(validationResults);
+                console.log(validationResults)
             }
         } else {
             setValid(true);

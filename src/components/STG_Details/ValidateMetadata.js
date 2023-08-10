@@ -10,7 +10,7 @@ import {  FEEDBACK_ORDER } from "../../configs/Constants";
 
 import { useEffect, useState } from "react";
 import SaveMetadata from "./SaveMetadata";
-import { validateFeedbacks, validateScores, validateSections, verifyProgramDetail } from "../../configs/ImportValidatorUtils";
+import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2 } from "../../configs/ImportValidatorUtils";
 import { getPCAMetadataDE } from "../../configs/Utils";
 
 
@@ -45,11 +45,14 @@ const ValidateMetadata = (
         const importedSectionsV = importedSections;
         const importedScoresV = importedScores;
         let errorCounts = 0;
+        let excelRow = 2;
 
         if (verifyProgramDetail(importResults, setValidationMessage)) {
+            let sections = [];
             let questions = [];
             let scores = [];
 
+            validationResults.sections = sections;
             validationResults.questions = questions;
             validationResults.scores = scores;
 
@@ -68,21 +71,34 @@ const ValidateMetadata = (
 
             //ADD FEEDBACK ERRORS TO DATA ELEMENTS
             if (hnqisMode) importedSectionsV.forEach((section) => {
-                delete section.errors
+                excelRow += 1;
                 let section_errors = 0;
-                section.dataElements.forEach((dataElement) => {
+                const sectionErrorDetails = {
+                    title: section.name || ('Section on row '+excelRow),
+                    tagName: '[ Section ]'
+                }
+                delete section.errors
+                validateSectionsHNQIS2(section, sectionErrorDetails);
+                
+                if (section.errors) {
+                    sections.push(section);
+                    errorCounts += section.errors.errors.length;
+                    section_errors += section.errors.errors.length;
+                }
 
+                section.dataElements.forEach((dataElement) => {
+                    excelRow += 1;
                     let metadata = getPCAMetadataDE(dataElement);
                     dataElement.labelFormName = metadata.labelFormName;
 
                     const errorDetails = {
-                        title: dataElement.labelFormName || dataElement.formName || dataElement.name,
+                        title: dataElement.labelFormName || dataElement.formName || dataElement.name || ('Element on row ' + excelRow),
                         tagName: dataElement.labelFormName ? '[ Label ]' : '[ Question ]'
                     }
 
                     delete dataElement.errors
 
-                    validateSections(importedScores, dataElement, metadata, errorDetails);
+                    validateQuestions(importedScores, dataElement, metadata, errorDetails);
                     if (dataElement.errors) questions.push(dataElement);
 
                     if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {
@@ -103,14 +119,15 @@ const ValidateMetadata = (
                         section_errors += dataElement.errors.errors.length;
                     }
                 });
-                if (section_errors > 0) section.errors = section_errors;
+                if (section_errors > 0) section.errorsCount = section_errors;
             });
 
             let score_errors = 0;
             delete importedScoresV.errors
             if (hnqisMode) importedScoresV.dataElements.forEach((dataElement) => {
+                excelRow += 1;
                 const errorDetails = {
-                    title: dataElement.formName || dataElement.name,
+                    title: dataElement.formName || dataElement.name || ('Score on row ' + excelRow),
                     tagName: '[ Score ]'
                 }
                 delete dataElement.errors
@@ -146,6 +163,7 @@ const ValidateMetadata = (
             } else {
                 setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
                 setSavingMetadata(false);
+                console.log(validationResults)
                 setValidationResults(validationResults);
             }
             previous.setSections(importedSectionsV);

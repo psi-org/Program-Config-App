@@ -634,7 +634,7 @@ const ExporterTracker = ({
         //Structure not selected
         ws.addConditionalFormatting({
             ref: 'A3:A102',
-            priority: 1,
+            priority: 2,
             rules: [
                 {
                     type: 'expression',
@@ -648,11 +648,11 @@ const ExporterTracker = ({
         //Duplicated TEA found
         ws.addConditionalFormatting({
             ref: 'C3:C102',
-            priority: 1,
+            priority: 2,
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['COUNTIF($C$3:$C$102,C3)>1'],
+                    formulae: ['AND($B3<>"",COUNTIF($B$3:$B$102,B3)>1)'],
                     style: conditionalError,
                 }
             ],
@@ -662,7 +662,7 @@ const ExporterTracker = ({
         //TEA/Section Name not defined
         ws.addConditionalFormatting({
             ref: 'C3:C102',
-            priority: 1,
+            priority: 2,
             rules: [
                 {
                     type: 'expression',
@@ -676,7 +676,7 @@ const ExporterTracker = ({
         //Selected TEA does not exist (1)
         ws.addConditionalFormatting({
             ref: 'B3:B102',
-            priority: 1,
+            priority: 2,
             rules: [
                 {
                     type: 'expression',
@@ -690,7 +690,7 @@ const ExporterTracker = ({
         //Selected TEA does not exist (2)
         ws.addConditionalFormatting({
             ref: 'D3:F102',
-            priority: 1,
+            priority: 2,
             rules: [
                 {
                     type: 'expression',
@@ -704,7 +704,7 @@ const ExporterTracker = ({
         //Disable future date if Value Type != DATE
         ws.addConditionalFormatting({
             ref: 'J3:J102',
-            priority: 1,
+            priority: 2,
             rules: [
                 {
                     type: 'expression',
@@ -712,13 +712,13 @@ const ExporterTracker = ({
                     style: disabledHighlighting,
                 }
             ],
-            promptTitle: 'TEA not found',
-            prompt: 'The specified TEA is not available.'
+            promptTitle: 'Future Date disabled',
+            prompt: 'Future Dates is not allowed for value types other than Date.'
         });
         //Row highlighting for TEA/Section
         ws.addConditionalFormatting({
             ref: 'A3:J102',
-            priority: 2,
+            priority: 1,
             rules: [
                 {
                     type: 'expression',
@@ -884,7 +884,7 @@ const ExporterTracker = ({
             option_set: "Option Set that defines the answers available for the current Data Element (forces Value Type)",
             option_set_details: "Link to details (options) of the selected Option Set",
             legend_set: "Legend that will be applied to the Data Element",
-            parent_question: "The Parent Name of the Data Element that will act as parent of the current Data Element",
+            parent_question: "Copy the Correlative of the Data Element that will act as parent of the current Data Element",
             answer_value: "Value that will trigger the 'show' rule of the Data Element",
             stage_id: configuration.stageId,
             stage_name: configuration.stageName
