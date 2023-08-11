@@ -134,7 +134,7 @@ export const TRACKER_TEMPLATE_MAP = {
     optionSet: 'Option Set',
     optionSetDetails: 'Option Set Details',
     legend: 'Legend Set',
-    parentQuestion: 'Parent Question',
+    parentQuestion: 'Parent Data Element',
     parentValue: 'Answer Value',
     stageId: 'Stage ID',
     stageName: 'Stage Name',

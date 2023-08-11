@@ -54,7 +54,7 @@ const readTemplateData = (
                     isBasicForm = true;
                     importedSections[sectionIndex] = getBasicForm('DE');
                 }
-                importedSections[isBasicForm?0:sectionIndex].dataElements.push(mapImportedDE(row, programPrefix, optionSets, legendSets, dataElementsPool));
+                importedSections[isBasicForm?0:sectionIndex].dataElements.push(mapImportedDE(row, programPrefix, currentData.stageNumber, optionSets, legendSets, dataElementsPool));
                 break;
             case 'question':
             case 'label':

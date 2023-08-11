@@ -9,6 +9,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useEffect, useState } from "react";
 //import SaveMetadata from "./SaveMetadata";
 import { getNewObjectsCount, validateDataElement, validateFeedbacks, validateSections, validateTEA, verifyProgramDetail } from "../../configs/ImportValidatorUtils";
+import { MAX_DATA_ELEMENT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH } from "../../configs/Constants";
+import { truncateString } from "../../configs/Utils";
 
 
 //TODO: Work In Progress
@@ -56,7 +58,7 @@ const ValidateTracker = (
                         title: section.name || ('Section on row ' + excelRow),
                         tagName: '[ Program TEA Section ]'
                     }
-                    delete section.errors
+                    delete section.errors;
                     validateSections(section, sectionErrorDetails);
 
                     if (section.errors) {
@@ -78,18 +80,43 @@ const ValidateTracker = (
             }
 
             importedStages.forEach(stage => {
+
+                excelRow = 2;
                 let stage_errors = 0;
+                delete stage.errors;
+
                 stage.importedSections.forEach(section => {
+                    excelRow += 1;
+                    const sectionErrorDetails = {
+                        title: section.name || `Section on row ${excelRow}`,
+                        tagName: `[ Section | ${stage.name} ]`
+                    }
+                    delete section.errors;
+                    validateSections(section, sectionErrorDetails);
+
+                    if (section.errors) {
+                        validationResults.stages.sections.push(section);
+                        stage_errors += section.errors.errors.length;
+                    }
+
                     section.dataElements.forEach(dataElement => {
+                        excelRow += 1;
+                        const errorDetails = {
+                            title: dataElement?.name ? `${truncateString(dataElement.name)} (Row ${excelRow})` : `Data Element on row ${excelRow}`,
+                            tagName: `[ Data Element | ${stage.name} ]`
+                        }
                         delete dataElement.errors;
-                        validateDataElement(dataElement);
-                        stage_errors += dataElement.errors?.length || 0;
+                        validateDataElement(dataElement, errorDetails);
+                        if (dataElement.errors) validationResults.stages.dataElements.push(dataElement);
+                        if (dataElement.errors?.errors.length > 0) stage_errors += dataElement.errors.errors.length;
                     });
+
                 });
+
                 errorCounts += stage_errors;
-                if (stage_errors > 0) stage.errors = stage_errors;
+                if (stage_errors > 0) stage.errorsCount = stage_errors;
+
             });
-            
 
             if (errorCounts === 0) {
                 setValid(true);
@@ -98,7 +125,6 @@ const ValidateTracker = (
                 setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
                 setSavingMetadata(false);
                 setValidationResults(validationResults);
-                console.log(validationResults)
             }
         } else {
             setValid(true);

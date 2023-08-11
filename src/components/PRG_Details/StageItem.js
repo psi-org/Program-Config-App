@@ -21,8 +21,10 @@ import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Tooltip } from "@mui/material";
+import BadgeErrors from "../UIElements/BadgeErrors";
+import ValidationMessages from "../STG_Details/ValidationMessages";
 
-const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
+const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
 
     const dispatch = useDispatch();
     const { setProgramStage } = bindActionCreators(actionCreators, dispatch);
@@ -30,6 +32,7 @@ const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editSta
 
     const [ref, setRef] = useState(undefined);
     const [open, setOpen] = useState(false)
+    const [showValidationMessage, setShowValidationMessage] = useState(false);
     const toggle = () => setOpen(!open)
 
     const editStage = stage => {
@@ -58,7 +61,8 @@ const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editSta
             <div className="ml_item-desc">
                 <div>{stage.programStageSections.length} {!eventMode && 'Program Stage'} Sections</div>
             </div>
-            <div className="ml_item-warning_error ">
+            <div className="ml_item-warning_error " onClick={() => setShowValidationMessage(!showValidationMessage)}>
+                {importResults?.errorsCount && importResults?.errorsCount > 0 && <BadgeErrors counts={importResults?.errorsCount} />}
             </div>
             <div className="ml_item-cta">
                 {!hnqisMode && !eventMode &&
@@ -90,6 +94,7 @@ const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editSta
                         data={stage}
                         setNewStage={setNewStage} />
                 }
+                {showValidationMessage && <ValidationMessages dataElements={importResults.importedSections.map(section => [section].concat(section.dataElements)).flat()} showValidationMessage={setShowValidationMessage} />}
             </div>
         </div>
     );

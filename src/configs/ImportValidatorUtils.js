@@ -1,47 +1,162 @@
-import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
-import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isNum, isValidParentName } from "./Utils";
+import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
+import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isNum, isValidCorrelative, isValidParentName } from "./Utils";
 
 export const HNQIS2_VALIDATION_SETTINGS = {
     sections: {
         enabled: true,
-        checkHasName: { enabled: true, title: "Section Form Name is not defined", errorMsg: { code: "EXW113", text: "A Form Name was not defined for the specified Section." } }
+        checkHasName: {
+            enabled: true, title: "Section Form Name is not defined", errorMsg: {
+                code: "EXW113", 
+                text: "A Form Name was not defined for the specified Section."
+            }
+        }
     },
     programDetails: {
         enabled: true,
-        checkHasFormName: { enabled: true, title: "Element Form Name is not defined", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
-        checkFormNameLength: { enabled: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).` } },
+        checkHasFormName: {
+            enabled: true, title: "Element Form Name is not defined", errorMsg: {
+                code: "EXW100", 
+                text: "A Form Name was not defined for the specified element."
+            }
+        },
+        checkFormNameLength: {
+            enabled: true, title: "Form name length not valid", errorMsg: {
+                code: "EXW112", 
+                text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+            }
+        },
         //Disabled validation EXW103
-        structureMatchesValue: { enabled: false, title: "Label should be LONG_TEXT", errorMsg: { code: "EXW103", text: "The expected Value Type for the label Data Element is LONG_TEXT." } },
-        hasFeedbackOrder: { enabled: true, title: "Missing Feedback Order", errorMsg: { code: "EXW107", text: "The specified question has Numerator and Denominator assigned but does not contribute to any score." } },
-        hasVarName: { enabled: true, title: "Parent Name not valid", errorMsg: { code: "EXW110", text: "The specified question does not have a valid Parent Name." } },
-        hasBothNumeratorDenominator: { enabled: true, title: "Numerator or Denominator missing", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (Numerator or Denominator)" } },
-        validAggregationType: { enabled: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW104", text: "The expected Aggregation Operator for the label Data Element is NONE" } },
-        validAggregationQuestion: { enabled: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW105", text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for Integer and Number types, and NONE for text inputs)" } },
-        isNumeratorNumeric: { enabled: true, title: "Score is not numeric", errorMsg: { code: "EXW105", text: "The specified question Numerator is not numeric" } },
-        isDenominatorNumeric: { enabled: true, title: "Score is not numeric", errorMsg: { code: "EXW108", text: "The specified question Denominator is not numeric" } },
-        hasParentQuestionNAnswerValue: { enabled: true, title: "Incomplete Parent Logic", errorMsg: { code: "EXW109", text: "The specified question lacks one of the components for the Parent Logic." } },
-        matchesScore: { enabled: true, title: "Score container not found", errorMsg: { code: "EXW110", text: "The specified question has been assigned to a score that is not defined." } }
+        structureMatchesValue: {
+            enabled: false, title: "Label should be LONG_TEXT", errorMsg: {
+                code: "EXW103", 
+                text: "The expected Value Type for the label Data Element is LONG_TEXT."
+            }
+        },
+        hasFeedbackOrder: {
+            enabled: true, title: "Missing Feedback Order", errorMsg: {
+                code: "EXW107", 
+                text: "The specified question has Numerator and Denominator assigned but does not contribute to any score."
+            }
+        },
+        hasVarName: {
+            enabled: true, title: "Parent Name not valid", errorMsg: {
+                code: "EXW110", 
+                text: "The specified question does not have a valid Parent Name."
+            }
+        },
+        hasBothNumeratorDenominator: {
+            enabled: true, title: "Numerator or Denominator missing", errorMsg: {
+                code: "EXW106", 
+                text: "The specified question lacks one of the scores (Numerator or Denominator)"
+            }
+        },
+        validAggregationType: {
+            enabled: true, title: "Aggregation Type Not Valid", errorMsg: {
+                code: "EW104", 
+                text: "The expected Aggregation Operator for the label Data Element is NONE"
+            }
+        },
+        validAggregationQuestion: {
+            enabled: true, title: "Aggregation Type Not Valid", errorMsg: {
+                code: "EW105", 
+                text: "The Data Element Aggregation Operator was not defined correctly. (SUM or AVERAGE for Integer and Number types, and NONE for text inputs)"
+            }
+        },
+        isNumeratorNumeric: {
+            enabled: true, title: "Score is not numeric", errorMsg: {
+                code: "EXW105", 
+                text: "The specified question Numerator is not numeric"
+            }
+        },
+        isDenominatorNumeric: {
+            enabled: true, title: "Score is not numeric", errorMsg: {
+                code: "EXW108", 
+                text: "The specified question Denominator is not numeric"
+            }
+        },
+        hasParentQuestionNAnswerValue: {
+            enabled: true, title: "Incomplete Parent Logic", errorMsg: {
+                code: "EXW109", 
+                text: "The specified question lacks one of the components for the Parent Logic."
+            }
+        },
+        matchesScore: {
+            enabled: true, title: "Score container not found", errorMsg: {
+                code: "EXW110", 
+                text: "The specified question has been assigned to a score that is not defined."
+            }
+        }
     },
     scores: {
         enabled: true,
-        checkHasFormName: { enabled: true, title: "Element Form Name is not defined", errorMsg: { code: "EXW100", text: "A Form Name was not defined for the specified element." } },
-        checkFormNameLength: { enabled: true, title: "Form name length not valid", errorMsg: { code: "EXW112", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).` } },
+        checkHasFormName: {
+            enabled: true, title: "Element Form Name is not defined", errorMsg: {
+                code: "EXW100", 
+                text: "A Form Name was not defined for the specified element."
+            }
+        },
+        checkFormNameLength: {
+            enabled: true, title: "Form name length not valid", errorMsg: {
+                code: "EXW112", 
+                text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+            }
+        },
         //Disabled validation EXW102
-        structureMatchesValue: { enabled: false, title: "Score should be NUMBER", errorMsg: { code: "EXW102", text: "The expected Value Type for the score Data Element is NUMBER." } },
-        hasScoreFeedbackOrder: { enabled: true, title: "Missing Feedback Order", errorMsg: { code: "EXW111", text: "The specified score Data Element lacks Feedback Order." } },
-        hasBothNumeratorDenominator: { enabled: true, title: "Numerator or Denominator missing", errorMsg: { code: "EXW106", text: "The specified question lacks one of the scores (Numerator or Denominator)" } },
-        validAggregationType: { enabled: true, title: "Aggregation Type Not Valid", errorMsg: { code: "EW103", text: "The expected Aggregation Operator for the score Data Element is AVERAGE" } }
+        structureMatchesValue: {
+            enabled: false, title: "Score should be NUMBER", errorMsg: {
+                code: "EXW102", 
+                text: "The expected Value Type for the score Data Element is NUMBER."
+            }
+        },
+        hasScoreFeedbackOrder: {
+            enabled: true, title: "Missing Feedback Order", errorMsg: {
+                code: "EXW111", 
+                text: "The specified score Data Element lacks Feedback Order."
+            }
+        },
+        hasBothNumeratorDenominator: {
+            enabled: true, title: "Numerator or Denominator missing", errorMsg: {
+                code: "EXW106", 
+                text: "The specified question lacks one of the scores (Numerator or Denominator)"
+            }
+        },
+        validAggregationType: {
+            enabled: true, title: "Aggregation Type Not Valid", errorMsg: {
+                code: "EW103", 
+                text: "The expected Aggregation Operator for the score Data Element is AVERAGE"
+            }
+        }
     },
     feedbackOrder: {
         enabled: true,
-        checkGaps: { enabled: true, title: "Feedback Order gap found", errorMsg: { code: "EW106", text: "A Feedback Order Gap was found, was expecting one of the following values" } },
-        checkDuplicated: { enabled: true, title: "Duplicated Feedback Order found", errorMsg: { code: "EW107", text: "The specified Feedback Order is shared by the Data Elements with the following codes" } },
+        checkGaps: {
+            enabled: true, title: "Feedback Order gap found", errorMsg: {
+                code: "EW106", 
+                text: "A Feedback Order Gap was found, was expecting one of the following values"
+            }
+        },
+        checkDuplicated: {
+            enabled: true, title: "Duplicated Feedback Order found", errorMsg: {
+                code: "EW107", 
+                text: "The specified Feedback Order is shared by the Data Elements with the following codes"
+            }
+        },
         //Error Equivalents for Data Elements
         duplicatedFO: {
-            enabled: true, title: "Duplicated Feedback Order found", errorMsg: { message: { code: "EW107", text: "The specified Data Element contains a duplicated Feedback Order." } }
+            enabled: true, title: "Duplicated Feedback Order found", errorMsg: {
+                message: {
+                    code: "EW107", 
+                    text: "The specified Data Element contains a duplicated Feedback Order."
+                }
+            }
         },
         gapFO: {
-            enabled: true, title: "Feedback Order gap found", errorMsg: { message: { code: "EW106", text: "The specified Data Element generates a gap in the Feedback Order sequence." } }
+            enabled: true, title: "Feedback Order gap found", errorMsg: {
+                message: {
+                    code: "EW106", 
+                    text: "The specified Data Element generates a gap in the Feedback Order sequence."
+                }
+            }
         }
     }
 }
@@ -49,16 +164,82 @@ export const HNQIS2_VALIDATION_SETTINGS = {
 export const TRACKER_VALIDATION_SETTINGS = {
     sections: {
         enabled: true,
-        checkHasName: { enabled: true, title: "Section Name is not defined", errorMsg: { code: "EXWT100", text: "A Name was not defined for the specified section." } }
-    },
-    dataElements: {
-        enabled: true,
-        checkHasFormName: { enabled: true, title: "Element Name is not defined", errorMsg: { code: "EXWT101", text: "A Name was not defined for the specified element." } },
+        checkHasName: {
+            enabled: true, title: "Section Name is not defined", errorMsg: {
+                code: "EXWT100", text: "A Name was not defined for the specified Section."
+            }
+        }
     },
     teas: {
         enabled: true,
-        checkHasName: { enabled: true, title: "Element Name is not defined", errorMsg: { code: "EXWT101", text: "A Name was not defined for the specified element." } },
-        checkDuplicated: { enabled: true, title: "Duplicated TEA", errorMsg: { code: "EXWT102", text: "The specified Tracked Entity Attribute is duplicated." } },
+        checkHasName: {
+            enabled: true, title: "Element Name is not defined", errorMsg: {
+                code: "EXWT101", text: "A Name was not defined for the specified element."
+            }
+        },
+        checkDuplicated: {
+            enabled: true, title: "Duplicated TEA", errorMsg: {
+                code: "EXWT102", text: "The specified Tracked Entity Attribute is duplicated."
+            }
+        },
+    },
+    dataElements: {
+        enabled: true,
+        checkHasCorrelative: {
+            enabled: true, title: "Invalid Data Element Correlative", errorMsg: {
+                code: "EXWT102", text: "The Correlative for the specified Data Element is not valid."
+            }
+        },
+        checkHasFormName: {
+            enabled: true, title: "Data Element Form Name is not defined", errorMsg: {
+                code: "EXWT103", text: "A Form Name was not defined for the specified Data Element."
+            }
+        },
+        checkFormNameLength: {
+            enabled: true, title: "Data Element Form Name length out of range", errorMsg: {
+                code: "EXWT104", text: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH} characters).`
+            }
+        },
+        checkHasName: {
+            enabled: true, title: "Data Element Name is not defined", errorMsg: {
+                code: "EXWT105", text: "A Name was not defined for the specified Data Element."
+            }
+        },
+        checkNameLength: {
+            enabled: true, title: "Data Element Name length out of range", errorMsg: {
+                code: "EXWT106", text: `Given Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH} characters).`
+            }
+        },
+        checkHasShortName: {
+            enabled: true, title: "Data Element Short Name is not defined", errorMsg: {
+                code: "EXWT107", text: "A Short Name was not defined for the specified Data Element."
+            }
+        },
+        checkShortNameLength: {
+            enabled: true, title: "Data Element Short Name length out of range", errorMsg: {
+                code: "EXWT108", text: `Given Short Name length is out of the accepted range (Less than ${MAX_SHORT_NAME_LENGTH} characters).`
+            }
+        },
+        checkCodeLength: {
+            enabled: true, title: "Data Element Code length out of range", errorMsg: {
+                code: "EXWT109", text: `Given Code length is out of the accepted range (Less than ${MAX_SHORT_NAME_LENGTH} characters).`
+            }
+        },
+        checkHasValueType: {
+            enabled: true, title: "Data Element Value Type is not defined", errorMsg: {
+                code: "EXWT110", text: "A Value Type was not defined for the specified Data Element."
+            }
+        },
+        checkHasParentLogic: {
+            enabled: true, title: "Incomplete Data Element Parent Logic", errorMsg: {
+                code: "EXWT111", text: "One of the components of the Parent Logic is missing (Parent Data Element or Answer Value)."
+            }
+        },
+        checkNotSelfParent: {
+            enabled: true, title: "Invalid Parent Data Element", errorMsg: {
+                code: "EXWT112", text: "A Data Element cannot be a Parent to itself."
+            }
+        },
     }
 }
 
@@ -262,15 +443,24 @@ export const hasVarName = ({ metadata }) => {
     return hasAttributeValue(metadata, "varName") && isValidParentName(metadata, "varName")
 }
 
+export const hasCorrelative = ({ metadata }) => {
+    return hasAttributeValue(metadata, "varName") && isValidCorrelative(metadata, "varName")
+}
+
 export const hasBothNumeratorDenominator = ({ metadata }) => {
     if (hasAttributeValue(metadata, "scoreNum")) return hasAttributeValue(metadata, "scoreDen");
     else if (hasAttributeValue(metadata, "scoreDen")) return false;
     return true;
 }
 
-export const hasBothParentQuestionNAnswerValue = ({ metadata }) => {
+export const hasBothParentLogicComponents = ({ metadata }) => {
     if (hasAttributeValue(metadata, "parentQuestion")) return hasAttributeValue(metadata, "parentValue");
     else if (hasAttributeValue(metadata, "parentValue")) return false;
+    return true;
+}
+
+export const parentIsNotSelf = ({ metadata }) => {
+    if (hasAttributeValue(metadata, "varName") && hasAttributeValue(metadata, "parentQuestion")) return metadata.varName !== metadata.parentQuestion
     return true;
 }
 
@@ -314,6 +504,13 @@ export const checkHasProperty = ({ object, property }) => {
     return (object[property] && !isBlank(object[property]));
 }
 
+export const checkPropertyLength = ({ object, property, min, max }) => {
+    if (object[property])
+        return object[property].length >= min && object[property].length <= max;
+
+    return true;
+}
+
 export const checkDuplicatedTEA = ({ tea, teaList }) => {
     return tea !== 'Not Found' && teaList.filter(element => element === tea).length > 1;
 }
@@ -334,15 +531,15 @@ export const validateQuestions = (importedScores, dataElement, metadata, errorDe
 
         validate(validations.checkHasFormName, checkHasFormName, { metadata, dataElement }, errors);
         validate(validations.checkFormNameLength, checkFormNameLength, { metadata, dataElement }, errors);
-        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element:'label', valueType: 'LONG_TEXT' }, errors);
+        validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element: 'label', valueType: 'LONG_TEXT' }, errors);
         validate(validations.hasFeedbackOrder, hasFeedbackOrder, { metadata, dataElement }, errors);
         validate(validations.hasVarName, hasVarName, { metadata }, errors);
         validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errors);
-        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'label', aggregationOperation: 'NONE'}, errors);
+        validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'label', aggregationOperation: 'NONE' }, errors);
         validate(validations.validAggregationQuestion, validAggregationQuestion, { metadata, dataElement }, errors);
         validate(validations.isNumeratorNumeric, isNumeric, { metadata, property: 'scoreNum' }, errors);
         validate(validations.isDenominatorNumeric, isNumeric, { metadata, property: 'scoreDen' }, errors);
-        validate(validations.hasParentQuestionNAnswerValue, hasBothParentQuestionNAnswerValue, { metadata }, errors);
+        validate(validations.hasParentQuestionNAnswerValue, hasBothParentLogicComponents, { metadata }, errors);
         validate(validations.matchesScore, questionMatchesScore, { importedScores, dataElement }, errors);
 
         if (errors.length > 0) dataElement.errors = {
@@ -397,7 +594,7 @@ export const validateScores = (dataElement, errorDetails) => {
         validate(validations.hasScoreFeedbackOrder, hasScoreFeedbackOrder, { metadata, dataElement }, errors);
         validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errors);
         validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'score', aggregationOperation: 'AVERAGE' }, errors);
-        
+
         if (errors.length > 0) dataElement.errors = {
             title: errorDetails.title,
             tagName: errorDetails.tagName,
@@ -424,15 +621,34 @@ export const validateTEA = (tea, teaList, errorDetails) => {
 
 }
 
-export const validateDataElement = (dataElement) => {
+export const validateDataElement = (dataElement, errorDetails) => {
     const validations = TRACKER_VALIDATION_SETTINGS.dataElements;
     if (!validations.enabled) return;
 
     let errors = [];
     let metadata = getPCAMetadataDE(dataElement);
-    
-    if (errors.length > 0) dataElement.errors = errors;
-    
+
+    validate(validations.checkHasCorrelative, hasCorrelative, { metadata }, errors);
+    validate(validations.checkHasFormName, checkHasProperty, { object: dataElement, property: 'formName' }, errors);
+    validate(validations.checkFormNameLength, checkPropertyLength, { object: dataElement, property: 'formName', min: MIN_DATA_ELEMENT_NAME_LENGTH, max: MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH }, errors);
+    if (metadata.autoNaming === 'No') {
+        validate(validations.checkHasName, checkHasProperty, { object: dataElement, property: 'name' }, errors);
+        validate(validations.checkNameLength, checkPropertyLength, { object: dataElement, property: 'name', min: MIN_DATA_ELEMENT_NAME_LENGTH, max: MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH }, errors);
+        validate(validations.checkHasShortName, checkHasProperty, { object: dataElement, property: 'shortName' }, errors);
+        validate(validations.checkShortNameLength, checkPropertyLength, { object: dataElement, property: 'shortName', min: 0, max: MAX_SHORT_NAME_LENGTH }, errors);
+        validate(validations.checkCodeLength, checkPropertyLength, { object: dataElement, property: 'code', min: 0, max: MAX_SHORT_NAME_LENGTH }, errors);
+    }
+    validate(validations.checkHasValueType, checkHasProperty, { object: dataElement, property: 'valueType' }, errors);
+    validate(validations.checkHasParentLogic, hasBothParentLogicComponents, { metadata }, errors);
+    validate(validations.checkNotSelfParent, parentIsNotSelf, { metadata }, errors);
+
+    if (errors.length > 0) dataElement.errors = {
+        title: errorDetails.title,
+        tagName: errorDetails.tagName,
+        errors,
+        displayBadges: true
+    };
+
 }
 
 export const getNewObjectsCount = (importResults) => extractAttributeValues(importResults, 'new').reduce((partialSum, a) => partialSum + a, 0)

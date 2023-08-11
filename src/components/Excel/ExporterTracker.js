@@ -152,7 +152,7 @@ const ExporterTracker = ({
         ws.getCell("B7").value = "Please read carefully all the instructions contained in this file to avoid issues and unexpected results when importing it to a DHIS2 server.";
 
         editingCell = buildCellObject(ws, "B8");
-        editingCell.cell.value = "Please keep in mind that this Template can only be used to edit existing DHIS2 Programs; Program creation is not supported.";
+        editingCell.cell.value = "Please keep in mind that this Template can only be used to edit existing DHIS2 Programs. Program creation is not supported.";
         editingCell.cell.style = { font: { color: { argb: 'FFC00000' } } };
 
 
@@ -830,7 +830,7 @@ const ExporterTracker = ({
                 key: "legend_set",
                 width: 20
             }, {
-                header: "Parent Question",
+                header: "Parent Data Element",
                 key: "parent_question",
                 width: 20
             }, {
@@ -884,7 +884,7 @@ const ExporterTracker = ({
             option_set: "Option Set that defines the answers available for the current Data Element (forces Value Type)",
             option_set_details: "Link to details (options) of the selected Option Set",
             legend_set: "Legend that will be applied to the Data Element",
-            parent_question: "Copy the Correlative of the Data Element that will act as parent of the current Data Element",
+            parent_question: "Copy the Correlative of the Data Element that will act as parent for the current Data Element",
             answer_value: "Value that will trigger the 'show' rule of the Data Element",
             stage_id: configuration.stageId,
             stage_name: configuration.stageName
@@ -1071,12 +1071,12 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [`AND($A3 = "Data Element",$C3 = "No",LEN($E3)>${MAX_DATA_ELEMENT_NAME_LENGTH})`],
+                    formulae: [`AND($A3 = "Data Element",$C3 = "No",OR(LEN($E3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($E3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`],
                     style: conditionalError,
                 }
             ],
             promptTitle: 'Name length out of range',
-            prompt: `Given Name length is out of the accepted range (Less than ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+            prompt: `Given Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
         });
         //conditional formatting for Short Name out of range
         ws.addConditionalFormatting({

@@ -143,8 +143,6 @@ const ProgramDetails = () => {
     )
 
     const commit = () => {
-        console.log(importResults)
-        //TODO: Validate imported settings
         //TODO: Save Changes after validation
         if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
         /*let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
@@ -233,11 +231,14 @@ const ProgramDetails = () => {
                     <div className="list-ml_item">
                         {
                             validationResults && 
-                            <Errors validationResults={
-                                (validationResults.teas.sections.concat(validationResults.teas.teas))
-                                .concat(validationResults.stages.sections.concat(validationResults.stages.dataElements))
-                                .map(tea => tea.errors)
-                            } key={"validationSec"} />
+                            <Errors
+                                validationResults={
+                                    (validationResults.teas.sections.concat(validationResults.teas.teas))
+                                    .concat(validationResults.stages.sections.concat(validationResults.stages.dataElements))
+                                    .map(tea => tea.errors)
+                                }
+                                key={"validationSec"}
+                            />
                         }
                         {importResults &&
                             <Removed
@@ -261,6 +262,7 @@ const ProgramDetails = () => {
                                     return (
                                         <StageItem
                                             stage={programStage}
+                                            importResults={importResults?.configurations?.importedStages?.find(result => result.id === programStage.id)}
                                             key={programStage.id}
                                             setNotification={setNotification}
                                             stagesRefetch={refetch}

@@ -30,7 +30,7 @@ const Errors = ({ validationResults }) => {
                 <div className="ml_item-title">
                     <span>Validation Errors</span>
                 </div>
-                <div className="ml_item-desc"><div style={tagStyle}>{validationResults.length} Validation Error(s)</div></div>
+                <div className="ml_item-desc"><div style={tagStyle}>{validationResults.reduce((acu, cur) => acu + (cur.errors?.length || 1), 0)} Validation Error(s)</div></div>
                 <div className="ml_item-warning_error "></div>
                 <div className="ml_item-cta" onClick={() => setExpanded(!expanded)} style={{ cursor: 'pointer' }}>
                     <img className="bsct_cta" alt="exp" src={expanded ? contracted_bottom_svg : expanded_bottom_svg} />

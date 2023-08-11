@@ -150,7 +150,8 @@ const Importer = (
                         headers,
                         (isTracker ? TRACKER_TEMPLATE_HEADERS : HNQIS2_TEMPLATE_HEADERS),
                         (4 + (2 * index) + indexModifier),
-                        (isTracker ? 1 : 2)
+                        (isTracker ? 1 : 2),
+                        true
                     )
                     if (!currentTemplateData.status) return;
                     templateData.push(currentTemplateData);
@@ -162,11 +163,15 @@ const Importer = (
                         ? importReadingTracker(teaData, templateData, programDetails, mappingDetails, programSpecificType)
                         : importReadingHNQIS(templateData, programDetails, mappingDetails);
                 
-
-                setImportSummary(importSummaryValues);
-                setImportResults(importSummaryValues);
-                setSaveStatus('Validate & Save');
-                setSavedAndValidated(false);
+                if (importSummaryValues.error) {
+                    addExecutedTask({ step: 10000, name: importSummaryValues.error, status: 'error' });
+                    setNotificationError(true);
+                } else {
+                    setImportSummary(importSummaryValues);
+                    setImportResults(importSummaryValues);
+                    setSaveStatus('Validate & Save');
+                    setSavedAndValidated(false);
+                }
             }
         }
         setButtonDisabled(false);
@@ -205,27 +210,37 @@ const Importer = (
     }
 
     const importReadingTracker = (teaData, templateData, programDetails, mappingDetails, programSpecificType) => {
-        let importSummaryValues = buildTrackerSummary(programSpecificType, templateData.length);
+        let importSummaryValues = buildTrackerSummary(programSpecificType, currentStagesData.length);
         let importedStages = [];
+        let importError = undefined;
         currentStagesData.forEach((currentStage, index) => {
-            importSummaryValues.stages[index].stageName = currentStage.name;
-            let { importedSections } = readTemplateData({
-                teaData,
-                currentData: { sections: setUpProgramStageSections(previous.stages.find(stage => stage.id === currentStage.id)) },
-                templateData: templateData[index].data,
-                programPrefix: programDetails.dePrefix || programDetails.id,
-                optionSets: mappingDetails.optionSets,
-                legendSets: mappingDetails.legendSets,
-                currentSectionsData: setUpProgramStageSections(currentStage.programStageSections),
-                mode: programSpecificType,
-                importSummaryValues: importSummaryValues.stages[index]
-            });
-            importedStages.push({
-                id: currentStage.id,
-                name: currentStage.name,
-                importedSections
-            })
+            let stageIndex = templateData.findIndex(elem => elem.stageId === currentStage.id);
+            if (stageIndex === -1) {
+                importError = `The import process has failed. Some Stages are missing in the imported file (${currentStage.name}), please download a new Template and try again.`;
+            } else {
+                importSummaryValues.stages[index].stageName = currentStage.name;
+                let { importedSections } = readTemplateData({
+                    teaData,
+                    currentData: { sections: setUpProgramStageSections(previous.stages.find(stage => stage.id === currentStage.id)), stageNumber: index + 1 },
+                    templateData: templateData[stageIndex].data,
+                    programPrefix: (programDetails.dePrefix) || programDetails.id,
+                    optionSets: mappingDetails.optionSets,
+                    legendSets: mappingDetails.legendSets,
+                    currentSectionsData: setUpProgramStageSections(currentStage.programStageSections),
+                    mode: programSpecificType,
+                    importSummaryValues: importSummaryValues.stages[index]
+                });
+
+                importedStages.push({
+                    id: currentStage.id,
+                    name: currentStage.name,
+                    stageNumber: index + 1,
+                    importedSections
+                });
+            }
         })
+
+        if (importError) return { error: importError };
 
         let importedProgramSections = [];
         if (teaData) {

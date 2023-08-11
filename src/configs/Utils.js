@@ -236,6 +236,10 @@ export const isValidParentName = (json, key) => {
     return (/_S\d+Q\d+/.test(json[key]))
 }
 
+export const isValidCorrelative = (json, key) => {
+    return (/_PS\d+_S\d+E\d+/.test(json[key]))
+}
+
 export const extractAttributeValues = (obj, targetAttribute, resultList = []) => {
     if (typeof obj === 'object' && obj !== null) {
         if (obj[targetAttribute] !== undefined) {

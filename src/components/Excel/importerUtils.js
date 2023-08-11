@@ -146,9 +146,10 @@ const worksheetValidation = (status, task, { setNotificationError, sheetName, he
     return status;
 }
 
-const getWorksheetData = (status, task, { currentWorksheet, templateHeadersList, structureColumn }) => {
+const getWorksheetData = (status, task, { currentWorksheet, templateHeadersList, structureColumn, isTrackerTemplate }) => {
 
     let templateData = [];
+    let stageId;
     let dataRow = 3;
 
     currentWorksheet.eachRow((row, rowIndex) => {
@@ -162,10 +163,12 @@ const getWorksheetData = (status, task, { currentWorksheet, templateHeadersList,
         }
     });
 
-    return { status, data: templateData };
+    if (isTrackerTemplate) stageId = currentWorksheet.getCell("Q2").value;
+
+    return { status, data: templateData, stageId };
 }
 
-export const handleWorksheetReading = (tasksHandler, currentWorksheet, setNotificationError, headers, templateHeadersList, startingIndex,structureColumn) => {
+export const handleWorksheetReading = (tasksHandler, currentWorksheet, setNotificationError, headers, templateHeadersList, startingIndex,structureColumn, isTrackerTemplate = false) => {
     if (!tasksHandler(
         startingIndex,
         `${currentWorksheet.name}: Validating worksheet columns`,
@@ -187,7 +190,8 @@ export const handleWorksheetReading = (tasksHandler, currentWorksheet, setNotifi
         {
             currentWorksheet,
             templateHeadersList,
-            structureColumn
+            structureColumn,
+            isTrackerTemplate
         }
     );
 
@@ -317,11 +321,12 @@ export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legen
     return parsedDE;
 };
 
-export const mapImportedDE = (data, programPrefix, optionSets, legendSets, dataElementsPool) => {
+export const mapImportedDE = (data, programPrefix, stageNumber, optionSets, legendSets, dataElementsPool) => {
     
     const autoNaming = data[TRACKER_TEMPLATE_MAP.autoNaming] === 'No' ? false : true;
+    const stagePrefix = `_PS${stageNumber}`;
     const code = autoNaming
-        ? programPrefix + '_' + (data[TRACKER_TEMPLATE_MAP.correlative]?.result || '???')
+        ? programPrefix + stagePrefix +(data[TRACKER_TEMPLATE_MAP.correlative]?.result || '???')
         : data[TRACKER_TEMPLATE_MAP.code];
 
     const existingDe = dataElementsPool[data[TRACKER_TEMPLATE_MAP.dataElementId]] || {};
@@ -341,7 +346,7 @@ export const mapImportedDE = (data, programPrefix, optionSets, legendSets, dataE
     parsedDE.domainType = 'TRACKER';
     parsedDE.valueType = getKeyByValue(DHIS2_VALUE_TYPES_MAP, data[TRACKER_TEMPLATE_MAP.valueType]);
     parsedDE.aggregationType = getKeyByValue(DHIS2_AGG_OPERATORS_MAP, data[TRACKER_TEMPLATE_MAP.aggOperator] || 'None');
-    parsedDE.parentName = data[TRACKER_TEMPLATE_MAP.parentName]?.result;
+    parsedDE.parentName = data[TRACKER_TEMPLATE_MAP.parentName]?.result?stagePrefix+data[TRACKER_TEMPLATE_MAP.parentName]?.result:undefined;
     parsedDE.attributeValues = (existingDe?.attributeValues?.filter(att =>
         ![METADATA].includes(att.attribute.id)
     ) || [])
@@ -363,15 +368,15 @@ export const mapImportedDE = (data, programPrefix, optionSets, legendSets, dataE
 
     const metadata = {
         isCompulsory: data[TRACKER_TEMPLATE_MAP.isCompulsory] || "No",
-        varName: data[TRACKER_TEMPLATE_MAP.correlative]?.result,
+        varName: stagePrefix+data[TRACKER_TEMPLATE_MAP.correlative]?.result,
         autoNaming: autoNaming ? 'Yes' : 'No'
     };
 
-    if (data[TRACKER_TEMPLATE_MAP.parentQuestion] !== "") {
-        metadata.parentQuestion = data[TRACKER_TEMPLATE_MAP.parentQuestion];
-        parsedDE.parentQuestion = data[TRACKER_TEMPLATE_MAP.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
+    if (data[TRACKER_TEMPLATE_MAP.parentQuestion] && data[TRACKER_TEMPLATE_MAP.parentQuestion] !== "") {
+        metadata.parentQuestion = stagePrefix+data[TRACKER_TEMPLATE_MAP.parentQuestion];
+        parsedDE.parentQuestion = stagePrefix+data[TRACKER_TEMPLATE_MAP.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
     }
-    if (data[TRACKER_TEMPLATE_MAP.parentValue] !== "") metadata.parentValue = data[TRACKER_TEMPLATE_MAP.parentValue];
+    if (data[TRACKER_TEMPLATE_MAP.parentValue] && data[TRACKER_TEMPLATE_MAP.parentValue] !== "") metadata.parentValue = data[TRACKER_TEMPLATE_MAP.parentValue];
 
     parsedDE.attributeValues.push(
         {

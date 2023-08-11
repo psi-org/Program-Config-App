@@ -181,6 +181,7 @@ const MAX_STAGE_NAME_LENGTH = 230;
 const MAX_SECTION_NAME_LENGTH = 230;
 const MAX_DATA_ELEMENT_NAME_LENGTH = 200;
 const MAX_FORM_NAME_LENGTH = 230;
+const MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH = 230;
 
 const MIN_NAME_LENGTH = 2;
 const MIN_DESCRIPTION_LENGTH = 2;
@@ -577,5 +578,6 @@ export {
     MAX_FORM_NAME_LENGTH,
     tagStyle,
     newTagStyle,
-    updatedTagStyle
+    updatedTagStyle,
+    MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH
 };

@@ -163,7 +163,6 @@ const ValidateMetadata = (
             } else {
                 setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
                 setSavingMetadata(false);
-                console.log(validationResults)
                 setValidationResults(validationResults);
             }
             previous.setSections(importedSectionsV);
