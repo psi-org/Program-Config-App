@@ -6,12 +6,12 @@ const ValidationMessages = (props) => {
     return <Modal>
         <ModalTitle>Validation Messages</ModalTitle>
         <ModalContent>
-            {props.dataElements.map((dataElement, k) => dataElement.errors && dataElement.errors.errors?.length > 0 &&
+            {props.objects.map((object, k) => object.errors && object.errors.errors?.length > 0 &&
                 <Messages
                     key={k}
-                    title={dataElement.errors.title}
+                    title={object.errors.title}
                     error={true}
-                    messages={dataElement.errors.errors}
+                    messages={object.errors.errors}
                 />
             )}
         </ModalContent>

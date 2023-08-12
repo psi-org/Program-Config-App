@@ -15,7 +15,7 @@ import { FlyoutMenu, MenuItem, Popper, Layer, colors, IconAdd16, IconDelete16, I
 
 import BadgeWarnings from "../UIElements/BadgeWarnings";
 import BadgeErrors from "../UIElements/BadgeErrors";
-import ValidationMessages from "./ValidationMessages";
+import ValidationMessages from "../UIElements/ValidationMessages";
 import { useState } from "react";
 
 import move_vert_svg from './../../images/i-more_vert_black.svg';
@@ -132,7 +132,7 @@ const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, update
                                 setSaveStatus={setSaveStatus}
                             />
                         }
-                        {showValidationMessage && <ValidationMessages dataElements={[dataElement]} showValidationMessage={setShowValidationMessage} />}
+                        {showValidationMessage && <ValidationMessages objects={[dataElement]} showValidationMessage={setShowValidationMessage} />}
                     </div>
                 )}
             </Draggable>

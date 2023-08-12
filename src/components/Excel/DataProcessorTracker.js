@@ -4,6 +4,7 @@ import { DeepCopy, arrayObjectToStringConverter } from '../../configs/Utils';
 import Exporter from "./Exporter";
 import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, METADATA } from '../../configs/Constants';
 import ExporterTracker from './ExporterTracker';
+import { getVarNameFromParentUid } from '../../configs/ExcelUtils';
 
 const optionSetQuery = {
     results: {
@@ -307,12 +308,6 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
         row.id = tea.id;
 
         return row;
-    }
-
-    const getVarNameFromParentUid = (parentUid, programStage) => {
-        let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
-        let deMetadata = JSON.parse(parentDe.attributeValues.find(av => av.attribute.id === METADATA)?.value || "{}");
-        return deMetadata.varName;
     }
 
     return (

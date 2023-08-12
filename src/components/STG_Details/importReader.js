@@ -100,29 +100,3 @@ const readTemplateData = (
 module.exports = {
     readTemplateData
 };
-
-/*
-const existingTEAs = props.data ? 
-props.data.programTrackedEntityAttributes.map(tea => ({
-    trackedEntityAttribute: tea.trackedEntityAttribute,
-    valueType: tea.valueType,
-    allowFutureDate: tea.allowFutureDate,
-    displayInList: tea.displayInList,
-    mandatory: tea.mandatory,
-    searchable: tea.searchable,
-    renderType:tea.renderType
-})) : []
-
-const availableTEAs = data.results.trackedEntityAttributes.filter(
-    tea => !existingTEAs.map(tea => tea.trackedEntityAttribute.id).includes(tea.id)
-).map(
-    tea => ({
-        trackedEntityAttribute: { id: tea.id, name: tea.name },
-        valueType: tea.valueType,
-        allowFutureDate: false,
-        displayInList: false,
-        mandatory: false,
-        searchable: false 
-    })
-)
-*/

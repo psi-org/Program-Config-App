@@ -22,7 +22,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Tooltip } from "@mui/material";
 import BadgeErrors from "../UIElements/BadgeErrors";
-import ValidationMessages from "../STG_Details/ValidationMessages";
+import ValidationMessages from "../UIElements/ValidationMessages";
 
 const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
 
@@ -94,7 +94,7 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
                         data={stage}
                         setNewStage={setNewStage} />
                 }
-                {showValidationMessage && <ValidationMessages dataElements={importResults.importedSections.map(section => [section].concat(section.dataElements)).flat()} showValidationMessage={setShowValidationMessage} />}
+                {showValidationMessage && <ValidationMessages objects={importResults.importedSections.map(section => [section].concat(section.dataElements)).flat()} showValidationMessage={setShowValidationMessage} />}
             </div>
         </div>
     );

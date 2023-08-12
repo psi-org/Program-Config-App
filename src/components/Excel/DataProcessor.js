@@ -3,6 +3,7 @@ import { useDataQuery } from '@dhis2/app-runtime'
 import { arrayObjectToStringConverter } from '../../configs/Utils';
 import Exporter from "./Exporter";
 import { COMPETENCY_CLASS, CRITICAL_STEPS, FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA, NON_CRITICAL_STEPS } from '../../configs/Constants';
+import { getVarNameFromParentUid } from '../../configs/ExcelUtils';
 
 const optionSetQuery = {
     results: {
@@ -155,7 +156,7 @@ const DataProcessor = (props) => {
                 if(row.structure == 'label') row.form_name = metaData.labelFormName || '';
                 row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: '';
                 row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
-                row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion) : '';
+                row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion, programStage) : '';
                 row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : '';
                 row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: '';
                 row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: '';
@@ -170,12 +171,6 @@ const DataProcessor = (props) => {
             });
         });
     };
-
-    const getVarNameFromParentUid = (parentUid) =>{
-        let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
-        let deMetadata = JSON.parse(parentDe.attributeValues.find(av => av.attribute.id === METADATA)?.value || "{}");
-        return deMetadata.varName;
-    }
 
     initialize();
 

@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE } from "../../configs/Constants";
+import { getProgramQuery, parseErrorsSaveMetadata } from "../../configs/Utils";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -23,7 +24,6 @@ const competencyClassAttribute = {
     "translations": [],
     "userAccesses": []
 };
-
 const queryId = {
     results: {
         resource: 'system/id.json',
@@ -36,7 +36,7 @@ const queryProgram = {
         resource: 'programs',
         id: ({ id }) => id,
         params: {
-            fields: ["id", "name", "shortName", "publicAccess", "ignoreOverdueEvents", "skipOffline", "enrollmentDateLabel", "onlyEnrollOnce", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "selectEnrollmentDatesInFuture", "registration", "useFirstStageDuringRegistration", "completeEventsExpiryDays", "withoutRegistration", "minAttributesRequiredToSearch", "displayFrontPageList", "programType", "accessLevel", "displayIncidentDate", "expiryDays", "style", "trackedEntityType", "programIndicators", "translations", "userGroupAccesses", "attributeValues", "userAccesses", "programRuleVariables", "programTrackedEntityAttributes[id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute,programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccesses]", "organisationUnits", "programSections", "programStages", "user"]
+            fields: getProgramQuery()
         }
     }
 };
@@ -51,14 +51,7 @@ const getParentUid = (parentName, dataElements) => {
     return dataElements.find(de => de.parentName == parentName)?.id
 };
 
-const parseErrors = (e) => {
-    let errors = e.response || e;
-    let data = errors.typeReports.map(tr => {
-        let type = tr.klass.split('.').pop()
-        return tr.objectReports.map(or => or.errorReports.map(er => ({ type, uid: or.uid, errorCode: er.errorCode, message: er.message })))
-    })
-    return data.flat(2)
-}
+
 
 const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, refetchProgramStage }) => {
 
@@ -92,9 +85,9 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
 
     const gotResponseError = (response) => {
         setErrorStatus(true);
-        setTypeReports(parseErrors(response));
+        setTypeReports(parseErrorsSaveMetadata(response));
         setCompleted(true);
-        setErrorReports(parseErrors(response))
+        setErrorReports(parseErrorsSaveMetadata(response))
     };
 
     useEffect(() => {
@@ -126,7 +119,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
          */
 
         let psdeSortOrder = 1
-        importedSections.forEach((section, secIdx) => { //v1.4.0 WORK
+        importedSections.forEach((section, secIdx) => {
 
             if (section.importStatus == 'new') section.id = uidPool.shift();
 

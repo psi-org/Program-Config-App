@@ -14,7 +14,7 @@ import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg'
 import {FlyoutMenu, MenuItem, Popper, Layer, Tag } from '@dhis2/ui';
 import BadgeWarnings from "../UIElements/BadgeWarnings";
 import BadgeErrors from "../UIElements/BadgeErrors";
-import ValidationMessages from "./ValidationMessages";
+import ValidationMessages from "../UIElements/ValidationMessages";
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -158,7 +158,7 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
                             </div>
                         )}
                     </Droppable>
-                    {showValidationMessage && <ValidationMessages dataElements={[stageSection].concat(stageSection.dataElements)} showValidationMessage={setShowValidationMessage} /> }
+                    {showValidationMessage && <ValidationMessages objects={[stageSection].concat(stageSection.dataElements)} showValidationMessage={setShowValidationMessage} /> }
                     {!!sectionToRemove && <AlertDialogSlide
                         open={!!sectionToRemove} 
                         title={"Remove this Section from the Stage?"}

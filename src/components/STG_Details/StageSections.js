@@ -1216,7 +1216,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : removedElements}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
-                    previous={{ sections, setSections, scoresSection, setScoresSection }}
+                    previous={{ sections: [...backupData.sections], setSections, scoresSection: DeepCopy(backupData.scoresSection), setScoresSection }}
                     setImportResults={setImportResults}
                     importResults={importResults}
                     setValidationResults={setValidationResults}

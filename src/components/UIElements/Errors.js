@@ -3,7 +3,7 @@ import { useState } from 'react';
 import error_svg from './../../images/i-error.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import ValidationMessages from "../STG_Details/ValidationMessages";
+import ValidationMessages from "../UIElements/ValidationMessages";
 import { METADATA, tagStyle } from '../../configs/Constants';
 import { ValidationErrorItem } from './ValidationErrorItem';
 import { extractAttributeValues } from '../../configs/Utils';
@@ -45,7 +45,11 @@ const Errors = ({ validationResults }) => {
                     display: expanded ? 'block' : 'none'
                 }}>
                 {
-                    validationResults.map((errorDetails, i) => {
+                    validationResults.sort((a, b) => { 
+                        if (a.title > b.title) return 1;
+                        if (a.title < b.title) return -1;
+                        return 0;
+                    }).map((errorDetails, i) => {
                         return (
                             <ValidationErrorItem 
                                 key={i} 
@@ -62,7 +66,7 @@ const Errors = ({ validationResults }) => {
                 }
 
             </div>
-            {showValidationMessage && <ValidationMessages dataElements={errors} showValidationMessage={setShowValidationMessage} />}
+            {showValidationMessage && <ValidationMessages objects={errors} showValidationMessage={setShowValidationMessage} />}
         </>
     )
 }

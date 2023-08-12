@@ -270,3 +270,9 @@ export const getHNQIS2MappingList = (ws) => {
         programs: getMappedValues(ws, 3, "R", { id: 'S', name: 'R' })
     };
 }
+
+export const getVarNameFromParentUid = (parentUid, programStage) => {
+    let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
+    let deMetadata = JSON.parse(parentDe?.attributeValues?.find(av => av.attribute.id === METADATA)?.value || "{}");
+    return deMetadata.varName;
+}

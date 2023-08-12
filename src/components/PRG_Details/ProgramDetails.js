@@ -16,7 +16,7 @@ import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
-import { DeepCopy, formatAlert, truncateString } from "../../configs/Utils";
+import { DeepCopy, formatAlert, getProgramQuery, truncateString } from "../../configs/Utils";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 import DataProcessorTracker from "../Excel/DataProcessorTracker";
 import Importer from "../Excel/Importer";
@@ -25,21 +25,16 @@ import { Button } from "@mui/material";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import Removed from "../UIElements/Removed";
-import ValidateTracker from "../Excel/ValidateTracker";
+import ValidateTracker from "../PRG_Details/ValidateTracker";
 import Errors from "../UIElements/Errors";
 
-const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,description,displayName,domainType,formName,id,legendSet,legendSets[id,name],name,optionSet[id,name],optionSetValue,sharing,shortName,style,valueType';
-const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style`;
-const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder`;
-const stagesQuery = `id,name,displayName,formType,programStageSections[${stageSectionsQuery}],description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements[${stageDataElementsQuery}],sortOrder`
-const programSectionsQuery = 'id,name,renderType,sortOrder,program,sharing,translations,attributeValues,trackedEntityAttributes';
 
 const query = {
     results: {
         resource: 'programs',
         id: ({ program }) => program,
         params: {
-            fields: ['id', 'displayName', 'programType', 'code', 'attributeValues', `programStages[${stagesQuery}]`, 'withoutRegistration', `programSections[${programSectionsQuery}]`, 'programTrackedEntityAttributes']
+            fields: getProgramQuery()
         }
     },
 };

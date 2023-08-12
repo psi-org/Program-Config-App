@@ -104,6 +104,15 @@ export function parseErrorsUL(response) {
     </ul>
 }
 
+export const parseErrorsSaveMetadata = (e) => {
+    let errors = e.response || e;
+    let data = errors.typeReports.map(tr => {
+        let type = tr.klass.split('.').pop()
+        return tr.objectReports.map(or => or.errorReports.map(er => ({ type, uid: or.uid, errorCode: er.errorCode, message: er.message })))
+    })
+    return data.flat(2)
+}
+
 export function truncateString(strVal, characters = 50,useEllipsis=true) {
     return (strVal.substring(0, characters) + ((strVal.length > characters && useEllipsis) ? '...' : ''))
 }
@@ -258,4 +267,54 @@ export const extractAttributeValues = (obj, targetAttribute, resultList = []) =>
 export const getPCAMetadataDE = (dataElement) => {
     let jsonData = dataElement.attributeValues?.find(attributeValue => attributeValue.attribute.id === METADATA);
     return jsonData ? JSON.parse(jsonData.value) : {};
+}
+
+export const getProgramQuery = () => {
+    const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,description,displayName,domainType,formName,id,legendSet,legendSets[id,name],name,optionSet[id,name],optionSetValue,sharing,shortName,style,valueType';
+    const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style`;
+    const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder`;
+    const stagesQuery = `id,name,displayName,formType,programStageSections[${stageSectionsQuery}],description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements[${stageDataElementsQuery}],sortOrder`
+    const programSectionsQuery = 'id,name,renderType,sortOrder,program,sharing,translations,attributeValues,trackedEntityAttributes';
+    const programTrackedEntityAttributes = 'id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute,programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccessesattributeValues,displayInList,id,mandatory,name,program,programTrackedEntityAttributeGroups,renderOptionsAsRadio,searchable,sortOrder,trackedEntityAttribute,translations,userAccesses,userGroupAccesses,valueType';
+
+    return [
+        'accessLevel',
+        'completeEventsExpiryDays',
+        'displayFrontPageList',
+        'displayIncidentDate',
+        'enrollmentDateLabel',
+        'expiryDays',
+        'id',
+        'ignoreOverdueEvents',
+        'maxTeiCountToReturn',
+        'minAttributesRequiredToSearch',
+        'name',
+        'onlyEnrollOnce',
+        'organisationUnits',
+        'programIndicators',
+        'programRuleVariables',
+        'displayName',
+        'programType',
+        'code',
+        'attributeValues',
+        `programStages[${stagesQuery}]`,
+        'withoutRegistration',
+        `programSections[${programSectionsQuery}]`,
+        `programTrackedEntityAttributes[${programTrackedEntityAttributes}]`,
+        'programType',
+        'publicAccess',
+        'registration',
+        'selectEnrollmentDatesInFuture',
+        'selectIncidentDatesInFuture',
+        'shortName',
+        'skipOffline',
+        'style',
+        'trackedEntityType',
+        'translations',
+        'useFirstStageDuringRegistration',
+        'user',
+        'userAccesses',
+        'userGroupAccesses',
+        'sharing'
+    ];
 }

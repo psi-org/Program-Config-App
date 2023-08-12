@@ -7,7 +7,7 @@ import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import BadgeWarnings from "../UIElements/BadgeWarnings";
 import BadgeErrors from "../UIElements/BadgeErrors";
-import ValidationMessages from "./ValidationMessages";
+import ValidationMessages from "../UIElements/ValidationMessages";
 
 import LaunchIcon from '@mui/icons-material/Launch';
 import RuleIcon from '@mui/icons-material/Rule';
@@ -116,7 +116,7 @@ const Scores = ({ stageSection, program, index }) => {
                         )
                     })
                 }
-                {showValidationMessage && <ValidationMessages dataElements={errors} showValidationMessage={setShowValidationMessage} />}
+                {showValidationMessage && <ValidationMessages objects={errors} showValidationMessage={setShowValidationMessage} />}
                 {scoreRules && (
                     <CustomMUIDialog open={!!scoreRules} maxWidth='md' fullWidth={true} onClose={() => setScoreRules(false)}>
                         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => setScoreRules(false)}>

@@ -42,6 +42,7 @@ const ValidateMetadata = (
     const [validationMessage, setValidationMessage] = useState("Metadata validated. Please use the 'SAVE' button to persist your changes.");
 
     useEffect(() => {
+        console.log(importedSections)
         const importedSectionsV = importedSections;
         const importedScoresV = importedScores;
         let errorCounts = 0;
