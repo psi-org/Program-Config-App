@@ -3,6 +3,7 @@ import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import {
     conditionalError,
     disabledHighlighting,
+    getTEAErrorsFormula,
     middleCenter,
     otherHighlighting,
     questionHighlighting,
@@ -10,6 +11,7 @@ import {
     sectionHighlighting,
     teaStructureValidator,
     TEMPLATE_PASSWORD,
+    TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS,
     trackerStructureValidator,
     verticalMiddle,
     yesNoValidator
@@ -558,6 +560,10 @@ const ExporterTracker = ({
             header: "Program TEA Id",
             key: "program_tea_id",
             width: 1
+        },{
+            header: "Errors/Warnings/Info",
+            key: "errs",
+            width: 50
         }];
         
         ['B1', 'D1', 'E1', 'F1'].forEach(cellValue => ws.getCell(cellValue).note = {
@@ -586,9 +592,10 @@ const ExporterTracker = ({
             mandatory: "If 'Yes', the TEA must be filled to complete the event.\n[Default is 'No']",
             searchable: "If 'Yes', allows the TEA to be used as a search filter in the Tracked Entity Instances list.\n[Default is 'No']",
             display_in_list: "If 'Yes', the value of the selected TEA will be displayed in the Tracked Entity Instances list.\n[Default is 'No']",
-            allow_future_date: "If 'Yes', the TEA will allow to select a date in future (DATE TEAs only).\n[Default is 'No']"
+            allow_future_date: "If 'Yes', the TEA will allow to select a date in future (DATE TEAs only).\n[Default is 'No']",
+            errs: "Details about the cell highlighting on each row."
         };
-        fillBackgroundToRange(ws, "A2:J2", "D9D9D9");
+        fillBackgroundToRange(ws, "A2:M2", "D9D9D9");
         ws.getRow(2).height = 100;
         ws.getRow(2).alignment = middleCenter;
 
@@ -597,12 +604,13 @@ const ExporterTracker = ({
         fillBackgroundToRange(ws, "C1:C1", "E2EFDA");
         fillBackgroundToRange(ws, "D1:F1", "BDD7EE");
         fillBackgroundToRange(ws, "G1:J1", "E2EFDA");
+        fillBackgroundToRange(ws, "M1:M1", "BDD7EE");
 
 
         addValidationTEA(ws);
         addConditionalFormattingTEA(ws);
         populateConfigurationTEA(ws);
-        applyBorderToRange(ws, 0, 0, 9, 102);
+        applyBorderToRange(ws, 0, 0, 12, 102);
     };
 
     const addValidationTEA = (ws) => {
@@ -638,12 +646,12 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($A3),NOT(ISBLANK($C3)))'],
+                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.structureNotSelected.formula],
                     style: conditionalError,
                 }
             ],
             promptTitle: 'Structure not selected',
-            prompt: 'A Structure has not been defined for the specified element.'
+            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.structureNotSelected.prompt
         });
         //Duplicated TEA found
         ws.addConditionalFormatting({
@@ -652,12 +660,12 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND($B3<>"",COUNTIF($B$3:$B$102,B3)>1)'],
+                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.duplicatedTEA.formula],
                     style: conditionalError,
                 }
             ],
             promptTitle: 'Duplicated value',
-            prompt: 'A duplicated TEA has been found.'
+            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.duplicatedTEA.prompt
         });
         //TEA/Section Name not defined
         ws.addConditionalFormatting({
@@ -666,12 +674,12 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($C3),NOT(ISBLANK($A3)))'],
+                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.nameNotDefined.formula],
                     style: conditionalError,
                 }
             ],
             promptTitle: 'Name not defined',
-            prompt: 'The Section/TEA Name was not defined.'
+            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.nameNotDefined.prompt
         });
         //Selected TEA does not exist (1)
         ws.addConditionalFormatting({
@@ -680,12 +688,12 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['OR(ISBLANK($B3), $B3 = "Not Found", ISBLANK($D3), $D3 = "Not Found", ISBLANK($E3), $E3 = "Not Found", ISBLANK($F3), $F3 = "Not Found")'],
+                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.teaNotFound.formula],
                     style: conditionalError,
                 }
             ],
             promptTitle: 'TEA not found',
-            prompt: 'The specified TEA is not available.'
+            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.teaNotFound.prompt
         });
         //Selected TEA does not exist (2)
         ws.addConditionalFormatting({
@@ -694,12 +702,12 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['OR(ISBLANK($B3), $B3 = "Not Found", ISBLANK($D3), $D3 = "Not Found", ISBLANK($E3), $E3 = "Not Found", ISBLANK($F3), $F3 = "Not Found")'],
+                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.teaNotFound.formula],
                     style: conditionalError,
                 }
             ],
             promptTitle: 'TEA not found',
-            prompt: 'The specified TEA is not available.'
+            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.teaNotFound.prompt
         });
         //Disable future date if Value Type != DATE
         ws.addConditionalFormatting({
@@ -708,12 +716,12 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND($A3 = "TEA", OR(ISBLANK($E3), AND($E3 <> "DATE", $E3 <> "DATETIME")))'],
+                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.disabledFutureDate.formula],
                     style: disabledHighlighting,
                 }
             ],
             promptTitle: 'Future Date disabled',
-            prompt: 'Future Dates is not allowed for value types other than Date.'
+            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.disabledFutureDate.prompt
         });
         //Row highlighting for TEA/Section
         ws.addConditionalFormatting({
@@ -756,6 +764,10 @@ const ExporterTracker = ({
                     formula: `=IF(AND(NOT(ISBLANK(A${dataRow})),A${dataRow}="TEA"),IF(ISNA(VLOOKUP(C${dataRow}, selected_TEA_Data,${2 + index},FALSE)),"Not Found",VLOOKUP(C${dataRow}, selected_TEA_Data,${2 + index},FALSE)),"")`
                 }
             })
+
+            configure.errs = {
+                formula: `=${getTEAErrorsFormula(dataRow)}`
+            }
 
             ws.getRow(dataRow).values = configure;
             if (configure.structure === "Section") {

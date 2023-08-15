@@ -1,7 +1,7 @@
-import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy, getObjectIdByProperty } from "./Utils";
+import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy } from "./Utils";
 import { saveAs } from 'file-saver';
-import { HNQIS2_TEMPLATE_MAP, thinBorder } from "./TemplateConstants";
-import { FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA, SHORT_DATE_FORMAT_OPTIONS } from "./Constants";
+import { thinBorder } from "./TemplateConstants";
+import { METADATA, SHORT_DATE_FORMAT_OPTIONS } from "./Constants";
 
 export function printArray2Column(sheet, array, header, startPosition, headerBgColor) {
     let coordinates = splitPosition(startPosition);

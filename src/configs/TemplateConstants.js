@@ -181,3 +181,43 @@ export const TEMPLATE_PROGRAM_TYPES = {
     tracker: 'Tracker Program',
     event: 'Event Program'
 }
+
+export const TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS = {
+    structureNotSelected: {
+        formula: 'AND(ISBLANK($A3),NOT(ISBLANK($C3)))',
+        dynamicFormula: 'AND(ISBLANK($A_ROWNUM_),NOT(ISBLANK($C_ROWNUM_)))',
+        prompt: 'Structure is not defined.'
+    },
+    duplicatedTEA: {
+        formula: 'AND($B3<>"",COUNTIF($B$3:$B$102,B3)>1)',
+        dynamicFormula: 'AND($B_ROWNUM_<>"",COUNTIF($B$3:$B$102,B_ROWNUM_)>1)',
+        prompt: 'Duplicated TEA.'
+    },
+    nameNotDefined: {
+        formula: 'AND(ISBLANK($C3),NOT(ISBLANK($A3)))',
+        dynamicFormula: 'AND(ISBLANK($C_ROWNUM_),NOT(ISBLANK($A_ROWNUM_)))',
+        prompt: 'Name not defined.'
+    },
+    teaNotFound: {
+        formula: 'OR(ISBLANK($B3), $B3 = "Not Found", ISBLANK($D3), $D3 = "Not Found", ISBLANK($E3), $E3 = "Not Found", ISBLANK($F3), $F3 = "Not Found")',
+        prompt: 'The specified TEA is not available.'
+    },
+    disabledFutureDate: {
+        formula: 'AND($A3 = "TEA", NOT(ISBLANK($C3)), OR(ISBLANK($E3), AND($E3 <> "DATE", $E3 <> "DATETIME")))',
+        dynamicFormula: 'AND($A_ROWNUM_ = "TEA", NOT(ISBLANK($C_ROWNUM_)), OR(ISBLANK($E_ROWNUM_), AND($E_ROWNUM_ <> "DATE", $E_ROWNUM_ <> "DATETIME")))',
+        prompt: 'Future Date not available for the selected TEA.'
+    }
+}
+
+export const getTEAErrorsFormula = (rowNumber) => {
+    let formula = "CONCATENATE(";
+
+    formula = formula + Object.keys(TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS).map(teaValidation => {
+        if (TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS[teaValidation].dynamicFormula)
+            return `IF(${TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS[teaValidation].dynamicFormula
+                .replaceAll('_ROWNUM_', rowNumber)}, "${TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS[teaValidation].prompt} ", "")`
+    }).join(',');
+
+    formula = formula + ',"")';
+    return formula;
+}
