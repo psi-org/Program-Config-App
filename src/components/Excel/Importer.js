@@ -73,6 +73,7 @@ const Importer = (
         setButtonDisabled(true);
         setImportResults(undefined);
         setValidationResults(undefined);
+        setNotificationError(false);
         let indexModifier = 0;
         if (typeof selectedFile !== 'undefined') {
             if (!tasksHandler(1, 'Validating Template format (XLSX)', false, fileValidation, { setNotificationError, selectedFile })) return;
@@ -162,7 +163,7 @@ const Importer = (
                     isTracker
                         ? importReadingTracker(teaData, templateData, programDetails, mappingDetails, programSpecificType)
                         : importReadingHNQIS(templateData, programDetails, mappingDetails);
-                
+
                 if (importSummaryValues.error) {
                     addExecutedTask({ step: 10000, name: importSummaryValues.error, status: 'error' });
                     setNotificationError(true);
@@ -213,6 +214,7 @@ const Importer = (
         let importSummaryValues = buildTrackerSummary(programSpecificType, currentStagesData.length);
         let importedStages = [];
         let importError = undefined;
+
         currentStagesData.forEach((currentStage, index) => {
             let stageIndex = templateData.findIndex(elem => elem.stageId === currentStage.id);
             if (stageIndex === -1) {

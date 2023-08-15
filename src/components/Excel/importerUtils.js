@@ -76,7 +76,7 @@ export const workbookValidation = (status, task, { setNotificationError, workboo
     workbook.eachSheet((worksheet, sheetId) => {
         if (worksheet.getCell("L1").value === 'Program TEA Id') {
             teasWS = worksheet;
-        } else if (worksheet.getCell("Q1").value === 'Stage ID' || worksheet.getCell("A1").value === 'Parent Name') {
+        } else if (worksheet.getCell("R1").value === 'Stage ID' || worksheet.getCell("A1").value === 'Parent Name') {
             templateWS.push(worksheet);
         } else {
             let id = worksheet.getCell("A1").value;
@@ -163,7 +163,7 @@ const getWorksheetData = (status, task, { currentWorksheet, templateHeadersList,
         }
     });
 
-    if (isTrackerTemplate) stageId = currentWorksheet.getCell("Q2").value;
+    if (isTrackerTemplate) stageId = currentWorksheet.getCell("R2").value;
 
     return { status, data: templateData, stageId };
 }

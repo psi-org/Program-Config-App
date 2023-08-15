@@ -3,7 +3,7 @@ import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
 import {
     conditionalError,
     disabledHighlighting,
-    getTEAErrorsFormula,
+    getPromptsFormula,
     middleCenter,
     otherHighlighting,
     questionHighlighting,
@@ -11,6 +11,7 @@ import {
     sectionHighlighting,
     teaStructureValidator,
     TEMPLATE_PASSWORD,
+    TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS,
     TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS,
     trackerStructureValidator,
     verticalMiddle,
@@ -562,21 +563,9 @@ const ExporterTracker = ({
             width: 1
         },{
             header: "Errors/Warnings/Info",
-            key: "errs",
+            key: "prompts",
             width: 50
         }];
-        
-        ['B1', 'D1', 'E1', 'F1'].forEach(cellValue => ws.getCell(cellValue).note = {
-            texts: [{ text: "If the cell is not automatically filled, drag the formula from another cell in this column." }],
-            margins: {
-                insetmode: 'custom',
-                inset: [0.25, 0.25, 0.35, 0.35]
-            },
-            protection: {
-                locked: true,
-                lockText: true
-            },
-        })
 
         ws.columns = cols;
         ws.getRow(1).height = 35;
@@ -593,8 +582,33 @@ const ExporterTracker = ({
             searchable: "If 'Yes', allows the TEA to be used as a search filter in the Tracked Entity Instances list.\n[Default is 'No']",
             display_in_list: "If 'Yes', the value of the selected TEA will be displayed in the Tracked Entity Instances list.\n[Default is 'No']",
             allow_future_date: "If 'Yes', the TEA will allow to select a date in future (DATE TEAs only).\n[Default is 'No']",
-            errs: "Details about the cell highlighting on each row."
+            prompts: "Details regarding the cell highlighting on each row."
         };
+
+        ['B1', 'D1', 'E1', 'F1'].forEach(cellValue => ws.getCell(cellValue).note = {
+            texts: [{ text: "If the cell is not automatically filled, then drag the formula from another cell in the same column." }],
+            margins: {
+                insetmode: 'custom',
+                inset: [0.25, 0.25, 0.35, 0.35]
+            },
+            protection: {
+                locked: true,
+                lockText: true
+            },
+        })
+
+        ws.getCell("M2").note = {
+            texts: [{ text: "If prompts are not displayed when cells in a row are highlighted in red, then drag the formula from another cell in the same column." }],
+            margins: {
+                insetmode: 'custom',
+                inset: [0.25, 0.25, 0.35, 0.35]
+            },
+            protection: {
+                locked: true,
+                lockText: true
+            },
+        };
+
         fillBackgroundToRange(ws, "A2:M2", "D9D9D9");
         ws.getRow(2).height = 100;
         ws.getRow(2).alignment = middleCenter;
@@ -639,6 +653,9 @@ const ExporterTracker = ({
     }
 
     const addConditionalFormattingTEA = (ws) => {
+
+        const validationsList = TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS;
+
         //Structure not selected
         ws.addConditionalFormatting({
             ref: 'A3:A102',
@@ -646,12 +663,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.structureNotSelected.formula],
+                    formulae: [validationsList.structureNotSelected.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Structure not selected',
-            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.structureNotSelected.prompt
+            ]
         });
         //Duplicated TEA found
         ws.addConditionalFormatting({
@@ -660,12 +675,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.duplicatedTEA.formula],
+                    formulae: [validationsList.duplicatedTEA.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Duplicated value',
-            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.duplicatedTEA.prompt
+            ]
         });
         //TEA/Section Name not defined
         ws.addConditionalFormatting({
@@ -674,12 +687,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.nameNotDefined.formula],
+                    formulae: [validationsList.nameNotDefined.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Name not defined',
-            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.nameNotDefined.prompt
+            ]
         });
         //Selected TEA does not exist (1)
         ws.addConditionalFormatting({
@@ -688,12 +699,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.teaNotFound.formula],
+                    formulae: [validationsList.teaNotFound.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'TEA not found',
-            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.teaNotFound.prompt
+            ]
         });
         //Selected TEA does not exist (2)
         ws.addConditionalFormatting({
@@ -702,12 +711,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.teaNotFound.formula],
+                    formulae: [validationsList.teaNotFound.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'TEA not found',
-            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.teaNotFound.prompt
+            ]
         });
         //Disable future date if Value Type != DATE
         ws.addConditionalFormatting({
@@ -716,12 +723,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.disabledFutureDate.formula],
+                    formulae: [validationsList.disabledFutureDate.formula],
                     style: disabledHighlighting,
                 }
-            ],
-            promptTitle: 'Future Date disabled',
-            prompt: TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS.disabledFutureDate.prompt
+            ]
         });
         //Row highlighting for TEA/Section
         ws.addConditionalFormatting({
@@ -765,8 +770,8 @@ const ExporterTracker = ({
                 }
             })
 
-            configure.errs = {
-                formula: `=${getTEAErrorsFormula(dataRow)}`
+            configure.prompts = {
+                formula: `=${getPromptsFormula(TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS, dataRow)}`
             }
 
             ws.getRow(dataRow).values = configure;
@@ -850,6 +855,10 @@ const ExporterTracker = ({
                 key: "answer_value",
                 width: 20
             }, {
+                header: "Errors/Warnings/Info",
+                key: "prompts",
+                width: 50
+            }, {
                 header: "Stage ID",
                 key: "stage_id",
                 width: 20
@@ -869,7 +878,8 @@ const ExporterTracker = ({
                 header: "Data Element Id",
                 key: "data_element_id",
                 width: 1
-            }];
+            }
+        ];
         fillBackgroundToRange(ws, "A1:A1", "E2EFDA");
         fillBackgroundToRange(ws, "B1:B1", "BDD7EE");
         fillBackgroundToRange(ws, "C1:H1", "E2EFDA");
@@ -877,7 +887,7 @@ const ExporterTracker = ({
         fillBackgroundToRange(ws, "J1:L1", "E2EFDA");
         fillBackgroundToRange(ws, "M1:M1", "BDD7EE");
         fillBackgroundToRange(ws, "N1:P1", "E2EFDA");
-        fillBackgroundToRange(ws, "Q1:R1", "BDD7EE");
+        fillBackgroundToRange(ws, "Q1:S1", "BDD7EE");
         ws.getRow(1).height = 35;
         ws.getRow(1).font = { bold: true };
         ws.getRow(1).alignment = middleCenter;
@@ -898,11 +908,12 @@ const ExporterTracker = ({
             legend_set: "Legend that will be applied to the Data Element",
             parent_question: "Copy the Correlative of the Data Element that will act as parent for the current Data Element",
             answer_value: "Value that will trigger the 'show' rule of the Data Element",
+            prompts: "Details regarding the cell highlighting on each row.",
             stage_id: configuration.stageId,
             stage_name: configuration.stageName
         };
         ws.getCell("B2").note = {
-            texts: [{ text: "If the correlative is not generated, drag the formula from another cell in this column." }],
+            texts: [{ text: "If the correlative is not generated, then drag the formula from another cell in the same column." }],
             margins: {
                 insetmode: 'custom',
                 inset: [0.25, 0.25, 0.35, 0.35]
@@ -913,7 +924,7 @@ const ExporterTracker = ({
             },
         };
         ws.getCell("M2").note = {
-            texts: [{ text: "If the [Click Here] text does not appear after selecting an Option Set, drag the formula from another cell in this column." }],
+            texts: [{ text: "If the [Click Here] text does not appear after selecting an Option Set, then drag the formula from another cell in the same column." }],
             margins: {
                 insetmode: 'custom',
                 inset: [0.25, 0.25, 0.35, 0.35]
@@ -923,10 +934,21 @@ const ExporterTracker = ({
                 lockText: true
             },
         };
-        fillBackgroundToRange(ws, "A2:R2", "D9D9D9");
+        ws.getCell("Q2").note = {
+            texts: [{ text: "If prompts are not displayed when cells in a row are highlighted in red, then drag the formula from another cell in the same column." }],
+            margins: {
+                insetmode: 'custom',
+                inset: [0.25, 0.25, 0.35, 0.35]
+            },
+            protection: {
+                locked: true,
+                lockText: true
+            },
+        };
+        fillBackgroundToRange(ws, "A2:S2", "D9D9D9");
         ws.getRow(2).height = 100;
         ws.getRow(2).alignment = middleCenter;
-        applyBorderToRange(ws, 0, 0, 17, 2);
+        applyBorderToRange(ws, 0, 0, 18, 2);
         addValidation(ws);
         addConditionalFormatting(ws);
         populateConfiguration(ws, configuration.configurations);
@@ -992,6 +1014,9 @@ const ExporterTracker = ({
     }
 
     const addConditionalFormatting = (ws) => {
+
+        const validationsList = TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS;
+
         //Correlative is not defined
         ws.addConditionalFormatting({
             ref: 'B3:B3000',
@@ -999,12 +1024,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($B3),$A3="Data Element")'],
+                    formulae: [validationsList.correlativeNotDefined.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Correlative not defined',
-            prompt: 'A correlative was not defined for the specified element.'
+            ]
         });
         //Form Name not defined if Structure is selected
         ws.addConditionalFormatting({
@@ -1013,12 +1036,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($D3),NOT(ISBLANK($A3)))'],
+                    formulae: [validationsList.formNameNotDefined.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Form name not defined',
-            prompt: 'A form name was not defined for the specified element.'
+            ]
         });
         //Name not defined if Structure is selected and No auto naming
         ws.addConditionalFormatting({
@@ -1027,12 +1048,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($E3),$A3 = "Data Element",$C3 = "No")'],
+                    formulae: [validationsList.nameNotDefined.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Name not defined',
-            prompt: 'A Name was not defined for the specified element.'
+            ]
         });
         //Short Name not defined if Structure is selected and No auto naming
         ws.addConditionalFormatting({
@@ -1041,12 +1060,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($F3),$A3 = "Data Element",$C3 = "No")'],
+                    formulae: [validationsList.shotNameNotDefined.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Short Name not defined',
-            prompt: 'A Short Name was not defined for the specified element.'
+            ]
         });
         //Structure not selected if Form Name is defined
         ws.addConditionalFormatting({
@@ -1055,12 +1072,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($A3),NOT(ISBLANK($D3)))'],
+                    formulae: [validationsList.structureNotDefined.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Form name not defined',
-            prompt: 'A form name was not defined for the specified element.'
+            ]
         });
         //conditional formatting for form name out of range
         ws.addConditionalFormatting({
@@ -1069,12 +1084,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [`AND(NOT(ISBLANK($A3)),OR(LEN($D3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($D3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`],
+                    formulae: [validationsList.formNameOutOfRange.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Form Name length out of range',
-            prompt: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+            ]
         });
         //conditional formatting for Name out of range
         ws.addConditionalFormatting({
@@ -1083,12 +1096,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [`AND($A3 = "Data Element",$C3 = "No",OR(LEN($E3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($E3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`],
+                    formulae: [validationsList.nameOutOfRange.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Name length out of range',
-            prompt: `Given Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+            ]
         });
         //conditional formatting for Short Name out of range
         ws.addConditionalFormatting({
@@ -1097,12 +1108,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [`AND($A3 = "Data Element",$C3 = "No",LEN($F3)>${MAX_SHORT_NAME_LENGTH})`],
+                    formulae: [validationsList.shortNameOutOfRange.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Short Name length out of range',
-            prompt: `Given Short Name length is out of the accepted range (Less than ${MAX_SHORT_NAME_LENGTH} characters).`
+            ]
         });
         //conditional formatting for Code out of range
         ws.addConditionalFormatting({
@@ -1111,12 +1120,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: [`AND($A3 = "Data Element",$C3 = "No",LEN($G3)>${MAX_SHORT_NAME_LENGTH})`],
+                    formulae: [validationsList.codeOutOfRange.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Code length out of range',
-            prompt: `Given Code length is out of the accepted range (Less than ${MAX_SHORT_NAME_LENGTH} characters).`
+            ]
         });
         //Disabled Full Name, Short Name, Code
         ws.addConditionalFormatting({
@@ -1125,25 +1132,22 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND($A3 = "Data Element",$C3 <> "No")'],
+                    formulae: [validationsList.autoNamingDisableFields.formula],
                     style: disabledHighlighting,
                 }
-            ],
-            promptTitle: 'Auto Naming Enabled',
-            prompt: 'The Full Name, Short Name and Code are generated automatically.'
+            ]
         });
+        //Disabled Value Type
         ws.addConditionalFormatting({
             ref: 'J3:J3000',
             priority: 1,
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND($A3 = "Data Element",NOT(ISBLANK($L3)))'],
+                    formulae: [validationsList.valueTypeDisable.formula],
                     style: disabledHighlighting,
                 }
-            ],
-            promptTitle: 'Option Set Selected',
-            prompt: 'The Value Type is inherited from the Option Set.'
+            ]
         });
         //Value Type not defined if Structure is selected
         ws.addConditionalFormatting({
@@ -1152,12 +1156,10 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($J3),$A3 = "Data Element")'],
+                    formulae: [validationsList.valueTypeNotDefined.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Name not defined',
-            prompt: 'A Name was not defined for the specified element.'
+            ]
         });
         //Checking incomplete parent and answer
         ws.addConditionalFormatting({
@@ -1166,7 +1168,7 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['OR(AND($O3<>"", $P3=""), AND($O3="", $P3<>""))'],
+                    formulae: [validationsList.incompleteParentLogic.formula],
                     style: conditionalError
                 }
             ]
@@ -1175,11 +1177,11 @@ const ExporterTracker = ({
         //Parent Name is the same as current Data Element Correlative
         ws.addConditionalFormatting({
             priority: 1,
-            ref: 'O4:O3000',
+            ref: 'O3:O3000',
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND($B4<>"",$B4=$O4)'],
+                    formulae: [validationsList.selfParent.formula],
                     style: conditionalError,
                 }
             ]
@@ -1217,6 +1219,11 @@ const ExporterTracker = ({
             }
             configure.value_type = DHIS2_VALUE_TYPES_MAP[configure.value_type];
             configure.agg_type = DHIS2_AGG_OPERATORS_MAP[configure.agg_type];
+
+            configure.prompts = {
+                formula: `=${getPromptsFormula(TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS, dataRow)}`
+            }
+
             ws.getRow(dataRow).values = configure;
             if (configure.structure === "Section") {
                 fillBackgroundToRange(ws, "A" + dataRow + ":P" + dataRow, "F8C291")
@@ -1227,7 +1234,7 @@ const ExporterTracker = ({
 
             dataRow = dataRow + 1;
         });
-        applyBorderToRange(ws, 0, 3, 15, 2998);
+        applyBorderToRange(ws, 0, 3, 16, 2998);
     };
 
     const addMapping = async (ws) => {
