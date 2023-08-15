@@ -32,6 +32,7 @@ const ValidateMetadata = (
         setValidationResults,
         programMetadata,
         setErrorReports,
+        stagesList,
         refetchProgramStage
     }
 ) => {
@@ -42,7 +43,6 @@ const ValidateMetadata = (
     const [validationMessage, setValidationMessage] = useState("Metadata validated. Please use the 'SAVE' button to persist your changes.");
 
     useEffect(() => {
-        console.log(importedSections)
         const importedSectionsV = importedSections;
         const importedScoresV = importedScores;
         let errorCounts = 0;
@@ -75,7 +75,7 @@ const ValidateMetadata = (
                 excelRow += 1;
                 let section_errors = 0;
                 const sectionErrorDetails = {
-                    title: section.name || ('Section on row '+excelRow),
+                    title: section.name || ('Section on Template row '+excelRow),
                     tagName: '[ Section ]'
                 }
                 delete section.errors
@@ -93,7 +93,7 @@ const ValidateMetadata = (
                     dataElement.labelFormName = metadata.labelFormName;
 
                     const errorDetails = {
-                        title: dataElement.labelFormName || dataElement.formName || dataElement.name || ('Element on row ' + excelRow),
+                        title: dataElement.labelFormName || dataElement.formName || dataElement.name || ('Element on Template row ' + excelRow),
                         tagName: dataElement.labelFormName ? '[ Label ]' : '[ Question ]'
                     }
 
@@ -128,7 +128,7 @@ const ValidateMetadata = (
             if (hnqisMode) importedScoresV.dataElements.forEach((dataElement) => {
                 excelRow += 1;
                 const errorDetails = {
-                    title: dataElement.formName || dataElement.name || ('Score on row ' + excelRow),
+                    title: dataElement.formName || dataElement.name || ('Score on Template row ' + excelRow),
                     tagName: '[ Score ]'
                 }
                 delete dataElement.errors
@@ -207,6 +207,7 @@ const ValidateMetadata = (
                     programMetadata={programMetadata}
                     setImportResults={setImportResults}
                     setErrorReports={setErrorReports}
+                    stagesList={stagesList}
                     refetchProgramStage={refetchProgramStage}
                 />
             }

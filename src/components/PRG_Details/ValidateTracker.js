@@ -8,21 +8,8 @@ import SaveIcon from '@mui/icons-material/Save';
 
 import { useEffect, useState } from "react";
 import SaveMetadata from "../STG_Details/SaveMetadata";
-import { getNewObjectsCount, validateDataElement, validateSections, validateTEA } from "../../configs/ImportValidatorUtils";
+import { buildProgramConfigurations, getNewObjectsCount, validateDataElement, validateSections, validateTEA } from "../../configs/ImportValidatorUtils";
 import { truncateString } from "../../configs/Utils";
-
-const buildProgramConfigurations = (programMetadata) => {
-    let importedStages = [];
-    let teas;
-
-    return {
-        configurations: {
-            importedStages,
-            teas
-        }
-    }
-}
-//TODO: Work In Progress
 
 const ValidateTracker = (
     {
@@ -56,7 +43,6 @@ const ValidateTracker = (
 
 
     useEffect(() => {
-        console.log(validationScope, programMetadata)
         const importedStages = validationScope.configurations.importedStages;
         const teas = validationScope.configurations.teas;
         let errorCounts = 0;
@@ -67,7 +53,7 @@ const ValidateTracker = (
             teas.forEach(section => {
                 excelRow += 1;
                 const sectionErrorDetails = {
-                    title: section.name || ('Section on row ' + excelRow),
+                    title: section.name || ('Section on Template row ' + excelRow),
                     tagName: '[ Program TEA Section ]'
                 }
                 delete section.errors;
@@ -80,7 +66,7 @@ const ValidateTracker = (
                 section.trackedEntityAttributes.forEach(tea => {
                     excelRow += 1;
                     const errorDetails = {
-                        title: tea?.trackedEntityAttribute?.name ? `${tea.trackedEntityAttribute.name} (Row ${excelRow})` : 'Tracked Entity Attribute on row '+excelRow,
+                        title: tea?.trackedEntityAttribute?.name ? `${tea.trackedEntityAttribute.name} (Template row ${excelRow})` : 'Tracked Entity Attribute on Template row '+excelRow,
                         tagName: '[ Tracked Entity Attribute ]'
                     }
                     delete tea.errors;
@@ -100,7 +86,7 @@ const ValidateTracker = (
             stage.importedSections.forEach(section => {
                 excelRow += 1;
                 const sectionErrorDetails = {
-                    title: section.name || `Section on row ${excelRow}`,
+                    title: section.name || `Section on Template row ${excelRow}`,
                     tagName: `[ Section | ${stage.name} ]`
                 }
                 delete section.errors;
@@ -114,7 +100,7 @@ const ValidateTracker = (
                 section.dataElements.forEach(dataElement => {
                     excelRow += 1;
                     const errorDetails = {
-                        title: dataElement?.name ? `${truncateString(dataElement.name)} (Row ${excelRow})` : `Data Element on row ${excelRow}`,
+                        title: dataElement?.name ? `${truncateString(dataElement.name)} (Template row ${excelRow})` : `Data Element on Template row ${excelRow}`,
                         tagName: `[ Data Element | ${stage.name} ]`
                     }
                     delete dataElement.errors;

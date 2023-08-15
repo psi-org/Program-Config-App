@@ -275,7 +275,7 @@ export const getProgramQuery = () => {
     const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder`;
     const stagesQuery = `id,name,displayName,formType,programStageSections[${stageSectionsQuery}],description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements[${stageDataElementsQuery}],sortOrder`
     const programSectionsQuery = 'id,name,renderType,sortOrder,program,sharing,translations,attributeValues,trackedEntityAttributes';
-    const programTrackedEntityAttributes = 'id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute,programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccessesattributeValues,displayInList,id,mandatory,name,program,programTrackedEntityAttributeGroups,renderOptionsAsRadio,searchable,sortOrder,trackedEntityAttribute,translations,userAccesses,userGroupAccesses,valueType';
+    const programTrackedEntityAttributes = 'id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute[id,name],programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccessesattributeValues,displayInList,id,mandatory,name,program,programTrackedEntityAttributeGroups,renderOptionsAsRadio,searchable,sortOrder,trackedEntityAttribute,translations,userAccesses,userGroupAccesses,valueType';
 
     return [
         'accessLevel',

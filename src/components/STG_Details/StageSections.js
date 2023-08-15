@@ -168,7 +168,7 @@ const queryPCAMetadata = {
         resource: 'programs',
         params: ({ programId }) => ({
             id: programId,
-            fields: ['attributeValues', 'sharing'],
+            fields: ['attributeValues', 'sharing', 'programStages'],
             filter: [`id:eq:${programId}`]
         })
     }
@@ -291,6 +291,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [criticalSection, setCriticalSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations") });
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
     const [programMetadata, setProgramMetadata] = useState();
+    const [stagesList, setStagesList] = useState();
     const [errorReports, setErrorReports] = useState(undefined)
 
     const [addedSection, setAddedSection] = useState()
@@ -327,6 +328,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     setProgramMetadata(JSON.parse(av.value || "{}"))
                 }
             })
+            setStagesList(res.results?.programs[0]?.programStages)
         })
     }
 
@@ -1222,6 +1224,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     setValidationResults={setValidationResults}
                     programMetadata={programMetadata}
                     setErrorReports={setErrorReports}
+                    stagesList={stagesList}
                     refetchProgramStage={refetchProgramStage}
                 />
             }

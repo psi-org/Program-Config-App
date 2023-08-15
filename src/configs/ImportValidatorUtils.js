@@ -1,4 +1,5 @@
-import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
+import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
+import { getVarNameFromParentUid } from "./ExcelUtils";
 import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isNum, isValidCorrelative, isValidParentName } from "./Utils";
 
 export const HNQIS2_VALIDATION_SETTINGS = {
@@ -651,4 +652,101 @@ export const validateDataElement = (dataElement, errorDetails) => {
 
 }
 
-export const getNewObjectsCount = (importResults) => extractAttributeValues(importResults, 'new').reduce((partialSum, a) => partialSum + a, 0)
+export const getNewObjectsCount = (importResults) => extractAttributeValues(importResults, 'new').reduce((partialSum, a) => partialSum + a, 0);
+
+//* Program Metadata Formatter for validations
+const mapAttributes = (attributes) => {
+    return attributes.map(t => ({
+        trackedEntityAttribute: t.trackedEntityAttribute,
+        valueType: t.valueType,
+        allowFutureDate: t.allowFutureDate || false,
+        displayInList: t.displayInList,
+        mandatory: t.mandatory,
+        searchable: t.searchable,
+        programTrackedEntityAttribute: t.id,
+        importStatus: 'update'
+    }))
+}
+
+const mapStage = (stage) => {
+    return stage.programStageSections && stage.programStageSections.length > 0 ?
+        // Stage with sections
+        stage.programStageSections.map(section => ({
+            id: section.id,
+            name: section.name,
+            displayName: section.displayName,
+            sortOrder: section.sortOrder,
+            importStatus: 'update',
+            isBasicForm: false,
+            newValues: 0,
+            updatedValues: section.dataElements.length,
+            dataElements: section.dataElements.map(de => {
+                let metadata = getPCAMetadataDE(de);
+                if (metadata.parentQuestion) {
+                    metadata.parentQuestion = getVarNameFromParentUid(metadata.parentQuestion, stage);
+                    let metadataAttribute = de.attributeValues.find(av => av.attribute.id === METADATA);
+                    metadataAttribute.value = JSON.stringify(metadata);
+                }
+                return de;
+            })
+        })) :
+        // Stage without sections
+        [{
+            id: "basic-form",
+            name: "Basic Form",
+            displayName: "Basic Form",
+            sortOrder: 0,
+            importStatus: 'update',
+            isBasicForm: true,
+            newValues: 0,
+            updatedValues: stage.programStageDataElements.length,
+            dataElements: stage.programStageDataElements.map(psde => psde.dataElement)
+        }]
+}
+
+const extractTEAs = (input) => {
+    return input.programSections && input.programSections.length > 0 ?
+        // Form with sections
+        input.programSections.map(section => ({
+            id: section.id,
+            name: section.name,
+            sortOrder: section.sortOrder,
+            importStatus: 'update',
+            isBasicForm: false,
+            newValues: 0,
+            updatedValues: section.trackedEntityAttributes.length,
+            trackedEntityAttributes: mapAttributes(
+                section.trackedEntityAttributes.map(teaId =>
+                    input.programTrackedEntityAttributes.find(ptea => ptea.trackedEntityAttribute.id === teaId.id)
+                )
+            )
+        })) :
+        // Basic Form
+        [
+            {
+                id: 'basic-form',
+                name: 'Basic Form',
+                sortOrder: 0,
+                importStatus: 'update',
+                isBasicForm: true,
+                newValues: 0,
+                updatedValues: input.programTrackedEntityAttributes.length,
+                trackedEntityAttributes: mapAttributes(input.programTrackedEntityAttributes)
+            }
+        ]
+}
+
+const extractStages = (input) => {
+    return input.programStages.map((stage, idx) => ({
+        id: stage.id,
+        name: stage.name,
+        stageNumber: idx + 1,
+        importedSections: mapStage(stage)
+    }))
+}
+
+export const buildProgramConfigurations = (input) => {
+    const teas = extractTEAs(input)
+    const importedStages = extractStages(input)
+    return { configurations: { teas, importedStages } }
+}

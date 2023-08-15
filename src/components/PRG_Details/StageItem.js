@@ -6,7 +6,7 @@ import actionCreators from "../../state/action-creators";
 import StageNew from "./StageNew";
 
 // *** Routing ***
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { useRef, useState } from "react";
 
 // *** IMAGES ***
@@ -27,6 +27,7 @@ import ValidationMessages from "../UIElements/ValidationMessages";
 const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
 
     const dispatch = useDispatch();
+    const history = useHistory();
     const { setProgramStage } = bindActionCreators(actionCreators, dispatch);
     const [showStageForm, setShowStageForm] = useState(false)
 
@@ -40,11 +41,15 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
     }
     return (
         <div className="ml_item" style={{ color: "#333333", backgroundColor: "#c5e3fc", border: "0.5px solid #D5DDE5", borderRadius: "4px" }}>
-            <div className="ml_list-icon" style={{ display: 'flex', alignItems: 'center' }}> 
+            <div className="ml_list-icon" style={{ display: 'flex', alignItems: 'center', cursor:'pointer' }} onClick={()=>{
+                setProgramStage(stage.id)
+                history.push('/programStage/'+stage.id)
+            }}> 
                 <HorizontalSplitIcon />
             </div>
-            <div className="ml_item-title" style={{
-                overflow: 'hidden'
+            <div className="ml_item-title" style={{  overflow: 'hidden', cursor:'pointer' }} onClick={()=>{
+                setProgramStage(stage.id)
+                history.push('/programStage/'+stage.id)
             }}>
                 <Tooltip title={stage.displayName} placement="bottom-start" arrow>
                     <span style={{
@@ -78,11 +83,6 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
                         </Popper>
                     </Layer>
                 }
-                <Link to={"/programStage/" + stage.id} style={{ color: '#333333' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setProgramStage(stage.id)}>
-                        <NavigateNextIcon />
-                    </div>
-                </Link>
                 {
                     showStageForm &&
                     <StageNew

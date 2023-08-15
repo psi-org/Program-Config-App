@@ -53,7 +53,24 @@ const getParentUid = (parentName, dataElements) => {
 
 
 
-const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, refetchProgramStage }) => {
+const SaveMetadata = (
+    {
+        hnqisMode,
+        newDEQty,
+        programStage,
+        importedSections,
+        importedScores,
+        criticalSection,
+        setSavingMetadata,
+        setSavedAndValidated,
+        removedItems,
+        programMetadata,
+        setImportResults,
+        setErrorReports,
+        stagesList,
+        refetchProgramStage
+    }
+) => {
 
     const [completed, setCompleted] = useState(false);
     const [errorStatus, setErrorStatus] = useState(false);
@@ -97,7 +114,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
     }, [])
     
 
-    if (uidPool && programPayload && !completed && !metadataRequest.called /* && !programRequest.called */) {
+    if (uidPool && programPayload && !completed && !metadataRequest.called) {
 
         let new_dataElements = [];
         let new_programStageDataElements = [];
@@ -119,6 +136,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
          */
 
         let psdeSortOrder = 1
+        const stageIndex = stagesList?.findIndex(stage => stage.id === programStage.id) || 0;
         importedSections.forEach((section, secIdx) => {
 
             if (section.importStatus == 'new') section.id = uidPool.shift();
@@ -127,7 +145,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
 
                 let DE_metadata = JSON.parse(dataElement.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
 
-                let newVarName = hnqisMode?`_S${secIdx + 1}Q${deIdx + 1}`:`_S${secIdx + 1}E${deIdx + 1}`;
+                let newVarName = hnqisMode?`_S${secIdx + 1}Q${deIdx + 1}`:`_PS${stageIndex+1}_S${secIdx + 1}E${deIdx + 1}`;
                 let newCode = `${programMetadata.dePrefix || section.id}_${newVarName}`;
                 // Name max: 230
                 // CODE_FORMNAME
@@ -174,7 +192,7 @@ const SaveMetadata = ({ hnqisMode, newDEQty, programStage, importedSections, imp
                 psdeSortOrder+=1
                 delete dataElement.displayInReports;
 
-                if(!hnqisMode) ['isCritical','elemType','labelFormName','varName','parentQuestion','parentValue'].forEach(key => delete DE_metadata[key])
+                if(!hnqisMode) ['isCritical','labelFormName'].forEach(key => delete DE_metadata[key])
                 
 
                 let pcaMetadataIndex = dataElement.attributeValues.findIndex(att => att.attribute.id == METADATA)
