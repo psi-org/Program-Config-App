@@ -196,7 +196,7 @@ const ValidateMetadata = (
             {save &&
                 <SaveMetadata
                     hnqisMode={hnqisMode}
-                    newDEQty={newDEQty}
+                    newObjectsQtty={newDEQty}
                     programStage={programStage}
                     importedSections={importedSections}
                     importedScores={importedScores}
@@ -208,7 +208,7 @@ const ValidateMetadata = (
                     setImportResults={setImportResults}
                     setErrorReports={setErrorReports}
                     stagesList={stagesList}
-                    refetchProgramStage={refetchProgramStage}
+                    saveType={'stage'}
                 />
             }
         </DialogActions>

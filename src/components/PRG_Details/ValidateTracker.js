@@ -119,6 +119,8 @@ const ValidateTracker = (
         if (errorCounts === 0) {
             setValid(true);
             setValidationResults(false);
+            console.log(programMetadata, validationScope);
+            console.log(validationResults)
         } else {
             setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
             setSavingMetadata(false);
@@ -156,7 +158,7 @@ const ValidateTracker = (
                     programMetadata={programMetadata}
                     setImportResults={setImportResults}
                     setErrorReports={setErrorReports}
-                    refetchProgramStage={refetchProgramStage}
+                    saveType={'program'}
                 />*/<></>
             }
         </DialogActions>

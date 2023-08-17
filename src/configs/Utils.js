@@ -318,3 +318,14 @@ export const getProgramQuery = () => {
         'sharing'
     ];
 }
+
+export const setPCAMetadata = (scopeObject, newMetadata) => {
+    let pcaMetadataIndex = scopeObject.attributeValues.findIndex(att => att.attribute.id == METADATA)
+    if (pcaMetadataIndex > -1) scopeObject.attributeValues[pcaMetadataIndex].value = JSON.stringify(newMetadata)
+    else scopeObject.attributeValues.push({
+        value: JSON.stringify(newMetadata),
+        attribute: {
+            id: METADATA
+        }
+    })
+}

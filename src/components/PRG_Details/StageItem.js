@@ -23,6 +23,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Tooltip } from "@mui/material";
 import BadgeErrors from "../UIElements/BadgeErrors";
 import ValidationMessages from "../UIElements/ValidationMessages";
+import { tagStyle } from "../../configs/Constants";
 
 const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
 
@@ -35,6 +36,19 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
     const [open, setOpen] = useState(false)
     const [showValidationMessage, setShowValidationMessage] = useState(false);
     const toggle = () => setOpen(!open)
+
+    var ImportSummaryCounts = undefined;
+    if (importResults?.importedSections) {
+        console.log(importResults)
+        ImportSummaryCounts = <>
+            <div style={tagStyle}>
+                {"New Objects: " + importResults.importedSections.reduce((acu, cur) => acu + (cur.newValues || 0)+ (cur.importStatus === 'new' ? 1 : 0), 0)}
+            </div>
+            <div style={tagStyle}>
+                {"Updated Objects: " + importResults.importedSections.reduce((acu, cur) =>  acu + (cur.updatedValues || 0)+(cur.importStatus==='update' ? 1 : 0), 0)}
+            </div>
+        </>;
+    }
 
     const editStage = stage => {
         setShowStageForm(true)
@@ -65,6 +79,7 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
             </div>
             <div className="ml_item-desc">
                 <div>{stage.programStageSections.length} {!eventMode && 'Program Stage'} Sections</div>
+                {ImportSummaryCounts}
             </div>
             <div className="ml_item-warning_error " onClick={() => setShowValidationMessage(!showValidationMessage)}>
                 {importResults?.errorsCount && importResults?.errorsCount > 0 && <BadgeErrors counts={importResults?.errorsCount} />}

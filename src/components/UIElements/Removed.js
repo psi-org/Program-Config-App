@@ -53,23 +53,23 @@ const Removed = ({ removedItems, tagText = 'Data Element(s)' }) => {
                         let elemId = element.id;
                         switch (deMetadata.elemType) {
                             case 'label':
-                                tag = '[Label]';
+                                tag = '[ Label ]';
                                 displayName = deMetadata.labelFormName;
                                 break;
                             case 'question':
-                                tag = '[Question]';
+                                tag = '[ Question ]';
                                 break;
                             case 'score':
-                                tag = '[Score]';
+                                tag = '[ Score ]';
                                 break;
                             default:
                                 if (element.trackedEntityAttribute) {
-                                    tag = '[Tracked Entity Attribute]';
-                                    displayName = element.displayName;
+                                    tag = '[ Tracked Entity Attribute ]';
+                                    displayName = element.name;
                                     route = 'programSection/trackedEntityAttribute';
                                     elemId = element.trackedEntityAttribute.id;
                                 } else {
-                                    tag = '[Data Element]';
+                                    tag = '[ Data Element ]';
                                 }
                                 break;
                         }

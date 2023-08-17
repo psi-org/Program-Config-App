@@ -31,7 +31,7 @@ const InfoBox = (props) => {
                     </div>
                 </DialogTitle>
                 <DialogContent>
-                    <div class='info-box-content'>
+                    <div className='info-box-content'>
                         {props.message}
                     </div>
                 </DialogContent>
