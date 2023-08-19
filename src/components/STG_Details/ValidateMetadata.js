@@ -195,6 +195,7 @@ const ValidateMetadata = (
             <Button variant='outlined' startIcon={<SaveIcon />} disabled={!valid} onClick={() => setSave(true)}> Save </Button>
             {save &&
                 <SaveMetadata
+                    programId={programStage.program.id}
                     hnqisMode={hnqisMode}
                     newObjectsQtty={newDEQty}
                     programStage={programStage}

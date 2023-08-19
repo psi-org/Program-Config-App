@@ -168,6 +168,7 @@ const Importer = (
                     addExecutedTask({ step: 10000, name: importSummaryValues.error, status: 'error' });
                     setNotificationError(true);
                 } else {
+                    console.log(importSummaryValues)
                     setImportSummary(importSummaryValues);
                     setImportResults(importSummaryValues);
                     setSaveStatus('Validate & Save');
@@ -221,6 +222,7 @@ const Importer = (
                 importError = `The import process has failed. Some Stages are missing in the imported file (${currentStage.name}), please download a new Template and try again.`;
             } else {
                 importSummaryValues.stages[index].stageName = currentStage.name;
+                importSummaryValues.stages[index].id = currentStage.id;
                 let { importedSections } = readTemplateData({
                     teaData,
                     currentData: { sections: setUpProgramStageSections(previous.stages.find(stage => stage.id === currentStage.id)), stageNumber: index + 1 },

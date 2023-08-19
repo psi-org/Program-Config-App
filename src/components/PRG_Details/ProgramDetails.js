@@ -16,7 +16,7 @@ import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
-import { DeepCopy, formatAlert, getProgramQuery, truncateString } from "../../configs/Utils";
+import { DeepCopy, extractAttributeValues, formatAlert, getProgramQuery, truncateString } from "../../configs/Utils";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 import DataProcessorTracker from "../Excel/DataProcessorTracker";
 import Importer from "../Excel/Importer";
@@ -140,8 +140,6 @@ const ProgramDetails = () => {
     const commit = () => {
         //TODO: Save Changes after validation
         if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
-        /*let removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement)
-        setRemovedElements(removed)*/
         setSavingMetadata(true);
         return;
     };

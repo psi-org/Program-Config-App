@@ -39,7 +39,6 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
 
     var ImportSummaryCounts = undefined;
     if (importResults?.importedSections) {
-        console.log(importResults)
         ImportSummaryCounts = <>
             <div style={tagStyle}>
                 {"New Objects: " + importResults.importedSections.reduce((acu, cur) => acu + (cur.newValues || 0)+ (cur.importStatus === 'new' ? 1 : 0), 0)}

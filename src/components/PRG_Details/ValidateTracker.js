@@ -17,6 +17,7 @@ const ValidateTracker = (
         setImportResults,
         programMetadata,
         programSpecificType,
+        removedItems,
         setSavingMetadata,
         setSavedAndValidated,
         setValidationResults,
@@ -119,8 +120,6 @@ const ValidateTracker = (
         if (errorCounts === 0) {
             setValid(true);
             setValidationResults(false);
-            console.log(programMetadata, validationScope);
-            console.log(validationResults)
         } else {
             setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
             setSavingMetadata(false);
@@ -144,22 +143,20 @@ const ValidateTracker = (
         <DialogActions style={{ padding: '1em' }}>
             <Button color="error" disabled={!processed} onClick={() => setSavingMetadata(false)}> Close </Button>
             <Button variant='outlined' startIcon={<SaveIcon />} disabled={!valid} onClick={() => setSave(true)}> Save </Button>
-            {save && 
-                /*<SaveMetadata
-                    hnqisMode={hnqisMode}
-                    newObjects={getNewObjectsCount(importResults)}
-                    programStage={programStage}
-                    importedStages={importedStages}
-                    importedScores={importedScores}
-                    criticalSection={criticalSection}
+            {save && validationScope &&
+                <SaveMetadata
+                    programId={programMetadata.id}
+                    newObjectsQtty={getNewObjectsCount(importResults)}
+                    importedStages={validationScope.configurations.importedStages}
+                    importedTEAs={validationScope.configurations.teas}
+                    importResults={importResults || { stages: [], teaSummary: {teas:[]} }}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
-                    removedItems={removedItems}
                     programMetadata={programMetadata}
                     setImportResults={setImportResults}
                     setErrorReports={setErrorReports}
                     saveType={'program'}
-                />*/<></>
+                />
             }
         </DialogActions>
 

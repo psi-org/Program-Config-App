@@ -27,7 +27,7 @@ const ErrorReports = ({ errors }) => {
                 </div>
                 <div className="ml_item-desc"></div>
                 <div className="ml_item-warning_error "></div>
-                <div className="ml_item-cta" onClick={() => setExpanded(!expanded)}>
+                <div className="ml_item-cta" onClick={() => setExpanded(!expanded)} style={{ cursor: 'pointer' }}>
                     <img className="bsct_cta" alt="exp" src={expanded ? contracted_bottom_svg : expanded_bottom_svg} />
                 </div>
             </div>
