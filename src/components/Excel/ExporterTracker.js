@@ -1194,11 +1194,11 @@ const ExporterTracker = ({
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND($A3 = "Section",$T3 = "basic-form")'],
+                    formulae: ['AND($A3 = "Section",$U3 = "basic-form")'],
                     style: otherHighlighting
                 }, {
                     type: 'expression',
-                    formulae: ['AND($A3 = "Section",$T3 <> "basic-form")'],
+                    formulae: ['AND($A3 = "Section",$U3 <> "basic-form")'],
                     style: sectionHighlighting
                 },
                 {

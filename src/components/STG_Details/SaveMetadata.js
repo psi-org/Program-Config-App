@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants";
-import { DeepCopy, getProgramQuery, parseErrorsSaveMetadata, setPCAMetadata } from "../../configs/Utils";
+import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, setPCAMetadata } from "../../configs/Utils";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -49,13 +49,12 @@ const metadataMutation = {
 
 const buildRemovedDE = (de) => {
     let suffix = `${String(+ new Date()).slice(-7)}[X]`;
-    de.name = de.name.slice(0, MAX_FORM_NAME_LENGTH - suffix.length) + suffix;
+    de.name = de.name.replaceAll(/\d{7}\[X\]/g,'').slice(0, MAX_FORM_NAME_LENGTH - suffix.length) + suffix;
     de.shortName = de.id + ' ' + suffix;
     delete de.code;
     return de
 }
 
-//TODO: Add Program Sharings to new Data Elements
 const processStageData = (
     {
         uidPool,
@@ -67,6 +66,8 @@ const processStageData = (
         criticalSection,
         programMetadata,
         stagesList,
+        originalStageDataElements,
+        stageSharings,
         programPayload
     }
 ) => {
@@ -129,8 +130,15 @@ const processStageData = (
             // Check if new DE
             if (dataElement.importStatus == 'new') {
                 dataElement.id = uidPool.shift();
+                dataElement.sharing = stageSharings;
                 //new_dataElements.push(dataElement);
             }
+
+            let existingPSDE = originalStageDataElements?.find(psde => psde.dataElement.id === dataElement.id);
+            if (existingPSDE) {
+                dataElement = mergeWithPriority(dataElement, existingPSDE.dataElement)
+            }
+
             delete dataElement.importStatus;
             new_programStageDataElements.push({
                 compulsory: (DE_metadata.isCompulsory == 'Yes' && !DE_metadata.parentQuestion), // True: mandatory is Yes and has no parents.
@@ -293,7 +301,7 @@ const processProgramData = (
     programMetadata.dePrefix = programPCAMetadata.dePrefix;
 
     importedStages.forEach(programStage => {
-        console.log(importResults.stages.find(stage => stage.id === programStage.id)?.dataElements?.removedItems)
+        const currentExistingStage = stagesList.find(stage => stage.id === programStage.id);
         programStage.sortOrder = programStage.stageNumber;
         let { tempMetadata, metadata } = processStageData(
             {
@@ -304,6 +312,8 @@ const processProgramData = (
                 removedItems: importResults.stages.find(stage => stage.id === programStage.id)?.dataElements?.removedItems || [],
                 programMetadata,
                 stagesList: stagesList,
+                originalStageDataElements: currentExistingStage.programStageDataElements,
+                stageSharings: currentExistingStage.sharing,
                 programPayload
             }
         )
@@ -384,6 +394,8 @@ const SaveMetadata = (props) => {
                         removedItems,
                         programMetadata: props.programMetadata,
                         stagesList: props.stagesList,
+                        originalStageDataElements: props.programStage.programStageDataElements,
+                        stageSharings: props.programStage.sharing,
                         programPayload
                     }
                 )
@@ -399,6 +411,8 @@ const SaveMetadata = (props) => {
                         programPayload
                     }
                 );
+            
+            //TODO: Set TEAs and ProgramSections.
 
             let newMetadata = {
                 ...metadata,
