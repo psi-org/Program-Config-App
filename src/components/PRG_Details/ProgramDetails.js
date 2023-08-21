@@ -103,6 +103,7 @@ const ProgramDetails = () => {
                 <div className="c_btns">
                     {!hnqisMode && !data.results.withoutRegistration &&
                         <>
+                        {/*
                         <MuiButton
                             variant="outlined"
                             color='inherit'
@@ -111,6 +112,7 @@ const ProgramDetails = () => {
                             disabled={showStageForm || showTEAEditor}>
                             TEA Settings
                         </MuiButton>
+                        */}
                         <MuiButton
                             variant="outlined"
                             color='inherit'

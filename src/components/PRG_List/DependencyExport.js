@@ -15,8 +15,8 @@ import Box from '@mui/material/Box';
 // *** Routing ***
 import { useState, useEffect } from "react";
 import { DeepCopy, changeAttributeValue, getJSONKeyTree, removeKey, truncateString } from "../../configs/Utils";
-import { DHIS2_KEY_MAP, DHIS2_PRIMARY_COLOR, EXPORT_PRESETS, EXTERNAL_IMPORT_REMOVE_KEYS, H2_ATTRIBUTES_TO_KEEP, JSON_ATTRIBUTE_SETTINGS, PROGRAM_TYPE_OPTIONS, PROGRAM_TYPE_OPTION_SET } from "../../configs/Constants";
-import { Accordion, AccordionDetails, AccordionSummary, ButtonGroup, Checkbox, FormControl, FormControlLabel, FormGroup, InputLabel, Select, Switch } from "@mui/material";
+import { DHIS2_KEY_MAP, DHIS2_PRIMARY_COLOR, EXPORT_HNQIS_PRESETS, EXPORT_PRESETS, EXTERNAL_IMPORT_REMOVE_KEYS, H2_ATTRIBUTES_TO_KEEP, JSON_ATTRIBUTE_SETTINGS, PROGRAM_TYPE_OPTIONS, PROGRAM_TYPE_OPTION_SET } from "../../configs/Constants";
+import { Accordion, AccordionDetails, AccordionSummary, ButtonGroup, Checkbox, Collapse, FormControl, FormControlLabel, FormGroup, InputLabel, Select, Switch } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { AssignmentLate } from "@mui/icons-material";
 import SelectOptions from "../UIElements/SelectOptions";
@@ -33,7 +33,20 @@ const queryLegends = {
     }
 };
 
-const DependencyExport = ({ program, setExportProgramId }) => {
+const queryProgramSections = {
+    results: {
+        resource: 'programSections',
+        paging: false,
+        params: ({  program }) => ({
+            fields: [ "name","created","lastUpdated","translations","externalAccess","userGroupAccesses","userAccesses","access","favorites","lastUpdatedBy","sharing","program","trackedEntityAttributes","sortOrder","favorite","id","attributeValues" ],
+            filter: [
+                `program.id:eq:${program}`
+            ]
+        })
+    }
+}
+
+const DependencyExport = ({ program, programType, setExportProgramId }) => {
 
     const queryProgramMetadata = {
         results: {
@@ -43,6 +56,9 @@ const DependencyExport = ({ program, setExportProgramId }) => {
 
     const legendsQuery = useDataQuery(queryLegends);
     const legends = legendsQuery.data?.results.legendSets;
+
+    const prgSectionsQuery = useDataQuery(queryProgramSections, { variables: { program } });
+    const prgSections = prgSectionsQuery.data?.results.programSections;
 
     const prgExportQuery = useDataQuery(queryProgramMetadata);
     const exportError = prgExportQuery.error?.details;
@@ -59,6 +75,9 @@ const DependencyExport = ({ program, setExportProgramId }) => {
     const [attributeSettings, setAttributeSettings] = useState(DeepCopy(JSON_ATTRIBUTE_SETTINGS))
     const [selectedPreset, setSelectedPreset] = useState('local')
 
+    // JSON Customization
+    const [jsonCustomizationEnabled, setJsonCustomizationEnabled] = useState(false)
+
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
     };
@@ -68,7 +87,8 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         setExportProgramId(undefined)
     }
 
-    if (prgMetadata && legends && !documentReady) {
+    if (prgMetadata && legends && prgSections && !documentReady) {
+
         let programRuleActionsDict = {}
         prgMetadata.programRules?.forEach(pr => {
             pr.programRuleActions.forEach(pra => {
@@ -89,6 +109,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
             }
         })
 
+        prgMetadata.programSections = prgSections
         prgMetadata.legendSets = legendSets
         prgMetadata.optionSets = prgMetadata.optionSets ?? []
         prgMetadata.optionSets.push(PROGRAM_TYPE_OPTION_SET);
@@ -282,7 +303,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
         <>
             <CustomMUIDialog open={true} maxWidth='lg' fullWidth={true} >
                 <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
-                    Download Metadata With Dependencies
+                    Download Metadata with Dependencies
                 </CustomMUIDialogTitle >
                 <DialogContent dividers style={{ padding: '1em 2em' }}>
                     {!documentReady && !exportError &&
@@ -300,140 +321,155 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                     {documentReady && prgMetadata && legends && !exportError && jsonKeyTree && jsonHeaders &&
                         <Box sx={{ width: '100%' }}>
                             <div style={{ lineHeight: '1.5em' }}>
-                                <p><strong>Your file is ready!</strong></p>
-                                <p>You can now download the metadata related to the program by clicking "Download Now".</p>
-
-                                <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <p><strong>Program:</strong> <em>{prgMetadata.programs[0].name}</em></p>
-                                    <SelectOptions
-                                        label={"Export Preset and Routines"}
-                                        useError={false}
-                                        items={EXPORT_PRESETS}
-                                        handler={selectPreset}
-                                        value={selectedPreset}
-                                        styles={{ width: '35%' }}
-                                        defaultOption="No Preset"
-                                        helperText={['h2External'].includes(selectedPreset) ? "This option performs special modifications to the file" : ""}
-                                    />
+                                <div style={{display:'grid', gridTemplateColumns:'4fr 3fr', columnGap:'1em'}}>
+                                    <div style={{display:'flex', flexDirection:'column', gap:'1em'}}>
+                                        <p><strong>Your file is ready!</strong></p>
+                                        <p>You can now download the metadata related to the program by clicking "Download".</p>
+                                        <p><strong>Program:</strong> <em>{prgMetadata.programs[0].name}</em></p>
+                                        <FormControlLabel control={
+                                            <Switch 
+                                                checked={jsonCustomizationEnabled} 
+                                                onChange={() => setJsonCustomizationEnabled(!jsonCustomizationEnabled)}
+                                                
+                                            />}
+                                            label="Enable JSON Customization"
+                                        />
+                                    </div>
+                                    <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between'}}>
+                                        <SelectOptions
+                                            label={"Target Server"}
+                                            useError={false}
+                                            defaultOption={false}
+                                            items={EXPORT_PRESETS.concat(programType === 'HNQIS2' ? EXPORT_HNQIS_PRESETS : [])}
+                                            handler={selectPreset}
+                                            value={selectedPreset}
+                                            styles={{ width: '100%' }}
+                                            helperText={['h2External'].includes(selectedPreset) ? "This option performs special modifications to the file" : ""}
+                                        />
+                                        <p style={{ color: '#2c6693' }}><br /><strong>NOTE: </strong>Keep in mind that any <em>Option Groups</em> or <em>Option Group Sets</em> related to the program are <strong>NOT</strong> included in the downloaded file.</p>
+                                    </div>
                                 </div>
+                            </div>
 
+                            
+
+                            {/* JSON Customization  */}
+                            
+                            <Collapse in={jsonCustomizationEnabled} timeout={1000} >
                                 <h3><br />JSON File Customization</h3>
                                 <hr style={{ margin: '8px 0' }} />
-                            </div>
 
-                            <Accordion style={{ marginTop: '1em' }}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#FFF' }} />} sx={{ backgroundColor: '#2c6693', color: '#FFF' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <span style={{ verticalAlign: 'center' }}>JSON File Objects</span>
-                                    </div>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1em' }}>
+                                <Accordion style={{ marginTop: '1em' }}>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#FFF' }} />} sx={{ backgroundColor: '#2c6693', color: '#FFF' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <span style={{ verticalAlign: 'center' }}>JSON File Objects</span>
+                                        </div>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1em' }}>
 
-                                        <ButtonGroup variant="outlined">
-                                            <Button onClick={() => changeSelected(true, jsonHeaders, setJsonHeaders)}>Select All</Button>
-                                            <Button onClick={() => { changeSelected(false, jsonHeaders, setJsonHeaders); setTabValue(0); }}>Deselect All</Button>
-                                        </ButtonGroup>
+                                            <ButtonGroup variant="outlined">
+                                                <Button onClick={() => changeSelected(true, jsonHeaders, setJsonHeaders)}>Select All</Button>
+                                                <Button onClick={() => { changeSelected(false, jsonHeaders, setJsonHeaders); setTabValue(0); }}>Deselect All</Button>
+                                            </ButtonGroup>
 
-                                    </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', margin: '1em 0', padding: '0 1em', maxHeight: '100px', height: '100px', alignItems: 'start', overflow: 'scroll', overflowX: 'hidden' }}>
-                                        {jsonHeaders.map((key, index) =>
-                                            <FormControlLabel
-                                                key={index}
-                                                control={<Checkbox checked={key.selected}
-                                                    onChange={() => changeSelectedHeader(key.key, !key.selected)}
-                                                />}
-                                                label={DHIS2_KEY_MAP[key.key]}
-                                            />)
-                                        }
-                                    </div>
-                                </AccordionDetails>
-                            </Accordion>
-
-                            <Accordion style={{ marginTop: '1em' }}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#FFF' }} />} sx={{ backgroundColor: '#2c6693', color: '#FFF' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <span style={{ verticalAlign: 'center' }}>JSON Attributes Settings</span>
-                                    </div>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <FormGroup style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                                        alignItems: 'center',
-                                        width: '100%',
-                                        marginBottom: '1em'
-                                    }}>
-                                        {attributeSettings.map((elem, index) => <FormControlLabel
-                                            key={index}
-                                            control={
-                                                <Switch checked={elem.selected} onChange={() => changeAttributeSettings(index, !elem.selected)} name="" />
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', margin: '1em 0', padding: '0 1em', maxHeight: '100px', height: '100px', alignItems: 'start', overflow: 'scroll', overflowX: 'hidden' }}>
+                                            {jsonHeaders.map((key, index) =>
+                                                <FormControlLabel
+                                                    key={index}
+                                                    control={<Checkbox checked={key.selected}
+                                                        onChange={() => changeSelectedHeader(key.key, !key.selected)}
+                                                    />}
+                                                    label={DHIS2_KEY_MAP[key.key]}
+                                                />)
                                             }
-                                            label={elem.label}
-                                        />
-                                        )}
-                                    </FormGroup>
-                                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1em' }}>
+                                        </div>
+                                    </AccordionDetails>
+                                </Accordion>
 
-                                        <label><strong>NOTE: </strong>These settings are prioritized over what's selected below.</label>
+                                <Accordion style={{ marginTop: '1em' }}>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#FFF' }} />} sx={{ backgroundColor: '#2c6693', color: '#FFF' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <span style={{ verticalAlign: 'center' }}>JSON Attributes Settings</span>
+                                        </div>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <FormGroup style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                                            alignItems: 'center',
+                                            width: '100%',
+                                            marginBottom: '1em'
+                                        }}>
+                                            {attributeSettings.map((elem, index) => <FormControlLabel
+                                                key={index}
+                                                control={
+                                                    <Switch checked={elem.selected} onChange={() => changeAttributeSettings(index, !elem.selected)} name="" />
+                                                }
+                                                label={elem.label}
+                                            />
+                                            )}
+                                        </FormGroup>
+                                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1em' }}>
 
-                                    </div>
-                                </AccordionDetails>
-                            </Accordion>
+                                            <label><strong>NOTE: </strong>These settings are prioritized over what's selected below.</label>
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1em', alignItems: 'center' }}>
-                                <h4>JSON Attributes by Object</h4>
-                                <ButtonGroup variant="outlined">
-                                    <Button onClick={() => changeSelected(true, jsonKeyTree, setJsonKeyTree)}>Select All</Button>
-                                    <Button onClick={() => changeSelected(false, jsonKeyTree, setJsonKeyTree)}>Deselect All</Button>
-                                </ButtonGroup>
+                                        </div>
+                                    </AccordionDetails>
+                                </Accordion>
 
-                            </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1em', alignItems: 'center' }}>
+                                    <h4>JSON Attributes by Object</h4>
+                                    <ButtonGroup variant="outlined">
+                                        <Button onClick={() => changeSelected(true, jsonKeyTree, setJsonKeyTree)}>Select All</Button>
+                                        <Button onClick={() => changeSelected(false, jsonKeyTree, setJsonKeyTree)}>Deselect All</Button>
+                                    </ButtonGroup>
+                                </div>
+                                <Tabs
+                                    value={tabValue}
+                                    onChange={handleTabChange}
+                                    variant="scrollable"
+                                    scrollButtons
+                                    allowScrollButtonsMobile
+                                    sx={{
+                                        [`& .${tabsClasses.scrollButtons}`]: {
+                                            '&.Mui-disabled': { opacity: 0.3 },
+                                        }
+                                    }}
+                                    TabIndicatorProps={{
+                                        style: {
+                                            backgroundColor: "#FFF"
+                                        }
+                                    }}
+                                    textColor='inherit'
+                                    style={{ marginBottom: '1em', marginTop: '1em', backgroundColor: DHIS2_PRIMARY_COLOR, color: 'white' }}
 
-                            <Tabs
-                                value={tabValue}
-                                onChange={handleTabChange}
-                                variant="scrollable"
-                                scrollButtons
-                                allowScrollButtonsMobile
-                                sx={{
-                                    [`& .${tabsClasses.scrollButtons}`]: {
-                                        '&.Mui-disabled': { opacity: 0.3 },
+                                >
+                                    {jsonHeaders.map((key, index) =>
+                                        <Tab disabled={!key.selected} key={index} label={DHIS2_KEY_MAP[key.key]} value={key.key} />)
                                     }
-                                }}
-                                TabIndicatorProps={{
-                                    style: {
-                                        backgroundColor: "#FFF"
+                                </Tabs>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', margin: '1em 0', padding: '0 1em', maxHeight: '250px', height: '250px', alignItems: 'start', overflow: 'scroll', overflowX: 'hidden' }}>
+                                    {tabValue !== 0 && jsonKeyTree[tabValue].map((elem, index) =>
+                                        <FormControlLabel
+                                            key={index}
+                                            control={<Checkbox checked={elem.selected}
+                                                onChange={() => handleKeyCheckboxChange(tabValue, index)}
+                                            />}
+                                            label={elem.key}
+                                        />)
                                     }
-                                }}
-                                textColor='inherit'
-                                style={{ marginBottom: '1em', marginTop: '1em', backgroundColor: DHIS2_PRIMARY_COLOR, color: 'white' }}
+                                </div>
+                            </Collapse>
 
-                            >
-                                {jsonHeaders.map((key, index) =>
-                                    <Tab disabled={!key.selected} key={index} label={DHIS2_KEY_MAP[key.key]} value={key.key} />)
-                                }
-                            </Tabs>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', margin: '1em 0', padding: '0 1em', maxHeight: '250px', height: '250px', alignItems: 'start', overflow: 'scroll', overflowX: 'hidden' }}>
-                                {tabValue !== 0 && jsonKeyTree[tabValue].map((elem, index) =>
-                                    <FormControlLabel
-                                        key={index}
-                                        control={<Checkbox checked={elem.selected}
-                                            onChange={() => handleKeyCheckboxChange(tabValue, index)}
-                                        />}
-                                        label={elem.key}
-                                    />)
-                                }
-                            </div>
-
-                            <p style={{ color: '#2c6693' }}><br /><strong>NOTE: </strong>Keep in mind that any <em>Option Groups</em> or <em>Option Group Sets</em> related to the program are <strong>NOT</strong> included in the downloaded file.</p>
+                            {/* END of JSON Customization  */}
                         </Box>
                     }
                 </DialogContent>
 
-                <DialogActions style={{ padding: '1em', display: 'flex', justifyContent: (documentReady && prgMetadata && legends)?'space-between':'end', alignItems: 'center' }}>
-                    {documentReady && prgMetadata && legends &&
+                <DialogActions style={{ padding: '1em', display: 'flex', justifyContent: (jsonCustomizationEnabled && documentReady && prgMetadata && legends) ?'space-between':'end', alignItems: 'center' }}>
+                    {jsonCustomizationEnabled && documentReady && prgMetadata && legends &&
                         <FormControlLabel
                             control={<Checkbox checked={downloadOriginal}
                                 onChange={() => setDownloadOriginal(!downloadOriginal)}
@@ -444,7 +480,7 @@ const DependencyExport = ({ program, setExportProgramId }) => {
                     <div>
                         <Button onClick={() => hideForm()} color="error"> Close </Button>
                         {documentReady && prgMetadata && legends &&
-                            <Button onClick={() => downloadFile()} variant='outlined' style={{ marginLeft: '1em' }} disabled={downloading} startIcon={<FileDownloadIcon />}> Download Now {selectedPreset != '' ? 'with Selected Preset' : ''}</Button>
+                            <Button onClick={() => downloadFile()} variant='outlined' style={{ marginLeft: '1em' }} disabled={downloading} startIcon={<FileDownloadIcon />}> Download  </Button>
                         }
                     </div>
                 </DialogActions>
