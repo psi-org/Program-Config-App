@@ -139,31 +139,36 @@ const H2Setting = forwardRef((props, ref) => {
     }
 
     useEffect(() => {
-        if (!ouMetadataLoading) {
-            if (props.pcaMetadata?.ouRoot) {
-                setSelectedOrgUnits([props.pcaMetadata?.ouRoot])
-                ouLevelRefetch({ id: props.pcaMetadata?.ouRoot }).then(data => {
-                    console.log(data)
+        const fetchOrgUnits = async () => {
+            try {
+                if (!ouMetadataLoading && props.pcaMetadata?.ouRoot) {
+                    setSelectedOrgUnits([props.pcaMetadata?.ouRoot]);
+                    
+                    const data = await ouLevelRefetch({ id: props.pcaMetadata?.ouRoot });
+                    console.log(data);
+                    
                     if (typeof data.result !== "undefined") {
                         let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level >= data.result.level);
-                        setOrgUnitPathSelected([data.result.path])
+                        setOrgUnitPathSelected([data.result.path]);
                         setOULevels(ouLevels);
                     }
-                }).catch(err => {
-                    console.log(err);
-                });
-            }
-            else {
-                ouTreeNLevelInit()
+                } else {
+                    ouTreeNLevelInit();
+                }
+            } catch (error) {
+                setOrgUnitPathSelected([]);
+                setOULevels(ouMetadata);
+                console.log("ouLevelLoading: ", ouLevelLoading);
             }
         }
+        fetchOrgUnits();
     }, [ouMetadata]);
 
     useEffect(() => {
-        if (!ouLevelLoading && orgUnitPathSelected.length > 0) {
+        if ((!ouLevelLoading && orgUnitPathSelected.length > 0) || noOULevelFound) {
             ouTreeNLevelInit(ouMetadata)
         }
-    }, [orgUnitPathSelected])
+    }, [orgUnitPathSelected, noOULevelFound])
 
     let ouTreeNLevelInit = () => {
         setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
