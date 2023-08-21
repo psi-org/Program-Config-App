@@ -139,30 +139,43 @@ const H2Setting = forwardRef((props, ref) => {
     }
 
     useEffect(() => {
+        const checkAndResetValues = (key, setter) => {
+            if (!ouMetadata.orgUnitLevels.organisationUnitLevels.some(olevel => olevel.id === key)) {
+                setter("");
+            }
+        };
+    
+        const fetchDataAndSetState = async () => {
+            const data = await ouLevelRefetch({ id: props.pcaMetadata?.ouRoot });
+            if (data.result) {
+                const ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(
+                    ol => ol.level >= data.result.level
+                );
+                setOrgUnitPathSelected([data.result.path]);
+                setOULevels(ouLevels);
+            }
+        };
+    
         const fetchOrgUnits = async () => {
             try {
                 if (!ouMetadataLoading && props.pcaMetadata?.ouRoot) {
                     setSelectedOrgUnits([props.pcaMetadata?.ouRoot]);
-                    
-                    const data = await ouLevelRefetch({ id: props.pcaMetadata?.ouRoot });
-                    console.log(data);
-                    
-                    if (typeof data.result !== "undefined") {
-                        let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level >= data.result.level);
-                        setOrgUnitPathSelected([data.result.path]);
-                        setOULevels(ouLevels);
-                    }
+    
+                    checkAndResetValues(props.pcaMetadata?.ouLevelTable, setOUTableRow);
+                    checkAndResetValues(props.pcaMetadata?.ouLevelMap, setOUMapPolygon);
+    
+                    await fetchDataAndSetState();
                 } else {
                     ouTreeNLevelInit();
                 }
             } catch (error) {
                 setOrgUnitPathSelected([]);
                 setOULevels(ouMetadata);
-                console.log("ouLevelLoading: ", ouLevelLoading);
             }
-        }
+        };
+    
         fetchOrgUnits();
-    }, [ouMetadata]);
+    }, [ouMetadata]);    
 
     useEffect(() => {
         if ((!ouLevelLoading && orgUnitPathSelected.length > 0) || noOULevelFound) {
