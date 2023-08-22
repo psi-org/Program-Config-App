@@ -274,7 +274,14 @@ const processStageData = (
         programStageDataElements: programStage.programStageDataElements
     };
 
-    return { tempMetadata, metadata };
+    return {
+        tempMetadata,
+        metadata,
+        teaConfigurations: {
+            programSections: programPayload.programSections,
+            programTrackedEntityAttributes: programPayload.programTrackedEntityAttributes
+        }
+    };
 }
 
 const processProgramData = (
@@ -296,13 +303,22 @@ const processProgramData = (
         programStageSections: [],
         programStageDataElements: []
     };
+
+    let teaConfigurations = {
+        programSections: [],
+        programTrackedEntityAttributes: []
+    };
+
     let tempMetadataDEs = [];
+
     let programPCAMetadata = JSON.parse(programPayload.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
     programMetadata.dePrefix = programPCAMetadata.dePrefix;
 
     importedStages.forEach(programStage => {
+
         const currentExistingStage = stagesList.find(stage => stage.id === programStage.id);
         programStage.sortOrder = programStage.stageNumber;
+
         let { tempMetadata, metadata } = processStageData(
             {
                 uidPool,
@@ -316,19 +332,61 @@ const processProgramData = (
                 stageSharings: currentExistingStage.sharing,
                 programPayload
             }
-        )
+        );
+
         Object.keys(metadata).forEach(key => {
             groupedMetadata[key] = groupedMetadata[key].concat(metadata[key]);
         });
+
         tempMetadataDEs = tempMetadataDEs.concat(tempMetadata.dataElements);
+
     })
 
+    if (programPayload.withoutRegistration === false) {
+        //*TEAs must be constructed
+        importedTEAs.forEach((teaSection, index) => {
+            
+            let programTrackedEntityAttributes = teaSection.trackedEntityAttributes.map(ptea => {
+                ptea.id = ptea.programTrackedEntityAttribute || uidPool.shift();
+                return ptea;
+            });
+
+            teaSection.id = teaSection.id || uidPool.shift();
+
+            teaConfigurations.programSections.push({
+                name: teaSection.name,
+                id: teaSection.id,
+                sortOrder: index,
+                renderType: {
+                    MOBILE: {
+                        type: "LISTING"
+                    },
+                    DESKTOP: {
+                        type: "LISTING"
+                    }
+                },
+                program: {
+                    id: programPayload.id
+                },
+                trackedEntityAttributes: programTrackedEntityAttributes.map(ptea => ({ id: ptea.trackedEntityAttribute.id }))
+            });
+
+            teaConfigurations.programTrackedEntityAttributes = teaConfigurations.programTrackedEntityAttributes.concat(programTrackedEntityAttributes);
+
+            //TODO: Remove programPayload: programSections and programTrackedEntityAttributes
+
+            programPayload.programSections = teaConfigurations.programSections;
+            programPayload.programTrackedEntityAttributes = teaConfigurations.programTrackedEntityAttributes;
+        });
+    }
+    
+
     //* Result Object
-    //TODO: Removed Data Elements are not reflected on the final payload
     return {
         tempMetadata:
             { dataElements: tempMetadataDEs },
-        metadata: groupedMetadata
+        metadata: groupedMetadata,
+        teaConfigurations
     };
 }
 
@@ -381,8 +439,11 @@ const SaveMetadata = (props) => {
 
     useEffect(() => {
         if (uidPool && programPayload && !completed && !metadataRequest.called) {
+
+            let programConfigurations = DeepCopy(programPayload);
+
             let removedItems = (props.saveType === 'stage') ? props.removedItems || [] : props.removedItems?.dataElements || [];
-            const { tempMetadata, metadata } = (props.saveType === 'stage')
+            const { tempMetadata, metadata, teaConfigurations } = (props.saveType === 'stage')
                 ? processStageData(
                     {
                         uidPool,
@@ -396,7 +457,7 @@ const SaveMetadata = (props) => {
                         stagesList: props.stagesList,
                         originalStageDataElements: props.programStage.programStageDataElements,
                         stageSharings: props.programStage.sharing,
-                        programPayload
+                        programPayload: programConfigurations
                     }
                 )
                 : processProgramData(
@@ -407,8 +468,8 @@ const SaveMetadata = (props) => {
                         importedTEAs: props.importedTEAs,
                         importResults: props.importResults,
                         programMetadata: props.programMetadata,
-                        stagesList: programPayload.programStages,
-                        programPayload
+                        stagesList: programConfigurations.programStages,
+                        programPayload: programConfigurations
                     }
                 );
             
@@ -416,9 +477,9 @@ const SaveMetadata = (props) => {
 
             let newMetadata = {
                 ...metadata,
-                programs: [programPayload],
-                programSections: programPayload.programSections,
-                programTrackedEntityAttributes: programPayload.programTrackedEntityAttributes
+                ...teaConfigurations,
+                programs: [programConfigurations],
+                
             }
 
             console.log(tempMetadata);
@@ -426,7 +487,7 @@ const SaveMetadata = (props) => {
 
             //? CALL METADATA REQUESTS - POST DHIS2
 
-            /*metadataRequest.mutate({ data: tempMetadata }).then(response => {
+            metadataRequest.mutate({ data: tempMetadata }).then(response => {
                 if (response.status != 'OK') {
                     //* Rollback after error
                     metadataRequest.mutate({ data: programPayloadBackup }).then(response2 => {
@@ -450,7 +511,7 @@ const SaveMetadata = (props) => {
                     props.setImportResults(false);
 
                 });
-            });*/
+            });
         }
     }, [uidPool, programPayload, completed, metadataRequest])
 
