@@ -153,14 +153,13 @@ const H2Setting = forwardRef((props, ref) => {
                 );
                 setOrgUnitPathSelected([data.result.path]);
                 setOULevels(ouLevels);
+                setSelectedOrgUnits([props.pcaMetadata?.ouRoot]);
             }
         };
     
         const fetchOrgUnits = async () => {
             try {
                 if (!ouMetadataLoading && props.pcaMetadata?.ouRoot) {
-                    setSelectedOrgUnits([props.pcaMetadata?.ouRoot]);
-    
                     checkAndResetValues(props.pcaMetadata?.ouLevelTable, setOUTableRow);
                     checkAndResetValues(props.pcaMetadata?.ouLevelMap, setOUMapPolygon);
     
@@ -169,6 +168,7 @@ const H2Setting = forwardRef((props, ref) => {
                     ouTreeNLevelInit();
                 }
             } catch (error) {
+                setSelectedOrgUnits([]);
                 setOrgUnitPathSelected([]);
                 setOULevels(ouMetadata);
             }
@@ -229,6 +229,7 @@ const H2Setting = forwardRef((props, ref) => {
                 selectedOrgUnits.length === 0
             )
                 response = false;
+            console.log("selected Org Units: ", selectedOrgUnits);
             validationErrors.healthArea =
                 healthArea === "" ? "This field is required" : undefined;
             validationErrors.ouTableRow =
@@ -241,6 +242,7 @@ const H2Setting = forwardRef((props, ref) => {
                     : undefined;
             validationErrors.aggregationType =
                 aggregationType === "" ? "This field is required" : undefined;
+            console.log("Validation Errors: ", validationErrors);
             return response;
         },
 
