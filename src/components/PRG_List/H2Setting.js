@@ -229,7 +229,6 @@ const H2Setting = forwardRef((props, ref) => {
                 selectedOrgUnits.length === 0
             )
                 response = false;
-            console.log("selected Org Units: ", selectedOrgUnits);
             validationErrors.healthArea =
                 healthArea === "" ? "This field is required" : undefined;
             validationErrors.ouTableRow =
@@ -242,7 +241,6 @@ const H2Setting = forwardRef((props, ref) => {
                     : undefined;
             validationErrors.aggregationType =
                 aggregationType === "" ? "This field is required" : undefined;
-            console.log("Validation Errors: ", validationErrors);
             return response;
         },
 
