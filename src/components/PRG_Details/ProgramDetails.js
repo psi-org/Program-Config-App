@@ -111,6 +111,7 @@ const ProgramDetails = () => {
     }
 
     useEffect(() => {
+        console.log(data)
         if (data && !backupData) storeBackupdata();
     }, [data])
 
@@ -219,7 +220,7 @@ const ProgramDetails = () => {
                     <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
                 }
             </div>
-            <div className="wrapper" style={{ padding: '1em 1.2em 0' }}>
+            <div className="wrapper" style={{ padding: '1em 1.2em 0', height: '75vh' }}>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
                         {

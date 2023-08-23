@@ -1,4 +1,4 @@
-import { MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
+import { MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
 
 export const thinBorder = {
     top: {
@@ -242,14 +242,14 @@ export const TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS = {
         prompt: 'Structure not defined.'
     },
     formNameOutOfRange: {
-        formula: `AND(NOT(ISBLANK($A3)),OR(LEN($D3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($D3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
-        dynamicFormula: `AND(NOT(ISBLANK($A_ROWNUM_)),OR(LEN($D_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($D_ROWNUM_)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
-        prompt: `Form Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+        formula: `AND(NOT(ISBLANK($A3)),OR(LEN($D3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($D3)>${MAX_FORM_NAME_LENGTH}))`,
+        dynamicFormula: `AND(NOT(ISBLANK($A_ROWNUM_)),OR(LEN($D_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($D_ROWNUM_)>${MAX_FORM_NAME_LENGTH}))`,
+        prompt: `Form Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`
     },
     nameOutOfRange: {
-        formula: `AND($A3 = "Data Element",$C3 = "No",OR(LEN($E3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($E3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
-        dynamicFormula: `AND($A_ROWNUM_ = "Data Element",$C_ROWNUM_ = "No",OR(LEN($E_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($E_ROWNUM_)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
-        prompt: `Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+        formula: `AND($A3 = "Data Element",$C3 = "No",OR(LEN($E3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($E3)>${MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH}))`,
+        dynamicFormula: `AND($A_ROWNUM_ = "Data Element",$C_ROWNUM_ = "No",OR(LEN($E_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($E_ROWNUM_)>${MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH}))`,
+        prompt: `Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH} characters).`
     },
     shortNameOutOfRange: {
         formula: `AND($A3 = "Data Element",$C3 = "No",LEN($F3)>${MAX_SHORT_NAME_LENGTH})`,

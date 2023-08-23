@@ -346,7 +346,7 @@ export const mapImportedDE = (data, programPrefix, stageNumber, optionSets, lege
     parsedDE.domainType = 'TRACKER';
     parsedDE.valueType = getKeyByValue(DHIS2_VALUE_TYPES_MAP, data[TRACKER_TEMPLATE_MAP.valueType]);
     parsedDE.aggregationType = getKeyByValue(DHIS2_AGG_OPERATORS_MAP, data[TRACKER_TEMPLATE_MAP.aggOperator] || 'None');
-    parsedDE.parentName = data[TRACKER_TEMPLATE_MAP.parentName]?.result?stagePrefix+data[TRACKER_TEMPLATE_MAP.parentName]?.result:undefined;
+    parsedDE.parentName = data[TRACKER_TEMPLATE_MAP.correlative]?.result?stagePrefix+data[TRACKER_TEMPLATE_MAP.correlative]?.result:undefined;
     parsedDE.attributeValues = (existingDe?.attributeValues?.filter(att =>
         ![METADATA].includes(att.attribute.id)
     ) || [])
@@ -371,12 +371,13 @@ export const mapImportedDE = (data, programPrefix, stageNumber, optionSets, lege
         varName: stagePrefix+data[TRACKER_TEMPLATE_MAP.correlative]?.result,
         autoNaming: autoNaming ? 'Yes' : 'No'
     };
-
+    
     if (data[TRACKER_TEMPLATE_MAP.parentQuestion] && data[TRACKER_TEMPLATE_MAP.parentQuestion] !== "") {
         metadata.parentQuestion = stagePrefix+data[TRACKER_TEMPLATE_MAP.parentQuestion];
         parsedDE.parentQuestion = stagePrefix+data[TRACKER_TEMPLATE_MAP.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
     }
-    if (data[TRACKER_TEMPLATE_MAP.parentValue] && data[TRACKER_TEMPLATE_MAP.parentValue] !== "") metadata.parentValue = data[TRACKER_TEMPLATE_MAP.parentValue];
+    if (data[TRACKER_TEMPLATE_MAP.parentValue] && data[TRACKER_TEMPLATE_MAP.parentValue] !== "")
+        metadata.parentValue = data[TRACKER_TEMPLATE_MAP.parentValue];
 
     parsedDE.attributeValues.push(
         {

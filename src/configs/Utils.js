@@ -280,6 +280,7 @@ export const getProgramQuery = () => {
     return [
         'accessLevel',
         'completeEventsExpiryDays',
+        'description',
         'displayFrontPageList',
         'displayIncidentDate',
         'enrollmentDateLabel',
@@ -315,7 +316,8 @@ export const getProgramQuery = () => {
         'user',
         'userAccesses',
         'userGroupAccesses',
-        'sharing'
+        'sharing',
+        'openDaysAfterCoEndDate'
     ];
 }
 

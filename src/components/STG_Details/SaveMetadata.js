@@ -318,6 +318,7 @@ const processProgramData = (
 
         const currentExistingStage = stagesList.find(stage => stage.id === programStage.id);
         programStage.sortOrder = programStage.stageNumber;
+        programStage = mergeWithPriority(programStage, currentExistingStage);
 
         let { tempMetadata, metadata } = processStageData(
             {

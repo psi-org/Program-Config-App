@@ -122,6 +122,7 @@ const ValidateTracker = (
             setValidationResults(false);
         } else {
             setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
+            console.log(validationResults)
             setSavingMetadata(false);
             setValidationResults(validationResults);
         }

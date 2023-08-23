@@ -33,7 +33,7 @@ import {
     writeWorkbook
 } from "../../configs/ExcelUtils";
 import { ReleaseNotesTracker } from "../../configs/ReleaseNotes";
-import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../../configs/Constants';
+import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP } from '../../configs/Constants';
 
 const ExporterTracker = ({
     programID, programPrefix, programName, programShortName, programTET, programCatCombo, programType, flag, stagesConfigurations, teaConfigurations, optionData, legendSetData, trackedEntityAttributesData, valueTypes, aggTypes, programData, isLoading, setFlag, setStatus
