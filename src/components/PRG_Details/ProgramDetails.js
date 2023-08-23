@@ -111,7 +111,6 @@ const ProgramDetails = () => {
     }
 
     useEffect(() => {
-        console.log(data)
         if (data && !backupData) storeBackupdata();
     }, [data])
 
@@ -139,7 +138,6 @@ const ProgramDetails = () => {
     )
 
     const commit = () => {
-        //TODO: Save Changes after validation
         if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
         setSavingMetadata(true);
         return;

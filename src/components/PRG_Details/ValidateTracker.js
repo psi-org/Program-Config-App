@@ -40,95 +40,100 @@ const ValidateTracker = (
     const [save, setSave] = useState(false);
     const [validationMessage, setValidationMessage] = useState("Metadata validated. Please use the 'SAVE' button to persist your changes.");
 
-    const [validationScope, setValidationScope] = useState(importResults || buildProgramConfigurations(programMetadata));
-
+    const [validationScope, setValidationScope] = useState();
 
     useEffect(() => {
-        const importedStages = validationScope.configurations.importedStages;
-        const teas = validationScope.configurations.teas;
-        let errorCounts = 0;
-        let excelRow = 2;
+        setValidationScope(importResults || buildProgramConfigurations(programMetadata))
+    }, [])
+    
+
+    useEffect(() => {
+        if (validationScope) {
+            const importedStages = validationScope.configurations.importedStages;
+            const teas = validationScope.configurations.teas;
+            let errorCounts = 0;
+            let excelRow = 2;
         
-        if (teas) {
-            const teaList = teas.map(section => section.trackedEntityAttributes.map(tea => tea.trackedEntityAttribute.id)).flat();
-            teas.forEach(section => {
-                excelRow += 1;
-                const sectionErrorDetails = {
-                    title: section.name || ('Section on Template row ' + excelRow),
-                    tagName: '[ Program TEA Section ]'
-                }
-                delete section.errors;
-                validateSections(section, sectionErrorDetails);
-
-                if (section.errors) {
-                    validationResults.teas.sections.push(section);
-                    errorCounts += section.errors.errors.length;
-                }
-                section.trackedEntityAttributes.forEach(tea => {
+            if (teas) {
+                const teaList = teas.map(section => section.trackedEntityAttributes.map(tea => tea.trackedEntityAttribute.id)).flat();
+                teas.forEach(section => {
                     excelRow += 1;
-                    const errorDetails = {
-                        title: tea?.trackedEntityAttribute?.name ? `${tea.trackedEntityAttribute.name} (Template row ${excelRow})` : 'Tracked Entity Attribute on Template row '+excelRow,
-                        tagName: '[ Tracked Entity Attribute ]'
+                    const sectionErrorDetails = {
+                        title: section.name || ('Section on Template row ' + excelRow),
+                        tagName: '[ Program TEA Section ]'
                     }
-                    delete tea.errors;
-                    validateTEA(tea, teaList, errorDetails);
-                    if (tea.errors) validationResults.teas.teas.push(tea);
-                    if (tea.errors?.errors.length > 0) errorCounts += tea.errors.errors.length;
-                })
-            });
-        }
+                    delete section.errors;
+                    validateSections(section, sectionErrorDetails);
 
-        importedStages.forEach(stage => {
+                    if (section.errors) {
+                        validationResults.teas.sections.push(section);
+                        errorCounts += section.errors.errors.length;
+                    }
+                    section.trackedEntityAttributes.forEach(tea => {
+                        excelRow += 1;
+                        const errorDetails = {
+                            title: tea?.trackedEntityAttribute?.name ? `${tea.trackedEntityAttribute.name} (Template row ${excelRow})` : 'Tracked Entity Attribute on Template row ' + excelRow,
+                            tagName: '[ Tracked Entity Attribute ]'
+                        }
+                        delete tea.errors;
+                        validateTEA(tea, teaList, errorDetails);
+                        if (tea.errors) validationResults.teas.teas.push(tea);
+                        if (tea.errors?.errors.length > 0) errorCounts += tea.errors.errors.length;
+                    })
+                });
+            }
 
-            excelRow = 2;
-            let stage_errors = 0;
-            delete stage.errors;
+            importedStages.forEach(stage => {
 
-            stage.importedSections.forEach(section => {
-                excelRow += 1;
-                const sectionErrorDetails = {
-                    title: section.name || `Section on Template row ${excelRow}`,
-                    tagName: `[ Section | ${stage.name} ]`
-                }
-                delete section.errors;
-                validateSections(section, sectionErrorDetails);
+                excelRow = 2;
+                let stage_errors = 0;
+                delete stage.errors;
 
-                if (section.errors) {
-                    validationResults.stages.sections.push(section);
-                    stage_errors += section.errors.errors.length;
-                }
-
-                section.dataElements.forEach(dataElement => {
+                stage.importedSections.forEach(section => {
                     excelRow += 1;
-                    const errorDetails = {
-                        title: dataElement?.name ? `${truncateString(dataElement.name)} (Template row ${excelRow})` : `Data Element on Template row ${excelRow}`,
-                        tagName: `[ Data Element | ${stage.name} ]`
+                    const sectionErrorDetails = {
+                        title: section.name || `Section on Template row ${excelRow}`,
+                        tagName: `[ Section | ${stage.name} ]`
                     }
-                    delete dataElement.errors;
-                    validateDataElement(dataElement, errorDetails);
-                    if (dataElement.errors) validationResults.stages.dataElements.push(dataElement);
-                    if (dataElement.errors?.errors.length > 0) stage_errors += dataElement.errors.errors.length;
+                    delete section.errors;
+                    validateSections(section, sectionErrorDetails);
+
+                    if (section.errors) {
+                        validationResults.stages.sections.push(section);
+                        stage_errors += section.errors.errors.length;
+                    }
+
+                    section.dataElements.forEach(dataElement => {
+                        excelRow += 1;
+                        const errorDetails = {
+                            title: dataElement?.name ? `${truncateString(dataElement.name)} (Template row ${excelRow})` : `Data Element on Template row ${excelRow}`,
+                            tagName: `[ Data Element | ${stage.name} ]`
+                        }
+                        delete dataElement.errors;
+                        validateDataElement(dataElement, errorDetails);
+                        if (dataElement.errors) validationResults.stages.dataElements.push(dataElement);
+                        if (dataElement.errors?.errors.length > 0) stage_errors += dataElement.errors.errors.length;
+                    });
+
                 });
 
+                errorCounts += stage_errors;
+                if (stage_errors > 0) stage.errorsCount = stage_errors;
+
             });
 
-            errorCounts += stage_errors;
-            if (stage_errors > 0) stage.errorsCount = stage_errors;
+            if (errorCounts === 0) {
+                setValid(true);
+                setValidationResults(false);
+            } else {
+                setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
+                setSavingMetadata(false);
+                setValidationResults(validationResults);
+            }
 
-        });
-
-        if (errorCounts === 0) {
-            setValid(true);
-            setValidationResults(false);
-        } else {
-            setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
-            console.log(validationResults)
-            setSavingMetadata(false);
-            setValidationResults(validationResults);
+            setProcessed(true);
         }
-
-        setProcessed(true);
-    });
+    }, [validationScope]);
 
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => setSavingMetadata(false)}>

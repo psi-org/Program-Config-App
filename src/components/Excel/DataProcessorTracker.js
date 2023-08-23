@@ -248,7 +248,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
     };
 
-    const setTEAContents = () => { //TODO: Add support for programs with basic form and TEAs not in form.
+    const setTEAContents = () => {
         let teaMap = {};
         let allTEAs = [];
         let unusedTEAs = [];

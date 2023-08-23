@@ -1,6 +1,6 @@
 import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
 import { getVarNameFromParentUid } from "./ExcelUtils";
-import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isNum, isValidCorrelative, isValidParentName } from "./Utils";
+import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isNum, isValidCorrelative, isValidParentName, setPCAMetadata } from "./Utils";
 
 export const HNQIS2_VALIDATION_SETTINGS = {
     sections: {
@@ -668,7 +668,6 @@ const mapAttributes = (attributes) => {
     }))
 }
 
-//TODO: Parent Question not being mapped correctly when validating directly without importing.
 const mapStage = (stage) => {
     return stage.programStageSections && stage.programStageSections.length > 0 ?
         // Stage with sections
@@ -683,10 +682,11 @@ const mapStage = (stage) => {
             updatedValues: section.dataElements.length,
             dataElements: section.dataElements.map(de => {
                 let metadata = getPCAMetadataDE(de);
+                de.parentName = metadata.varName;
                 if (metadata.parentQuestion) {
-                    metadata.parentQuestion = getVarNameFromParentUid(metadata.parentQuestion, stage);
-                    let metadataAttribute = de.attributeValues.find(av => av.attribute.id === METADATA);
-                    metadataAttribute.value = JSON.stringify(metadata);
+                    metadata.parentQuestion = getVarNameFromParentUid(metadata.parentQuestion, stage, false);
+                    setPCAMetadata(de, metadata)
+                    de.parentQuestion = metadata.parentQuestion;
                 }
                 return de;
             })

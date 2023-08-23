@@ -271,8 +271,10 @@ export const getHNQIS2MappingList = (ws) => {
     };
 }
 
-export const getVarNameFromParentUid = (parentUid, programStage) => {
+export const getVarNameFromParentUid = (parentUid, programStage, removeStagePrefix = true) => {
     let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
     let deMetadata = JSON.parse(parentDe?.attributeValues?.find(av => av.attribute.id === METADATA)?.value || "{}");
-    return deMetadata.varName?.replace(/_PS\d+/g, '');
+    if(removeStagePrefix)
+        return deMetadata.varName?.replace(/_PS\d+/g, '');
+    return deMetadata.varName;
 }

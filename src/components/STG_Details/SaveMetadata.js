@@ -165,7 +165,6 @@ const processStageData = (
         section.dataElements.map(de => {
             let attributeValues = de.attributeValues;
             if (de.parentQuestion) {
-
                 let metadataIndex = de.attributeValues.findIndex(att => att.attribute.id == METADATA);
 
                 let metadata = JSON.parse(de.attributeValues[metadataIndex]?.value || "{}");
@@ -374,8 +373,6 @@ const processProgramData = (
 
             teaConfigurations.programTrackedEntityAttributes = teaConfigurations.programTrackedEntityAttributes.concat(programTrackedEntityAttributes);
 
-            //TODO: Remove programPayload: programSections and programTrackedEntityAttributes
-
             programPayload.programSections = teaConfigurations.programSections;
             programPayload.programTrackedEntityAttributes = teaConfigurations.programTrackedEntityAttributes;
         });
@@ -473,8 +470,6 @@ const SaveMetadata = (props) => {
                         programPayload: programConfigurations
                     }
                 );
-            
-            //TODO: Set TEAs and ProgramSections.
 
             let newMetadata = {
                 ...metadata,
@@ -482,9 +477,6 @@ const SaveMetadata = (props) => {
                 programs: [programConfigurations],
                 
             }
-
-            console.log(tempMetadata);
-            console.log(newMetadata);
 
             //? CALL METADATA REQUESTS - POST DHIS2
 
