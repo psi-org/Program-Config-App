@@ -139,31 +139,49 @@ const H2Setting = forwardRef((props, ref) => {
     }
 
     useEffect(() => {
-        if (!ouMetadataLoading) {
-            if (props.pcaMetadata?.ouRoot) {
-                setSelectedOrgUnits([props.pcaMetadata?.ouRoot])
-                ouLevelRefetch({ id: props.pcaMetadata?.ouRoot }).then(data => {
-                    console.log(data)
-                    if (typeof data.result !== "undefined") {
-                        let ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(ol => ol.level >= data.result.level);
-                        setOrgUnitPathSelected([data.result.path])
-                        setOULevels(ouLevels);
-                    }
-                }).catch(err => {
-                    console.log(err);
-                });
+        const checkAndResetValues = (key, setter) => {
+            if (!ouMetadata.orgUnitLevels.organisationUnitLevels.some(olevel => olevel.id === key)) {
+                setter("");
             }
-            else {
-                ouTreeNLevelInit()
+        };
+    
+        const fetchDataAndSetState = async () => {
+            const data = await ouLevelRefetch({ id: props.pcaMetadata?.ouRoot });
+            if (data.result) {
+                const ouLevels = ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(
+                    ol => ol.level >= data.result.level
+                );
+                setOrgUnitPathSelected([data.result.path]);
+                setOULevels(ouLevels);
+                setSelectedOrgUnits([props.pcaMetadata?.ouRoot]);
             }
-        }
-    }, [ouMetadata]);
+        };
+    
+        const fetchOrgUnits = async () => {
+            try {
+                if (!ouMetadataLoading && props.pcaMetadata?.ouRoot) {
+                    checkAndResetValues(props.pcaMetadata?.ouLevelTable, setOUTableRow);
+                    checkAndResetValues(props.pcaMetadata?.ouLevelMap, setOUMapPolygon);
+    
+                    await fetchDataAndSetState();
+                } else {
+                    ouTreeNLevelInit();
+                }
+            } catch (error) {
+                setSelectedOrgUnits([]);
+                setOrgUnitPathSelected([]);
+                setOULevels(ouMetadata);
+            }
+        };
+    
+        fetchOrgUnits();
+    }, [ouMetadata]);    
 
     useEffect(() => {
-        if (!ouLevelLoading && orgUnitPathSelected.length > 0) {
+        if ((!ouLevelLoading && orgUnitPathSelected.length > 0) || noOULevelFound) {
             ouTreeNLevelInit(ouMetadata)
         }
-    }, [orgUnitPathSelected])
+    }, [orgUnitPathSelected, noOULevelFound])
 
     let ouTreeNLevelInit = () => {
         setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
