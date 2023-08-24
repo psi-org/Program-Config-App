@@ -575,7 +575,7 @@ export const readQuestionComposites = (sections) => {
     return questionCompositeScores.sort()
 }
 
-const hideShowLogic = (hideShowGroup, programId, uidPool) => {
+export const hideShowLogic = (hideShowGroup, programId, uidPool) => {
     var hideShowRules = [], hideShowActions = [];
 
     Object.keys(hideShowGroup).forEach(parentCode => {

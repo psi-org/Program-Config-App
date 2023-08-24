@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
-import CustomMUIDialog from './../UIElements/CustomMUIDialog'
+import CustomMUIDialogTitle from './CustomMUIDialogTitle'
+import CustomMUIDialog from './CustomMUIDialog'
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants";
 import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, setPCAMetadata } from "../../configs/Utils";
 
@@ -511,12 +511,12 @@ const SaveMetadata = (props) => {
 
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => props.setSavingMetadata(false)}>
-            {props.hnqisMode ? 'Save Assessment' : 'Save Stage'}
+            {props.hnqisMode ? 'Save Assessment' : 'Save Configurations'}
         </CustomMUIDialogTitle >
         <DialogContent dividers style={{ padding: '1em 2em' }}>
 
             <NoticeBox title="Saving content" error={errorStatus}>
-                {!completed && <CircularLoader small />}
+                {!completed && !errorStatus && <CircularLoader small />}
                 {
                     successStatus &&
                     (

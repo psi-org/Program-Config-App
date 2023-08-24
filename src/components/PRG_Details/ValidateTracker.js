@@ -7,7 +7,7 @@ import CustomMUIDialog from '../UIElements/CustomMUIDialog'
 import SaveIcon from '@mui/icons-material/Save';
 
 import { useEffect, useState } from "react";
-import SaveMetadata from "../STG_Details/SaveMetadata";
+import SaveMetadata from "../UIElements/SaveMetadata";
 import { buildProgramConfigurations, getNewObjectsCount, validateDataElement, validateSections, validateTEA } from "../../configs/ImportValidatorUtils";
 import { truncateString } from "../../configs/Utils";
 

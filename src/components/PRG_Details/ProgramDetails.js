@@ -1,6 +1,6 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useSelector } from "react-redux";
-import { Chip, CircularLoader, NoticeBox } from '@dhis2/ui';
+import { Chip, CircularLoader, NoticeBox, IconCheckmarkCircle24, IconCross24 } from '@dhis2/ui';
 
 // ------------------
 import { Link, useParams } from "react-router-dom";
@@ -16,17 +16,21 @@ import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
-import { DeepCopy, extractAttributeValues, formatAlert, getProgramQuery, truncateString } from "../../configs/Utils";
+import { DeepCopy, extractAttributeValues, formatAlert, getPCAMetadataDE, getProgramQuery, setPCAMetadata, truncateString } from "../../configs/Utils";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 import DataProcessorTracker from "../Excel/DataProcessorTracker";
 import Importer from "../Excel/Importer";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants";
-import { Button } from "@mui/material";
+import { Button, DialogActions, DialogContent } from "@mui/material";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import Removed from "../UIElements/Removed";
 import ValidateTracker from "../PRG_Details/ValidateTracker";
 import Errors from "../UIElements/Errors";
+import CustomMUIDialog from "../UIElements/CustomMUIDialog";
+import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
+import { BUILD_VERSION, METADATA } from "../../configs/Constants";
+import { buildProgramRules, hideShowLogic } from "../STG_Details/Scripting";
 
 
 const query = {
@@ -45,6 +49,53 @@ const createMutation = {
     data: ({ data }) => data
 };
 
+const deleteMetadataMutation = {
+    resource: 'metadata?importStrategy=DELETE',
+    type: 'create',
+    data: ({ data }) => data
+};
+
+const queryProgramSettings = {
+    results: {
+        resource: 'programs',
+        id: ({ programId }) => programId,
+        params: {
+            fields: ['lastUpdated', 'id', 'href', 'created', 'name', 'shortName', 'publicAccess', 'ignoreOverdueEvents', 'skipOffline', 'enrollmentDateLabel', 'onlyEnrollOnce', 'version', 'displayFormName', 'displayEnrollmentDateLabel', 'selectIncidentDatesInFuture', 'maxTeiCountToReturn', 'selectEnrollmentDatesInFuture', 'registration', 'openDaysAfterCoEndDate', 'favorite', 'useFirstStageDuringRegistration', 'displayName', 'completeEventsExpiryDays', 'displayShortName', 'externalAccess', 'withoutRegistration', 'minAttributesRequiredToSearch', 'displayFrontPageList', 'programType', 'accessLevel', 'displayIncidentDate', 'expiryDays', 'categoryCombo', 'sharing', 'access', 'trackedEntityType', 'createdBy', 'user', 'programIndicators', 'translations', 'userGroupAccesses', 'attributeValues', 'userRoles', 'userAccesses', 'favorites', 'programRuleVariables', 'programTrackedEntityAttributes', 'notificationTemplates', 'organisationUnits', 'programSections', 'programStages', 'style']
+        }
+    },
+}
+
+const queryIds = {
+    results: {
+        resource: 'system/id.json',
+        params: ({ n }) => ({
+            limit: n
+        })
+    }
+};
+
+const queryPR = {
+    results: {
+        resource: 'programRules',
+        params: ({ programId }) => ({
+            fields: ['id', 'name', 'condition', 'programRuleActions'],
+            pageSize: 1000,
+            filter: ['program.id:eq:' + programId, 'description:eq:_Scripted']
+        })
+    }
+};
+
+const queryPRV = {
+    results: {
+        resource: 'programRuleVariables',
+        params: ({ programId }) => ({
+            fields: ['id', 'name'],
+            pageSize: 2000,
+            filter: ['program.id:eq:' + programId, 'name:$like:_']
+        })
+    }
+};
+
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -52,41 +103,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const ProgramDetails = () => {
 
     const h2Ready = localStorage.getItem('h2Ready') === 'true';
-    
-    let metadataDM = useDataMutation(createMutation, {
-        onError: (err) => {
-            console.error(err)
-        }
-    });
-    
-    const createMetadata = {
-        mutate: metadataDM[0],
-        loading: metadataDM[1].loading,
-        error: metadataDM[1].error,
-        data: metadataDM[1].data
-    };
 
     const { id } = useParams();
-    const [showStageForm, setShowStageForm] = useState(false);
-    const [notification, setNotification] = useState(undefined);
-    const [snackSeverity, setSnackSeverity] = useState(undefined);
-    const [newStage, setNewStage] = useState();
-    const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
-    const [importerEnabled, setImporterEnabled] = useState(false);
-    const [exportToExcel, setExportToExcel] = useState(false);
-    const [exportStatus, setExportStatus] = useState("Download Template");
-    const [saveStatus, setSaveStatus] = useState('Validate');
-    const [importResults, setImportResults] = useState();
-    const [savedAndValidated, setSavedAndValidated] = useState(false);
-    const [savingMetadata, setSavingMetadata] = useState(false);
-    const [validationResults, setValidationResults] = useState(undefined);
-    const [errorReports, setErrorReports] = useState(undefined);
-    const [removedElements, setRemovedElements] = useState([]);
-    const [backupData, setBackupData] = useState()
-
-    useEffect(() => {
-        if (notification) setSnackSeverity(notification.severity)
-    }, [notification])
 
     if (id && id.length == 11) {
         const dispatch = useDispatch();
@@ -102,7 +120,60 @@ const ProgramDetails = () => {
         </NoticeBox>
     )
 
+    let metadataDM = useDataMutation(createMutation, {
+        onError: (err) => {
+            console.error(err)
+        }
+    });
+
+    const createMetadata = {
+        mutate: metadataDM[0],
+        loading: metadataDM[1].loading,
+        error: metadataDM[1].error,
+        data: metadataDM[1].data
+    };
+
+    const deleteMetadata = useDataMutation(deleteMetadataMutation, {
+        onError: (err) => {
+            console.error(err)
+        }
+    })[0];
+
+    const [showStageForm, setShowStageForm] = useState(false);
+    const [notification, setNotification] = useState(undefined);
+    const [snackSeverity, setSnackSeverity] = useState(undefined);
+    const [newStage, setNewStage] = useState();
+    const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
+    const [importerEnabled, setImporterEnabled] = useState(false);
+    const [exportToExcel, setExportToExcel] = useState(false);
+    const [exportStatus, setExportStatus] = useState("Download Template");
+    const [saveStatus, setSaveStatus] = useState('Validate');
+    const [importResults, setImportResults] = useState();
+    const [savedAndValidated, setSavedAndValidated] = useState(false);
+    const [savingMetadata, setSavingMetadata] = useState(false);
+    const [validationResults, setValidationResults] = useState(undefined);
+    const [errorReports, setErrorReports] = useState(undefined);
+    const [backupData, setBackupData] = useState()
+    const [progressSteps, setProgressSteps] = useState(0);
+    const [saveAndBuild, setSaveAndBuild] = useState(false);
+
+    useEffect(() => {
+        if (notification) setSnackSeverity(notification.severity)
+    }, [notification])
+
+    // Get Ids
+    const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: 0 } });
+    //setUidPool(idsQuery.data?.results.codes);
+
+    // Fetch Program Rules from Program
+    const prDQ = useDataQuery(queryPR, { variables: { programId: program } });
+
+    // Fetch Program Rule Variables from Program
+    const prvDQ = useDataQuery(queryPRV, { variables: { programId: program } });
+
     const { loading, error, data, refetch } = useDataQuery(query, { variables: { program } });
+
+    const { refetch: getProgramSettings } = useDataQuery(queryProgramSettings, { lazy: true, variables: { program } });
 
     const storeBackupdata = () => {
         setBackupData({
@@ -143,6 +214,124 @@ const ProgramDetails = () => {
         return;
     };
 
+    const updateProgramBuildVersion = (programId, pcaMetadata) => {
+        getProgramSettings({ programId }).then(res => {
+            let program = res.results;
+            pcaMetadata.buildVersion = BUILD_VERSION;
+            setPCAMetadata(program, pcaMetadata);
+
+            createMetadata.mutate({ data: { programs: [program] } }).then(response => {
+                if (response.status == 'OK') {
+                    setProgressSteps(6)
+                    setSaveAndBuild('Completed');
+                    setSavedAndValidated(false);
+
+                    prDQ.refetch();
+                    prvDQ.refetch();
+                }
+            })
+        })
+    }
+
+    const buildProgramRulesTracker = () => {
+        if (!savedAndValidated) return;
+        //--------------------- NEW METADATA --------------------//
+        refetch({ program }).then(programConfig => {
+
+            setProgressSteps(1);
+
+            let pcaMetadata = JSON.parse(programConfig.results?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}")
+            setSaveAndBuild('Run');
+
+            let programStages = programConfig.results?.programStages;
+            let n = (programStages?.reduce((acu, cur) => acu + (cur.programStageDataElements?.length || 0), 0) || 0)*2;
+
+            idsQuery.refetch({ n }).then(uidData => {
+                if (uidData) {
+                    let uidPool = uidData.results.codes;
+                    setProgressSteps(2);
+
+                    let hideShowGroup = {};
+                    let programRuleVariables = [];
+
+                    // Data Elements Variables
+                    programStages.forEach((stage, stgIdx) => {
+                        let stageSections = (stage.programStageSections && stage.programStageSections.length > 0)
+                            ? stage.programStageSections
+                            : [{
+                                dataElements: stage.programStageDataElements.map(psde => psde.dataElement)
+                            }];
+                        
+                        const varNameRef = stageSections.map(sec => sec.dataElements.map(de => {
+                            let metadata = getPCAMetadataDE(de)
+                            return { id: de.id, varName: metadata.varName }
+                        })).flat();
+
+                        stageSections.forEach((section, secIdx) => {
+                            section.dataElements.forEach((dataElement, deIdx) => {
+
+                                programRuleVariables.push({
+                                    name: `_PS${stgIdx + 1}_S${secIdx + 1}E${deIdx + 1}`,
+                                    programRuleVariableSourceType: "DATAELEMENT_CURRENT_EVENT",
+                                    useCodeForOptionSet: dataElement.optionSet?.id ? true : false,
+                                    program: { id: program },
+                                    dataElement: { id: dataElement.id }
+                                });
+
+                                let metadata = getPCAMetadataDE(dataElement);
+
+                                if (metadata.parentQuestion !== undefined && metadata.parentValue !== undefined) {
+                                    let parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
+                                    let parentValue = String(metadata.parentValue);
+
+                                    !hideShowGroup[parentQuestion] ? hideShowGroup[parentQuestion] = {} : undefined;
+                                    !hideShowGroup[parentQuestion][parentValue] ? hideShowGroup[parentQuestion][parentValue] = [] : undefined;
+                                    !hideShowGroup[parentQuestion][parentValue].push({ id: dataElement.id, mandatory: metadata.isCompulsory });
+                                }
+
+                            });
+                        });
+
+                    });
+
+                    const { hideShowRules, hideShowActions } = hideShowLogic(hideShowGroup, program, uidPool);
+
+                    const metadata = { programRuleVariables, programRules: hideShowRules, programRuleActions: hideShowActions };
+
+                    setProgressSteps(3);
+
+                    let programRulesDel = prDQ.data.results.programRules.map(pr => ({ id: pr.id }));
+                    let programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
+
+                    const oldMetadata = {
+                        programRules: programRulesDel.length > 0 ? programRulesDel : undefined,
+                        programRuleVariables: programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined
+                    };
+
+                    deleteMetadata({ data: oldMetadata }).then((res) => {
+                        if (res.status == 'OK') {
+                            setProgressSteps(4);
+
+                            createMetadata.mutate({ data: metadata }).then(response => {
+
+                                if (response.status == 'OK') {
+                                    setProgressSteps(5);
+
+                                    updateProgramBuildVersion(program, pcaMetadata);
+
+                                }
+                            });
+                        }
+
+                    });
+
+                }
+            })
+
+        })
+    }
+
+
     return (
         <div>
             <div className="sub_nav">
@@ -178,7 +367,7 @@ const ProgramDetails = () => {
 
                             <Button
                                 variant='contained'
-                                onClick={() => { }}
+                                onClick={() => buildProgramRulesTracker()}
                                 startIcon={<ConstructionIcon />}
                                 size='medium'
                                 disabled={!savedAndValidated}
@@ -192,13 +381,13 @@ const ProgramDetails = () => {
                                 setImporterEnabled={setImporterEnabled}
                                 setExportToExcel={setExportToExcel}
                             />
-                            
+
                             {!hnqisMode && exportToExcel &&
                                 <DataProcessorTracker
                                     programId={program}
                                     isLoading={setExportToExcel}
                                     setStatus={setExportStatus}
-                            />}
+                                />}
                         </>
                     }
                 </div>
@@ -218,35 +407,88 @@ const ProgramDetails = () => {
                     <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
                 }
             </div>
+            {!hnqisMode && saveAndBuild &&
+
+                <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
+                    <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => { if ((saveAndBuild === 'Completed') || (createMetadata?.data?.status === 'ERROR')) { setSaveAndBuild(false); setProgressSteps(0); } }}>
+                        Setting Up Program Rules for {data.results.displayName}
+                    </CustomMUIDialogTitle >
+                    <DialogContent dividers style={{ padding: '1em 2em' }}>
+                        {(progressSteps > 0) && 
+                            <div className="progressItem">
+                                {progressSteps === 1 && <CircularLoader small />}
+                                {progressSteps === 1 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 1 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p style={{ maxWidth: '90%' }}> Fetching IDs</p>
+                            </div>
+                        }
+                        {(progressSteps > 1) && 
+                            <div className="progressItem">
+                                {progressSteps === 2 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps === 2 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 2 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p style={{ maxWidth: '90%' }}> Building new Metadata</p>
+                            </div>
+                        }
+                        {(progressSteps > 2) && 
+                            <div className="progressItem">
+                                {progressSteps === 3 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps === 3 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p style={{ maxWidth: '90%' }}> Deleting old Metadata</p>
+                            </div>
+                        }
+                        {(progressSteps > 3) && 
+                            <div className="progressItem">
+                                {progressSteps === 4 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
+                                {progressSteps === 4 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
+                                {progressSteps !== 4 && <IconCheckmarkCircle24 color={'#00b894'} />}
+                                <p style={{ maxWidth: '90%' }}> Importing new Metadata</p>
+                            </div>
+                        }
+                        {(progressSteps > 4) && 
+                            <div className="progressItem">
+                                <IconCheckmarkCircle24 color={'#00b894'} />
+                                <p> Process completed</p>
+                            </div>
+                        }
+                    </DialogContent>
+
+                    <DialogActions style={{ padding: '1em' }}>
+                        <Button variant='outlined' disabled={(saveAndBuild != 'Completed') && (createMetadata?.data?.status !== 'ERROR')} onClick={() => { setSaveAndBuild(false); setProgressSteps(0); }}> Done </Button>
+                    </DialogActions>
+
+                </CustomMUIDialog>
+            }
             <div className="wrapper" style={{ padding: '1em 1.2em 0', height: '75vh' }}>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
                         {
-                            validationResults && 
+                            validationResults &&
                             <Errors
                                 validationResults={
                                     (validationResults.teas.sections.concat(validationResults.teas.teas))
-                                    .concat(validationResults.stages.sections.concat(validationResults.stages.dataElements))
-                                    .map(tea => tea.errors)
+                                        .concat(validationResults.stages.sections.concat(validationResults.stages.dataElements))
+                                        .map(tea => tea.errors)
                                 }
                                 key={"validationSec"}
                             />
                         }
                         {importResults &&
                             <Removed
-                            removedItems={
-                                (importResults.teaSummary
-                                    ? importResults.teaSummary.teas.removedItems
-                                    : []
-                                ).concat(importResults.stages.map(stage =>
-                                    stage.dataElements.removedItems
-                                ).flat())
-                            }
-                            key={"removedSec"}
-                            tagText='Object(s)'
+                                removedItems={
+                                    (importResults.teaSummary
+                                        ? importResults.teaSummary.teas.removedItems
+                                        : []
+                                    ).concat(importResults.stages.map(stage =>
+                                        stage.dataElements.removedItems
+                                    ).flat())
+                                }
+                                key={"removedSec"}
+                                tagText='Object(s)'
                             />
                         }
-                        <div style={{width: '100%', padding: '0.5em 0'}}>
+                        <div style={{ width: '100%', padding: '0.5em 0' }}>
                             {
                                 data.results.programStages.sort((stageA, stageB) =>
                                     (stageA.sortOrder > stageB.sortOrder) ? 1 : ((stageA.sortOrder < stageB.sortOrder) ? -1 : 0)
@@ -270,7 +512,7 @@ const ProgramDetails = () => {
                                 <div className="title" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2em' }}>There are currently no Stages in this Program</div>
                             }
                         </div>
-                        
+
                     </div>
                 </div>
                 {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName} setNewStage={setNewStage} />}

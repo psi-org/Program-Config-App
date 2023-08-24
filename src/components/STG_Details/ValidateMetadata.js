@@ -9,7 +9,7 @@ import {  FEEDBACK_ORDER } from "../../configs/Constants";
 
 
 import { useEffect, useState } from "react";
-import SaveMetadata from "./SaveMetadata";
+import SaveMetadata from "../UIElements/SaveMetadata";
 import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2 } from "../../configs/ImportValidatorUtils";
 import { getPCAMetadataDE } from "../../configs/Utils";
 
