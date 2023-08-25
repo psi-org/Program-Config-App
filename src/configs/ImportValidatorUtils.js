@@ -742,6 +742,7 @@ const extractStages = (input) => {
         id: stage.id,
         name: stage.name,
         stageNumber: idx + 1,
+        formType: stage.formType,
         importedSections: mapStage(stage)
     }))
 }

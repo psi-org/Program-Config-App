@@ -94,7 +94,7 @@ const processStageData = (
     const stageIndex = stagesList?.findIndex(stage => stage.id === programStage.id) || 0;
     importedSections.forEach((section, secIdx) => {
 
-        if (section.isBasicForm) isBasicForm = true;
+        if (section.isBasicForm || section.formType === 'DEFAULT') isBasicForm = true;
         if (section.importStatus == 'new') section.id = uidPool.shift();
 
         section.dataElements.forEach((dataElement, deIdx) => {
@@ -353,23 +353,25 @@ const processProgramData = (
 
             teaSection.id = teaSection.id || uidPool.shift();
 
-            teaConfigurations.programSections.push({
-                name: teaSection.name,
-                id: teaSection.id,
-                sortOrder: index,
-                renderType: {
-                    MOBILE: {
-                        type: "LISTING"
+            if (teaSection.id !== 'basic-form') {
+                teaConfigurations.programSections.push({
+                    name: teaSection.name,
+                    id: teaSection.id,
+                    sortOrder: index,
+                    renderType: {
+                        MOBILE: {
+                            type: "LISTING"
+                        },
+                        DESKTOP: {
+                            type: "LISTING"
+                        }
                     },
-                    DESKTOP: {
-                        type: "LISTING"
-                    }
-                },
-                program: {
-                    id: programPayload.id
-                },
-                trackedEntityAttributes: programTrackedEntityAttributes.map(ptea => ({ id: ptea.trackedEntityAttribute.id }))
-            });
+                    program: {
+                        id: programPayload.id
+                    },
+                    trackedEntityAttributes: programTrackedEntityAttributes.map(ptea => ({ id: ptea.trackedEntityAttribute.id }))
+                });
+            }
 
             teaConfigurations.programTrackedEntityAttributes = teaConfigurations.programTrackedEntityAttributes.concat(programTrackedEntityAttributes);
 
