@@ -19,6 +19,7 @@ import {
     COMPETENCY_CLASS,
     CRITICAL_STEPS,
     DATASTORE_H2_METADATA,
+    EVENT_VALIDATION_STRATEGIES,
     H2_METADATA_VERSION,
     MAX_PREFIX_LENGTH,
     MAX_PROGRAM_NAME_LENGTH,
@@ -43,7 +44,7 @@ import Select from "@mui/material/Select";
 import SendIcon from "@mui/icons-material/Send";
 import FormHelperText from "@mui/material/FormHelperText";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {  FormLabel,  Slide, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
+import { FormLabel, Slide, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
 import StyleManager from "../UIElements/StyleManager";
 import { DeepCopy, parseErrorsJoin, truncateString } from "../../configs/Utils";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -91,7 +92,7 @@ const queryTEType = {
     results: {
         resource: "trackedEntityTypes",
         params: {
-            fields: ["id", "name","trackedEntityTypeAttributes[trackedEntityAttribute[id]]"],
+            fields: ["id", "name", "trackedEntityTypeAttributes[trackedEntityAttribute[id]]"],
             paging: false,
         },
     },
@@ -161,25 +162,25 @@ const ProgramNew = (props) => {
     // * END OF STEPPER * //
 
     // * Snackbar
-    const [snackParams,setSnackParams] = useState(false)
+    const [snackParams, setSnackParams] = useState(false)
     const pushNotification = (content, severity = "success") => setSnackParams({ content, severity })
 
     // * TEA Editor * //
     const [useSections, setUseSections] = useState(props.data?.programSections?.length > 0);
-    const [attributesFormSections, setAttributesFormSections] = useState( props.data?.programSections || [] );
+    const [attributesFormSections, setAttributesFormSections] = useState(props.data?.programSections || []);
     const [assignedAttributes, setAssignedAttributes] = useState([]);
 
     const [inputModalOpened, setInputModalOpened] = useState(false);
 
-    const { refetch:getIds } = useDataQuery(queryIds, { lazy: true });
+    const { refetch: getIds } = useDataQuery(queryIds, { lazy: true });
     const onAddNewSection = (name) => {
-        getIds({n:1}).then(results => {
+        getIds({ n: 1 }).then(results => {
             const id = results.results.codes[0]
             attributesFormSections.push({
                 id,
                 name,
                 program: { id: programId },
-                trackedEntityAttributes:[]
+                trackedEntityAttributes: []
             })
             setAttributesFormSections([...attributesFormSections])
         })
@@ -244,8 +245,8 @@ const ProgramNew = (props) => {
     const [programTET, setProgramTET] = useState(
         props.data
             ? {
-                label: props.data.trackedEntityType.name,
-                id: props.data.trackedEntityType.id,
+                label: props.data.trackedEntityType?.name,
+                id: props.data.trackedEntityType?.id,
             }
             : ""
     );
@@ -271,6 +272,7 @@ const ProgramNew = (props) => {
             }
             : ""
     );
+    const [validationStrategy, setValidationStrategy] = useState(props.data?.programStages[0]?.validationStrategy || "ON_UPDATE_AND_INSERT");
 
     const h2SettingsRef = useRef();
 
@@ -331,10 +333,10 @@ const ProgramNew = (props) => {
     };
 
     const programTETChange = (event, value) => {
-        
+
         if (value) {
             // Remove from selected
-            if(programTET !== ""){
+            if (programTET !== "") {
                 trackedEntityTypes.find(tet => tet.id === programTET.id).trackedEntityTypeAttributes.forEach(tea => {
                     let idx = programTEAs.selected.findIndex(teaId => teaId === tea.trackedEntityAttribute.id)
                     if (idx > -1) programTEAs.selected.splice(idx, 1)
@@ -343,7 +345,7 @@ const ProgramNew = (props) => {
 
             // Add new selected
             trackedEntityTypes.find(tet => tet.id === value.id).trackedEntityTypeAttributes.forEach(tea => {
-                if (!programTEAs.selected.includes(tea.trackedEntityAttribute.id)){
+                if (!programTEAs.selected.includes(tea.trackedEntityAttribute.id)) {
                     programTEAs.selected.push(tea.trackedEntityAttribute.id)
                 }
             })
@@ -361,11 +363,15 @@ const ProgramNew = (props) => {
         setCategoryCombo(value || "");
     };
 
+    const validationStrategyChange = (event) => {
+        setValidationStrategy(event.target.value);
+    };
+
     const updateAssignedAttributes = () => {
         // Validate selected attributes that are not in program sections
         let newAssignedAttributes = [];
-        programTEAs.selected.forEach( teaId => {
-            if(!attributesFormSections.map(section => section.trackedEntityAttributes.map(tea => tea.id)).flat().includes(teaId)){
+        programTEAs.selected.forEach(teaId => {
+            if (!attributesFormSections.map(section => section.trackedEntityAttributes.map(tea => tea.id)).flat().includes(teaId)) {
                 newAssignedAttributes.push(programTEAs.available.find(tea => tea.trackedEntityAttribute.id === teaId))
             }
         })
@@ -373,20 +379,20 @@ const ProgramNew = (props) => {
     }
 
     const handleChangeTEAs = (res) => {
-        if(programTET !== ""){
-            let TETAttributes = trackedEntityTypes.find( tet => tet.id === programTET.id).trackedEntityTypeAttributes
+        if (programTET !== "") {
+            let TETAttributes = trackedEntityTypes.find(tet => tet.id === programTET.id).trackedEntityTypeAttributes
 
-            if(TETAttributes.every( tea => res.selected.includes(tea.trackedEntityAttribute.id))){
+            if (TETAttributes.every(tea => res.selected.includes(tea.trackedEntityAttribute.id))) {
                 programTEAs.selected = res.selected;
                 setProgramTEAs(DeepCopy(programTEAs));
-            }else{
-                programTEAs.selected = programTEAs.selected.filter( 
-                    teaId => TETAttributes.map( tea => tea.trackedEntityAttribute.id).includes(teaId) || res.selected.includes(teaId)
+            } else {
+                programTEAs.selected = programTEAs.selected.filter(
+                    teaId => TETAttributes.map(tea => tea.trackedEntityAttribute.id).includes(teaId) || res.selected.includes(teaId)
                 )
                 setProgramTEAs(DeepCopy(programTEAs));
-                pushNotification("You must include all Tracked Entity Type attributes","error");
+                pushNotification("You must include all Tracked Entity Type attributes", "error");
             }
-        }else{
+        } else {
             programTEAs.selected = res.selected;
             setProgramTEAs(DeepCopy(programTEAs));
         }
@@ -504,7 +510,7 @@ const ProgramNew = (props) => {
 
                 // ? Existing TEAs in the program
 
-                const existingTEAs = props.data ? 
+                const existingTEAs = props.data ?
                     props.data.programTrackedEntityAttributes.map(tea => ({
                         trackedEntityAttribute: tea.trackedEntityAttribute,
                         valueType: tea.valueType,
@@ -512,7 +518,7 @@ const ProgramNew = (props) => {
                         displayInList: tea.displayInList,
                         mandatory: tea.mandatory,
                         searchable: tea.searchable,
-                        renderType:tea.renderType
+                        renderType: tea.renderType
                     })) : []
 
                 const availableTEAs = data.results.trackedEntityAttributes.filter(
@@ -524,17 +530,17 @@ const ProgramNew = (props) => {
                         allowFutureDate: false,
                         displayInList: false,
                         mandatory: false,
-                        searchable: false 
+                        searchable: false
                     })
                 )
-                
+
                 let teaOptions = {
-                    available:availableTEAs.concat(existingTEAs),
+                    available: availableTEAs.concat(existingTEAs),
                     selected: existingTEAs.map(tea => tea.trackedEntityAttribute.id)
                 }
 
                 // ! Enforce Tracked Entity Type Attributes for existing programs
-                if(props?.data?.trackedEntityType?.trackedEntityTypeAttributes){
+                if (props?.data?.trackedEntityType?.trackedEntityTypeAttributes) {
                     teaOptions.selected = teaOptions.selected.concat(
                         props.data.trackedEntityType.trackedEntityTypeAttributes.map(
                             att => att.trackedEntityAttribute.id
@@ -544,21 +550,21 @@ const ProgramNew = (props) => {
                     )
                 }
 
-                setProgramTEAs({...teaOptions})
-                
+                setProgramTEAs({ ...teaOptions })
+
 
                 // ? Assigned TEAs but not used in the form
                 const assignedAtts = props.data && props.data.programSections ?
-                teaOptions.selected.filter(
-                    teaId => !props.data.programSections.map(
-                        section => section.trackedEntityAttributes.map(tea => tea.id)
-                    ).flat().includes(teaId)
-                ).map(
-                    assignedTea => teaOptions.available.find(
-                        tea => tea.trackedEntityAttribute.id === assignedTea
+                    teaOptions.selected.filter(
+                        teaId => !props.data.programSections.map(
+                            section => section.trackedEntityAttributes.map(tea => tea.id)
+                        ).flat().includes(teaId)
+                    ).map(
+                        assignedTea => teaOptions.available.find(
+                            tea => tea.trackedEntityAttribute.id === assignedTea
+                        )
                     )
-                ) 
-                : [] ;
+                    : [];
 
                 setAssignedAttributes(assignedAtts);
 
@@ -584,6 +590,7 @@ const ProgramNew = (props) => {
         }
     }, []);
 
+    //TODO: Add support for Event Programs creation or edition
     function submission() {
         setSentForm(true);
         props.setNotification(undefined);
@@ -593,8 +600,8 @@ const ProgramNew = (props) => {
             setSentForm(false);
             return;
         }
-        
-        let useCompetency = pgrTypePCA === "hnqis" ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass ==='Yes':undefined;
+
+        let useCompetency = pgrTypePCA === "hnqis" ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass === 'Yes' : undefined;
 
         //Validating available prefix
         checkForExistingPrefix({
@@ -700,7 +707,7 @@ const ProgramNew = (props) => {
                                     section.dataElements.find(
                                         (de) => de.id === CRITICAL_STEPS
                                     ) || section.name === "Critical Steps Calculations"
-                            );
+                                );
                         }
 
                         prgrm.programStages = prgrm.programStages.map((ps) => ({
@@ -791,21 +798,21 @@ const ProgramNew = (props) => {
                     // PROGRAM TRACKED ENTITY ATTRIBUTES & PROGRAM SECTIONS
 
                     prgrm.programTrackedEntityAttributes = programTEAs.selected.map(
-                        (teaId,idx) => {
+                        (teaId, idx) => {
                             let t = programTEAs.available.find(tea => tea.trackedEntityAttribute.id === teaId)
                             t.sortOrder = idx
                             return t
                         }
                     )
-        
-                    if(useSections){
-                        programSections = attributesFormSections.map((section,idx) => {
+
+                    if (useSections) {
+                        programSections = attributesFormSections.map((section, idx) => {
                             section.sortOrder = idx
                             return section
                         })
                     }
-        
-                    prgrm.programSections = programSections.map(section => ({id:section.id}) )
+
+                    prgrm.programSections = programSections.map(section => ({ id: section.id }))
 
                     createOrUpdateMetaData(prgrm.attributeValues);
                 }
@@ -912,36 +919,36 @@ const ProgramNew = (props) => {
                         ? ("Edit Program " + truncateString(props.data.name))
                         : "Create New Program"}
                 </CustomMUIDialogTitle>
-                <DialogContent dividers style={{ padding: "1em 2em", height:'65vh', maxHeight:'65vh', overflowX:'hidden' }}>
-                    <div style={{marginBottom:'2rem'}}>
+                <DialogContent dividers style={{ padding: "1em 2em", height: '65vh', maxHeight: '65vh', overflowX: 'hidden' }}>
+                    <div style={{ marginBottom: '2rem' }}>
                         <Stepper alternativeLabel nonLinear activeStep={activeStep}>
-                            <Step style={{cursor:'pointer'}} container={containerRef.current}>
-                                <StepLabel error={!basicValidated} onClick={()=>changeStep(0)}>Basic Settings</StepLabel>
+                            <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
+                                <StepLabel error={!basicValidated} onClick={() => changeStep(0)}>Basic Settings</StepLabel>
                             </Step>
                             {pgrTypePCA === 'hnqis' &&
-                                <Step style={{cursor:'pointer'}} container={containerRef.current}>
-                                    <StepLabel error={!hnqisValidated} onClick={()=>changeStep(1)} >HNQIS2 Settings</StepLabel>
+                                <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
+                                    <StepLabel error={!hnqisValidated} onClick={() => changeStep(1)} >HNQIS2 Settings</StepLabel>
+                                </Step>
+                            }
+                            {(pgrTypePCA === 'tracker' || pgrTypePCA === 'event') &&
+                                <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
+                                    <StepLabel onClick={() => changeStep(1)}>{pgrTypePCA === 'tracker'?'Tracker':'Event'} Program Settings</StepLabel>
                                 </Step>
                             }
                             {pgrTypePCA === 'tracker' &&
-                                <Step style={{cursor:'pointer'}} container={containerRef.current}>
-                                    <StepLabel onClick={()=>changeStep(1)}>Tracker Program Settings</StepLabel>
+                                <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
+                                    <StepLabel onClick={() => changeStep(2)}>Tracked Entity Attributes Form</StepLabel>
                                 </Step>
                             }
-                            {pgrTypePCA === 'tracker' &&
-                                <Step style={{cursor:'pointer'}} container={containerRef.current}>
-                                    <StepLabel onClick={()=>changeStep(2)}>Tracked Entity Attributes Form</StepLabel>
-                                </Step>
-                            }
-                            
+
                         </Stepper>
                     </div>
                     <div className="stepperContent">
                         {/* BASIC SETTINGS */}
                         <Slide in={activeStep === 0} direction={activeStep > previousStep ? 'left' : 'right'}>
-                            <div style={{display:activeStep === 0 ? 'inherit' : 'none'}}>
-                                <div style={{ display: "flex", flexDirection:'column', justifyContent: "space-between"}}>
-                                    <FormControl sx={{ maxWidth: "30%" }} error={validationErrors.pgrType !== undefined} style={{marginTop:'1rem'}}>
+                            <div style={{ display: activeStep === 0 ? 'inherit' : 'none' }}>
+                                <div style={{ display: "flex", flexDirection: 'column', justifyContent: "space-between" }}>
+                                    <FormControl sx={{ maxWidth: "30%" }} error={validationErrors.pgrType !== undefined} style={{ marginTop: '1rem' }}>
                                         <InputLabel id="label-prgType">Program Type (*)</InputLabel>
                                         <Select
                                             labelId="label-prgType"
@@ -956,6 +963,9 @@ const ProgramNew = (props) => {
                                             </MenuItem>
                                             <MenuItem value={"tracker"}>
                                                 Tracker Program
+                                            </MenuItem>
+                                            <MenuItem value={"event"}>
+                                                Event Program
                                             </MenuItem>
                                             <MenuItem
                                                 disabled={
@@ -984,6 +994,7 @@ const ProgramNew = (props) => {
                                             {validationErrors.pgrType}
                                         </FormHelperText>
                                     </FormControl>
+
                                     <FormControl sx={{ minWidth: "65%" }}>
                                         <TextField
                                             error={validationErrors.prefix !== undefined}
@@ -1034,37 +1045,40 @@ const ProgramNew = (props) => {
                                         value={programShortName}
                                         onChange={handleChangeProgramShortName}
                                     />
-                                    <Autocomplete
-                                        id="tetSelect"
-                                        disabled={pgrTypePCA !== "tracker"}
-                                        options={
-                                            trackedEntityTypes?.map((tet) => ({
-                                                label: tet.name,
-                                                id: tet.id,
-                                            })) || [{ label: "", id: "" }]
-                                        }
-                                        sx={{ width: "100%" }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                error={
-                                                    validationErrors.programTET !==
-                                                    undefined
-                                                }
-                                                label="Tracked Entity Type (*)"
-                                                margin="normal"
-                                                variant="standard"
-                                                helperText={validationErrors.programTET}
-                                            />
-                                        )}
-                                        value={programTET}
-                                        onChange={programTETChange}
-                                        getOptionLabel={(option) => option.label || ""}
-                                        isOptionEqualToValue={(option, value) =>
-                                            option.id === value.id
-                                        }
-                                        defaultValue={""}
-                                    />
+
+                                    {pgrTypePCA && pgrTypePCA !== '' && pgrTypePCA !== 'event' &&
+                                        <Autocomplete
+                                            id="tetSelect"
+                                            disabled={pgrTypePCA !== "tracker"}
+                                            options={
+                                                trackedEntityTypes?.map((tet) => ({
+                                                    label: tet.name,
+                                                    id: tet.id,
+                                                })) || [{ label: "", id: "" }]
+                                            }
+                                            sx={{ width: "100%" }}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    error={
+                                                        validationErrors.programTET !==
+                                                        undefined
+                                                    }
+                                                    label="Tracked Entity Type (*)"
+                                                    margin="normal"
+                                                    variant="standard"
+                                                    helperText={validationErrors.programTET}
+                                                />
+                                            )}
+                                            value={programTET}
+                                            onChange={programTETChange}
+                                            getOptionLabel={(option) => option.label || ""}
+                                            isOptionEqualToValue={(option, value) =>
+                                                option.id === value.id
+                                            }
+                                            defaultValue={""}
+                                        />
+                                    }
                                     <StyleManager
                                         icon={programIcon}
                                         setIcon={setProgramIcon}
@@ -1079,13 +1093,14 @@ const ProgramNew = (props) => {
                                             marginTop: "1em",
                                         }}
                                     />
+
                                 </div>
                             </div>
                         </Slide>
-                        
+
                         {/* HNQIS2 SETTINGS */}
                         <Slide in={pgrTypePCA === 'hnqis' && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
-                            <div style={{ display: pgrTypePCA === 'hnqis' && activeStep === 1 ? 'inherit' : 'none'}}>
+                            <div style={{ display: pgrTypePCA === 'hnqis' && activeStep === 1 ? 'inherit' : 'none' }}>
                                 <H2Setting
                                     pcaMetadata={props.pcaMetadata}
                                     ref={h2SettingsRef}
@@ -1094,8 +1109,8 @@ const ProgramNew = (props) => {
                             </div>
                         </Slide>
                         {/* TRACKER PROGRAM SETTINGS */}
-                        <Slide in={pgrTypePCA === 'tracker' && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
-                            <div style={{display: (pgrTypePCA === 'tracker' && activeStep === 1) ? 'inherit' : 'none'}}>
+                        <Slide in={(pgrTypePCA === 'tracker' || pgrTypePCA === 'event') && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
+                            <div style={{ display: ((pgrTypePCA === 'tracker' || pgrTypePCA === 'event') && activeStep === 1) ? 'inherit' : 'none' }}>
                                 <FormControl
                                     sx={{ minWidth: "100%" }}
                                     error={
@@ -1104,7 +1119,7 @@ const ProgramNew = (props) => {
                                 >
                                     <Autocomplete
                                         id="ccSelect"
-                                        disabled={pgrTypePCA !== "tracker"}
+                                        disabled={(pgrTypePCA !== 'tracker' && pgrTypePCA !== 'event')}
                                         options={programCategoryCombos?.map(
                                             (pcc) => ({
                                                 label: pcc.name,
@@ -1138,54 +1153,76 @@ const ProgramNew = (props) => {
                                         defaultValue={"default"}
                                     />
                                 </FormControl>
+                                {pgrTypePCA === 'event' &&
+                                    <FormControl variant="standard" sx={{ width: '100%', marginTop: '1em' }}>
+                                        <InputLabel id="label-validationStrat">Validation Strategy (*)</InputLabel>
+                                        <Select
+                                            labelId="label-validationStrat"
+                                            id="validationStrat"
+                                            value={validationStrategy}
+                                            disabled={pgrTypePCA !== 'event'}
+                                            onChange={validationStrategyChange}
+                                            label="Validation Strategy (*)"
+                                            variant="standard"
+                                        >
+                                            <MenuItem value={"ON_COMPLETE"}>
+                                                On Complete
+                                            </MenuItem>
+                                            <MenuItem value={"ON_UPDATE_AND_INSERT"}>
+                                                On update and insert
+                                            </MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                }
+                                {pgrTypePCA === 'tracker' &&
+                                    <div style={{ marginTop: "1.5em", display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                        <FormLabel
+                                            style={{
+                                                display: "inline-block",
+                                                marginBottom: "8px",
+                                            }}
+                                        >
+                                            Program Tracked Entity Attributes
+                                        </FormLabel>
+                                        <Transfer
+                                            filterable
+                                            onChange={handleChangeTEAs}
+                                            options={programTEAs.available.map(
+                                                (tea) => ({
+                                                    label: tea.trackedEntityAttribute.name,
+                                                    value: tea.trackedEntityAttribute.id,
+                                                })
+                                            )}
+                                            selected={programTEAs.selected}
+                                            optionsWidth="48%"
+                                            selectedWidth="48%"
+                                        />
 
-                                <div style={{ marginTop: "1.5em" , display:'flex', flexDirection:'column', gap:'1rem'}}>
-                                    <FormLabel
-                                        style={{
-                                            display: "inline-block",
-                                            marginBottom: "8px",
-                                        }}
-                                    >
-                                        Program Tracked Entity Attributes
-                                    </FormLabel>
-                                    <Transfer
-                                        filterable
-                                        onChange={handleChangeTEAs}
-                                        options={programTEAs.available.map(
-                                            (tea) => ({
-                                                label: tea.trackedEntityAttribute.name,
-                                                value: tea.trackedEntityAttribute.id,
-                                            })
-                                        )}
-                                        selected={programTEAs.selected}
-                                        optionsWidth="48%"
-                                        selectedWidth="48%"
-                                    />
-                                    
-                                </div>
+                                    </div>
+                                }
                             </div>
                         </Slide>
                         {/* TRACKED ENTITY ATTRIBUTES FORM */}
                         {programTEAs.available.length > 0 &&
                             <Slide in={pgrTypePCA === 'tracker' && activeStep === 2} direction={activeStep > previousStep ? 'left' : 'right'}>
-                                <div style={{display: (pgrTypePCA === 'tracker' && activeStep === 2) ? 'inherit' : 'none'}}>
-                                    <div style={{display:'flex', justifyContent:'space-between', width:'100%', margin:'1rem 0', alignItems:'center'}}>
-                                        <FormControlLabel 
+                                <div style={{ display: (pgrTypePCA === 'tracker' && activeStep === 2) ? 'inherit' : 'none' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', margin: '1rem 0', alignItems: 'center' }}>
+                                        <FormControlLabel
                                             control={
                                                 <Switch
                                                     checked={useSections}
-                                                    onChange={(e)=>setUseSections(e.target.checked)}
+                                                    onChange={(e) => setUseSections(e.target.checked)}
                                                     inputProps={{ 'aria-label': 'controlled' }}
                                                 />
                                             }
-                                            label="Use Form Sections"     
+                                            label="Use Form Sections"
                                         />
                                         <div>
-                                            {useSections && <Button 
-                                                variant='contained' 
-                                                
-                                                startIcon={<AddCircleOutlineIcon/>}
-                                                onClick={()=>{setInputModalOpened(true)}}
+                                            {useSections && <Button
+                                                variant='contained'
+
+                                                startIcon={<AddCircleOutlineIcon />}
+                                                onClick={() => { setInputModalOpened(true) }}
                                             >Add new section</Button>}
                                         </div>
                                     </div>
@@ -1200,7 +1237,7 @@ const ProgramNew = (props) => {
                                     />
                                 </div>
                             </Slide>
-                        }   
+                        }
                     </div>
                 </DialogContent>
                 <DialogActions style={{ padding: "1em" }}>
@@ -1236,13 +1273,13 @@ const ProgramNew = (props) => {
             </CustomMUIDialog>
             {
                 inputModalOpened &&
-                <InputModal 
-                    opened={inputModalOpened} 
+                <InputModal
+                    opened={inputModalOpened}
                     title={'Form Section Name'}
                     label={'Name'}
                     value={''}
-                    onClose={()=>setInputModalOpened(false)}
-                    onConfirm={(value)=>{
+                    onClose={() => setInputModalOpened(false)}
+                    onConfirm={(value) => {
                         onAddNewSection(value)
                         setInputModalOpened(false)
                     }}
