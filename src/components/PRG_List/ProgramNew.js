@@ -3,8 +3,10 @@ import { Transfer } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 //import styles from './Program.module.css'
 import {
+    EventStage,
     HnqisProgramConfigs,
     Program,
+    programStage,
     PS_ActionPlanStage,
     PS_AssessmentStage,
     PSS_CriticalSteps,
@@ -19,7 +21,6 @@ import {
     COMPETENCY_CLASS,
     CRITICAL_STEPS,
     DATASTORE_H2_METADATA,
-    EVENT_VALIDATION_STRATEGIES,
     H2_METADATA_VERSION,
     MAX_PREFIX_LENGTH,
     MAX_PROGRAM_NAME_LENGTH,
@@ -49,10 +50,8 @@ import StyleManager from "../UIElements/StyleManager";
 import { DeepCopy, parseErrorsJoin, truncateString } from "../../configs/Utils";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import H2Setting from "./H2Setting"
-import { set } from "react-hook-form";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { setProgram } from "../../state/action-creators/program";
 import AttributesEditor from "../TEAEditor/AttributesEditor";
 
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -65,7 +64,7 @@ import InputModal from "../PRG_Details/InputModal";
 const queryId = {
     results: {
         resource: "system/id.json",
-        params: { limit: 6 },
+        params: { limit: 15 },
     },
 };
 
@@ -305,7 +304,9 @@ const ProgramNew = (props) => {
             setProgramTET({ label: hnqisTET.name, id: hnqisTET.id });
         } else {
             setProgramTET("");
-            if (value === "tracker") {
+            if (value === "event") {
+                setButtonDisabled(false);
+            } else if (value === "tracker") {
                 setButtonDisabled(false);
                 fetchTrackerMetadata();
             } else {
@@ -472,7 +473,7 @@ const ProgramNew = (props) => {
             validationErrors.shortName = undefined;
         }
 
-        if (programTET === "") {
+        if (programTET === "" && pgrTypePCA !== 'event') {
             response = false;
             validationErrors.programTET = "This field is required";
         } else {
@@ -482,7 +483,7 @@ const ProgramNew = (props) => {
         setBasicValidated(response);
 
         // * HNQIS2 Settings Validation * //
-        if (pgrTypePCA === "tracker" && pgrTypePCA !== "hnqis") {
+        if ((pgrTypePCA === "tracker" || pgrTypePCA === "event") && pgrTypePCA !== "hnqis") {
             validationErrors.healthArea =
                 validationErrors.ouTableRow =
                 validationErrors.ouMapPolygon =
@@ -614,7 +615,6 @@ const ProgramNew = (props) => {
                 setSentForm(false);
                 return;
             }
-
             if (!metadataRequest.called && dataIsValid) {
                 let prgrm = props.data
                     ? DeepCopy(props.data)
@@ -625,7 +625,7 @@ const ProgramNew = (props) => {
 
                 prgrm.name = programName;
                 prgrm.shortName = programShortName;
-                prgrm.id = programId;
+                prgrm.id = programId || uidPool.shift();
 
                 let auxstyle = {};
                 if (programIcon) auxstyle.icon = programIcon;
@@ -655,7 +655,7 @@ const ProgramNew = (props) => {
 
                         assessmentStage = DeepCopy(PS_AssessmentStage);
                         assessmentStage.id = assessmentId;
-                        assessmentStage.name = "Assessment [" + programId + "]"; //! Not adding the ID may result in an error
+                        assessmentStage.name = "Assessment [" + prgrm.id + "]"; //! Not adding the ID may result in an error
                         assessmentStage.programStageSections.push({
                             id: defaultSectionId,
                         });
@@ -665,13 +665,13 @@ const ProgramNew = (props) => {
                         assessmentStage.programStageSections.push({
                             id: scoresSectionId,
                         });
-                        assessmentStage.program.id = programId;
+                        assessmentStage.program.id = prgrm.id;
 
                         actionPlanStage = DeepCopy(PS_ActionPlanStage);
                         actionPlanStage.id = actionPlanId;
                         actionPlanStage.name =
-                            "Action Plan [" + programId + "]"; //! Not adding the ID may result in an error
-                        actionPlanStage.program.id = programId;
+                            "Action Plan [" + prgrm.id + "]"; //! Not adding the ID may result in an error
+                        actionPlanStage.program.id = prgrm.id;
 
                         defaultSection = DeepCopy(PSS_Default);
                         defaultSection.id = defaultSectionId;
@@ -787,32 +787,49 @@ const ProgramNew = (props) => {
                     }
                 } else {
                     //Tracker Programs
-                    prgrm.trackedEntityType = { id: programTET.id };
-                    prgrm.programTrackedEntityAttributes = [];
+                    if (pgrTypePCA === "tracker") {
+                        prgrm.trackedEntityType = { id: programTET.id };
+                        prgrm.programTrackedEntityAttributes = [];
+                        // PROGRAM TRACKED ENTITY ATTRIBUTES & PROGRAM SECTIONS
+
+                        prgrm.programTrackedEntityAttributes = programTEAs.selected.map(
+                            (teaId, idx) => {
+                                let t = programTEAs.available.find(tea => tea.trackedEntityAttribute.id === teaId)
+                                t.sortOrder = idx
+                                return t
+                            }
+                        )
+
+                        if (useSections) {
+                            programSections = attributesFormSections.map((section, idx) => {
+                                section.sortOrder = idx
+                                return section
+                            })
+                        }
+
+                        prgrm.programSections = programSections.map(section => ({ id: section.id }))
+                    }
+                    if (pgrTypePCA === "event") {
+                        prgrm.withoutRegistration = true;
+                        prgrm.programType = 'WITHOUT_REGISTRATION';
+
+
+                        let editStage = props.data ? props.data.programStages[0] : DeepCopy(EventStage);
+                        if (!props.data) {
+                            editStage.id = uidPool.shift();
+                        }
+                        editStage.name = prgrm.name;
+                        editStage.validationStrategy = validationStrategy;
+                        editStage.program = {id: prgrm.id}
+                        prgrm.programStages = [{ id: editStage.id }];
+                        programStages = [editStage]
+                    }
+                    
                     prgrm.attributeValues = [];
                     prgrm.categoryCombo =
                         categoryCombo !== ""
                             ? { id: categoryCombo.id }
                             : undefined;
-
-                    // PROGRAM TRACKED ENTITY ATTRIBUTES & PROGRAM SECTIONS
-
-                    prgrm.programTrackedEntityAttributes = programTEAs.selected.map(
-                        (teaId, idx) => {
-                            let t = programTEAs.available.find(tea => tea.trackedEntityAttribute.id === teaId)
-                            t.sortOrder = idx
-                            return t
-                        }
-                    )
-
-                    if (useSections) {
-                        programSections = attributesFormSections.map((section, idx) => {
-                            section.sortOrder = idx
-                            return section
-                        })
-                    }
-
-                    prgrm.programSections = programSections.map(section => ({ id: section.id }))
 
                     createOrUpdateMetaData(prgrm.attributeValues);
                 }
