@@ -403,7 +403,7 @@ const EXPORT_HNQIS_PRESETS = [
     { value: 'h2External', label: 'HNQIS2-Enabled Server'}
 ]
 
-const EXTERNAL_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions'];
+const EXTERNAL_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions','trackedEntityTypes','trackedEntityAttributes'];
 
 const H2_ATTRIBUTES_TO_KEEP = ['haUflNqP85K', 'LP171jpctBm', 'yB5tFAAN7bI', 'DVzuBdj9kli', 'yhKEe6BLEer'];
 
