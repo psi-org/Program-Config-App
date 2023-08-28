@@ -261,7 +261,7 @@ const ProgramNew = (props) => {
         selected: [],
     });
     const [programCategoryCombos, setProgramCategoryCombos] = useState([
-        { name: "Select an option", id: "" },
+        { name: "default", id: "" }
     ]);
     const [categoryCombo, setCategoryCombo] = useState(
         props.data
@@ -361,7 +361,7 @@ const ProgramNew = (props) => {
     };
 
     const categoryComboChange = (event, value) => {
-        setCategoryCombo(value || "");
+        setCategoryCombo(value);
     };
 
     const validationStrategyChange = (event) => {
@@ -578,16 +578,15 @@ const ProgramNew = (props) => {
                 setAttributesFormSections([...attributesFormSections])
             }
         });
-
-        findCategoryCombos().then((ccdata) => {
-            if (ccdata?.results?.categoryCombos)
-                setProgramCategoryCombos(ccdata.results.categoryCombos);
-        });
     };
 
     useEffect(() => {
-        if (props.programType === "tracker") {
-            fetchTrackerMetadata();
+        if (props.programType === "tracker" || props.programType === "event") {
+            if (props.programType === "tracker") fetchTrackerMetadata();
+            findCategoryCombos().then((ccdata) => {
+                if (ccdata?.results?.categoryCombos)
+                    setProgramCategoryCombos([{ name: "default", id: "" }].concat(ccdata.results.categoryCombos));
+            });
         }
     }, []);
 
@@ -827,7 +826,7 @@ const ProgramNew = (props) => {
                     
                     prgrm.attributeValues = [];
                     prgrm.categoryCombo =
-                        categoryCombo !== ""
+                        categoryCombo && categoryCombo.id !== ""
                             ? { id: categoryCombo.id }
                             : undefined;
 

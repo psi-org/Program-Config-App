@@ -198,7 +198,7 @@ const ProgramItem = ({
                                             icon={<DownloadIcon />}
                                             onClick={() => {
                                                 toggle();
-                                                downloadMetadata(program.id);
+                                                downloadMetadata({ id: program.id, type: programType });
                                             }}
                                         />
                                         <MenuSectionHeader label="In Server" />
