@@ -581,14 +581,14 @@ const ProgramNew = (props) => {
     };
 
     useEffect(() => {
-        if (props.programType === "tracker" || props.programType === "event") {
-            if (props.programType === "tracker") fetchTrackerMetadata();
+        if (pgrTypePCA === "tracker" || pgrTypePCA === "event") {
+            if (pgrTypePCA === "tracker") fetchTrackerMetadata();
             findCategoryCombos().then((ccdata) => {
                 if (ccdata?.results?.categoryCombos)
                     setProgramCategoryCombos([{ name: "default", id: "" }].concat(ccdata.results.categoryCombos));
             });
         }
-    }, []);
+    }, [pgrTypePCA]);
 
     //TODO: Add support for Event Programs creation or edition
     function submission() {
