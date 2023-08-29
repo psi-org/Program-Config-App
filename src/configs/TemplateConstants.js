@@ -1,4 +1,4 @@
-import { MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
+import { MAX_DATA_ELEMENT_NAME_LENGTH, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
 
 export const thinBorder = {
     top: {
@@ -284,6 +284,59 @@ export const TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS = {
     selfParent: {
         formula: 'AND($B3<>"",$B3=$O3)',
         dynamicFormula: 'AND($B_ROWNUM_<>"",$B_ROWNUM_=$O_ROWNUM_)',
+        prompt: 'The element is parent of itself.'
+    }
+}
+
+export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
+    parentNameNotDefined: {
+        formula: 'AND(ISBLANK($A3),OR($B3="question",$B3="label"))',
+        dynamicFormula: 'AND(ISBLANK($A_ROWNUM_),OR($B_ROWNUM_="question",$B_ROWNUM_="label"))',
+        prompt: 'Parent Name not defined.'
+    },
+    formNameNotDefined: {
+        formula: 'AND(ISBLANK($C3),NOT(ISBLANK($B3)))',
+        dynamicFormula: 'AND(ISBLANK($C_ROWNUM_),NOT(ISBLANK($B_ROWNUM_)))',
+        prompt: 'Form Name not defined.'
+    },
+    formNameOutOfRange: {
+        formula: `AND(NOT(ISBLANK($B3)),OR(LEN($C3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
+        dynamicFormula: `AND(NOT(ISBLANK($B_ROWNUM_)),OR(LEN($C_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C_ROWNUM_)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
+        prompt: `Form Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+    },
+    valueTypeDisable: {
+        formula: 'AND($B3 = "question",NOT(ISBLANK($G3)))',
+        dynamicFormula: 'AND($B_ROWNUM_ = "question",NOT(ISBLANK($G_ROWNUM_)))',
+        prompt: 'Value Type inherited from Option Set.'
+    },
+    scoreDisable: {
+        formula: '$B3="score"',
+        dynamicFormula: '$B_ROWNUM_="score"',
+        prompt: 'Data Element configured as Score.'
+    },
+    labelDisable: {
+        formula: '$B3="label"',
+        dynamicFormula: '$B_ROWNUM_="label"',
+        prompt: 'Data Element configured as Label.'
+    },
+    feedbackOrderNotDefined: {
+        formula: 'OR(AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3)), AND($B3="score", ISBLANK($K3)))',
+        dynamicFormula: 'OR(AND(OR(NOT(ISBLANK($I_ROWNUM_)),NOT(ISBLANK($J_ROWNUM_))), ISBLANK($K_ROWNUM_)), AND($B_ROWNUM_="score", ISBLANK($K_ROWNUM_)))',
+        prompt: 'Feedback Order not defined.'
+    },
+    incompleteScoring: {
+        formula: 'OR(AND($I3<>"",$J3=""), AND($I3="",$J3<>""))',
+        dynamicFormula: 'OR(AND($I_ROWNUM_<>"",$J_ROWNUM_=""), AND($I_ROWNUM_="",$J_ROWNUM_<>""))',
+        prompt: 'Incomplete Numerator or Denominator.'
+    },
+    incompleteParentLogic: {
+        formula: 'OR(AND($L3<>"", $M3=""), AND($L3="", $M3<>""))',
+        dynamicFormula: 'OR(AND($L_ROWNUM_<>"", $M_ROWNUM_=""), AND($L_ROWNUM_="", $M_ROWNUM_<>""))',
+        prompt: 'Incomplete Parent Logic.'
+    },
+    selfParent: {
+        formula: 'AND($A3<>"",$A3=$L3)',
+        dynamicFormula: 'AND($A_ROWNUM_<>"",$A_ROWNUM_=$L_ROWNUM_)',
         prompt: 'The element is parent of itself.'
     }
 }

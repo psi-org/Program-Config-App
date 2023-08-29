@@ -334,7 +334,7 @@ const Importer = (
                 {(currentTask || executedTasks.length > 0) &&
                     <div style={{ width: '100%', marginBottom: '1em' }}>
                         <ImportStatusBox
-                            title='HNQIS Configuration - Import Status'
+                            title='Configurations File - Import Status'
                             currentTask={currentTask}
                             executedTasks={executedTasks}
                             isError={isNotificationError}

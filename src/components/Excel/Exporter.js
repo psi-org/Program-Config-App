@@ -13,7 +13,9 @@ import {
     TEMPLATE_PASSWORD,
     HNQIS2_VALUE_TYPES,
     verticalMiddle,
-    yesNoValidator
+    yesNoValidator,
+    HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS,
+    getPromptsFormula
 } from "../../configs/TemplateConstants";
 import {
     addCreator,
@@ -683,7 +685,7 @@ const Exporter = (props) => {
             key: "score_denominator",
             width: 13
         }, {
-            header: "Compositive Indicator (Feedback Order)",
+            header: "Feedback Order",
             key: "compositive_indicator",
             width: 22,
             style: { numFmt: '@' }
@@ -715,6 +717,10 @@ const Exporter = (props) => {
             header: "Data Element Id",
             key: "data_element_id",
             width: 1
+        },{
+            header: "Errors/Warnings/Info",
+            key: "prompts",
+            width: 50
         }];
         fillBackgroundToRange(ws, "A1:C1", "efefef");
         fillBackgroundToRange(ws, "D1:E1", "f4cccc");
@@ -741,8 +747,34 @@ const Exporter = (props) => {
             description: `Enter the help text that will be displayed to the supervisor during data entry`,
             program_stage_id: "",
             program_section_id: "",
-            data_element_id: ""
+            data_element_id: "",
+            prompts: "Details regarding the cell highlighting on each row."
         };
+
+        ws.getCell("A2").note = {
+            texts: [{ text: "If the Parent Name is not automatically generated for questions, then drag the formula from another cell in the same column." }],
+            margins: {
+                insetmode: 'custom',
+                inset: [0.25, 0.25, 0.35, 0.35]
+            },
+            protection: {
+                locked: true,
+                lockText: true
+            },
+        }
+
+        ws.getCell("S2").note = {
+            texts: [{ text: "If prompts are not displayed when cells in a row are highlighted in red, then drag the formula from another cell in the same column." }],
+            margins: {
+                insetmode: 'custom',
+                inset: [0.25, 0.25, 0.35, 0.35]
+            },
+            protection: {
+                locked: true,
+                lockText: true
+            },
+        };
+
         ws.getRow(2).fill = {
             type: "pattern",
             pattern: "solid",
@@ -752,7 +784,7 @@ const Exporter = (props) => {
         };
         ws.getRow(2).height = 100;
         ws.getRow(2).alignment = middleCenter;
-        applyBorderToRange(ws, 0, 0, 14, 2);
+        applyBorderToRange(ws, 0, 0, 18, 2);
         addValidation(ws);
         addConditionalFormatting(ws);
         populateConfiguration(ws);
@@ -825,18 +857,18 @@ const Exporter = (props) => {
     }
 
     const addConditionalFormatting = (ws) => {
+        const validationsList = HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS;
+
         //Highlight when Parent Name is not defined for Questions and Labels
         ws.addConditionalFormatting({
             ref: 'A3:A3000',
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($A3),OR($B3="question",$B3="label"))'],
+                    formulae: [validationsList.parentNameNotDefined.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Parent name not defined',
-            prompt: 'A parent name was not defined for the specified element.'
+            ]
         });
         //Highlight when the Form Name is not defined and a Structure is selected
         ws.addConditionalFormatting({
@@ -844,12 +876,10 @@ const Exporter = (props) => {
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND(ISBLANK($C3),NOT(ISBLANK($B3)))'],
+                    formulae: [validationsList.formNameNotDefined.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Form name not defined',
-            prompt: 'A form name was not defined for the specified element.'
+            ]
         });
         //Form name out of range
         ws.addConditionalFormatting({
@@ -857,12 +887,10 @@ const Exporter = (props) => {
             rules: [
                 {
                     type: 'expression',
-                    formulae: [`AND(NOT(ISBLANK($B3)),OR(LEN($C3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`],
+                    formulae: [validationsList.formNameOutOfRange.formula],
                     style: conditionalError,
                 }
-            ],
-            promptTitle: 'Form Name out of range',
-            prompt: `Given Form Name length is out of the accepted range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+            ]
         });
         //Disable Value Type when Option Set is selected
         ws.addConditionalFormatting({
@@ -870,51 +898,51 @@ const Exporter = (props) => {
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['NOT(ISBLANK($G3))'],
+                    formulae: [validationsList.valueTypeDisable.formula],
                     style: disabledHighlighting
                 }
             ]
         });
         //conditional formatting for structure=label
         ws.addConditionalFormatting({
-            ref: 'F3:F3000',
+            ref: 'D3:J3000',
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['$B3="label"'],
+                    formulae: [validationsList.labelDisable.formula],
                     style: disabledHighlighting
                 }
             ]
         });
-        //conditional formatting for structure=scores (1)
+        //conditional formatting for structure=score (1)
         ws.addConditionalFormatting({
             ref: 'A3:A3000',
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['$B3="score"'],
+                    formulae: [validationsList.scoreDisable.formula],
                     style: disabledHighlighting
                 }
             ]
         });
-        //conditional formatting for structure=scores (2)
+        //conditional formatting for structure=score (2)
         ws.addConditionalFormatting({
             ref: 'D3:J3000',
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['$B3="score"'],
+                    formulae: [validationsList.scoreDisable.formula],
                     style: disabledHighlighting
                 }
             ]
         });
-        //conditional formatting for structure=scores (3)
+        //conditional formatting for structure=score (3)
         ws.addConditionalFormatting({
             ref: 'L3:O3000',
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['$B3="score"'],
+                    formulae: [validationsList.scoreDisable.formula],
                     style: disabledHighlighting
                 }
             ]
@@ -927,7 +955,7 @@ const Exporter = (props) => {
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['OR(AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3)), AND($B3="score", ISBLANK($K3)))'],
+                    formulae: [validationsList.feedbackOrderNotDefined.formula],
                     style: conditionalError
                 }
             ]
@@ -938,7 +966,7 @@ const Exporter = (props) => {
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['OR(AND($I3<>"",$J3=""), AND($I3="",$J3<>""))'],
+                    formulae: [validationsList.incompleteScoring.formula],
                     style: conditionalError
                 }
             ]
@@ -949,18 +977,18 @@ const Exporter = (props) => {
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['OR(AND($L3<>"", $M3=""), AND($L3="", $M3<>""))'],
+                    formulae: [validationsList.incompleteParentLogic.formula],
                     style: conditionalError
                 }
             ]
         })
         //Parent question is the same as the Parent Name of the current Question
         ws.addConditionalFormatting({
-            ref: 'L4:L3000',
+            ref: 'L3:L3000',
             rules: [
                 {
                     type: 'expression',
-                    formulae: ['AND($A4<>"",$A4=$L4)'],
+                    formulae: [validationsList.selfParent.formula],
                     style: conditionalError,
                 }
             ]
@@ -993,6 +1021,9 @@ const Exporter = (props) => {
         let dataRow = 3;
         if (props.Configures.length > 0) {
             props.Configures.forEach((configure) => {
+                configure.prompts = {
+                    formula: `=${getPromptsFormula(HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS, dataRow)}`
+                }
                 ws.getRow(dataRow).values = configure;
                 ws.getCell("A" + dataRow).value = { formula: '_xlfn.IF(OR(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section",ISBLANK(INDIRECT(_xlfn.CONCAT("B",ROW())))),"",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"Q",ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1)))' };
                 if (configure.structure === "Section") {
@@ -1004,7 +1035,7 @@ const Exporter = (props) => {
 
                 dataRow = dataRow + 1;
             });
-            applyBorderToRange(ws, 0, 3, 14, dataRow - 1);
+            applyBorderToRange(ws, 0, 3, 18, dataRow - 1);
         }
     };
 
