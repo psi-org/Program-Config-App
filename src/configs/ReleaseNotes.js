@@ -23,7 +23,7 @@ export const ReleaseNotes = [
     {
         "version": "v1.4",
         "date": "2023-07-31",
-        "description": "- Improved and fixed some Conditional Format Rules.\n- Improved Template design.\n - Added Server Information to the Instructions Tab.\n- Improved overall grammar."
+        "description": "- Improved and fixed some Conditional Format Rules.\n- Improved Template design.\n- New 'Errors/Warnings/Info' column added to the Template tab to display various prompts.\n - Added Server Information to the Instructions Tab.\n- Improved overall grammar."
     }
 ]
 

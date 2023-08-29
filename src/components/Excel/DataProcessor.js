@@ -154,10 +154,10 @@ const DataProcessor = (props) => {
                 row.parentValue = '';
                 row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
                 if(row.structure == 'label') row.form_name = metaData.labelFormName || '';
-                row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: '';
-                row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : '';
-                row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion, programStage) : '';
-                row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : '';
+                row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: undefined;
+                row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : undefined;
+                row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion, programStage) : undefined;
+                row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : undefined;
                 row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: '';
                 row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: '';
 

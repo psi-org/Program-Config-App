@@ -376,7 +376,7 @@ export const mapImportedDE = (data, programPrefix, stageNumber, optionSets, lege
         metadata.parentQuestion = stagePrefix+data[TRACKER_TEMPLATE_MAP.parentQuestion];
         parsedDE.parentQuestion = stagePrefix+data[TRACKER_TEMPLATE_MAP.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
     }
-    if (data[TRACKER_TEMPLATE_MAP.parentValue] && data[TRACKER_TEMPLATE_MAP.parentValue] !== "")
+    if (data[TRACKER_TEMPLATE_MAP.parentValue] !== "")
         metadata.parentValue = data[TRACKER_TEMPLATE_MAP.parentValue];
 
     parsedDE.attributeValues.push(
