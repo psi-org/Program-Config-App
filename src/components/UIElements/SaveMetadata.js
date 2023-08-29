@@ -94,7 +94,7 @@ const processStageData = (
     const stageIndex = stagesList?.findIndex(stage => stage.id === programStage.id) || 0;
     importedSections.forEach((section, secIdx) => {
 
-        if (section.isBasicForm || section.formType === 'DEFAULT') isBasicForm = true;
+        if (section.isBasicForm || section.formType === 'DEFAULT' || section.id === 'basic-form') isBasicForm = true;
         if (section.importStatus == 'new') section.id = uidPool.shift();
 
         section.dataElements.forEach((dataElement, deIdx) => {

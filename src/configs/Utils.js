@@ -279,6 +279,7 @@ export const getProgramQuery = () => {
 
     return [
         'accessLevel',
+        'categoryCombo',
         'completeEventsExpiryDays',
         'description',
         'displayFrontPageList',

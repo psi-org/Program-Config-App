@@ -219,7 +219,7 @@ const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     // Globals
     const programId = programStage.program.id;
-    const [isSectionMode, setIsSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0)
+    const [isSectionMode, setIsSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0);
     const { data: androidSettings, refetch: refreshAndroidSettings } = useDataQuery(queryAndroidSettings);
     const { data: currentUser } = useDataQuery(queryCurrentUser);
     const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings, {
@@ -297,7 +297,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [addedSection, setAddedSection] = useState()
     const [backupData, setBackupData] = useState()
 
-    const storeBackupdata = () => { 
+    const storeBackupdata = () => {
         setBackupData({
             sections: sections,
             scoresSection: scoresSection,
@@ -312,7 +312,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     useEffect(() => {
         if (savedAndValidated) storeBackupdata();
     }, [savedAndValidated])
-    
+
 
     useEffect(() => {
         getProgramMetadata()
@@ -845,7 +845,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
 
                     <ButtonStrip>
-                        {isSectionMode && !readOnly &&
+                        {!readOnly &&
                             <Button
                                 color='inherit'
                                 size='small'
@@ -941,7 +941,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                         </Tooltip>
                     </ButtonStrip>
                 </div>
-            </div>            
+            </div>
             {hnqisMode && importerEnabled &&
                 <Importer
                     displayForm={setImporterEnabled}
@@ -963,7 +963,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 }}>
                     Sections for Program Stage <strong>{programStage.displayName}</strong>
                 </span>
-                {(readOnly || !isSectionMode) &&
+                {readOnly &&
                     <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
                 }
             </div>
@@ -1186,7 +1186,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 </div>
                             )}
                         </Droppable>
-                        {hnqisMode && (isSectionMode) && 
+                        {hnqisMode && (isSectionMode) &&
                             <>
                                 <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection?.id || "crit"} />
                                 <Scores stageSection={scoresSection} index={0} key={scoresSection?.id || "scores"} program={programId} />
