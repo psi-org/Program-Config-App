@@ -84,7 +84,7 @@ const ProgramStage = () => {
 
         let programStageData = DeepCopy({...data.results})
 
-        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisMode={hnqisMode} readOnly={readOnly}/>
+        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisMode={hnqisMode} readOnly={readOnly || (hnqisMode && programStageData.name.includes('Action Plan'))}/>
     }
 
     return <span><CircularLoader /></span> 

@@ -198,7 +198,8 @@ const ProgramDetails = () => {
     }
     if (loading) { return <span><CircularLoader /></span> }
 
-    const hnqisMode = !!data.results.attributeValues.find(av => av.value === "HNQIS2")
+    const hnqisMode = !!data.results.attributeValues.find(av => av.value === "HNQIS2");
+    const readOnly = !!data.results.attributeValues.find(av => av.value === "HNQIS");
 
     if (hnqisMode && !h2Ready) return (
         <div style={{ margin: '2em' }}>
@@ -354,7 +355,7 @@ const ProgramDetails = () => {
                         </>
                     }
                     {
-                        !hnqisMode &&
+                        !hnqisMode && !readOnly &&
                         <>
                             <Button
                                 color='inherit'
@@ -403,7 +404,7 @@ const ProgramDetails = () => {
                         {data.results.displayName}
                     </strong>
                 </span>
-                {data.results.withoutRegistration &&
+                {readOnly &&
                     <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
                 }
             </div>
