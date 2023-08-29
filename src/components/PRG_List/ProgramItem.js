@@ -157,7 +157,7 @@ const ProgramItem = ({
                 {open && (
                     <Layer onClick={toggle}>
                         <Popper reference={ref} placement="bottom-end">
-                            {!program.withoutRegistration && (
+                            {programType !== "HNQIS" &&
                                 <FlyoutMenu>
                                     <MenuItem
                                         label="Edit Program"
@@ -198,7 +198,7 @@ const ProgramItem = ({
                                             icon={<DownloadIcon />}
                                             onClick={() => {
                                                 toggle();
-                                                downloadMetadata({id:program.id,type:programType});
+                                                downloadMetadata({ id: program.id, type: programType });
                                             }}
                                         />
                                         <MenuSectionHeader label="In Server" />
@@ -230,10 +230,10 @@ const ProgramItem = ({
                                         }}
                                     />
                                 </FlyoutMenu>
-                            )}
-                            {program.withoutRegistration && (
+                            }
+                            {programType === "HNQIS" &&
                                 <FlyoutMenu>
-                                    {programType === "HNQIS" && h2Ready && (
+                                    {h2Ready &&
                                         <MenuItem
                                             label={
                                                 pcaMetadata.h2Reworked !== "Yes"
@@ -249,25 +249,24 @@ const ProgramItem = ({
                                                 convertToH2(program.id);
                                             }}
                                         />
-                                    )}
-                                    {programType === "HNQIS" &&
-                                        pcaMetadata.dataConverted !== "Yes" &&
-                                        h2Ready && (
-                                            <MenuItem
-                                                label={
-                                                    "Transfer Assessment Data to HNQIS 2.0"
-                                                }
-                                                disabled={
-                                                    pcaMetadata.h2Reworked !==
-                                                    "Yes"
-                                                }
-                                                icon={<MoveDownIcon />}
-                                                onClick={() => {
-                                                    toggle();
-                                                    transferDataH2(program);
-                                                }}
-                                            />
-                                        )}
+                                    }
+                                    {
+                                        pcaMetadata.dataConverted !== "Yes" && h2Ready &&
+                                        <MenuItem
+                                            label={
+                                                "Transfer Assessment Data to HNQIS 2.0"
+                                            }
+                                            disabled={
+                                                pcaMetadata.h2Reworked !==
+                                                "Yes"
+                                            }
+                                            icon={<MoveDownIcon />}
+                                            onClick={() => {
+                                                toggle();
+                                                transferDataH2(program);
+                                            }}
+                                        />
+                                    }
                                     <MenuItem
                                         disabled={true}
                                         destructive
@@ -279,7 +278,7 @@ const ProgramItem = ({
                                         }}
                                     />
                                 </FlyoutMenu>
-                            )}
+                            }
                         </Popper>
                     </Layer>
                 )}
@@ -291,7 +290,7 @@ const ProgramItem = ({
                         doSearch={doSearch}
                         data={program}
                         programType={
-                            programType === "HNQIS2" ? "hnqis" : "tracker"
+                            programType === "HNQIS2" ? "hnqis" : (program.withoutRegistration?"event":"tracker")
                         }
                         pcaMetadata={pcaMetadata}
                         readOnly={!program.access.update}
