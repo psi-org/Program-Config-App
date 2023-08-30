@@ -140,9 +140,9 @@ const DataProcessor = (props) => {
                 let row = {};
 
                 row.form_name = dataElement.formName.replaceAll(' [C]','');
-                row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : '';
-                row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : '';
-                row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : '';
+                row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : undefined;
+                row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : undefined;
+                row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : undefined;
                 row.description = dataElement.description;
 
                 row.program_stage_id = program_stage_id;
@@ -158,14 +158,14 @@ const DataProcessor = (props) => {
                 row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : undefined;
                 row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion, programStage) : undefined;
                 row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : undefined;
-                row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: '';
-                row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: '';
+                row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: undefined;
+                row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: undefined;
 
                 let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_ORDER);
-                row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : '';
+                row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : undefined;
 
                 let feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_TEXT);
-                row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : '';
+                row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : undefined;
 
                 Configures.push(row);
             });

@@ -274,8 +274,8 @@ export const TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS = {
         prompt: 'Value Type inherited from Option Set.'
     },
     valueTypeNotDefined: {
-        formula: 'AND(ISBLANK($J3),$A3 = "Data Element")',
-        dynamicFormula: 'AND(ISBLANK($J_ROWNUM_),$A_ROWNUM_ = "Data Element")',
+        formula: 'AND(ISBLANK($J3),$A3 = "Data Element",ISBLANK($L3))',
+        dynamicFormula: 'AND(ISBLANK($J_ROWNUM_),$A_ROWNUM_ = "Data Element",ISBLANK($L_ROWNUM_))',
         prompt: 'Value Type not defined.'
     },
     incompleteParentLogic: {
@@ -287,10 +287,14 @@ export const TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS = {
         formula: 'AND($B3<>"",$B3=$O3)',
         dynamicFormula: 'AND($B_ROWNUM_<>"",$B_ROWNUM_=$O_ROWNUM_)',
         prompt: 'The element is parent of itself.'
+    },
+    parentNotFound: {
+        formula: 'AND($A3 = "Data Element",NOT(ISNUMBER(MATCH($O3, B:B, 0))),$O3<>"")',
+        dynamicFormula: 'AND($A_ROWNUM_ = "Data Element",NOT(ISNUMBER(MATCH($O_ROWNUM_, B:B, 0))),$O_ROWNUM_<>"")',
+        prompt: 'Parent Data Element not found.'
     }
 }
 
-//TODO: Improve Validations
 export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
     parentNameNotDefined: {
         formula: 'AND(ISBLANK($A3),OR($B3="question",$B3="label"))',
@@ -306,6 +310,11 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
         formula: `AND(NOT(ISBLANK($B3)),OR(LEN($C3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
         dynamicFormula: `AND(NOT(ISBLANK($B_ROWNUM_)),OR(LEN($C_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C_ROWNUM_)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
         prompt: `Form Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
+    },
+    valueTypeNotDefined: {
+        formula: 'AND($B3 = "question",ISBLANK($G3),ISBLANK($F3))',
+        dynamicFormula: 'AND($B_ROWNUM_ = "question",ISBLANK($G_ROWNUM_),ISBLANK($F_ROWNUM_))',
+        prompt: 'Value Type not defined.'
     },
     valueTypeDisable: {
         formula: 'AND($B3 = "question",NOT(ISBLANK($G3)))',
@@ -341,6 +350,11 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
         formula: 'AND($A3<>"",$A3=$L3)',
         dynamicFormula: 'AND($A_ROWNUM_<>"",$A_ROWNUM_=$L_ROWNUM_)',
         prompt: 'The element is parent of itself.'
+    },
+    parentNotFound: {
+        formula: 'AND(OR($B3 = "question",$B3 = "label"),NOT(ISNUMBER(MATCH($L3, A:A, 0))),$L3<>"")',
+        dynamicFormula: 'AND(OR($B_ROWNUM_ = "question",$B_ROWNUM_ = "label"),NOT(ISNUMBER(MATCH($L_ROWNUM_, A:A, 0))),$L_ROWNUM_<>"")',
+        prompt: 'Parent Question not found.'
     }
 }
 

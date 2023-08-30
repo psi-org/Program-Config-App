@@ -99,7 +99,7 @@ const ValidateMetadata = (
 
                     delete dataElement.errors
 
-                    validateQuestions(importedScores, dataElement, metadata, errorDetails);
+                    validateQuestions(importedScores, dataElement, metadata, section.dataElements,errorDetails);
                     if (dataElement.errors) questions.push(dataElement);
 
                     if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {

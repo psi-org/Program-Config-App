@@ -892,6 +892,17 @@ const Exporter = (props) => {
                 }
             ]
         });
+        //Value type not defined
+        ws.addConditionalFormatting({
+            ref: 'F3:F3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: [validationsList.valueTypeNotDefined.formula],
+                    style: conditionalError,
+                }
+            ]
+        });
         //Disable Value Type when Option Set is selected
         ws.addConditionalFormatting({
             ref: 'F3:F3000',
@@ -989,6 +1000,17 @@ const Exporter = (props) => {
                 {
                     type: 'expression',
                     formulae: [validationsList.selfParent.formula],
+                    style: conditionalError,
+                }
+            ]
+        });
+        //Parent question is not found
+        ws.addConditionalFormatting({
+            ref: 'L3:L3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: [validationsList.parentNotFound.formula],
                     style: conditionalError,
                 }
             ]

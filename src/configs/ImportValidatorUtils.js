@@ -86,6 +86,21 @@ export const HNQIS2_VALIDATION_SETTINGS = {
                 code: "EXW110", 
                 text: "The specified question has been assigned to a score that is not defined."
             }
+        },
+        checkHasValueType: {
+            enabled: true, title: "Question Value Type is not defined", errorMsg: {
+                code: "EXW114", text: "A Value Type was not defined for the specified question."
+            }
+        },
+        checkNotSelfParent: {
+            enabled: true, title: "Invalid Parent Question", errorMsg: {
+                code: "EXW115", text: "A Question cannot be a Parent to itself."
+            }
+        },
+        checkParentExists: {
+            enabled: true, title: "Invalid Parent Question", errorMsg: {
+                code: "EXW116", text: "The specified Parent does not exist in the Assessment."
+            }
         }
     },
     scores: {
@@ -241,6 +256,11 @@ export const TRACKER_VALIDATION_SETTINGS = {
                 code: "EXWT112", text: "A Data Element cannot be a Parent to itself."
             }
         },
+        checkParentExists: {
+            enabled: true, title: "Invalid Parent Data Element", errorMsg: {
+                code: "EXWT113", text: "The specified Parent does not exist in the Stage of the Data Element."
+            }
+        }
     }
 }
 
@@ -465,6 +485,14 @@ export const parentIsNotSelf = ({ metadata }) => {
     return true;
 }
 
+export const parentExists = ({ metadata, dataElementsList }) => {
+    if (!metadata.parentQuestion || metadata.parentQuestion === "") return true;
+    return dataElementsList.find(dataElement => { 
+        const deMetadata = getPCAMetadataDE(dataElement);
+        return deMetadata.varName === metadata.parentQuestion
+    });
+}
+
 export const questionMatchesScore = ({ importedScores, dataElement }) => {
     let feedbackOrder = dataElement.attributeValues.find(attributeValue => attributeValue.attribute.id === FEEDBACK_ORDER)?.value;
     if (!feedbackOrder) return true
@@ -525,7 +553,7 @@ const validate = (validation, validationFunction, params, errorsArray, negateRes
         });
 }
 
-export const validateQuestions = (importedScores, dataElement, metadata, errorDetails) => {
+export const validateQuestions = (importedScores, dataElement, metadata, dataElementsList, errorDetails) => {
     const validations = HNQIS2_VALIDATION_SETTINGS.programDetails;
     if (validations.enabled) {
         let errors = [];
@@ -535,6 +563,7 @@ export const validateQuestions = (importedScores, dataElement, metadata, errorDe
         validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element: 'label', valueType: 'LONG_TEXT' }, errors);
         validate(validations.hasFeedbackOrder, hasFeedbackOrder, { metadata, dataElement }, errors);
         validate(validations.hasVarName, hasVarName, { metadata }, errors);
+        validate(validations.checkHasValueType, checkHasProperty, { object: dataElement, property: 'valueType' }, errors);
         validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errors);
         validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'label', aggregationOperation: 'NONE' }, errors);
         validate(validations.validAggregationQuestion, validAggregationQuestion, { metadata, dataElement }, errors);
@@ -542,6 +571,8 @@ export const validateQuestions = (importedScores, dataElement, metadata, errorDe
         validate(validations.isDenominatorNumeric, isNumeric, { metadata, property: 'scoreDen' }, errors);
         validate(validations.hasParentQuestionNAnswerValue, hasBothParentLogicComponents, { metadata }, errors);
         validate(validations.matchesScore, questionMatchesScore, { importedScores, dataElement }, errors);
+        validate(validations.checkNotSelfParent, parentIsNotSelf, { metadata }, errors);
+        validate(validations.checkParentExists, parentExists, { metadata, dataElementsList }, errors);
 
         if (errors.length > 0) dataElement.errors = {
             title: errorDetails.title,
@@ -622,7 +653,7 @@ export const validateTEA = (tea, teaList, errorDetails) => {
 
 }
 
-export const validateDataElement = (dataElement, errorDetails) => {
+export const validateDataElement = (dataElement, errorDetails, dataElementsList) => {
     const validations = TRACKER_VALIDATION_SETTINGS.dataElements;
     if (!validations.enabled) return;
 
@@ -642,6 +673,7 @@ export const validateDataElement = (dataElement, errorDetails) => {
     validate(validations.checkHasValueType, checkHasProperty, { object: dataElement, property: 'valueType' }, errors);
     validate(validations.checkHasParentLogic, hasBothParentLogicComponents, { metadata }, errors);
     validate(validations.checkNotSelfParent, parentIsNotSelf, { metadata }, errors);
+    validate(validations.checkParentExists, parentExists, { metadata, dataElementsList }, errors);
 
     if (errors.length > 0) dataElement.errors = {
         title: errorDetails.title,

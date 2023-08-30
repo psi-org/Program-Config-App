@@ -1187,6 +1187,19 @@ const ExporterTracker = ({
             ]
         });
 
+        //Parent Data Element not found
+        ws.addConditionalFormatting({
+            priority: 1,
+            ref: 'O3:O3000',
+            rules: [
+                {
+                    type: 'expression',
+                    formulae: [validationsList.parentNotFound.formula],
+                    style: conditionalError,
+                }
+            ]
+        });
+
         //Highlight color for Section or Data Element row
         ws.addConditionalFormatting({
             ref: 'A3:P3000',

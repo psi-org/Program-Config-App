@@ -110,7 +110,7 @@ const ValidateTracker = (
                             tagName: `[ Data Element | ${stage.name} ]`
                         }
                         delete dataElement.errors;
-                        validateDataElement(dataElement, errorDetails);
+                        validateDataElement(dataElement, errorDetails, section.dataElements);
                         if (dataElement.errors) validationResults.stages.dataElements.push(dataElement);
                         if (dataElement.errors?.errors.length > 0) stage_errors += dataElement.errors.errors.length;
                     });
