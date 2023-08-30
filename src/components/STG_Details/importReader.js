@@ -18,6 +18,7 @@ const readTemplateData = (
     const isHNQIS = mode === TEMPLATE_PROGRAM_TYPES.hnqis2;
     let sectionIndex = -1;
     let isBasicForm = false;
+    let ignoredSections = [];
     let importedSections = [];
     let importedScores = [];
     let dataElementsPool = currentSectionsData?.map(section => section.dataElements)
@@ -30,11 +31,14 @@ const readTemplateData = (
     
     const templateMap = (isHNQIS) ? HNQIS2_TEMPLATE_MAP : TRACKER_TEMPLATE_MAP;
     
-    templateData.forEach(row => {
+    templateData.forEach((row, rowNum) => {
         switch (row[templateMap.structure]) {
             case 'Section':
                 if (row[templateMap.programSection] === 'basic-form' && sectionIndex === -1) isBasicForm = true;
-                if ((isBasicForm && importedSections.length > 0)) break;
+                if ((isBasicForm && importedSections.length > 0)) {
+                    ignoredSections.push({ name: row[templateMap.formName], rowNum: rowNum+3})
+                    break;
+                }
                 sectionIndex += 1;
                 if (isHNQIS && (row[HNQIS2_TEMPLATE_MAP.formName] == "Critical Steps Calculations" || row[HNQIS2_TEMPLATE_MAP.formName] == "Scores")) break;
                 importedSections[sectionIndex] = {
@@ -93,7 +97,7 @@ const readTemplateData = (
 
     
 
-    return { importedSections };
+    return { importedSections, ignoredSections };
 
 };
 

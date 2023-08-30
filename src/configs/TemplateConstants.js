@@ -56,7 +56,7 @@ export const HNQIS2_TEMPLATE_MAP = {
     legend: "Legend",
     scoreNum: "Score Numerator",
     scoreDen: "Score Denominator",
-    feedbackOrder: "Compositive Indicator (Feedback Order)",
+    feedbackOrder: "Feedback Order",
     parentQuestion: "Parent Question",
     parentValue: "Answer Value",
     feedbackText: "Feedback Text",
@@ -64,6 +64,7 @@ export const HNQIS2_TEMPLATE_MAP = {
     programStage: "Program Stage Id",
     programSection: "Program Section Id",
     dataElementId: "Data Element Id",
+    prompts: "Errors/Warnings/Info"
 };
 
 export const HNQIS2_TEMPLATE_HEADERS = [
@@ -84,7 +85,8 @@ export const HNQIS2_TEMPLATE_HEADERS = [
     HNQIS2_TEMPLATE_MAP.description,
     HNQIS2_TEMPLATE_MAP.programStage,
     HNQIS2_TEMPLATE_MAP.programSection,
-    HNQIS2_TEMPLATE_MAP.dataElementId
+    HNQIS2_TEMPLATE_MAP.dataElementId,
+    HNQIS2_TEMPLATE_MAP.prompts
 ];
 
 export const HNQIS2_TEMPLATE_VERSION_CELL = "D13";
@@ -288,6 +290,7 @@ export const TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS = {
     }
 }
 
+//TODO: Improve Validations
 export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
     parentNameNotDefined: {
         formula: 'AND(ISBLANK($A3),OR($B3="question",$B3="label"))',

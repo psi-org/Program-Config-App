@@ -15,6 +15,7 @@ import { getHNQIS2MappingList, getTrackerMappingList } from "../../configs/Excel
 import FileSelector from "../UIElements/FileSelector";
 import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, getProgramDetailsTracker, buildHNQIS2Summary, buildTrackerSummary, isTracker, countChanges, getBasicForm } from "./importerUtils";
 import { buildBasicFormStage, setUpProgramStageSections } from "../../configs/Utils";
+import { NoticeBox } from "@dhis2-ui/notice-box";
 
 //* Tracker Only: currentStagesData
 //* HNQIS Only: setSaveStatus, programMetadata, currentSectionsData, setSavedAndValidated
@@ -94,7 +95,7 @@ const Importer = (
                     { setNotificationError, workbook: loadedWorkbook, isTracker, programSpecificType }
                 );
 
-                if (!worksheets.status) return;
+                if (!worksheets?.status) return;
 
                 const templateWS = worksheets.templateWS;
                 const instructionsWS = worksheets.instructionsWS;
@@ -138,6 +139,7 @@ const Importer = (
                 }
 
                 let templateData = [];
+                let stopFlag = false;
 
                 templateWS.forEach((currentTemplate, index) => {
 
@@ -154,10 +156,15 @@ const Importer = (
                         (isTracker ? 1 : 2),
                         true
                     )
-                    if (!currentTemplateData.status) return;
+                    if (!currentTemplateData?.status) {
+                        stopFlag = true;
+                        return;
+                    }
                     templateData.push(currentTemplateData);
 
                 });
+
+                if (stopFlag) return;
 
                 let importSummaryValues =
                     isTracker
@@ -168,7 +175,6 @@ const Importer = (
                     addExecutedTask({ step: 10000, name: importSummaryValues.error, status: 'error' });
                     setNotificationError(true);
                 } else {
-                    console.log(importSummaryValues)
                     setImportSummary(importSummaryValues);
                     setImportResults(importSummaryValues);
                     setSaveStatus('Validate & Save');
@@ -207,7 +213,7 @@ const Importer = (
         programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
         programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
         programMetadata.setProgramMetadata(programMetadata_new);
-        
+
         return importSummaryValues;
     }
 
@@ -215,6 +221,7 @@ const Importer = (
         let importSummaryValues = buildTrackerSummary(programSpecificType, currentStagesData.length);
         let importedStages = [];
         let importError = undefined;
+        let skippedSections = [];
 
         currentStagesData.forEach((currentStage, index) => {
             let stageIndex = templateData.findIndex(elem => elem.stageId === currentStage.id);
@@ -223,7 +230,7 @@ const Importer = (
             } else {
                 importSummaryValues.stages[index].stageName = currentStage.name;
                 importSummaryValues.stages[index].id = currentStage.id;
-                let { importedSections } = readTemplateData({
+                let { importedSections, ignoredSections } = readTemplateData({
                     teaData,
                     currentData: { sections: setUpProgramStageSections(previous.stages.find(stage => stage.id === currentStage.id)), stageNumber: index + 1 },
                     templateData: templateData[stageIndex].data,
@@ -234,6 +241,8 @@ const Importer = (
                     mode: programSpecificType,
                     importSummaryValues: importSummaryValues.stages[index]
                 });
+
+                if(ignoredSections.length > 0) skippedSections.push({ stage: currentStage.name, ignoredSections });
 
                 importedStages.push({
                     id: currentStage.id,
@@ -247,14 +256,18 @@ const Importer = (
         if (importError) return { error: importError };
 
         let importedProgramSections = [];
+        let ignoredProgramSections = [];
         if (teaData) {
             let programSectionIndex = -1;
             let isBasicForm = false;
-            teaData.forEach(row => {
+            teaData.forEach((row, rowNum) => {
                 switch (row[TRACKER_TEA_MAP.structure]) {
                     case 'Section':
                         if (row[TRACKER_TEA_MAP.programSection] === 'basic-form' && programSectionIndex === -1) isBasicForm = true;
-                        if ((isBasicForm && importedProgramSections.length > 0)) break;
+                        if ((isBasicForm && importedProgramSections.length > 0)) {
+                            ignoredProgramSections.push({ name: row[TRACKER_TEA_MAP.name], rowNum: rowNum + 3 });
+                            break;
+                        }
                         programSectionIndex += 1;
                         importedProgramSections[programSectionIndex] = {
                             id: row[TRACKER_TEA_MAP.programSection] || undefined,
@@ -284,6 +297,10 @@ const Importer = (
                         break;
                 }
             });
+
+            console.log(ignoredProgramSections, skippedSections)
+
+            if (ignoredProgramSections.length > 0) skippedSections.push({ stage: 'Tracked Entity Attributes', ignoredSections: ignoredProgramSections });
 
             let currentTEAData = {
                 sections: []
@@ -320,16 +337,16 @@ const Importer = (
 
         importSummaryValues.program = programDetails;
         importSummaryValues.mapping = mappingDetails;
-        importSummaryValues.configurations = { teas: importedProgramSections, importedStages };
+        importSummaryValues.configurations = { teas: importedProgramSections, importedStages, skippedSections };
 
         return importSummaryValues;
     }
 
-    return (<CustomMUIDialog open={true} maxWidth={isTracker(programSpecificType)?'lg':'sm'} fullWidth={true} >
+    return (<CustomMUIDialog open={true} maxWidth={isTracker(programSpecificType) ? 'lg' : 'sm'} fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
             Template Importer
         </CustomMUIDialogTitle >
-        <DialogContent dividers style={{ display: 'flex', flexDirection: isTracker(programSpecificType) ?'row':'column', justifyContent: 'space-between', padding: '1em 2em' }}>
+        <DialogContent dividers style={{ display: 'flex', flexDirection: isTracker(programSpecificType) ? 'row' : 'column', justifyContent: 'space-between', padding: '1em 2em' }}>
             <div style={{ width: isTracker(programSpecificType) ? '49%' : '100%', maxHeight: '30rem', overflow: 'scroll', overflowX: 'hidden' }}>
                 {(currentTask || executedTasks.length > 0) &&
                     <div style={{ width: '100%', marginBottom: '1em' }}>
@@ -339,6 +356,13 @@ const Importer = (
                             executedTasks={executedTasks}
                             isError={isNotificationError}
                         />
+                        {importSummary?.configurations?.skippedSections?.length > 0 &&
+                            <div style={{ width: '100%', marginTop: '0.5em' }}>
+                                <NoticeBox title={'Ignored Sections to keep Basic Form'}>
+                                    {importSummary.configurations.skippedSections.map(ss => ss.ignoredSections.map(is => <p key={is.rowNum}><strong>{`[ ${ss.stage} ]`}</strong>{` ${is.name} (Row ${is.rowNum})`}</p>))}
+                                </NoticeBox>
+                            </div>
+                        }
                     </div>
                 }
                 {importSummary && programSpecificType === TEMPLATE_PROGRAM_TYPES.hnqis2 &&
@@ -355,13 +379,13 @@ const Importer = (
             </div>
 
             {importSummary && isTracker(programSpecificType) &&
-                <div style={{ width: '49%', maxHeight: '30rem', overflow: 'scroll', overflowX: 'hidden'}}>
+                <div style={{ width: '49%', maxHeight: '30rem', overflow: 'scroll', overflowX: 'hidden' }}>
                     {importSummary.teaSummary && <ImportSummary title={`Import Summary - Tracked Entity Attributes`} importCategories={[
                         { name: 'Sections', content: importSummary.teaSummary.programSections },
                         { name: 'Tracked Entity Attributes', content: importSummary.teaSummary.teas }
                     ]} />}
                     {importSummary.stages.map((stage, index) => {
-                        return <ImportSummary key={stage.stageName+index} title={`Import Summary - ${stage.stageName}`} importCategories={[
+                        return <ImportSummary key={stage.stageName + index} title={`Import Summary - ${stage.stageName}`} importCategories={[
                             { name: 'Sections', content: stage.sections },
                             { name: 'Stage Data Elements', content: stage.dataElements }
                         ]} />
