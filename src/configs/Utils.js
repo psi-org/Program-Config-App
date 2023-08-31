@@ -344,3 +344,10 @@ export const  mergeWithPriority = (priorityObject, secondaryObject) =>{
 
     return mergedObject;
 }
+
+export const getPureValue = (value) => {
+    let res = value;
+    if (typeof value === 'string')
+        res = value.replaceAll('"', '');
+    return res;
+}

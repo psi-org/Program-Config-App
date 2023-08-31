@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { useDataQuery } from '@dhis2/app-runtime'
-import { arrayObjectToStringConverter } from '../../configs/Utils';
+import { arrayObjectToStringConverter, getPureValue } from '../../configs/Utils';
 import Exporter from "./Exporter";
 import { COMPETENCY_CLASS, CRITICAL_STEPS, FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA, NON_CRITICAL_STEPS } from '../../configs/Constants';
 import { getVarNameFromParentUid } from '../../configs/ExcelUtils';
@@ -157,7 +157,7 @@ const DataProcessor = (props) => {
                 row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: undefined;
                 row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : undefined;
                 row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion, programStage) : undefined;
-                row.answer_value = (typeof metaData.parentValue !== 'undefined') ? metaData.parentValue : undefined;
+                row.answer_value = (typeof metaData.parentValue !== 'undefined') ? getPureValue(metaData.parentValue) : undefined;
                 row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: undefined;
                 row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: undefined;
 

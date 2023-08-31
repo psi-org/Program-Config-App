@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDataQuery } from '@dhis2/app-runtime'
-import { DeepCopy, arrayObjectToStringConverter } from '../../configs/Utils';
+import { DeepCopy, arrayObjectToStringConverter, getPureValue } from '../../configs/Utils';
 import Exporter from "./Exporter";
 import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, METADATA } from '../../configs/Constants';
 import ExporterTracker from './ExporterTracker';
@@ -232,7 +232,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
                     row.program_section_id = program_section_id;
                     row.data_element_id = dataElement.id;
                     row.parent_question = (typeof metadata.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metadata.parentQuestion, programStage) : undefined;
-                    row.answer_value = (typeof metadata.parentValue !== 'undefined') ? metadata.parentValue : undefined;
+                    row.answer_value = (typeof metadata.parentValue !== 'undefined') ? getPureValue(metadata.parentValue) : undefined;
                     row.program_stage_id = programStage.id
 
                     currentConfigurations.push(row);

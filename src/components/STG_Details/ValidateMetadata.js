@@ -11,7 +11,7 @@ import {  FEEDBACK_ORDER } from "../../configs/Constants";
 import { useEffect, useState } from "react";
 import SaveMetadata from "../UIElements/SaveMetadata";
 import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2 } from "../../configs/ImportValidatorUtils";
-import { getPCAMetadataDE } from "../../configs/Utils";
+import { DeepCopy, getPCAMetadataDE } from "../../configs/Utils";
 
 
 
@@ -43,65 +43,99 @@ const ValidateMetadata = (
     const [validationMessage, setValidationMessage] = useState("Metadata validated. Please use the 'SAVE' button to persist your changes.");
 
     useEffect(() => {
-        const importedSectionsV = importedSections;
-        const importedScoresV = importedScores;
-        let errorCounts = 0;
-        let excelRow = 2;
+        if (!save) {
+            const importedSectionsV = importedSections;
+            const importedScoresV = importedScores;
+            let errorCounts = 0;
+            let excelRow = 2;
 
-        if (verifyProgramDetail(importResults, setValidationMessage)) {
-            let sections = [];
-            let questions = [];
-            let scores = [];
+            if (verifyProgramDetail(importResults, setValidationMessage)) {
+                let sections = [];
+                let questions = [];
+                let scores = [];
 
-            validationResults.sections = sections;
-            validationResults.questions = questions;
-            validationResults.scores = scores;
+                validationResults.sections = sections;
+                validationResults.questions = questions;
+                validationResults.scores = scores;
 
-            let feedbacksErrors, feedbacksWarnings
+                let feedbacksErrors, feedbacksWarnings
 
-            // CHECK FEEDBACK DATA
-            if (hnqisMode) {
-                let validateResults = validateFeedbacks(hnqisMode, importedSectionsV.concat(importedScoresV))
-                feedbacksErrors = validateResults.feedbacksErrors
-                feedbacksWarnings = validateResults.feedbacksWarnings
+                // CHECK FEEDBACK DATA
+                if (hnqisMode) {
+                    let validateResults = validateFeedbacks(hnqisMode, importedSectionsV.concat(importedScoresV))
+                    feedbacksErrors = validateResults.feedbacksErrors
+                    feedbacksWarnings = validateResults.feedbacksWarnings
                 
-                errorCounts += feedbacksErrors.length
-                validationResults.feedbacks = feedbacksErrors;
-            }
+                    errorCounts += feedbacksErrors.length
+                    validationResults.feedbacks = feedbacksErrors;
+                }
             
 
-            //ADD FEEDBACK ERRORS TO DATA ELEMENTS
-            let dataElementsList = importedSectionsV.map(section => section.dataElements).flat();
-            if (hnqisMode) importedSectionsV.forEach((section) => {
-                excelRow += 1;
-                let section_errors = 0;
-                const sectionErrorDetails = {
-                    title: section.name || ('Section on Template row '+excelRow),
-                    tagName: '[ Section ]'
-                }
-                delete section.errors
-                validateSectionsHNQIS2(section, sectionErrorDetails);
-                
-                if (section.errors) {
-                    sections.push(section);
-                    errorCounts += section.errors.errors.length;
-                    section_errors += section.errors.errors.length;
-                }
-
-                section.dataElements.forEach((dataElement) => {
+                //ADD FEEDBACK ERRORS TO DATA ELEMENTS
+                let dataElementsList = DeepCopy(importedSectionsV.map(section => section.dataElements).flat());
+                if (hnqisMode) importedSectionsV.forEach((section) => {
                     excelRow += 1;
-                    let metadata = getPCAMetadataDE(dataElement);
-                    dataElement.labelFormName = metadata.labelFormName;
-
-                    const errorDetails = {
-                        title: dataElement.labelFormName || dataElement.formName || dataElement.name || ('Element on Template row ' + excelRow),
-                        tagName: dataElement.labelFormName ? '[ Label ]' : '[ Question ]'
+                    let section_errors = 0;
+                    const sectionErrorDetails = {
+                        title: section.name || ('Section on Template row ' + excelRow),
+                        tagName: '[ Section ]'
+                    }
+                    delete section.errors
+                    validateSectionsHNQIS2(section, sectionErrorDetails);
+                
+                    if (section.errors) {
+                        sections.push(section);
+                        errorCounts += section.errors.errors.length;
+                        section_errors += section.errors.errors.length;
                     }
 
-                    delete dataElement.errors
+                    section.dataElements.forEach((dataElement) => {
+                        excelRow += 1;
+                        let metadata = getPCAMetadataDE(dataElement);
+                        dataElement.labelFormName = metadata.labelFormName;
 
-                    validateQuestions(importedScores, dataElement, metadata, dataElementsList,errorDetails);
-                    if (dataElement.errors) questions.push(dataElement);
+                        const errorDetails = {
+                            title: dataElement.labelFormName || dataElement.formName || dataElement.name || ('Element on Template row ' + excelRow),
+                            tagName: dataElement.labelFormName ? '[ Label ]' : '[ Question ]'
+                        }
+
+                        delete dataElement.errors
+
+                        validateQuestions(importedScores, dataElement, metadata, dataElementsList, errorDetails);
+                        if (dataElement.errors) questions.push(dataElement);
+
+                        if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {
+                            let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
+
+                            let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
+
+                            dataElement.errors ? dataElement.errors.errors.push(deErrs) : dataElement.errors = {
+                                title: errorDetails.title,
+                                tagName: errorDetails.tagName,
+                                errors: [deErrs],
+                                displayBadges: true
+                            };
+                        }
+
+                        if (dataElement.errors) {
+                            errorCounts += dataElement.errors.errors.length;
+                            section_errors += dataElement.errors.errors.length;
+                        }
+                    });
+                    if (section_errors > 0) section.errorsCount = section_errors;
+                });
+
+                let score_errors = 0;
+                delete importedScoresV.errors
+                if (hnqisMode) importedScoresV.dataElements.forEach((dataElement) => {
+                    excelRow += 1;
+                    const errorDetails = {
+                        title: dataElement.formName || dataElement.name || ('Score on Template row ' + excelRow),
+                        tagName: '[ Score ]'
+                    }
+                    delete dataElement.errors
+                    validateScores(dataElement, errorDetails);
+                    if (dataElement.errors) scores.push(dataElement);
 
                     if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {
                         let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
@@ -114,67 +148,35 @@ const ValidateMetadata = (
                             errors: [deErrs],
                             displayBadges: true
                         };
+
                     }
 
                     if (dataElement.errors) {
                         errorCounts += dataElement.errors.errors.length;
-                        section_errors += dataElement.errors.errors.length;
+                        score_errors += dataElement.errors.errors.length;
                     }
+
                 });
-                if (section_errors > 0) section.errorsCount = section_errors;
-            });
+                if (score_errors > 0) importedScoresV.errors = score_errors;
 
-            let score_errors = 0;
-            delete importedScoresV.errors
-            if (hnqisMode) importedScoresV.dataElements.forEach((dataElement) => {
-                excelRow += 1;
-                const errorDetails = {
-                    title: dataElement.formName || dataElement.name || ('Score on Template row ' + excelRow),
-                    tagName: '[ Score ]'
+                // SUMMARY - RESULTS
+                if (errorCounts === 0) {
+                    setValid(true);
+                    setValidationResults(false);
+                } else {
+                    setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
+                    setSavingMetadata(false);
+                    setValidationResults(validationResults);
                 }
-                delete dataElement.errors
-                validateScores(dataElement, errorDetails);
-                if (dataElement.errors) scores.push(dataElement);
+                previous.setSections(importedSectionsV);
+                previous.setScoresSection(importedScoresV);
 
-                if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {
-                    let deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
 
-                    let deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
-
-                    dataElement.errors ? dataElement.errors.errors.push(deErrs) : dataElement.errors = {
-                        title: errorDetails.title,
-                        tagName: errorDetails.tagName,
-                        errors: [deErrs],
-                        displayBadges: true
-                    };
-
-                }
-
-                if (dataElement.errors) {
-                    errorCounts += dataElement.errors.errors.length;
-                    score_errors += dataElement.errors.errors.length;
-                }
-
-            });
-            if (score_errors > 0) importedScoresV.errors = score_errors;
-
-            // SUMMARY - RESULTS
-            if (errorCounts === 0) {
-                setValid(true);
-                setValidationResults(false);
             } else {
-                setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
-                setSavingMetadata(false);
-                setValidationResults(validationResults);
+                setValid(false);
             }
-            previous.setSections(importedSectionsV);
-            previous.setScoresSection(importedScoresV);
-
-
-        } else {
-            setValid(false);
+            setProcessed(true);
         }
-        setProcessed(true);
     });
 
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >

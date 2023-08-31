@@ -48,7 +48,7 @@ const ValidateTracker = (
     
 
     useEffect(() => {
-        if (validationScope) {
+        if (validationScope && !save) {
             const importedStages = validationScope.configurations.importedStages;
             const teas = validationScope.configurations.teas;
             let errorCounts = 0;
