@@ -6,7 +6,7 @@ import actionCreators from "../../state/action-creators";
 import StageNew from "./StageNew";
 
 // *** Routing ***
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { useRef, useState } from "react";
 
 // *** IMAGES ***
@@ -21,27 +21,48 @@ import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Tooltip } from "@mui/material";
+import BadgeErrors from "../UIElements/BadgeErrors";
+import ValidationMessages from "../UIElements/ValidationMessages";
+import { tagStyle } from "../../configs/Constants";
 
-const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
+const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
 
     const dispatch = useDispatch();
+    const history = useHistory();
     const { setProgramStage } = bindActionCreators(actionCreators, dispatch);
     const [showStageForm, setShowStageForm] = useState(false)
 
     const [ref, setRef] = useState(undefined);
     const [open, setOpen] = useState(false)
+    const [showValidationMessage, setShowValidationMessage] = useState(false);
     const toggle = () => setOpen(!open)
+
+    var ImportSummaryCounts = undefined;
+    if (importResults?.importedSections) {
+        ImportSummaryCounts = <>
+            <div style={tagStyle}>
+                {"New Objects: " + importResults.importedSections.reduce((acu, cur) => acu + (cur.newValues || 0)+ (cur.importStatus === 'new' ? 1 : 0), 0)}
+            </div>
+            <div style={tagStyle}>
+                {"Updated Objects: " + importResults.importedSections.reduce((acu, cur) =>  acu + (cur.updatedValues || 0)+(cur.importStatus==='update' ? 1 : 0), 0)}
+            </div>
+        </>;
+    }
 
     const editStage = stage => {
         setShowStageForm(true)
     }
     return (
         <div className="ml_item" style={{ color: "#333333", backgroundColor: "#c5e3fc", border: "0.5px solid #D5DDE5", borderRadius: "4px" }}>
-            <div className="ml_list-icon" style={{ display: 'flex', alignItems: 'center' }}> 
+            <div className="ml_list-icon" style={{ display: 'flex', alignItems: 'center', cursor:'pointer' }} onClick={()=>{
+                setProgramStage(stage.id)
+                history.push('/programStage/'+stage.id)
+            }}> 
                 <HorizontalSplitIcon />
             </div>
-            <div className="ml_item-title" style={{
-                overflow: 'hidden'
+            <div className="ml_item-title" style={{  overflow: 'hidden', cursor:'pointer' }} onClick={()=>{
+                setProgramStage(stage.id)
+                history.push('/programStage/'+stage.id)
             }}>
                 <Tooltip title={stage.displayName} placement="bottom-start" arrow>
                     <span style={{
@@ -57,8 +78,10 @@ const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editSta
             </div>
             <div className="ml_item-desc">
                 <div>{stage.programStageSections.length} {!eventMode && 'Program Stage'} Sections</div>
+                {ImportSummaryCounts}
             </div>
-            <div className="ml_item-warning_error ">
+            <div className="ml_item-warning_error " onClick={() => setShowValidationMessage(!showValidationMessage)}>
+                {importResults?.errorsCount && importResults?.errorsCount > 0 && <BadgeErrors counts={importResults?.errorsCount} />}
             </div>
             <div className="ml_item-cta">
                 {!hnqisMode && !eventMode &&
@@ -74,11 +97,6 @@ const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editSta
                         </Popper>
                     </Layer>
                 }
-                <Link to={"/programStage/" + stage.id} style={{ color: '#333333' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setProgramStage(stage.id)}>
-                        <NavigateNextIcon />
-                    </div>
-                </Link>
                 {
                     showStageForm &&
                     <StageNew
@@ -90,6 +108,7 @@ const StageItem = ({ stage, setNotification, stagesRefetch, setNewStage, editSta
                         data={stage}
                         setNewStage={setNewStage} />
                 }
+                {showValidationMessage && <ValidationMessages objects={importResults.importedSections.map(section => [section].concat(section.dataElements)).flat()} showValidationMessage={setShowValidationMessage} />}
             </div>
         </div>
     );

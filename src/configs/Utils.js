@@ -1,4 +1,5 @@
 import { coerce, gte, lte } from 'semver';
+import { METADATA } from './Constants';
 
 export function splitPosition(position) {
     return position.split(/(\d+)/);
@@ -103,6 +104,15 @@ export function parseErrorsUL(response) {
     </ul>
 }
 
+export const parseErrorsSaveMetadata = (e) => {
+    let errors = e.response || e;
+    let data = errors.typeReports.map(tr => {
+        let type = tr.klass.split('.').pop()
+        return tr.objectReports.map(or => or.errorReports.map(er => ({ type, uid: or.uid, errorCode: er.errorCode, message: er.message })))
+    })
+    return data.flat(2)
+}
+
 export function truncateString(strVal, characters = 50,useEllipsis=true) {
     return (strVal.substring(0, characters) + ((strVal.length > characters && useEllipsis) ? '...' : ''))
 }
@@ -180,4 +190,165 @@ export function removeKey(obj, key) {
     }
 
     return obj;
+}
+
+export function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+}
+
+export const getObjectIdByProperty = (propertyValue, object, property) => {
+    return object.find(o => o[property] == propertyValue)?.id
+};
+
+export const getObjectByProperty = (propertyValue, object, property) => {
+    return object.find(o => o[property] == propertyValue)
+};
+
+export const buildAttributeValue = (attributeId, value) => ({
+    attribute: { id: attributeId },
+    value
+})
+
+export const buildBasicFormStage = (stageDataElements) => ({
+    id: 'basic-form',
+    name: "Basic Form",
+    displayName: "Basic Form",
+    sortOrder: '1',
+    dataElements: stageDataElements?.map(de => DeepCopy(de.dataElement)) || []
+})
+
+export const setUpProgramStageSections = (programStage) => {
+    if (programStage.formType === 'SECTION')
+        return programStage.programStageSections;
+    else
+        return [buildBasicFormStage(programStage.programStageDataElements)];
+}
+
+export const hasAttributeValue = (json, key) => {
+    if (typeof json[key] !== 'undefined')
+        return (json[key] !== "");
+    return false;
+}
+
+export const isNum = (value) => {
+    return !isNaN(value);
+}
+
+export const isEmpty = (str) => {
+    return (!str || str.length === 0);
+}
+
+export const isBlank = (str) => {
+    return (!str || /^\s*$/.test(str));
+}
+
+export const isValidParentName = (json, key) => {
+    return (/_S\d+Q\d+/.test(json[key]))
+}
+
+export const isValidCorrelative = (json, key) => {
+    return (/_PS\d+_S\d+E\d+/.test(json[key]))
+}
+
+export const extractAttributeValues = (obj, targetAttribute, resultList = []) => {
+    if (typeof obj === 'object' && obj !== null) {
+        if (obj[targetAttribute] !== undefined) {
+            resultList.push(obj[targetAttribute]);
+        }
+
+        for (const key in obj) {
+            if (typeof obj[key] === 'object' && obj[key] !== null) {
+                extractAttributeValues(obj[key], targetAttribute, resultList);
+            }
+        }
+    }
+    return resultList;
+}
+
+export const getPCAMetadataDE = (dataElement) => {
+    let jsonData = dataElement.attributeValues?.find(attributeValue => attributeValue.attribute.id === METADATA);
+    return jsonData ? JSON.parse(jsonData.value) : {};
+}
+
+export const getProgramQuery = () => {
+    const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,description,displayName,domainType,formName,id,legendSet,legendSets[id,name],name,optionSet[id,name],optionSetValue,sharing,shortName,style,valueType,categoryCombo';
+    const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style`;
+    const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder`;
+    const stagesQuery = `id,name,displayName,formType,programStageSections[${stageSectionsQuery}],description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements[${stageDataElementsQuery}],sortOrder,sharing`
+    const programSectionsQuery = 'id,name,renderType,sortOrder,program,sharing,translations,attributeValues,trackedEntityAttributes';
+    const programTrackedEntityAttributes = 'id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute[id,name],programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccessesattributeValues,displayInList,id,mandatory,name,program,programTrackedEntityAttributeGroups,renderOptionsAsRadio,searchable,sortOrder,trackedEntityAttribute,translations,userAccesses,userGroupAccesses,valueType';
+
+    return [
+        'accessLevel',
+        'categoryCombo',
+        'completeEventsExpiryDays',
+        'description',
+        'displayFrontPageList',
+        'displayIncidentDate',
+        'enrollmentDateLabel',
+        'expiryDays',
+        'id',
+        'ignoreOverdueEvents',
+        'maxTeiCountToReturn',
+        'minAttributesRequiredToSearch',
+        'name',
+        'onlyEnrollOnce',
+        'organisationUnits',
+        'programIndicators',
+        'programRuleVariables',
+        'displayName',
+        'programType',
+        'code',
+        'attributeValues',
+        `programStages[${stagesQuery}]`,
+        'withoutRegistration',
+        `programSections[${programSectionsQuery}]`,
+        `programTrackedEntityAttributes[${programTrackedEntityAttributes}]`,
+        'programType',
+        'publicAccess',
+        'registration',
+        'selectEnrollmentDatesInFuture',
+        'selectIncidentDatesInFuture',
+        'shortName',
+        'skipOffline',
+        'style',
+        'trackedEntityType',
+        'translations',
+        'useFirstStageDuringRegistration',
+        'user',
+        'userAccesses',
+        'userGroupAccesses',
+        'sharing',
+        'openDaysAfterCoEndDate'
+    ];
+}
+
+export const setPCAMetadata = (scopeObject, newMetadata) => {
+    let pcaMetadataIndex = scopeObject.attributeValues.findIndex(att => att.attribute.id == METADATA)
+    if (pcaMetadataIndex > -1) scopeObject.attributeValues[pcaMetadataIndex].value = JSON.stringify(newMetadata)
+    else scopeObject.attributeValues.push({
+        value: JSON.stringify(newMetadata),
+        attribute: {
+            id: METADATA
+        }
+    })
+}
+
+export const  mergeWithPriority = (priorityObject, secondaryObject) =>{
+    const mergedObject = DeepCopy(secondaryObject);
+
+    for (const key in priorityObject) {
+        if (priorityObject.hasOwnProperty(key)) {
+            mergedObject[key] = priorityObject[key];
+        }
+    }
+
+    return mergedObject;
+}
+
+export const getPureValue = (value) => {
+    let res = value;
+    if (typeof value === 'string')
+        res = value.replaceAll('"', '');
+    return res;
 }

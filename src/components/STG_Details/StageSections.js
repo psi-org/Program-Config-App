@@ -15,14 +15,12 @@ import DataProcessor from "../Excel/DataProcessor";
 import Importer from "../Excel/Importer";
 import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Scripting";
 import { Link } from "react-router-dom";
-import Removed from "./Removed";
+import Removed from "../UIElements/Removed";
 import ValidateMetadata from "./ValidateMetadata";
-import Errors from "./Errors";
-import ErrorReports from "./ErrorReports";
+import Errors from "../UIElements/Errors";
+import ErrorReports from "../UIElements/ErrorReports";
 
 import RefreshIcon from '@mui/icons-material/Refresh';
-import PublishIcon from '@mui/icons-material/Publish';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -53,7 +51,9 @@ import InsightsIcon from '@mui/icons-material/Insights';
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
-import { DeepCopy, extractMetadataPermissions, truncateString } from "../../configs/Utils";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, truncateString } from "../../configs/Utils";
+import ImportDownloadButton from "../UIElements/ImportDownloadButton";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants";
 
 const createMutation = {
     resource: 'metadata',
@@ -168,7 +168,7 @@ const queryPCAMetadata = {
         resource: 'programs',
         params: ({ programId }) => ({
             id: programId,
-            fields: ['attributeValues', 'sharing'],
+            fields: ['attributeValues', 'sharing', 'programStages'],
             filter: [`id:eq:${programId}`]
         })
     }
@@ -215,12 +215,11 @@ const queryExistingLocalAnalytics = {
 
 
 const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
-const optionsTemplate = ['IMPORT TEMPLATE', 'DOWNLOAD TEMPLATE'];
 
 const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     // Globals
     const programId = programStage.program.id;
-    const [isSectionMode, setIsSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0)
+    const [isSectionMode, setIsSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0);
     const { data: androidSettings, refetch: refreshAndroidSettings } = useDataQuery(queryAndroidSettings);
     const { data: currentUser } = useDataQuery(queryCurrentUser);
     const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings, {
@@ -236,9 +235,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
 
     //const { data: existingLocalAnalytics } = useDataQuery(queryExistingLocalAnalytics, { variables: { programId } });
-
-
-
     // Flags
     const [saveStatus, setSaveStatus] = useState(hnqisMode ? 'Validate' : 'Save Changes');
     const [saveAndBuild, setSaveAndBuild] = useState(false);
@@ -250,8 +246,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [importerEnabled, setImporterEnabled] = useState(false);
     const [importResults, setImportResults] = useState(false);
     const [progressSteps, setProgressSteps] = useState(0);
-    const [isValid, setIsValid] = useState(true);
-    const [validationResults, setValidationResults] = useState(false);
+    const [validationResults, setValidationResults] = useState();
 
     const [editSectionIndex, setEditSectionIndex] = useState(undefined);
     const [newSectionIndex, setNewSectionIndex] = useState(undefined);
@@ -270,8 +265,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const anchorRef = useRef(null);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
-    const [openTemplateBtn, setOpenTemplateBtn] = useState(false);
-    const anchorRefTemplate = useRef(null);
     const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
 
     useEffect(() => {
@@ -283,7 +276,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     useEffect(() => {
         if (importerEnabled) {
             setErrorReports(undefined)
-            setValidationResults(false)
+            setValidationResults(undefined)
         }
     }, [importerEnabled])
 
@@ -292,15 +285,34 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
     const [originalProgramStageDataElements, setOriginalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
     const [sections, setSections] = useState((isSectionMode)
         ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
-        : [{ name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement)) }]
+        : [buildBasicFormStage(programStage.programStageDataElements)]
     );
     const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
     const [criticalSection, setCriticalSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations") });
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
     const [programMetadata, setProgramMetadata] = useState();
+    const [stagesList, setStagesList] = useState();
     const [errorReports, setErrorReports] = useState(undefined)
 
     const [addedSection, setAddedSection] = useState()
+    const [backupData, setBackupData] = useState()
+
+    const storeBackupdata = () => {
+        setBackupData({
+            sections: sections,
+            scoresSection: scoresSection,
+            currentSectionsData: programStage.programStageSections
+        })
+    }
+
+    useEffect(() => {
+        if (sections && scoresSection && !backupData) storeBackupdata();
+    }, [sections, scoresSection])
+
+    useEffect(() => {
+        if (savedAndValidated) storeBackupdata();
+    }, [savedAndValidated])
+
 
     useEffect(() => {
         getProgramMetadata()
@@ -316,6 +328,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     setProgramMetadata(JSON.parse(av.value || "{}"))
                 }
             })
+            setStagesList(res.results?.programs[0]?.programStages)
         })
     }
 
@@ -328,7 +341,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
             setOriginalProgramStageDataElements(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
             setSections((isSectionMode)
                 ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
-                : [{ name: "Basic Form", displayName: "Basic Form", sortOrder: '1', id: 'X', dataElements: programStage.programStageDataElements.map(de => DeepCopy(de.dataElement)) }]
+                : [buildBasicFormStage(programStage.programStageDataElements)]
             )
             setScoresSection({ ...programStage.programStageSections.find(s => hnqisMode && (isSectionMode) && s.name === "Scores") })
             setCriticalSection({ ...programStage.programStageSections.find(s => hnqisMode && (isSectionMode) && s.name === "Critical Steps Calculations") })
@@ -563,15 +576,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         return;
     };
 
-    const configuration_download = (e) => {
-        e.preventDefault();
-        setExportToExcel(true);
-        setExportStatus("Generating Configuration File...")
-    };
 
-    const configuration_import = () => {
-        setImporterEnabled(true);
-    };
 
     useEffect(() => {
         if (androidSettingsError) updateProgramBuildVersion(programId);
@@ -716,7 +721,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                         setProgressSteps(4);
 
                         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
-                        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea); //useCompetencyClass
+                        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea);
                         const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass, sharingSettings, programMetadata.programIndicatorsAggType);
                         const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, sharingSettings, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap);
                         const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports };
@@ -823,37 +828,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
         setOpen(false);
     };
 
-    const handleClickTemplate = (event) => {
-        switch (selectedIndexTemplate) {
-            case 0:
-                setImporterEnabled(true)
-                break;
-            case 1:
-                configuration_download(event)
-                break;
-            default:
-                break;
-        }
-    };
-
-
-    const handleMenuItemClickTemplate = (event, index) => {
-        setSelectedIndexTemplate(index);
-        setOpenTemplateBtn(false);
-    };
-
-    const handleToggleTemplate = () => {
-        setOpenTemplateBtn((prevOpen) => !prevOpen);
-    };
-
-    const handleCloseTemplate = (event) => {
-        if (anchorRefTemplate.current && anchorRefTemplate.current.contains(event.target)) {
-            return;
-        }
-
-        setOpenTemplateBtn(false);
-    };
-
     return (
         <div className="cont_stage">
             <div className="sub_nav align-items-center">
@@ -871,7 +845,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
 
 
                     <ButtonStrip>
-                        {isSectionMode && !readOnly &&
+                        {!readOnly &&
                             <Button
                                 color='inherit'
                                 size='small'
@@ -881,15 +855,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 onClick={() => commit()}
                             > {saveStatus}</Button>
                         }
-                        {/*hnqisMode && isSectionMode &&
-                            <Button
-                                variant='contained'
-                                size='small'
-                                startIcon={<ConstructionIcon />}
-                                disabled={!savedAndValidated}
-                                onClick={() => allAuth ? run() : setShowDisclaimer(true)}
-                            >Set up program</Button>
-                        */}
                         {hnqisMode && isSectionMode &&
                             <>
                                 <ButtonGroup disableElevation color='primary' variant="contained" ref={anchorRef} aria-label="split button">
@@ -954,70 +919,15 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                             </>
                         }
                         {hnqisMode && isSectionMode &&
-                            <>
-                                <ButtonGroup disableElevation ref={anchorRefTemplate} aria-label="split button">
-                                    <LoadingButton
-                                        onClick={handleClickTemplate}
-                                        startIcon={selectedIndexTemplate === 1 ? <FileDownloadIcon /> : <PublishIcon />}
-                                        size='small'
-                                        variant="contained"
-                                        color="success"
-                                        disabled={exportToExcel}
-                                        loadingPosition="start"
-                                        loading={exportToExcel}
-                                    >{optionsTemplate[selectedIndexTemplate]}</LoadingButton>
-                                    <Button
-                                        size="small"
-                                        variant="contained"
-                                        color="success"
-                                        aria-controls={openTemplateBtn ? 'split-button-menu' : undefined}
-                                        aria-expanded={openTemplateBtn ? 'true' : undefined}
-                                        aria-label="select merge strategy"
-                                        aria-haspopup="menu"
-                                        disabled={exportToExcel}
-                                        onClick={handleToggleTemplate}
-                                    >
-                                        <ArrowDropDownIcon />
-                                    </Button>
-                                </ButtonGroup>
-                                <Popper
-                                    sx={{
-                                        zIndex: 1
-                                    }}
-
-                                    open={openTemplateBtn}
-                                    anchorEl={anchorRefTemplate.current}
-                                    role={undefined}
-                                    transition
-                                    disablePortal
-                                >
-                                    {({ TransitionProps, placement }) => (
-                                        <Grow
-                                            {...TransitionProps}
-                                            style={{
-                                                transformOrigin:
-                                                    placement === 'bottom' ? 'center top' : 'center bottom',
-                                            }}
-                                        >
-                                            <Paper>
-                                                <ClickAwayListener onClickAway={handleCloseTemplate}>
-                                                    <MenuList id="split-button-menu" autoFocusItem>
-                                                        {optionsTemplate.map((option, index) => (
-                                                            <MenuItem
-                                                                key={option}
-                                                                selected={index === selectedIndexTemplate}
-                                                                onClick={(event) => handleMenuItemClickTemplate(event, index)}
-                                                            >
-                                                                {option}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </MenuList>
-                                                </ClickAwayListener>
-                                            </Paper>
-                                        </Grow>
-                                    )}
-                                </Popper>
-                            </>
+                            <ImportDownloadButton
+                                value={selectedIndexTemplate}
+                                setValue={setSelectedIndexTemplate}
+                                disabled={exportToExcel}
+                                setStatus={setExportStatus}
+                                setImporterEnabled={setImporterEnabled}
+                                setExportToExcel={setExportToExcel}
+                                size="small"
+                            />
                         }
                         <Tooltip title="Reload" arrow>
                             <IconButton
@@ -1032,7 +942,19 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     </ButtonStrip>
                 </div>
             </div>
-            {hnqisMode && importerEnabled && <Importer setSavedAndValidated={setSavedAndValidated} displayForm={setImporterEnabled} previous={{ sections, setSections, scoresSection, setScoresSection }} setSaveStatus={setSaveStatus} setImportResults={setImportResults} programMetadata={{ programMetadata, setProgramMetadata }} currentSectionsData={programStage.programStageSections} />}
+            {hnqisMode && importerEnabled &&
+                <Importer
+                    displayForm={setImporterEnabled}
+                    setImportResults={setImportResults}
+                    setValidationResults={setValidationResults}
+                    programSpecificType={TEMPLATE_PROGRAM_TYPES.hnqis2}
+                    previous={{ sections: [...backupData.sections], setSections, scoresSection: DeepCopy(backupData.scoresSection), setScoresSection }}
+                    setSaveStatus={setSaveStatus}
+                    programMetadata={{ programMetadata, setProgramMetadata }}
+                    currentSectionsData={backupData.currentSectionsData}
+                    setSavedAndValidated={setSavedAndValidated}
+                />
+            }
             <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', margin: '0', alignItems: 'center' }}>
                 <span style={{
                     overflow: 'hidden',
@@ -1041,7 +963,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                 }}>
                     Sections for Program Stage <strong>{programStage.displayName}</strong>
                 </span>
-                {(readOnly || !isSectionMode) &&
+                {readOnly &&
                     <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
                 }
             </div>
@@ -1154,7 +1076,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 {progressSteps === 3 && <CircularLoader small />}
                                 {progressSteps === 3 && createMetadata?.data?.status == "ERROR" && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 3 && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p style={{ maxWidth: '90%' }}> Reading assesment's questions</p>
+                                <p style={{ maxWidth: '90%' }}> Reading assessment's questions</p>
                             </div>
                         }
                         {(progressSteps > 3) && !programSettingsError &&
@@ -1215,11 +1137,23 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                         }
                         {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
-                            <Removed importResults={importResults} index={0} key={"removedSec"} />
+                            <Removed
+                                removedItems={importResults.questions.removedItems.concat(importResults.scores.removedItems)}
+                                key={"removedSec"}
+                            />
                         }
                         {
-                            validationResults && (validationResults.questions.length > 0 || validationResults.scores.length > 0 || validationResults.feedbacks.length > 0) &&
-                            <Errors validationResults={validationResults} index={0} key={"validationSec"} />
+                            validationResults && (validationResults.sections.length > 0 || validationResults.questions.length > 0 || validationResults.scores.length > 0 || validationResults.feedbacks.length > 0) &&
+                            <Errors
+                                validationResults={
+                                    (
+                                        validationResults.sections.concat(
+                                            (validationResults.questions.concat(validationResults.scores))
+                                        ).map(element => element.errors).flat()
+                                    ).concat(validationResults.feedbacks)
+                                }
+                                key={"validationSec"}
+                            />
                         }
                         {
                             errorReports && <ErrorReports errors={errorReports} />
@@ -1252,8 +1186,12 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                                 </div>
                             )}
                         </Droppable>
-                        {hnqisMode && (isSectionMode) && <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection?.id || "crit"} />}
-                        {hnqisMode && (isSectionMode) && <Scores stageSection={scoresSection} index={0} key={scoresSection?.id || "scores"} program={programId} />}
+                        {hnqisMode && (isSectionMode) &&
+                            <>
+                                <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection?.id || "crit"} />
+                                <Scores stageSection={scoresSection} index={0} key={scoresSection?.id || "scores"} program={programId} />
+                            </>
+                        }
 
                     </div>
                 </div>
@@ -1277,18 +1215,16 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                     importedSections={sections}
                     importedScores={scoresSection}
                     criticalSection={criticalSection}
-                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : removedElements /*[]*/}
-
-                    // createMetadata={createMetadata}
+                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : removedElements}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
-                    previous={{ sections, setSections, scoresSection, setScoresSection }}
+                    previous={{ sections: [...backupData.sections], setSections, scoresSection: DeepCopy(backupData.scoresSection), setScoresSection }}
                     setImportResults={setImportResults}
                     importResults={importResults}
-                    setIsValid={setIsValid}
                     setValidationResults={setValidationResults}
                     programMetadata={programMetadata}
                     setErrorReports={setErrorReports}
+                    stagesList={stagesList}
                     refetchProgramStage={refetchProgramStage}
                 />
             }

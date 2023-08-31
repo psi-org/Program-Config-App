@@ -145,14 +145,10 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
     const valueTypeChange = (data) => {
         validationErrors.valueType = undefined
+        validationErrors.aggType = undefined
         setValidationErrors({ ...validationErrors })
         setValueType(data.target.value)
-    }
-
-    useEffect(()=>{
-        validationErrors.aggType=undefined
-        setValidationErrors({ ...validationErrors })
-        switch (valueType) {
+        switch (data.target.value) {
             case 'NUMBER':
             case 'INTEGER':
             case 'INTEGER_POSITIVE':
@@ -172,7 +168,8 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                 setAggType('')
                 break;
         }
-    },[valueType])
+    }
+
 
     const aggTypeChange = (data) => {
         validationErrors.aggType = undefined

@@ -261,7 +261,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     const ouLevelAssignmentHandler = () => {
         let id = userOrgUnits[0];
-        let oulevel = parseInt(orgUnitLevel) - 1; //TODO: not sure why i am substracting it over here
+        let oulevel = parseInt(orgUnitLevel) - 1; 
         oUnits.refetch({ id: id, level: oulevel }).then((data) => {
             if (data) {
                 selectOrgUnits(data);
@@ -271,7 +271,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     const ouLevelRemovalHandler = () => {
         let id = userOrgUnits[0];
-        let oulevel = parseInt(orgUnitLevel) - 1; //TODO: not sure why i am substracting it over here
+        let oulevel = parseInt(orgUnitLevel) - 1;
         oUnits.refetch({ id: id, level: oulevel }).then((data) => {
             if (data) {
                 deselectOrgUnits(data);

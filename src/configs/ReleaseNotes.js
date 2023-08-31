@@ -13,11 +13,25 @@ export const ReleaseNotes = [
     {
         "version": "v1.2",
         "date": "2022-04-01",
-        "description": " - Use of defined Names instead of static range.\n - Added Conditional Validation to Check 'Parent Question' and 'Parent Name'."
+        "description": "- Use of defined Names instead of static range.\n- Added Conditional Validation to Check 'Parent Question' and 'Parent Name'."
     },
     {
         "version": "v1.3",
         "date": "2022-09-12",
         "description": "Fixed dropdown validations for Critical Step, Compulsory, Value Type, Option Set and Legend columns."
+    },
+    {
+        "version": "v1.4",
+        "date": "2023-07-31",
+        "description": "- Improved and fixed some Conditional Format Rules.\n- Improved Template design.\n- New 'Errors/Warnings/Info' column added to the Template tab to display various prompts.\n - Added Server Information to the Instructions Tab.\n- Improved overall grammar."
+    }
+]
+
+// EXCEL TEMPLATE RELEASE NOTES
+export const ReleaseNotesTracker = [
+    {
+        "version": "v1.0",
+        "date": "2023-07-31",
+        "description": "Initial Release"
     }
 ]

@@ -12,67 +12,67 @@ import TimeIcon from '@mui/icons-material/AccessTime';
 import { ArrowDownward, ArrowUpward, PlaylistAddCheck, StackedLineChart } from '@mui/icons-material';
 
 const BUILD_VERSION = "1.7.0"
-const BUILD_DATE = "June, 2023"
-const MIN_VERSION = "2.36"
+const BUILD_DATE = "September, 2023"
+const MIN_VERSION = "2.37"
 const MAX_VERSION = "2.40.0"
 
-const PCA_METADATA_VERSION = "1.1.1"
-const H2_METADATA_VERSION = "1.1.2"
+const PCA_METADATA_VERSION = "1.1.1";
+const H2_METADATA_VERSION = "1.1.2";
 
-const PCA_ATTRIBUTES = ["yB5tFAAN7bI","haUflNqP85K"]
-const PCA_OPTION_SETS = ["TOcCuCN2CLm"]
-const PCA_OPTIONS = ["Ip3IqzzqgLN","Jz4YKD15lnK","QR0HHcQri91","v9XPATv6G3N"]
-const PCA_USER_ROLES = ["QbYqOgwk5fJ", "JDmJ4ADTaDq"]
+const PCA_ATTRIBUTES = ["yB5tFAAN7bI", "haUflNqP85K"];
+const PCA_OPTION_SETS = ["TOcCuCN2CLm"];
+const PCA_OPTIONS = ["Ip3IqzzqgLN", "Jz4YKD15lnK", "QR0HHcQri91", "v9XPATv6G3N"];
+const PCA_USER_ROLES = ["QbYqOgwk5fJ", "JDmJ4ADTaDq"];
 
 // *HNQIS2 Attributes
-const COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe"
-const GLOBAL_SCORE_ATTRIBUTE = "NQdpdST0Gcx"
-const ASSESSMENT_DATE_ATTRIBUTE = "UlUYUyZJ6o9"
-const HEALTH_AREA_ATTRIBUTE = "Xe5hUu6KkUT"
-const ORGANISATION_UNIT_ATTRIBUTE = "nHg1hGgtJwm"
+const COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe";
+const GLOBAL_SCORE_ATTRIBUTE = "NQdpdST0Gcx";
+const ASSESSMENT_DATE_ATTRIBUTE = "UlUYUyZJ6o9";
+const HEALTH_AREA_ATTRIBUTE = "Xe5hUu6KkUT";
+const ORGANISATION_UNIT_ATTRIBUTE = "nHg1hGgtJwm";
 
 // *H2 Data Elements
-const COMPETENCY_CLASS = "NAaHST5ZDTE"
-const CRITICAL_STEPS = "VqBfZjZhKkU"
-const NON_CRITICAL_STEPS = "pzWDtDUorBt"
-const ACTION_PLAN_ACTION = "F0Qcr8ANr7t"
-const ACTION_PLAN_DUE_DATE = "DIoqtxbSJIL"
-const ACTION_PLAN_RESPONSIBLE = "nswci5V4j0d"
+const COMPETENCY_CLASS = "NAaHST5ZDTE";
+const CRITICAL_STEPS = "VqBfZjZhKkU";
+const NON_CRITICAL_STEPS = "pzWDtDUorBt";
+const ACTION_PLAN_ACTION = "F0Qcr8ANr7t";
+const ACTION_PLAN_DUE_DATE = "DIoqtxbSJIL";
+const ACTION_PLAN_RESPONSIBLE = "nswci5V4j0d";
 
 // *H2 Tracked Entity Type
-const ASSESSMENT_TET = "oNwpeWkfoWc"
+const ASSESSMENT_TET = "oNwpeWkfoWc";
 
 // *H2 Option Sets
-const OPTION_SET_COMPETENCY = "NDfZ129owtz"
-const OPTION_SET_HEALTH_AREAS = "y752HEwvCGi"
+const OPTION_SET_COMPETENCY = "NDfZ129owtz";
+const OPTION_SET_HEALTH_AREAS = "y752HEwvCGi";
 
 // *H2 Legend Sets
-const LEGEND_YES_NO = "RXxPYFwtgf4"
-const LEGEND_YES_PARTIAL_NO = "kqQjtHIc7II"
-const VISUALIZATIONS_LEGEND = "nvVrBnbud3L"
+const LEGEND_YES_NO = "RXxPYFwtgf4";
+const LEGEND_YES_PARTIAL_NO = "kqQjtHIc7II";
+const VISUALIZATIONS_LEGEND = "nvVrBnbud3L";
 
 // *H1 Control Data Elements
-const H1_OVERALL_SCORE = "Y8Nmpp7RhXw"
-const H1_COMPETENCY_CLASS = "KesgQ5NHkQW"
+const H1_OVERALL_SCORE = "Y8Nmpp7RhXw";
+const H1_COMPETENCY_CLASS = "KesgQ5NHkQW";
 
-const H1_ACTION1 = "wRaxfSNz5Xb"
-const H1_RESPONSIBLE1 = "hUXusK1q7qX"
-const H1_DUE_DATE1 = "zAWljfTXSnZ"
-const H1_COMPLETION_DATE1 = "bu0dDZmEqb6"
+const H1_ACTION1 = "wRaxfSNz5Xb";
+const H1_RESPONSIBLE1 = "hUXusK1q7qX";
+const H1_DUE_DATE1 = "zAWljfTXSnZ";
+const H1_COMPLETION_DATE1 = "bu0dDZmEqb6";
 
-const H1_ACTION2 = "uv22UMpXUA2"
-const H1_RESPONSIBLE2 = "Qor2Meb1sNf"
-const H1_DUE_DATE2 = "BtReGP2EMKA"
-const H1_COMPLETION_DATE2 = "ClN8h6d1C9o"
+const H1_ACTION2 = "uv22UMpXUA2";
+const H1_RESPONSIBLE2 = "Qor2Meb1sNf";
+const H1_DUE_DATE2 = "BtReGP2EMKA";
+const H1_COMPLETION_DATE2 = "ClN8h6d1C9o";
 
-const H1_ACTION3 = "OJRW4LPDsdU"
-const H1_RESPONSIBLE3 = "z9bskG067HE"
-const H1_DUE_DATE3 = "bVPpgPm1hj0"
-const H1_COMPLETION_DATE3 = "LPFqIi0Ml4a"
+const H1_ACTION3 = "OJRW4LPDsdU";
+const H1_RESPONSIBLE3 = "z9bskG067HE";
+const H1_DUE_DATE3 = "bVPpgPm1hj0";
+const H1_COMPLETION_DATE3 = "LPFqIi0Ml4a";
 
-const H1_ACTION_PLAN_OLD = "Im5C86I2ObV"    // ?Interpreted as Action 1
-const H1_ACTION1_OLD = "ibpjjNJLn44"        // ?Interpreted as Action 2
-const H1_ACTION2_OLD = "bwwyHVzxnTZ"        // ?Interpreted as Action 3
+const H1_ACTION_PLAN_OLD = "Im5C86I2ObV";   // ?Interpreted as Action 1
+const H1_ACTION1_OLD = "ibpjjNJLn44";       // ?Interpreted as Action 2
+const H1_ACTION2_OLD = "bwwyHVzxnTZ";       // ?Interpreted as Action 3
 
 const H2_REQUIRED = {
     dataElements: [
@@ -119,74 +119,88 @@ const H2_REQUIRED = {
     legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND],
 };
 
-const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'numeric',minute:'numeric',second:'numeric',hour12:false }
+const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false, localeMatcher: 'best fit', };
+const SHORT_DATE_FORMAT_OPTIONS = { localeMatcher: 'best fit', hour12: false, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }
 
-const NAMESPACE = "programconfigapp"
-const BACKUPS_NAMESPACE = `${NAMESPACE}_backups`
+const NAMESPACE = "programconfigapp";
+const BACKUPS_NAMESPACE = `${NAMESPACE}_backups`;
 const TRANSFERRED_EVENTS_NAMESPACE = `${NAMESPACE}_transferred`;
-const DATASTORE_PCA_METADATA = "PCAMetadata"
-const DATASTORE_H2_METADATA = "H2Metadata"
+const DATASTORE_PCA_METADATA = "PCAMetadata";
+const DATASTORE_H2_METADATA = "H2Metadata";
 
 const PERIOD_TYPES = [
-    {label: "Daily", value: "Daily"},
-    {label: "Weekly", value: "Weekly"},
-    {label: "Weekly starting Wednesday", value: "WeeklyWednesday"},
-    {label: "Weekly starting Thursday", value: "WeeklyThursday"},
-    {label: "Weekly starting Saturday", value: "WeeklySaturday"},
-    {label: "Weekly starting Sunday", value: "WeeklySunday"},
-    {label: "Bi-Weekly", value: "BiWeekly"},
-    {label: "Monthly", value: "Monthly"},
-    {label: "Bi-Monthly", value: "BiMonthly"},
-    {label: "Quarterly", value: "Quarterly"},
-    {label: "Six-Monthly", value: "SixMonthly"},
-    {label: "Six-Monthly starting April", value: "SixMonthlyApril"},
-    {label: "Six-Monthly starting November", value: "SixMonthlyNov"},
-    {label: "Yearly", value: "Yearly"},
-    {label: "Financial year starting April", value: "FinancialApril"},
-    {label: "Financial year starting July", value: "FinancialJuly"},
-    {label: "Financial year starting October", value: "FinancialOct"},
-    {label: "Financial year starting November", value: "FinancialNov"}
-]
+    { label: "Daily", value: "Daily" },
+    { label: "Weekly", value: "Weekly" },
+    { label: "Weekly starting Wednesday", value: "WeeklyWednesday" },
+    { label: "Weekly starting Thursday", value: "WeeklyThursday" },
+    { label: "Weekly starting Saturday", value: "WeeklySaturday" },
+    { label: "Weekly starting Sunday", value: "WeeklySunday" },
+    { label: "Bi-Weekly", value: "BiWeekly" },
+    { label: "Monthly", value: "Monthly" },
+    { label: "Bi-Monthly", value: "BiMonthly" },
+    { label: "Quarterly", value: "Quarterly" },
+    { label: "Six-Monthly", value: "SixMonthly" },
+    { label: "Six-Monthly starting April", value: "SixMonthlyApril" },
+    { label: "Six-Monthly starting November", value: "SixMonthlyNov" },
+    { label: "Yearly", value: "Yearly" },
+    { label: "Financial year starting April", value: "FinancialApril" },
+    { label: "Financial year starting July", value: "FinancialJuly" },
+    { label: "Financial year starting October", value: "FinancialOct" },
+    { label: "Financial year starting November", value: "FinancialNov" }
+];
 
 const FEATURE_TYPES = [
-    {label: 'None', value: 'NONE'},
-    {label: 'Point', value: 'POINT'},
-    {label: 'Polygon', value: 'POLYGON'}
-]
+    { label: 'None', value: 'NONE' },
+    { label: 'Point', value: 'POINT' },
+    { label: 'Polygon', value: 'POLYGON' }
+];
 
 const REPORT_DATE_TO_USE = [
-    {label: 'Incident Date', value: 'incidentDate'},
-    {label: 'Enrollment Date', value: 'enrollmentDate'}
-]
+    { label: 'Incident Date', value: 'incidentDate' },
+    { label: 'Enrollment Date', value: 'enrollmentDate' }
+];
 
-const METADATA = "haUflNqP85K"
+const METADATA = "haUflNqP85K";
 
-const QUESTION_TYPE_ATTRIBUTE = "RkNBKHl7FcO"
-const DE_TYPE_ATTRIBUTE = "IMVz39TtAHM"
-const HEADER_ATTRIBUTE = "olcVXnDPG1U"
-const QUESTION_PARENT_ATTRIBUTE = "jeZmx9zUd5p"
-const QUESTION_PARENT_OPTIONS_ATTRIBUTE = "zszUcUt6cH0"
-const COMPOSITIVE_SCORE_ATTRIBUTE = "k738RpAYLmz"
-const SCORE_NUM_ATTRIBUTE = "Zyr7rlDOJy8"
-const SCORE_DEN_ATTRIBUTE = "l7WdLDhE3xW"
-const QUESTION_ORDER_ATTRIBUTE = "xf9iDHNFLgx"
+const QUESTION_TYPE_ATTRIBUTE = "RkNBKHl7FcO";
+const DE_TYPE_ATTRIBUTE = "IMVz39TtAHM";
+const HEADER_ATTRIBUTE = "olcVXnDPG1U";
+const QUESTION_PARENT_ATTRIBUTE = "jeZmx9zUd5p";
+const QUESTION_PARENT_OPTIONS_ATTRIBUTE = "zszUcUt6cH0";
+const COMPOSITIVE_SCORE_ATTRIBUTE = "k738RpAYLmz";
+const SCORE_NUM_ATTRIBUTE = "Zyr7rlDOJy8";
+const SCORE_DEN_ATTRIBUTE = "l7WdLDhE3xW";
+const QUESTION_ORDER_ATTRIBUTE = "xf9iDHNFLgx";
 
-const FEEDBACK_ORDER = "LP171jpctBm"
-const FEEDBACK_TEXT = "yhKEe6BLEer"
+const FEEDBACK_ORDER = "LP171jpctBm";
+const FEEDBACK_TEXT = "yhKEe6BLEer";
 
-const MAX_PREFIX_LENGTH = 25
-const MAX_PROGRAM_NAME_LENGTH = 230
-const MAX_STAGE_NAME_LENGTH = 230
-const MAX_SECTION_NAME_LENGTH = 230
+const MAX_PREFIX_LENGTH = 25;
+const MAX_PROGRAM_NAME_LENGTH = 230;
+const MAX_STAGE_NAME_LENGTH = 230;
+const MAX_SECTION_NAME_LENGTH = 230;
 const MAX_DATA_ELEMENT_NAME_LENGTH = 200;
+const MAX_FORM_NAME_LENGTH = 230;
+const MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH = 230;
 
-const MIN_NAME_LENGTH = 2
-const MIN_DESCRIPTION_LENGTH = 2
+const MIN_NAME_LENGTH = 2;
+const MIN_DESCRIPTION_LENGTH = 2;
 const MIN_DATA_ELEMENT_NAME_LENGTH = 2;
 
-const MAX_SHORT_NAME_LENGTH = 50
+const MAX_SHORT_NAME_LENGTH = 50;
 
-const ELEM_TYPES = [{ label: 'Question', value: 'question' }, { label: 'Label', value: 'label' }]
+const RENDER_TYPES = [
+    'DEFAULT',
+    'DROPDOWN',
+    'VERTICAL_RADIOBUTTONS',
+    'HORIZONTAL_RADIOBUTTONS',
+    'VERTICAL_CHECKBOXES',
+    'HORIZONTAL_CHECKBOXES',
+    'VALUE'
+];
+
+const ELEM_TYPES = [{ label: 'Question', value: 'question' }, { label: 'Label', value: 'label' }];
+
 const VALUE_TYPES = [
     { label: 'Number', value: 'NUMBER', icon: <NumberIcon /> },
     { label: 'Integer', value: 'INTEGER', icon: <NumberIcon /> },
@@ -197,7 +211,8 @@ const VALUE_TYPES = [
     { label: 'Percentage', value: 'PERCENTAGE', icon: <PercentIcon /> },
     { label: 'Date', value: 'DATE', icon: <DateIcon /> },
     { label: 'Time', value: 'TIME', icon: <TimeIcon /> },
-]
+];
+
 const AGG_TYPES = [
     { value: 'NONE', label: 'None', icon: <BlockIcon /> },
     { value: 'SUM', label: 'Sum', icon: <FunctionsIcon /> },
@@ -208,7 +223,7 @@ const AGG_TYPES = [
     { value: 'VARIANCE', label: 'Variance', icon: <SsidChartIcon /> },
     { value: 'MIN', label: 'Min', icon: <RemoveIcon /> },
     { value: 'MAX', label: 'Max', icon: <AddIcon /> }
-]
+];
 
 const AGG_TYPES_H2_PI = [
     { label: 'Average', value: 'AVERAGE', icon: <TimelineIcon /> },
@@ -340,7 +355,7 @@ const DHIS2_KEY_MAP = {
     "validationRuleGroups": "Validation Rule Group",
     "validationRules": "Validation Rule",
     "visualizations": "Visualization",
-}
+};
 
 const PROGRAM_TYPE_OPTIONS = [
     {
@@ -414,7 +429,63 @@ const JSON_ATTRIBUTE_SETTINGS = [
     { key: 'reuser', label: 'Remove all "Created By" and "Last Updated By" fields', selected: false, affects: ['createdBy', 'lastUpdatedBy'] },
     { key: 'recats', label: 'Remove every field related to "Categories"', selected: false, affects: ['category', 'categoryCombo', 'categoryOptionCombo', 'categoryOption', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions'] },
     { key: 'relegends', label: 'Remove Legend Sets', selected: false, affects: ['legends', 'legendSets', 'legend', 'legendSet'] },
-]
+];
+
+const DHIS2_VALUE_TYPES_MAP = {
+    "TEXT": "Text",
+    "LONG_TEXT": "Long Text",
+    "LETTER": "Letter",
+    "PHONE_NUMBER": "Phone Number",
+    "EMAIL": "Email",
+    "BOOLEAN": "Yes/No",
+    "TRUE_ONLY": "Yes only",
+    "DATE": "Date",
+    "DATETIME": "Date & Time",
+    "TIME": "Time",
+    "NUMBER": "Number",
+    "UNIT_INTERVAL": "Unit Interval",
+    "PERCENTAGE": "Percentage",
+    "INTEGER": "Integer",
+    "INTEGER_POSITIVE": "Positive Integer",
+    "INTEGER_NEGATIVE": "Negative Integer",
+    "INTEGER_ZERO_OR_POSITIVE": "Positive or Zero Integer",
+    "COORDINATE": "Coordinate",
+    "ORGANISATION_UNIT": "Orgnisation Unit",
+    "REFERENCE": "Reference",
+    "AGE": "Age",
+    "URL": "URL",
+    "FILE_RESOURCE": "File",
+    "IMAGE": "Image",
+    "GEOJSON": "GeoJSON",
+    "USERNAME": "Username",
+    "TRACKER_ASSOCIATE": "Tracker Associate"
+};
+
+const DHIS2_AGG_OPERATORS_MAP = {
+    "SUM": "Sum", 
+    "AVERAGE": "Average", 
+    "AVERAGE_SUM_ORG_UNIT": "Average (Sum in Org Unit hierarchy)", 
+    "LAST": "Last value (Sum in Org Unit hierarchy)", 
+    "LAST_AVERAGE_ORG_UNIT": "Last value (Average in Org Unit hierarchy)", 
+    "LAST_LAST_ORG_UNIT": "** last_last_org_unit **", 
+    "LAST_IN_PERIOD": "Last value in period (Sum in Org Unit hierarchy)", 
+    "LAST_IN_PERIOD_AVERAGE_ORG_UNIT": "Last value in period (Average in Org Unit hierarchy)", 
+    "FIRST": "First value (Sum in Org Unit hierarchy)", 
+    "FIRST_AVERAGE_ORG_UNIT": "First value (Average in Org Unit hierarchy)", 
+    "FIRST_FIRST_ORG_UNIT": "** first_first_org_unit ", 
+    "COUNT": "Count", 
+    "STDDEV": "Standard Deviation", 
+    "VARIANCE": "Variance", 
+    "MIN": "Min", 
+    "MAX": "Max", 
+    "NONE": "None", 
+    "CUSTOM": "Custom", 
+    "DEFAULT": "Default"
+}
+
+const tagStyle = { minWidth: '11em', maxWidth: '10em', display: 'flex', justifyContent: 'center' };
+const newTagStyle = { minWidth: '6em', maxWidth: '6em', display: 'flex', justifyContent: 'center' };
+const updatedTagStyle = { minWidth: '8em', maxWidth: '8em', display: 'flex', justifyContent: 'center' };
 
 export {
     ACTION_PLAN_ACTION,
@@ -435,8 +506,10 @@ export {
     DATASTORE_PCA_METADATA,
     DATE_FORMAT_OPTIONS,
     DE_TYPE_ATTRIBUTE,
+    DHIS2_AGG_OPERATORS_MAP,
     DHIS2_KEY_MAP,
     DHIS2_PRIMARY_COLOR,
+    DHIS2_VALUE_TYPES_MAP,
     ELEM_TYPES,
     EXPORT_PRESETS,
     EXPORT_HNQIS_PRESETS,
@@ -448,7 +521,7 @@ export {
     H1_ACTION_PLAN_OLD,
     H1_ACTION1_OLD,
     H1_ACTION1,
-    H1_ACTION2_OLD, 
+    H1_ACTION2_OLD,
     H1_ACTION2,
     H1_ACTION3,
     H1_COMPETENCY_CLASS,
@@ -499,10 +572,17 @@ export {
     QUESTION_PARENT_ATTRIBUTE,
     QUESTION_PARENT_OPTIONS_ATTRIBUTE,
     QUESTION_TYPE_ATTRIBUTE,
+    RENDER_TYPES,
     REPORT_DATE_TO_USE,
     SCORE_DEN_ATTRIBUTE,
     SCORE_NUM_ATTRIBUTE,
     TRANSFERRED_EVENTS_NAMESPACE,
     VALUE_TYPES,
-    VISUALIZATIONS_LEGEND
+    VISUALIZATIONS_LEGEND,
+    SHORT_DATE_FORMAT_OPTIONS,
+    MAX_FORM_NAME_LENGTH,
+    tagStyle,
+    newTagStyle,
+    updatedTagStyle,
+    MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH
 };
