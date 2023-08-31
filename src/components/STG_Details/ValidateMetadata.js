@@ -72,7 +72,8 @@ const ValidateMetadata = (
             
 
                 //ADD FEEDBACK ERRORS TO DATA ELEMENTS
-                let dataElementsList = DeepCopy(importedSectionsV.map(section => section.dataElements).flat());
+                let dataElementsList = DeepCopy(importedSections.map(section => section.dataElements).flat());
+
                 if (hnqisMode) importedSectionsV.forEach((section) => {
                     excelRow += 1;
                     let section_errors = 0;
