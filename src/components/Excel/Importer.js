@@ -298,8 +298,6 @@ const Importer = (
                 }
             });
 
-            console.log(ignoredProgramSections, skippedSections)
-
             if (ignoredProgramSections.length > 0) skippedSections.push({ stage: 'Tracked Entity Attributes', ignoredSections: ignoredProgramSections });
 
             let currentTEAData = {

@@ -71,6 +71,7 @@ const ValidateMetadata = (
             
 
             //ADD FEEDBACK ERRORS TO DATA ELEMENTS
+            let dataElementsList = importedSectionsV.map(section => section.dataElements).flat();
             if (hnqisMode) importedSectionsV.forEach((section) => {
                 excelRow += 1;
                 let section_errors = 0;
@@ -99,7 +100,7 @@ const ValidateMetadata = (
 
                     delete dataElement.errors
 
-                    validateQuestions(importedScores, dataElement, metadata, section.dataElements,errorDetails);
+                    validateQuestions(importedScores, dataElement, metadata, dataElementsList,errorDetails);
                     if (dataElement.errors) questions.push(dataElement);
 
                     if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {

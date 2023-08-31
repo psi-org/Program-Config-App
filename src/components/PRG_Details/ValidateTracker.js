@@ -89,6 +89,8 @@ const ValidateTracker = (
                 let stage_errors = 0;
                 delete stage.errors;
 
+                let dataElementsList = stage.importedSections.map(section => section.dataElements).flat();
+
                 stage.importedSections.forEach(section => {
                     excelRow += 1;
                     const sectionErrorDetails = {
@@ -110,7 +112,7 @@ const ValidateTracker = (
                             tagName: `[ Data Element | ${stage.name} ]`
                         }
                         delete dataElement.errors;
-                        validateDataElement(dataElement, errorDetails, section.dataElements);
+                        validateDataElement(dataElement, errorDetails, dataElementsList);
                         if (dataElement.errors) validationResults.stages.dataElements.push(dataElement);
                         if (dataElement.errors?.errors.length > 0) stage_errors += dataElement.errors.errors.length;
                     });
