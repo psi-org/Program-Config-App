@@ -1,25 +1,14 @@
-import LoadingButton from "@mui/lab/LoadingButton";
+import { useDataMutation } from '@dhis2/app-runtime'
 import { NoticeBox } from "@dhis2/ui";
-import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
-import { useState } from "react";
 import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
+import LoadingButton from "@mui/lab/LoadingButton";
+import React, { useState } from "react";
+import { NAMESPACE, PCA_METADATA_VERSION, DATASTORE_PCA_METADATA } from '../../configs/Constants.js'
 import metadataPackage from '../../configs/pcaMetadataPackage.json'
-import { NAMESPACE, PCA_METADATA_VERSION, DATASTORE_PCA_METADATA } from '../../configs/Constants'
+import { parseErrorsUL } from '../../utils/Utils.js';
 
 const metadataMutation = {
     resource: 'metadata',
-    type: 'create',
-    data: ({ data }) => data
-};
-
-const queryDataStore = {
-    results: {
-        resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}`
-    }
-};
-
-const dataStoreMutation = {
-    resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}?encrypt=true`,
     type: 'create',
     data: ({ data }) => data
 };
@@ -32,7 +21,7 @@ const dataStoreMutationUpdate = {
 
 const MetadataErrorPage = () => {
 
-    let metadataDM = useDataMutation(metadataMutation, {
+    const  metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             setSentData(false);
             setError(err.details)
@@ -45,8 +34,6 @@ const MetadataErrorPage = () => {
         data: metadataDM[1].data,
         called: metadataDM[1].called
     };
-
-    const { data: pcaMetadataData } = useDataQuery(queryDataStore);
 
     const [dataStoreUpdate] = useDataMutation(dataStoreMutationUpdate, {
         onError: (err) => {
@@ -65,13 +52,13 @@ const MetadataErrorPage = () => {
                 setError(response)
             } else {
                 //Success
-                let dsData = {
+                const  dsData = {
                     version:PCA_METADATA_VERSION,
                     date: new Date()
                 }
                 dataStoreUpdate({data:dsData}).then(res => {
-                    if(res.status!= 'OK') setError(res)
-                    else window.location.reload()
+                    if (res.status != 'OK') { setError(res) }
+                    else { window.location.reload() }
                 })
                 
             }
@@ -104,7 +91,7 @@ const MetadataErrorPage = () => {
                     {error &&
                     <NoticeBox error={true} title="Install Error">
                         <p>The Metadata Package could not be updated.</p>
-                        {parseErrorsULrrorsUL(error)}
+                        {parseErrorsUL(error)}
                     </NoticeBox>}
                 </div>
             </div>

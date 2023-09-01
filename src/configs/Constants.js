@@ -1,15 +1,16 @@
-import RemoveIcon from '@mui/icons-material/Remove';
-import AddIcon from '@mui/icons-material/Add';
-import FunctionsIcon from '@mui/icons-material/Functions';
-import BlockIcon from '@mui/icons-material/Block';
-import TimelineIcon from '@mui/icons-material/Timeline';
-import SsidChartIcon from '@mui/icons-material/SsidChart';
-import PercentIcon from '@mui/icons-material/Percent';
-import TextIcon from '@mui/icons-material/TextFields';
-import NumberIcon from '@mui/icons-material/Numbers';
-import DateIcon from '@mui/icons-material/CalendarToday';
-import TimeIcon from '@mui/icons-material/AccessTime';
 import { ArrowDownward, ArrowUpward, PlaylistAddCheck, StackedLineChart } from '@mui/icons-material';
+import TimeIcon from '@mui/icons-material/AccessTime';
+import AddIcon from '@mui/icons-material/Add';
+import BlockIcon from '@mui/icons-material/Block';
+import DateIcon from '@mui/icons-material/CalendarToday';
+import FunctionsIcon from '@mui/icons-material/Functions';
+import NumberIcon from '@mui/icons-material/Numbers';
+import PercentIcon from '@mui/icons-material/Percent';
+import RemoveIcon from '@mui/icons-material/Remove';
+import SsidChartIcon from '@mui/icons-material/SsidChart';
+import TextIcon from '@mui/icons-material/TextFields';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import React from 'react';
 
 const BUILD_VERSION = "1.7.0"
 const BUILD_DATE = "September, 2023"
@@ -19,19 +20,26 @@ const MAX_VERSION = "2.40.0"
 const PCA_METADATA_VERSION = "1.1.1";
 const H2_METADATA_VERSION = "1.1.2";
 
+const DHIS2_PRIMARY_COLOR = "#2c6693";
+
+//* PCA Metadata Package
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI", "haUflNqP85K"];
 const PCA_OPTION_SETS = ["TOcCuCN2CLm"];
 const PCA_OPTIONS = ["Ip3IqzzqgLN", "Jz4YKD15lnK", "QR0HHcQri91", "v9XPATv6G3N"];
 const PCA_USER_ROLES = ["QbYqOgwk5fJ", "JDmJ4ADTaDq"];
 
-// *HNQIS2 Attributes
+//* HNQIS2 Tracked Entity Attributes
 const COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe";
 const GLOBAL_SCORE_ATTRIBUTE = "NQdpdST0Gcx";
 const ASSESSMENT_DATE_ATTRIBUTE = "UlUYUyZJ6o9";
 const HEALTH_AREA_ATTRIBUTE = "Xe5hUu6KkUT";
 const ORGANISATION_UNIT_ATTRIBUTE = "nHg1hGgtJwm";
 
-// *H2 Data Elements
+//* HNQIS2 Attributes
+const FEEDBACK_ORDER = "LP171jpctBm";
+const FEEDBACK_TEXT = "yhKEe6BLEer";
+
+//* H2 Data Elements
 const COMPETENCY_CLASS = "NAaHST5ZDTE";
 const CRITICAL_STEPS = "VqBfZjZhKkU";
 const NON_CRITICAL_STEPS = "pzWDtDUorBt";
@@ -39,19 +47,19 @@ const ACTION_PLAN_ACTION = "F0Qcr8ANr7t";
 const ACTION_PLAN_DUE_DATE = "DIoqtxbSJIL";
 const ACTION_PLAN_RESPONSIBLE = "nswci5V4j0d";
 
-// *H2 Tracked Entity Type
+//* H2 Tracked Entity Type
 const ASSESSMENT_TET = "oNwpeWkfoWc";
 
-// *H2 Option Sets
+//* H2 Option Sets
 const OPTION_SET_COMPETENCY = "NDfZ129owtz";
 const OPTION_SET_HEALTH_AREAS = "y752HEwvCGi";
 
-// *H2 Legend Sets
+//* H2 Legend Sets
 const LEGEND_YES_NO = "RXxPYFwtgf4";
 const LEGEND_YES_PARTIAL_NO = "kqQjtHIc7II";
 const VISUALIZATIONS_LEGEND = "nvVrBnbud3L";
 
-// *H1 Control Data Elements
+//* H1 Control Data Elements
 const H1_OVERALL_SCORE = "Y8Nmpp7RhXw";
 const H1_COMPETENCY_CLASS = "KesgQ5NHkQW";
 
@@ -74,6 +82,7 @@ const H1_ACTION_PLAN_OLD = "Im5C86I2ObV";   // ?Interpreted as Action 1
 const H1_ACTION1_OLD = "ibpjjNJLn44";       // ?Interpreted as Action 2
 const H1_ACTION2_OLD = "bwwyHVzxnTZ";       // ?Interpreted as Action 3
 
+//* HNQIS2 Metadata Package
 const H2_REQUIRED = {
     dataElements: [
         COMPETENCY_CLASS,
@@ -115,7 +124,7 @@ const H2_REQUIRED = {
         ASSESSMENT_DATE_ATTRIBUTE,
         COMPETENCY_ATTRIBUTE,
     ],
-    attributes: ["LP171jpctBm", "yhKEe6BLEer"],
+    attributes: [FEEDBACK_ORDER, FEEDBACK_TEXT],
     legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND],
 };
 
@@ -160,8 +169,10 @@ const REPORT_DATE_TO_USE = [
     { label: 'Enrollment Date', value: 'enrollmentDate' }
 ];
 
+//* PCA Metadata Attribute ID
 const METADATA = "haUflNqP85K";
 
+//* HNQIS 1.X Attributes
 const QUESTION_TYPE_ATTRIBUTE = "RkNBKHl7FcO";
 const DE_TYPE_ATTRIBUTE = "IMVz39TtAHM";
 const HEADER_ATTRIBUTE = "olcVXnDPG1U";
@@ -172,9 +183,7 @@ const SCORE_NUM_ATTRIBUTE = "Zyr7rlDOJy8";
 const SCORE_DEN_ATTRIBUTE = "l7WdLDhE3xW";
 const QUESTION_ORDER_ATTRIBUTE = "xf9iDHNFLgx";
 
-const FEEDBACK_ORDER = "LP171jpctBm";
-const FEEDBACK_TEXT = "yhKEe6BLEer";
-
+//* Field Lengths
 const MAX_PREFIX_LENGTH = 25;
 const MAX_PROGRAM_NAME_LENGTH = 230;
 const MAX_STAGE_NAME_LENGTH = 230;
@@ -189,6 +198,8 @@ const MIN_DATA_ELEMENT_NAME_LENGTH = 2;
 
 const MAX_SHORT_NAME_LENGTH = 50;
 
+//* DHIS2 Render Types
+
 const RENDER_TYPES = [
     'DEFAULT',
     'DROPDOWN',
@@ -199,8 +210,10 @@ const RENDER_TYPES = [
     'VALUE'
 ];
 
+//* HNQIS2 Elem Types
 const ELEM_TYPES = [{ label: 'Question', value: 'question' }, { label: 'Label', value: 'label' }];
 
+//* PCA Dropdowns
 const VALUE_TYPES = [
     { label: 'Number', value: 'NUMBER', icon: <NumberIcon /> },
     { label: 'Integer', value: 'INTEGER', icon: <NumberIcon /> },
@@ -238,6 +251,7 @@ const AGG_TYPES_H2_PI = [
     { label: 'Max', value: 'MAX', icon: <ArrowUpward /> },
 ];
 
+//* Mappings for JSON Metadata Export
 const DHIS2_KEY_MAP = {
     "accesses": "Access",
     "analyticsPeriodBoundaries": "Analytics Period Boundary",
@@ -357,6 +371,7 @@ const DHIS2_KEY_MAP = {
     "visualizations": "Visualization",
 };
 
+//* Program Types besides Tracker and Event
 const PROGRAM_TYPE_OPTIONS = [
     {
         "code": "HNQIS",
@@ -407,7 +422,7 @@ const PROGRAM_TYPE_OPTION_SET = {
     ]
 };
 
-const DHIS2_PRIMARY_COLOR = "#2c6693";
+//* JSON Metadata Export related
 
 const EXPORT_PRESETS = [
     { value: 'local', label: 'Current Server'},
@@ -431,6 +446,7 @@ const JSON_ATTRIBUTE_SETTINGS = [
     { key: 'relegends', label: 'Remove Legend Sets', selected: false, affects: ['legends', 'legendSets', 'legend', 'legendSet'] },
 ];
 
+//* DHIS2 Value Types
 const DHIS2_VALUE_TYPES_MAP = {
     "TEXT": "Text",
     "LONG_TEXT": "Long Text",
@@ -461,6 +477,7 @@ const DHIS2_VALUE_TYPES_MAP = {
     "TRACKER_ASSOCIATE": "Tracker Associate"
 };
 
+//* DHIS2 Aggregation Types
 const DHIS2_AGG_OPERATORS_MAP = {
     "SUM": "Sum", 
     "AVERAGE": "Average", 
@@ -483,6 +500,7 @@ const DHIS2_AGG_OPERATORS_MAP = {
     "DEFAULT": "Default"
 }
 
+//* PCA Tag Styles
 const tagStyle = { minWidth: '11em', maxWidth: '10em', display: 'flex', justifyContent: 'center' };
 const newTagStyle = { minWidth: '6em', maxWidth: '6em', display: 'flex', justifyContent: 'center' };
 const updatedTagStyle = { minWidth: '8em', maxWidth: '8em', display: 'flex', justifyContent: 'center' };
@@ -511,8 +529,8 @@ export {
     DHIS2_PRIMARY_COLOR,
     DHIS2_VALUE_TYPES_MAP,
     ELEM_TYPES,
-    EXPORT_PRESETS,
     EXPORT_HNQIS_PRESETS,
+    EXPORT_PRESETS,
     EXTERNAL_IMPORT_REMOVE_KEYS,
     FEATURE_TYPES,
     FEEDBACK_ORDER,
@@ -544,11 +562,13 @@ export {
     LEGEND_YES_NO,
     LEGEND_YES_PARTIAL_NO,
     MAX_DATA_ELEMENT_NAME_LENGTH,
+    MAX_FORM_NAME_LENGTH,
     MAX_PREFIX_LENGTH,
     MAX_PROGRAM_NAME_LENGTH,
     MAX_SECTION_NAME_LENGTH,
     MAX_SHORT_NAME_LENGTH,
     MAX_STAGE_NAME_LENGTH,
+    MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH,
     MAX_VERSION,
     METADATA,
     MIN_DATA_ELEMENT_NAME_LENGTH,
@@ -556,6 +576,7 @@ export {
     MIN_NAME_LENGTH,
     MIN_VERSION,
     NAMESPACE,
+    newTagStyle,
     NON_CRITICAL_STEPS,
     OPTION_SET_COMPETENCY,
     OPTION_SET_HEALTH_AREAS,
@@ -576,13 +597,10 @@ export {
     REPORT_DATE_TO_USE,
     SCORE_DEN_ATTRIBUTE,
     SCORE_NUM_ATTRIBUTE,
-    TRANSFERRED_EVENTS_NAMESPACE,
-    VALUE_TYPES,
-    VISUALIZATIONS_LEGEND,
     SHORT_DATE_FORMAT_OPTIONS,
-    MAX_FORM_NAME_LENGTH,
     tagStyle,
-    newTagStyle,
+    TRANSFERRED_EVENTS_NAMESPACE,
     updatedTagStyle,
-    MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH
+    VALUE_TYPES,
+    VISUALIZATIONS_LEGEND
 };
