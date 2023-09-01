@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
 import { useDataQuery } from '@dhis2/app-runtime'
-import { arrayObjectToStringConverter, getPureValue } from '../../utils/Utils';
-import Exporter from "./Exporter";
-import { COMPETENCY_CLASS, CRITICAL_STEPS, FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA, NON_CRITICAL_STEPS } from '../../configs/Constants';
-import { getVarNameFromParentUid } from '../../utils/ExcelUtils';
+import PropTypes from 'prop-types';
+import React, {useState} from 'react';
+import { COMPETENCY_CLASS, CRITICAL_STEPS, FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA, NON_CRITICAL_STEPS } from '../../configs/Constants.js';
+import { getVarNameFromParentUid } from '../../utils/ExcelUtils.js';
+import { getPureValue } from '../../utils/Utils.js';
+import Exporter from "./Exporter.js";
 
 const optionSetQuery = {
     results: {
@@ -54,11 +55,11 @@ const DataProcessor = (props) => {
     let programPrefix = "";
     let useCompetencyClass = "";
     let programHealthArea = "";
-    let programName = "";
+    //let programName = "";
     let programShortName = "";
     if(typeof programStage.program !== "undefined")
     {
-        programName = programStage.program.name;
+        //programName = programStage.program.name;
         programShortName = programStage.program.shortName;
         programMetadata = JSON.parse(programStage.program.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
         programPrefix = programMetadata?.dePrefix || programStage.program.id;
@@ -73,13 +74,13 @@ const DataProcessor = (props) => {
     const { data: lsData } = useDataQuery(legendSetsQuery);
     const { data: progData } = useDataQuery(programsQuery);
 
-    let Configures = [];
+    const Configures = [];
     let optionData = [];
     let healthAreaData = [];
     let legendSetData = [];
     let programData = [];
 
-    let optionPool = data?.results.optionSets;
+    const optionPool = data?.results.optionSets;
     if (optionPool)
     {
         optionData = optionPool.map(op=>{
@@ -87,7 +88,7 @@ const DataProcessor = (props) => {
         })
     }
 
-    let haPools = haData?.results.optionSets[0].options;
+    const  haPools = haData?.results.optionSets[0].options;
     if (haPools)
     {
         healthAreaData = haPools.map(hp=>{
@@ -95,7 +96,7 @@ const DataProcessor = (props) => {
         });
     }
 
-    let legendPool = lsData?.results.legendSets;
+    const  legendPool = lsData?.results.legendSets;
     if (legendPool)
     {
         legendSetData = legendPool.map(lp => {
@@ -103,7 +104,7 @@ const DataProcessor = (props) => {
         });
     }
 
-    let prgPool = progData?.results.programs;
+    const  prgPool = progData?.results.programs;
     if (prgPool)
     {
         programData = prgPool.map(pp=>{
@@ -112,24 +113,24 @@ const DataProcessor = (props) => {
     }
 
     const initialize = () => {
-        if(typeof programStage.program !== "undefined") compile_report();
+        if (typeof programStage.program !== "undefined") { compile_report() }
         setTimeout(function() {
             setIsDownloaded(true);
         }, 2000);
     }
 
     const compile_report = () => {
-        let program_stage_id = programStage.id;
+        const  program_stage_id = programStage.id;
 
         programStage.programStageSections.forEach((programSection) => {
-            let criticalStepsDataElements = [COMPETENCY_CLASS, CRITICAL_STEPS, NON_CRITICAL_STEPS];
+            const  criticalStepsDataElements = [COMPETENCY_CLASS, CRITICAL_STEPS, NON_CRITICAL_STEPS];
 
-            let program_section_id = programSection.id;
+            const  program_section_id = programSection.id;
 
             // Skip 'Critical Steps Calculations' Section
-            if(programSection.dataElements.find(de => criticalStepsDataElements.includes(de.id))) return;
+            if (programSection.dataElements.find(de => criticalStepsDataElements.includes(de.id))) { return }
 
-            let row = {};
+            const  row = {};
             row.structure = "Section";
             row.form_name = programSection.displayName;
             row.program_stage_id = program_stage_id;
@@ -137,7 +138,7 @@ const DataProcessor = (props) => {
             Configures.push(row);
 
             programSection.dataElements.forEach((dataElement) => {
-                let row = {};
+                const  row = {};
 
                 row.form_name = dataElement.formName.replaceAll(' [C]','');
                 row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : undefined;
@@ -149,11 +150,11 @@ const DataProcessor = (props) => {
                 row.program_section_id = program_section_id;
                 row.data_element_id = dataElement.id;
 
-                let metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
-                let metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
+                const metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
+                const metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
                 row.parentValue = '';
                 row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
-                if(row.structure == 'label') row.form_name = metaData.labelFormName || '';
+                if (row.structure == 'label') { row.form_name = metaData.labelFormName || '' }
                 row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: undefined;
                 row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : undefined;
                 row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion, programStage) : undefined;
@@ -161,10 +162,10 @@ const DataProcessor = (props) => {
                 row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: undefined;
                 row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: undefined;
 
-                let compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_ORDER);
+                const compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_ORDER);
                 row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : undefined;
 
-                let feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_TEXT);
+                const feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_TEXT);
                 row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : undefined;
 
                 Configures.push(row);
@@ -176,9 +177,33 @@ const DataProcessor = (props) => {
 
     return (
         <>
-            {isDownloaded && exportFlag && <Exporter programName={props.programName} flag={exportFlag} setFlag={setExportFlag} Configures={Configures}  optionData={optionData} healthAreaData={healthAreaData} legendSetData={legendSetData} programData={programData} isLoading={props.isLoading} programShortName={programShortName} programPrefix={programPrefix} useCompetencyClass={useCompetencyClass} programHealthArea={programHealthArea}  setStatus={props.setStatus}/>}
+            {isDownloaded && exportFlag &&
+                <Exporter
+                    programName={props.programName}
+                    flag={exportFlag}
+                    setFlag={setExportFlag}
+                    Configures={Configures}
+                    optionData={optionData}
+                    healthAreaData={healthAreaData}
+                    legendSetData={legendSetData}
+                    programData={programData}
+                    isLoading={props.isLoading}
+                    programShortName={programShortName}
+                    programPrefix={programPrefix}
+                    useCompetencyClass={useCompetencyClass}
+                    programHealthArea={programHealthArea}
+                    setStatus={props.setStatus}
+                />}
         </>
     );
+}
+
+DataProcessor.propTypes = {
+    isLoading: PropTypes.func,
+    programName: PropTypes.string,
+    programStageSections: PropTypes.array,
+    ps: PropTypes.object,
+    setStatus: PropTypes.func
 }
 
 export default DataProcessor;
