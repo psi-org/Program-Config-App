@@ -1,13 +1,14 @@
-import {useRef, useState} from "react";
 import {useDataMutation, useDataQuery} from "@dhis2/app-runtime";
-import CustomMUIDialog from "../UIElements/CustomMUIDialog";
-import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
+import SaveAsIcon from '@mui/icons-material/SaveAs';
 import {Box, Button, CircularProgress, DialogActions, DialogContent, TextField} from "@mui/material";
+import PropTypes from "prop-types";
+import React, {useRef, useState} from "react";
 import {
     ACTION_PLAN_ACTION,
     ACTION_PLAN_DUE_DATE,
     ACTION_PLAN_RESPONSIBLE,
     ASSESSMENT_DATE_ATTRIBUTE,
+    ASSESSMENT_TET,
     BACKUPS_NAMESPACE,
     COMPETENCY_ATTRIBUTE,
     COMPETENCY_CLASS,
@@ -15,12 +16,11 @@ import {
     GLOBAL_SCORE_ATTRIBUTE,
     HEALTH_AREA_ATTRIBUTE,
     NON_CRITICAL_STEPS,
-    ORGANISATION_UNIT_ATTRIBUTE,
-    ASSESSMENT_TET
-} from "../../configs/Constants";
-import SaveAsIcon from '@mui/icons-material/SaveAs';
-
-import {DeepCopy, parseErrorsJoin, truncateString} from "../../utils/Utils";
+    ORGANISATION_UNIT_ATTRIBUTE
+} from "../../configs/Constants.js";
+import {DeepCopy, parseErrorsJoin, truncateString} from "../../utils/Utils.js";
+import CustomMUIDialog from "../UIElements/CustomMUIDialog.js";
+import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle.js";
 
 const BackupScreen = (props) => {
     const programMetadata = {
@@ -72,9 +72,9 @@ const BackupScreen = (props) => {
     const [programName, setProgramName] = useState(truncateString(props.program.name, 30, false) + '_' + formatDate(new Date(), "_", "_"));
     const [programVersion, setProgramVersion] = useState(props.program.version);
     const [processing, setProcessing] = useState(false);
-    let nameInput = useRef();
-    let versionInput = useRef();
-    let commentInput = useRef();
+    const nameInput = useRef();
+    const versionInput = useRef();
+    const commentInput = useRef();
 
     const { loading: dsLoading, data: dsData } = useDataQuery(queryDataStore);
     const { loading: loadingMetadata, data: metaData } = useDataQuery(programMetadata, {
@@ -145,7 +145,7 @@ const BackupScreen = (props) => {
         }
         setValidationError(false);
         setVersionValidationError(false);
-        let backup = {
+        const backup = {
             "id": new Date().valueOf(),
             "name": nameInput.current.value,
             "backup_date": timestamp,
@@ -154,7 +154,7 @@ const BackupScreen = (props) => {
             "metadata": processMetadata(metaData.results)
         };
         dsBackups.backups.push(backup);
-        let backupToDatastore = !dsData?.results ? dsCreateRequest : dsUpdateRequest
+        const backupToDatastore = !dsData?.results ? dsCreateRequest : dsUpdateRequest
         backupToDatastore.mutate({ data: dsBackups })
             .then(response => {
                 if (response.status !== 'OK') {
@@ -272,7 +272,7 @@ const BackupScreen = (props) => {
     }
 
     const filterComponent = (elements, filterList) => {
-        let results = []
+        const results = []
         elements?.forEach((element) => {
             if(!filterList.includes(element.id)) {
                 delete element.created;
@@ -344,6 +344,12 @@ const BackupScreen = (props) => {
             }
         </CustomMUIDialog>
     </>
+}
+
+BackupScreen.propTypes = {
+    program: PropTypes.object,
+    setBackupProgramId: PropTypes.func,
+    setNotification: PropTypes.func
 }
 
 export default BackupScreen
