@@ -31,7 +31,7 @@ import {
     printArray2Column,
     printObjectArray,
     writeWorkbook
-} from "../../configs/ExcelUtils";
+} from "../../utils/ExcelUtils";
 import { ReleaseNotesTracker } from "../../configs/ReleaseNotes";
 import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP } from '../../configs/Constants';
 

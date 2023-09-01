@@ -4,7 +4,7 @@ import React from 'react'
 import classes from './App.module.css'
 import { useDataQuery } from "@dhis2/app-runtime";
 import { MIN_VERSION, MAX_VERSION, PCA_ATTRIBUTES, PCA_OPTIONS, PCA_USER_ROLES, PCA_OPTION_SETS, H2_REQUIRED, PCA_METADATA_VERSION, NAMESPACE, DATASTORE_PCA_METADATA } from './configs/Constants';
-import { versionIsValid } from './configs/Utils';
+import { versionIsValid } from './utils/Utils';
 
 /**
  * STORE [w/Redux]

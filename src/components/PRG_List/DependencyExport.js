@@ -14,7 +14,7 @@ import Box from '@mui/material/Box';
 
 // *** Routing ***
 import { useState, useEffect } from "react";
-import { DeepCopy, changeAttributeValue, getJSONKeyTree, removeKey, truncateString } from "../../configs/Utils";
+import { DeepCopy, changeAttributeValue, getJSONKeyTree, removeKey, truncateString } from "../../utils/Utils";
 import { DHIS2_KEY_MAP, DHIS2_PRIMARY_COLOR, EXPORT_HNQIS_PRESETS, EXPORT_PRESETS, EXTERNAL_IMPORT_REMOVE_KEYS, H2_ATTRIBUTES_TO_KEEP, JSON_ATTRIBUTE_SETTINGS, PROGRAM_TYPE_OPTIONS, PROGRAM_TYPE_OPTION_SET } from "../../configs/Constants";
 import { Accordion, AccordionDetails, AccordionSummary, ButtonGroup, Checkbox, Collapse, FormControl, FormControlLabel, FormGroup, InputLabel, Select, Switch } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';

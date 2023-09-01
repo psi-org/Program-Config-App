@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import { useDataQuery } from '@dhis2/app-runtime'
-import { arrayObjectToStringConverter, getPureValue } from '../../configs/Utils';
+import { arrayObjectToStringConverter, getPureValue } from '../../utils/Utils';
 import Exporter from "./Exporter";
 import { COMPETENCY_CLASS, CRITICAL_STEPS, FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA, NON_CRITICAL_STEPS } from '../../configs/Constants';
-import { getVarNameFromParentUid } from '../../configs/ExcelUtils';
+import { getVarNameFromParentUid } from '../../utils/ExcelUtils';
 
 const optionSetQuery = {
     results: {

@@ -10,8 +10,8 @@ import {  FEEDBACK_ORDER } from "../../configs/Constants";
 
 import { useEffect, useState } from "react";
 import SaveMetadata from "../UIElements/SaveMetadata";
-import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2 } from "../../configs/ImportValidatorUtils";
-import { DeepCopy, getPCAMetadataDE } from "../../configs/Utils";
+import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2 } from "../../utils/ImportValidatorUtils";
+import { DeepCopy, getPCAMetadataDE } from "../../utils/Utils";
 
 
 

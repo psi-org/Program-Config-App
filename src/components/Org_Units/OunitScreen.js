@@ -23,7 +23,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
-import { parseErrorsJoin, parseErrorsUL, truncateString } from "../../configs/Utils";
+import { parseErrorsJoin, parseErrorsUL, truncateString } from "../../utils/Utils";
 
 const orgUnitsQuery = {
     userOrgUnits: {

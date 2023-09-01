@@ -1,5 +1,5 @@
 import { coerce, gte, lte } from 'semver';
-import { METADATA } from './Constants';
+import { METADATA } from '../configs/Constants';
 
 export function splitPosition(position) {
     return position.split(/(\d+)/);

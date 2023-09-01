@@ -10,7 +10,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { Button } from "@mui/material";
 import { NoticeBox } from '@dhis2/ui'
-import { parseErrors, parseErrorsUL } from '../../configs/Utils'
+import { parseErrors, parseErrorsUL } from '../../utils/Utils'
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import H2MetadataJSON from '../../configs/HNQIS2_Metadata_Package.json'

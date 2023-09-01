@@ -32,7 +32,7 @@ import {
     printArray2Column,
     printObjectArray,
     writeWorkbook
-} from "../../configs/ExcelUtils";
+} from "../../utils/ExcelUtils";
 import { ReleaseNotes } from "../../configs/ReleaseNotes";
 import { MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../../configs/Constants';
 

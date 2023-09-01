@@ -5,7 +5,7 @@ import { useState } from "react";
 import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 import metadataPackage from './pcaMetadataPackage.json'
 import {NAMESPACE,PCA_METADATA_VERSION,DATASTORE_PCA_METADATA} from '../../configs/Constants'
-import { parseErrorsUL } from "../../configs/Utils";
+import { parseErrorsUL } from "../../utils/Utils";
 
 const metadataMutation = {
     resource: 'metadata',

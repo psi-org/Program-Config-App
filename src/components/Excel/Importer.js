@@ -11,10 +11,10 @@ import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog'
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ImportSummary from "../UIElements/ImportSummary";
-import { getHNQIS2MappingList, getTrackerMappingList } from "../../configs/ExcelUtils";
+import { getHNQIS2MappingList, getTrackerMappingList } from "../../utils/ExcelUtils";
 import FileSelector from "../UIElements/FileSelector";
-import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, getProgramDetailsTracker, buildHNQIS2Summary, buildTrackerSummary, isTracker, countChanges, getBasicForm } from "./importerUtils";
-import { buildBasicFormStage, setUpProgramStageSections } from "../../configs/Utils";
+import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, getProgramDetailsTracker, buildHNQIS2Summary, buildTrackerSummary, isTracker, countChanges, getBasicForm } from "../../utils/importerUtils";
+import { buildBasicFormStage, setUpProgramStageSections } from "../../utils/Utils";
 import { NoticeBox } from "@dhis2-ui/notice-box";
 
 //* Tracker Only: currentStagesData

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useDataQuery } from '@dhis2/app-runtime'
-import { DeepCopy, arrayObjectToStringConverter, getPureValue } from '../../configs/Utils';
+import { DeepCopy, arrayObjectToStringConverter, getPureValue } from '../../utils/Utils';
 import Exporter from "./Exporter";
 import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, METADATA } from '../../configs/Constants';
 import ExporterTracker from './ExporterTracker';
-import { getVarNameFromParentUid } from '../../configs/ExcelUtils';
+import { getVarNameFromParentUid } from '../../utils/ExcelUtils';
 
 const optionSetQuery = {
     results: {

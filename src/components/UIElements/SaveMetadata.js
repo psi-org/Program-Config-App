@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import CustomMUIDialogTitle from './CustomMUIDialogTitle'
 import CustomMUIDialog from './CustomMUIDialog'
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants";
-import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, setPCAMetadata } from "../../configs/Utils";
+import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, setPCAMetadata } from "../../utils/Utils";
 
 const competencyClassAttribute = {
     "mandatory": false,

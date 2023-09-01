@@ -51,7 +51,7 @@ import InsightsIcon from '@mui/icons-material/Insights';
 
 import SectionManager from './SectionManager'
 import DataElementManager from './DataElementManager'
-import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, truncateString } from "../../configs/Utils";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, truncateString } from "../../utils/Utils";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants";
 

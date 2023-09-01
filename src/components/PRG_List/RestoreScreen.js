@@ -7,7 +7,7 @@ import {BACKUPS_NAMESPACE} from "../../configs/Constants";
 
 import RestoreItem from "./RestoreItem";
 import RestoreOptions from "./RestoreOptions";
-import {truncateString} from "../../configs/Utils";
+import {truncateString} from "../../utils/Utils";
 
 ``
 const RestoreScreen = (props) => {

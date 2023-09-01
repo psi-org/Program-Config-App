@@ -22,7 +22,7 @@ import {
     Typography
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import {DeepCopy, parseErrorsJoin} from '../../configs/Utils';
+import {DeepCopy, parseErrorsJoin} from '../../utils/Utils';
 import {styled} from '@mui/material/styles';
 import {tableCellClasses} from '@mui/material/TableCell';
 import {

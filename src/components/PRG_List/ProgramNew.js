@@ -47,7 +47,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { FormLabel, Slide, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
 import StyleManager from "../UIElements/StyleManager";
-import { DeepCopy, parseErrorsJoin, truncateString } from "../../configs/Utils";
+import { DeepCopy, parseErrorsJoin, truncateString } from "../../utils/Utils";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import H2Setting from "./H2Setting"
 import Snackbar from '@mui/material/Snackbar';

@@ -20,7 +20,7 @@ import {
 } from "../../configs/Constants";
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 
-import {DeepCopy, parseErrorsJoin, truncateString} from "../../configs/Utils";
+import {DeepCopy, parseErrorsJoin, truncateString} from "../../utils/Utils";
 
 const BackupScreen = (props) => {
     const programMetadata = {

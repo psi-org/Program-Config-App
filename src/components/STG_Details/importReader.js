@@ -1,5 +1,5 @@
 const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, TRACKER_TEA_MAP } = require("../../configs/TemplateConstants");
-const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm } = require("../Excel/importerUtils");
+const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm } = require("../../utils/importerUtils");
 
 const readTemplateData = (
     {

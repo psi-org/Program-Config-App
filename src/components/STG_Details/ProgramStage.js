@@ -12,9 +12,8 @@ import { useSelector } from "react-redux";
 import {NoticeBox, CircularLoader} from "@dhis2/ui";
 import { Link, useParams } from "react-router-dom";
 import StageSections from "./StageSections";
-import { ajax } from "jquery";
 
-import {DeepCopy} from "../../configs/Utils"
+import {DeepCopy} from "../../utils/Utils"
 
 const query = {
     results: {

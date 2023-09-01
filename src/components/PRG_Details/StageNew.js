@@ -17,7 +17,7 @@ import SendIcon from '@mui/icons-material/Send';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import SelectOptions from '../UIElements/SelectOptions';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { parseErrorsJoin } from '../../configs/Utils';
+import { parseErrorsJoin } from '../../utils/Utils';
 
 //const { Form, Field } = ReactFinalForm
 

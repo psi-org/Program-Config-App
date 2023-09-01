@@ -1,7 +1,7 @@
 import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy } from "./Utils";
 import { saveAs } from 'file-saver';
-import { thinBorder } from "./TemplateConstants";
-import { METADATA, SHORT_DATE_FORMAT_OPTIONS } from "./Constants";
+import { thinBorder } from "../configs/TemplateConstants";
+import { METADATA, SHORT_DATE_FORMAT_OPTIONS } from "../configs/Constants";
 
 export function printArray2Column(sheet, array, header, startPosition, headerBgColor) {
     let coordinates = splitPosition(startPosition);

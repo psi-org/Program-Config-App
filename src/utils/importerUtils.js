@@ -1,7 +1,7 @@
-import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA } from "../../configs/Constants";
-import { ReleaseNotes, ReleaseNotesTracker } from "../../configs/ReleaseNotes";
-import { HNQIS2_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../../configs/TemplateConstants";
-import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty } from "../../configs/Utils";
+import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA } from "../configs/Constants";
+import { ReleaseNotes, ReleaseNotesTracker } from "../configs/ReleaseNotes";
+import { HNQIS2_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../configs/TemplateConstants";
+import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty } from "./Utils";
 
 export const isTracker = (importType) => [TEMPLATE_PROGRAM_TYPES.tracker, TEMPLATE_PROGRAM_TYPES.event].includes(importType);
 

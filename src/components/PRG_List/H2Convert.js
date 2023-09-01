@@ -33,7 +33,7 @@ import AlertDialogSlide from "../UIElements/AlertDialogSlide";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 
-import { parseErrorsJoin, parseErrorsUL } from "../../configs/Utils";
+import { parseErrorsJoin, parseErrorsUL } from "../../utils/Utils";
 
 import {
     QUESTION_TYPE_ATTRIBUTE,
@@ -61,7 +61,7 @@ import {
     PSS_CriticalSteps,
     PSS_Scores,
 } from "./../../configs/ProgramTemplate";
-import { DeepCopy } from "../../configs/Utils";
+import { DeepCopy } from "../../utils/Utils";
 import H2Setting from "./H2Setting";
 
 const queryProgramMetadata = {

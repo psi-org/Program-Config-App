@@ -6,7 +6,7 @@ import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg'
 import ValidationMessages from "../UIElements/ValidationMessages";
 import { METADATA, tagStyle } from '../../configs/Constants';
 import { ValidationErrorItem } from './ValidationErrorItem';
-import { extractAttributeValues } from '../../configs/Utils';
+import { extractAttributeValues } from '../../utils/Utils';
 
 const Errors = ({ validationResults }) => {
     const [showValidationMessage, setShowValidationMessage] = useState(false);

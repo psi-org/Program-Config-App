@@ -31,7 +31,7 @@ import tinycolor from 'tinycolor2';
 import ProgramNew from "./ProgramNew";
 import { BUILD_VERSION, DATE_FORMAT_OPTIONS, METADATA } from "../../configs/Constants";
 import { Alert, IconButton, Slide, Snackbar, Tooltip, Typography } from "@mui/material";
-import { versionIsValid } from "../../configs/Utils";
+import { versionIsValid } from "../../utils/Utils";
 
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //

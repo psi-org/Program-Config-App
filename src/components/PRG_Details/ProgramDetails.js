@@ -18,7 +18,7 @@ import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import MuiChip from '@mui/material/Chip';
-import { DeepCopy, extractAttributeValues, formatAlert, getPCAMetadataDE, getProgramQuery, setPCAMetadata, truncateString } from "../../configs/Utils";
+import { DeepCopy, extractAttributeValues, formatAlert, getPCAMetadataDE, getProgramQuery, setPCAMetadata, truncateString } from "../../utils/Utils";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton";
 import DataProcessorTracker from "../Excel/DataProcessorTracker";
 import Importer from "../Excel/Importer";

@@ -8,8 +8,8 @@ import SaveIcon from '@mui/icons-material/Save';
 
 import { useEffect, useState } from "react";
 import SaveMetadata from "../UIElements/SaveMetadata";
-import { buildProgramConfigurations, getNewObjectsCount, validateDataElement, validateSections, validateTEA } from "../../configs/ImportValidatorUtils";
-import { truncateString } from "../../configs/Utils";
+import { buildProgramConfigurations, getNewObjectsCount, validateDataElement, validateSections, validateTEA } from "../../utils/ImportValidatorUtils";
+import { truncateString } from "../../utils/Utils";
 
 const ValidateTracker = (
     {

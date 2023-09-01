@@ -32,7 +32,7 @@ import H2Metadata from "./H2Metadata";
 import { Tooltip } from "@mui/material";
 import H2Convert from "./H2Convert";
 import H2Transfer from "./H2Transfer";
-import { formatAlert } from "../../configs/Utils";
+import { formatAlert } from "../../utils/Utils";
 
 
 const queryProgramType = {

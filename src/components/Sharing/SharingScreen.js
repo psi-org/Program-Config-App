@@ -10,7 +10,7 @@ import {
     CenteredContent
 } from "@dhis2/ui";
 import SharingItem from './SharingItem';
-import {DeepCopy, parseErrors, parseErrorsJoin, parseErrorsUL, truncateString} from '../../configs/Utils';
+import {DeepCopy, parseErrors, parseErrorsJoin, parseErrorsUL, truncateString} from '../../utils/Utils';
 
 import EditIcon from '@mui/icons-material/Edit';
 import {useRef, useState, useEffect} from "react";
