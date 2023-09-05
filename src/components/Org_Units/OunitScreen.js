@@ -1,8 +1,8 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { OrganisationUnitTree } from "@dhis2/ui";
-import React, { useEffect, useRef, useState } from "react";
-import CustomMUIDialog from "../UIElements/CustomMUIDialog";
-import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
+import ClearIcon from "@mui/icons-material/Clear";
+import SearchIcon from "@mui/icons-material/Search";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
     Alert,
     Box,
@@ -18,12 +18,13 @@ import {
     TextField,
     Tooltip
 } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
-import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
-import ClearIcon from "@mui/icons-material/Clear";
-import SearchIcon from "@mui/icons-material/Search";
-import { parseErrorsJoin, parseErrorsUL, truncateString } from "../../utils/Utils";
+import InputAdornment from "@mui/material/InputAdornment";
+import PropTypes from 'prop-types';
+import React, { useEffect, useRef, useState } from "react";
+import { parseErrorsJoin, parseErrorsUL, truncateString } from "../../utils/Utils.js";
+import CustomMUIDialog from "../UIElements/CustomMUIDialog.js";
+import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle.js";
 
 const orgUnitsQuery = {
     userOrgUnits: {
@@ -115,7 +116,6 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const [orgUnitGroup, setOrgUnitGroup] = useState("");
     const [hasChanges, setHasChanges] = useState(false);
     const [content, setContent] = useState("form");
-    const [importStatus, setImportStatus] = useState({});
     const [selectedOrgUnits, setSelectedOrgUnits] = useState([]);
     const [orgUnitPathSelected, setOrgUnitPathSelected] = useState([]);
     const [orgUnitTreeRoot, setOrgUnitTreeRoot] = useState([]);
@@ -162,9 +162,9 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     useEffect(() => {
         if (!poLoading) {
-            let ouPaths = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path)];
-            let ouExpanded = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path.split('/').slice(0, -1).join('/'))]
-            let ouIds = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.id)];
+            const ouPaths = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path)];
+            const ouExpanded = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path.split('/').slice(0, -1).join('/'))]
+            const ouIds = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.id)];
             if (ouPaths.length > 0 && ouIds.length > 0) {
                 setOrgUnitPathSelected(ouPaths);
                 setOrgUnitExpanded(ouExpanded)
@@ -176,11 +176,12 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     }, [ouMetadata, prgOrgUnitData]);
 
     useEffect(() => {
-        if (orgUnitPathSelected.length > 0)
+        if (orgUnitPathSelected.length > 0) {
             ouTreeRootInit();
+        }
     }, [orgUnitPathSelected, selectedOrgUnits])
 
-    let ouTreeRootInit = () => {
+    const ouTreeRootInit = () => {
         if (!ouMetadataLoading) {
             setOrgUnitTreeRoot([
                 ...ouMetadata.userOrgUnits?.organisationUnits.map(
@@ -227,14 +228,14 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     const doSearch = () => {
         setFilterLoading(true)
-        let filterString = filterRef.current.value;
+        const filterString = filterRef.current.value;
         if (filterString) {
             setFilterValue(filterString)
             searchOunits.refetch({ filterString: filterString })
                 .then((data) => {
                     if (data?.results) {
                         setOrgUnitTreeRoot([]);
-                        let filterResults = [
+                        const filterResults = [
                             ...data.results?.organisationUnits.map(
                                 (ou) => ou.path
                             ),
@@ -260,8 +261,8 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     }
 
     const ouLevelAssignmentHandler = () => {
-        let id = userOrgUnits[0];
-        let oulevel = parseInt(orgUnitLevel) - 1; 
+        const id = userOrgUnits[0];
+        const oulevel = parseInt(orgUnitLevel) - 1; 
         oUnits.refetch({ id: id, level: oulevel }).then((data) => {
             if (data) {
                 selectOrgUnits(data);
@@ -270,8 +271,8 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     };
 
     const ouLevelRemovalHandler = () => {
-        let id = userOrgUnits[0];
-        let oulevel = parseInt(orgUnitLevel) - 1;
+        const id = userOrgUnits[0];
+        const oulevel = parseInt(orgUnitLevel) - 1;
         oUnits.refetch({ id: id, level: oulevel }).then((data) => {
             if (data) {
                 deselectOrgUnits(data);
@@ -280,7 +281,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     };
 
     const ouGroupAssignmentHandler = () => {
-        let id = userOrgUnits[0];
+        const id = userOrgUnits[0];
         oUnitsByGroups
             .refetch({ id: id, groupId: orgUnitGroup })
             .then((data) => {
@@ -291,7 +292,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     };
 
     const ouGroupRemovalHandler = () => {
-        let id = userOrgUnits[0];
+        const id = userOrgUnits[0];
         oUnitsByGroups
             .refetch({ id: id, groupId: orgUnitGroup })
             .then((data) => {
@@ -327,7 +328,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const orgUnitAssignmentHandler = () => {
         setContent("loading");
         if (!metadataLoading) {
-            let metadata = {};
+            const metadata = {};
             metadata.programs = prgMetaData.results?.programs;
             metadata.programs[0].organisationUnits = selectedOrgUnits.map(
                 (ounit) => {
@@ -629,18 +630,12 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                         )}
                         {content === "status" && (
                             <div>
-                                <b>Import Status</b>
-                                <hr />
-                                <p>Created: {importStatus.created}</p>
-                                <p>Updated: {importStatus.updated}</p>
-                                <p>Deleted: {importStatus.deleted}</p>
-                                <p>Ignored: {importStatus.ignored}</p>
-                                <p>Total: {importStatus.total}</p>
+                                <b>Something went wrong!</b>
                             </div>
                         )}
                         {fetchErrors &&
                             <Alert severity="error" style={{ marginTop: "10px", maxHeight: "100px", overflow: 'auto' }}>
-                                <p>Assign Organisation Units feature  disabled due to the following errors:</p>
+                                <p>Assign Organisation Units feature disabled due to the following errors:</p>
                                 {fetchErrors}
                             </Alert>
                         }
@@ -676,5 +671,12 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
         </>
     );
 };
+
+OunitScreen.propTypes = {
+    id: PropTypes.string,
+    readOnly: PropTypes.bool,
+    setNotification: PropTypes.func,
+    setOrgUnitProgram: PropTypes.func
+}
 
 export default OunitScreen;

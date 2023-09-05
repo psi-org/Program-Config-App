@@ -1,36 +1,25 @@
-// Hooks
-import {useState,useEffect} from 'react';
 import { useDataQuery,useDataMutation } from "@dhis2/app-runtime";
-
-// DIALOG
+import { Transfer } from "@dhis2/ui";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import SendIcon from '@mui/icons-material/Send';
+import LoadingButton from '@mui/lab/LoadingButton';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialog from '../UIElements/CustomMUIDialog'
-import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle'
-
-import Button from '@mui/material/Button';
-import LoadingButton from '@mui/lab/LoadingButton';
-
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-
-// STEPPER
-import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepButton from '@mui/material/StepButton';
 import StepContent from '@mui/material/StepContent';
-
-// TRANSFER
-import { Transfer } from "@dhis2/ui";
-
-import FormControlLabel from '@mui/material/FormControlLabel';
+import Stepper from '@mui/material/Stepper';
 import Switch from '@mui/material/Switch';
-
-// Icons and Colors
-import SendIcon from '@mui/icons-material/Send';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import InputModal from './InputModal';
-import AttributesEditor from '../TEAEditor/AttributesEditor';
+import PropTypes from 'prop-types';
+import React, {useState,useEffect} from 'react';
+import AttributesEditor from '../TEAEditor/AttributesEditor.js';
+import CustomMUIDialog from '../UIElements/CustomMUIDialog.js'
+import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.js'
+import InputModal from './InputModal.js';
 
 // Queries
 const queryProgram = {
@@ -143,7 +132,7 @@ const AttributesModal = ({programId,onClose}) => {
                     })
                 )
 
-                let teaOptions = {
+                const teaOptions = {
                     available:availableTEAs.concat(existingTEAs),
                     selected: existingTEAs.map(tea => tea.trackedEntityAttribute.id)
                 }
@@ -231,12 +220,12 @@ const AttributesModal = ({programId,onClose}) => {
     const onSubmit = () => {
         programRefetch({programId}).then(programResults => {
 
-            let data = {programs:[], programSections:[]}
+            const data = {programs:[], programSections:[]}
 
-            let program = programResults.results
+            const program = programResults.results
             program.programTrackedEntityAttributes = teaOptions.selected.map(
                 (teaId,idx) => {
-                    let t = teaOptions.available.find(tea => tea.trackedEntityAttribute.id === teaId)
+                    const t = teaOptions.available.find(tea => tea.trackedEntityAttribute.id === teaId)
                     t.sortOrder = idx
                     return t
                 }
@@ -253,7 +242,7 @@ const AttributesModal = ({programId,onClose}) => {
 
             data.programs.push(program)
             
-            updateMetadata({data}).then(results => {
+            updateMetadata({data}).then(() => {
                 pushNotification('Program updated successfully')
                 loadProgramData()
             }).catch(error => {
@@ -376,8 +365,6 @@ const AttributesModal = ({programId,onClose}) => {
     )
 }
 
-export default AttributesModal
-
 const exitDisclaimerModal = ({opened,onConfirm,onCancel}) => {
     return (
         <CustomMUIDialog open={opened} maxWidth='sm' fullWidth={true} >
@@ -397,3 +384,10 @@ const exitDisclaimerModal = ({opened,onConfirm,onCancel}) => {
         </CustomMUIDialog>
     )
 }
+
+AttributesModal.propTypes = {
+    programId: PropTypes.string,
+    onClose: PropTypes.func
+}
+
+export default AttributesModal;
