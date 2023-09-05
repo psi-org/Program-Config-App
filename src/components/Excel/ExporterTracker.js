@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
+import { useEffect } from 'react';
+import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP } from '../../configs/Constants.js';
+import { ReleaseNotesTracker } from "../../configs/ReleaseNotes.js";
 import {
     conditionalError,
     disabledHighlighting,
@@ -16,7 +18,7 @@ import {
     trackerStructureValidator,
     verticalMiddle,
     yesNoValidator
-} from "../../configs/TemplateConstants";
+} from "../../configs/TemplateConstants.js";
 import {
     addCreator,
     addProtection,
@@ -31,12 +33,10 @@ import {
     printArray2Column,
     printObjectArray,
     writeWorkbook
-} from "../../utils/ExcelUtils";
-import { ReleaseNotesTracker } from "../../configs/ReleaseNotes";
-import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP } from '../../configs/Constants';
+} from "../../utils/ExcelUtils.js";
 
 const ExporterTracker = ({
-    programID, programPrefix, programName, programShortName, programTET, programCatCombo, programType, flag, stagesConfigurations, teaConfigurations, optionData, legendSetData, trackedEntityAttributesData, valueTypes, aggTypes, programData, isLoading, setFlag, setStatus
+    programID, programPrefix, programName, programShortName, programTET, programCatCombo, programType, flag, stagesConfigurations, teaConfigurations, optionData, legendSetData, trackedEntityAttributesData, valueTypes, aggTypes, isLoading, setFlag, setStatus
 }) => {
 
     const password = TEMPLATE_PASSWORD;
@@ -74,9 +74,9 @@ const ExporterTracker = ({
         }
 
 
-        let stagesArray = [];
+        const stagesArray = [];
         stagesConfigurations.forEach(configuration => {
-            let worksheet = workbook.addWorksheet(configuration.stageName, {
+            const worksheet = workbook.addWorksheet(configuration.stageName, {
                 views: [{
                     showGridLines: false,
                     state: 'frozen',
@@ -513,7 +513,7 @@ const ExporterTracker = ({
     };
 
     const addTEAConfigurations = ws => {
-        let cols = [{
+        const cols = [{
             header: "Structure",
             key: "structure",
             width: 15,
@@ -757,13 +757,13 @@ const ExporterTracker = ({
         teaConfigurations.concat(new Array(100 - teaConfigurations.length).fill({
             form_name: "",
             program_section_id: "",
-        })).forEach((configure, index) => {
+        })).forEach((configure) => {
             if (configure.structure === "Section") {
                 configure.name = configure.form_name;
                 configure.form_name = '';
             }
 
-            let autoColumns = ['uid', 'short_name', 'aggregation_type', 'value_type'];
+            const autoColumns = ['uid', 'short_name', 'aggregation_type', 'value_type'];
             autoColumns.forEach((col, index) => {
                 configure[col] = {
                     formula: `=IF(AND(NOT(ISBLANK(A${dataRow})),A${dataRow}="TEA"),IF(ISNA(VLOOKUP(C${dataRow}, selected_TEA_Data,${2 + index},FALSE)),"Not Found",VLOOKUP(C${dataRow}, selected_TEA_Data,${2 + index},FALSE)),"")`
@@ -1252,7 +1252,7 @@ const ExporterTracker = ({
 
     const addMapping = async (ws) => {
 
-        let editingCell = buildCellObject(ws, "A1");
+        const editingCell = buildCellObject(ws, "A1");
         editingCell.cell.value = "M";
         editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
 

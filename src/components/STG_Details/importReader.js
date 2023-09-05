@@ -1,9 +1,8 @@
-const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, TRACKER_TEA_MAP } = require("../../configs/TemplateConstants");
-const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm } = require("../../utils/importerUtils");
+const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP } = require("../../configs/TemplateConstants.js");
+const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm } = require("../../utils/importerUtils.js");
 
 const readTemplateData = (
     {
-        teaData,
         templateData,
         currentData,
         programPrefix = 'Prefix',
@@ -18,10 +17,10 @@ const readTemplateData = (
     const isHNQIS = mode === TEMPLATE_PROGRAM_TYPES.hnqis2;
     let sectionIndex = -1;
     let isBasicForm = false;
-    let ignoredSections = [];
-    let importedSections = [];
-    let importedScores = [];
-    let dataElementsPool = currentSectionsData?.map(section => section.dataElements)
+    const ignoredSections = [];
+    const importedSections = [];
+    const importedScores = [];
+    const dataElementsPool = currentSectionsData?.map(section => section.dataElements)
         .flat().reduce((acu, cur) => {
         acu[cur.id] = { sharing: cur.sharing, attributeValues: cur.attributeValues, style: cur.style, categoryCombo: cur.categoryCombo };
         return acu;
@@ -34,13 +33,13 @@ const readTemplateData = (
     templateData.forEach((row, rowNum) => {
         switch (row[templateMap.structure]) {
             case 'Section':
-                if (row[templateMap.programSection] === 'basic-form' && sectionIndex === -1) isBasicForm = true;
+                if (row[templateMap.programSection] === 'basic-form' && sectionIndex === -1) { isBasicForm = true }
                 if ((isBasicForm && importedSections.length > 0)) {
-                    ignoredSections.push({ name: row[templateMap.formName], rowNum: rowNum+3})
+                    ignoredSections.push({ name: row[templateMap.formName], rowNum: rowNum + 3 })
                     break;
                 }
                 sectionIndex += 1;
-                if (isHNQIS && (row[HNQIS2_TEMPLATE_MAP.formName] == "Critical Steps Calculations" || row[HNQIS2_TEMPLATE_MAP.formName] == "Scores")) break;
+                if (isHNQIS && (row[HNQIS2_TEMPLATE_MAP.formName] == "Critical Steps Calculations" || row[HNQIS2_TEMPLATE_MAP.formName] == "Scores")) { break }
                 importedSections[sectionIndex] = {
                     id: row[templateMap.programSection] || undefined,
                     name: row[templateMap.formName],
@@ -58,14 +57,35 @@ const readTemplateData = (
                     isBasicForm = true;
                     importedSections[sectionIndex] = getBasicForm('DE');
                 }
-                importedSections[isBasicForm?0:sectionIndex].dataElements.push(mapImportedDE(row, programPrefix, currentData.stageNumber, optionSets, legendSets, dataElementsPool));
+                importedSections[isBasicForm ? 0 : sectionIndex].dataElements.push(mapImportedDE({
+                    data: row,
+                    programPrefix,
+                    stageNumber: currentData.stageNumber,
+                    optionSets,
+                    legendSets,
+                    dataElementsPool
+                }));
                 break;
             case 'question':
             case 'label':
-                importedSections[sectionIndex].dataElements.push(mapImportedDEHNQIS2(row, programPrefix, row[HNQIS2_TEMPLATE_MAP.structure], optionSets, legendSets, dataElementsPool));
+                importedSections[sectionIndex].dataElements.push(mapImportedDEHNQIS2({
+                    data: row,
+                    programPrefix,
+                    type: row[HNQIS2_TEMPLATE_MAP.structure],
+                    optionSets,
+                    legendSets,
+                    dataElementsPool
+                }));
                 break;
             case 'score':
-                importedScores.push(mapImportedDEHNQIS2(row, programPrefix, 'score', optionSets, legendSets, dataElementsPool));
+                importedScores.push(mapImportedDEHNQIS2({
+                    data: row,
+                    programPrefix,
+                    type: 'score',
+                    optionSets,
+                    legendSets,
+                    dataElementsPool
+                }));
                 break;
         }
     });
@@ -86,7 +106,7 @@ const readTemplateData = (
         });
 
         // Removed Scores
-        let removedScores = currentData.scoresSection.dataElements.filter(de =>
+        const removedScores = currentData.scoresSection.dataElements.filter(de =>
             !importedScores.find(i_score => i_score.id == de.id)
         );
         importSummaryValues.scores.removed = removedScores.length;

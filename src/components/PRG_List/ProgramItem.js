@@ -1,37 +1,30 @@
-// *** Global State ***
-import { useDispatch } from "react-redux";
-import { bindActionCreators } from "redux";
-import actionCreators from "../../state/action-creators";
-
-//UI Elements
 import { FlyoutMenu, MenuItem, Popper, Layer, MenuSectionHeader } from "@dhis2/ui";
-import EditIcon from '@mui/icons-material/Edit';
-import ShareIcon from '@mui/icons-material/Share';
+import BackupIcon from '@mui/icons-material/Backup';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
-import PublicIcon from '@mui/icons-material/Public';
-import BackupIcon from '@mui/icons-material/Backup';
-import RestoreIcon from '@mui/icons-material/Restore';
-import StorageIcon from '@mui/icons-material/Storage';
+import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
-import Popover from '@mui/material/Popover';
-import UpgradeIcon from '@mui/icons-material/SwitchAccessShortcutAdd';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 import NewReleasesIcon from '@mui/icons-material/NewReleases';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-
-// *** Routing ***
+import PublicIcon from '@mui/icons-material/Public';
+import RestoreIcon from '@mui/icons-material/Restore';
+import ShareIcon from '@mui/icons-material/Share';
+import StorageIcon from '@mui/icons-material/Storage';
+import UpgradeIcon from '@mui/icons-material/SwitchAccessShortcutAdd';
+import {  IconButton, Slide, Snackbar, Tooltip } from "@mui/material";
+import Popover from '@mui/material/Popover';
+import PropTypes from 'prop-types';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { useRef, useState } from "react";
-
-// *** IMAGES ***
-import move_vert_svg from './../../images/i-more_vert_black.svg';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { bindActionCreators } from "redux";
 import tinycolor from 'tinycolor2';
-import ProgramNew from "./ProgramNew";
-import { BUILD_VERSION, DATE_FORMAT_OPTIONS, METADATA } from "../../configs/Constants";
-import { Alert, IconButton, Slide, Snackbar, Tooltip, Typography } from "@mui/material";
-import { versionIsValid } from "../../utils/Utils";
+import { BUILD_VERSION, DATE_FORMAT_OPTIONS, METADATA } from "../../configs/Constants.js";
+import actionCreators from "../../state/action-creators";
+import { versionIsValid } from "../../utils/Utils.js";
+import move_vert_svg from './../../images/i-more_vert_black.svg';
+import ProgramNew from "./ProgramNew.js";
 
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
@@ -50,6 +43,7 @@ const ProgramItem = ({
     doSearch,
     convertToH2,
     transferDataH2,
+    setSearchLocalStorage
 }) => {
 
     const [showNotification, setShowNotification] = useState(false);
@@ -108,7 +102,7 @@ const ProgramItem = ({
                         </div>
                     </div>
                 </div>
-                <div className="ml_item-title" style={{ overflow: 'hidden', cursor: 'pointer' }} onClick={() => { setProgram(program.id); history.push('/program/' + program.id); }}>
+                <div className="ml_item-title" style={{ overflow: 'hidden', cursor: 'pointer' }} onClick={() => { setProgram(program.id); history.push('/program/' + program.id); setSearchLocalStorage();}}>
                     <Tooltip title={program.name} placement="bottom-start" arrow>
                         <span style={{
                             overflow: 'hidden',
@@ -422,7 +416,7 @@ const ProgramItem = ({
                         <div>
                             <strong>API URL</strong>
                             <br />
-                            <a href={program.href + ".json"} target="_blank">
+                            <a href={program.href + ".json"} target="_blank" rel="noreferrer">
                                 {program.href}
                             </a>
                         </div>
@@ -441,5 +435,22 @@ const ProgramItem = ({
         </>
     );
 };
+
+ProgramItem.propTypes = {
+    assignOrgUnit: PropTypes,
+    backupProgram: PropTypes,
+    convertToH2: PropTypes,
+    deleteProgram: PropTypes,
+    doSearch: PropTypes,
+    downloadMetadata: PropTypes,
+    prgTypeId: PropTypes,
+    program: PropTypes,
+    refetch: PropTypes,
+    restoreProgram: PropTypes,
+    setNotification: PropTypes,
+    setSearchLocalStorage: PropTypes,
+    shareProgram: PropTypes,
+    transferDataH2: PropTypes
+}
 
 export default ProgramItem;

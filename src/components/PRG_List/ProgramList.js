@@ -1,39 +1,31 @@
 import { useDataQuery } from "@dhis2/app-runtime";
-import { Chip, CircularLoader, NoticeBox, Pagination } from "@dhis2/ui";
-import { useState, useEffect } from "react";
-import ProgramNew from './ProgramNew'
-
+import { Chip, CircularLoader, NoticeBox, Pagination, FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-
-import TextField from '@mui/material/TextField';
-import InputAdornment from "@mui/material/InputAdornment";
-
-import SearchIcon from '@mui/icons-material/Search';
-
-import ProgramItem from "./ProgramItem";
-import DependencyExport from "./DependencyExport";
-import SharingScreen from "../Sharing/SharingScreen";
-import OunitScreen from "../Org_Units/OunitScreen";
-import BackupScreen from "../PRG_List/BackupScreen";
-import RestoreScreen from "../PRG_List/RestoreScreen";
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-import MuiButton from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
-
-import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
-import IconButton from '@mui/material/IconButton';
-import SettingsIcon from '@mui/icons-material/Settings';
 import InfoIcon from '@mui/icons-material/Info';
 import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
-
-import About from "./About";
-import H2Metadata from "./H2Metadata";
+import SearchIcon from '@mui/icons-material/Search';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { Tooltip } from "@mui/material";
-import H2Convert from "./H2Convert";
-import H2Transfer from "./H2Transfer";
-import { formatAlert } from "../../utils/Utils";
-
+import MuiAlert from '@mui/material/Alert';
+import MuiButton from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from "@mui/material/InputAdornment";
+import Snackbar from '@mui/material/Snackbar';
+import TextField from '@mui/material/TextField';
+import React, { useState, useEffect } from "react";
+import { formatAlert } from "../../utils/Utils.js";
+import OunitScreen from "../Org_Units/OunitScreen.js";
+import BackupScreen from "../PRG_List/BackupScreen.js";
+import RestoreScreen from "../PRG_List/RestoreScreen.js";
+import SharingScreen from "../Sharing/SharingScreen.js";
+import About from "./About.js";
+import DependencyExport from "./DependencyExport.js";
+import H2Convert from "./H2Convert.js";
+import H2Metadata from "./H2Metadata.js";
+import H2Transfer from "./H2Transfer.js";
+import ProgramItem from "./ProgramItem.js";
+import ProgramNew from './ProgramNew.js'
 
 const queryProgramType = {
     results: {
@@ -50,7 +42,7 @@ const query = {
         resource: "programs",
         paging: false,
         params: ({ token, pageSize, page }) => {
-            let paramsObject = {
+            const paramsObject = {
                 pageSize,
                 page,
                 fields: ["code", "id", "name", "shortName", "created", "lastUpdated", "href", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "relatedProgram", "categoryCombo[id,name]", "trackedEntityType[id,name,trackedEntityTypeAttributes[trackedEntityAttribute[id]]]", "style", "programTrackedEntityAttributes[id,name,displayInList,sortOrder,mandatory,allowFutureDate,renderOptionAsRadio,searchable,valueType,trackedEntityAttribute[id,name],renderType]", "notificationTemplates", "translations", "organisationUnits", "attributeValues", "programSections[id,name,trackedEntityAttributes,sortOrder,program,renderType]","programStages[id, name, allowGenerateNextVisit, formType, generatedByEnrollmentDate, sortOrder, hideDueDate, enableUserAssignment, minDaysFromStart, openAfterEnrollment, repeatable, remindCompleted, displayGenerateEventBox, validationStrategy, autoGenerateEvent, blockEntryForm, program, sharing, programStageDataElements, translations, attributeValues, programStageSections[*]]", "access", "withoutRegistration"],
@@ -89,13 +81,13 @@ const ProgramList = () => {
 
     // *********************** //
 
-    const [pageSize, setPageSize] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(Number(localStorage.getItem('programsListPageSize')) || 10);
+    const [currentPage, setCurrentPage] = useState(Number(localStorage.getItem('programsListPage')) || 1);
     const [showProgramForm, setShowProgramForm] = useState(false);
     const [notification, setNotification] = useState(undefined);
     const [snackSeverity, setSnackSeverity] = useState(undefined);
 
-    const [filterValue, setFilterValue] = useState('')
+    const [filterValue, setFilterValue] = useState(localStorage.getItem('programsListFilter') || '')
 
     const [settingsMenu, setSettingsMenu] = useState(false)
     const [ref, setRef] = useState();
@@ -104,8 +96,14 @@ const ProgramList = () => {
     const [H2Modal, setH2Modal] = useState(false);
 
     useEffect(() => {
-        if (notification) setSnackSeverity(notification.severity)
+        if (notification) { setSnackSeverity(notification.severity) }
     }, [notification])
+
+    useEffect(() => {
+        if (pageSize && currentPage && filterValue) {
+            setSearchLocalStorage('');
+        }
+    }, [])
 
     const prgTypeQuery = useDataQuery(queryProgramType);
     const prgTypeId = prgTypeQuery.data?.results?.attributes[0]?.id;
@@ -115,7 +113,7 @@ const ProgramList = () => {
     }
 
     const shareProgram = (program, prgType) => {
-        let prg = data.results?.programs?.filter(p => { return p.id === program });
+        const prg = data.results?.programs?.filter(p => { return p.id === program });
         setReadOnlyPermission(!prg[0]?.access?.update);
         setSharingProgramId(program)
         setSharingProgramType(prgType)
@@ -141,26 +139,40 @@ const ProgramList = () => {
         setRestoreProgramId(program)
     }
 
-    const deleteProgram = (program) => {
+    const deleteProgram = () => {
+        
+    }
 
+    const setSearchLocalStorage = (filter, page = 1, pageSize = 10) => {
+        localStorage.setItem('programsListPage', page);
+        localStorage.setItem('programsListPageSize', pageSize);
+        localStorage.setItem('programsListFilter', filter || '');
+
+    }
+
+    const setSearchLocalStorageWithCurrentValues = () => {
+        setSearchLocalStorage(filterValue, currentPage, pageSize);
     }
 
     const { loading, error, data, refetch } = useDataQuery(query, { variables: { token: filterValue, pageSize, page: currentPage } });
 
-    if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
-    if (loading) return <CircularLoader />
+    if (error) { return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox> }
+    if (loading) { return <CircularLoader /> }
 
     const doSearch = (filter) => {
-        if (filter) setFilterValue(filter)
-        setCurrentPage(1)
+        if (filter) { setFilterValue(filter) }
+        setCurrentPage(1);
+        setSearchLocalStorage(filterValue, currentPage, pageSize)
         refetch({ token: filter ?? filterValue, page: 1, pageSize })
     }
 
     const resetSearch = () => {
         setFilterValue("")
         setCurrentPage(1)
+        setSearchLocalStorage("", 1, 10);
         refetch({ token: "", page: 1, pageSize })
     }
+    
 
     return (
         <div>
@@ -347,6 +359,7 @@ const ProgramList = () => {
                                     doSearch={doSearch}
                                     convertToH2={convertToH2}
                                     transferDataH2={transferDataH2}
+                                    setSearchLocalStorage={setSearchLocalStorageWithCurrentValues}
                                 />
                             );
                         })}
@@ -354,7 +367,7 @@ const ProgramList = () => {
                 </div>
             </div>
             {data.results?.programs?.length > 0 &&
-                <div className="wrapper" style={{ padding: '0 1.2em' }}>
+                <div className="wrapper" style={{ padding: '0 1.2em', marginTop: '0.5em' }}>
                     <Pagination
                         page={data.results?.pager?.page}
                         pageSize={data.results?.pager?.pageSize}
@@ -364,10 +377,12 @@ const ProgramList = () => {
                         onPageSizeChange={(pageSize) => {
                             setPageSize(pageSize);
                             refetch({ pageSize, page: 1 });
+                            setSearchLocalStorage(filterValue, 1, pageSize);
                         }}
                         onPageChange={(page) => {
                             setCurrentPage(page);
                             refetch({ page, pageSize });
+                            setSearchLocalStorage(filterValue, page, pageSize);
                         }}
                     />
                 </div>

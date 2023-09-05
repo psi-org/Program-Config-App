@@ -1,16 +1,16 @@
-import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA } from "../configs/Constants";
-import { ReleaseNotes, ReleaseNotesTracker } from "../configs/ReleaseNotes";
-import { HNQIS2_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../configs/TemplateConstants";
-import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty } from "./Utils";
+import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA } from "../configs/Constants.js";
+import { ReleaseNotes, ReleaseNotesTracker } from "../configs/ReleaseNotes.js";
+import { HNQIS2_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../configs/TemplateConstants.js";
+import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty } from "./Utils.js";
 
 export const isTracker = (importType) => [TEMPLATE_PROGRAM_TYPES.tracker, TEMPLATE_PROGRAM_TYPES.event].includes(importType);
 
 export const getProgramDetailsHNQIS2 = (ws, mappingDetails) => {
-    let program = {};
+    const program = {};
 
     program.name = ws.getCell("C12").value;
     program.shortName = ws.getCell("C13").value;
-    let result = mappingDetails.programs.filter(prog => prog.name === program.name);
+    const result = mappingDetails.programs.filter(prog => prog.name === program.name);
     program.id = result[0]?.id;
     program.useCompetencyClass = ws.getCell("C14").value;
     program.dePrefix = ws.getCell("C15").value;
@@ -20,7 +20,7 @@ export const getProgramDetailsHNQIS2 = (ws, mappingDetails) => {
 }
 
 export const getProgramDetailsTracker = (ws) => {
-    let program = {};
+    const program = {};
 
     program.id = ws.getCell("J17").value;
     program.dePrefix = ws.getCell("J18").value;
@@ -68,18 +68,18 @@ export const serverAndVersionValidation = (status, task, { setNotificationError,
 
 export const workbookValidation = (status, task, { setNotificationError, workbook, isTracker, programSpecificType }) => {
 
-    let templateWS = [];
+    const templateWS = [];
     let teasWS;
     let instructionsWS;
     let mappingWS;
     let isEvent = false;
-    workbook.eachSheet((worksheet, sheetId) => {
+    workbook.eachSheet((worksheet) => {
         if (worksheet.getCell("L1").value === 'Program TEA Id') {
             teasWS = worksheet;
         } else if (worksheet.getCell("R1").value === 'Stage ID' || worksheet.getCell("A1").value === 'Parent Name') {
             templateWS.push(worksheet);
         } else {
-            let id = worksheet.getCell("A1").value;
+            const id = worksheet.getCell("A1").value;
             switch (id) {
                 case 'I':
                     instructionsWS = worksheet;
@@ -117,13 +117,13 @@ export const workbookValidation = (status, task, { setNotificationError, workboo
         setNotificationError(true);
     }
 
-    if (!status) return false;
+    if (!status) { return false }
     
-    let errorsArray = [];
-    if (!instructionsWS) errorsArray.push('Instructions');
-    if (isTracker && !teasWS && !isEvent) errorsArray.push('TEAs');
-    if (templateWS.length === 0) errorsArray.push((isTracker && !isEvent) ? 'Stage Template(s)' : 'Template');
-    if (!mappingWS) errorsArray.push('Mapping');
+    const errorsArray = [];
+    if (!instructionsWS) { errorsArray.push('Instructions') }
+    if (isTracker && !teasWS && !isEvent) { errorsArray.push('TEAs') }
+    if (templateWS.length === 0) { errorsArray.push((isTracker && !isEvent) ? 'Stage Template(s)' : 'Template') }
+    if (!mappingWS) { errorsArray.push('Mapping') }
     if (errorsArray.length > 0) {
         task.status = "error";
         status = false;
@@ -148,14 +148,14 @@ const worksheetValidation = (status, task, { setNotificationError, sheetName, he
 
 const getWorksheetData = (status, task, { currentWorksheet, templateHeadersList, structureColumn, isTrackerTemplate }) => {
 
-    let templateData = [];
+    const templateData = [];
     let stageId;
-    let dataRow = 3;
+    const dataRow = 3;
 
     currentWorksheet.eachRow((row, rowIndex) => {
         if (rowIndex >= dataRow && row.values[structureColumn]) {
-            let dataRow = {};
-            let rowVals = row.values;
+            const dataRow = {};
+            const rowVals = row.values;
             templateHeadersList.forEach((header, index) => {
                 dataRow[header] = rowVals[index + 1]
             })
@@ -163,16 +163,14 @@ const getWorksheetData = (status, task, { currentWorksheet, templateHeadersList,
         }
     });
 
-    if (isTrackerTemplate) stageId = currentWorksheet.getCell("R2").value;
+    if (isTrackerTemplate) { stageId = currentWorksheet.getCell("R2").value }
 
     return { status, data: templateData, stageId };
 }
 
-export const handleWorksheetReading = (tasksHandler, currentWorksheet, setNotificationError, headers, templateHeadersList, startingIndex,structureColumn, isTrackerTemplate = false) => {
+export const handleWorksheetReading = ({ tasksHandler, currentWorksheet, setNotificationError, headers, templateHeadersList, startingIndex, structureColumn, isTrackerTemplate = false }) => {
     if (!tasksHandler(
-        startingIndex,
-        `${currentWorksheet.name}: Validating worksheet columns`,
-        true,
+        { step: startingIndex, message: `${currentWorksheet.name}: Validating worksheet columns`, initialStatus: true },
         worksheetValidation,
         {
             setNotificationError,
@@ -180,12 +178,10 @@ export const handleWorksheetReading = (tasksHandler, currentWorksheet, setNotifi
             headers,
             templateHeadersList
         }
-    )) return;
+    )) { return }
 
     return tasksHandler(
-        startingIndex + 1,
-        `Extracting data from '${currentWorksheet.name}'`,
-        true,
+        { step: startingIndex + 1, message: `Extracting data from '${currentWorksheet.name}'`, initialStatus: true },
         getWorksheetData,
         {
             currentWorksheet,
@@ -206,7 +202,7 @@ export const buildHNQIS2Summary = () => ({
 })
 
 export const buildTrackerSummary = (mode, stages) => { 
-    let result = { stages: [] };
+    const result = { stages: [] };
     for (let index = 0; index < stages; index++) {
         result.stages.push({
             sections: buildSummaryObject(),
@@ -222,7 +218,7 @@ export const buildTrackerSummary = (mode, stages) => {
     return result;
 }
 
-export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legendSets, dataElementsPool) => {
+export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, legendSets, dataElementsPool }) => {
     let code = "";
 
     let aggType;
@@ -244,7 +240,7 @@ export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legen
     parsedDE.domainType = 'TRACKER';
 
     if (data[HNQIS2_TEMPLATE_MAP.optionSet] && data[HNQIS2_TEMPLATE_MAP.optionSet] !== "") {
-        let os = getObjectByProperty(data[HNQIS2_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
+        const os = getObjectByProperty(data[HNQIS2_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
         parsedDE.optionSet = { id: os.id };
         parsedDE.optionSetValue = true;
         data[HNQIS2_TEMPLATE_MAP.valueType] = os.valueType;
@@ -255,7 +251,7 @@ export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legen
         aggType = 'AVERAGE';
         data[HNQIS2_TEMPLATE_MAP.valueType] = 'NUMBER';
     } else {
-        if (type == 'label') data[HNQIS2_TEMPLATE_MAP.valueType] = 'LONG_TEXT';
+        if (type == 'label') { data[HNQIS2_TEMPLATE_MAP.valueType] = 'LONG_TEXT' }
 
         code = programPrefix + '_' + (data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???');
         switch (data[HNQIS2_TEMPLATE_MAP.valueType]) {
@@ -286,11 +282,13 @@ export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legen
         ];
     }
 
-    if (data[HNQIS2_TEMPLATE_MAP.feedbackOrder] && data[HNQIS2_TEMPLATE_MAP.feedbackOrder] !== "")
-        parsedDE.attributeValues.push(buildAttributeValue(FEEDBACK_ORDER, String(data[HNQIS2_TEMPLATE_MAP.feedbackOrder])));
+    if (data[HNQIS2_TEMPLATE_MAP.feedbackOrder] && data[HNQIS2_TEMPLATE_MAP.feedbackOrder] !== "") {
+        parsedDE.attributeValues.push(buildAttributeValue(FEEDBACK_ORDER, String(data[HNQIS2_TEMPLATE_MAP.feedbackOrder])))
+    }
 
-    if (data[HNQIS2_TEMPLATE_MAP.feedbackText] && data[HNQIS2_TEMPLATE_MAP.feedbackText] !== "")
-        parsedDE.attributeValues.push(buildAttributeValue(FEEDBACK_TEXT, data[HNQIS2_TEMPLATE_MAP.feedbackText]));
+    if (data[HNQIS2_TEMPLATE_MAP.feedbackText] && data[HNQIS2_TEMPLATE_MAP.feedbackText] !== "") {
+        parsedDE.attributeValues.push(buildAttributeValue(FEEDBACK_TEXT, data[HNQIS2_TEMPLATE_MAP.feedbackText]))
+    }
 
     const metadata = {
         isCompulsory: data[HNQIS2_TEMPLATE_MAP.isCompulsory] || "No",
@@ -300,16 +298,16 @@ export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legen
         autoNaming: 'Yes'
     };
 
-    if (data[HNQIS2_TEMPLATE_MAP.scoreNum] !== "") metadata.scoreNum = data[HNQIS2_TEMPLATE_MAP.scoreNum];
-    if (data[HNQIS2_TEMPLATE_MAP.scoreDen] !== "") metadata.scoreDen = data[HNQIS2_TEMPLATE_MAP.scoreDen];
+    if (data[HNQIS2_TEMPLATE_MAP.scoreNum] !== "") { metadata.scoreNum = data[HNQIS2_TEMPLATE_MAP.scoreNum] }
+    if (data[HNQIS2_TEMPLATE_MAP.scoreDen] !== "") { metadata.scoreDen = data[HNQIS2_TEMPLATE_MAP.scoreDen] }
 
     if (data[HNQIS2_TEMPLATE_MAP.parentQuestion] !== "") {
         metadata.parentQuestion = data[HNQIS2_TEMPLATE_MAP.parentQuestion];
         parsedDE.parentQuestion = data[HNQIS2_TEMPLATE_MAP.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
     }
-    if (data[HNQIS2_TEMPLATE_MAP.parentValue] !== "") metadata.parentValue = data[HNQIS2_TEMPLATE_MAP.parentValue];
+    if (data[HNQIS2_TEMPLATE_MAP.parentValue] !== "") { metadata.parentValue = data[HNQIS2_TEMPLATE_MAP.parentValue] }
 
-    if (type == 'label') metadata.labelFormName = data[HNQIS2_TEMPLATE_MAP.formName];
+    if (type == 'label') { metadata.labelFormName = data[HNQIS2_TEMPLATE_MAP.formName] }
 
     parsedDE.attributeValues.push(
         {
@@ -321,7 +319,7 @@ export const mapImportedDEHNQIS2 = (data, programPrefix, type, optionSets, legen
     return parsedDE;
 };
 
-export const mapImportedDE = (data, programPrefix, stageNumber, optionSets, legendSets, dataElementsPool) => {
+export const mapImportedDE = ({ data, programPrefix, stageNumber, optionSets, legendSets, dataElementsPool }) => {
     
     const autoNaming = data[TRACKER_TEMPLATE_MAP.autoNaming] === 'No' ? false : true;
     const stagePrefix = `_PS${stageNumber}`;
@@ -353,7 +351,7 @@ export const mapImportedDE = (data, programPrefix, stageNumber, optionSets, lege
 
 
     if (data[TRACKER_TEMPLATE_MAP.optionSet] && data[TRACKER_TEMPLATE_MAP.optionSet] !== "") {
-        let os = getObjectByProperty(data[TRACKER_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
+        const os = getObjectByProperty(data[TRACKER_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
         parsedDE.optionSet = { id: os.id };
         parsedDE.optionSetValue = true;
         parsedDE.valueType = os.valueType;
@@ -376,8 +374,9 @@ export const mapImportedDE = (data, programPrefix, stageNumber, optionSets, lege
         metadata.parentQuestion = stagePrefix+data[TRACKER_TEMPLATE_MAP.parentQuestion];
         parsedDE.parentQuestion = stagePrefix+data[TRACKER_TEMPLATE_MAP.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
     }
-    if (data[TRACKER_TEMPLATE_MAP.parentValue] !== "")
-        metadata.parentValue = data[TRACKER_TEMPLATE_MAP.parentValue];
+    if (data[TRACKER_TEMPLATE_MAP.parentValue] !== "") {
+        metadata.parentValue = data[TRACKER_TEMPLATE_MAP.parentValue]
+    }
 
     parsedDE.attributeValues.push(
         {
@@ -424,9 +423,9 @@ export const countChanges = (
     });
 
     // Compare previous objects with imported data -> Get removed data
-    let removedObjects = currentData.map(sec => {
+    const removedObjects = currentData.map(sec => {
         // Section removed -> Increase counter
-        if (!sections.find(i_sec => i_sec[impSectionId] == sec[sectionId])) sectionsSummary.removed++;
+        if (!sections.find(i_sec => i_sec[impSectionId] == sec[sectionId])) { sectionsSummary.removed++ }
         return sec[countObject].filter(obj =>
             !sections.find(i_sec => i_sec[countObject].find(i_obj => i_obj[impObjId] == obj[objId]))
         )
@@ -437,14 +436,14 @@ export const countChanges = (
 }
 
 export const getBasicForm = (type) => {
-    let result = {
+    const result = {
         id: 'basic-form',
         name: 'Basic Form',
         sortOrder: 0,
         importStatus: 'update',
         isBasicForm: true
     };
-    if (type === 'TEA') result.trackedEntityAttributes = [];
-    if (type === 'DE') result.dataElements = [];
+    if (type === 'TEA') { result.trackedEntityAttributes = [] }
+    if (type === 'DE') { result.dataElements = [] }
     return result;
 }
