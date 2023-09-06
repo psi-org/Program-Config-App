@@ -1,27 +1,21 @@
 import { useDataQuery } from "@dhis2/app-runtime";
-
-//UI Elements
-import { CircularLoader, MenuItem } from "@dhis2/ui";
-import Button from '@mui/material/Button';
+import { CircularLoader } from "@dhis2/ui";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import { Accordion, AccordionDetails, AccordionSummary, ButtonGroup, Checkbox, Collapse, FormControlLabel, FormGroup, Switch } from "@mui/material";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
-import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-import Tabs, { tabsClasses } from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-
-// *** Routing ***
-import { useState, useEffect } from "react";
-import { DeepCopy, changeAttributeValue, getJSONKeyTree, removeKey, truncateString } from "../../utils/Utils";
-import { DHIS2_KEY_MAP, DHIS2_PRIMARY_COLOR, EXPORT_HNQIS_PRESETS, EXPORT_PRESETS, EXTERNAL_IMPORT_REMOVE_KEYS, H2_ATTRIBUTES_TO_KEEP, JSON_ATTRIBUTE_SETTINGS, PROGRAM_TYPE_OPTIONS, PROGRAM_TYPE_OPTION_SET } from "../../configs/Constants";
-import { Accordion, AccordionDetails, AccordionSummary, ButtonGroup, Checkbox, Collapse, FormControl, FormControlLabel, FormGroup, InputLabel, Select, Switch } from "@mui/material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { AssignmentLate } from "@mui/icons-material";
-import SelectOptions from "../UIElements/SelectOptions";
-
-// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
+import Tabs, { tabsClasses } from '@mui/material/Tabs';
+import PropTypes from 'prop-types';
+import React, { useState } from "react";
+import { DHIS2_KEY_MAP, DHIS2_PRIMARY_COLOR, EXPORT_HNQIS_PRESETS, EXPORT_PRESETS, EXTERNAL_IMPORT_REMOVE_KEYS, H2_ATTRIBUTES_TO_KEEP, JSON_ATTRIBUTE_SETTINGS, PROGRAM_TYPE_OPTIONS, PROGRAM_TYPE_OPTION_SET } from "../../configs/Constants.js";
+import { DeepCopy, changeAttributeValue, getJSONKeyTree, removeKey } from "../../utils/Utils.js";
+import SelectOptions from "../UIElements/SelectOptions.js";
+import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 
 const queryLegends = {
     results: {
@@ -64,35 +58,35 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
     const exportError = prgExportQuery.error?.details;
     const prgMetadata = prgExportQuery.data?.results;
 
-    const [documentReady, setDocumentReady] = useState(false)
-    const [downloading, setDownloading] = useState(false)
-    const [programMetadata, setProgramMetadata] = useState(undefined)
-    const [tabValue, setTabValue] = useState(0)
-    const [jsonKeyTree, setJsonKeyTree] = useState()
-    const [downloadOriginal, setDownloadOriginal] = useState(false)
-    const [jsonHeaders, setJsonHeaders] = useState([])
+    const [documentReady, setDocumentReady] = useState(false);
+    const [downloading, setDownloading] = useState(false);
+    const [programMetadata, setProgramMetadata] = useState(undefined);
+    const [tabValue, setTabValue] = useState(0);
+    const [jsonKeyTree, setJsonKeyTree] = useState();
+    const [downloadOriginal, setDownloadOriginal] = useState(false);
+    const [jsonHeaders, setJsonHeaders] = useState([]);
 
-    const [attributeSettings, setAttributeSettings] = useState(DeepCopy(JSON_ATTRIBUTE_SETTINGS))
-    const [selectedPreset, setSelectedPreset] = useState('local')
+    const [attributeSettings, setAttributeSettings] = useState(DeepCopy(JSON_ATTRIBUTE_SETTINGS));
+    const [selectedPreset, setSelectedPreset] = useState('local');
 
     // JSON Customization
-    const [jsonCustomizationEnabled, setJsonCustomizationEnabled] = useState(false)
+    const [jsonCustomizationEnabled, setJsonCustomizationEnabled] = useState(false);
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
     };
 
     const hideForm = () => {
-        setDocumentReady(false)
-        setExportProgramId(undefined)
+        setDocumentReady(false);
+        setExportProgramId(undefined);
     }
 
     if (prgMetadata && legends && prgSections && !documentReady) {
 
-        let programRuleActionsDict = {}
+        const programRuleActionsDict = {}
         prgMetadata.programRules?.forEach(pr => {
             pr.programRuleActions.forEach(pra => {
-                programRuleActionsDict[pra.id] = pr.id
+                programRuleActionsDict[pra.id] = pr.id;
             })
         });
         prgMetadata.programRuleActions?.forEach(pra => {
@@ -101,53 +95,53 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
             }
         });
 
-        let legendSets = []
+        const legendSets = [];
 
         legends.forEach(legend => {
             if (prgMetadata.dataElements?.find(de => de.legendSets?.find(l => l.id == legend.id))) {
-                legendSets.push(legend)
+                legendSets.push(legend);
             }
         })
 
-        prgMetadata.programSections = prgSections
-        prgMetadata.legendSets = legendSets
-        prgMetadata.optionSets = prgMetadata.optionSets ?? []
+        prgMetadata.programSections = prgSections;
+        prgMetadata.legendSets = legendSets;
+        prgMetadata.optionSets = prgMetadata.optionSets ?? [];
         prgMetadata.optionSets.push(PROGRAM_TYPE_OPTION_SET);
 
         prgMetadata.options = prgMetadata.options ?? [];
         prgMetadata.options = prgMetadata.options.concat(PROGRAM_TYPE_OPTIONS);
 
-        setProgramMetadata(prgMetadata)
-        let keyTree = getJSONKeyTree(prgMetadata)
-        let tabsList = Object.keys(keyTree).map(key => ({ key, selected: true }))
+        setProgramMetadata(prgMetadata);
+        const keyTree = getJSONKeyTree(prgMetadata);
+        const tabsList = Object.keys(keyTree).map(key => ({ key, selected: true }));
 
-        setTabValue(tabsList[0].key)
-        setJsonKeyTree(keyTree)
-        setJsonHeaders(tabsList)
+        setTabValue(tabsList[0].key);
+        setJsonKeyTree(keyTree);
+        setJsonHeaders(tabsList);
 
         setDocumentReady(true);
     }
 
     //* Apply changes to the file before downloading
     const downloadFile = () => {
-        //https://theroadtoenterprise.com/blog/how-to-download-csv-and-json-files-in-react
-        let metadata = DeepCopy(programMetadata);
-        let cleanMetadata = {}
-        let globalAttributesToRemove = []
+        const metadata = DeepCopy(programMetadata);
+        const cleanMetadata = {};
+        let globalAttributesToRemove = [];
 
         attributeSettings?.forEach(setting => {
-            if (setting.selected)
-                globalAttributesToRemove = globalAttributesToRemove.concat(setting.affects)
+            if (setting.selected) {
+                globalAttributesToRemove = globalAttributesToRemove.concat(setting.affects);
+            }
         })
 
-        let keep = []
-        let remove = []
+        const keep = [];
+        const remove = [];
 
         jsonHeaders?.forEach(header => {
             if (header.selected) {
-                keep.push(header.key)
+                keep.push(header.key);
             } else {
-                remove.push(header.key)
+                remove.push(header.key);
             }
         })
 
@@ -161,7 +155,7 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
         //HNQIS2 ROUTINES
         if (selectedPreset === 'h2External') {
             //DELETE HNQIS 1.6 ATTRIBUTES NOT NEEDED
-            let attributes = cleanMetadata.attributes
+            const attributes = cleanMetadata.attributes;
 
             //Because splice changes the array length, using forEach is not possible
             for (let i = (attributes?.length || 0) - 1; i >= 0; i--) {
@@ -172,10 +166,10 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
 
             //DELETE DE ATTRIBUTEVALUES ASSOCIATED WITH THE ONES REMOVED IN PREVIOUS STEP
 
-            let de = cleanMetadata.dataElements;
+            const de = cleanMetadata.dataElements;
             de?.forEach((element) => {
 
-                let attrValues = element.attributeValues;
+                const attrValues = element.attributeValues;
 
                 for (let i = attrValues.length - 1; i >= 0; i--) {
 
@@ -190,12 +184,14 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
         //REMOVE SELECTED ATTRIBUTES ON EACH OBJECT
         keep?.forEach(objectKey =>
             jsonKeyTree[objectKey]?.forEach(attributeKey => {
-                if (!attributeKey.selected) removeKey(cleanMetadata[objectKey], attributeKey.key)
+                if (!attributeKey.selected) {
+                    removeKey(cleanMetadata[objectKey], attributeKey.key);
+                }
             })
         )
 
         //REMOVE GLOBAL ATTRIBUTES
-        globalAttributesToRemove?.forEach(key => removeKey(cleanMetadata, key))
+        globalAttributesToRemove?.forEach(key => removeKey(cleanMetadata, key));
 
         setDownloading(true);
 
@@ -234,69 +230,69 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
     }
 
     const handleKeyCheckboxChange = (tabValue, key) => {
-        jsonKeyTree[tabValue][key].selected = !jsonKeyTree[tabValue][key].selected
-        setJsonKeyTree(DeepCopy(jsonKeyTree))
+        jsonKeyTree[tabValue][key].selected = !jsonKeyTree[tabValue][key].selected;
+        setJsonKeyTree(DeepCopy(jsonKeyTree));
     }
 
     const changeSelectedHeader = (key, value) => {
         for (let i = 0; i < jsonHeaders.length; i++) {
             if (jsonHeaders[i].key === key) {
-                jsonHeaders[i].selected = value
+                jsonHeaders[i].selected = value;
             }
-            if (key === tabValue) setTabValue(0)
+            if (key === tabValue) { setTabValue(0) }
         }
-        setJsonHeaders(DeepCopy(jsonHeaders))
+        setJsonHeaders(DeepCopy(jsonHeaders));
     }
 
     const changeSelected = (value, object, setObject) => {
-        changeAttributeValue(object, 'selected', value)
-        setObject(DeepCopy(object))
+        changeAttributeValue(object, 'selected', value);
+        setObject(DeepCopy(object));
     }
 
     const selectPreset = (event) => {
-        let preset = event.target.value
-        changeSelected(true, jsonHeaders, setJsonHeaders)
+        const preset = event.target.value;
+        changeSelected(true, jsonHeaders, setJsonHeaders);
         switch (preset) {
             case '':
             case 'local':
-                changeAttributeSettingsByKey('sharings', false)
-                changeAttributeSettingsByKey('ous', false)
-                changeAttributeSettingsByKey('redates', false)
-                changeAttributeSettingsByKey('reuser', false)
-                changeAttributeSettingsByKey('recats', false)
-                changeAttributeSettingsByKey('relegends', false)
+                changeAttributeSettingsByKey('sharings', false);
+                changeAttributeSettingsByKey('ous', false);
+                changeAttributeSettingsByKey('redates', false);
+                changeAttributeSettingsByKey('reuser', false);
+                changeAttributeSettingsByKey('recats', false);
+                changeAttributeSettingsByKey('relegends', false);
                 break
             case 'external':
-                changeAttributeSettingsByKey('sharings', true)
-                changeAttributeSettingsByKey('ous', true)
-                changeAttributeSettingsByKey('redates', true)
-                changeAttributeSettingsByKey('reuser', true)
-                changeAttributeSettingsByKey('recats', false)
-                changeAttributeSettingsByKey('relegends', false)
+                changeAttributeSettingsByKey('sharings', true);
+                changeAttributeSettingsByKey('ous', true);
+                changeAttributeSettingsByKey('redates', true);
+                changeAttributeSettingsByKey('reuser', true);
+                changeAttributeSettingsByKey('recats', false);
+                changeAttributeSettingsByKey('relegends', false);
                 break
             case 'h2External':
-                changeAttributeSettingsByKey('sharings', true)
-                changeAttributeSettingsByKey('ous', true)
-                changeAttributeSettingsByKey('redates', true)
-                changeAttributeSettingsByKey('reuser', true)
-                changeAttributeSettingsByKey('recats', true)
-                changeAttributeSettingsByKey('relegends', true)
+                changeAttributeSettingsByKey('sharings', true);
+                changeAttributeSettingsByKey('ous', true);
+                changeAttributeSettingsByKey('redates', true);
+                changeAttributeSettingsByKey('reuser', true);
+                changeAttributeSettingsByKey('recats', true);
+                changeAttributeSettingsByKey('relegends', true);
                 EXTERNAL_IMPORT_REMOVE_KEYS.forEach(key => {
                     changeSelectedHeader(key, false);
                 })
                 break
         }
-        setSelectedPreset(preset)
+        setSelectedPreset(preset);
     };
 
     const changeAttributeSettings = (index, value) => {
-        attributeSettings[index].selected = value
-        setAttributeSettings(DeepCopy(attributeSettings))
+        attributeSettings[index].selected = value;
+        setAttributeSettings(DeepCopy(attributeSettings));
     }
 
     const changeAttributeSettingsByKey = (key, value) => {
-        let index = attributeSettings.map(e => e.key).indexOf(key)
-        changeAttributeSettings(index, value)
+        const index = attributeSettings.map(e => e.key).indexOf(key);
+        changeAttributeSettings(index, value);
     }
 
     return (
@@ -324,7 +320,7 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
                                 <div style={{display:'grid', gridTemplateColumns:'4fr 3fr', columnGap:'1em'}}>
                                     <div style={{display:'flex', flexDirection:'column', gap:'1em'}}>
                                         <p><strong>Your file is ready!</strong></p>
-                                        <p>You can now download the metadata related to the program by clicking "Download".</p>
+                                        <p>You can now download the metadata related to the program by clicking &quot;Download&quot;.</p>
                                         <p><strong>Program:</strong> <em>{prgMetadata.programs[0].name}</em></p>
                                         <FormControlLabel control={
                                             <Switch 
@@ -413,7 +409,7 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
                                         </FormGroup>
                                         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1em' }}>
 
-                                            <label><strong>NOTE: </strong>These settings are prioritized over what's selected below.</label>
+                                            <label><strong>NOTE: </strong>These settings are prioritized over what&apos;s selected below.</label>
 
                                         </div>
                                     </AccordionDetails>
@@ -488,6 +484,12 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
             </CustomMUIDialog>
         </>
     );
+}
+
+DependencyExport.propTypes = {
+    program: PropTypes.string,
+    programType: PropTypes.string,
+    setExportProgramId: PropTypes.func
 }
 
 export default DependencyExport;

@@ -1,23 +1,20 @@
-import React from 'react';
-import { useState } from "react";
 import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
-import { PERIOD_TYPES, FEATURE_TYPES, METADATA, MAX_STAGE_NAME_LENGTH, BUILD_VERSION, MIN_DESCRIPTION_LENGTH, REPORT_DATE_TO_USE } from '../../configs/Constants';
-//import styles from './Program.module.css'
-import { PS_Generic } from './../../configs/ProgramTemplate';
-
+import SendIcon from '@mui/icons-material/Send';
+import LoadingButton from '@mui/lab/LoadingButton';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
-import SendIcon from '@mui/icons-material/Send';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import SelectOptions from '../UIElements/SelectOptions';
-import LoadingButton from '@mui/lab/LoadingButton';
-import { parseErrorsJoin } from '../../utils/Utils';
+import TextField from '@mui/material/TextField';
+import PropTypes from 'prop-types';
+import React, { useState } from "react";
+import { PERIOD_TYPES, FEATURE_TYPES, METADATA, MAX_STAGE_NAME_LENGTH, BUILD_VERSION, MIN_DESCRIPTION_LENGTH, REPORT_DATE_TO_USE } from '../../configs/Constants.js';
+import { parseErrorsJoin } from '../../utils/Utils.js';
+import SelectOptions from '../UIElements/SelectOptions.js';
+import { PS_Generic } from './../../configs/ProgramTemplate.js';
+import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 
 //const { Form, Field } = ReactFinalForm
 
@@ -36,7 +33,7 @@ const metadataMutation = {
 
 const StageNew = (props) => {
     // Create Mutation
-    let metadataDM = useDataMutation(metadataMutation, {
+    const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             console.error(err.details);
             props.setNotification({
@@ -56,8 +53,6 @@ const StageNew = (props) => {
 
     const idsQuery = useDataQuery(queryId);
     const stageUid = props.data?.id || idsQuery.data?.results.codes[0];
-
-    const [programId, setProgramId] = useState(props.programId);
     const [sentForm, setSentForm] = useState(false);
 
     const [stageName, setStageName] = useState(props.data?.name || '');
@@ -143,74 +138,78 @@ const StageNew = (props) => {
         let response = true;
 
         if (stageName.trim() === '') {
-            response = false
-            validationErrors.stageName = 'This field is required'
+            response = false;
+            validationErrors.stageName = 'This field is required';
         }else if (stageName.length > MAX_STAGE_NAME_LENGTH) {
-            response = false
-            validationErrors.stageName = `This field cannot exceed ${MAX_STAGE_NAME_LENGTH} characters`
+            response = false;
+            validationErrors.stageName = `This field cannot exceed ${MAX_STAGE_NAME_LENGTH} characters`;
         } else {
-            validationErrors.stageName = undefined
+            validationErrors.stageName = undefined;
         }
 
         if (String(scheduledDaysStart).trim() === '') {
-            response = false
-            validationErrors.scheduledDaysStart = 'This field is required'
+            response = false;
+            validationErrors.scheduledDaysStart = 'This field is required';
         } else if (scheduledDaysStart < 0) {
-            response = false
-            validationErrors.scheduledDaysStart = 'This field must be equal or greater than 0'
+            response = false;
+            validationErrors.scheduledDaysStart = 'This field must be equal or greater than 0';
         } else {
-            validationErrors.scheduledDaysStart = undefined
+            validationErrors.scheduledDaysStart = undefined;
         }
 
         if (description!=='' && description.length < MIN_DESCRIPTION_LENGTH) {
-            response = false
-            validationErrors.description = `This field must contain at least ${MIN_DESCRIPTION_LENGTH} characters`
+            response = false;
+            validationErrors.description = `This field must contain at least ${MIN_DESCRIPTION_LENGTH} characters`;
         } else {
-            validationErrors.description = undefined
+            validationErrors.description = undefined;
         }
 
-        setValidationErrors({ ...validationErrors })
+        setValidationErrors({ ...validationErrors });
 
         return response;
     }
 
     function submission() {
-        setSentForm(true)
-        props.setNotification(undefined)
-        //let prgTypeId = 'yB5tFAAN7bI';
-        let dataIsValid = formDataIsValid()
+        setSentForm(true);
+        props.setNotification(undefined);
+
+        const dataIsValid = formDataIsValid();
         if (!dataIsValid) {
-            setSentForm(false)
-            return
+            setSentForm(false);
+            return;
         }
         if (!metadataRequest.called && dataIsValid) {
 
-            let stage = JSON.parse(JSON.stringify(PS_Generic))
-            stage.id = props.data?.id ?? stageUid
-            stage.name = stageName
-            if (description) stage.description = description
-            stage.program.id = programId
-            stage.minDaysFromStart = scheduledDaysStart
-            stage.repeatable = repeatable
-            stage.periodType = periodType
-            stage.displayGenerateEventBox = displayGenerateEventBox
-            stage.autoGenerateEvent = autoGenerate
-            if (openFormAfterEnroll) stage.openAfterEnrollment = openFormAfterEnroll
-            if (openFormAfterEnroll) stage.reportDateToUse = reportDateToUse
-            stage.remindCompleted = askCompleteProgram
-            stage.allowGenerateNextVisit = askCreateEvent
-            if (featureType) stage.featureType = featureType
+            const stage = JSON.parse(JSON.stringify(PS_Generic));
+            stage.id = props.data?.id ?? stageUid;
+            stage.name = stageName;
+            if (description) { stage.description = description }
+            stage.program.id = props.programId;
+            stage.minDaysFromStart = scheduledDaysStart;
+            stage.repeatable = repeatable;
+            stage.periodType = periodType;
+            stage.displayGenerateEventBox = displayGenerateEventBox;
+            stage.autoGenerateEvent = autoGenerate;
+            if (openFormAfterEnroll) {
+                stage.openAfterEnrollment = openFormAfterEnroll;
+                stage.reportDateToUse = reportDateToUse;
+            }
+            stage.remindCompleted = askCompleteProgram;
+            stage.allowGenerateNextVisit = askCreateEvent;
+            if (featureType) { stage.featureType = featureType }
 
             /* KEEP EXISTING VALUES FOR: */
-            if(props.data?.attributeValues) stage.attributeValues = props.data.attributeValues
-            if(props.data?.programStageSections) stage.programStageSections = props.data.programStageSections
-            if(props.data?.programStageDataElements) stage.programStageDataElements = props.data.programStageDataElements
-            if(props.data?.publicAccess) stage.publicAccess = props.data.publicAccess
-            if(props.data?.notificationTemplates) stage.notificationTemplates = props.data.notificationTemplates
+            if (props.data) {
+                stage.attributeValues = props.data.attributeValues;
+                stage.programStageSections = props.data.programStageSections;
+                stage.programStageDataElements = props.data.programStageDataElements;
+                stage.publicAccess = props.data.publicAccess;
+                stage.notificationTemplates = props.data.notificationTemplates;
+            }
 
-            createOrUpdateMetaData(stage.attributeValues)
+            createOrUpdateMetaData(stage.attributeValues);
 
-            let metadata = {
+            const metadata = {
                 programStages: [stage]
             }
 
@@ -232,16 +231,16 @@ const StageNew = (props) => {
     }
 
     function createOrUpdateMetaData(attributeValues) {
-        let metaDataArray = attributeValues.filter(av => av.attribute.id === METADATA);
+        const metaDataArray = attributeValues.filter(av => av.attribute.id === METADATA);
         if (metaDataArray.length > 0) {
-            let metaData_value = JSON.parse(metaDataArray[0].value);
+            const metaData_value = JSON.parse(metaDataArray[0].value);
             metaData_value.saveVersion = BUILD_VERSION;
             metaDataArray[0].value = JSON.stringify(metaData_value);
         }
         else {
-            let attr = { id: METADATA };
-            let val = { saveVersion: BUILD_VERSION };
-            let attributeValue = { attribute: attr, value: JSON.stringify(val) }
+            const attr = { id: METADATA };
+            const val = { saveVersion: BUILD_VERSION };
+            const attributeValue = { attribute: attr, value: JSON.stringify(val) }
             attributeValues.push(attributeValue);
         }
     }
@@ -381,6 +380,16 @@ const StageNew = (props) => {
             </DialogActions>
         </CustomMUIDialog>
     </>
+}
+
+StageNew.propTypes = {
+    data: PropTypes.object,
+    programId: PropTypes.string,
+    programName: PropTypes.string,
+    setNewStage: PropTypes.func,
+    setNotification: PropTypes.func,
+    setShowStageForm: PropTypes.func,
+    stagesRefetch: PropTypes.func
 }
 
 export default StageNew;

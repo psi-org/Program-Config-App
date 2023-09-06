@@ -544,12 +544,10 @@ const ProgramDetails = () => {
                         importResults={importResults}
                         setImportResults={setImportResults}
                         programMetadata={data.results}
-                        programSpecificType={data.results.withoutRegistration ? TEMPLATE_PROGRAM_TYPES.event : TEMPLATE_PROGRAM_TYPES.tracker}
                         setSavingMetadata={setSavingMetadata}
                         setSavedAndValidated={setSavedAndValidated}
                         setValidationResults={setValidationResults}
                         setErrorReports={setErrorReports}
-                        refetchProgram={refetch}
                     />
                 }
             </div>

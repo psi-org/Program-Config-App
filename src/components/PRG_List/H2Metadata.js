@@ -1,19 +1,19 @@
-import { useState } from "react"
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { NAMESPACE, DATASTORE_H2_METADATA, H2_METADATA_VERSION, DATE_FORMAT_OPTIONS } from "../../configs/Constants";
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
+import { NoticeBox } from '@dhis2/ui'
+import DescriptionIcon from '@mui/icons-material/Description';
 import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 import WarningIcon from '@mui/icons-material/Warning';
-import DescriptionIcon from '@mui/icons-material/Description';
-import { Button } from "@mui/material";
-import { NoticeBox } from '@dhis2/ui'
-import { parseErrors, parseErrorsUL } from '../../utils/Utils'
 import LoadingButton from '@mui/lab/LoadingButton';
-
+import { Button } from "@mui/material";
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import PropTypes from 'prop-types';
+import React, { useState } from "react"
+import { NAMESPACE, DATASTORE_H2_METADATA, H2_METADATA_VERSION, DATE_FORMAT_OPTIONS } from "../../configs/Constants.js";
 import H2MetadataJSON from '../../configs/HNQIS2_Metadata_Package.json'
+import { parseErrorsUL } from '../../utils/Utils.js'
+import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 
 const metadataMutation = {
     resource: 'metadata',
@@ -41,49 +41,50 @@ const queryHNQIS2Metadata = {
 
 const H2Metadata = (props) => {
 
-    const h2Ready = localStorage.getItem('h2Ready') === 'true'
+    const h2Ready = localStorage.getItem('h2Ready') === 'true';
 
-    const [sending, setSending] = useState(false)
-    const [error, setError] = useState(undefined)
-    const [success, setSuccess] = useState(undefined)
+    const [sending, setSending] = useState(false);
+    const [error, setError] = useState(undefined);
+    const [success, setSuccess] = useState(undefined);
     const { data: hnqis2Metadata, refetch: hnqis2MetadataRefetch } = useDataQuery(queryHNQIS2Metadata);
     const [metadataMutate] = useDataMutation(metadataMutation, {
         onError: (err) => {
             setSending(false);
-            setError(err.details)
+            setError(err.details);
         }
     });
     const [dataStoreUpdate] = useDataMutation(updateDataStoreMutation, {
         onError: (err) => {
             setSending(false);
-            setError(err.details)
+            setError(err.details);
         }
     });
     const [dataStoreCreate] = useDataMutation(dataStoreMutation, {
         onError: (err) => {
             setSending(false);
-            setError(err.details)
+            setError(err.details);
         }
     });
 
     const install = () => {
-        setSending(true)
+        setSending(true);
         metadataMutate({ data: H2MetadataJSON }).then(response => {
-            setTimeout(setSending(false), 1000)
-            if (response.status != 'OK') setError(response)
-            else {
-                //Success
-                let dsData = {
+            setTimeout(setSending(false), 1000);
+            if (response.status != 'OK') {
+                setError(response);
+            } else {
+                const dsData = {
                     version: H2_METADATA_VERSION,
                     date: new Date()
                 }
-                let sendToDataStore = !hnqis2Metadata?.results ? dataStoreCreate : dataStoreUpdate
+                const sendToDataStore = !hnqis2Metadata?.results ? dataStoreCreate : dataStoreUpdate;
                 sendToDataStore({ data: dsData }).then(res => {
-                    if (res.status != 'OK') setError(res)
-                    else {
-                        setSuccess(true)
-                        localStorage.setItem('h2Ready', String(true))
-                        hnqis2MetadataRefetch()
+                    if (res.status != 'OK') {
+                        setError(res);
+                    } else {
+                        setSuccess(true);
+                        localStorage.setItem('h2Ready', String(true));
+                        hnqis2MetadataRefetch();
                     }
                 })
 
@@ -138,6 +139,11 @@ const H2Metadata = (props) => {
             </DialogActions>
         </CustomMUIDialog>
     )
+}
+
+H2Metadata.propTypes = {
+    H2Modal: PropTypes.bool,
+    setH2Modal: PropTypes.func
 }
 
 export default H2Metadata

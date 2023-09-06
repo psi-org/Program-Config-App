@@ -1,6 +1,7 @@
 import {FlyoutMenu, MenuItem, Popper, Layer, MenuSectionHeader} from "@dhis2/ui";
-
 import DoneIcon from '@mui/icons-material/Done';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 const SharingOptions = ({ permission, reference, setEntityPermission, toggle }) => {
 
@@ -34,6 +35,13 @@ const SharingOptions = ({ permission, reference, setEntityPermission, toggle }) 
             </Popper>
         </Layer>
     )
+}
+
+SharingOptions.propTypes = {
+    permission: PropTypes.array,
+    reference: PropTypes.object,
+    setEntityPermission: PropTypes.func,
+    toggle: PropTypes.func,
 }
 
 export default SharingOptions

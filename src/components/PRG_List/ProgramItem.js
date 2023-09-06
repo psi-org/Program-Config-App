@@ -437,20 +437,20 @@ const ProgramItem = ({
 };
 
 ProgramItem.propTypes = {
-    assignOrgUnit: PropTypes,
-    backupProgram: PropTypes,
-    convertToH2: PropTypes,
-    deleteProgram: PropTypes,
-    doSearch: PropTypes,
-    downloadMetadata: PropTypes,
-    prgTypeId: PropTypes,
-    program: PropTypes,
-    refetch: PropTypes,
-    restoreProgram: PropTypes,
-    setNotification: PropTypes,
-    setSearchLocalStorage: PropTypes,
-    shareProgram: PropTypes,
-    transferDataH2: PropTypes
+    assignOrgUnit: PropTypes.func,
+    backupProgram: PropTypes.func,
+    convertToH2: PropTypes.func,
+    deleteProgram: PropTypes.func,
+    doSearch: PropTypes.func,
+    downloadMetadata: PropTypes.func,
+    prgTypeId: PropTypes.string,
+    program: PropTypes.object,
+    refetch: PropTypes.func,
+    restoreProgram: PropTypes.func,
+    setNotification: PropTypes.func,
+    setSearchLocalStorage: PropTypes.func,
+    shareProgram: PropTypes.func,
+    transferDataH2: PropTypes.func
 }
 
 export default ProgramItem;

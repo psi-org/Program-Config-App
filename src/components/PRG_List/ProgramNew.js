@@ -1,19 +1,26 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Transfer } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-//import styles from './Program.module.css'
-import {
-    EventStage,
-    HnqisProgramConfigs,
-    Program,
-    programStage,
-    PS_ActionPlanStage,
-    PS_AssessmentStage,
-    PSS_CriticalSteps,
-    PSS_Default,
-    PSS_Scores,
-} from "../../configs/ProgramTemplate";
-
+import { Transfer } from "@dhis2/ui";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import SendIcon from "@mui/icons-material/Send";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { FormLabel, Slide, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
+import Alert from '@mui/material/Alert';
+import Autocomplete from "@mui/material/Autocomplete";
+import Button from "@mui/material/Button";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormHelperText from "@mui/material/FormHelperText";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Snackbar from '@mui/material/Snackbar';
+import Switch from '@mui/material/Switch';
+import TextField from "@mui/material/TextField";
+import PropTypes from 'prop-types';
+import React, { useEffect, useRef, useState } from "react";
 import {
     ASSESSMENT_TET,
     BUILD_VERSION,
@@ -29,37 +36,24 @@ import {
     MIN_NAME_LENGTH,
     NAMESPACE,
     NON_CRITICAL_STEPS,
-} from "../../configs/Constants";
-
-import Button from "@mui/material/Button";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import CustomMUIDialog from "./../UIElements/CustomMUIDialog";
-import CustomMUIDialogTitle from "./../UIElements/CustomMUIDialogTitle";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import SendIcon from "@mui/icons-material/Send";
-import FormHelperText from "@mui/material/FormHelperText";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { FormLabel, Slide, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
-import StyleManager from "../UIElements/StyleManager";
-import { DeepCopy, parseErrorsJoin, truncateString } from "../../utils/Utils";
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import H2Setting from "./H2Setting"
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import AttributesEditor from "../TEAEditor/AttributesEditor";
-
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import InputModal from "../PRG_Details/InputModal";
-
-//const { Form, Field } = ReactFinalForm
+} from "../../configs/Constants.js";
+import {
+    EventStage,
+    HnqisProgramConfigs,
+    Program,
+    PS_ActionPlanStage,
+    PS_AssessmentStage,
+    PSS_CriticalSteps,
+    PSS_Default,
+    PSS_Scores,
+} from "../../configs/ProgramTemplate.js";
+import { DeepCopy, parseErrorsJoin, truncateString } from "../../utils/Utils.js";
+import InputModal from "../PRG_Details/InputModal.js";
+import AttributesEditor from "../TEAEditor/AttributesEditor.js";
+import StyleManager from "../UIElements/StyleManager.js";
+import CustomMUIDialog from "./../UIElements/CustomMUIDialog.js";
+import CustomMUIDialogTitle from "./../UIElements/CustomMUIDialogTitle.js";
+import H2Setting from "./H2Setting.js"
 
 const queryId = {
     results: {
@@ -190,7 +184,7 @@ const ProgramNew = (props) => {
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
 
     // Create Mutation
-    let metadataDM = useDataMutation(metadataMutation, {
+    const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             props.setNotification({
                 message: parseErrorsJoin(err.details, '\\n'),
@@ -217,13 +211,13 @@ const ProgramNew = (props) => {
     const teTypeQuery = useDataQuery(queryTEType);
     const trackedEntityTypes = teTypeQuery.data?.results.trackedEntityTypes;
 
-    const { data: trackedEntityAttributes, refetch: findTEAttributes } =
+    const { refetch: findTEAttributes } =
         useDataQuery(queryTEAttributes, { lazy: true });
-    const { data: categoryCombos, refetch: findCategoryCombos } = useDataQuery(
+    const { refetch: findCategoryCombos } = useDataQuery(
         queryCatCombos,
         { lazy: true }
     );
-    const { data: existingPrefixes, refetch: checkForExistingPrefix } =
+    const { refetch: checkForExistingPrefix } =
         useDataQuery(queryAvailablePrefix, {
             lazy: true,
             variables: { dePrefix: undefined, program: undefined },
@@ -294,11 +288,11 @@ const ProgramNew = (props) => {
         validationErrors.pgrType = undefined;
         validationErrors.programTET = undefined;
         setValidationErrors({ ...validationErrors });
-        let value = event.target.value;
+        const value = event.target.value;
         setPgrTypePCA(value);
         if (value === "hnqis") {
             setButtonDisabled(true);
-            let hnqisTET = trackedEntityTypes.find(
+            const hnqisTET = trackedEntityTypes.find(
                 (tet) => tet.id === ASSESSMENT_TET
             );
             setProgramTET({ label: hnqisTET.name, id: hnqisTET.id });
@@ -339,8 +333,8 @@ const ProgramNew = (props) => {
             // Remove from selected
             if (programTET !== "") {
                 trackedEntityTypes.find(tet => tet.id === programTET.id).trackedEntityTypeAttributes.forEach(tea => {
-                    let idx = programTEAs.selected.findIndex(teaId => teaId === tea.trackedEntityAttribute.id)
-                    if (idx > -1) programTEAs.selected.splice(idx, 1)
+                    const idx = programTEAs.selected.findIndex(teaId => teaId === tea.trackedEntityAttribute.id)
+                    if (idx > -1) { programTEAs.selected.splice(idx, 1) }
                 })
             }
 
@@ -370,7 +364,7 @@ const ProgramNew = (props) => {
 
     const updateAssignedAttributes = () => {
         // Validate selected attributes that are not in program sections
-        let newAssignedAttributes = [];
+        const newAssignedAttributes = [];
         programTEAs.selected.forEach(teaId => {
             if (!attributesFormSections.map(section => section.trackedEntityAttributes.map(tea => tea.id)).flat().includes(teaId)) {
                 newAssignedAttributes.push(programTEAs.available.find(tea => tea.trackedEntityAttribute.id === teaId))
@@ -381,7 +375,7 @@ const ProgramNew = (props) => {
 
     const handleChangeTEAs = (res) => {
         if (programTET !== "") {
-            let TETAttributes = trackedEntityTypes.find(tet => tet.id === programTET.id).trackedEntityTypeAttributes
+            const TETAttributes = trackedEntityTypes.find(tet => tet.id === programTET.id).trackedEntityTypeAttributes
 
             if (TETAttributes.every(tea => res.selected.includes(tea.trackedEntityAttribute.id))) {
                 programTEAs.selected = res.selected;
@@ -489,7 +483,7 @@ const ProgramNew = (props) => {
                 validationErrors.ouMapPolygon =
                 undefined;
         } else {
-            let hnqisValidation = h2SettingsRef.current.handleFormValidation()
+            const hnqisValidation = h2SettingsRef.current.handleFormValidation()
             setHnqisValidated(hnqisValidation);
             response = response && hnqisValidation;
         }
@@ -535,7 +529,7 @@ const ProgramNew = (props) => {
                     })
                 )
 
-                let teaOptions = {
+                const teaOptions = {
                     available: availableTEAs.concat(existingTEAs),
                     selected: existingTEAs.map(tea => tea.trackedEntityAttribute.id)
                 }
@@ -582,10 +576,11 @@ const ProgramNew = (props) => {
 
     useEffect(() => {
         if (pgrTypePCA === "tracker" || pgrTypePCA === "event") {
-            if (pgrTypePCA === "tracker") fetchTrackerMetadata();
+            if (pgrTypePCA === "tracker") { fetchTrackerMetadata() }
             findCategoryCombos().then((ccdata) => {
-                if (ccdata?.results?.categoryCombos)
+                if (ccdata?.results?.categoryCombos) {
                     setProgramCategoryCombos([{ name: "default", id: "" }].concat(ccdata.results.categoryCombos));
+                }
             });
         }
     }, [pgrTypePCA]);
@@ -595,13 +590,13 @@ const ProgramNew = (props) => {
         setSentForm(true);
         props.setNotification(undefined);
         //let prgTypeId = 'yB5tFAAN7bI';
-        let dataIsValid = formDataIsValid();
+        const dataIsValid = formDataIsValid();
         if (!dataIsValid) {
             setSentForm(false);
             return;
         }
 
-        let useCompetency = pgrTypePCA === "hnqis" ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass === 'Yes' : undefined;
+        const useCompetency = pgrTypePCA === "hnqis" ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass === 'Yes' : undefined;
 
         //Validating available prefix
         checkForExistingPrefix({
@@ -615,7 +610,7 @@ const ProgramNew = (props) => {
                 return;
             }
             if (!metadataRequest.called && dataIsValid) {
-                let prgrm = props.data
+                const prgrm = props.data
                     ? DeepCopy(props.data)
                     : DeepCopy(Program);
                 let programStages = undefined;
@@ -626,12 +621,15 @@ const ProgramNew = (props) => {
                 prgrm.shortName = programShortName;
                 prgrm.id = programId || uidPool.shift();
 
-                let auxstyle = {};
-                if (programIcon) auxstyle.icon = programIcon;
-                if (programColor) auxstyle.color = programColor;
+                const auxstyle = {};
+                if (programIcon) { auxstyle.icon = programIcon }
+                if (programColor) { auxstyle.color = programColor }
 
-                if (Object.keys(auxstyle).length > 0) prgrm.style = auxstyle
-                else prgrm.style = undefined
+                if (Object.keys(auxstyle).length > 0) {
+                    prgrm.style = auxstyle;
+                } else {
+                    prgrm.style = undefined;
+                }
 
                 if (pgrTypePCA === "hnqis") {
                     //HNQIS2 Programs
@@ -675,21 +673,18 @@ const ProgramNew = (props) => {
                         defaultSection = DeepCopy(PSS_Default);
                         defaultSection.id = defaultSectionId;
                         defaultSection.programStage.id = assessmentId;
-                        //defaultSection.name = defaultSection.name
 
                         criticalSteps = DeepCopy(PSS_CriticalSteps);
                         criticalSteps.id = stepsSectionId;
                         criticalSteps.programStage.id = assessmentId;
-                        //criticalSteps.name = criticalSteps.name
 
                         scores = DeepCopy(PSS_Scores);
                         scores.id = scoresSectionId;
-                        scores.name = scores.name;
                         scores.programStage.id = assessmentId;
                     } else {
-                        assessmentStage = prgrm.programStages.find(section => section.name.toLowerCase().includes('assessment'))
-                        let exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS]
-                        excludedStageDEs = assessmentStage.programStageDataElements.filter(elem => !exclusionsDEs.includes(elem.dataElement.id))
+                        assessmentStage = prgrm.programStages.find(section => section.name.toLowerCase().includes('assessment'));
+                        const exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS];
+                        excludedStageDEs = assessmentStage.programStageDataElements.filter(elem => !exclusionsDEs.includes(elem.dataElement.id));
                     }
 
                     prgrm.programTrackedEntityAttributes = DeepCopy(HnqisProgramConfigs.programTrackedEntityAttributes);
@@ -762,7 +757,7 @@ const ProgramNew = (props) => {
 
                     createOrUpdateMetaData(prgrm.attributeValues);
 
-                    if (assessmentStage?.programStageDataElements.length == 0 || props.data)
+                    if (assessmentStage?.programStageDataElements.length == 0 || props.data){
                         assessmentStage.programStageDataElements = excludedStageDEs.concat(criticalSteps.dataElements.map((de, index) => ({
                             sortOrder: index + excludedStageDEs.length,
                             compulsory: false,
@@ -770,6 +765,7 @@ const ProgramNew = (props) => {
                             programStage: { id: assessmentStage.id },
                             dataElement: de
                         })));
+                    }
 
                     if (!props.data) {
                         programStages = [assessmentStage, actionPlanStage];
@@ -793,35 +789,35 @@ const ProgramNew = (props) => {
 
                         prgrm.programTrackedEntityAttributes = programTEAs.selected.map(
                             (teaId, idx) => {
-                                let t = programTEAs.available.find(tea => tea.trackedEntityAttribute.id === teaId)
-                                t.sortOrder = idx
-                                return t
+                                const t = programTEAs.available.find(tea => tea.trackedEntityAttribute.id === teaId);
+                                t.sortOrder = idx;
+                                return t;
                             }
                         )
 
                         if (useSections) {
                             programSections = attributesFormSections.map((section, idx) => {
-                                section.sortOrder = idx
-                                return section
+                                section.sortOrder = idx;
+                                return section;
                             })
                         }
 
-                        prgrm.programSections = programSections.map(section => ({ id: section.id }))
+                        prgrm.programSections = programSections.map(section => ({ id: section.id }));
                     }
                     if (pgrTypePCA === "event") {
                         prgrm.withoutRegistration = true;
                         prgrm.programType = 'WITHOUT_REGISTRATION';
 
 
-                        let editStage = props.data ? props.data.programStages[0] : DeepCopy(EventStage);
+                        const editStage = props.data ? props.data.programStages[0] : DeepCopy(EventStage);
                         if (!props.data) {
                             editStage.id = uidPool.shift();
                         }
                         editStage.name = prgrm.name;
                         editStage.validationStrategy = validationStrategy;
-                        editStage.program = {id: prgrm.id}
+                        editStage.program = { id: prgrm.id };
                         prgrm.programStages = [{ id: editStage.id }];
-                        programStages = [editStage]
+                        programStages = [editStage];
                     }
                     
                     prgrm.attributeValues = [];
@@ -834,7 +830,7 @@ const ProgramNew = (props) => {
                 }
 
                 // If editing only send program
-                let metadata = props.data
+                const metadata = props.data
                     ? {
                         programs: [prgrm],
                         programStageSections: programStageSections,
@@ -871,13 +867,13 @@ const ProgramNew = (props) => {
     }
 
     function createOrUpdateMetaData(attributeValues) {
-        let metaDataArray = attributeValues.filter(
+        const metaDataArray = attributeValues.filter(
             (av) => av.attribute.id === METADATA
         );
         if (metaDataArray.length > 0) {
             let metaData_value = JSON.parse(metaDataArray[0].value);
             if (pgrTypePCA === "hnqis") {
-                let h1Program = metaData_value.h1Program;
+                const h1Program = metaData_value.h1Program;
                 metaData_value = h2SettingsRef.current.saveMetaData()
                 metaData_value.h1Program = h1Program;
             }
@@ -885,14 +881,14 @@ const ProgramNew = (props) => {
             metaData_value.saveVersion = BUILD_VERSION;
             metaDataArray[0].value = JSON.stringify(metaData_value);
         } else {
-            let attr = { id: METADATA };
+            const attr = { id: METADATA };
             let val = {};
             if (pgrTypePCA === "hnqis") {
                 val = h2SettingsRef.current.saveMetadata();
             }
             val.saveVersion = BUILD_VERSION;
             val.dePrefix = dePrefix;
-            let attributeValue = {
+            const attributeValue = {
                 attribute: attr,
                 value: JSON.stringify(val),
             };
@@ -1304,5 +1300,16 @@ const ProgramNew = (props) => {
         </>
     );
 };
+
+ProgramNew.propTypes = {
+    data: PropTypes.object,
+    doSearch: PropTypes.func,
+    pcaMetadata: PropTypes.object,
+    programType: PropTypes.string,
+    programsRefetch: PropTypes.func,
+    readOnly: PropTypes.bool,
+    setNotification: PropTypes.func,
+    setShowProgramForm: PropTypes.func
+}
 
 export default ProgramNew;

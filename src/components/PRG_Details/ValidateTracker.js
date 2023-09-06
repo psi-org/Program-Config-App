@@ -1,31 +1,28 @@
 import { CircularLoader, NoticeBox } from "@dhis2/ui";
+import SaveIcon from '@mui/icons-material/Save';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle'
-import CustomMUIDialog from '../UIElements/CustomMUIDialog'
-import SaveIcon from '@mui/icons-material/Save';
-
-import { useEffect, useState } from "react";
-import SaveMetadata from "../UIElements/SaveMetadata";
-import { buildProgramConfigurations, getNewObjectsCount, validateDataElement, validateSections, validateTEA } from "../../utils/ImportValidatorUtils";
-import { truncateString } from "../../utils/Utils";
+import PropTypes from 'prop-types';
+import React, { useEffect, useState } from "react";
+import { buildProgramConfigurations, getNewObjectsCount, validateDataElement, validateSections, validateTEA } from "../../utils/ImportValidatorUtils.js";
+import { truncateString } from "../../utils/Utils.js";
+import CustomMUIDialog from '../UIElements/CustomMUIDialog.js'
+import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.js'
+import SaveMetadata from "../UIElements/SaveMetadata.js";
 
 const ValidateTracker = (
     {
         importResults,
-        setImportResults,
         programMetadata,
-        programSpecificType,
-        removedItems,
-        setSavingMetadata,
-        setSavedAndValidated,
-        setValidationResults,
         setErrorReports,
-        refetchProgram
+        setImportResults,
+        setSavedAndValidated,
+        setSavingMetadata,
+        setValidationResults
     }
 ) => {
-    let validationResults = {
+    const validationResults = {
         stages: {
             sections: [],
             dataElements: []
@@ -77,8 +74,8 @@ const ValidateTracker = (
                         }
                         delete tea.errors;
                         validateTEA(tea, teaList, errorDetails);
-                        if (tea.errors) validationResults.teas.teas.push(tea);
-                        if (tea.errors?.errors.length > 0) errorCounts += tea.errors.errors.length;
+                        if (tea.errors) { validationResults.teas.teas.push(tea) }
+                        if (tea.errors?.errors.length > 0) { errorCounts += tea.errors.errors.length }
                     })
                 });
             }
@@ -89,7 +86,7 @@ const ValidateTracker = (
                 let stage_errors = 0;
                 delete stage.errors;
 
-                let dataElementsList = stage.importedSections.map(section => section.dataElements).flat();
+                const dataElementsList = stage.importedSections.map(section => section.dataElements).flat();
 
                 stage.importedSections.forEach(section => {
                     excelRow += 1;
@@ -113,14 +110,14 @@ const ValidateTracker = (
                         }
                         delete dataElement.errors;
                         validateDataElement(dataElement, errorDetails, dataElementsList);
-                        if (dataElement.errors) validationResults.stages.dataElements.push(dataElement);
-                        if (dataElement.errors?.errors.length > 0) stage_errors += dataElement.errors.errors.length;
+                        if (dataElement.errors) { validationResults.stages.dataElements.push(dataElement) }
+                        if (dataElement.errors?.errors.length > 0) { stage_errors += dataElement.errors.errors.length }
                     });
 
                 });
 
                 errorCounts += stage_errors;
-                if (stage_errors > 0) stage.errorsCount = stage_errors;
+                if (stage_errors > 0) { stage.errorsCount = stage_errors }
 
             });
 
@@ -169,6 +166,16 @@ const ValidateTracker = (
         </DialogActions>
 
     </CustomMUIDialog>)
+}
+
+ValidateTracker.propTypes = {
+    importResults: PropTypes.object,
+    programMetadata: PropTypes.object,
+    setErrorReports: PropTypes.func,
+    setImportResults: PropTypes.func,
+    setSavedAndValidated: PropTypes.func,
+    setSavingMetadata: PropTypes.func,
+    setValidationResults: PropTypes.func
 }
 
 export default ValidateTracker;

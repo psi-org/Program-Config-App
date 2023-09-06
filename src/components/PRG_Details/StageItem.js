@@ -1,29 +1,20 @@
-// *** Global State ***
-import { useDispatch } from "react-redux";
-import { bindActionCreators } from "redux";
-import actionCreators from "../../state/action-creators";
-
-import StageNew from "./StageNew";
-
-// *** Routing ***
-import { useHistory } from "react-router-dom";
-import { useRef, useState } from "react";
-
-// *** IMAGES ***
-import stg_svg from './../../images/i-drag_black.svg';
-import move_vert_svg from './../../images/i-more_vert_black.svg';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
-
-import Chip from '@mui/material/Chip';
-
 import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
 import { Tooltip } from "@mui/material";
-import BadgeErrors from "../UIElements/BadgeErrors";
-import ValidationMessages from "../UIElements/ValidationMessages";
-import { tagStyle } from "../../configs/Constants";
+import Chip from '@mui/material/Chip';
+import PropTypes from 'prop-types';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { bindActionCreators } from "redux";
+import { tagStyle } from "../../configs/Constants.js";
+import actionCreators from "../../state/action-creators";
+import BadgeErrors from "../UIElements/BadgeErrors.js";
+import ValidationMessages from "../UIElements/ValidationMessages.js";
+import move_vert_svg from './../../images/i-more_vert_black.svg';
+import StageNew from "./StageNew.js";
 
 const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
 
@@ -49,7 +40,7 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
         </>;
     }
 
-    const editStage = stage => {
+    const editStage = () => {
         setShowStageForm(true)
     }
     return (
@@ -91,7 +82,7 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
                     <Layer onClick={toggle}>
                         <Popper reference={ref} placement="bottom-end">
                             <FlyoutMenu>
-                                <MenuItem label="Edit Program Stage" icon={<EditIcon />} onClick={() => { toggle(); editStage(stage); }} />
+                                <MenuItem label="Edit Program Stage" icon={<EditIcon />} onClick={() => { toggle(); editStage(); }} />
                                 <MenuItem disabled={true} destructive label="Delete Program Stage" icon={<DeleteIcon />} onClick={() => { toggle(); /* Add function */ }} />
                             </FlyoutMenu>
                         </Popper>
@@ -112,6 +103,17 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
             </div>
         </div>
     );
+}
+
+StageItem.propTypes = {
+    editStatus: PropTypes.string,
+    eventMode: PropTypes.bool,
+    hnqisMode: PropTypes.bool,
+    importResults: PropTypes.object,
+    setNewStage: PropTypes.func,
+    setNotification: PropTypes.func,
+    stage: PropTypes.object,
+    stagesRefetch: PropTypes.func
 }
 
 export default StageItem;

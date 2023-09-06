@@ -1,68 +1,29 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-
 import { CircularLoader } from "@dhis2/ui";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LabelIcon from "@mui/icons-material/LabelImportant";
+import PercentIcon from "@mui/icons-material/Percent";
+import QuizIcon from "@mui/icons-material/Quiz";
+import SettingsIcon from '@mui/icons-material/Settings';
+import UpgradeIcon from "@mui/icons-material/SwitchAccessShortcutAdd";
+import { DialogTitle } from "@mui/material";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import CustomMUIDialogTitle from "./../UIElements/CustomMUIDialogTitle";
-import CustomMUIDialog from "./../UIElements/CustomMUIDialog";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-
-import UpgradeIcon from "@mui/icons-material/SwitchAccessShortcutAdd";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import LabelIcon from "@mui/icons-material/LabelImportant";
-import QuizIcon from "@mui/icons-material/Quiz";
-import PercentIcon from "@mui/icons-material/Percent";
-import SettingsIcon from '@mui/icons-material/Settings';
-
-import { useState, useEffect, useRef } from "react";
-import {
-    DialogTitle,
-    FormControl,
-    FormControlLabel,
-    Switch,
-} from "@mui/material";
-import SelectOptions from "../UIElements/SelectOptions";
-
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-
-import AlertDialogSlide from "../UIElements/AlertDialogSlide";
-
-import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
-
-import { parseErrorsJoin, parseErrorsUL } from "../../utils/Utils";
-
-import {
-    QUESTION_TYPE_ATTRIBUTE,
-    DE_TYPE_ATTRIBUTE,
-    HEADER_ATTRIBUTE,
-    QUESTION_PARENT_ATTRIBUTE,
-    QUESTION_PARENT_OPTIONS_ATTRIBUTE,
-    COMPOSITIVE_SCORE_ATTRIBUTE,
-    SCORE_NUM_ATTRIBUTE,
-    SCORE_DEN_ATTRIBUTE,
-    QUESTION_ORDER_ATTRIBUTE,
-    METADATA,
-    FEEDBACK_ORDER,
-    COMPETENCY_ATTRIBUTE,
-    COMPETENCY_CLASS,
-    FEEDBACK_TEXT,
-    LEGEND_YES_NO,
-} from "../../configs/Constants";
-import {
-    Program,
-    HnqisProgramConfigs,
-    PS_AssessmentStage,
-    PS_ActionPlanStage,
-    PSS_Default,
-    PSS_CriticalSteps,
-    PSS_Scores,
-} from "./../../configs/ProgramTemplate";
-import { DeepCopy } from "../../utils/Utils";
-import H2Setting from "./H2Setting";
+import PropTypes from 'prop-types';
+import React, { useState, useEffect, useRef } from "react";
+import { QUESTION_TYPE_ATTRIBUTE, DE_TYPE_ATTRIBUTE, HEADER_ATTRIBUTE, QUESTION_PARENT_ATTRIBUTE, QUESTION_PARENT_OPTIONS_ATTRIBUTE, COMPOSITIVE_SCORE_ATTRIBUTE, SCORE_NUM_ATTRIBUTE, SCORE_DEN_ATTRIBUTE, QUESTION_ORDER_ATTRIBUTE, METADATA, FEEDBACK_ORDER, COMPETENCY_ATTRIBUTE, COMPETENCY_CLASS, FEEDBACK_TEXT, LEGEND_YES_NO } from "../../configs/Constants.js";
+import { parseErrorsJoin, parseErrorsUL, DeepCopy } from "../../utils/Utils.js";
+import AlertDialogSlide from "../UIElements/AlertDialogSlide.js";
+import { Program, HnqisProgramConfigs, PS_AssessmentStage, PS_ActionPlanStage, PSS_CriticalSteps, PSS_Scores } from "./../../configs/ProgramTemplate.js";
+import CustomMUIDialog from "./../UIElements/CustomMUIDialog.js";
+import CustomMUIDialogTitle from "./../UIElements/CustomMUIDialogTitle.js";
+import H2Setting from "./H2Setting.js";
 
 const queryProgramMetadata = {
     results: {
@@ -160,7 +121,7 @@ const H2Convert = ({
     setNotification,
     doSearch,
 }) => {
-    let metadataDM = useDataMutation(metadataMutation, {
+    const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             setNotification({
                 message: parseErrorsJoin(err.details, '\\n'),
@@ -178,7 +139,6 @@ const H2Convert = ({
     };
 
     const [dialogStatus, setDialogStatus] = useState(false);
-    const [errorHA, setErrorHA] = useState();
     const [loading, setLoading] = useState(true);
     const [loadingConversion, setLoadingConversion] = useState(false);
     const [statusModal, setStatusModal] = useState(false);
@@ -190,7 +150,6 @@ const H2Convert = ({
     });
     const { data: haQuery } = useDataQuery(queryHealthAreas);
 
-    const [healthArea, setHealthArea] = useState("");
     const [healthAreaOptions, setHealthAreaOptions] = useState(undefined);
 
     const [sectionsData, setSectionsData] = useState(undefined);
@@ -199,13 +158,13 @@ const H2Convert = ({
 
     const [buttonDisabled, setButtonDisabled] = useState(true);
 
-    const { data: idQueryRes, refetch: getIDs } = useDataQuery(queryId, {
+    const { refetch: getIDs } = useDataQuery(queryId, {
         lazy: true,
         variables: { n: undefined },
     });
-    const { data: idProgramType, refetch: getProgramTypeAttribute } =
+    const { refetch: getProgramTypeAttribute } =
         useDataQuery(queryProgramType, { lazy: true });
-    const { data: checklistOptions, refetch: getChecklistOptions } =
+    const { refetch: getChecklistOptions } =
         useDataQuery(queryOptions, {
             lazy: true,
             variables: { optionsList: undefined },
@@ -224,16 +183,16 @@ const H2Convert = ({
     }, [programData, haQuery]);
 
     useEffect(() => {
-        if (healthAreaOptions) setLoading(false);
+        if (healthAreaOptions) { setLoading(false) }
     }, [healthAreaOptions]);
 
     useEffect(() => {
         if (programData) {
-            let optionsList = [];
-            let program = programData?.results?.programs[0];
+            const optionsList = [];
+            const program = programData?.results?.programs[0];
 
-            let h1Tabs = program.programStages[0].programStageSections;
-            let h1StageDataElements =
+            const h1Tabs = program.programStages[0].programStageSections;
+            const h1StageDataElements =
                 program.programStages[0].programStageDataElements;
 
             let newDataElementsList = [];
@@ -241,11 +200,11 @@ const H2Convert = ({
                 (tab) =>
                     (newDataElementsList = newDataElementsList.concat(
                         tab.dataElements.map((de) => {
-                            let programStageDataElement =
+                            const programStageDataElement =
                                 h1StageDataElements.find(
                                     (psde) => psde.dataElement.id === de.id
                                 );
-                            let metadata =
+                            const metadata =
                                 programStageDataElement.dataElement.attributeValues.reduce(
                                     (meta, att) => {
                                         meta[att.attribute.id] = att.value;
@@ -255,15 +214,12 @@ const H2Convert = ({
                                 );
                             if (
                                 metadata[QUESTION_PARENT_OPTIONS_ATTRIBUTE] &&
-                                !optionsList.includes(
-                                    metadata[QUESTION_PARENT_OPTIONS_ATTRIBUTE]
-                                )
-                            )
+                                !optionsList.includes( metadata[QUESTION_PARENT_OPTIONS_ATTRIBUTE] )
+                            ) {
                                 optionsList.push(
-                                    metadata[
-                                        QUESTION_PARENT_OPTIONS_ATTRIBUTE
-                                    ].split(",")[0]
+                                    metadata[QUESTION_PARENT_OPTIONS_ATTRIBUTE].split(",")[0]
                                 );
+                            }
 
                             return {
                                 tabName: tab.name,
@@ -279,17 +235,19 @@ const H2Convert = ({
             // Build NEW sections
             setSectionsData(
                 newDataElementsList.reduce((acu, cur) => {
-                    let header =
+                    const header =
                         cur.programStageDataElement.dataElement.attributeValues.find(
                             (att) => att.attribute.id === HEADER_ATTRIBUTE
                         )?.value;
-                    let sectionName = `${cur.tabName} - ${header}`;
-                    let sectionIdx = acu.findIndex(
+                    const sectionName = `${cur.tabName} - ${header}`;
+                    const sectionIdx = acu.findIndex(
                         (section) => section.name === sectionName
                     );
-                    if (sectionIdx === -1)
+                    if (sectionIdx === -1) {
                         acu.push({ name: sectionName, dataElements: [cur] });
-                    else acu[sectionIdx].dataElements.push(cur);
+                    } else {
+                        acu[sectionIdx].dataElements.push(cur);
+                    }
                     return acu;
                 }, [])
             );
@@ -321,14 +279,14 @@ const H2Convert = ({
                             )?.value !== "0"
                     )
                     .sort((a, b) => {
-                        let aStruct = a.dataElement.attributeValues
+                        const aStruct = a.dataElement.attributeValues
                             .find(
                                 (att) =>
                                     att.attribute.id ===
                                     COMPOSITIVE_SCORE_ATTRIBUTE
                             )
                             .value.split(".");
-                        let bStruct = b.dataElement.attributeValues
+                        const bStruct = b.dataElement.attributeValues
                             .find(
                                 (att) =>
                                     att.attribute.id ===
@@ -337,15 +295,15 @@ const H2Convert = ({
                             .value.split(".");
 
                         while (true) {
-                            let x = aStruct.shift(),
+                            const x = aStruct.shift(),
                                 y = bStruct.shift();
 
-                            if (!x && !y) break;
-                            if (!x && y) return -1;
-                            if (x && !y) return 1;
+                            if (!x && !y) { break }
+                            if (!x && y) { return -1 }
+                            if (x && !y) { return 1 }
 
-                            if (parseInt(x) > parseInt(y)) return 1;
-                            if (parseInt(x) < parseInt(y)) return -1;
+                            if (parseInt(x) > parseInt(y)) { return 1 }
+                            if (parseInt(x) < parseInt(y)) { return -1 }
                         }
 
                         return 0;
@@ -359,7 +317,7 @@ const H2Convert = ({
     };
 
     const submission = () => {
-        let hnqisValidation = h2SettingsRef.current.handleFormValidation()
+        const hnqisValidation = h2SettingsRef.current.handleFormValidation()
         setErrorBadge(!hnqisValidation)
         if (hnqisValidation) {
             setDialogStatus(true);
@@ -376,12 +334,12 @@ const H2Convert = ({
         let questionFeedbackOrder = 1;
         let labelsQtty = 0;
         let psdeSortOrder = 1;
-        let originalLabelIDs = [];
+        const originalLabelIDs = [];
 
         const optionsResult = await getChecklistOptions({
             optionsList: currentChecklistOptions,
         });
-        let optionsMap = optionsResult?.results?.options;
+        const optionsMap = optionsResult?.results?.options;
 
         const program_dataElements = [];
         const program_programStageDataElements = [];
@@ -401,7 +359,7 @@ const H2Convert = ({
                 )
                 .map((de, deIndex) => {
                     // SAVE PROGRAM STAGE DATA ELEMENT
-                    let psde = DeepCopy(de.programStageDataElement);
+                    const psde = DeepCopy(de.programStageDataElement);
                     psde.sortOrder = psdeSortOrder;
                     psde.dataElement = {
                         id: de.programStageDataElement.dataElement.id,
@@ -409,7 +367,7 @@ const H2Convert = ({
                     program_programStageDataElements.push(psde);
                     psdeSortOrder += 1;
 
-                    let dataElement = de.programStageDataElement.dataElement;
+                    const dataElement = de.programStageDataElement.dataElement;
 
                     if (
                         [
@@ -433,11 +391,11 @@ const H2Convert = ({
                             questionFeedbackOrder = 1;
                         }
 
-                        let feedbackOrder = `${compositiveScoreOrder}.${questionFeedbackOrder++}`;
-                        let foIndex = dataElement.attributeValues.findIndex(
+                        const feedbackOrder = `${compositiveScoreOrder}.${questionFeedbackOrder++}`;
+                        const foIndex = dataElement.attributeValues.findIndex(
                             (att) => att.attribute.id === FEEDBACK_ORDER
                         );
-                        let feedbackOrderAttribute = {
+                        const feedbackOrderAttribute = {
                             attribute: { id: FEEDBACK_ORDER },
                             value: feedbackOrder,
                         };
@@ -454,10 +412,10 @@ const H2Convert = ({
                     }
 
                     if (dataElement.description) {
-                        let ftIndex = dataElement.attributeValues.findIndex(
+                        const ftIndex = dataElement.attributeValues.findIndex(
                             (att) => att.attribute.id === FEEDBACK_TEXT
                         );
-                        let feedbackTextAttribute = {
+                        const feedbackTextAttribute = {
                             attribute: { id: FEEDBACK_TEXT },
                             value: dataElement.description,
                         };
@@ -476,7 +434,7 @@ const H2Convert = ({
                         dataElement.displayDescription = undefined;
                     }
 
-                    let parentValue = optionsMap.find(
+                    const parentValue = optionsMap.find(
                         (option) =>
                             option.id ===
                             de.metadata[
@@ -523,7 +481,7 @@ const H2Convert = ({
                         dataElement.legendSets = [{ "id": LEGEND_YES_NO }]
                     }
 
-                    let pcaMetadataIndex =
+                    const pcaMetadataIndex =
                         dataElement.attributeValues.findIndex(
                             (att) => att.attribute.id === METADATA
                         );
@@ -551,13 +509,13 @@ const H2Convert = ({
             return section;
         });
 
-        let newScores = scores
-            .map((score, scoreIndex) => {
-                let de = DeepCopy(score.dataElement);
+        const newScores = scores
+            .map((score) => {
+                const de = DeepCopy(score.dataElement);
                 de.aggregationType = "AVERAGE";
 
                 // FEEDBACK ORDER
-                let foIndex = de.attributeValues.findIndex(
+                const foIndex = de.attributeValues.findIndex(
                     (att) => att.attribute.id === FEEDBACK_ORDER
                 );
 
@@ -576,12 +534,12 @@ const H2Convert = ({
 
                 // PCA METADATA
 
-                let pcaMetadata = {
+                const pcaMetadata = {
                     isCompulsory: "No",
                     isCritical: "No",
                     elemType: "score",
                 };
-                let pcaMetadataIndex = de.attributeValues.findIndex(
+                const pcaMetadataIndex = de.attributeValues.findIndex(
                     (att) => att.attribute.id === METADATA
                 );
 
@@ -614,22 +572,22 @@ const H2Convert = ({
             });
 
         const newIds = await getIDs({ n: 5 + labelsQtty + newSections.length });
-        let uidPool = newIds?.results?.codes;
+        const uidPool = newIds?.results?.codes;
 
         const programTypeData = await getProgramTypeAttribute();
-        let prgTypeId = programTypeData?.results?.attributes[0]?.id;
+        const prgTypeId = programTypeData?.results?.attributes[0]?.id;
 
         if (uidPool && prgTypeId) {
             //Program Setup
-            let programOld = programData?.results?.programs[0];
+            const programOld = programData?.results?.programs[0];
 
-            let programId = uidPool.shift();
-            let assessmentId = uidPool.shift();
-            let actionPlanId = uidPool.shift();
-            let stepsSectionId = uidPool.shift();
-            let scoresSectionId = uidPool.shift();
+            const programId = uidPool.shift();
+            const assessmentId = uidPool.shift();
+            const actionPlanId = uidPool.shift();
+            const stepsSectionId = uidPool.shift();
+            const scoresSectionId = uidPool.shift();
 
-            let prgrm = DeepCopy(Program);
+            const prgrm = DeepCopy(Program);
             Object.assign(prgrm, HnqisProgramConfigs);
 
             let assessmentStage = undefined;
@@ -647,12 +605,8 @@ const H2Convert = ({
                 attribute: { id: prgTypeId },
             });
 
-            let pcaMetadataVal = h2SettingsRef.current.saveMetaData();
-            let useCompetency = pcaMetadataVal?.useCompetencyClass === 'Yes';
-            /*
-            pcaMetadataVal.useCompetencyClass = useCompetency ? "Yes" : "No";
-            pcaMetadataVal.healthArea = healthArea;
-            */
+            const pcaMetadataVal = h2SettingsRef.current.saveMetaData();
+            const useCompetency = pcaMetadataVal?.useCompetencyClass === 'Yes';
             
             pcaMetadataVal.h1Program = programOld.id;
             pcaMetadataVal.dePrefix = programOld.shortName.slice(0, 22) + " H2";
@@ -743,7 +697,7 @@ const H2Convert = ({
             programStages = [assessmentStage, actionPlanStage];
             programStageSections = newSections.concat(criticalSteps, scores);
 
-            let h1PCAMetadata = {
+            const h1PCAMetadata = {
                 attribute: { id: METADATA },
                 value: JSON.stringify({
                     h2Reworked: "Yes",
@@ -751,7 +705,7 @@ const H2Convert = ({
                 }),
             };
 
-            let metadataIdx = programOld.attributeValues.findIndex(
+            const metadataIdx = programOld.attributeValues.findIndex(
                 (att) => att.attribute.id === METADATA
             );
             if (metadataIdx > -1) {
@@ -766,7 +720,7 @@ const H2Convert = ({
             });
 
             // Creating New Data Elements for labels (Patching IDs)
-            let labelIDMapping = {};
+            const labelIDMapping = {};
             originalLabelIDs.forEach(
                 (id) => (labelIDMapping[id] = uidPool.shift())
             );
@@ -791,22 +745,12 @@ const H2Convert = ({
             });
 
             // Building results object
-            let resultMeta = {
+            const resultMeta = {
                 programs: [prgrm, programOld],
                 programStages,
                 programStageSections,
                 dataElements: program_dataElements,
             };
-
-            // console.log(resultMeta)
-
-            // doSearch(programOld.name)
-            // setNotification({
-            //     message: 'The HNQIS 1.X Program has been converted to HNQIS 2.0 successfully, access it to apply changes and finish setting it up.',
-            //     severity: 'success'
-            // });
-            // setConversionH2ProgramId(undefined)
-            // setLoadingConversion(false)
 
             metadataRequest.mutate({ data: resultMeta }).then((response) => {
                 if (response.status === "OK") {
@@ -1068,13 +1012,13 @@ const H2Convert = ({
                                             sx={{ backgroundColor: "#f1f1f1" }}
                                         >
                                             {scoresData.map((score, key) => {
-                                                let compositiveScore =
+                                                const compositiveScore =
                                                     score.dataElement.attributeValues.find(
                                                         (att) =>
                                                             att.attribute.id ===
                                                             COMPOSITIVE_SCORE_ATTRIBUTE
                                                     ).value;
-                                                let levels =
+                                                const levels =
                                                     compositiveScore.split(
                                                         "."
                                                     ).length;
@@ -1220,5 +1164,12 @@ const H2Convert = ({
         </>
     );
 };
+
+H2Convert.propTypes = {
+    doSearch: PropTypes.func,
+    program: PropTypes.string,
+    setConversionH2ProgramId: PropTypes.func,
+    setNotification: PropTypes.func
+}
 
 export default H2Convert;

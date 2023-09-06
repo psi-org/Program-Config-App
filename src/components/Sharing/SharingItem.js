@@ -1,15 +1,15 @@
-import { useState } from "react";
-import SharingOptions from "./SharingOptions";
-
 import ApartmentIcon from '@mui/icons-material/Apartment';
-import ExternalIcon from '@mui/icons-material/Public';
+import BlockIcon from '@mui/icons-material/Block';
+import DeleteIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
 import PeopleIcon from '@mui/icons-material/People';
 import PersonIcon from '@mui/icons-material/Person';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Close';
-import BlockIcon from '@mui/icons-material/Block';
+import ExternalIcon from '@mui/icons-material/Public';
 import ViewIcon from '@mui/icons-material/Visibility';
 import IconButton from '@mui/material/IconButton'
+import PropTypes from 'prop-types';
+import React, { useState } from "react";
+import SharingOptions from "./SharingOptions.js";
 
 const SharingItem = ({ type, element, permission, updatePermission, deleteUserPermission }) => {
     const [permissionArray, setPermssionArray] = useState((!permission) ? Array(6).fill("-") : permission.split(""));
@@ -26,7 +26,7 @@ const SharingItem = ({ type, element, permission, updatePermission, deleteUserPe
     }
 
     const updateUnGPermission = (segment, permsn) => {
-        let pArray = permissionArray;
+        const pArray = permissionArray;
         if (segment === 1) {
             pArray[0] = permsn[0];
             pArray[1] = permsn[1];
@@ -58,6 +58,14 @@ const SharingItem = ({ type, element, permission, updatePermission, deleteUserPe
             </div>
         </div>
     )
+}
+
+SharingItem.propTypes = {
+    deleteUserPermission: PropTypes.func,
+    element: PropTypes.object,
+    permission: PropTypes.string,
+    type: PropTypes.string,
+    updatePermission: PropTypes.func
 }
 
 export default SharingItem;
