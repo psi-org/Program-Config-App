@@ -1,5 +1,5 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { DeepCopy } from '../../utils/Utils';
+import { DeepCopy } from '../../utils/Utils.js';
 
 const sharingQuery = {
     results: {
@@ -13,14 +13,14 @@ const sharingQuery = {
 /**
  * @deprecated
  */
-const VisualizationSharing = ({id, sharing}) => {
+const VisualizationSharing = ({ id, sharing }) => {
     const metadataMutation = {
         resource: `sharing?type=visualization&id=${id}`,
         type: 'update',
-        data: ({data}) => data
+        data: ({ data }) => data
     };
-    const {loading, data} = useDataQuery(sharingQuery, { variables: {element: 'visualization', id: id}});
-    let metadataDM = useDataMutation(metadataMutation, {
+    const { loading, data } = useDataQuery(sharingQuery, { variables: { element: 'visualization', id: id } });
+    const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             console.error(err)
         }
@@ -33,27 +33,27 @@ const VisualizationSharing = ({id, sharing}) => {
         called: metadataDM[1].called
     };
     const dePermission = (permission) => {
-        return permission.substring(0,2)+'------';
+        return permission.substring(0, 2) + '------';
     }
     let payload;
-    if(!loading)
-    {
+    if (!loading) {
         payload = DeepCopy(data.results);
         payload.object.publicAccess = dePermission(sharing.object.publicAccess);
         payload.object.userAccesses = [];
         payload.object.userGroupAccesses = [];
         sharing.object.userAccesses.forEach((user) => {
-            payload.object.userAccesses.push({id: user.id, access: dePermission(user.access)})
+            payload.object.userAccesses.push({ id: user.id, access: dePermission(user.access) })
         });
         sharing.object.userGroupAccesses.forEach((userGroup) => {
-            payload.object.userGroupAccesses.push({id: userGroup.id, access: dePermission(userGroup.access)})
+            payload.object.userGroupAccesses.push({ id: userGroup.id, access: dePermission(userGroup.access) })
         });
-        if(!metadataRequest.called) {
-            metadataRequest.mutate({data: payload }).then(response => {
-                if(response?.status === "OK")
+        if (!metadataRequest.called) {
+            metadataRequest.mutate({ data: payload }).then(response => {
+                if (response?.status === "OK") {
                     console.log("Visualization Updated successfully")
-                else
+                } else {
                     console.log("Error Saving Visualization")
+                }
             });
         }
     }

@@ -1,20 +1,21 @@
-import {useState, useEffect} from 'react';
 import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
+import PropTypes from 'prop-types';
+import React, {useState, useEffect} from 'react';
 
 const Suggestions = ({ usersNGroups, keyword, setSearch, addEntity, posRef }) => {
 
-    let [results,setResults] = useState([])
+    const [results,setResults] = useState([])
 
     useEffect(()=>{
-        let keyVal = keyword.trim().toLowerCase();
+        const keyVal = keyword.trim().toLowerCase();
 
-        let nUsers = usersNGroups?.userData.users?.filter((user) => { 
+        const nUsers = usersNGroups?.userData.users?.filter((user) => { 
             return String(user.displayName?.toLowerCase()||'').includes(keyVal) || String(user.userCredentials.username?.toLowerCase()||'').includes(keyVal)
         })?.map(user => (
             <MenuItem label={user.displayName} key={user.id} onClick={() => {selectUserOrGroup("userAccesses", user)}}/>
         ))||[];
 
-        let nUserGroups = usersNGroups?.userGroupData.userGroups?.filter((userGroup) => { 
+        const nUserGroups = usersNGroups?.userGroupData.userGroups?.filter((userGroup) => { 
             return String(userGroup.displayName?.toLowerCase()||'').includes(keyVal)
         })?.map(userGroup => (
             <MenuItem label={userGroup.displayName} key={userGroup.id} onClick={()=>{selectUserOrGroup("userGroupAccesses", userGroup)}}/>
@@ -41,6 +42,14 @@ const Suggestions = ({ usersNGroups, keyword, setSearch, addEntity, posRef }) =>
                 </Layer>
         }
             </>
+}
+
+Suggestions.propTypes = {
+    addEntity: PropTypes.func,
+    keyword: PropTypes.string,
+    posRef: PropTypes.object,
+    setSearch: PropTypes.func,
+    usersNGroups: PropTypes.object,
 }
 
 export default Suggestions;

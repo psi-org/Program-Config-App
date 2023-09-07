@@ -1,12 +1,11 @@
-import { useState } from 'react';
-
-// *** IMAGES ***
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { tagStyle } from '../../configs/Constants.js';
 import cogs_svg from './../../images/cogs.svg';
-import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import { tagStyle } from '../../configs/Constants';
+import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 
-const CriticalCalculations = ({ stageSection, index }) => {
+const CriticalCalculations = ({ stageSection }) => {
     const [expanded, setExpanded] = useState(false);
 
     return (
@@ -57,5 +56,9 @@ const CriticalCalculations = ({ stageSection, index }) => {
         </>
     );
 };
+
+CriticalCalculations.propTypes = {
+    stageSection: PropTypes.object
+}
 
 export default CriticalCalculations;

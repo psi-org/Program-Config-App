@@ -1188,7 +1188,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
                         </Droppable>
                         {hnqisMode && (isSectionMode) &&
                             <>
-                                <CriticalCalculations stageSection={criticalSection} index={0} key={criticalSection?.id || "crit"} />
+                                <CriticalCalculations stageSection={criticalSection} ikey={criticalSection?.id || "crit"} />
                                 <Scores stageSection={scoresSection} index={0} key={scoresSection?.id || "scores"} program={programId} />
                             </>
                         }
