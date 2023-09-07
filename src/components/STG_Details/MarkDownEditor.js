@@ -1,27 +1,26 @@
+import MDEditor from "@uiw/react-md-editor";
+import PropTypes from 'prop-types';
 import React from "react";
-import MDEditor, {
-    commands,
-    ICommand,
-    TextState,
-    TextAreaTextApi
-} from "@uiw/react-md-editor";
-
 import rehypeSanitize from "rehype-sanitize";
 
-//import { bold, italic, divider, unorderedListCommand, orderedListCommand, checkedListCommand, title, image, link } from '@uiw/react-md-editor/lib/commands';
-
-const MarkDownEditor = (props) => {
+const MarkDownEditor = ({ disabled, setValue, value }) => {
     return <MDEditor
         fullscreen={false}
-        value={!props.disabled?props.value:''}
+        value={!disabled ? value : ''}
         onChange={(val) => {
-            if (!props.disabled) props.setValue(val);
+            if (!disabled) { setValue(val) }
         }}
         height='200'
         previewOptions={{
             rehypePlugins: [[rehypeSanitize]],
         }}
     />
+}
+
+MarkDownEditor.propTypes = {
+    disabled: PropTypes.bool,
+    setValue: PropTypes.func,
+    value: PropTypes.string
 }
 
 export default MarkDownEditor

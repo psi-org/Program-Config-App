@@ -1,28 +1,22 @@
-import React from 'react';
-import { useState, useRef, useEffect } from "react";
-import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
-
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
-import SendIcon from '@mui/icons-material/Send';
-
-import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import { DataGrid } from '@mui/x-data-grid';
-import DataElementForm from "./DataElementForm";
-
+import { useDataQuery } from '@dhis2/app-runtime'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SearchIcon from '@mui/icons-material/Search';
-
-import InputAdornment from "@mui/material/InputAdornment";
-import AlertDialogSlide from '../UIElements/AlertDialogSlide';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import InputAdornment from "@mui/material/InputAdornment";
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import TextField from '@mui/material/TextField';
+import { DataGrid } from '@mui/x-data-grid';
+import PropTypes from 'prop-types';
+import React, { useState, useRef, useEffect } from "react";
+import AlertDialogSlide from '../UIElements/AlertDialogSlide.js';
+import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
+import DataElementForm from "./DataElementForm.js";
 
 const dataElementsSearchQuery = {
     results: {
@@ -57,8 +51,8 @@ function TabPanel(props) {
 
 TabPanel.propTypes = {
     children: PropTypes.node,
-    index: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
+    index: PropTypes.isRequired.number,
+    value: PropTypes.isRequired.number,
 };
 
 function a11yProps(index) {
@@ -73,7 +67,7 @@ const DataElementManager = (props) => {
     const [newDataElements,setNewDataElements] = useState([])
     const [filterValue, setFilterValue] = useState('')
     const [saveDeFlag, setSaveDeFlag] = useState(false);
-    const { data: dataElements, loading: loadingSearch, refetch: search } = useDataQuery(dataElementsSearchQuery, { lazy: true, variables: { token: undefined, page: undefined } });
+    const { loading: loadingSearch, refetch: search } = useDataQuery(dataElementsSearchQuery, { lazy: true, variables: { token: undefined, page: undefined } });
     
     const [tabValue, setTabValue] = useState(0);
     const handleTabChange = (event, newValue) => setTabValue(newValue)
@@ -86,12 +80,11 @@ const DataElementManager = (props) => {
     }
 
     const craftDate = (params) => {
-        let date = new Date(params.row.lastUpdated)
+        const date = new Date(params.row.lastUpdated)
         return date.toLocaleString()
     }
 
     // DATA GRID //
-    const [loading, setLoading] = useState(false)
     const [page, setPage] = useState(0)
     const [pageChanged,setPageChanged] = useState(false)
     const [rows, setRows] = useState([])
@@ -108,17 +101,6 @@ const DataElementManager = (props) => {
     ]
 
     const doSearch = async () => {
-        /* search({ token: filterValue, page:page }).then(data => {
-            if (data?.results?.dataElements) {
-                setRows(data.results.dataElements)
-                setTotalRows(data.results.pager.total)    
-            }
-            setTimeout(() => {
-                setSelectionModel(prevSelectionModel.current)
-                
-            });
-        }) */
-
         const data = await search({ token: filterValue, page:page })
         if(data.results?.dataElements){
             setRows(data.results.dataElements)
@@ -128,13 +110,16 @@ const DataElementManager = (props) => {
     }
 
     useEffect(()=>{
-        if(page>0) doSearch()
+        if (page > 0) { doSearch() }
     },[page])
 
     useEffect(()=>{
         if( page > 0 ){
-            if(pageChanged) setPageChanged(false)
-            else checkSelectedDE(selectionModel)
+            if (pageChanged) {
+                setPageChanged(false)
+            } else {
+                checkSelectedDE(selectionModel)
+            }
         }
     },[selectionModel])
         
@@ -145,7 +130,7 @@ const DataElementManager = (props) => {
         setNewDataElements(model.map(id => {
             let deObject
             deObject = newDataElements.find(de => de.id === id)
-            if(!deObject) deObject = rows.find(de => de.id===id)
+            if (!deObject) { deObject = rows.find(de => de.id === id) }
             return deObject
         }))
     }
@@ -164,7 +149,7 @@ const DataElementManager = (props) => {
         if(tabValue === 1){ //New DE
             setSaveDeFlag(true)
         }else{ //Existing DEs
-            let newDEObjects = newDataElements.map(de => ({
+            const newDEObjects = newDataElements.map(de => ({
                 type:'added',
                 displayInReports: false,
                 compulsory: false,
@@ -180,7 +165,7 @@ const DataElementManager = (props) => {
             })
             setSelectionModel([])
             setNewDataElements([])
-            if (props.hnqisMode) props.setSaveStatus('Validate & Save');
+            if (props.hnqisMode) { props.setSaveStatus('Validate & Save') }
         }
     }
 
@@ -214,8 +199,9 @@ const DataElementManager = (props) => {
                                     onChange={handleChangeFilterValue}
                                     onKeyPress={event => {
                                         if (event.key === 'Enter' && filterValue!=='') {
-                                            if(page===1) doSearch()
-                                            else setPage(1)
+                                            if (page === 1) {
+                                                doSearch()
+                                            } else { setPage(1) }
                                         }
                                     }}
                                     autoComplete='off'
@@ -224,8 +210,9 @@ const DataElementManager = (props) => {
                                             <InputAdornment position='end'>
                                                 <Button onClick={() => {
                                                     if (filterValue!=='') {
-                                                        if(page===1) doSearch()
-                                                        else setPage(1)
+                                                        if (page === 1) {
+                                                            doSearch()
+                                                        } else { setPage(1) }
                                                     }
                                                 }} 
                                                 startIcon={<SearchIcon />} 
@@ -304,6 +291,16 @@ const DataElementManager = (props) => {
             </CustomMUIDialog>
         </>
     )
+}
+
+DataElementManager.propTypes = {
+    deRef: PropTypes.object,
+    hnqisMode: PropTypes.bool,
+    program: PropTypes.string,
+    programStageDataElements: PropTypes.array,
+    saveAdd: PropTypes.func,
+    setDeManager: PropTypes.func,
+    setSaveStatus: PropTypes.func,
 }
 
 export default DataElementManager;

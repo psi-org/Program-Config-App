@@ -1,12 +1,11 @@
-import { useState } from 'react';
-
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { tagStyle } from '../../configs/Constants.js';
+import ValidationMessages from "../UIElements/ValidationMessages.js";
+import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import error_svg from './../../images/i-error.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
-import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import ValidationMessages from "../UIElements/ValidationMessages";
-import { METADATA, tagStyle } from '../../configs/Constants';
-import { ValidationErrorItem } from './ValidationErrorItem';
-import { extractAttributeValues } from '../../utils/Utils';
+import { ValidationErrorItem } from './ValidationErrorItem.js';
 
 const Errors = ({ validationResults }) => {
     const [showValidationMessage, setShowValidationMessage] = useState(false);
@@ -45,19 +44,19 @@ const Errors = ({ validationResults }) => {
                     display: expanded ? 'block' : 'none'
                 }}>
                 {
-                    validationResults.sort((a, b) => { 
-                        if (a.title > b.title) return 1;
-                        if (a.title < b.title) return -1;
+                    validationResults.sort((a, b) => {
+                        if (a.title > b.title) { return 1 }
+                        if (a.title < b.title) { return -1 }
                         return 0;
                     }).map((errorDetails, i) => {
                         return (
-                            <ValidationErrorItem 
-                                key={i} 
-                                id={'errorDetails_' + i} 
+                            <ValidationErrorItem
+                                key={i}
+                                id={'errorDetails_' + i}
                                 tagName={errorDetails.tagName}
                                 errorTitle={errorDetails.title}
                                 errorObject={errorDetails}
-                                displayBadges={ errorDetails.displayBadges }
+                                displayBadges={errorDetails.displayBadges}
                                 setShowValidationMessage={setShowValidationMessage}
                                 setErrors={setErrors}
                             />
@@ -69,6 +68,10 @@ const Errors = ({ validationResults }) => {
             {showValidationMessage && <ValidationMessages objects={errors} showValidationMessage={setShowValidationMessage} />}
         </>
     )
+}
+
+Errors.propTypes = {
+    validationResults: PropTypes.array
 }
 
 export default Errors;

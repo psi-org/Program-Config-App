@@ -82,7 +82,7 @@ const Exporter = (props) => {
         addReleaseNotes(releaseNotesWS, ReleaseNotes, password);
         hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
         addProtection(templateWS,3,3000,password);
-        writeWorkbook(workbook, props.programName, props.setStatus, props.isLoading);
+        writeWorkbook(workbook, props.programName, props.isLoading);
     };
 
     const addInstructions = async (ws) => {

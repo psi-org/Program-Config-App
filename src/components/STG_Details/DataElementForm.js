@@ -1,32 +1,25 @@
-//MATERIAL UI
 import { useDataQuery } from '@dhis2/app-runtime';
-import { TextField, Select, MenuItem, FormControl, InputLabel, FormControlLabel, Switch, Autocomplete, Grid, FormLabel, Button } from '@mui/material';
-import { useEffect, useState } from "react"
-import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES, AGG_TYPES, MAX_SHORT_NAME_LENGTH } from '../../configs/Constants';
-import RowRadioButtonsGroup from './RowRadioButtonsGroup';
-
-import FilterNoneIcon from '@mui/icons-material/FilterNone';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Cancel';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import InfoIcon from '@mui/icons-material/Info';
-import CloseIcon from '@mui/icons-material/Close';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CloseIcon from '@mui/icons-material/Close';
+import FilterNoneIcon from '@mui/icons-material/FilterNone';
+import InfoIcon from '@mui/icons-material/Info';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import SaveIcon from '@mui/icons-material/Save';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { TextField, FormControl, FormControlLabel, Switch, Autocomplete, Grid, FormLabel, Button } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-
-import SelectOptions from '../UIElements/SelectOptions';
-import MarkDownEditor from './MarkDownEditor';
-import InfoBox from './../UIElements/InfoBox';
-
-import AlertDialogSlide from '../UIElements/AlertDialogSlide';
-
-import ProgramRulesList from './../UIElements/ProgramRulesList'
-
-import StyleManager from '../UIElements/StyleManager';
-
-import { ChromePicker } from 'react-color';
+import PropTypes from 'prop-types';
+import React, { useEffect, useState } from "react"
+import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES, AGG_TYPES, MAX_SHORT_NAME_LENGTH } from '../../configs/Constants.js';
+import AlertDialogSlide from '../UIElements/AlertDialogSlide.js';
+import SelectOptions from '../UIElements/SelectOptions.js';
+import StyleManager from '../UIElements/StyleManager.js';
+import InfoBox from './../UIElements/InfoBox.js';
+import ProgramRulesList from './../UIElements/ProgramRulesList.js'
+import MarkDownEditor from './MarkDownEditor.js';
+import RowRadioButtonsGroup from './RowRadioButtonsGroup.js';
 
 const optionSetQuery = {
     results: {
@@ -67,7 +60,7 @@ const queryId = {
 
 const DataElementForm = ({ program, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisMode, setSaveStatus }) => {
 
-    const de = programStageDataElement.dataElement
+    const de = programStageDataElement.dataElement;
 
     const idQuery = useDataQuery(queryId);
     const newDeId = idQuery.data?.results.codes[0];
@@ -82,11 +75,11 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
     
 
     useEffect(() => {
-        if(initOptionSets) setServerOptionSets(initOptionSets)
+        if (initOptionSets) { setServerOptionSets(initOptionSets) }
     }, [initOptionSets])
 
     useEffect(() => {
-        if(initLegendSets) setServerLegendSets(initLegendSets)
+        if (initLegendSets) { setServerLegendSets(initLegendSets) }
     }, [initLegendSets])
     
 
@@ -292,16 +285,16 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                 validationErrors.shortName = undefined
             }
 
-            if (code.length > MAX_SHORT_NAME_LENGTH) {
+            if (elementCode && elementCode.length > MAX_SHORT_NAME_LENGTH) {
                 response = false
-                validationErrors.code = `This field must contain less than  ${MAX_SHORT_NAME_LENGTH} characters`
+                validationErrors.elementCode = `This field must contain less than  ${MAX_SHORT_NAME_LENGTH} characters`
             } else {
-                validationErrors.code = undefined
+                validationErrors.elementCode = undefined
             }
         } else {
             validationErrors.elementName = undefined
             validationErrors.shortName = undefined
-            validationErrors.code = undefined
+            validationErrors.elementCode = undefined
         }
 
         if (String(numerator).trim() !== '' && String(denominator).trim() === '') {
@@ -346,9 +339,9 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
     }
 
     const buildStyle = () => {
-        let auxstyle = {};
-        if (deIcon) auxstyle.icon = deIcon;
-        if (deColor) auxstyle.color = deColor;
+        const auxstyle = {};
+        if (deIcon) { auxstyle.icon = deIcon }
+        if (deColor) { auxstyle.color = deColor }
 
         return (Object.keys(auxstyle).length > 0)?auxstyle:undefined
     }
@@ -356,10 +349,10 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
     const callSave = () => {
 
         // Save new values in local variable de
-        let data = JSON.parse(JSON.stringify(de))
+        const data = JSON.parse(JSON.stringify(de))
         
-        let attributeValues = []
-        let metadata = JSON.parse(de?.attributeValues?.find(att => att.attribute.id === METADATA)?.value || '{}')
+        const attributeValues = []
+        const metadata = JSON.parse(de?.attributeValues?.find(att => att.attribute.id === METADATA)?.value || '{}')
 
         data.style = buildStyle()
 
@@ -394,29 +387,29 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
         // METADATA
         // Elem type
-        metadata.elemType = structure
-        metadata.isCompulsory = compulsory ? "Yes" : "No"
-        metadata.isCritical = critical ? "Yes" : "No"
-        if (numerator) metadata.scoreNum = numerator
-        if (denominator) metadata.scoreDen = denominator
-        if (structure === 'label') metadata.labelFormName = formName
+        metadata.elemType = structure;
+        metadata.isCompulsory = compulsory ? "Yes" : "No";
+        metadata.isCritical = critical ? "Yes" : "No";
+        if (numerator) { metadata.scoreNum = numerator }
+        if (denominator) { metadata.scoreDen = denominator }
+        if (structure === 'label') { metadata.labelFormName = formName }
         metadata.autoNaming = autoNaming ? 'Yes' : 'No';
 
         attributeValues.push({ attribute: { id: METADATA }, value: JSON.stringify(metadata) })
 
         // FEEDBACK ORDER
-        if (feedbackOrder) attributeValues.push({ attribute: { id: FEEDBACK_ORDER }, value: feedbackOrder })
+        if (feedbackOrder) { attributeValues.push({ attribute: { id: FEEDBACK_ORDER }, value: feedbackOrder }) }
         // FEEDBACK TEXT
-        if (feedbackText) attributeValues.push({ attribute: { id: FEEDBACK_TEXT }, value: feedbackText })
+        if (feedbackText) { attributeValues.push({ attribute: { id: FEEDBACK_TEXT }, value: feedbackText }) }
 
         // PROGRAM STAGE DATA ELEMENT
-        let stageDataElement = JSON.parse(JSON.stringify(programStageDataElement))
-        stageDataElement.displayInReports = displayInReports
-        stageDataElement.dataElement = data
-        stageDataElement.dataElement.attributeValues = attributeValues
+        const stageDataElement = JSON.parse(JSON.stringify(programStageDataElement));
+        stageDataElement.displayInReports = displayInReports;
+        stageDataElement.dataElement = data;
+        stageDataElement.dataElement.attributeValues = attributeValues;
 
-        save(de.id, section, stageDataElement)
-        if (hnqisMode) setSaveStatus('Validate & Save');
+        save(de.id, section, stageDataElement);
+        if (hnqisMode) { setSaveStatus('Validate & Save') }
 
     }
 
@@ -424,9 +417,9 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
     useEffect(() => {
         if (saveFlag && setSaveFlag) {
             if (formDataIsValid()) {
-                let optionSetValue = undefined
-                let legendSetsValue = []
-                let attributes = []
+                let optionSetValue = undefined;
+                const legendSetsValue = [];
+                const attributes = [];
 
                 if (optionSet) {
                     optionSetValue = {
@@ -493,7 +486,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                     })
                 }
 
-                let dataElement = {
+                const dataElement = {
                     name: newDeId + "_" + formName,
                     id: newDeId,
                     shortName: (newDeId + "_" + formName).slice(0, 50),
@@ -518,16 +511,17 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                     dataElement.code = elementCode;
                 }
 
-                let newCreatedDe = {
+                const newCreatedDe = {
                     type:'created',
                     displayInReports: displayInReports,
                     compulsory: compulsory,
                     dataElement
                 }
-                save(newCreatedDe)
+
+                save(newCreatedDe);
             }
             setSaveFlag(false)
-            if (hnqisMode) setSaveStatus('Validate & Save');
+            if (hnqisMode) { setSaveStatus('Validate & Save') }
         }
     }, [saveFlag])
     //End New DE
@@ -593,7 +587,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                                     <p>
                                         <strong>Question:</strong> Defines a question Data Element that can be answered in some way (text field, numeric field, option set, etc.).<br /><br />
                                         <strong>Label:</strong> Defines a label Data Element, usually these are used to display instructions or help text. Choosing label will
-                                        automatically select "Long Text" as Value Type and disable several fields in the configuration form.
+                                        automatically select &lsquo;Long Text&lsquo; as Value Type and disable several fields in the configuration form.
                                     </p>
                                 }
                                 alignment='start'
@@ -641,7 +635,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                                     <br />If an Option Set is selected,
                                     the Value Type will be assigned automatically to match the Option Set.
                                     <br /><br />
-                                    If the current program is a HNQIS2 program, only Option Sets that include "HNQIS" in the name will be displayed.
+                                    If the current program is a HNQIS2 program, only Option Sets that include &lsquo;HNQIS&lsquo; in the name will be displayed.
                                 </p>
                             }
                         />
@@ -819,7 +813,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                                 Legend Sets are color categories based on number ranges.<br />
                                 The selected legend will be applied to the Data Element during data entry and information display of any kind.
                                 <br /><br />
-                                If the current program is a HNQIS2 program, only Legend Sets that include "HNQIS" in the name will be displayed.
+                                If the current program is a HNQIS2 program, only Legend Sets that include &lsquo;HNQIS&lsquo; in the name will be displayed.
                             </p>
                         }
                         margin='0 0 0 0.5em'
@@ -854,7 +848,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                             title="About Critical Questions"
                             message={
                                 <p>
-                                    HNQIS scores are divided in critical and non-critical, this is mostly used for the "Competency Classification" but can also be used for other types of classification in analytics as well.<br /><br />
+                                    HNQIS scores are divided in critical and non-critical, this is mostly used for the &lsquo;Competency Classification&lsquo; but can also be used for other types of classification in analytics as well.<br /><br />
                                     A Critical Question will count for the critical score calculations.
                                 </p>
                             }
@@ -968,7 +962,9 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                             startIcon={<SaveIcon />}
                             size="large"
                             color="success"
-                            onClick={() => { if (formDataIsValid()) callSave() }}>
+                            onClick={() => {
+                                if (formDataIsValid()) { callSave() }
+                            }}>
                             Save
                         </Button>
                     </div>
@@ -989,6 +985,18 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
             />
         </div>
     )
+}
+
+DataElementForm.propTypes = {
+    hnqisMode: PropTypes.bool,
+    program: PropTypes.string,
+    programStageDataElement: PropTypes.object,
+    save: PropTypes.func,
+    saveFlag: PropTypes.bool,
+    section: PropTypes.string,
+    setDeToEdit: PropTypes.func,
+    setSaveFlag: PropTypes.func,
+    setSaveStatus: PropTypes.func
 }
 
 export default DataElementForm

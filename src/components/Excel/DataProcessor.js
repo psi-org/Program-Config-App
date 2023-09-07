@@ -192,7 +192,6 @@ const DataProcessor = (props) => {
                     programPrefix={programPrefix}
                     useCompetencyClass={useCompetencyClass}
                     programHealthArea={programHealthArea}
-                    setStatus={props.setStatus}
                 />}
         </>
     );
@@ -202,8 +201,7 @@ DataProcessor.propTypes = {
     isLoading: PropTypes.func,
     programName: PropTypes.string,
     programStageSections: PropTypes.array,
-    ps: PropTypes.object,
-    setStatus: PropTypes.func
+    ps: PropTypes.object
 }
 
 export default DataProcessor;

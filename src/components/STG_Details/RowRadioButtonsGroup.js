@@ -1,8 +1,10 @@
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormLabel from '@mui/material/FormLabel';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 const RowRadioButtonsGroup = ({label,items,handler,value=''}) => (
     <FormControl>
@@ -18,5 +20,12 @@ const RowRadioButtonsGroup = ({label,items,handler,value=''}) => (
         </RadioGroup>
     </FormControl>
 )
+
+RowRadioButtonsGroup.propTypes = {
+    handler: PropTypes.func,
+    items: PropTypes.array,
+    label: PropTypes.string,
+    value: PropTypes.string
+}
 
 export default RowRadioButtonsGroup

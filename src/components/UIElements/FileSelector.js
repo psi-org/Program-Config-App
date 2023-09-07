@@ -1,4 +1,6 @@
 import Button from '@mui/material/Button';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 const FileSelector = ({ fileName, setFile, acceptedFiles }) => {
     return (
@@ -23,6 +25,12 @@ const FileSelector = ({ fileName, setFile, acceptedFiles }) => {
                 }}>{fileName}</span>
         </div>
     )
+}
+
+FileSelector.propTypes = {
+    acceptedFiles: PropTypes.string,
+    fileName: PropTypes.string,
+    setFile: PropTypes.func
 }
 
 export default FileSelector

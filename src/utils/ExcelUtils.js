@@ -147,11 +147,10 @@ export const formatDate = (date) => {
     return `${dateYMD} [${dateHMS[0]}h ${dateHMS[1]}m]`
 }
 
-export const writeWorkbook = async (wb, name, setStatus, isLoading) => {
+export const writeWorkbook = async (wb, name, isLoading) => {
     const buf = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buf]), `${name} - ${formatDate(new Date())}.xlsx`);
 
-    setStatus("Download Template");
     isLoading(false);
 };
 

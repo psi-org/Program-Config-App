@@ -1,9 +1,9 @@
-import {useState} from 'react';
-
-// *** IMAGES ***
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import error_svg from './../../images/i-error.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
-import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
+
 const ErrorReports = ({ errors }) => {
 
     const [expanded, setExpanded] = useState(false)
@@ -71,5 +71,9 @@ const ErrorReports = ({ errors }) => {
         </div>
     );
 };
+
+ErrorReports.propTypes = {
+    errors: PropTypes.array
+}
 
 export default ErrorReports;

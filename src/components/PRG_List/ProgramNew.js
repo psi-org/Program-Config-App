@@ -139,47 +139,6 @@ const queryHNQIS2Metadata = {
 
 const ProgramNew = (props) => {
 
-    // * STEPPER * //
-
-    const [activeStep, setActiveStep] = useState(0);
-    let previousStep = 0;
-    const [basicValidated, setBasicValidated] = useState(true);
-    const [hnqisValidated, setHnqisValidated] = useState(true);
-
-    const containerRef = useRef(null);
-    const changeStep = (step) => {
-        previousStep = activeStep;
-        setActiveStep(step);
-    }
-
-    // * END OF STEPPER * //
-
-    // * Snackbar
-    const [snackParams, setSnackParams] = useState(false)
-    const pushNotification = (content, severity = "success") => setSnackParams({ content, severity })
-
-    // * TEA Editor * //
-    const [useSections, setUseSections] = useState(props.data?.programSections?.length > 0);
-    const [attributesFormSections, setAttributesFormSections] = useState(props.data?.programSections || []);
-    const [assignedAttributes, setAssignedAttributes] = useState([]);
-
-    const [inputModalOpened, setInputModalOpened] = useState(false);
-
-    const { refetch: getIds } = useDataQuery(queryIds, { lazy: true });
-    const onAddNewSection = (name) => {
-        getIds({ n: 1 }).then(results => {
-            const id = results.results.codes[0]
-            attributesFormSections.push({
-                id,
-                name,
-                program: { id: programId },
-                trackedEntityAttributes: []
-            })
-            setAttributesFormSections([...attributesFormSections])
-        })
-    }
-    // * END OF TEA Editor * //
-
     const h2Ready = localStorage.getItem("h2Ready") === "true";
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
 
@@ -361,6 +320,46 @@ const ProgramNew = (props) => {
     const validationStrategyChange = (event) => {
         setValidationStrategy(event.target.value);
     };
+
+    // * STEPPER * //
+
+    const [activeStep, setActiveStep] = useState(0);
+    let previousStep = 0;
+    const [basicValidated, setBasicValidated] = useState(true);
+    const [hnqisValidated, setHnqisValidated] = useState(true);
+
+    const containerRef = useRef(null);
+    const changeStep = (step) => {
+        previousStep = activeStep;
+        setActiveStep(step);
+    }
+
+    // * END OF STEPPER * //
+
+    // * Snackbar
+    const [snackParams, setSnackParams] = useState(false)
+    const pushNotification = (content, severity = "success") => setSnackParams({ content, severity })
+
+    // * TEA Editor * //
+    const [useSections, setUseSections] = useState(props.data?.programSections?.length > 0);
+    const [attributesFormSections, setAttributesFormSections] = useState(props.data?.programSections || []);
+    const [assignedAttributes, setAssignedAttributes] = useState([]);
+
+    const [inputModalOpened, setInputModalOpened] = useState(false);
+
+    const { refetch: getIds } = useDataQuery(queryIds, { lazy: true });
+    const onAddNewSection = (name) => {
+        getIds({ n: 1 }).then(results => {
+            const id = results.results.codes[0]
+            attributesFormSections.push({
+                id,
+                name,
+                trackedEntityAttributes: []
+            })
+            setAttributesFormSections([...attributesFormSections])
+        })
+    }
+    // * END OF TEA Editor * //
 
     const updateAssignedAttributes = () => {
         // Validate selected attributes that are not in program sections
@@ -798,6 +797,7 @@ const ProgramNew = (props) => {
                         if (useSections) {
                             programSections = attributesFormSections.map((section, idx) => {
                                 section.sortOrder = idx;
+                                section.program = { id: prgrm.id };
                                 return section;
                             })
                         }
