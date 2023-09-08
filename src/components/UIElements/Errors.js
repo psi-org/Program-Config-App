@@ -5,7 +5,7 @@ import ValidationMessages from "../UIElements/ValidationMessages.js";
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import error_svg from './../../images/i-error.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
-import { ValidationErrorItem } from './ValidationErrorItem.js';
+import ValidationErrorItem from './ValidationErrorItem.js';
 
 const Errors = ({ validationResults }) => {
     const [showValidationMessage, setShowValidationMessage] = useState(false);

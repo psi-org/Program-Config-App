@@ -1,4 +1,6 @@
 import { IconCheckmarkCircle24, IconError24, colors, CircularLoader } from "@dhis2/ui"
+import PropTypes from 'prop-types';
+import React from 'react';
 
 const ImportTask = ({ type, name }) => {
     return (
@@ -18,6 +20,11 @@ const ImportTask = ({ type, name }) => {
             <span style={{ marginLeft: '0.5em', width: '100%', textAlign: 'justify', display: 'block'}}>{name}</span>
         </div>
     )
+}
+
+ImportTask.propTypes = {
+    name: PropTypes.string,
+    type: PropTypes.string
 }
 
 export default ImportTask;

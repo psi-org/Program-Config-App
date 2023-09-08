@@ -1,7 +1,6 @@
 import { combineReducers } from "redux";
-
-import program from "./program";
-import programStage from "./programStage";
+import program from "./program.js";
+import programStage from "./programStage.js";
 
 const reducers = combineReducers({
     program,

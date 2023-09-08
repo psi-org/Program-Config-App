@@ -1,4 +1,4 @@
-import { MAX_DATA_ELEMENT_NAME_LENGTH, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants";
+import { MAX_DATA_ELEMENT_NAME_LENGTH, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "./Constants.js";
 
 export const thinBorder = {
     top: {
@@ -362,9 +362,10 @@ export const getPromptsFormula = (validationsList, rowNumber) => {
     let formula = "CONCATENATE(";
 
     formula = formula + Object.keys(validationsList).map(teaValidation => {
-        if (validationsList[teaValidation].dynamicFormula)
+        if (validationsList[teaValidation].dynamicFormula) {
             return `IF(${validationsList[teaValidation].dynamicFormula
                 .replaceAll('_ROWNUM_', rowNumber)}, "${validationsList[teaValidation].prompt} ", "")`
+        }
     }).join(',');
 
     formula = formula + ',"")';

@@ -1,11 +1,12 @@
+import React from 'react';
 import { coerce, gte, lte } from 'semver';
-import { METADATA } from '../configs/Constants';
+import { METADATA } from '../configs/Constants.js';
 
 export function splitPosition(position) {
     return position.split(/(\d+)/);
 }
 export function number2Character(numb) {
-    let zPlace = 25;
+    const zPlace = 25;
     let quo = 0;
 
     if (numb > zPlace) {
@@ -29,8 +30,8 @@ export function character2Number(rangeString) {
     return characterPos(ranges[0]) - 65;
 }
 export function columnCharacters(startCharacter, dataObj) {
-    let columns = [];
-    let posStartCharacter = character2Number(startCharacter);
+    const columns = [];
+    const posStartCharacter = character2Number(startCharacter);
     Object.keys(dataObj).forEach((key, index) => {
         columns.push(number2Character(posStartCharacter + index));
     });
@@ -55,12 +56,12 @@ function characterPos(chr) {
 }
 
 export function versionIsValid(serverVersion, limitMin, limitMax) {
-    let coercedVersion = coerce(serverVersion).version
+    const coercedVersion = coerce(serverVersion).version
     return gte(coercedVersion, coerce(limitMin)) && lte(coercedVersion, coerce(limitMax));
 }
 
 export function parseErrors(response) {
-    let errorRes = response.response || response;
+    const errorRes = response.response || response;
     let index = 0
     return errorRes.typeReports?.reduce((reports, typeReport) =>
         reports.concat(
@@ -74,20 +75,20 @@ export function parseErrors(response) {
     ).flat() || <p>{response.httpStatus}: {response.message}.</p>
 }
 
-export function parseErrorsJoin(response,joinVal) {
-    let errorRes = response.response || response;
+export function parseErrorsJoin(response, joinVal) {
+    const errorRes = response.response || response;
     return errorRes.typeReports?.reduce((reports, typeReport) =>
         reports.concat(
             typeReport.objectReports.map(objectReport =>
                 objectReport.errorReports.map(err => err.message)
             )
         ), []
-    ).flat().join(joinVal) || (response.httpStatus+": "+response.message+".")
+    ).flat().join(joinVal) || (response.httpStatus + ": " + response.message + ".")
 }
 
 
 export function parseErrorsUL(response) {
-    let errorRes = response.response || response;
+    const errorRes = response.response || response;
     let index = 0
     return <ul>{
         errorRes.typeReports?.reduce((reports, typeReport) =>
@@ -105,15 +106,15 @@ export function parseErrorsUL(response) {
 }
 
 export const parseErrorsSaveMetadata = (e) => {
-    let errors = e.response || e;
-    let data = errors.typeReports.map(tr => {
-        let type = tr.klass.split('.').pop()
+    const errors = e.response || e;
+    const data = errors.typeReports.map(tr => {
+        const type = tr.klass.split('.').pop()
         return tr.objectReports.map(or => or.errorReports.map(er => ({ type, uid: or.uid, errorCode: er.errorCode, message: er.message })))
     })
     return data.flat(2)
 }
 
-export function truncateString(strVal, characters = 50,useEllipsis=true) {
+export function truncateString(strVal, characters = 50, useEllipsis = true) {
     return (strVal.substring(0, characters) + ((strVal.length > characters && useEllipsis) ? '...' : ''))
 }
 
@@ -121,7 +122,7 @@ export function formatAlert(text) {
     return text?.split('\\n').map((elem, index) => <p key={index}>{elem}</p>)
 }
 
-export function extractMetadataPermissions(permissions){
+export function extractMetadataPermissions(permissions) {
     return permissions.slice(0, 2) + '------';
 }
 
@@ -133,7 +134,7 @@ export function getUniqueKeys(arrayOfObjects) {
         keys.forEach(key => uniqueKeys.add(key));
     }
 
-    return Array.from(uniqueKeys).sort().map(key => ({key, selected: true}));
+    return Array.from(uniqueKeys).sort().map(key => ({ key, selected: true }));
 }
 
 /*Returns an object with:
@@ -141,16 +142,16 @@ export function getUniqueKeys(arrayOfObjects) {
     * value = object -> Object with more objects
     * value = array -> Object with array of objects (the array is a list of all the unique keys)
 */
-export function getJSONKeyTree(obj, level=1, index=0) {
-    let res = {}
+export function getJSONKeyTree(obj, level = 1, index = 0) {
+    const res = {}
     for (const key in obj) {
-        if (!!obj[key] && obj[key].constructor !== Array && obj[key].constructor === Object && index<level) {
-            let subRes = getJSONKeyTree(obj[key], level, index+1)
+        if (!!obj[key] && obj[key].constructor !== Array && obj[key].constructor === Object && index < level) {
+            const subRes = getJSONKeyTree(obj[key], level, index + 1)
             res[key] = Object.keys(subRes).map(key => subRes[key][0])
         } else if (Array.isArray(obj[key])) {
             res[key] = getUniqueKeys(obj[key])
         } else {
-            res[key] = [{ key, selected:true }]
+            res[key] = [{ key, selected: true }]
         }
     }
     return res
@@ -162,7 +163,7 @@ export function changeAttributeValue(obj, attribute, newValue) {
             changeAttributeValue(obj[i], attribute, newValue);
         }
     } else if (typeof obj === 'object') {
-        for (let key in obj) {
+        for (const key in obj) {
             if (key === attribute) {
                 obj[key] = newValue;
             } else {
@@ -218,15 +219,17 @@ export const buildBasicFormStage = (stageDataElements) => ({
 })
 
 export const setUpProgramStageSections = (programStage) => {
-    if (programStage.formType === 'SECTION')
+    if (programStage.formType === 'SECTION') {
         return programStage.programStageSections;
-    else
+    } else {
         return [buildBasicFormStage(programStage.programStageDataElements)];
+    }
 }
 
 export const hasAttributeValue = (json, key) => {
-    if (typeof json[key] !== 'undefined')
+    if (typeof json[key] !== 'undefined') {
         return (json[key] !== "");
+    }
     return false;
 }
 
@@ -266,7 +269,7 @@ export const extractAttributeValues = (obj, targetAttribute, resultList = []) =>
 }
 
 export const getPCAMetadataDE = (dataElement) => {
-    let jsonData = dataElement.attributeValues?.find(attributeValue => attributeValue.attribute.id === METADATA);
+    const jsonData = dataElement.attributeValues?.find(attributeValue => attributeValue.attribute.id === METADATA);
     return jsonData ? JSON.parse(jsonData.value) : {};
 }
 
@@ -324,21 +327,24 @@ export const getProgramQuery = () => {
 }
 
 export const setPCAMetadata = (scopeObject, newMetadata) => {
-    let pcaMetadataIndex = scopeObject.attributeValues.findIndex(att => att.attribute.id == METADATA)
-    if (pcaMetadataIndex > -1) scopeObject.attributeValues[pcaMetadataIndex].value = JSON.stringify(newMetadata)
-    else scopeObject.attributeValues.push({
-        value: JSON.stringify(newMetadata),
-        attribute: {
-            id: METADATA
-        }
-    })
+    const pcaMetadataIndex = scopeObject.attributeValues.findIndex(att => att.attribute.id == METADATA)
+    if (pcaMetadataIndex > -1) {
+        scopeObject.attributeValues[pcaMetadataIndex].value = JSON.stringify(newMetadata);
+    } else {
+        scopeObject.attributeValues.push({
+            value: JSON.stringify(newMetadata),
+            attribute: {
+                id: METADATA
+            }
+        })
+    }
 }
 
-export const  mergeWithPriority = (priorityObject, secondaryObject) =>{
+export const mergeWithPriority = (priorityObject, secondaryObject) => {
     const mergedObject = DeepCopy(secondaryObject);
 
     for (const key in priorityObject) {
-        if (priorityObject.hasOwnProperty(key)) {
+        if (Object.hasOwn(priorityObject, key)) {
             mergedObject[key] = priorityObject[key];
         }
     }
@@ -348,7 +354,8 @@ export const  mergeWithPriority = (priorityObject, secondaryObject) =>{
 
 export const getPureValue = (value) => {
     let res = value;
-    if (typeof value === 'string')
+    if (typeof value === 'string') {
         res = value.replaceAll('"', '');
+    }
     return res;
 }

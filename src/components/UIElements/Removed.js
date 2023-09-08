@@ -1,13 +1,11 @@
-// *** Modules ***
-import { useState } from 'react';
-
-// *** IMAGES ***
+import LaunchIcon from '@mui/icons-material/Launch';
+import { IconButton, Tooltip } from '@mui/material';
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { METADATA, tagStyle } from '../../configs/Constants.js';
+import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import error_svg from './../../images/i-error.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
-import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import { METADATA, tagStyle } from '../../configs/Constants';
-import { IconButton, Tooltip } from '@mui/material';
-import LaunchIcon from '@mui/icons-material/Launch';
 
 const Removed = ({ removedItems, tagText = 'Data Element(s)' }) => {
 
@@ -15,7 +13,7 @@ const Removed = ({ removedItems, tagText = 'Data Element(s)' }) => {
 
     return (
         removedItems.length > 0 &&
-        <>  
+        <>
             <div
                 className="ml_item"
                 style={{
@@ -47,7 +45,7 @@ const Removed = ({ removedItems, tagText = 'Data Element(s)' }) => {
                 }}>
                 {
                     removedItems.map((element, i) => {
-                        let deMetadata = JSON.parse(element.attributeValues?.find(att => att.attribute.id == METADATA)?.value || "{}");
+                        const deMetadata = JSON.parse(element.attributeValues?.find(att => att.attribute.id == METADATA)?.value || "{}");
                         let tag, displayName;
                         let route = 'dataElementSection/dataElement';
                         let elemId = element.id;
@@ -97,7 +95,7 @@ const Removed = ({ removedItems, tagText = 'Data Element(s)' }) => {
                                     <a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + `/dhis-web-maintenance/index.html#/edit/${route}/${elemId}`}>
                                         <Tooltip title="Open in Maintenance App" placement="top">
                                             <IconButton size='small'>
-                                                <LaunchIcon fontSize="inherit"/>
+                                                <LaunchIcon fontSize="inherit" />
                                             </IconButton>
                                         </Tooltip>
                                     </a>
@@ -110,5 +108,10 @@ const Removed = ({ removedItems, tagText = 'Data Element(s)' }) => {
         </>
     );
 };
+
+Removed.propTypes = {
+    removedItems: PropTypes.array,
+    tagText: PropTypes.string
+}
 
 export default Removed;
