@@ -362,6 +362,16 @@ const ProgramNew = (props) => {
     // * END OF TEA Editor * //
 
     const updateAssignedAttributes = () => {
+
+        // Remove old TET attributes
+        attributesFormSections.forEach(section => {
+            section.trackedEntityAttributes = section.trackedEntityAttributes.filter(
+                tea => programTEAs.selected.includes(tea.id)
+            )
+        })
+        setAttributesFormSections([...attributesFormSections])
+
+
         // Validate selected attributes that are not in program sections
         const newAssignedAttributes = [];
         programTEAs.selected.forEach(teaId => {
