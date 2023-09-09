@@ -1,21 +1,21 @@
-import { useState } from "react";
-import ExcelJS from "exceljs/dist/es5/exceljs.browser";
-import ImportStatusBox from "../UIElements/ImportStatusBox";
-import { HNQIS2_ORIGIN_SERVER_CELL, HNQIS2_TEMPLATE_HEADERS, HNQIS2_TEMPLATE_VERSION_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_ORIGIN_SERVER_CELL, TRACKER_TEA_HEADERS, TRACKER_TEA_MAP, TRACKER_TEMPLATE_HEADERS, TRACKER_TEMPLATE_VERSION_CELL } from "../../configs/TemplateConstants";
-import { readTemplateData } from '../STG_Details/importReader';
-
+import { NoticeBox } from "@dhis2-ui/notice-box";
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
-import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import ImportSummary from "../UIElements/ImportSummary";
-import { getHNQIS2MappingList, getTrackerMappingList } from "../../configs/ExcelUtils";
-import FileSelector from "../UIElements/FileSelector";
-import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, getProgramDetailsTracker, buildHNQIS2Summary, buildTrackerSummary, isTracker, countChanges, getBasicForm } from "./importerUtils";
-import { buildBasicFormStage, setUpProgramStageSections } from "../../configs/Utils";
-import { NoticeBox } from "@dhis2-ui/notice-box";
+import ExcelJS from "exceljs/dist/es5/exceljs.browser";
+import PropTypes from 'prop-types';
+import React, { useState } from "react";
+import { HNQIS2_ORIGIN_SERVER_CELL, HNQIS2_TEMPLATE_HEADERS, HNQIS2_TEMPLATE_VERSION_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_ORIGIN_SERVER_CELL, TRACKER_TEA_HEADERS, TRACKER_TEA_MAP, TRACKER_TEMPLATE_HEADERS, TRACKER_TEMPLATE_VERSION_CELL } from "../../configs/TemplateConstants.js";
+import { getHNQIS2MappingList, getTrackerMappingList } from "../../utils/ExcelUtils.js";
+import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, getProgramDetailsTracker, buildHNQIS2Summary, buildTrackerSummary, isTracker, countChanges, getBasicForm } from "../../utils/importerUtils.js";
+import { setUpProgramStageSections } from "../../utils/Utils.js";
+import { readTemplateData } from '../STG_Details/importReader.js';
+import FileSelector from "../UIElements/FileSelector.js";
+import ImportStatusBox from "../UIElements/ImportStatusBox.js";
+import ImportSummary from "../UIElements/ImportSummary.js";
+import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 
 //* Tracker Only: currentStagesData
 //* HNQIS Only: setSaveStatus, programMetadata, currentSectionsData, setSavedAndValidated
@@ -58,11 +58,11 @@ const Importer = (
         displayForm(false);
     }
 
-    const tasksHandler = (step, message, initialStatus, actionFunction, params = {}) => {
-        let task = { step, name: message, status: initialStatus ? 'success' : 'error' };
+    const tasksHandler = ({ step, message, initialStatus }, actionFunction, params = {}) => {
+        const task = { step, name: message, status: initialStatus ? 'success' : 'error' };
         setCurrentTask(task.name);
 
-        let result = actionFunction(initialStatus, task, { setNotificationError, ...params });
+        const result = actionFunction(initialStatus, task, { setNotificationError, ...params });
 
         addExecutedTask(task);
         setCurrentTask(null);
@@ -77,7 +77,7 @@ const Importer = (
         setNotificationError(false);
         let indexModifier = 0;
         if (typeof selectedFile !== 'undefined') {
-            if (!tasksHandler(1, 'Validating Template format (XLSX)', false, fileValidation, { setNotificationError, selectedFile })) return;
+            if (!tasksHandler({ step: 1, message: 'Validating Template format (XLSX)', initialStatus: false }, fileValidation, { setNotificationError, selectedFile })) { return }
 
             const workbook = new ExcelJS.Workbook();
             const reader = new FileReader();
@@ -86,16 +86,14 @@ const Importer = (
             reader.onload = async () => {
 
                 const buffer = reader.result;
-                let loadedWorkbook = await workbook.xlsx.load(buffer)
-                let worksheets = tasksHandler(
-                    2,
-                    'Validating worksheets in the workbook',
-                    true,
+                const loadedWorkbook = await workbook.xlsx.load(buffer)
+                const worksheets = tasksHandler(
+                    { step: 2, message: 'Validating worksheets in the workbook', initialStatus: true },
                     workbookValidation,
                     { setNotificationError, workbook: loadedWorkbook, isTracker, programSpecificType }
                 );
 
-                if (!worksheets?.status) return;
+                if (!worksheets?.status) { return }
 
                 const templateWS = worksheets.templateWS;
                 const instructionsWS = worksheets.instructionsWS;
@@ -104,12 +102,10 @@ const Importer = (
                 const mappingDetails = isTracker
                     ? getTrackerMappingList(mappingWS)
                     : getHNQIS2MappingList(mappingWS);
-                let programDetails = !isTracker ? getProgramDetailsHNQIS2(instructionsWS, mappingDetails) : getProgramDetailsTracker(instructionsWS);
+                const programDetails = !isTracker ? getProgramDetailsHNQIS2(instructionsWS, mappingDetails) : getProgramDetailsTracker(instructionsWS);
 
                 if (!tasksHandler(
-                    3,
-                    'Validating Template version and origin server',
-                    false,
+                    { step: 3, message: 'Validating Template version and origin server', initialStatus: false },
                     serverAndVersionValidation,
                     {
                         setNotificationError,
@@ -118,7 +114,7 @@ const Importer = (
                         templateVersionCell: isTracker ? TRACKER_TEMPLATE_VERSION_CELL : HNQIS2_TEMPLATE_VERSION_CELL,
                         originServerCell: isTracker ? TRACKER_ORIGIN_SERVER_CELL : HNQIS2_ORIGIN_SERVER_CELL
                     }
-                )) return;
+                )) { return }
 
                 let teaData;
                 if (teasWS) {
@@ -127,18 +123,18 @@ const Importer = (
                     const headers = teasWS.getRow(1).values;
                     headers.shift();
 
-                    teaData = handleWorksheetReading(
+                    teaData = handleWorksheetReading({
                         tasksHandler,
-                        teasWS,
+                        currentWorksheet: teasWS,
                         setNotificationError,
                         headers,
-                        TRACKER_TEA_HEADERS,
-                        4,
-                        1
-                    ).data
+                        templateHeadersList: TRACKER_TEA_HEADERS,
+                        startingIndex: 4,
+                        structureColumn: 1
+                    }).data
                 }
 
-                let templateData = [];
+                const templateData = [];
                 let stopFlag = false;
 
                 templateWS.forEach((currentTemplate, index) => {
@@ -146,29 +142,31 @@ const Importer = (
                     const headers = currentTemplate.getRow(1).values;
                     headers.shift();
 
-                    let currentTemplateData = handleWorksheetReading(
+                    const currentTemplateData = handleWorksheetReading({
                         tasksHandler,
-                        currentTemplate,
+                        currentWorksheet: currentTemplate,
                         setNotificationError,
                         headers,
-                        (isTracker ? TRACKER_TEMPLATE_HEADERS : HNQIS2_TEMPLATE_HEADERS),
-                        (4 + (2 * index) + indexModifier),
-                        (isTracker ? 1 : 2),
-                        true
-                    )
+                        templateHeadersList: (isTracker ? TRACKER_TEMPLATE_HEADERS : HNQIS2_TEMPLATE_HEADERS),
+                        startingIndex: (4 + (2 * index) + indexModifier),
+                        structureColumn: (isTracker ? 1 : 2),
+                        isTrackerTemplate: true
+                    });
+                
                     if (!currentTemplateData?.status) {
                         stopFlag = true;
                         return;
                     }
+                    
                     templateData.push(currentTemplateData);
 
                 });
 
-                if (stopFlag) return;
+                if (stopFlag) { return }
 
-                let importSummaryValues =
+                const importSummaryValues =
                     isTracker
-                        ? importReadingTracker(teaData, templateData, programDetails, mappingDetails, programSpecificType)
+                        ? importReadingTracker({ teaData, templateData }, { programDetails, mappingDetails }, programSpecificType)
                         : importReadingHNQIS(templateData, programDetails, mappingDetails);
 
                 if (importSummaryValues.error) {
@@ -186,8 +184,8 @@ const Importer = (
     }
 
     const importReadingHNQIS = (templateData, programDetails, mappingDetails) => {
-        let importSummaryValues = buildHNQIS2Summary();
-        let { importedSections, importedScores } = readTemplateData({
+        const importSummaryValues = buildHNQIS2Summary();
+        const { importedSections, importedScores } = readTemplateData({
             templateData: templateData[0].data,
             currentData: previous,
             programPrefix: programDetails.dePrefix || programDetails.id,
@@ -201,14 +199,14 @@ const Importer = (
         importSummaryValues.program = programDetails;
         importSummaryValues.mapping = mappingDetails;
 
-        let newScoresSection = previous.scoresSection;
+        const newScoresSection = previous.scoresSection;
         newScoresSection.dataElements = importedScores;
         delete newScoresSection.errors;
 
         previous.setSections(importedSections);
         previous.setScoresSection(newScoresSection);
 
-        let programMetadata_new = programMetadata.programMetadata;
+        const programMetadata_new = programMetadata.programMetadata;
         programMetadata_new.dePrefix = programDetails.dePrefix;
         programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
         programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
@@ -217,21 +215,20 @@ const Importer = (
         return importSummaryValues;
     }
 
-    const importReadingTracker = (teaData, templateData, programDetails, mappingDetails, programSpecificType) => {
-        let importSummaryValues = buildTrackerSummary(programSpecificType, currentStagesData.length);
-        let importedStages = [];
+    const importReadingTracker = ({ teaData, templateData }, { programDetails, mappingDetails }, programSpecificType) => {
+        const importSummaryValues = buildTrackerSummary(programSpecificType, currentStagesData.length);
+        const importedStages = [];
         let importError = undefined;
-        let skippedSections = [];
+        const skippedSections = [];
 
         currentStagesData.forEach((currentStage, index) => {
-            let stageIndex = templateData.findIndex(elem => elem.stageId === currentStage.id);
+            const stageIndex = templateData.findIndex(elem => elem.stageId === currentStage.id);
             if (stageIndex === -1) {
                 importError = `The import process has failed. Some Stages are missing in the imported file (${currentStage.name}), please download a new Template and try again.`;
             } else {
                 importSummaryValues.stages[index].stageName = currentStage.name;
                 importSummaryValues.stages[index].id = currentStage.id;
-                let { importedSections, ignoredSections } = readTemplateData({
-                    teaData,
+                const { importedSections, ignoredSections } = readTemplateData({
                     currentData: { sections: setUpProgramStageSections(previous.stages.find(stage => stage.id === currentStage.id)), stageNumber: index + 1 },
                     templateData: templateData[stageIndex].data,
                     programPrefix: (programDetails.dePrefix) || programDetails.id,
@@ -242,7 +239,7 @@ const Importer = (
                     importSummaryValues: importSummaryValues.stages[index]
                 });
 
-                if(ignoredSections.length > 0) skippedSections.push({ stage: currentStage.name, ignoredSections });
+                if (ignoredSections.length > 0) { skippedSections.push({ stage: currentStage.name, ignoredSections }) }
 
                 importedStages.push({
                     id: currentStage.id,
@@ -253,17 +250,17 @@ const Importer = (
             }
         })
 
-        if (importError) return { error: importError };
+        if (importError) { return { error: importError } }
 
-        let importedProgramSections = [];
-        let ignoredProgramSections = [];
+        const importedProgramSections = [];
+        const ignoredProgramSections = [];
         if (teaData) {
             let programSectionIndex = -1;
             let isBasicForm = false;
             teaData.forEach((row, rowNum) => {
                 switch (row[TRACKER_TEA_MAP.structure]) {
                     case 'Section':
-                        if (row[TRACKER_TEA_MAP.programSection] === 'basic-form' && programSectionIndex === -1) isBasicForm = true;
+                        if (row[TRACKER_TEA_MAP.programSection] === 'basic-form' && programSectionIndex === -1) { isBasicForm = true }
                         if ((isBasicForm && importedProgramSections.length > 0)) {
                             ignoredProgramSections.push({ name: row[TRACKER_TEA_MAP.name], rowNum: rowNum + 3 });
                             break;
@@ -298,9 +295,9 @@ const Importer = (
                 }
             });
 
-            if (ignoredProgramSections.length > 0) skippedSections.push({ stage: 'Tracked Entity Attributes', ignoredSections: ignoredProgramSections });
+            if (ignoredProgramSections.length > 0) { skippedSections.push({ stage: 'Tracked Entity Attributes', ignoredSections: ignoredProgramSections }) }
 
-            let currentTEAData = {
+            const currentTEAData = {
                 sections: []
             };
             if (previous.programSections.length === 0) {
@@ -310,7 +307,7 @@ const Importer = (
                 })
             } else {
                 previous.programSections.forEach(ps => {
-                    let previousPS = {
+                    const previousPS = {
                         id: ps.id,
                         trackedEntityAttributes: previous.teas.filter(tea =>
                             ps.trackedEntityAttributes.find(psTEA =>
@@ -399,6 +396,19 @@ const Importer = (
         </DialogActions>
 
     </CustomMUIDialog>)
+}
+
+Importer.propTypes = {
+    currentSectionsData: PropTypes.array,
+    currentStagesData: PropTypes.array,
+    displayForm: PropTypes.func,
+    previous: PropTypes.object,
+    programMetadata: PropTypes.object,
+    programSpecificType: PropTypes.string,
+    setImportResults: PropTypes.func,
+    setSaveStatus: PropTypes.func,
+    setSavedAndValidated: PropTypes.func,
+    setValidationResults: PropTypes.func
 }
 
 export default Importer;

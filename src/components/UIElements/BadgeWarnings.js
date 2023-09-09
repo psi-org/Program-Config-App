@@ -1,4 +1,7 @@
+import PropTypes from 'prop-types';
+import React from 'react';
 import warning_svg from './../../images/i-warning.svg';
+
 const BadgeWarnings = ({ counts }) => {
     return  <>
         <img src={warning_svg} alt={"err"}/>
@@ -6,6 +9,10 @@ const BadgeWarnings = ({ counts }) => {
             {counts}
         </div>
     </>
+}
+
+BadgeWarnings.propTypes = {
+    counts: PropTypes.number
 }
 
 export default BadgeWarnings

@@ -1,37 +1,27 @@
-import { useEffect } from "react";
-import $ from 'jquery';
-
-import { Draggable } from "react-beautiful-dnd";
-
-import DataElementForm from "./DataElementForm";
-import AlertDialogSlide from "../UIElements/AlertDialogSlide";
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import { Tooltip } from "@mui/material";
-import { METADATA } from "../../configs/Constants";
-
-// *** IMAGES ***
-import de_svg from './../../images/i-drag_black.svg';
-import { FlyoutMenu, MenuItem, Popper, Layer, colors, IconAdd16, IconDelete16, IconEdit16, Tag } from '@dhis2/ui';
-
-import BadgeWarnings from "../UIElements/BadgeWarnings";
-import BadgeErrors from "../UIElements/BadgeErrors";
-import ValidationMessages from "../UIElements/ValidationMessages";
-import { useState } from "react";
-
-import move_vert_svg from './../../images/i-more_vert_black.svg';
-
-import EditIcon from '@mui/icons-material/Edit';
-import EditOffIcon from '@mui/icons-material/EditOff';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { FlyoutMenu, MenuItem, Popper, Layer, Tag } from '@dhis2/ui';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DEIcon from '@mui/icons-material/Dns';
+import EditIcon from '@mui/icons-material/Edit';
+import EditOffIcon from '@mui/icons-material/EditOff';
 import LabelIcon from "@mui/icons-material/LabelImportant";
 import QuizIcon from "@mui/icons-material/Quiz";
-import DEIcon from '@mui/icons-material/Dns';
-
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { Tooltip } from "@mui/material";
 import Chip from '@mui/material/Chip';
+import PropTypes from 'prop-types';
+import React, { useState } from "react";
+import { Draggable } from "react-beautiful-dnd";
+import { METADATA } from "../../configs/Constants.js";
+import AlertDialogSlide from "../UIElements/AlertDialogSlide.js";
+import BadgeErrors from "../UIElements/BadgeErrors.js";
+import BadgeWarnings from "../UIElements/BadgeWarnings.js";
+import ValidationMessages from "../UIElements/ValidationMessages.js";
+import move_vert_svg from './../../images/i-more_vert_black.svg';
+import DataElementForm from "./DataElementForm.js";
 
-const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, updateDEValues, section, index, hnqisMode, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
+const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, section, index, hnqisMode, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -45,8 +35,8 @@ const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, update
 
     let classNames = '';
 
-    let metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || '{}');
-    let renderFormName = metadata?.labelFormName;
+    const metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || '{}');
+    const renderFormName = metadata?.labelFormName;
 
     classNames += " ml_item";
     classNames += (dataElement.importStatus) ? ' import_' + dataElement.importStatus : '';
@@ -77,7 +67,7 @@ const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, update
                 index={index}
                 isDragDisabled={dataElement.importStatus != undefined || DEActions.deToEdit !== '' || !isSectionMode || readOnly}
             >
-                {(provided, snapshot) => (
+                {(provided) => (
                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                         <div id={"de_" + dataElement.id} className={'data-element-header ' + (openMenu ? 'data-element-selected ' : '') + classNames}>
                             <div className="ml_item-icon" style={{ display: 'flex', alignItems: 'center' }}>
@@ -155,6 +145,18 @@ const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, update
     );
 };
 
-
+DraggableDataElement.propTypes = {
+    DEActions: PropTypes.object,
+    dataElement: PropTypes.object,
+    deStatus: PropTypes.object,
+    hnqisMode: PropTypes.bool,
+    index: PropTypes.number,
+    isSectionMode: PropTypes.bool,
+    program: PropTypes.string,
+    readOnly: PropTypes.bool,
+    section: PropTypes.string,
+    setSaveStatus: PropTypes.func,
+    stageDE: PropTypes.object,
+}
 
 export default DraggableDataElement;

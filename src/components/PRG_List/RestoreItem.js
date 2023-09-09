@@ -1,8 +1,9 @@
-import * as React from 'react';
-import { ListItem, ListItemText, Typography, Divider, IconButton  } from '@mui/material';
-import RestoreIcon from '@mui/icons-material/Restore';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import RestoreIcon from '@mui/icons-material/Restore';
+import { ListItem, ListItemText, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 const RestoreItem = (props) => {
 
@@ -39,6 +40,11 @@ const RestoreItem = (props) => {
             {/*<Divider/>*/}
         </>
     )
+}
+
+RestoreItem.propTypes = {
+    backup: PropTypes.object,
+    restoreHandler: PropTypes.func
 }
 
 export default RestoreItem

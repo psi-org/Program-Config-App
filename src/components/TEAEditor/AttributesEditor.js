@@ -1,7 +1,8 @@
+import PropTypes from 'prop-types';
+import React from 'react';
 import { DragDropContext } from "react-beautiful-dnd";
-import BasicForm from './BasicForm';
-import SectionsForm from './SectionsForm';
-
+import BasicForm from './BasicForm.js';
+import SectionsForm from './SectionsForm.js';
 
 const AttributesEditor = ({
     useSections,
@@ -50,14 +51,14 @@ const AttributesEditor = ({
     const onDragEnd = (result) => {
 
         // Dropped outside
-        if(result.destination === null || result.source === null) return
+        if (result.destination === null || result.source === null) { return }
 
-        const { source, destination, type, draggableId } = result;
+        const { source, destination, type } = result;
 
 
         if(type==='SECTION'){
             // Sections reordering
-            if(source.index === destination.index) return       // * No changes
+            if (source.index === destination.index) { return }  // * No changes
 
             const [i] = attributesFormSections.splice(source.index,1)
             attributesFormSections.splice(destination.index,0,i) 
@@ -122,6 +123,16 @@ const AttributesEditor = ({
             />
         }      
     </DragDropContext>
+}
+
+AttributesEditor.propTypes = {
+    assignedAttributes: PropTypes.array,
+    attributesFormSections: PropTypes.array,
+    setAssignedAttributes: PropTypes.func,
+    setAttributesFormSections: PropTypes.func,
+    setTeaOptions: PropTypes.func,
+    teaOptions: PropTypes.object,
+    useSections: PropTypes.bool,
 }
 
 export default AttributesEditor;

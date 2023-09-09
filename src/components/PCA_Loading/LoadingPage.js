@@ -1,4 +1,5 @@
 import { CircularLoader } from "@dhis2/ui";
+import React from 'react';
 
 const LoadingPage = () => {
     return (

@@ -1,8 +1,10 @@
+import PropTypes from 'prop-types';
+import React from "react";
 import error_svg from './../../images/i-error.svg';
-import BadgeWarnings from "./BadgeWarnings";
-import BadgeErrors from "./BadgeErrors";
+import BadgeErrors from "./BadgeErrors.js";
+import BadgeWarnings from "./BadgeWarnings.js";
 
-export const ValidationErrorItem = (
+const ValidationErrorItem = (
     {
         id,
         tagName,
@@ -41,3 +43,15 @@ export const ValidationErrorItem = (
         </div>
     )
 }
+
+ValidationErrorItem.propTypes = {
+    displayBadges: PropTypes.bool,
+    errorObject: PropTypes.object,
+    errorTitle: PropTypes.string,
+    id: PropTypes.string,
+    setErrors: PropTypes.func,
+    setShowValidationMessage: PropTypes.func,
+    tagName: PropTypes.string
+}
+
+export default ValidationErrorItem;

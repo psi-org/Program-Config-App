@@ -1,28 +1,24 @@
-// *** Modules ***
-import $ from 'jquery';
-import { useEffect, useState } from 'react';
-
-// *** IMAGES ***
-import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
-import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
-import BadgeWarnings from "../UIElements/BadgeWarnings";
-import BadgeErrors from "../UIElements/BadgeErrors";
-import ValidationMessages from "../UIElements/ValidationMessages";
-
 import LaunchIcon from '@mui/icons-material/Launch';
+import PercentIcon from '@mui/icons-material/Percent';
 import RuleIcon from '@mui/icons-material/Rule';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Button, IconButton } from '@mui/material';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
-import ProgramRulesList from '../UIElements/ProgramRulesList';
 import Tooltip from '@mui/material/Tooltip';
-import PercentIcon from '@mui/icons-material/Percent';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import { FEEDBACK_ORDER, tagStyle } from '../../configs/Constants';
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { FEEDBACK_ORDER, tagStyle } from '../../configs/Constants.js';
+import BadgeErrors from "../UIElements/BadgeErrors.js";
+import BadgeWarnings from "../UIElements/BadgeWarnings.js";
+import ProgramRulesList from '../UIElements/ProgramRulesList.js';
+import ValidationMessages from "../UIElements/ValidationMessages.js";
+import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
+import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
+import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 
-const Scores = ({ stageSection, program, index }) => {
+const Scores = ({ stageSection, program }) => {
     const [showValidationMessage, setShowValidationMessage] = useState(false);
     const [errors, setErrors] = useState([]);
     const [scoreRules, setScoreRules] = useState(false);
@@ -68,8 +64,8 @@ const Scores = ({ stageSection, program, index }) => {
             }}>
                 {
                     stageSection.dataElements.map((dataElement, i) => {
-                        let classNames = "ml_item" + ((dataElement.importStatus) ? ' import_' + dataElement.importStatus : '');
-                        let compositiveIndicator = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
+                        const classNames = "ml_item" + ((dataElement.importStatus) ? ' import_' + dataElement.importStatus : '');
+                        const compositiveIndicator = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
                         return (
                             <div
                                 id={"de_" + dataElement.id}
@@ -139,5 +135,10 @@ const Scores = ({ stageSection, program, index }) => {
         </div>
     );
 };
+
+Scores.propTypes = {
+    program: PropTypes.string,
+    stageSection: PropTypes.object
+}
 
 export default Scores;

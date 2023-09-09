@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
+import { useEffect } from 'react';
+import { ReleaseNotes } from "../../configs/ReleaseNotes.js";
 import {
     HNQIS2_AGG_OPERATORS,
     conditionalError,
@@ -16,7 +17,7 @@ import {
     yesNoValidator,
     HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS,
     getPromptsFormula
-} from "../../configs/TemplateConstants";
+} from "../../configs/TemplateConstants.js";
 import {
     addCreator,
     addProtection,
@@ -32,9 +33,7 @@ import {
     printArray2Column,
     printObjectArray,
     writeWorkbook
-} from "../../configs/ExcelUtils";
-import { ReleaseNotes } from "../../configs/ReleaseNotes";
-import { MAX_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from '../../configs/Constants';
+} from "../../utils/ExcelUtils.js";
 
 const Exporter = (props) => {
 
@@ -83,7 +82,7 @@ const Exporter = (props) => {
         addReleaseNotes(releaseNotesWS, ReleaseNotes, password);
         hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
         addProtection(templateWS,3,3000,password);
-        writeWorkbook(workbook, props.programName, props.setStatus, props.isLoading);
+        writeWorkbook(workbook, props.programName, props.isLoading);
     };
 
     const addInstructions = async (ws) => {
@@ -136,7 +135,7 @@ const Exporter = (props) => {
         ws.getCell("C13").value = props.programShortName;
         ws.getCell("C14").value = props.useCompetencyClass;
         ws.getCell("C15").value = props.programPrefix;
-        let healthAreaFound = props.healthAreaData.find(ha => ha["code"] == props.programHealthArea);
+        const healthAreaFound = props.healthAreaData.find(ha => ha["code"] == props.programHealthArea);
         ws.getCell("C16").value = healthAreaFound ? healthAreaFound["Health Area"] : "Family Planning";
         editingCell = buildCellObject(ws, "D13");
         editingCell.cell.value = ReleaseNotes.at(-1).version;
@@ -1063,7 +1062,7 @@ const Exporter = (props) => {
 
     const addMapping = async (ws) => {
 
-        let editingCell = buildCellObject(ws, "A1");
+        const editingCell = buildCellObject(ws, "A1");
         editingCell.cell.value = "M";
         editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
 

@@ -1,5 +1,7 @@
 import { ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Button } from "@dhis2/ui";
-import Messages from "./Messages";
+import PropTypes from 'prop-types';
+import React from 'react';
+import Messages from "./Messages.js";
 
 
 const ValidationMessages = (props) => {
@@ -21,6 +23,11 @@ const ValidationMessages = (props) => {
             </ButtonStrip>
         </ModalActions>
     </Modal>
+}
+
+ValidationMessages.propTypes = {
+    objects: PropTypes.array,
+    showValidationMessage: PropTypes.func
 }
 
 export default ValidationMessages;

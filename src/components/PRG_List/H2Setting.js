@@ -1,15 +1,16 @@
-import { Alert, FormLabel } from "@mui/material";
-import FormHelperText from "@mui/material/FormHelperText";
-import FormControl from "@mui/material/FormControl";
-import { AlertBar, OrganisationUnitTree } from "@dhis2/ui";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import SelectOptions from "../UIElements/SelectOptions";
-import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { useDataQuery } from "@dhis2/app-runtime";
-import LinearProgress from "@mui/material/LinearProgress";
+import { OrganisationUnitTree } from "@dhis2/ui";
+import { Alert, FormLabel } from "@mui/material";
 import Box from "@mui/material/Box";
-import { AGG_TYPES_H2_PI, BUILD_VERSION } from "../../configs/Constants";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import LinearProgress from "@mui/material/LinearProgress";
+import Switch from "@mui/material/Switch";
+import PropTypes from 'prop-types';
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import { AGG_TYPES_H2_PI, BUILD_VERSION } from "../../configs/Constants.js";
+import SelectOptions from "../UIElements/SelectOptions.js";
 
 const query = {
     results: {
@@ -51,9 +52,9 @@ const ouUnitQuery = {
 const H2Setting = forwardRef((props, ref) => {
     let id;
     const { loading: ouMetadataLoading, data: ouMetadata } = useDataQuery(orgUnitsQuery);
-    const { loading: ouLevelLoading, data: getOuLevel, refetch: ouLevelRefetch, error: noOULevelFound } = useDataQuery(ouUnitQuery, { variables: { id: id } });
+    const { loading: ouLevelLoading, refetch: ouLevelRefetch, error: noOULevelFound } = useDataQuery(ouUnitQuery, { variables: { id: id } });
 
-    const { data: haQuery, refetch: findHealthAreas } = useDataQuery(query, {
+    const { refetch: findHealthAreas } = useDataQuery(query, {
         lazy: true,
     });
 
@@ -183,7 +184,7 @@ const H2Setting = forwardRef((props, ref) => {
         }
     }, [orgUnitPathSelected, noOULevelFound])
 
-    let ouTreeNLevelInit = () => {
+    const ouTreeNLevelInit = () => {
         setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
         setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
 
@@ -200,7 +201,7 @@ const H2Setting = forwardRef((props, ref) => {
         if (event.checked) {
             ouLevelRefetch({ id: event.id }).then((data) => {
                 if (typeof data.result !== "undefined") {
-                    let ouLevels =
+                    const ouLevels =
                         ouMetadata.orgUnitLevels?.organisationUnitLevels.filter(
                             (ol) => ol.level >= data.result.level
                         );
@@ -227,8 +228,9 @@ const H2Setting = forwardRef((props, ref) => {
                 ouMapPolygon === "" ||
                 aggregationType === "" ||
                 selectedOrgUnits.length === 0
-            )
+            ) {
                 response = false;
+            }
             validationErrors.healthArea =
                 healthArea === "" ? "This field is required" : undefined;
             validationErrors.ouTableRow =
@@ -245,7 +247,7 @@ const H2Setting = forwardRef((props, ref) => {
         },
 
         saveMetaData() {
-            let data = {};
+            const data = {};
             data.saveVersion = BUILD_VERSION;
             data.buildVersion = props.pcaMetadata?.buildVersion;
             data.useCompetencyClass = useCompetency ? "Yes" : "No";
@@ -441,5 +443,12 @@ const H2Setting = forwardRef((props, ref) => {
         </>
     )
 })
+
+H2Setting.displayName = 'H2Setting';
+
+H2Setting.propTypes = {
+    pcaMetadata: PropTypes.object,
+    setButtonDisabled: PropTypes.func
+}
 
 export default H2Setting

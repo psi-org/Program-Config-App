@@ -1,10 +1,10 @@
-import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy } from "./Utils";
 import { saveAs } from 'file-saver';
-import { thinBorder } from "./TemplateConstants";
-import { METADATA, SHORT_DATE_FORMAT_OPTIONS } from "./Constants";
+import { METADATA, SHORT_DATE_FORMAT_OPTIONS } from "../configs/Constants.js";
+import { thinBorder } from "../configs/TemplateConstants.js";
+import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy } from "./Utils.js";
 
 export function printArray2Column(sheet, array, header, startPosition, headerBgColor) {
-    let coordinates = splitPosition(startPosition);
+    const coordinates = splitPosition(startPosition);
     sheet.getColumn(coordinates[0]).width = 20;
     sheet.getCell(startPosition).value = header;
     sheet.getCell(startPosition).font = {
@@ -28,12 +28,12 @@ export function printArray2Column(sheet, array, header, startPosition, headerBgC
     applyBorderToRange(sheet, character2Number(coordinates[0]), coordinates[1], character2Number(coordinates[0]), parseInt(coordinates[1]) + parseInt(array.length));
 }
 export function printObjectArray(sheet, datas, position, headerBgColor) {
-    let excelColumns = columnCharacters(splitPosition(position)[0], datas[0]);
-    let headerRow = splitPosition(position)[1];
+    const excelColumns = columnCharacters(splitPosition(position)[0], datas[0]);
+    const headerRow = splitPosition(position)[1];
     let row = parseInt(headerRow) + parseInt(1);
-    let keys = Object.keys(datas[0]);
+    const keys = Object.keys(datas[0]);
     keys.forEach((key, index) => {
-        let cell = sheet.getCell(excelColumns[index] + headerRow);
+        const cell = sheet.getCell(excelColumns[index] + headerRow);
         cell.value = key;
         cell.alignment = { wrapText: true };
         cell.font = {
@@ -51,7 +51,7 @@ export function printObjectArray(sheet, datas, position, headerBgColor) {
     });
     datas.forEach(data => {
         keys.forEach((key, index) => {
-            let cell = sheet.getCell(excelColumns[index] + row);
+            const cell = sheet.getCell(excelColumns[index] + row);
             cell.value = data[key];
         });
         row = parseInt(row) + parseInt(1);
@@ -68,9 +68,9 @@ export function applyBorderToRange(sheet, startCol, startRow, endCol, endRow, bo
     }
 }
 export function fillBackgroundToRange(sheet, range, backgroundColor) {
-    let rangeParts = range.split(":");
-    let start = splitPosition(rangeParts[0]);
-    let end = splitPosition(rangeParts[1]);
+    const rangeParts = range.split(":");
+    const start = splitPosition(rangeParts[0]);
+    const end = splitPosition(rangeParts[1]);
     for (let i = parseInt(start[1]); i <= parseInt(end[1]); i++) {
         for (let j = character2Number(start[0]); j <= character2Number(end[0]); j++) {
             const colChar = number2Character(j);
@@ -87,9 +87,9 @@ export function fillBackgroundToRange(sheet, range, backgroundColor) {
 }
 
 export function defineName(sheet, range, rangeName) {
-    let rangeParts = range.split(":");
-    let start = splitPosition(rangeParts[0]);
-    let end = splitPosition(rangeParts[1]);
+    const rangeParts = range.split(":");
+    const start = splitPosition(rangeParts[0]);
+    const end = splitPosition(rangeParts[1]);
     for (let i = parseInt(start[1]); i <= parseInt(end[1]); i++) {
         for (let j = character2Number(start[0]); j <= character2Number(end[0]); j++) {
             const colChar = number2Character(j);
@@ -100,9 +100,9 @@ export function defineName(sheet, range, rangeName) {
 }
 
 export function applyStyleToRange(sheet, range, userStyle) {
-    let rangeParts = range.split(":");
-    let start = splitPosition(rangeParts[0]);
-    let end = splitPosition(rangeParts[1]);
+    const rangeParts = range.split(":");
+    const start = splitPosition(rangeParts[0]);
+    const end = splitPosition(rangeParts[1]);
     for (let i = parseInt(start[1]); i <= parseInt(end[1]); i++) {
         for (let j = character2Number(start[0]); j <= character2Number(end[0]); j++) {
             const colChar = number2Character(j);
@@ -124,9 +124,9 @@ function validateCell(sheet, cell, validationRule) {
 }
 
 function validateRange(sheet, range, validationRule) {
-    let rangeParts = range.split(":");
-    let start = splitPosition(rangeParts[0]);
-    let end = splitPosition(rangeParts[1]);
+    const rangeParts = range.split(":");
+    const start = splitPosition(rangeParts[0]);
+    const end = splitPosition(rangeParts[1]);
 
     for (let i = start[1]; i <= end[1]; i++) {
         for (let j = character2Number(start[0]); j <= character2Number(end[0]); j++) {
@@ -138,20 +138,17 @@ function validateRange(sheet, range, validationRule) {
 }
 
 export const formatDate = (date) => {
-    let formattedDate = date.toLocaleString("en-US", SHORT_DATE_FORMAT_OPTIONS).split(', ');
+    const formattedDate = date.toLocaleString("en-US", SHORT_DATE_FORMAT_OPTIONS).split(', ');
 
-    /*let d = date.split('.')[0].split('T')
-    */
-    let dateYMD = formattedDate[0].replaceAll('/', '-');
-    let dateHMS = formattedDate[1].split(":")
+    const dateYMD = formattedDate[0].replaceAll('/', '-');
+    const dateHMS = formattedDate[1].split(":")
     return `${dateYMD} [${dateHMS[0]}h ${dateHMS[1]}m]`
 }
 
-export const writeWorkbook = async (wb, name, setStatus, isLoading) => {
+export const writeWorkbook = async (wb, name, isLoading) => {
     const buf = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buf]), `${name} - ${formatDate(new Date())}.xlsx`);
 
-    setStatus("Download Template");
     isLoading(false);
 };
 
@@ -222,7 +219,7 @@ export const buildCellObject = (ws, cell) => ({
 })
 
 export const generateBorderObject = (borderSchema, style = "thin") => {
-    let result = {};
+    const result = {};
 
     while (borderSchema.length < 4) {
         borderSchema = borderSchema+"0";
@@ -230,20 +227,20 @@ export const generateBorderObject = (borderSchema, style = "thin") => {
 
     borderSchema = borderSchema.substring(0, 4);
 
-    if (borderSchema[0] === "1") result.top = { style }
-    if (borderSchema[1] === "1") result.right = { style }
-    if (borderSchema[2] === "1") result.bottom = { style }
-    if (borderSchema[3] === "1") result.left = { style }
+    if (borderSchema[0] === "1") {result.top = { style }}
+    if (borderSchema[1] === "1") {result.right = { style }}
+    if (borderSchema[2] === "1") {result.bottom = { style }}
+    if (borderSchema[3] === "1") {result.left = { style }}
 
     return result;
 }
 
 export const getMappedValues = (ws, startRow, refColumn, dataMap) => {
     let i = startRow;
-    let mappedValues = [];
+    const mappedValues = [];
 
     while (ws.getCell(refColumn + i).value !== null) {
-        let value = {};
+        const value = {};
         for (const [key, column] of Object.entries(dataMap)) {
             value[key] = ws.getCell(column + i).value
         }
@@ -272,9 +269,10 @@ export const getHNQIS2MappingList = (ws) => {
 }
 
 export const getVarNameFromParentUid = (parentUid, programStage, removeStagePrefix = true) => {
-    let parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
-    let deMetadata = JSON.parse(parentDe?.attributeValues?.find(av => av.attribute.id === METADATA)?.value || "{}");
-    if(removeStagePrefix)
+    const parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
+    const deMetadata = JSON.parse(parentDe?.attributeValues?.find(av => av.attribute.id === METADATA)?.value || "{}");
+    if(removeStagePrefix){
         return deMetadata.varName?.replace(/_PS\d+/g, '');
+    }
     return deMetadata.varName;
 }

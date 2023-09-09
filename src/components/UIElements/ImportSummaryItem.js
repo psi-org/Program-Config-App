@@ -1,4 +1,6 @@
 import { Tag } from "@dhis2/ui";
+import PropTypes from 'prop-types';
+import React from 'react';
 
 const ImportSummaryItem = ({ title, contentsList }) => {
     return (
@@ -23,6 +25,11 @@ const ImportSummaryItem = ({ title, contentsList }) => {
             ))}
         </div>
     )
+}
+
+ImportSummaryItem.propTypes = {
+    contentsList: PropTypes.array,
+    title: PropTypes.string
 }
 
 export default ImportSummaryItem

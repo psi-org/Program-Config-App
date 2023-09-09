@@ -1,38 +1,32 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { useSelector } from "react-redux";
 import { Chip, CircularLoader, NoticeBox, IconCheckmarkCircle24, IconCross24 } from '@dhis2/ui';
-
-// ------------------
-import { Link, useParams } from "react-router-dom";
-import StageItem from "./StageItem";
-import StageNew from "./StageNew";
-// ------------------
-import { useDispatch } from "react-redux";
-import { bindActionCreators } from "redux";
-import actionCreators from "../../state/action-creators";
-import { useState, useEffect } from "react";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import TuneIcon from '@mui/icons-material/Tune';
-
-import MuiButton from '@mui/material/Button';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-import MuiChip from '@mui/material/Chip';
-import { DeepCopy, extractAttributeValues, formatAlert, getPCAMetadataDE, getProgramQuery, setPCAMetadata, truncateString } from "../../configs/Utils";
-import ImportDownloadButton from "../UIElements/ImportDownloadButton";
-import DataProcessorTracker from "../Excel/DataProcessorTracker";
-import Importer from "../Excel/Importer";
-import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants";
-import { Button, DialogActions, DialogContent } from "@mui/material";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
-import Removed from "../UIElements/Removed";
-import ValidateTracker from "../PRG_Details/ValidateTracker";
-import Errors from "../UIElements/Errors";
-import CustomMUIDialog from "../UIElements/CustomMUIDialog";
-import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
-import { BUILD_VERSION, METADATA } from "../../configs/Constants";
-import { buildProgramRules, hideShowLogic } from "../STG_Details/Scripting";
+import { Button, DialogActions, DialogContent } from "@mui/material";
+import MuiAlert from '@mui/material/Alert';
+import MuiButton from '@mui/material/Button';
+import MuiChip from '@mui/material/Chip';
+import Snackbar from '@mui/material/Snackbar';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
+import { bindActionCreators } from "redux";
+import { BUILD_VERSION, METADATA } from "../../configs/Constants.js";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
+import actionCreators from "../../state/action-creators";
+import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, setPCAMetadata, truncateString } from "../../utils/Utils.js";
+import DataProcessorTracker from "../Excel/DataProcessorTracker.js";
+import Importer from "../Excel/Importer.js";
+import ValidateTracker from "../PRG_Details/ValidateTracker.js";
+import { hideShowLogic } from "../STG_Details/Scripting.js";
+import CustomMUIDialog from "../UIElements/CustomMUIDialog.js";
+import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle.js";
+import Errors from "../UIElements/Errors.js";
+import ImportDownloadButton from "../UIElements/ImportDownloadButton.js";
+import Removed from "../UIElements/Removed.js";
+import StageItem from "./StageItem.js";
+import StageNew from "./StageNew.js";
 
 
 const query = {
@@ -108,21 +102,15 @@ const ProgramDetails = () => {
 
     const { id } = useParams();
 
-    if (id && id.length == 11) {
+    if (id && id.length === 11) {
         const dispatch = useDispatch();
         const { setProgram } = bindActionCreators(actionCreators, dispatch);
         setProgram(id);
     }
 
     const program = useSelector(state => state.program);
-
-    if (!program) return (
-        <NoticeBox title="Missing Program ID" error>
-            No program ID was provided, please try again! <Link to="/">Go to programs list</Link>
-        </NoticeBox>
-    )
-
-    let metadataDM = useDataMutation(createMutation, {
+    
+    const metadataDM = useDataMutation(createMutation, {
         onError: (err) => {
             console.error(err)
         }
@@ -160,7 +148,7 @@ const ProgramDetails = () => {
     const [saveAndBuild, setSaveAndBuild] = useState(false);
 
     useEffect(() => {
-        if (notification) setSnackSeverity(notification.severity)
+        if (notification) { setSnackSeverity(notification.severity) }
     }, [notification])
 
     // Get Ids
@@ -184,12 +172,20 @@ const ProgramDetails = () => {
     }
 
     useEffect(() => {
-        if (data && !backupData) storeBackupdata();
+        if (data && !backupData) { storeBackupdata() }
     }, [data])
 
     useEffect(() => {
-        if (savedAndValidated) storeBackupdata();
+        if (savedAndValidated) { storeBackupdata() }
     }, [savedAndValidated])
+
+    if (!program) {
+        return (
+            <NoticeBox title="Missing Program ID" error>
+                No program ID was provided, please try again! <Link to="/">Go to programs list</Link>
+            </NoticeBox>
+        )
+    }
 
     if (error) {
         return (
@@ -198,28 +194,31 @@ const ProgramDetails = () => {
             </NoticeBox>
         )
     }
+
     if (loading) { return <span><CircularLoader /></span> }
 
     const hnqisMode = !!data.results.attributeValues.find(av => av.value === "HNQIS2");
     const readOnly = !!data.results.attributeValues.find(av => av.value === "HNQIS");
 
-    if (hnqisMode && !h2Ready) return (
-        <div style={{ margin: '2em' }}>
-            <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
-                <span>First go to the <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue.</span>
-            </NoticeBox>
-        </div>
-    )
+    if (hnqisMode && !h2Ready) {
+        return (
+            <div style={{ margin: '2em' }}>
+                <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
+                    <span>First go to the <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue.</span>
+                </NoticeBox>
+            </div>
+        )
+    }
 
     const commit = () => {
-        if (createMetadata.data && createMetadata.data.status) delete createMetadata.data.status
+        if (createMetadata.data && createMetadata.data.status) { delete createMetadata.data.status }
         setSavingMetadata(true);
         return;
     };
 
     const updateProgramBuildVersion = (programId, pcaMetadata) => {
         getProgramSettings({ programId }).then(res => {
-            let program = res.results;
+            const program = res.results;
             pcaMetadata.buildVersion = BUILD_VERSION;
             setPCAMetadata(program, pcaMetadata);
 
@@ -237,36 +236,36 @@ const ProgramDetails = () => {
     }
 
     const buildProgramRulesTracker = () => {
-        if (!savedAndValidated) return;
+        if (!savedAndValidated) { return }
         //--------------------- NEW METADATA --------------------//
         refetch({ program }).then(programConfig => {
 
             setProgressSteps(1);
 
-            let pcaMetadata = JSON.parse(programConfig.results?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}")
+            const pcaMetadata = JSON.parse(programConfig.results?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}")
             setSaveAndBuild('Run');
 
-            let programStages = programConfig.results?.programStages;
-            let n = (programStages?.reduce((acu, cur) => acu + (cur.programStageDataElements?.length || 0), 0) || 0)*2;
+            const programStages = programConfig.results?.programStages;
+            const n = (programStages?.reduce((acu, cur) => acu + (cur.programStageDataElements?.length || 0), 0) || 0)*2;
 
             idsQuery.refetch({ n }).then(uidData => {
                 if (uidData) {
-                    let uidPool = uidData.results.codes;
+                    const uidPool = uidData.results.codes;
                     setProgressSteps(2);
 
-                    let hideShowGroup = {};
-                    let programRuleVariables = [];
+                    const hideShowGroup = {};
+                    const programRuleVariables = [];
 
                     // Data Elements Variables
                     programStages.forEach((stage, stgIdx) => {
-                        let stageSections = (stage.programStageSections && stage.programStageSections.length > 0)
+                        const stageSections = (stage.programStageSections && stage.programStageSections.length > 0)
                             ? stage.programStageSections
                             : [{
                                 dataElements: stage.programStageDataElements.map(psde => psde.dataElement)
                             }];
                         
                         const varNameRef = stageSections.map(sec => sec.dataElements.map(de => {
-                            let metadata = getPCAMetadataDE(de)
+                            const metadata = getPCAMetadataDE(de)
                             return { id: de.id, varName: metadata.varName }
                         })).flat();
 
@@ -281,11 +280,11 @@ const ProgramDetails = () => {
                                     dataElement: { id: dataElement.id }
                                 });
 
-                                let metadata = getPCAMetadataDE(dataElement);
+                                const metadata = getPCAMetadataDE(dataElement);
 
                                 if (metadata.parentQuestion !== undefined && metadata.parentValue !== undefined) {
-                                    let parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
-                                    let parentValue = String(metadata.parentValue);
+                                    const parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
+                                    const parentValue = String(metadata.parentValue);
 
                                     !hideShowGroup[parentQuestion] ? hideShowGroup[parentQuestion] = {} : undefined;
                                     !hideShowGroup[parentQuestion][parentValue] ? hideShowGroup[parentQuestion][parentValue] = [] : undefined;
@@ -303,8 +302,8 @@ const ProgramDetails = () => {
 
                     setProgressSteps(3);
 
-                    let programRulesDel = prDQ.data.results.programRules.map(pr => ({ id: pr.id }));
-                    let programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
+                    const programRulesDel = prDQ.data.results.programRules.map(pr => ({ id: pr.id }));
+                    const programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
 
                     const oldMetadata = {
                         programRules: programRulesDel.length > 0 ? programRulesDel : undefined,
@@ -545,12 +544,10 @@ const ProgramDetails = () => {
                         importResults={importResults}
                         setImportResults={setImportResults}
                         programMetadata={data.results}
-                        programSpecificType={data.results.withoutRegistration ? TEMPLATE_PROGRAM_TYPES.event : TEMPLATE_PROGRAM_TYPES.tracker}
                         setSavingMetadata={setSavingMetadata}
                         setSavedAndValidated={setSavedAndValidated}
                         setValidationResults={setValidationResults}
                         setErrorReports={setErrorReports}
-                        refetchProgram={refetch}
                     />
                 }
             </div>

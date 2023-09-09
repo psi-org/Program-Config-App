@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import PublishIcon from '@mui/icons-material/Publish';
 import { LoadingButton } from '@mui/lab';
 import { Button, ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@mui/material';
-import PublishIcon from '@mui/icons-material/Publish';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import PropTypes from 'prop-types';
+import React, { useState, useRef } from 'react';
 
 const optionsTemplate = ['IMPORT TEMPLATE', 'DOWNLOAD TEMPLATE'];
 
-const ImportDownloadButton = ({value, setValue, disabled = false, setStatus, setImporterEnabled, setExportToExcel, size='regular'}) => {
+const ImportDownloadButton = ({value, setValue, disabled = false, setImporterEnabled, setExportToExcel, size='regular'}) => {
 
     const anchorRefTemplate = useRef(null);
     const [openTemplateBtn, setOpenTemplateBtn] = useState(false);
@@ -45,7 +46,6 @@ const ImportDownloadButton = ({value, setValue, disabled = false, setStatus, set
     const configuration_download = (e) => {
         e.preventDefault();
         setExportToExcel(true);
-        setStatus("Generating Configuration File...")
     };
 
     return (
@@ -114,6 +114,15 @@ const ImportDownloadButton = ({value, setValue, disabled = false, setStatus, set
             </Popper>
         </>
     )
+}
+
+ImportDownloadButton.propTypes = {
+    disabled: PropTypes.bool,
+    setExportToExcel: PropTypes.func,
+    setImporterEnabled: PropTypes.func,
+    setValue: PropTypes.func,
+    size: PropTypes.string,
+    value: PropTypes.number
 }
 
 export default ImportDownloadButton

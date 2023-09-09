@@ -1,13 +1,14 @@
-import { CircularLoader, NoticeBox, Tag } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
-import { useState, useEffect } from "react";
+import { CircularLoader, NoticeBox, Tag } from "@dhis2/ui";
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialogTitle from './CustomMUIDialogTitle'
-import CustomMUIDialog from './CustomMUIDialog'
-import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants";
-import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, setPCAMetadata } from "../../configs/Utils";
+import PropTypes from 'prop-types';
+import React, { useState, useEffect } from "react";
+import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants.js";
+import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, setPCAMetadata } from "../../utils/Utils.js";
+import CustomMUIDialog from './CustomMUIDialog.js';
+import CustomMUIDialogTitle from './CustomMUIDialogTitle.js';
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -48,7 +49,7 @@ const metadataMutation = {
 };
 
 const buildRemovedDE = (de) => {
-    let suffix = `${String(+ new Date()).slice(-7)}[X]`;
+    const suffix = `${String(+ new Date()).slice(-7)}[X]`;
     de.name = de.name.replaceAll(/\d{7}\[X\]/g,'').slice(0, MAX_FORM_NAME_LENGTH - suffix.length) + suffix;
     de.shortName = de.id + ' ' + suffix;
     delete de.code;
@@ -72,18 +73,20 @@ const processStageData = (
     }
 ) => {
     let new_dataElements = [];
-    let new_programStageDataElements = [];
+    const new_programStageDataElements = [];
     let isBasicForm = false;
 
-    if (hnqisMode) criticalSection.dataElements.forEach((de, i) => {
-        new_programStageDataElements.push(
-            {
-                compulsory: false,
-                sortOrder: i + 1,
-                dataElement: { id: de.id }
-            }
-        )
-    });
+    if (hnqisMode) {
+        criticalSection.dataElements.forEach((de, i) => {
+            new_programStageDataElements.push(
+                {
+                    compulsory: false,
+                    sortOrder: i + 1,
+                    dataElement: { id: de.id }
+                }
+            )
+        });
+    }
 
     /**
      * Delete importStatus: section & Data Elements
@@ -94,30 +97,30 @@ const processStageData = (
     const stageIndex = stagesList?.findIndex(stage => stage.id === programStage.id) || 0;
     importedSections.forEach((section, secIdx) => {
 
-        if (section.isBasicForm || section.formType === 'DEFAULT' || section.id === 'basic-form') isBasicForm = true;
-        if (section.importStatus == 'new') section.id = uidPool.shift();
+        if (section.isBasicForm || section.formType === 'DEFAULT' || section.id === 'basic-form') { isBasicForm = true }
+        if (section.importStatus == 'new') { section.id = uidPool.shift() }
 
         section.dataElements.forEach((dataElement, deIdx) => {
 
-            let DE_metadata = JSON.parse(dataElement.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
+            const DE_metadata = JSON.parse(dataElement.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
 
-            let newVarName = hnqisMode ? `_S${secIdx + 1}Q${deIdx + 1}` : `_PS${stageIndex + 1}_S${secIdx + 1}E${deIdx + 1}`;
-            let newCode = `${programMetadata.dePrefix || section.id}_${newVarName}`;
+            const newVarName = hnqisMode ? `_S${secIdx + 1}Q${deIdx + 1}` : `_PS${stageIndex + 1}_S${secIdx + 1}E${deIdx + 1}`;
+            const newCode = `${programMetadata.dePrefix || section.id}_${newVarName}`;
 
             let formName = ""
             if (hnqisMode) {
                 formName = DE_metadata.elemType == 'label' ? DE_metadata.labelFormName : dataElement.formName;
 
                 formName = formName.replaceAll(' [C]', '');
-                if (DE_metadata.isCritical == 'Yes') formName += ' [C]'
+                if (DE_metadata.isCritical == 'Yes') { formName += ' [C]' }
                 DE_metadata.elemType == 'label' ? DE_metadata.labelFormName = formName : dataElement.formName = formName;
             } else {
                 formName = dataElement.formName;
             }
 
 
-            let name = (newCode + '_' + formName).slice(0, MAX_FORM_NAME_LENGTH)
-            let shortName = (newCode + '_' + formName).slice(0, MAX_SHORT_NAME_LENGTH)
+            const name = (newCode + '_' + formName).slice(0, MAX_FORM_NAME_LENGTH)
+            const shortName = (newCode + '_' + formName).slice(0, MAX_SHORT_NAME_LENGTH)
 
             DE_metadata.varName = newVarName;
 
@@ -134,7 +137,7 @@ const processStageData = (
                 //new_dataElements.push(dataElement);
             }
 
-            let existingPSDE = originalStageDataElements?.find(psde => psde.dataElement.id === dataElement.id);
+            const existingPSDE = originalStageDataElements?.find(psde => psde.dataElement.id === dataElement.id);
             if (existingPSDE) {
                 dataElement = mergeWithPriority(dataElement, existingPSDE.dataElement)
             }
@@ -149,7 +152,7 @@ const processStageData = (
             psdeSortOrder += 1
             delete dataElement.displayInReports;
 
-            if (!hnqisMode) ['isCritical', 'labelFormName'].forEach(key => delete DE_metadata[key])
+            if (!hnqisMode) { ['isCritical', 'labelFormName'].forEach(key => delete DE_metadata[key]) }
 
             setPCAMetadata(dataElement, DE_metadata);
         });
@@ -160,16 +163,16 @@ const processStageData = (
     });
 
     // Map parent name with data element uid
-    let importedDataElements = importedSections.map(sec => sec.dataElements).flat();
+    const importedDataElements = importedSections.map(sec => sec.dataElements).flat();
     importedSections.map(section => {
         section.dataElements.map(de => {
-            let attributeValues = de.attributeValues;
+            const attributeValues = de.attributeValues;
             if (de.parentQuestion) {
-                let metadataIndex = de.attributeValues.findIndex(att => att.attribute.id == METADATA);
+                const metadataIndex = de.attributeValues.findIndex(att => att.attribute.id == METADATA);
 
-                let metadata = JSON.parse(de.attributeValues[metadataIndex]?.value || "{}");
+                const metadata = JSON.parse(de.attributeValues[metadataIndex]?.value || "{}");
 
-                let parentId = importedDataElements.find(ide => ide.parentName == de.parentQuestion)?.id;
+                const parentId = importedDataElements.find(ide => ide.parentName == de.parentQuestion)?.id;
                 metadata.parentQuestion = parentId;
 
                 attributeValues[metadataIndex].value = JSON.stringify(metadata);
@@ -216,13 +219,13 @@ const processStageData = (
 
     //*Update Items with suffix [X] to avoid Update conflicts
     let tempUpdate;
-    let removed = (removedItems && removedItems.length) > 0 ? removedItems.map(de => buildRemovedDE(de)) : [];
+    const removed = (removedItems && removedItems.length) > 0 ? removedItems.map(de => buildRemovedDE(de)) : [];
     if (new_dataElements && new_dataElements.length > 0) {
-        let toUpdateDE = DeepCopy(new_dataElements);
+        const toUpdateDE = DeepCopy(new_dataElements);
         tempUpdate = toUpdateDE.map(de => buildRemovedDE(de));
     }
 
-    let tempMetadata = {
+    const tempMetadata = {
         dataElements: removed.concat(tempUpdate || [])
     };
 
@@ -231,8 +234,8 @@ const processStageData = (
     programStage.programStageDataElements = new_programStageDataElements;
 
     //*PROGRAM UPDATE ==> trackedEntityAttributes, attributeValues[metadata]
-    let programMetadataIdx = programPayload.attributeValues.findIndex(att => att.attribute.id === METADATA);
-    let new_programMetadata = JSON.parse(programPayload.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
+    const programMetadataIdx = programPayload.attributeValues.findIndex(att => att.attribute.id === METADATA);
+    const new_programMetadata = JSON.parse(programPayload.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
     new_programMetadata.dePrefix = programMetadata.dePrefix;
 
     if (hnqisMode) {
@@ -243,7 +246,7 @@ const processStageData = (
 
     new_programMetadata.saveVersion = BUILD_VERSION;
 
-    let metadataObject = {
+    const metadataObject = {
         attribute: { id: METADATA },
         value: JSON.stringify(new_programMetadata)
     };
@@ -255,7 +258,7 @@ const processStageData = (
     }
 
     //* PROGRAM TRACKED ENTITY ATTRIBUTES
-    let currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE);
+    const currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE);
     if (hnqisMode && new_programMetadata.useCompetencyClass == "Yes" && !currentCompetencyAttribute) {
         competencyClassAttribute.program.id = programPayload.id;
         programPayload.programTrackedEntityAttributes.push(competencyClassAttribute);
@@ -266,7 +269,7 @@ const processStageData = (
     }
 
     //* Result Object
-    let metadata = {
+    const metadata = {
         dataElements: new_dataElements,
         programStages: [programStage],
         programStageSections: !isBasicForm ? programStage.programStageSections : [],
@@ -296,21 +299,21 @@ const processProgramData = (
     }
 ) => {
 
-    let groupedMetadata = {
+    const groupedMetadata = {
         dataElements: [],
         programStages: [],
         programStageSections: [],
         programStageDataElements: []
     };
 
-    let teaConfigurations = {
+    const teaConfigurations = {
         programSections: [],
         programTrackedEntityAttributes: []
     };
 
     let tempMetadataDEs = [];
 
-    let programPCAMetadata = JSON.parse(programPayload.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
+    const programPCAMetadata = JSON.parse(programPayload.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
     programMetadata.dePrefix = programPCAMetadata.dePrefix;
 
     importedStages.forEach(programStage => {
@@ -319,7 +322,7 @@ const processProgramData = (
         programStage.sortOrder = programStage.stageNumber;
         programStage = mergeWithPriority(programStage, currentExistingStage);
 
-        let { tempMetadata, metadata } = processStageData(
+        const { tempMetadata, metadata } = processStageData(
             {
                 uidPool,
                 hnqisMode,
@@ -346,7 +349,7 @@ const processProgramData = (
         //*TEAs must be constructed
         importedTEAs.forEach((teaSection, index) => {
             
-            let programTrackedEntityAttributes = teaSection.trackedEntityAttributes.map(ptea => {
+            const programTrackedEntityAttributes = teaSection.trackedEntityAttributes.map(ptea => {
                 ptea.id = ptea.programTrackedEntityAttribute || uidPool.shift();
                 return ptea;
             });
@@ -403,7 +406,7 @@ const SaveMetadata = (props) => {
     const [programPayloadBackup, setProgramPayloadBackup] = useState();
 
     // Create Mutation
-    let metadataDM = useDataMutation(metadataMutation, {
+    const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             gotResponseError(err.details);
         }
@@ -421,7 +424,7 @@ const SaveMetadata = (props) => {
 
     // Get Ids for new Data Elements
     const idsQuery = useDataQuery(queryId, { variables: { n: props.newObjectsQtty } });
-    let uidPool = idsQuery.data?.results.codes;
+    const uidPool = idsQuery.data?.results.codes;
 
     const gotResponseError = (response) => {
         setErrorStatus(true);
@@ -440,9 +443,9 @@ const SaveMetadata = (props) => {
     useEffect(() => {
         if (uidPool && programPayload && !completed && !metadataRequest.called) {
 
-            let programConfigurations = DeepCopy(programPayload);
+            const programConfigurations = DeepCopy(programPayload);
 
-            let removedItems = (props.saveType === 'stage') ? props.removedItems || [] : props.removedItems?.dataElements || [];
+            const removedItems = (props.saveType === 'stage') ? props.removedItems || [] : props.removedItems?.dataElements || [];
             const { tempMetadata, metadata, teaConfigurations } = (props.saveType === 'stage')
                 ? processStageData(
                     {
@@ -473,7 +476,7 @@ const SaveMetadata = (props) => {
                     }
                 );
 
-            let newMetadata = {
+            const newMetadata = {
                 ...metadata,
                 ...teaConfigurations,
                 programs: [programConfigurations],
@@ -552,5 +555,25 @@ const SaveMetadata = (props) => {
     </CustomMUIDialog>)
 };
 
+SaveMetadata.propTypes = {
+    criticalSection: PropTypes.object,
+    hnqisMode: PropTypes.bool,
+    importResults: PropTypes.object,
+    importedScores: PropTypes.array,
+    importedSections: PropTypes.array,
+    importedStages: PropTypes.array,
+    importedTEAs: PropTypes.array,
+    newObjectsQtty: PropTypes.number,
+    programId: PropTypes.string,
+    programMetadata: PropTypes.object,
+    programStage: PropTypes.object,
+    removedItems: PropTypes.array,
+    saveType: PropTypes.string,
+    setErrorReports: PropTypes.func,
+    setImportResults: PropTypes.func,
+    setSavedAndValidated: PropTypes.func,
+    setSavingMetadata: PropTypes.func,
+    stagesList: PropTypes.array
+}
 
 export default SaveMetadata;
