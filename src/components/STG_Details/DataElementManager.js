@@ -51,8 +51,8 @@ function TabPanel(props) {
 
 TabPanel.propTypes = {
     children: PropTypes.node,
-    index: PropTypes.isRequired.number,
-    value: PropTypes.isRequired.number,
+    index: PropTypes.number,
+    value: PropTypes.number,
 };
 
 function a11yProps(index) {

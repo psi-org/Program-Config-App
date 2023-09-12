@@ -116,13 +116,13 @@ const ProgramItem = ({
 
 
                 <div className="ml_item-desc">
-                    {programType === 'HNQIS2' && pcaMetadata.buildVersion && !versionIsValid(pcaMetadata.buildVersion, BUILD_VERSION, BUILD_VERSION) &&
-                        <Tooltip title={"This HNQIS 2.0 Program was built in version " + pcaMetadata.buildVersion + ", please Set Up Program again to update it."}>
+                    {programType !== 'HNQIS' && pcaMetadata.buildVersion && !versionIsValid(pcaMetadata.buildVersion, BUILD_VERSION, BUILD_VERSION) &&
+                        <Tooltip title={`This Program's logic was built in version ${pcaMetadata.buildVersion}, please ${programType === 'HNQIS2' ?"'Set Up Program'":"'Build Program Rules'"} again to update it.`}>
                             <NewReleasesIcon color="error" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
                         </Tooltip>
                     }
-                    {programType === 'HNQIS2' && !pcaMetadata.buildVersion &&
-                        <Tooltip title={"This HNQIS 2.0 Program hasn't been built yet."}>
+                    {programType !== 'HNQIS' && !pcaMetadata.buildVersion &&
+                        <Tooltip title={"This Program's logic hasn't been built yet."}>
                             <NewReleasesIcon color="error" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
                         </Tooltip>
                     }
@@ -406,7 +406,7 @@ const ProgramItem = ({
                             <br />
                             {pcaMetadata.saveVersion || 'N/A'}
                         </div>
-                        {programType === 'HNQIS2' &&
+                        {programType !== 'HNQIS' &&
                             <div>
                                 <strong>Build Version</strong>
                                 <br />

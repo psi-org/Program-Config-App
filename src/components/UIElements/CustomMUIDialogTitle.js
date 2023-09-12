@@ -30,7 +30,7 @@ const CustomMUIDialogTitle = (props) => {
 
 CustomMUIDialogTitle.propTypes = {
     children: PropTypes.node,
-    onClose: PropTypes.isRequired.func,
+    onClose: PropTypes.func,
 };
 
 export default CustomMUIDialogTitle;
