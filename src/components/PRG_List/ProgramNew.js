@@ -208,6 +208,9 @@ const ProgramNew = (props) => {
     const [programShortName, setProgramShortName] = useState(
         props.data?.shortName || ""
     );
+    const [programCode, setProgramCode] = useState(
+        props.data?.code || ""
+    );
     const [sentForm, setSentForm] = useState(false);
     const [programTEAs, setProgramTEAs] = useState({
         available: [],
@@ -234,6 +237,7 @@ const ProgramNew = (props) => {
         prefix: undefined,
         programName: undefined,
         shortName: undefined,
+        code: undefined,
         programTET: undefined,
         healthArea: undefined,
         ouTableRow: undefined,
@@ -284,6 +288,12 @@ const ProgramNew = (props) => {
         validationErrors.shortName = undefined;
         setValidationErrors({ ...validationErrors });
         setProgramShortName(event.target.value);
+    };
+
+    const handleChangeProgramCode = (event) => {
+        validationErrors.code = undefined;
+        setValidationErrors({ ...validationErrors });
+        setProgramCode(event.target.value);
     };
 
     const programTETChange = (event, value) => {
@@ -451,12 +461,10 @@ const ProgramNew = (props) => {
             response = false;
             validationErrors.programName = "This field is required";
         } else if (
-            programName.length < MIN_NAME_LENGTH ||
-            programName.length > MAX_PROGRAM_NAME_LENGTH /*- (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1*/
+            programName.length < MIN_NAME_LENGTH || programName.length > MAX_PROGRAM_NAME_LENGTH
         ) {
             response = false;
-            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_PROGRAM_NAME_LENGTH /*-
-        (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1*/} characters`;
+            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_PROGRAM_NAME_LENGTH} characters`;
         } else {
             validationErrors.programName = undefined;
         }
@@ -466,14 +474,19 @@ const ProgramNew = (props) => {
             validationErrors.shortName = "This field is required";
         } else if (
             programShortName.length >
-            MAX_SHORT_NAME_LENGTH /*- (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1*/
+            MAX_SHORT_NAME_LENGTH
         ) {
             response = false;
-            validationErrors.shortName = `This field cannot exceed ${MAX_SHORT_NAME_LENGTH /*-
-                (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
-                1*/ } characters`;
+            validationErrors.shortName = `This field cannot exceed ${MAX_SHORT_NAME_LENGTH} characters`;
         } else {
             validationErrors.shortName = undefined;
+        }
+
+        if (programCode.length > MAX_SHORT_NAME_LENGTH) {
+            response = false;
+            validationErrors.code = `This field cannot exceed ${MAX_SHORT_NAME_LENGTH} characters`;
+        } else {
+            validationErrors.code = undefined;
         }
 
         if (programTET === "" && pgrTypePCA !== 'event') {
@@ -598,7 +611,6 @@ const ProgramNew = (props) => {
     function submission() {
         setSentForm(true);
         props.setNotification(undefined);
-        //let prgTypeId = 'yB5tFAAN7bI';
         const dataIsValid = formDataIsValid();
         if (!dataIsValid) {
             setSentForm(false);
@@ -628,6 +640,7 @@ const ProgramNew = (props) => {
 
                 prgrm.name = programName;
                 prgrm.shortName = programShortName;
+                prgrm.code = programCode;
                 prgrm.id = programId || uidPool.shift();
 
                 const auxstyle = {};
@@ -766,7 +779,7 @@ const ProgramNew = (props) => {
 
                     createOrUpdateMetaData(prgrm.attributeValues);
 
-                    if (assessmentStage?.programStageDataElements.length == 0 || props.data){
+                    if (assessmentStage?.programStageDataElements.length == 0 || props.data) {
                         assessmentStage.programStageDataElements = excludedStageDEs.concat(criticalSteps.dataElements.map((de, index) => ({
                             sortOrder: index + excludedStageDEs.length,
                             compulsory: false,
@@ -829,8 +842,8 @@ const ProgramNew = (props) => {
                         prgrm.programStages = [{ id: editStage.id }];
                         programStages = [editStage];
                     }
-                    
-                    prgrm.attributeValues = [];
+
+
                     prgrm.categoryCombo =
                         categoryCombo && categoryCombo.id !== ""
                             ? { id: categoryCombo.id }
@@ -954,7 +967,7 @@ const ProgramNew = (props) => {
                             }
                             {(pgrTypePCA === 'tracker' || pgrTypePCA === 'event') &&
                                 <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
-                                    <StepLabel onClick={() => changeStep(1)}>{pgrTypePCA === 'tracker'?'Tracker':'Event'} Program Settings</StepLabel>
+                                    <StepLabel onClick={() => changeStep(1)}>{pgrTypePCA === 'tracker' ? 'Tracker' : 'Event'} Program Settings</StepLabel>
                                 </Step>
                             }
                             {pgrTypePCA === 'tracker' &&
@@ -1066,6 +1079,24 @@ const ProgramNew = (props) => {
                                         }}
                                         value={programShortName}
                                         onChange={handleChangeProgramShortName}
+                                    />
+
+                                    <TextField
+                                        error={validationErrors.code !== undefined}
+                                        helperText={validationErrors.code}
+                                        margin="normal"
+                                        id="code"
+                                        label="Program Code"
+                                        type="text"
+                                        sx={{ width: "100%" }}
+                                        variant="standard"
+                                        autoComplete="off"
+                                        inputProps={{
+                                            maxLength:
+                                                MAX_SHORT_NAME_LENGTH /*- dePrefix.length*/,
+                                        }}
+                                        value={programCode}
+                                        onChange={handleChangeProgramCode}
                                     />
 
                                     {pgrTypePCA && pgrTypePCA !== '' && pgrTypePCA !== 'event' &&

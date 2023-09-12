@@ -12,7 +12,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import ShareIcon from '@mui/icons-material/Share';
 import StorageIcon from '@mui/icons-material/Storage';
 import UpgradeIcon from '@mui/icons-material/SwitchAccessShortcutAdd';
-import {  IconButton, Slide, Snackbar, Tooltip } from "@mui/material";
+import { IconButton, Slide, Snackbar, Tooltip } from "@mui/material";
 import Popover from '@mui/material/Popover';
 import PropTypes from 'prop-types';
 import React, { useState } from "react";
@@ -102,7 +102,7 @@ const ProgramItem = ({
                         </div>
                     </div>
                 </div>
-                <div className="ml_item-title" style={{ overflow: 'hidden', cursor: 'pointer' }} onClick={() => { setProgram(program.id); history.push('/program/' + program.id); setSearchLocalStorage();}}>
+                <div className="ml_item-title" style={{ overflow: 'hidden', cursor: 'pointer' }} onClick={() => { setProgram(program.id); history.push('/program/' + program.id); setSearchLocalStorage(); }}>
                     <Tooltip title={program.name} placement="bottom-start" arrow>
                         <span style={{
                             overflow: 'hidden',
@@ -117,7 +117,7 @@ const ProgramItem = ({
 
                 <div className="ml_item-desc">
                     {programType !== 'HNQIS' && pcaMetadata.buildVersion && !versionIsValid(pcaMetadata.buildVersion, BUILD_VERSION, BUILD_VERSION) &&
-                        <Tooltip title={`This Program's logic was built in version ${pcaMetadata.buildVersion}, please ${programType === 'HNQIS2' ?"'Set Up Program'":"'Build Program Rules'"} again to update it.`}>
+                        <Tooltip title={`This Program's logic was built in version ${pcaMetadata.buildVersion}, please ${programType === 'HNQIS2' ? "'Set Up Program'" : "'Build Program Rules'"} again to update it.`}>
                             <NewReleasesIcon color="error" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
                         </Tooltip>
                     }
@@ -401,17 +401,19 @@ const ProgramItem = ({
                                 DATE_FORMAT_OPTIONS
                             )}
                         </div>
-                        <div>
-                            <strong>Save Version</strong>
-                            <br />
-                            {pcaMetadata.saveVersion || 'N/A'}
-                        </div>
                         {programType !== 'HNQIS' &&
-                            <div>
-                                <strong>Build Version</strong>
-                                <br />
-                                {pcaMetadata.buildVersion || 'N/A'}
-                            </div>
+                            <>
+                                <div>
+                                    <strong>Save Version</strong>
+                                    <br />
+                                    {pcaMetadata.saveVersion || 'N/A'}
+                                </div>
+                                <div>
+                                    <strong>Build Version</strong>
+                                    <br />
+                                    {pcaMetadata.buildVersion || 'N/A'}
+                                </div>
+                            </>
                         }
                         <div>
                             <strong>API URL</strong>
