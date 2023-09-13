@@ -298,11 +298,13 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 
     const getProgramMetadata = () => {
         getProgramAttributes({ programId }).then(res => {
+            let metadataParse = '{}';
             res.results?.programs[0]?.attributeValues.forEach(av => {
                 if (av.attribute.id === METADATA) {
-                    setProgramMetadata(JSON.parse(av.value || "{}"))
+                    metadataParse = av.value;
                 }
             })
+            setProgramMetadata(JSON.parse(metadataParse))
             setStagesList(res.results?.programs[0]?.programStages)
         })
     }
@@ -800,8 +802,6 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                 </div>
                 <div className="c_srch"></div>
                 <div style={{ color: '#444444', paddingRight: '1em' }}>
-
-
                     <ButtonStrip>
                         {!readOnly &&
                             <Button
