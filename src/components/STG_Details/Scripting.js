@@ -835,6 +835,9 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
         });
     });
 
+    //Define Global Scores
+    buildScores(scoreMap);
+
     // Request Program Rules for Composite Scores
     compositeValues.forEach(score => {
         const compositeData = {
