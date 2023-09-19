@@ -7,7 +7,7 @@ const config = {
         app: './src/App.js',
     },
     minDHIS2Version:'2.36',
-    maxDHIS2Version:'2.38'
+    maxDHIS2Version:'2.40'
 }
 
 module.exports = config

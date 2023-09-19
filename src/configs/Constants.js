@@ -15,7 +15,7 @@ import React from 'react';
 const BUILD_VERSION = "1.7.0"
 const BUILD_DATE = "September, 2023"
 const MIN_VERSION = "2.37"
-const MAX_VERSION = "2.40.0"
+const MAX_VERSION = "2.40.5"
 
 const PCA_METADATA_VERSION = "1.1.1";
 const H2_METADATA_VERSION = "1.1.2";
