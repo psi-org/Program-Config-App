@@ -22,6 +22,7 @@ import ValidateTracker from "../PRG_Details/ValidateTracker.js";
 import { hideShowLogic } from "../STG_Details/Scripting.js";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog.js";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle.js";
+import ErrorReports from "../UIElements/ErrorReports.js";
 import Errors from "../UIElements/Errors.js";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton.js";
 import Removed from "../UIElements/Removed.js";
@@ -465,6 +466,9 @@ const ProgramDetails = () => {
             <div className="wrapper" style={{ padding: '1em 1.2em 0', height: '75vh' }}>
                 <div className="layout_prgms_stages">
                     <div className="list-ml_item">
+                        {
+                            errorReports && <ErrorReports errors={errorReports} />
+                        }
                         {
                             validationResults &&
                             <Errors

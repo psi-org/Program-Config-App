@@ -843,7 +843,7 @@ const ProgramNew = (props) => {
                         programStages = [editStage];
                     }
 
-
+                    prgrm.attributeValues = prgrm.attributeValues || [];
                     prgrm.categoryCombo =
                         categoryCombo && categoryCombo.id !== ""
                             ? { id: categoryCombo.id }
@@ -890,7 +890,7 @@ const ProgramNew = (props) => {
     }
 
     function createOrUpdateMetaData(attributeValues) {
-        const metaDataArray = attributeValues.filter(
+        const metaDataArray = attributeValues?.filter(
             (av) => av.attribute.id === METADATA
         );
         if (metaDataArray.length > 0) {
