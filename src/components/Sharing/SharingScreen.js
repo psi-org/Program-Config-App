@@ -436,7 +436,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
             .then(response => {
                 if (response?.status === "OK") {
                     setNotification({
-                        message: `Chages to the Sharing Settings applied successfully`,
+                        message: `Changes to the Sharing Settings applied successfully`,
                         severity: 'success'
                     })
                 } else {

@@ -432,6 +432,7 @@ const ProgramNew = (props) => {
     }
 
     function hideForm() {
+        //TODO: Reset TEAs
         props.setShowProgramForm(false);
     }
 
@@ -607,7 +608,11 @@ const ProgramNew = (props) => {
         }
     }, [pgrTypePCA]);
 
-    //TODO: Add support for Event Programs creation or edition
+    useEffect(() => {
+        //TODO: Set backup TEAs
+    }, [])
+
+
     function submission() {
         setSentForm(true);
         props.setNotification(undefined);
@@ -951,7 +956,7 @@ const ProgramNew = (props) => {
                     onClose={() => hideForm()}
                 >
                     {props.data
-                        ? ("Edit Program " + truncateString(props.data.name))
+                        ? ("Edit Program - " + truncateString(props.data.name))
                         : "Create New Program"}
                 </CustomMUIDialogTitle>
                 <DialogContent dividers style={{ padding: "1em 2em", height: '65vh', maxHeight: '65vh', overflowX: 'hidden' }}>
