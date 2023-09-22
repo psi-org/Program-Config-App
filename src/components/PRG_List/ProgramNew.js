@@ -516,7 +516,6 @@ const ProgramNew = (props) => {
     };
 
     const fetchTrackerMetadata = () => {
-        console.info("Fetching Tracker Metadata");
         findTEAttributes().then((data) => {
             if (data?.results?.trackedEntityAttributes) {
                 programTEAs.available = data.results.trackedEntityAttributes;
@@ -608,10 +607,9 @@ const ProgramNew = (props) => {
         }
     }, [pgrTypePCA]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         //TODO: Set backup TEAs
-    }, [])
-
+    }, [])*/
 
     function submission() {
         setSentForm(true);
