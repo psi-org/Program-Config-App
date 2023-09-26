@@ -359,3 +359,9 @@ export const getPureValue = (value) => {
     }
     return res;
 }
+
+export const concatArraysUnique = (array1, array2) => {
+    return [...array1].filter(value =>
+        !array2.includes(value)
+    ).concat([...array2])
+}

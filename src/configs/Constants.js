@@ -17,7 +17,7 @@ const BUILD_DATE = "September, 2023"
 const MIN_VERSION = "2.37"
 const MAX_VERSION = "2.40.5"
 
-const PCA_METADATA_VERSION = "1.1.1";
+const PCA_METADATA_VERSION = "1.1.2";
 const H2_METADATA_VERSION = "1.1.2";
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
@@ -433,7 +433,7 @@ const EXPORT_HNQIS_PRESETS = [
     { value: 'h2External', label: 'HNQIS2-Enabled Server'}
 ]
 
-const EXTERNAL_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions','trackedEntityTypes','trackedEntityAttributes'];
+const H2_ENABLED_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions','trackedEntityTypes','trackedEntityAttributes'];
 
 const H2_ATTRIBUTES_TO_KEEP = ['haUflNqP85K', 'LP171jpctBm', 'yB5tFAAN7bI', 'DVzuBdj9kli', 'yhKEe6BLEer'];
 
@@ -531,7 +531,7 @@ export {
     ELEM_TYPES,
     EXPORT_HNQIS_PRESETS,
     EXPORT_PRESETS,
-    EXTERNAL_IMPORT_REMOVE_KEYS,
+    H2_ENABLED_IMPORT_REMOVE_KEYS,
     FEATURE_TYPES,
     FEEDBACK_ORDER,
     FEEDBACK_TEXT,

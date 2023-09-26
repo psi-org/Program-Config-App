@@ -22,7 +22,7 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from "react";
-import { parseErrorsJoin, parseErrorsUL, truncateString } from "../../utils/Utils.js";
+import { concatArraysUnique, parseErrorsJoin, parseErrorsUL, truncateString } from "../../utils/Utils.js";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog.js";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle.js";
 
@@ -54,7 +54,6 @@ const orgUnitsQuery = {
 const ouQuery = {
     results: {
         resource: "organisationUnits",
-        id: ({ id }) => id,
         params: ({ level }) => ({
             paging: false,
             fields: ["id", "path"],
@@ -66,7 +65,6 @@ const ouQuery = {
 const ouGroupQuery = {
     results: {
         resource: "organisationUnits",
-        id: ({ id }) => id,
         params: ({ groupId }) => ({
             paging: false,
             fields: ["id", "path"],
@@ -226,6 +224,10 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
         setHasChanges(true);
     };
 
+    //TODO: The search bug occurs if the user does not have acces to the full route to the target Org Unit
+    //? Solution? Slice the path until the highest levels in the hierarchy are found
+    //* /1/2/3/4/5 -> (Available until 3) -> Return /3/4/5
+
     const doSearch = () => {
         setFilterLoading(true)
         const filterString = filterRef.current.value;
@@ -262,21 +264,17 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     const ouLevelAssignmentHandler = () => {
         const id = userOrgUnits[0];
-        const oulevel = parseInt(orgUnitLevel) - 1; 
+        const oulevel = parseInt(orgUnitLevel);
         oUnits.refetch({ id: id, level: oulevel }).then((data) => {
-            if (data) {
-                selectOrgUnits(data);
-            }
+            if (data) { selectOrgUnits(data) }
         });
     };
 
     const ouLevelRemovalHandler = () => {
         const id = userOrgUnits[0];
-        const oulevel = parseInt(orgUnitLevel) - 1;
+        const oulevel = parseInt(orgUnitLevel);
         oUnits.refetch({ id: id, level: oulevel }).then((data) => {
-            if (data) {
-                deselectOrgUnits(data);
-            }
+            if (data) { deselectOrgUnits(data) }
         });
     };
 
@@ -285,9 +283,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
         oUnitsByGroups
             .refetch({ id: id, groupId: orgUnitGroup })
             .then((data) => {
-                if (data) {
-                    selectOrgUnits(data);
-                }
+                if (data) { selectOrgUnits(data) }
             });
     };
 
@@ -296,26 +292,24 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
         oUnitsByGroups
             .refetch({ id: id, groupId: orgUnitGroup })
             .then((data) => {
-                if (data) {
-                    deselectOrgUnits(data);
-                }
+                if (data) { deselectOrgUnits(data) }
             });
     };
 
     const selectOrgUnits = (data) => {
-        setSelectedOrgUnits((prevState) => [
-            ...prevState,
-            ...data.results?.organisationUnits.map((ou) => ou.id),
-        ]);
-        setOrgUnitPathSelected((prevState) => [
-            ...prevState,
-            ...data.results?.organisationUnits.map((ou) => ou.path),
-        ]);
+        const ounits = data.results?.organisationUnits || [];
+
+        const ounitsIdList = ounits.map((ou) => ou.id);
+        const ounitsPathList = ounits.map((ou) => ou.path);
+
+        setSelectedOrgUnits((prevState) => concatArraysUnique(prevState, ounitsIdList));
+        setOrgUnitPathSelected((prevState) => concatArraysUnique(prevState, ounitsPathList));
+
         setHasChanges(true);
     };
 
     const deselectOrgUnits = (data) => {
-        const ounits = data.results?.organisationUnits;
+        const ounits = data.results?.organisationUnits || [];
         setSelectedOrgUnits((prevState) =>
             prevState.filter((ou) => !ounits.find((ou2) => ou2.id === ou))
         );
@@ -466,18 +460,18 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                     )}
                                     <div
                                         style={{
-                                            width: "400px",
+                                            width: "450px",
                                             background: "white",
                                             marginLeft: "1rem",
                                             marginTop: "1rem",
                                             display: "inline-block",
                                         }}
                                     >
-                                        <span>For Organisation units within</span>
-                                        <div style={{ flexDirection: "row" }}>
+                                        <span>Select Organisation Units within:</span>
+                                        <div style={{ flexDirection: "row", marginTop: '1em' }}>
                                             <FormControl
                                                 variant={"standard"}
-                                                style={{ width: "200px" }}
+                                                style={{ width: "250px" }}
                                             >
                                                 <InputLabel
                                                     id={
@@ -549,10 +543,10 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                 </Button>
                                             </ButtonGroup>
                                         </div>
-                                        <div style={{ flexDirection: "row" }}>
+                                        <div style={{ flexDirection: "row", marginTop: '1em' }}>
                                             <FormControl
                                                 variant={"standard"}
-                                                style={{ width: "200px" }}
+                                                style={{ width: "250px" }}
                                             >
                                                 <InputLabel
                                                     id={
