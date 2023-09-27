@@ -13,6 +13,7 @@ import {
     DialogContent,
     FormControl,
     InputLabel,
+    LinearProgress,
     MenuItem,
     Select,
     TextField,
@@ -122,6 +123,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const [filterValue, setFilterValue] = useState('');
     const [filterLoading, setFilterLoading] = useState(false);
     const [fetchErrors, setFetchErrors] = useState(undefined);
+    const [loadingBulkAction, setLoadingBulkAction] = useState(false);
 
     const { loading: ouMetadataLoading, data: ouMetadata } =
         useDataQuery(orgUnitsQuery);
@@ -224,14 +226,10 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
         setHasChanges(true);
     };
 
-    //TODO: The search bug occurs if the user does not have acces to the full route to the target Org Unit
-    //? Solution? Slice the path until the highest levels in the hierarchy are found
-    //* /1/2/3/4/5 -> (Available until 3) -> Return /3/4/5
-
     const doSearch = () => {
         setFilterLoading(true)
         const filterString = filterRef.current.value;
-        if (filterString) {
+        if (filterString && filterString.trim() !== '') {
             setFilterValue(filterString)
             searchOunits.refetch({ filterString: filterString })
                 .then((data) => {
@@ -241,7 +239,18 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                             ...data.results?.organisationUnits.map(
                                 (ou) => ou.path
                             ),
-                        ];
+                        ].map(route => {
+                            const routeParts = route.split('/');
+                            let routeCut = '/';
+                            for (let index = 1; index < routeParts.length; index++) {
+                                if (userOrgUnits.includes(routeParts[index])) {
+                                    break;
+                                } else {
+                                    routeCut = routeCut + routeParts[index] + '/'
+                                }
+                            }
+                            return route.replace(routeCut, '/');
+                        })
                         setOrgUnitFiltered(filterResults);
                         setOrgUnitExpanded(filterResults);
                         setOrgUnitTreeRoot(userOrgUnits);
@@ -255,7 +264,6 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     const resetSearch = () => {
         setFilterValue("")
-        setOrgUnitTreeRoot([]);
         setOrgUnitFiltered([]);
         setOrgUnitExpanded([]);
         setOrgUnitTreeRoot(userOrgUnits);
@@ -264,35 +272,43 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     const ouLevelAssignmentHandler = () => {
         const id = userOrgUnits[0];
+        setLoadingBulkAction(true);
         const oulevel = parseInt(orgUnitLevel);
         oUnits.refetch({ id: id, level: oulevel }).then((data) => {
             if (data) { selectOrgUnits(data) }
+            setLoadingBulkAction(false);
         });
     };
 
     const ouLevelRemovalHandler = () => {
         const id = userOrgUnits[0];
+        setLoadingBulkAction(true);
         const oulevel = parseInt(orgUnitLevel);
         oUnits.refetch({ id: id, level: oulevel }).then((data) => {
             if (data) { deselectOrgUnits(data) }
+            setLoadingBulkAction(false);
         });
     };
 
     const ouGroupAssignmentHandler = () => {
         const id = userOrgUnits[0];
+        setLoadingBulkAction(true);
         oUnitsByGroups
             .refetch({ id: id, groupId: orgUnitGroup })
             .then((data) => {
                 if (data) { selectOrgUnits(data) }
+                setLoadingBulkAction(false);
             });
     };
 
     const ouGroupRemovalHandler = () => {
         const id = userOrgUnits[0];
+        setLoadingBulkAction(true);
         oUnitsByGroups
             .refetch({ id: id, groupId: orgUnitGroup })
             .then((data) => {
                 if (data) { deselectOrgUnits(data) }
+                setLoadingBulkAction(false);
             });
     };
 
@@ -392,6 +408,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                 doSearch();
                                             }
                                         }}
+                                        disabled={loadingBulkAction}
                                         sx={{ width: "100%" }}
                                         autoComplete={"off"}
                                         InputProps={{
@@ -406,7 +423,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                                 resetSearch();
                                                             }}
                                                             style={{ marginRight: "0.5em" }}
-                                                            disabled={filterLoading}
+                                                            disabled={filterLoading || loadingBulkAction}
                                                         >
                                                             <ClearIcon />
                                                         </IconButton>
@@ -418,7 +435,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                         startIcon={<SearchIcon />}
                                                         variant="contained"
                                                         color="primary"
-                                                        loading={filterLoading}
+                                                        loading={filterLoading || loadingBulkAction}
                                                     >
                                                         Filter
                                                     </LoadingButton>
@@ -528,7 +545,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                 }}
                                             >
                                                 <Button
-                                                    disabled={!orgUnitLevel}
+                                                    disabled={!orgUnitLevel || loadingBulkAction || filterLoading}
                                                     onClick={
                                                         ouLevelAssignmentHandler
                                                     }
@@ -536,7 +553,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                     SELECT
                                                 </Button>
                                                 <Button
-                                                    disabled={!orgUnitLevel}
+                                                    disabled={!orgUnitLevel || loadingBulkAction || filterLoading}
                                                     onClick={ouLevelRemovalHandler}
                                                 >
                                                     DESELECT
@@ -603,7 +620,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                 }}
                                             >
                                                 <Button
-                                                    disabled={!orgUnitGroup}
+                                                    disabled={!orgUnitGroup || loadingBulkAction || filterLoading}
                                                     onClick={
                                                         ouGroupAssignmentHandler
                                                     }
@@ -611,13 +628,19 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                     SELECT
                                                 </Button>
                                                 <Button
-                                                    disabled={!orgUnitGroup}
+                                                    disabled={!orgUnitGroup || loadingBulkAction || filterLoading}
                                                     onClick={ouGroupRemovalHandler}
                                                 >
                                                     DESELECT
                                                 </Button>
                                             </ButtonGroup>
                                         </div>
+                                        {loadingBulkAction &&
+                                            <div style={{ width: '100%', marginTop: '1em' }}>
+                                                <p>Loading Data</p>
+                                                <LinearProgress />
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -643,7 +666,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                         <Button
                             onClick={orgUnitAssignmentHandler}
                             color={"primary"}
-                            disabled={!!fetchErrors}
+                            disabled={!!fetchErrors || loadingBulkAction}
                         >
                             Apply
                         </Button>
