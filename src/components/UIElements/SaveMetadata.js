@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from "react";
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants.js";
-import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, setPCAMetadata } from "../../utils/Utils.js";
+import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata } from "../../utils/Utils.js";
 import CustomMUIDialog from './CustomMUIDialog.js';
 import CustomMUIDialogTitle from './CustomMUIDialogTitle.js';
 
@@ -133,7 +133,8 @@ const processStageData = (
             // Check if new DE
             if (dataElement.importStatus == 'new') {
                 dataElement.id = uidPool.shift();
-                dataElement.sharing = stageSharings;
+                delete (stageSharings.owner);
+                dataElement.sharing = DeepCopy(stageSharings);
                 //new_dataElements.push(dataElement);
             }
 
@@ -332,7 +333,7 @@ const processProgramData = (
                 programMetadata,
                 stagesList: stagesList,
                 originalStageDataElements: currentExistingStage.programStageDataElements,
-                stageSharings: currentExistingStage.sharing,
+                stageSharings: extractMetadataPermissionsAllLevels(DeepCopy(currentExistingStage.sharing)),
                 programPayload
             }
         );
@@ -459,7 +460,7 @@ const SaveMetadata = (props) => {
                         programMetadata: props.programMetadata,
                         stagesList: props.stagesList,
                         originalStageDataElements: props.programStage.programStageDataElements,
-                        stageSharings: props.programStage.sharing,
+                        stageSharings: extractMetadataPermissionsAllLevels(DeepCopy(props.programStage.sharing)),
                         programPayload: programConfigurations
                     }
                 )

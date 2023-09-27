@@ -56,7 +56,7 @@ const currentProgramQuery = {
     },
 }
 
-const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
+const DataProcessorTracker = ({ programId, isLoading }) => {
 
     const { data: currentProgram } = useDataQuery(currentProgramQuery, { variables: { programId } });
     const { data: optionSets } = useDataQuery(optionSetQuery);
@@ -166,8 +166,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
                 aggTypes,
                 programData,
                 isLoading,
-                setFlag: setExportFlag,
-                setStatus
+                setFlag: setExportFlag
             })
         }
     }, [currentProgram, optionSets, legendSets, trackedEntityAttributes, deProperties]);
@@ -324,8 +323,7 @@ const DataProcessorTracker = ({ programId, isLoading, setStatus }) => {
 
 DataProcessorTracker.propTypes = {
     isLoading: PropTypes.func,
-    programId: PropTypes.string,
-    setStatus: PropTypes.func
+    programId: PropTypes.string
 }
 
 export default DataProcessorTracker;

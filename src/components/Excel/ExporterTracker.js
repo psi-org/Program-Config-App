@@ -36,7 +36,7 @@ import {
 } from "../../utils/ExcelUtils.js";
 
 const ExporterTracker = ({
-    programID, programPrefix, programName, programShortName, programTET, programCatCombo, programType, flag, stagesConfigurations, teaConfigurations, optionData, legendSetData, trackedEntityAttributesData, valueTypes, aggTypes, isLoading, setFlag, setStatus
+    programID, programPrefix, programName, programShortName, programTET, programCatCombo, programType, flag, stagesConfigurations, teaConfigurations, optionData, legendSetData, trackedEntityAttributesData, valueTypes, aggTypes, isLoading, setFlag
 }) => {
 
     const password = TEMPLATE_PASSWORD;
@@ -113,7 +113,7 @@ const ExporterTracker = ({
         addMapping(mappingWS);
 
 
-        writeWorkbook(workbook, programName, setStatus, isLoading);
+        writeWorkbook(workbook, programName, isLoading);
 
     };
 

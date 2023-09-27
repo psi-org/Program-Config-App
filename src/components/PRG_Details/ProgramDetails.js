@@ -137,7 +137,6 @@ const ProgramDetails = () => {
     const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
     const [importerEnabled, setImporterEnabled] = useState(false);
     const [exportToExcel, setExportToExcel] = useState(false);
-    const [exportStatus, setExportStatus] = useState("Download Template");
     const [saveStatus, setSaveStatus] = useState('Validate');
     const [importResults, setImportResults] = useState();
     const [savedAndValidated, setSavedAndValidated] = useState(false);
@@ -151,7 +150,7 @@ const ProgramDetails = () => {
     useEffect(() => {
         if (notification) { setSnackSeverity(notification.severity) }
     }, [notification])
-
+    
     // Get Ids
     const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: 0 } });
     //setUidPool(idsQuery.data?.results.codes);
@@ -334,7 +333,6 @@ const ProgramDetails = () => {
         })
     }
 
-
     return (
         <div>
             <div className="sub_nav">
@@ -380,7 +378,6 @@ const ProgramDetails = () => {
                                 value={selectedIndexTemplate}
                                 setValue={setSelectedIndexTemplate}
                                 disabled={exportToExcel}
-                                setStatus={setExportStatus}
                                 setImporterEnabled={setImporterEnabled}
                                 setExportToExcel={setExportToExcel}
                             />
@@ -389,7 +386,6 @@ const ProgramDetails = () => {
                                 <DataProcessorTracker
                                     programId={program}
                                     isLoading={setExportToExcel}
-                                    setStatus={setExportStatus}
                                 />}
                         </>
                     }
@@ -507,7 +503,7 @@ const ProgramDetails = () => {
                                             setNotification={setNotification}
                                             stagesRefetch={refetch}
                                             setNewStage={setNewStage}
-                                            editStatus={newStage?.stage === programStage.id && newStage?.mode}
+                                            editStatus={newStage?.stage === programStage.id?(newStage?.mode||''):''}
                                             hnqisMode={hnqisMode}
                                             eventMode={data.results.withoutRegistration}
                                         />

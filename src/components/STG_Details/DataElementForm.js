@@ -141,7 +141,10 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         validationErrors.aggType = undefined
         setValidationErrors({ ...validationErrors })
         setValueType(data.target.value)
-        switch (data.target.value) {
+    }
+
+    useEffect(() => {
+        switch (valueType) {
             case 'NUMBER':
             case 'INTEGER':
             case 'INTEGER_POSITIVE':
@@ -161,8 +164,8 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                 setAggType('')
                 break;
         }
-    }
-
+    }, [valueType])
+    
 
     const aggTypeChange = (data) => {
         validationErrors.aggType = undefined
@@ -705,7 +708,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                         <p>
                             This is the text that will be displayed in the form to represent this Data Element.<br /><br />
                             In HNQIS Mode, The Name, Short Name and Code properties of the Data Element will be generated automatically using the Form Name.<br /><br />
-                            The automatic naming can be disabled in base Tracker Programs.
+                            The automatic naming can be disabled in base Tracker/Event Programs.
                         </p>
                     }
                     margin='0 1em 0 0.5em'

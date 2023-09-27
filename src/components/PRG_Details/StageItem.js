@@ -65,7 +65,7 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
                         verticalAlign: 'middle'
                     }}>{stage.displayName}</span>
                 </Tooltip>
-                {editStatus && <Chip label={editStatus.toUpperCase()} color="success" className="blink-opacity-2" style={{ marginLeft: '1em' }} />}
+                {editStatus!=='' && <Chip label={editStatus.toUpperCase()} color="success" className="blink-opacity-2" style={{ marginLeft: '1em' }} />}
             </div>
             <div className="ml_item-desc">
                 <div>{stage.programStageSections.length} {!eventMode && 'Program Stage'} Sections</div>

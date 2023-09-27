@@ -365,3 +365,17 @@ export const concatArraysUnique = (array1, array2) => {
         !array2.includes(value)
     ).concat([...array2])
 }
+
+export const extractMetadataPermissionsAllLevels = (sharing) => {
+    if (sharing !== null && typeof sharing === 'object') {
+        if (Object.hasOwn(sharing,'access')) {
+            sharing['access'] = extractMetadataPermissions(sharing['access']);
+        }
+        for (var key in sharing) {
+            if (Object.hasOwn(sharing, key)) {
+                extractMetadataPermissionsAllLevels(sharing[key]);
+            }
+        }
+    }
+    return sharing;
+}

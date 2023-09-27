@@ -22,7 +22,7 @@ const ImportSummary = ({ title, importCategories }) => {
 }
 
 ImportSummary.propTypes = {
-    importCategories: PropTypes.string,
+    importCategories: PropTypes.array,
     title: PropTypes.string
 }
 
