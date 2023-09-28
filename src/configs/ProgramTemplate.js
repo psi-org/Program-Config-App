@@ -164,7 +164,6 @@ const PSS_Scores = {
 }
 
 const PS_Generic = {
-    "publicAccess": "rw------", //! Remove?
     "id": "stageID",
     "name": "Stage",
     "displayGenerateEventBox": true,

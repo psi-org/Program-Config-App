@@ -93,7 +93,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
     const [elementName, setElementName] = useState(de?.name || '')
     const [shortName, setShortName] = useState(de?.shortName || '')
     const [elementCode, setElementCode] = useState(de?.code || '')
-    const [compulsory, setCompulsory] = useState((hnqisMode? metadata.isCompulsory === 'Yes' : programStageDataElement.compulsory) ?? false)  // metadata.isCompulsory : ['Yes','No']
+    const [compulsory, setCompulsory] = useState((metadata.isCompulsory? metadata.isCompulsory === 'Yes' : programStageDataElement.compulsory) ?? false)  // metadata.isCompulsory : ['Yes','No']
     const [displayInReports, setDisplayInReports] = useState(programStageDataElement.displayInReports ?? false)
     const [optionSet, setOptionSet] = useState(de?.optionSet ? { label: de.optionSet.name, id: de.optionSet.id } : null)
     const [legendSet, setLegendSet] = useState(de?.legendSet ? { label: de.legendSet.name, id: de.legendSet.id } : null)
@@ -390,12 +390,14 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
         // METADATA
         // Elem type
-        metadata.elemType = structure;
         metadata.isCompulsory = compulsory ? "Yes" : "No";
-        metadata.isCritical = critical ? "Yes" : "No";
-        if (numerator) { metadata.scoreNum = numerator }
-        if (denominator) { metadata.scoreDen = denominator }
-        if (structure === 'label') { metadata.labelFormName = formName }
+        if (hnqisMode) {
+            metadata.elemType = structure;
+            metadata.isCritical = critical ? "Yes" : "No";
+            if (numerator) { metadata.scoreNum = numerator }
+            if (denominator) { metadata.scoreDen = denominator }
+            if (structure === 'label') { metadata.labelFormName = formName }
+        }
         metadata.autoNaming = autoNaming ? 'Yes' : 'No';
 
         attributeValues.push({ attribute: { id: METADATA }, value: JSON.stringify(metadata) })

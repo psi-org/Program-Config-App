@@ -498,6 +498,7 @@ const ProgramDetails = () => {
                                     return (
                                         <StageItem
                                             stage={programStage}
+                                            programSharing={DeepCopy(data.results.sharing)}
                                             importResults={importResults?.configurations?.importedStages?.find(result => result.id === programStage.id)}
                                             key={programStage.id}
                                             setNotification={setNotification}
@@ -517,7 +518,16 @@ const ProgramDetails = () => {
 
                     </div>
                 </div>
-                {showStageForm && <StageNew setShowStageForm={setShowStageForm} stagesRefetch={refetch} setNotification={setNotification} programId={program} programName={data.results.displayName} setNewStage={setNewStage}/>}
+                {showStageForm &&
+                    <StageNew
+                        setShowStageForm={setShowStageForm}
+                        programSharing={DeepCopy(data.results.sharing)}
+                        stagesRefetch={refetch}
+                        setNotification={setNotification}
+                        programId={program}
+                        programName={data.results.displayName}
+                        setNewStage={setNewStage}
+                    />}
                 <Snackbar
                     anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                     open={notification !== undefined}

@@ -560,7 +560,7 @@ SaveMetadata.propTypes = {
     criticalSection: PropTypes.object,
     hnqisMode: PropTypes.bool,
     importResults: PropTypes.object,
-    importedScores: PropTypes.array,
+    importedScores: PropTypes.object,
     importedSections: PropTypes.array,
     importedStages: PropTypes.array,
     importedTEAs: PropTypes.array,

@@ -16,7 +16,7 @@ import ValidationMessages from "../UIElements/ValidationMessages.js";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import StageNew from "./StageNew.js";
 
-const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
+const StageItem = ({ stage, programSharing, importResults,  setNotification, stagesRefetch, setNewStage, editStatus, hnqisMode, eventMode }) => {
 
     const dispatch = useDispatch();
     const history = useHistory();
@@ -97,7 +97,9 @@ const StageItem = ({ stage, importResults,  setNotification, stagesRefetch, setN
                         stagesRefetch={stagesRefetch}
                         programName={stage.program.name}
                         data={stage}
-                        setNewStage={setNewStage} />
+                        setNewStage={setNewStage}
+                        programSharing={programSharing}
+                    />
                 }
                 {showValidationMessage && <ValidationMessages objects={importResults.importedSections.map(section => [section].concat(section.dataElements)).flat()} showValidationMessage={setShowValidationMessage} />}
             </div>
@@ -110,6 +112,7 @@ StageItem.propTypes = {
     eventMode: PropTypes.bool,
     hnqisMode: PropTypes.bool,
     importResults: PropTypes.object,
+    programSharing: PropTypes.object,
     setNewStage: PropTypes.func,
     setNotification: PropTypes.func,
     stage: PropTypes.object,

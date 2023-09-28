@@ -178,7 +178,7 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
 DraggableSection.propTypes = {
     DEActions: PropTypes.object,
     SectionActions: PropTypes.object,
-    editStatus: PropTypes.object,
+    editStatus: PropTypes.oneOfType([PropTypes.object,PropTypes.bool]),
     hnqisMode: PropTypes.bool,
     index: PropTypes.number,
     isSectionMode: PropTypes.bool,

@@ -207,6 +207,11 @@ const StageNew = (props) => {
                 stage.notificationTemplates = props.data.notificationTemplates;
             }
 
+            const programSharing = props.programSharing;
+            delete programSharing.owner;
+
+            stage.sharing = props.data?.sharing || programSharing;
+
             createOrUpdateMetaData(stage.attributeValues);
 
             const metadata = {
@@ -386,6 +391,7 @@ StageNew.propTypes = {
     data: PropTypes.object,
     programId: PropTypes.string,
     programName: PropTypes.string,
+    programSharing: PropTypes.object,
     setNewStage: PropTypes.func,
     setNotification: PropTypes.func,
     setShowStageForm: PropTypes.func,
