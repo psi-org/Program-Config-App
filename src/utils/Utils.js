@@ -379,3 +379,5 @@ export const extractMetadataPermissionsAllLevels = (sharing) => {
     }
     return sharing;
 }
+
+export const removeWindowsForbiddenCharacters = (string) => string.replaceAll(/[*?:\\/[\]]+/g, '');

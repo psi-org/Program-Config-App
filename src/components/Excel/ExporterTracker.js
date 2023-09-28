@@ -34,6 +34,7 @@ import {
     printObjectArray,
     writeWorkbook
 } from "../../utils/ExcelUtils.js";
+import { removeWindowsForbiddenCharacters } from '../../utils/Utils.js';
 
 const ExporterTracker = ({
     programID, programPrefix, programName, programShortName, programTET, programCatCombo, programType, flag, stagesConfigurations, teaConfigurations, optionData, legendSetData, trackedEntityAttributesData, valueTypes, aggTypes, isLoading, setFlag
@@ -76,7 +77,7 @@ const ExporterTracker = ({
 
         const stagesArray = [];
         stagesConfigurations.forEach(configuration => {
-            const worksheet = workbook.addWorksheet(configuration.stageName, {
+            const worksheet = workbook.addWorksheet(removeWindowsForbiddenCharacters(configuration.stageName), {
                 views: [{
                     showGridLines: false,
                     state: 'frozen',
