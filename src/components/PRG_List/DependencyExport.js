@@ -20,9 +20,9 @@ import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 const queryLegends = {
     results: {
         resource: 'legendSets',
-        paging: false,
         params: {
-            fields: ['name', 'id', 'attributeValues', 'legends', 'translations']
+            fields: ['name', 'id', 'attributeValues', 'legends', 'translations'],
+            paging: false
         }
     }
 };
@@ -30,12 +30,12 @@ const queryLegends = {
 const queryProgramSections = {
     results: {
         resource: 'programSections',
-        paging: false,
         params: ({  program }) => ({
             fields: [ "name","created","lastUpdated","translations","externalAccess","userGroupAccesses","userAccesses","access","favorites","lastUpdatedBy","sharing","program","trackedEntityAttributes","sortOrder","favorite","id","attributeValues" ],
             filter: [
                 `program.id:eq:${program}`
-            ]
+            ],
+            paging: false
         })
     }
 }
@@ -261,7 +261,7 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
                 changeAttributeSettingsByKey('reuser', false);
                 changeAttributeSettingsByKey('recats', false);
                 changeAttributeSettingsByKey('relegends', false);
-                break
+                break;
             case 'external':
                 changeAttributeSettingsByKey('sharings', true);
                 changeAttributeSettingsByKey('ous', true);
@@ -269,7 +269,8 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
                 changeAttributeSettingsByKey('reuser', true);
                 changeAttributeSettingsByKey('recats', false);
                 changeAttributeSettingsByKey('relegends', false);
-                break
+                changeSelectedHeader('system', false);
+                break;
             case 'h2External':
                 changeAttributeSettingsByKey('sharings', true);
                 changeAttributeSettingsByKey('ous', true);
@@ -280,7 +281,7 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
                 H2_ENABLED_IMPORT_REMOVE_KEYS.forEach(key => {
                     changeSelectedHeader(key, false);
                 })
-                break
+                break;
         }
         setSelectedPreset(preset);
     };

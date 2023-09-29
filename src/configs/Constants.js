@@ -13,7 +13,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
 const BUILD_VERSION = "1.7.0"
-const BUILD_DATE = "September, 2023"
+const BUILD_DATE = "October, 2023"
 const MIN_VERSION = "2.37"
 const MAX_VERSION = "2.40.5"
 
@@ -433,7 +433,7 @@ const EXPORT_HNQIS_PRESETS = [
     { value: 'h2External', label: 'HNQIS2-Enabled Server'}
 ]
 
-const H2_ENABLED_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions','trackedEntityTypes','trackedEntityAttributes'];
+const H2_ENABLED_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions','trackedEntityTypes','trackedEntityAttributes','system'];
 
 const H2_ATTRIBUTES_TO_KEEP = ['haUflNqP85K', 'LP171jpctBm', 'yB5tFAAN7bI', 'DVzuBdj9kli', 'yhKEe6BLEer'];
 

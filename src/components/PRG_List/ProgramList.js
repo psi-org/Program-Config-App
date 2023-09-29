@@ -40,7 +40,6 @@ const queryProgramType = {
 const query = {
     results: {
         resource: "programs",
-        paging: false,
         params: ({ token, pageSize, page }) => {
             const paramsObject = {
                 pageSize,

@@ -160,10 +160,26 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     let userOrgUnits;
 
+    const cutOrgUnitsPath = (route) => {
+        const routeParts = route.split('/');
+        let routeCut = '/';
+        for (let index = 1; index < routeParts.length; index++) {
+            if (userOrgUnits.includes(routeParts[index])) {
+                break;
+            } else {
+                routeCut = routeCut + routeParts[index] + '/'
+            }
+        }
+        return route.replace(routeCut, '/');
+    }
+
     useEffect(() => {
-        if (!poLoading) {
+        if (!poLoading && userOrgUnits) {
             const ouPaths = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path)];
-            const ouExpanded = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path.split('/').slice(0, -1).join('/'))]
+            const ouExpanded = [...prgOrgUnitData.results?.organisationUnits.map((ou) => {
+                const ouPath = cutOrgUnitsPath(ou.path);
+                return ouPath.split('/').slice(0, -1).join('/');
+            })]
             const ouIds = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.id)];
             if (ouPaths.length > 0 && ouIds.length > 0) {
                 setOrgUnitPathSelected(ouPaths);
@@ -173,7 +189,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                 ouTreeRootInit();
             }
         }
-    }, [ouMetadata, prgOrgUnitData]);
+    }, [ouMetadata, prgOrgUnitData, userOrgUnits]);
 
     useEffect(() => {
         if (orgUnitPathSelected.length > 0) {
@@ -239,18 +255,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                             ...data.results?.organisationUnits.map(
                                 (ou) => ou.path
                             ),
-                        ].map(route => {
-                            const routeParts = route.split('/');
-                            let routeCut = '/';
-                            for (let index = 1; index < routeParts.length; index++) {
-                                if (userOrgUnits.includes(routeParts[index])) {
-                                    break;
-                                } else {
-                                    routeCut = routeCut + routeParts[index] + '/'
-                                }
-                            }
-                            return route.replace(routeCut, '/');
-                        })
+                        ].map(cutOrgUnitsPath)
                         setOrgUnitFiltered(filterResults);
                         setOrgUnitExpanded(filterResults);
                         setOrgUnitTreeRoot(userOrgUnits);
