@@ -545,7 +545,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                 return <ObjectSharing key={v.id} id={v.id} element={v.element} sharing={payload} />
             })}
             <Modal onClose={hideForm}>
-                <ModalTitle>Sharing settings</ModalTitle>
+                <ModalTitle>Sharing Settings</ModalTitle>
                 <ModalContent>
                     {content === 'loading' && <Box sx={{ display: 'inline-flex' }}><CircularProgress /></Box>}
                     {content === 'form' && <div>
@@ -718,6 +718,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                                 role={undefined}
                                 transition
                                 disablePortal
+                                sx={{zIndex:'10'}}
                             >
                                 {({ TransitionProps, placement }) => (
                                     <Grow

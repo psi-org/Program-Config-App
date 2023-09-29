@@ -422,7 +422,7 @@ const ProgramNew = (props) => {
         updateAssignedAttributes();
     };
 
-    if (uidPool && uidPool.length === 6 && !props.data) {
+    if (uidPool && uidPool.length === 15 && !props.data) {
         setProgramId(uidPool.shift());
         setAssessmentId(uidPool.shift());
         setActionPlanId(uidPool.shift());
