@@ -1,11 +1,24 @@
 import { ArrowDownward, ArrowUpward, PlaylistAddCheck, StackedLineChart } from '@mui/icons-material';
 import TimeIcon from '@mui/icons-material/AccessTime';
 import AddIcon from '@mui/icons-material/Add';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import BlockIcon from '@mui/icons-material/Block';
 import DateIcon from '@mui/icons-material/CalendarToday';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import DataArrayIcon from '@mui/icons-material/DataArray';
+import DataObjectIcon from '@mui/icons-material/DataObject';
+import EmailIcon from '@mui/icons-material/Email';
 import FunctionsIcon from '@mui/icons-material/Functions';
+import HttpIcon from '@mui/icons-material/Http';
+import ImageIcon from '@mui/icons-material/Image';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import NumberIcon from '@mui/icons-material/Numbers';
 import PercentIcon from '@mui/icons-material/Percent';
+import PhoneIcon from '@mui/icons-material/Phone';
+import PlaceIcon from '@mui/icons-material/Place';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SsidChartIcon from '@mui/icons-material/SsidChart';
 import TextIcon from '@mui/icons-material/TextFields';
@@ -214,7 +227,7 @@ const RENDER_TYPES = [
 const ELEM_TYPES = [{ label: 'Question', value: 'question' }, { label: 'Label', value: 'label' }];
 
 //* PCA Dropdowns
-const VALUE_TYPES = [
+const VALUE_TYPES_H2 = [
     { label: 'Number', value: 'NUMBER', icon: <NumberIcon /> },
     { label: 'Integer', value: 'INTEGER', icon: <NumberIcon /> },
     { label: 'Positive Integer', value: 'INTEGER_POSITIVE', icon: <NumberIcon /> },
@@ -224,6 +237,36 @@ const VALUE_TYPES = [
     { label: 'Percentage', value: 'PERCENTAGE', icon: <PercentIcon /> },
     { label: 'Date', value: 'DATE', icon: <DateIcon /> },
     { label: 'Time', value: 'TIME', icon: <TimeIcon /> },
+];
+
+const VALUE_TYPES_TRACKER = [
+    { label: 'Text', value: 'TEXT', icon: <TextIcon /> },
+    { label: 'Long Text', value: 'LONG_TEXT', icon: <TextIcon /> },
+    { label: 'Letter', value: 'LETTER', icon: <TextIcon /> },
+    { label: 'Phone Number', value: 'PHONE_NUMBER', icon: <PhoneIcon />},
+    { label: 'Email', value: 'EMAIL', icon: <EmailIcon />},
+    { label: 'Yes/No', value: 'BOOLEAN', icon: <ArrowDropDownIcon /> },
+    { label: 'Yes only', value: 'TRUE_ONLY', icon: <CheckBoxIcon /> },
+    { label: 'Date', value: 'DATE', icon: <DateIcon /> },
+    { label: 'Date & Time', value: 'DATETIME', icon: <DateIcon /> },
+    { label: 'Time', value: 'TIME', icon: <TimeIcon /> },
+    { label: 'Number', value: 'NUMBER', icon: <NumberIcon /> },
+    { label: 'Unit Interval', value: 'UNIT_INTERVAL', icon: <DataArrayIcon />},
+    { label: 'Percentage', value: 'PERCENTAGE', icon: <PercentIcon /> },
+    { label: 'Integer', value: 'INTEGER', icon: <NumberIcon /> },
+    { label: 'Positive Integer', value: 'INTEGER_POSITIVE', icon: <NumberIcon /> },
+    { label: 'Negative Integer', value: 'INTEGER_NEGATIVE', icon: <NumberIcon /> },
+    { label: 'Positive or Zero Integer', value: 'INTEGER_ZERO_OR_POSITIVE', icon: <NumberIcon /> },
+    { label: 'Coordinate', value: 'COORDINATE', icon: <PlaceIcon />},
+    { label: 'Orgnisation Unit', value: 'ORGANISATION_UNIT', icon: <ApartmentIcon />},
+    { label: 'Reference', value: 'REFERENCE', icon: <ArrowRightAltIcon />},
+    { label: 'Age', value: 'AGE', icon: <NumberIcon /> },
+    { label: 'URL', value: 'URL', icon: <HttpIcon />},
+    { label: 'File', value: 'FILE_RESOURCE', icon: <InsertDriveFileIcon />},
+    { label: 'Image', value: 'IMAGE', icon: <ImageIcon />},
+    { label: 'GeoJSON', value: 'GEOJSON', icon: <DataObjectIcon />},
+    { label: 'Username', value: 'USERNAME', icon: <TextIcon /> },
+    { label: 'Tracker Associate', value: 'TRACKER_ASSOCIATE', icon: <QuestionMarkIcon />}
 ];
 
 const AGG_TYPES = [
@@ -601,6 +644,7 @@ export {
     tagStyle,
     TRANSFERRED_EVENTS_NAMESPACE,
     updatedTagStyle,
-    VALUE_TYPES,
+    VALUE_TYPES_H2,
+    VALUE_TYPES_TRACKER,
     VISUALIZATIONS_LEGEND
 };

@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react"
-import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES, AGG_TYPES, MAX_SHORT_NAME_LENGTH } from '../../configs/Constants.js';
+import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES_H2, AGG_TYPES, MAX_SHORT_NAME_LENGTH, VALUE_TYPES_TRACKER } from '../../configs/Constants.js';
 import AlertDialogSlide from '../UIElements/AlertDialogSlide.js';
 import SelectOptions from '../UIElements/SelectOptions.js';
 import StyleManager from '../UIElements/StyleManager.js';
@@ -651,7 +651,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
                             styles={{ width: '40%' }}
                             useError={validationErrors.valueType !== undefined}
                             helperText={validationErrors.valueType}
-                            items={VALUE_TYPES}
+                            items={hnqisMode?VALUE_TYPES_H2:VALUE_TYPES_TRACKER}
                             value={valueType}
                             disabled={structure === 'label' || optionSet != null}
                             handler={valueTypeChange} />
