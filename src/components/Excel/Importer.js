@@ -162,6 +162,8 @@ const Importer = (
 
                 });
 
+                console.log('test')
+
                 if (stopFlag) { return }
 
                 const importSummaryValues =

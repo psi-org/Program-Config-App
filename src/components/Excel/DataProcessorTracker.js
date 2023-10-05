@@ -223,7 +223,12 @@ const DataProcessorTracker = ({ programId, isLoading }) => {
                     row.form_name = dataElement.formName;
                     row.description = dataElement.description;
 
-                    row.compulsory = (typeof metadata.isCompulsory !== 'undefined') ? metadata.isCompulsory : 'No';
+                    const psdeCompulsory = programStage.programStageDataElements?.find(psde =>
+                        psde.dataElement.id === dataElement.id)?.compulsory ? 'Yes' : 'No';
+
+                    row.compulsory = (typeof metadata.isCompulsory !== 'undefined')
+                        ? metadata.isCompulsory
+                        : psdeCompulsory;
                     row.value_type = (typeof dataElement.valueType !== 'undefined') ? dataElement.valueType : undefined;
                     row.agg_type = dataElement.aggregationType;
 

@@ -119,7 +119,6 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const [orgUnitPathSelected, setOrgUnitPathSelected] = useState([]);
     const [orgUnitTreeRoot, setOrgUnitTreeRoot] = useState([]);
     const [orgUnitFiltered, setOrgUnitFiltered] = useState([]);
-    const [orgUnitExpanded, setOrgUnitExpanded] = useState([]);
     const [filterValue, setFilterValue] = useState('');
     const [filterLoading, setFilterLoading] = useState(false);
     const [fetchErrors, setFetchErrors] = useState(undefined);
@@ -176,14 +175,9 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     useEffect(() => {
         if (!poLoading && userOrgUnits) {
             const ouPaths = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path)];
-            const ouExpanded = [...prgOrgUnitData.results?.organisationUnits.map((ou) => {
-                const ouPath = cutOrgUnitsPath(ou.path);
-                return ouPath.split('/').slice(0, -1).join('/');
-            })]
             const ouIds = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.id)];
             if (ouPaths.length > 0 && ouIds.length > 0) {
                 setOrgUnitPathSelected(ouPaths);
-                setOrgUnitExpanded(ouExpanded)
                 setSelectedOrgUnits(ouIds);
             } else {
                 ouTreeRootInit();
@@ -257,7 +251,6 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                             ),
                         ].map(cutOrgUnitsPath)
                         setOrgUnitFiltered(filterResults);
-                        setOrgUnitExpanded(filterResults);
                         setOrgUnitTreeRoot(userOrgUnits);
                     }
                     setFilterLoading(false)
@@ -270,7 +263,6 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const resetSearch = () => {
         setFilterValue("")
         setOrgUnitFiltered([]);
-        setOrgUnitExpanded([]);
         setOrgUnitTreeRoot(userOrgUnits);
         setFilterLoading(false)
     }
@@ -475,7 +467,6 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                 roots={orgUnitTreeRoot}
                                                 onChange={orgUnitSelectionHandler}
                                                 selected={orgUnitPathSelected}
-                                                initiallyExpanded={orgUnitExpanded}
                                                 filter={orgUnitFiltered}
                                             />
                                         </div>

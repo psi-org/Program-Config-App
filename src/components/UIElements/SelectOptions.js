@@ -19,7 +19,7 @@ const SelectOptions = ({ label, items, value, disabled = false, useError = true,
 )
 
 SelectOptions.propTypes = {
-    defaultOption: PropTypes.string,
+    defaultOption: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
     disabled: PropTypes.bool,
     handler: PropTypes.func,
     helperText: PropTypes.string,

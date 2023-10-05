@@ -44,8 +44,8 @@ const InfoBox = (props) => {
 InfoBox.propTypes = {
     alignment: PropTypes.string,
     margin: PropTypes.string,
-    message: PropTypes.message,
-    title: PropTypes.title
+    message: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    title: PropTypes.string
 }
 
 export default InfoBox;

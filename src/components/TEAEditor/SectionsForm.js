@@ -97,7 +97,7 @@ SectionsForm.propTypes = {
     removeFromForm: PropTypes.func,
     removeSection: PropTypes.func,
     teaOptions: PropTypes.object,
-    useSections: PropTypes.func,
+    useSections: PropTypes.bool,
     onSectionNameChange: PropTypes.func,
 }
 

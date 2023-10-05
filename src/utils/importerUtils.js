@@ -241,9 +241,11 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
 
     if (data[HNQIS2_TEMPLATE_MAP.optionSet] && data[HNQIS2_TEMPLATE_MAP.optionSet] !== "") {
         const os = getObjectByProperty(data[HNQIS2_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
-        parsedDE.optionSet = { id: os.id };
-        parsedDE.optionSetValue = true;
-        data[HNQIS2_TEMPLATE_MAP.valueType] = os.valueType;
+        if (os) {
+            parsedDE.optionSet = { id: os.id };
+            parsedDE.optionSetValue = true;
+            data[HNQIS2_TEMPLATE_MAP.valueType] = os.valueType;
+        }
     }
 
     if (type == 'score') {
@@ -352,9 +354,11 @@ export const mapImportedDE = ({ data, programPrefix, stageNumber, optionSets, le
 
     if (data[TRACKER_TEMPLATE_MAP.optionSet] && data[TRACKER_TEMPLATE_MAP.optionSet] !== "") {
         const os = getObjectByProperty(data[TRACKER_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
-        parsedDE.optionSet = { id: os.id };
-        parsedDE.optionSetValue = true;
-        parsedDE.valueType = os.valueType;
+        if (os) {
+            parsedDE.optionSet = { id: os.id };
+            parsedDE.optionSetValue = true;
+            parsedDE.valueType = os.valueType;
+        }
     }
 
     if (data[TRACKER_TEMPLATE_MAP.legend] && data[TRACKER_TEMPLATE_MAP.legend] !== "") {
