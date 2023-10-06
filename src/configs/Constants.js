@@ -25,10 +25,10 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "1.7.0"
+const BUILD_VERSION = "2.0.0"
 const BUILD_DATE = "October, 2023"
-const MIN_VERSION = "2.37"
-const MAX_VERSION = "2.40.5"
+const MIN_VERSION = "2.37.x"
+const MAX_VERSION = "2.40.x"
 
 const PCA_METADATA_VERSION = "1.1.2";
 const H2_METADATA_VERSION = "1.1.2";

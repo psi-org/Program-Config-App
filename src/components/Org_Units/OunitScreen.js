@@ -119,6 +119,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const [orgUnitPathSelected, setOrgUnitPathSelected] = useState([]);
     const [orgUnitTreeRoot, setOrgUnitTreeRoot] = useState([]);
     const [orgUnitFiltered, setOrgUnitFiltered] = useState([]);
+    const [orgUnitExpanded, setOrgUnitExpanded] = useState([]);
     const [filterValue, setFilterValue] = useState('');
     const [filterLoading, setFilterLoading] = useState(false);
     const [fetchErrors, setFetchErrors] = useState(undefined);
@@ -244,7 +245,6 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
             searchOunits.refetch({ filterString: filterString })
                 .then((data) => {
                     if (data?.results) {
-                        setOrgUnitTreeRoot([]);
                         const filterResults = [
                             ...data.results?.organisationUnits.map(
                                 (ou) => ou.path
@@ -252,6 +252,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                         ].map(cutOrgUnitsPath)
                         setOrgUnitFiltered(filterResults);
                         setOrgUnitTreeRoot(userOrgUnits);
+                        setOrgUnitExpanded(filterResults);
                     }
                     setFilterLoading(false)
                 });
@@ -263,6 +264,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const resetSearch = () => {
         setFilterValue("")
         setOrgUnitFiltered([]);
+        setOrgUnitExpanded([]);
         setOrgUnitTreeRoot(userOrgUnits);
         setFilterLoading(false)
     }
@@ -396,6 +398,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                         margin="dense"
                                         id={"filterOrgUnitName"}
                                         label={"Filter Organisation Units by UID, Code or Name"}
+                                        helperText={"Please Note: The Organisation Unit Tree is not automatically expanded after filtering"}
                                         variant="outlined"
                                         inputRef={filterRef}
                                         value={filterValue}
@@ -414,16 +417,17 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                     <Tooltip
                                                         title="Clear Filter"
                                                         placement="left"
-                                                    >
-                                                        <IconButton
-                                                            onClick={() => {
-                                                                resetSearch();
-                                                            }}
-                                                            style={{ marginRight: "0.5em" }}
-                                                            disabled={filterLoading || loadingBulkAction}
-                                                        >
-                                                            <ClearIcon />
-                                                        </IconButton>
+                                                    ><span>
+                                                            <IconButton
+                                                                onClick={() => {
+                                                                    resetSearch();
+                                                                }}
+                                                                style={{ marginRight: "0.5em" }}
+                                                                disabled={filterLoading || loadingBulkAction}
+                                                            >
+                                                                <ClearIcon />
+                                                            </IconButton>
+                                                        </span>
                                                     </Tooltip>
                                                     <LoadingButton
                                                         onClick={() => {
@@ -443,7 +447,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
                                     <div style={{ marginTop: "10px" }}>
                                         {" "}
-                                        {selectedOrgUnits.length} Organisation units
+                                        {selectedOrgUnits.length} Organisation Units
                                         selected{" "}
                                     </div>
                                     {!poLoading && orgUnitTreeRoot.length > 0 && (
@@ -468,6 +472,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                 onChange={orgUnitSelectionHandler}
                                                 selected={orgUnitPathSelected}
                                                 filter={orgUnitFiltered}
+                                                highlighted={orgUnitExpanded}
                                             />
                                         </div>
                                     )}
