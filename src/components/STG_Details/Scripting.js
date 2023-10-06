@@ -1,6 +1,6 @@
 import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../configs/AnalyticsTemplates.js";
 import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND } from "../../configs/Constants.js";
-import { DeepCopy } from "../../utils/Utils.js";
+import { DeepCopy, padValue } from "../../utils/Utils.js";
 
 /**
  * 
@@ -714,7 +714,7 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
     sections.forEach((section, secIdx) => {
         section.dataElements.forEach((dataElement, deIdx) => {
             programRuleVariables.push({
-                name: `_S${secIdx + 1}Q${deIdx + 1}`,
+                name: `_S${padValue(secIdx + 1,"00")}Q${padValue(deIdx + 1,"000")}`,
                 programRuleVariableSourceType: "DATAELEMENT_CURRENT_EVENT",
                 useCodeForOptionSet: dataElement.optionSet?.id ? true : false,
                 program: { id: programId },
@@ -798,7 +798,7 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
                 locateInTree(
                     {
                         subLevels: order.split("."),
-                        prgVarName: `_S${secIdx + 1}Q${deIdx + 1}`,
+                        prgVarName: `_S${padValue(secIdx + 1,"00")}Q${padValue(deIdx + 1,"000")}`,
                         scoreNum: metadata.scoreNum,
                         scoreDen: metadata.scoreDen,
                         isCritical: metadata.isCritical

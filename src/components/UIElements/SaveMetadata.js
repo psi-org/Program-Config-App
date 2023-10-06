@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from "react";
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants.js";
-import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata } from "../../utils/Utils.js";
+import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue } from "../../utils/Utils.js";
 import CustomMUIDialog from './CustomMUIDialog.js';
 import CustomMUIDialogTitle from './CustomMUIDialogTitle.js';
 
@@ -104,7 +104,7 @@ const processStageData = (
 
             const DE_metadata = JSON.parse(dataElement.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
 
-            const newVarName = hnqisMode ? `_S${secIdx + 1}Q${deIdx + 1}` : `_PS${stageIndex + 1}_S${secIdx + 1}E${deIdx + 1}`;
+            const newVarName = hnqisMode ? `_S${padValue(secIdx + 1,"00")}Q${padValue(deIdx + 1,"000")}` : `_PS${padValue(stageIndex + 1,"00")}_S${padValue(secIdx + 1,"00")}E${padValue(deIdx + 1,"000")}`;
             const newCode = `${programMetadata.dePrefix || section.id}_${newVarName}`;
 
             let formName = ""

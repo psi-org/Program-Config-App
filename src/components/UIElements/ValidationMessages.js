@@ -16,6 +16,7 @@ const ValidationMessages = (props) => {
                     messages={object.errors.errors}
                 />
             )}
+            <p><strong>Please Note:</strong> Row numbers do NOT include blank or unstructured rows.</p>
         </ModalContent>
         <ModalActions>
             <ButtonStrip right>

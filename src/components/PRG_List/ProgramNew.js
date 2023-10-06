@@ -1036,7 +1036,7 @@ const ProgramNew = (props) => {
                                     <FormControl sx={{ minWidth: "65%" }}>
                                         <TextField
                                             error={validationErrors.prefix !== undefined}
-                                            helperText={validationErrors.prefix}
+                                            helperText={validationErrors.prefix || "Please Note: The Prefix will be applied to the Data Elements ONLY during the 'Validate & Save' process"}
                                             margin="normal"
                                             id="prefix"
                                             label="Program Data Element Prefix (*)"

@@ -15,7 +15,7 @@ import { bindActionCreators } from "redux";
 import { BUILD_VERSION, METADATA } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import actionCreators from "../../state/action-creators";
-import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, setPCAMetadata, truncateString } from "../../utils/Utils.js";
+import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, padValue, setPCAMetadata, truncateString } from "../../utils/Utils.js";
 import DataProcessorTracker from "../Excel/DataProcessorTracker.js";
 import Importer from "../Excel/Importer.js";
 import ValidateTracker from "../PRG_Details/ValidateTracker.js";
@@ -273,7 +273,7 @@ const ProgramDetails = () => {
                             section.dataElements.forEach((dataElement, deIdx) => {
 
                                 programRuleVariables.push({
-                                    name: `_PS${stgIdx + 1}_S${secIdx + 1}E${deIdx + 1}`,
+                                    name: `_PS${stgIdx + 1}_S${padValue(secIdx + 1, "00")}E${padValue(deIdx + 1, "000")}`,
                                     programRuleVariableSourceType: "DATAELEMENT_CURRENT_EVENT",
                                     useCodeForOptionSet: dataElement.optionSet?.id ? true : false,
                                     program: { id: program },

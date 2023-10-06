@@ -88,7 +88,7 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
     // States
     const [structure, setStructure] = useState(metadata.elemType || 'question')
     const [valueType, setValueType] = useState(de?.valueType || '')
-    const [aggType, setAggType] = useState(de?.aggregationType || 'NONE') //TODO: AggType not changeable?
+    const [aggType, setAggType] = useState(de?.aggregationType || 'NONE')
     const [formName, setFormName] = useState((metadata.elemType === 'label' ? metadata.labelFormName : de?.formName)?.replace(' [C]', '') || '')
     const [elementName, setElementName] = useState(de?.name || '')
     const [shortName, setShortName] = useState(de?.shortName || '')

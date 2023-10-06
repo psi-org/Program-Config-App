@@ -1227,7 +1227,7 @@ const ExporterTracker = ({
     const populateConfiguration = async (ws, configurations) => {
         let dataRow = 3;
         configurations.concat(new Array(2998 - configurations.length).fill({})).forEach((configure) => {
-            configure.correlative = { formula: '=_xlfn.IF(OR(INDIRECT(_xlfn.CONCAT("A",ROW()))="Section",ISBLANK(INDIRECT(_xlfn.CONCAT("A",ROW())))),"",_xlfn.CONCAT("_S",COUNTIF(_xlfn.INDIRECT(CONCATENATE("A1:A",ROW())),"Section"),"E",ROW()-ROW($A$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("A1:A",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("A1:A",ROW())))))+1))' };
+            configure.correlative = { formula: '=_xlfn.IF(OR(INDIRECT(_xlfn.CONCAT("A",ROW()))="Section",ISBLANK(INDIRECT(_xlfn.CONCAT("A",ROW())))),"",_xlfn.CONCAT("_S",TEXT(COUNTIF(_xlfn.INDIRECT(CONCATENATE("A1:A",ROW())),"Section"),"00"),"E",TEXT(ROW()-ROW($A$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("A1:A",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("A1:A",ROW())))))+1,"000")))' };
             configure.option_set_details = {
                 formula: `=IF(NOT(ISBLANK(L${dataRow})),IF(ISNA(VLOOKUP(L${dataRow}, selected_Option_Set_Data,4,FALSE)),"Not Found",HYPERLINK(VLOOKUP(L${dataRow}, selected_Option_Set_Data,4,FALSE),"[Click Here]")),"")`,
             }

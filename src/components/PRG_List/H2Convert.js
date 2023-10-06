@@ -18,7 +18,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from "react";
 import { QUESTION_TYPE_ATTRIBUTE, DE_TYPE_ATTRIBUTE, HEADER_ATTRIBUTE, QUESTION_PARENT_ATTRIBUTE, QUESTION_PARENT_OPTIONS_ATTRIBUTE, COMPOSITIVE_SCORE_ATTRIBUTE, SCORE_NUM_ATTRIBUTE, SCORE_DEN_ATTRIBUTE, QUESTION_ORDER_ATTRIBUTE, METADATA, FEEDBACK_ORDER, COMPETENCY_ATTRIBUTE, COMPETENCY_CLASS, FEEDBACK_TEXT, LEGEND_YES_NO } from "../../configs/Constants.js";
-import { parseErrorsJoin, parseErrorsUL, DeepCopy } from "../../utils/Utils.js";
+import { parseErrorsJoin, parseErrorsUL, DeepCopy, padValue } from "../../utils/Utils.js";
 import AlertDialogSlide from "../UIElements/AlertDialogSlide.js";
 import { Program, HnqisProgramConfigs, PS_AssessmentStage, PS_ActionPlanStage, PSS_CriticalSteps, PSS_Scores } from "./../../configs/ProgramTemplate.js";
 import CustomMUIDialog from "./../UIElements/CustomMUIDialog.js";
@@ -449,7 +449,7 @@ const H2Convert = ({
                         isCritical: de.programStageDataElement.compulsory
                             ? "Yes"
                             : "No",
-                        varName: `_S${sectionIndex + 1}Q${deIndex + 1}`,
+                        varName: `_S${padValue(sectionIndex + 1, "00")}Q${padValue(deIndex + 1,"000")}`,
                         parentQuestion: de.metadata[QUESTION_PARENT_ATTRIBUTE],
                         parentValue: parseFloat(parentValue) || parentValue,
                         scoreNum:

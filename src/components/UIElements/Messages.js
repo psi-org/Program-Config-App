@@ -17,10 +17,10 @@ const Messages = ({ title, error, warning, messages }) => {
 }
 
 Messages.propTypes = {
-    error: PropTypes,
-    messages: PropTypes,
-    title: PropTypes,
-    warning: PropTypes,
+    error: PropTypes.bool,
+    messages: PropTypes.array,
+    title: PropTypes.string,
+    warning: PropTypes.bool,
 }
 
 export default Messages
