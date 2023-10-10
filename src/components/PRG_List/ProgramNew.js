@@ -254,7 +254,7 @@ const ProgramNew = (props) => {
         const value = event.target.value;
         setPgrTypePCA(value);
         if (value === "hnqis") {
-            setButtonDisabled(true);
+            setButtonDisabled(false);
             const hnqisTET = trackedEntityTypes.find(
                 (tet) => tet.id === ASSESSMENT_TET
             );
@@ -1160,7 +1160,6 @@ const ProgramNew = (props) => {
                                 <H2Setting
                                     pcaMetadata={props.pcaMetadata}
                                     ref={h2SettingsRef}
-                                    setButtonDisabled={setButtonDisabled}
                                 />
                             </div>
                         </Slide>

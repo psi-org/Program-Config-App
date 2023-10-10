@@ -255,7 +255,7 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
     } else {
         if (type == 'label') { data[HNQIS2_TEMPLATE_MAP.valueType] = 'LONG_TEXT' }
 
-        code = programPrefix + '_' + (data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???');
+        code = programPrefix + (data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???');
         switch (data[HNQIS2_TEMPLATE_MAP.valueType]) {
             case 'TEXT':
             case 'LONG_TEXT':
@@ -267,8 +267,8 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
     }
 
     parsedDE.code = code;
-    parsedDE.name = (code + '_' + data[HNQIS2_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH);
-    parsedDE.shortName = (code + '_' + data[HNQIS2_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH);
+    parsedDE.name = (code + data[HNQIS2_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH);
+    parsedDE.shortName = (code + data[HNQIS2_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH);
     parsedDE.valueType = data[HNQIS2_TEMPLATE_MAP.valueType];
     parsedDE.aggregationType = aggType;
 
@@ -335,10 +335,10 @@ export const mapImportedDE = ({ data, programPrefix, stageNumber, optionSets, le
 
     parsedDE.id = data[TRACKER_TEMPLATE_MAP.dataElementId] || undefined;
     parsedDE.name = autoNaming
-        ? (code + '_' + data[TRACKER_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH)
+        ? (code + data[TRACKER_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH)
         : data[TRACKER_TEMPLATE_MAP.name];
     parsedDE.shortName = autoNaming
-        ? (code + '_' + data[TRACKER_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH)
+        ? (code + data[TRACKER_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH)
         : data[TRACKER_TEMPLATE_MAP.shortName];
     parsedDE.code = autoNaming ? code : data[TRACKER_TEMPLATE_MAP.code];
     parsedDE.description = data[TRACKER_TEMPLATE_MAP.description];

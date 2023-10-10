@@ -1,7 +1,7 @@
 import { saveAs } from 'file-saver';
 import { METADATA, SHORT_DATE_FORMAT_OPTIONS } from "../configs/Constants.js";
 import { thinBorder } from "../configs/TemplateConstants.js";
-import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy } from "./Utils.js";
+import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy, padValue } from "./Utils.js";
 
 export function printArray2Column(sheet, array, header, startPosition, headerBgColor) {
     const coordinates = splitPosition(startPosition);
@@ -271,8 +271,21 @@ export const getHNQIS2MappingList = (ws) => {
 export const getVarNameFromParentUid = (parentUid, programStage, removeStagePrefix = true) => {
     const parentDe = programStage.programStageSections.map(pss => pss.dataElements).flat().find(de => de.id == parentUid);
     const deMetadata = JSON.parse(parentDe?.attributeValues?.find(av => av.attribute.id === METADATA)?.value || "{}");
-    if(removeStagePrefix){
-        return deMetadata.varName?.replace(/_PS\d+/g, '');
+    const [psPrefix] = deMetadata.varName?.match(/_PS\d+/g);
+    
+    let cleanPrefix = deMetadata.varName?.replace(psPrefix, '');
+    cleanPrefix = cleanPrefix.replace('_S', '');
+
+    if (cleanPrefix) {
+        const [letter] = cleanPrefix.match(/[EQ]/g);
+        const [start, end] = cleanPrefix.split(letter);
+        cleanPrefix = `${padValue(start, '00')}${letter}${padValue(end, '000')}`
+        deMetadata.varName = '_S' + cleanPrefix;
     }
+
+    if (!removeStagePrefix) {
+        deMetadata.varName = psPrefix + deMetadata.varName;
+    }
+
     return deMetadata.varName;
 }

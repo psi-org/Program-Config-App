@@ -1,5 +1,5 @@
 import React from 'react';
-import { coerce, gte, lte } from 'semver';
+import { coerce, gte, lte, satisfies } from 'semver';
 import { METADATA } from '../configs/Constants.js';
 
 export function splitPosition(position) {
@@ -56,8 +56,8 @@ function characterPos(chr) {
 }
 
 export function versionIsValid(serverVersion, limitMin, limitMax) {
-    const coercedVersion = coerce(serverVersion).version
-    return gte(coercedVersion, coerce(limitMin)) && lte(coercedVersion, coerce(limitMax));
+    const coercedVersion = coerce(serverVersion).version;
+    return satisfies(coercedVersion, `>=${limitMin} <=${limitMax}`);
 }
 
 export function parseErrors(response) {

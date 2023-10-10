@@ -503,6 +503,7 @@ export const parentExists = ({ metadata, dataElementsList }) => {
     if (!metadata.parentQuestion || metadata.parentQuestion === "") {
         return true;
     }
+    console.log(metadata)
     return dataElementsList.find(dataElement => {
         const deMetadata = getPCAMetadataDE(dataElement);
         return (deMetadata.varName === metadata.parentQuestion || dataElement.id === metadata.parentQuestion);

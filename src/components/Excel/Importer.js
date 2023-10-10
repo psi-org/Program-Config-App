@@ -353,7 +353,7 @@ const Importer = (
                         />
                         {importSummary?.configurations?.skippedSections?.length > 0 &&
                             <div style={{ width: '100%', marginTop: '0.5em' }}>
-                                <NoticeBox title={'One or more Program Stages were imported as Basic Form. To keep the Stage Sections, delete the light blue row in the following Stage Template(s):'} warning={true}>
+                                <NoticeBox title={'One or more Program Stages were imported as Basic Form. To keep the Stage Sections, delete the light blue row and make sure that the first available row is a Section in the following Stage Template(s):'} warning={true}>
                                     <ul>{[...new Set(importSummary.configurations.skippedSections.map(ss => ss.stage))].map(stage => <li key={stage}>{stage}</li>)}</ul>
                                 </NoticeBox>
                             </div>

@@ -76,8 +76,8 @@ const ExporterTracker = ({
 
 
         const stagesArray = [];
-        stagesConfigurations.forEach(configuration => {
-            const worksheet = workbook.addWorksheet(removeWindowsForbiddenCharacters(configuration.stageName), {
+        stagesConfigurations.forEach((configuration, index) => {
+            const worksheet = workbook.addWorksheet(`${index+1}) ${removeWindowsForbiddenCharacters(configuration.stageName)}`, {
                 views: [{
                     showGridLines: false,
                     state: 'frozen',

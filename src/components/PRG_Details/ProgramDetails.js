@@ -273,7 +273,7 @@ const ProgramDetails = () => {
                             section.dataElements.forEach((dataElement, deIdx) => {
 
                                 programRuleVariables.push({
-                                    name: `_PS${stgIdx + 1}_S${padValue(secIdx + 1, "00")}E${padValue(deIdx + 1, "000")}`,
+                                    name: `_PS${padValue(stgIdx + 1, "00")}_S${padValue(secIdx + 1, "00")}E${padValue(deIdx + 1, "000")}`,
                                     programRuleVariableSourceType: "DATAELEMENT_CURRENT_EVENT",
                                     useCodeForOptionSet: dataElement.optionSet?.id ? true : false,
                                     program: { id: program },

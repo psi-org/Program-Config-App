@@ -191,12 +191,6 @@ const H2Setting = forwardRef((props, ref) => {
         setorgUnitTreeRootLoaded(true)
     }
 
-    useEffect(() => {
-        if (orgUnitTreeRoot.length > 0) {
-            props.setButtonDisabled(false)
-        }
-    }, [orgUnitTreeRoot])
-
     const orgUnitSelectionHandler = (event) => {
         if (event.checked) {
             ouLevelRefetch({ id: event.id }).then((data) => {
@@ -447,8 +441,7 @@ const H2Setting = forwardRef((props, ref) => {
 H2Setting.displayName = 'H2Setting';
 
 H2Setting.propTypes = {
-    pcaMetadata: PropTypes.object,
-    setButtonDisabled: PropTypes.func
+    pcaMetadata: PropTypes.object
 }
 
 export default H2Setting
