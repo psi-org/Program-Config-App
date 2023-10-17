@@ -1,11 +1,8 @@
 import { NoticeBox } from '@dhis2/ui';
-import { MIN_VERSION, MAX_VERSION } from '../../configs/Constants';
-
+import React from 'react';
+import { MIN_VERSION, MAX_VERSION } from '../../configs/Constants.js';
 
 const VersionErrorPage = () => {
-
-    
-
     return (
         <div>
             <div className="sub_nav">

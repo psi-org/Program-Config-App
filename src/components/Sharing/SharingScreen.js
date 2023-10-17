@@ -1,21 +1,18 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { CircularLoader, Modal, ModalContent, ModalTitle, NoticeBox, ModalActions, ButtonStrip, CenteredContent } from "@dhis2/ui";
-import SharingItem from './SharingItem';
-import { DeepCopy, parseErrors, parseErrorsJoin, parseErrorsUL, truncateString } from '../../configs/Utils';
-
-import EditIcon from '@mui/icons-material/Edit';
-import { useRef, useState, useEffect } from "react";
-import Suggestions from "./Suggestions";
-import SharingOptions from "./SharingOptions";
-import ViewIcon from "@mui/icons-material/Visibility";
-import BlockIcon from "@mui/icons-material/Block";
-import CloseIcon from '@mui/icons-material/Close';
+import {
+    CircularLoader,
+    Modal,
+    ModalContent,
+    ModalTitle,
+    NoticeBox,
+    ModalActions,
+    ButtonStrip
+} from "@dhis2/ui";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import IconButton from "@mui/material/IconButton";
-import Alert from '@mui/material/Alert';
+import BlockIcon from "@mui/icons-material/Block";
+import EditIcon from '@mui/icons-material/Edit';
 import HelpIcon from '@mui/icons-material/Help';
-
+import ViewIcon from "@mui/icons-material/Visibility";
 import {
     CircularProgress,
     Box,
@@ -28,8 +25,24 @@ import {
     MenuList,
     FormGroup, FormControlLabel, Checkbox, Tooltip
 } from "@mui/material";
-import ObjectSharing from "./ObjectSharing";
-import { ACTION_PLAN_ACTION, ACTION_PLAN_DUE_DATE, ACTION_PLAN_RESPONSIBLE, COMPETENCY_CLASS, CRITICAL_STEPS, NON_CRITICAL_STEPS } from "../../configs/Constants";
+import Alert from '@mui/material/Alert';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import IconButton from "@mui/material/IconButton";
+import PropTypes from 'prop-types';
+import React, { useRef, useState, useEffect } from "react";
+import {
+    ACTION_PLAN_ACTION,
+    ACTION_PLAN_DUE_DATE,
+    ACTION_PLAN_RESPONSIBLE,
+    COMPETENCY_CLASS,
+    CRITICAL_STEPS,
+    NON_CRITICAL_STEPS
+} from "../../configs/Constants.js";
+import { DeepCopy, parseErrorsJoin, parseErrorsUL, truncateString } from '../../utils/Utils.js';
+import ObjectSharing from "./ObjectSharing.js";
+import SharingItem from './SharingItem.js';
+import SharingOptions from "./SharingOptions.js";
+import Suggestions from "./Suggestions.js";
 
 const sharingQuery = {
     results: {
@@ -83,7 +96,7 @@ const queryMaps = {
     results: {
         resource: 'maps',
         params: _ref7 => {
-            let {
+            const {
                 programId
             } = _ref7;
             return {
@@ -97,7 +110,7 @@ const queryEventReport = {
     results: {
         resource: 'eventReports',
         params: _ref9 => {
-            let {
+            const {
                 programId
             } = _ref9;
             return {
@@ -111,7 +124,7 @@ const queryDashboards = {
     results: {
         resource: 'dashboards',
         params: _ref11 => {
-            let {
+            const {
                 programId
             } = _ref11;
             return {
@@ -145,7 +158,6 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     const [entityType, setEntityType] = useState(undefined);
     const [entity, setEntity] = useState({});
     const [open, setOpen] = useState(false);
-    const [importStatus, setImportStatus] = useState({});
     const anchorRef = useRef(null);
     const [selectedIndex, setSelectedIndex] = useState(type === 'hnqis' ? 2 : 0);
     const [content, setContent] = useState('form');
@@ -165,7 +177,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
         }
     });
     const { loading: prgDELoading, data: prgDEData } = useDataQuery(psDataElementAccess, { variables: { id: id } });
-    const { loading: visualizerLoading, data: vData } = useDataQuery(visualizationQuery, { variables: { id: id } });
+    const { data: vData } = useDataQuery(visualizationQuery, { variables: { id: id } });
     const mapsDQ = useDataQuery(queryMaps, { variables: { programId: id } });
     const eventReportDQ = useDataQuery(queryEventReport, { variables: { programId: id } });
     const dashboardsDQ = useDataQuery(queryDashboards, { variables: { programId: id } });
@@ -187,7 +199,6 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
 
     let payload, usersNGroups, metadata;
     let userAccessRestricted = false;
-    let errorStates = [];
     let hnqisElements = [];
     const exclusionDataElements = ["NAaHST5ZDTE", "VqBfZjZhKkU", "pzWDtDUorBt", "F0Qcr8ANr7t", "DIoqtxbSJIL", "nswci5V4j0d"]; //Excluding HNQIS2 specific data elements from sharing update
 
@@ -215,7 +226,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     useEffect(() => {
         if (!prgDELoading && prgDEData) {
             const prgStages = prgDEData.des?.programStages;
-            let restrictedDataElements = [];
+            const restrictedDataElements = [];
             prgStages.forEach(ps => {
                 ps.programStageDataElements.forEach(de => {
                     if (!de.dataElement.access.update && !exclusionDataElements.includes(de.dataElement.id)) {
@@ -234,13 +245,16 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
 
     const toggle = () => setOptionOpen(!optionOpen);
 
-    if (error) return <NoticeBox title="Error retrieving programs list"> <span>{JSON.stringify(error)}</span> </NoticeBox>
-    if (loading) return <CircularLoader />
-
+    if (error) {
+        return <NoticeBox title="Error retrieving programs list">
+            <span>{JSON.stringify(error)}</span>
+        </NoticeBox>
+    }
+    if (loading) { return <CircularLoader /> }
 
     if (!metadataLoading && prgMetaData) {
         metadata = prgMetaData.results;
-        let psde = metadata.programStages?.map(ps => ps.programStageDataElements.map(psde => psde.dataElement.id))?.flat()
+        const psde = metadata.programStages?.map(ps => ps.programStageDataElements.map(psde => psde.dataElement.id))?.flat()
         metadata.dataElements = metadata.dataElements?.filter(de => psde.includes(de.id))
     }
 
@@ -259,13 +273,13 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
         setUsrGrp(ent.displayName);
         setEntityType(type);
 
-        let e = { ...ent };
+        const e = { ...ent };
         e.access = usrPermission;
         setEntity(e);
     }
 
     const setEntityPermission = (permission) => {
-        let e = { ...entity };
+        const e = { ...entity };
         setUsrPermission(permission);
         e.access = permission;
         setEntity(e);
@@ -278,7 +292,9 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     }
 
     const userPermissionState = () => {
-        return (<IconButton color='inherit' style={{ marginRight: '1em' }}>{(usrPermission[1] === "w") ? <EditIcon /> : (usrPermission[0] === "r" && usrPermission[1] !== "w") ? <ViewIcon /> : <BlockIcon />}</IconButton>)
+        return (<IconButton color='inherit' style={{ marginRight: '1em' }}>{(usrPermission[1] === "w") ?
+            <EditIcon /> : (usrPermission[0] === "r" && usrPermission[1] !== "w") ? <ViewIcon /> :
+                <BlockIcon />}</IconButton>)
     }
 
     const handleSuggestions = (e) => {
@@ -311,8 +327,8 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     }
 
     function availableUserGroups() {
-        let obj = payload.object;
-        let e = DeepCopy(entities);
+        const obj = payload.object;
+        const e = DeepCopy(entities);
         if (e !== null) {
             obj.userAccesses.forEach((ua) => {
                 e.userData.users.splice(e.userData.users.findIndex(u => {
@@ -335,13 +351,17 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                 data.results.object.publicAccess = "--------";
                 break;
             case 'userAccesses':
-                var userIndex = data.results.object.userAccesses.findIndex(user => { return user.id === id });
+                var userIndex = data.results.object.userAccesses.findIndex(user => {
+                    return user.id === id
+                });
                 data.results.object.userAccesses.splice(userIndex, 1);
                 setDeleted(deleted => [...deleted, { id: id, type: "users" }]);
                 // setDeleted(deleted => deleted.userAccesses.push(id));
                 break;
             case 'userGroupAccesses':
-                var userGroupIndex = data.results.object.userGroupAccesses.findIndex(userGroup => { return userGroup.id === id });
+                var userGroupIndex = data.results.object.userGroupAccesses.findIndex(userGroup => {
+                    return userGroup.id === id
+                });
                 data.results.object.userGroupAccesses.splice(userGroupIndex, 1);
                 setDeleted(deleted => [...deleted, { id: id, type: "userGroups" }]);
                 // setDeleted(deleted => deleted.userGroupAccesses.push(id));
@@ -358,11 +378,15 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                 payload.object.publicAccess = permission;
                 break;
             case 'userAccesses':
-                var userIndex = payload.object.userAccesses.findIndex(user => { return user.id === id });
+                var userIndex = payload.object.userAccesses.findIndex(user => {
+                    return user.id === id
+                });
                 payload.object.userAccesses[userIndex].access = permission;
                 break;
             case 'userGroupAccesses':
-                var userGroupIndex = payload.object.userGroupAccesses.findIndex(userGroup => { return userGroup.id === id });
+                var userGroupIndex = payload.object.userGroupAccesses.findIndex(userGroup => {
+                    return userGroup.id === id
+                });
                 payload.object.userGroupAccesses[userGroupIndex].access = permission;
                 break;
             default:
@@ -378,23 +402,28 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
         const programTypeId = metadata?.attributes?.filter((attribute) => {
             return attribute.code === "PROGRAM_TYPE"
         })[0]?.id;
-        const programType = programTypeId ? (metadata.programs[0].attributeValues?.filter((av) => { return av.attribute.id === programTypeId })[0]?.value || 'Tracker') : 'Tracker';
+        const programType = programTypeId ? (metadata.programs[0].attributeValues?.filter((av) => {
+            return av.attribute.id === programTypeId
+        })[0]?.value || 'Tracker') : 'Tracker';
 
         if (programType === "HNQIS2") {
             addHNQISElement4Sharing();
-            if (hnqisElements.length > 0)
+            if (hnqisElements.length > 0){
                 setAdditionalElements([...hnqisElements]);
+            }
             setRunAdditionalSharing(true);
         }
 
-        let payloadMetadata = {};
+        const payloadMetadata = {};
         payloadMetadata.programs = metadata.programs;
         payloadMetadata.programIndicators = metadata.programIndicators;
+        const exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS, ACTION_PLAN_ACTION, ACTION_PLAN_DUE_DATE, ACTION_PLAN_RESPONSIBLE];
         switch (level) {
-            case 2:
-                let exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS, ACTION_PLAN_ACTION, ACTION_PLAN_DUE_DATE, ACTION_PLAN_RESPONSIBLE];
-                payloadMetadata.dataElements = metadata.dataElements.filter(de => !exclusionsDEs.includes(de.id));
             case 1:
+                payloadMetadata.programStages = metadata.programStages;
+                break;
+            case 2:
+                payloadMetadata.dataElements = metadata.dataElements?.filter(de => !exclusionsDEs.includes(de.id)) || [];
                 payloadMetadata.programStages = metadata.programStages;
                 break;
             default:
@@ -407,7 +436,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
             .then(response => {
                 if (response?.status === "OK") {
                     setNotification({
-                        message: `Chages to the Sharing Settings applied successfully`,
+                        message: `Changes to the Sharing Settings applied successfully`,
                         severity: 'success'
                     })
                 } else {
@@ -421,8 +450,17 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
             });
     }
     const applySharing = (elements, meta) => {
-        let DE_Sharing = deSharing(payload.object);
+
+        const DE_Sharing = deSharing(payload.object);
         elements?.forEach((element) => {
+            // BUFIX for 2.36.13.2
+            if (!element.sharing.userGroups) {
+                element.sharing.userGroups = {};
+            }
+            if (!element.sharing.users) {
+                element.sharing.users = {};
+            }
+            // END BUFIX for 2.36.13.2
             if (!exclusionDataElements.includes(element.id)) {
                 if (meta === "dataElements" && overwrite) //Overwrite all the permission for dataElements if checked
                 {
@@ -433,24 +471,30 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                     element.sharing.public = (meta === 'dataElements' || meta === 'programIndicators') ? dePermission(payload.object.publicAccess) : payload.object.publicAccess;
                     payload.object.userAccesses.forEach((user) => {
 
-                        if (element.sharing.users.hasOwnProperty(user.id) && overwrite) {
+                        if (Object.hasOwn(element.sharing.users,user.id) && overwrite) {
                             element.sharing.users[user.id].access = (meta === 'dataElements' || meta === 'programIndicators') ? dePermission(user.access) : user.access; //update permission if user exist
                         } else {
-                            element.sharing.users[user.id] = { id: user.id, access: (meta === 'dataElements' || meta === 'programIndicators') ? dePermission(user.access) : user.access } //Add user with permission if doesn't exist
+                            element.sharing.users[user.id] = {
+                                id: user.id,
+                                access: (meta === 'dataElements' || meta === 'programIndicators') ? dePermission(user.access) : user.access
+                            } //Add user with permission if doesn't exist
                         }
                     })
                     payload.object.userGroupAccesses.forEach((userGroup) => {
-                        if (element.sharing.userGroups.hasOwnProperty(userGroup.id) && overwrite) {
+                        if (Object.hasOwn(element.sharing.userGroups,userGroup.id) && overwrite) {
                             element.sharing.userGroups[userGroup.id].access = (meta === 'dataElements' || meta === 'programIndicators') ? dePermission(userGroup.access) : userGroup.access;
                         } else {
-                            element.sharing.userGroups[userGroup.id] = { id: userGroup.id, access: (meta === 'dataElements' || meta === 'programIndicators') ? dePermission(userGroup.access) : userGroup.access }
+                            element.sharing.userGroups[userGroup.id] = {
+                                id: userGroup.id,
+                                access: (meta === 'dataElements' || meta === 'programIndicators') ? dePermission(userGroup.access) : userGroup.access
+                            }
                         }
                     })
                 }
                 if (meta !== "dataElements" || overwrite) //Overwrite all the permission for dataElements if checked
                 {
                     deleted.forEach(del => {
-                        if (element.sharing[del.type].hasOwnProperty(del.id)) {
+                        if (Object.hasOwn(element.sharing[del.type], del.id)) {
                             delete element.sharing[del.type][del.id];
                         }
                     });
@@ -487,7 +531,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
     }
 
     const addElement = (element, items) => {
-        let elements = items.map(item => ({ element: element, id: item.id }));
+        const elements = items.map(item => ({ element: element, id: item.id }));
         hnqisElements = hnqisElements.concat(elements);
     }
 
@@ -501,14 +545,19 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                 return <ObjectSharing key={v.id} id={v.id} element={v.element} sharing={payload} />
             })}
             <Modal onClose={hideForm}>
-                <ModalTitle>Sharing settings</ModalTitle>
+                <ModalTitle>Sharing Settings</ModalTitle>
                 <ModalContent>
                     {content === 'loading' && <Box sx={{ display: 'inline-flex' }}><CircularProgress /></Box>}
                     {content === 'form' && <div>
-                        <h2 style={{ fontSize: 24, fontWeight: 300, margin: 0 }}>{truncateString(data.results?.object.displayName, 40)}</h2>
+                        <h2 style={{
+                            fontSize: 24,
+                            fontWeight: 300,
+                            margin: 0
+                        }}>{truncateString(data.results?.object.displayName, 40)}</h2>
                         <div>Created by: {data.results?.object.user.name}</div>
                         {restrictions.length > 0 &&
-                            <Alert severity="error" style={{ marginTop: "10px", maxHeight: "100px", overflow: 'auto' }}>Limited Access:
+                            <Alert severity="error" style={{ marginTop: "10px", maxHeight: "100px", overflow: 'auto' }}>Limited
+                                Access:
                                 <ul>
                                     {restrictions.map((restriction, index) => {
                                         return <li key={index}>{restriction}</li>
@@ -529,28 +578,78 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                                 {fetchErrors}
                             </Alert>
                         }
-                        <div style={{ boxSizing: "border-box", fontSize: 14, paddingLeft: 16, marginTop: 30, color: 'rgba(0, 0, 0, 0.54)', lineHeight: "48px" }}>Who has access</div>
+                        <div style={{
+                            boxSizing: "border-box",
+                            fontSize: 14,
+                            paddingLeft: 16,
+                            marginTop: 30,
+                            color: 'rgba(0, 0, 0, 0.54)',
+                            lineHeight: "48px"
+                        }}>Who has access
+                        </div>
                         <hr style={{ marginTop: -1, height: 1, border: "none", backgroundColor: "#bdbdbd" }} />
                         <div style={{ height: "240px", overflowY: "scroll" }}>
-                            <SharingItem key={"publicAccess"} type={"publicAccess"} element={{ id: "publicAccess", displayName: "Public Access" }} permission={data.results?.object.publicAccess} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission} />
+                            <SharingItem key={"publicAccess"} type={"publicAccess"}
+                                element={{ id: "publicAccess", displayName: "Public Access" }}
+                                permission={data.results?.object.publicAccess}
+                                updatePermission={updateUserPermission}
+                                deleteUserPermission={deleteUserPermission} />
                             {/*<SharingItem key={"externalAccess"} type={"externalAccess"} element={{id: "externalAccess", displayName: "External Access"}} permission={data.results?.object.externalAccess} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission}/>*/}
                             {
                                 data.results?.object.userAccesses.map(function (userAccess) {
-                                    return <SharingItem key={userAccess.id} type={"userAccesses"} element={{ id: userAccess.id, displayName: userAccess.displayName }} permission={userAccess.access} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission} />
+                                    return <SharingItem key={userAccess.id} type={"userAccesses"} element={{
+                                        id: userAccess.id,
+                                        displayName: userAccess.displayName
+                                    }} permission={userAccess.access} updatePermission={updateUserPermission}
+                                        deleteUserPermission={deleteUserPermission} />
                                 })
                             }
                             {
                                 data.results?.object.userGroupAccesses.map(function (userGroupAccess) {
-                                    return <SharingItem key={userGroupAccess.id} type={"userGroupAccesses"} element={{ id: userGroupAccess.id, displayName: userGroupAccess.displayName }} permission={userGroupAccess.access} updatePermission={updateUserPermission} deleteUserPermission={deleteUserPermission} />
+                                    return <SharingItem key={userGroupAccess.id} type={"userGroupAccesses"} element={{
+                                        id: userGroupAccess.id,
+                                        displayName: userGroupAccess.displayName
+                                    }} permission={userGroupAccess.access} updatePermission={updateUserPermission}
+                                        deleteUserPermission={deleteUserPermission} />
                                 })
                             }
                         </div>
-                        <div style={{ fontWeight: 400, padding: "16px", backgroundColor: 'rgb(245,245,245)', display: "flex", flexDirection: 'column', justifyContent: "center" }}>
-                            <div style={{ color: 'rgb(129, 129, 129)', paddingBottom: "8px" }}>Add users and user groups</div>
+                        <div style={{
+                            fontWeight: 400,
+                            padding: "16px",
+                            backgroundColor: 'rgb(245,245,245)',
+                            display: "flex",
+                            flexDirection: 'column',
+                            justifyContent: "center"
+                        }}>
+                            <div style={{ color: 'rgb(129, 129, 129)', paddingBottom: "8px" }}>Add users and user groups
+                            </div>
                             <div style={{ display: "flex", flexDirection: "row", alignItems: 'center', flex: "1 1 0" }}>
 
-                                <div style={{ display: "inline-block", position: "relative", width: "100%", backgroundColor: "white", boxShadow: 'rgb(204,204,204) 2px 2px 2px', padding: "0 16px", marginRight: "16px", height: '3em' }}>
-                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"} onChange={handleSuggestions} value={usrGrp || ""} style={{ appearance: "textfield", padding: "0px", position: "relative", border: "none", outline: "none", backgroundColor: 'rgba(0,0,0,0)', color: 'rgba(0,0,0,0.87)', cursor: "inherit", opacity: 1, height: "100%", width: "100%" }} placeholder={"Enter Names"} disabled={userAccessRestricted} />
+                                <div style={{
+                                    display: "inline-block",
+                                    position: "relative",
+                                    width: "100%",
+                                    backgroundColor: "white",
+                                    boxShadow: 'rgb(204,204,204) 2px 2px 2px',
+                                    padding: "0 16px",
+                                    marginRight: "16px",
+                                    height: '3em'
+                                }}>
+                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"}
+                                        onChange={handleSuggestions} value={usrGrp || ""} style={{
+                                            appearance: "textfield",
+                                            padding: "0px",
+                                            position: "relative",
+                                            border: "none",
+                                            outline: "none",
+                                            backgroundColor: 'rgba(0,0,0,0)',
+                                            color: 'rgba(0,0,0,0.87)',
+                                            cursor: "inherit",
+                                            opacity: 1,
+                                            height: "100%",
+                                            width: "100%"
+                                        }} placeholder={"Enter Names"} disabled={userAccessRestricted} />
                                 </div>
 
                                 {search &&
@@ -563,42 +662,44 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                                     />
                                 }
 
-                                <div id={'newPermission'} style={{ padding: "auto" }} onClick={() => { toggle(); }}>
+                                <div id={'newPermission'} style={{ padding: "auto" }} onClick={() => {
+                                    toggle();
+                                }}>
                                     {userPermissionState()}
                                 </div>
-                                {optionOpen && <SharingOptions permission={usrPermission.split("")} reference={document.getElementById('newPermission')} setEntityPermission={setEntityPermission} toggle={toggle} />}
+                                {optionOpen && <SharingOptions permission={usrPermission.split("")}
+                                    reference={document.getElementById('newPermission')}
+                                    setEntityPermission={setEntityPermission}
+                                    toggle={toggle} />}
 
-                                <Button onClick={() => assignRole()} variant="outlined" disabled={userAccessRestricted}>Assign</Button>
+                                <Button onClick={() => assignRole()} variant="outlined"
+                                    disabled={userAccessRestricted}>Assign</Button>
                             </div>
                         </div>
                         {(selectedIndex === 2) &&
                             <div style={{ display: 'flex', alignItems: 'center', margin: "1em 0 0 1em" }}>
                                 <FormGroup>
-                                    <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox} inputProps={{ 'aria-label': 'controlled' }} />} label={"Overwrite Existing Settings in Data Elements"} />
+                                    <FormControlLabel control={<Checkbox checked={overwrite} onChange={handleCheckbox}
+                                        inputProps={{ 'aria-label': 'controlled' }} />}
+                                        label={"Overwrite Existing Settings in Data Elements"} />
                                 </FormGroup>
-                                <Tooltip title="Replaces the current Sharing Settings of the Data Elements contained in the Program" placement="top-start">
+                                <Tooltip
+                                    title="Replaces the current Sharing Settings of the Data Elements contained in the Program"
+                                    placement="top-start">
                                     <HelpIcon color="disabled" style={{ cursor: 'pointer' }} />
                                 </Tooltip>
                             </div>
                         }
                     </div>
                     }
-                    {content === 'status' &&
-                        <div>
-                            <b>Import Status</b><hr />
-                            <p>Created: {importStatus.created}</p>
-                            <p>Updated: {importStatus.updated}</p>
-                            <p>Deleted: {importStatus.deleted}</p>
-                            <p>Ignored: {importStatus.ignored}</p>
-                            <p>Total: {importStatus.total}</p>
-                        </div>}
                 </ModalContent>
                 {content === 'form' &&
                     <ModalActions>
                         <ButtonStrip end>
                             {/*<Button onClick={()=>hideForm()} variant="outlined" startIcon={<CloseIcon />}>Close</Button>*/}
                             <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
-                                <Button onClick={handleClick} disabled={readOnly || !!fetchErrors}>{btnOptions[selectedIndex]}</Button>
+                                <Button onClick={handleClick}
+                                    disabled={readOnly || !!fetchErrors}>{btnOptions[selectedIndex]}</Button>
                                 <Button
                                     size="small"
                                     aria-controls={open ? 'split-button-menu' : undefined}
@@ -617,6 +718,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                                 role={undefined}
                                 transition
                                 disablePortal
+                                sx={{zIndex:'10'}}
                             >
                                 {({ TransitionProps, placement }) => (
                                     <Grow
@@ -651,6 +753,16 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
             </Modal>
         </>
     )
+}
+
+SharingScreen.propTypes = {
+    element: PropTypes.string,
+    id: PropTypes.string,
+    readOnly: PropTypes.bool,
+    setNotification: PropTypes.func,
+    setSharingProgramId: PropTypes.func,
+    setType: PropTypes.func,
+    type: PropTypes.string
 }
 
 export default SharingScreen;

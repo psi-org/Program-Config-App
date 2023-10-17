@@ -10,6 +10,15 @@ const Program = {
     "programStages": []
 }
 
+const EventStage = {
+    "id": "Stage Id",
+    "name": "Program Name",
+    "validationStrategy": "ValidationStrat",
+    "programStageDataElements": [],
+    "notificationTemplates": [],
+    "programStageSections": []
+}
+
 const HnqisProgramConfigs = {
     "trackedEntityType": { "id": "oNwpeWkfoWc" },
     "attributeValues": [
@@ -155,7 +164,6 @@ const PSS_Scores = {
 }
 
 const PS_Generic = {
-    "publicAccess": "rw------", //! Remove?
     "id": "stageID",
     "name": "Stage",
     "displayGenerateEventBox": true,
@@ -171,6 +179,7 @@ const PS_Generic = {
 
 module.exports = {
     Program,
+    EventStage,
     HnqisProgramConfigs,
     PS_Generic,
     PS_AssessmentStage,

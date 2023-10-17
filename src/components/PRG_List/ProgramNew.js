@@ -1,17 +1,26 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Transfer } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-//import styles from './Program.module.css'
-import {
-    HnqisProgramConfigs,
-    Program,
-    PS_ActionPlanStage,
-    PS_AssessmentStage,
-    PSS_CriticalSteps,
-    PSS_Default,
-    PSS_Scores,
-} from "../../configs/ProgramTemplate";
-
+import { Transfer } from "@dhis2/ui";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import SendIcon from "@mui/icons-material/Send";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { FormLabel, Slide, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
+import Alert from '@mui/material/Alert';
+import Autocomplete from "@mui/material/Autocomplete";
+import Button from "@mui/material/Button";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormHelperText from "@mui/material/FormHelperText";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Snackbar from '@mui/material/Snackbar';
+import Switch from '@mui/material/Switch';
+import TextField from "@mui/material/TextField";
+import PropTypes from 'prop-types';
+import React, { useEffect, useRef, useState } from "react";
 import {
     ASSESSMENT_TET,
     BUILD_VERSION,
@@ -27,35 +36,39 @@ import {
     MIN_NAME_LENGTH,
     NAMESPACE,
     NON_CRITICAL_STEPS,
-} from "../../configs/Constants";
-
-import Button from "@mui/material/Button";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import CustomMUIDialog from "./../UIElements/CustomMUIDialog";
-import CustomMUIDialogTitle from "./../UIElements/CustomMUIDialogTitle";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import SendIcon from "@mui/icons-material/Send";
-import FormHelperText from "@mui/material/FormHelperText";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { FormLabel, Tooltip } from "@mui/material";
-import StyleManager from "../UIElements/StyleManager";
-import { DeepCopy, parseErrorsJoin, truncateString } from "../../configs/Utils";
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import H2Setting from "./H2Setting"
-
-//const { Form, Field } = ReactFinalForm
+} from "../../configs/Constants.js";
+import {
+    EventStage,
+    HnqisProgramConfigs,
+    Program,
+    PS_ActionPlanStage,
+    PS_AssessmentStage,
+    PSS_CriticalSteps,
+    PSS_Default,
+    PSS_Scores,
+} from "../../configs/ProgramTemplate.js";
+import { DeepCopy, parseErrorsJoin, truncateString } from "../../utils/Utils.js";
+import InputModal from "../PRG_Details/InputModal.js";
+import AttributesEditor from "../TEAEditor/AttributesEditor.js";
+import StyleManager from "../UIElements/StyleManager.js";
+import CustomMUIDialog from "./../UIElements/CustomMUIDialog.js";
+import CustomMUIDialogTitle from "./../UIElements/CustomMUIDialogTitle.js";
+import H2Setting from "./H2Setting.js"
 
 const queryId = {
     results: {
         resource: "system/id.json",
-        params: { limit: 6 },
+        params: { limit: 15 },
     },
+};
+
+const queryIds = {
+    results: {
+        resource: 'system/id.json',
+        params: ({ n }) => ({
+            limit: n
+        })
+    }
 };
 
 const queryProgramType = {
@@ -72,7 +85,7 @@ const queryTEType = {
     results: {
         resource: "trackedEntityTypes",
         params: {
-            fields: ["id", "name"],
+            fields: ["id", "name", "trackedEntityTypeAttributes[trackedEntityAttribute[id]]"],
             paging: false,
         },
     },
@@ -125,11 +138,12 @@ const queryHNQIS2Metadata = {
 };
 
 const ProgramNew = (props) => {
+
     const h2Ready = localStorage.getItem("h2Ready") === "true";
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
 
     // Create Mutation
-    let metadataDM = useDataMutation(metadataMutation, {
+    const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             props.setNotification({
                 message: parseErrorsJoin(err.details, '\\n'),
@@ -156,13 +170,13 @@ const ProgramNew = (props) => {
     const teTypeQuery = useDataQuery(queryTEType);
     const trackedEntityTypes = teTypeQuery.data?.results.trackedEntityTypes;
 
-    const { data: trackedEntityAttributes, refetch: findTEAttributes } =
+    const { refetch: findTEAttributes } =
         useDataQuery(queryTEAttributes, { lazy: true });
-    const { data: categoryCombos, refetch: findCategoryCombos } = useDataQuery(
+    const { refetch: findCategoryCombos } = useDataQuery(
         queryCatCombos,
         { lazy: true }
     );
-    const { data: existingPrefixes, refetch: checkForExistingPrefix } =
+    const { refetch: checkForExistingPrefix } =
         useDataQuery(queryAvailablePrefix, {
             lazy: true,
             variables: { dePrefix: undefined, program: undefined },
@@ -183,8 +197,8 @@ const ProgramNew = (props) => {
     const [programTET, setProgramTET] = useState(
         props.data
             ? {
-                label: props.data.trackedEntityType.name,
-                id: props.data.trackedEntityType.id,
+                label: props.data.trackedEntityType?.name,
+                id: props.data.trackedEntityType?.id,
             }
             : ""
     );
@@ -194,13 +208,16 @@ const ProgramNew = (props) => {
     const [programShortName, setProgramShortName] = useState(
         props.data?.shortName || ""
     );
+    const [programCode, setProgramCode] = useState(
+        props.data?.code || ""
+    );
     const [sentForm, setSentForm] = useState(false);
     const [programTEAs, setProgramTEAs] = useState({
         available: [],
         selected: [],
     });
     const [programCategoryCombos, setProgramCategoryCombos] = useState([
-        { name: "Select an option", id: "" },
+        { name: "default", id: "" }
     ]);
     const [categoryCombo, setCategoryCombo] = useState(
         props.data
@@ -210,6 +227,7 @@ const ProgramNew = (props) => {
             }
             : ""
     );
+    const [validationStrategy, setValidationStrategy] = useState(props.data?.programStages[0]?.validationStrategy || "ON_UPDATE_AND_INSERT");
 
     const h2SettingsRef = useRef();
 
@@ -219,6 +237,7 @@ const ProgramNew = (props) => {
         prefix: undefined,
         programName: undefined,
         shortName: undefined,
+        code: undefined,
         programTET: undefined,
         healthArea: undefined,
         ouTableRow: undefined,
@@ -232,17 +251,19 @@ const ProgramNew = (props) => {
         validationErrors.pgrType = undefined;
         validationErrors.programTET = undefined;
         setValidationErrors({ ...validationErrors });
-        let value = event.target.value;
+        const value = event.target.value;
         setPgrTypePCA(value);
         if (value === "hnqis") {
-            setButtonDisabled(true);
-            let hnqisTET = trackedEntityTypes.find(
+            setButtonDisabled(false);
+            const hnqisTET = trackedEntityTypes.find(
                 (tet) => tet.id === ASSESSMENT_TET
             );
             setProgramTET({ label: hnqisTET.name, id: hnqisTET.id });
         } else {
             setProgramTET("");
-            if (value === "tracker") {
+            if (value === "event") {
+                setButtonDisabled(false);
+            } else if (value === "tracker") {
                 setButtonDisabled(false);
                 fetchTrackerMetadata();
             } else {
@@ -269,24 +290,139 @@ const ProgramNew = (props) => {
         setProgramShortName(event.target.value);
     };
 
+    const handleChangeProgramCode = (event) => {
+        validationErrors.code = undefined;
+        setValidationErrors({ ...validationErrors });
+        setProgramCode(event.target.value);
+    };
+
     const programTETChange = (event, value) => {
+
         if (value) {
+            // Remove from selected
+            if (programTET !== "") {
+                trackedEntityTypes.find(tet => tet.id === programTET.id).trackedEntityTypeAttributes.forEach(tea => {
+                    const idx = programTEAs.selected.findIndex(teaId => teaId === tea.trackedEntityAttribute.id)
+                    if (idx > -1) { programTEAs.selected.splice(idx, 1) }
+                })
+            }
+
+            // Add new selected
+            trackedEntityTypes.find(tet => tet.id === value.id).trackedEntityTypeAttributes.forEach(tea => {
+                if (!programTEAs.selected.includes(tea.trackedEntityAttribute.id)) {
+                    programTEAs.selected.push(tea.trackedEntityAttribute.id)
+                }
+            })
+            setProgramTEAs({ ...programTEAs });
+
             validationErrors.programTET = undefined;
             setValidationErrors({ ...validationErrors });
         }
         setProgramTET(value || "");
+
+        updateAssignedAttributes();
     };
 
     const categoryComboChange = (event, value) => {
-        setCategoryCombo(value || "");
+        setCategoryCombo(value);
     };
+
+    const validationStrategyChange = (event) => {
+        setValidationStrategy(event.target.value);
+    };
+
+    // * STEPPER * //
+
+    const [activeStep, setActiveStep] = useState(0);
+    let previousStep = 0;
+    const [basicValidated, setBasicValidated] = useState(true);
+    const [hnqisValidated, setHnqisValidated] = useState(true);
+
+    const containerRef = useRef(null);
+    const changeStep = (step) => {
+        previousStep = activeStep;
+        setActiveStep(step);
+    }
+
+    // * END OF STEPPER * //
+
+    // * Snackbar
+    const [snackParams, setSnackParams] = useState(false)
+    const pushNotification = (content, severity = "success") => setSnackParams({ content, severity })
+
+    // * TEA Editor * //
+    const [useSections, setUseSections] = useState(props.data?.programSections?.length > 0);
+    const [attributesFormSections, setAttributesFormSections] = useState(props.data?.programSections || []);
+    const [assignedAttributes, setAssignedAttributes] = useState([]);
+
+    const [inputModalOpened, setInputModalOpened] = useState(false);
+
+    const { refetch: getIds } = useDataQuery(queryIds, { lazy: true });
+    const onAddNewSection = (name) => {
+        getIds({ n: 1 }).then(results => {
+            const id = results.results.codes[0]
+            attributesFormSections.push({
+                id,
+                name,
+                trackedEntityAttributes: []
+            })
+            setAttributesFormSections([...attributesFormSections])
+        })
+    }
+    // * END OF TEA Editor * //
+
+    const updateAssignedAttributes = () => {
+
+        // Remove old TET attributes
+        attributesFormSections.forEach(section => {
+            section.trackedEntityAttributes = section.trackedEntityAttributes.filter(
+                tea => programTEAs.selected.includes(tea.id)
+            )
+        })
+        setAttributesFormSections([...attributesFormSections])
+
+
+        // Validate selected attributes that are not in program sections
+        const newAssignedAttributes = [];
+        programTEAs.selected.forEach(teaId => {
+            if (!attributesFormSections.map(section => section.trackedEntityAttributes.map(tea => tea.id)).flat().includes(teaId)) {
+                newAssignedAttributes.push(programTEAs.available.find(tea => tea.trackedEntityAttribute.id === teaId))
+            }
+        })
+        setAssignedAttributes([...newAssignedAttributes])
+    }
 
     const handleChangeTEAs = (res) => {
-        programTEAs.selected = res.selected;
-        setProgramTEAs(DeepCopy(programTEAs));
+        if (programTET !== "") {
+            const TETAttributes = trackedEntityTypes.find(tet => tet.id === programTET.id).trackedEntityTypeAttributes
+
+            if (TETAttributes.every(tea => res.selected.includes(tea.trackedEntityAttribute.id))) {
+                programTEAs.selected = res.selected;
+                setProgramTEAs(DeepCopy(programTEAs));
+            } else {
+                programTEAs.selected = programTEAs.selected.filter(
+                    teaId => TETAttributes.map(tea => tea.trackedEntityAttribute.id).includes(teaId) || res.selected.includes(teaId)
+                )
+                setProgramTEAs(DeepCopy(programTEAs));
+                pushNotification("You must include all Tracked Entity Type attributes", "error");
+            }
+        } else {
+            programTEAs.selected = res.selected;
+            setProgramTEAs(DeepCopy(programTEAs));
+        }
+
+        // ! REMOVE form attributes not assigned to program
+        attributesFormSections.forEach(section => {
+            section.trackedEntityAttributes = section.trackedEntityAttributes.filter(
+                tea => programTEAs.selected.includes(tea.id)
+            )
+        })
+        setAttributesFormSections([...attributesFormSections])
+
+        updateAssignedAttributes();
     };
 
-    if (uidPool && uidPool.length === 6 && !props.data) {
+    if (uidPool && uidPool.length === 15 && !props.data) {
         setProgramId(uidPool.shift());
         setAssessmentId(uidPool.shift());
         setActionPlanId(uidPool.shift());
@@ -296,12 +432,15 @@ const ProgramNew = (props) => {
     }
 
     function hideForm() {
+        //TODO: Reset TEAs
         props.setShowProgramForm(false);
     }
 
     const formDataIsValid = () => {
+
         let response = true;
 
+        // * Basic Settings Validation * //
         if (pgrTypePCA === "") {
             response = false;
             validationErrors.pgrType = "This field is required";
@@ -323,12 +462,10 @@ const ProgramNew = (props) => {
             response = false;
             validationErrors.programName = "This field is required";
         } else if (
-            programName.length < MIN_NAME_LENGTH ||
-            programName.length > MAX_PROGRAM_NAME_LENGTH /*- (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1*/
+            programName.length < MIN_NAME_LENGTH || programName.length > MAX_PROGRAM_NAME_LENGTH
         ) {
             response = false;
-            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_PROGRAM_NAME_LENGTH /*-
-        (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1*/} characters`;
+            validationErrors.programName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_PROGRAM_NAME_LENGTH} characters`;
         } else {
             validationErrors.programName = undefined;
         }
@@ -338,30 +475,39 @@ const ProgramNew = (props) => {
             validationErrors.shortName = "This field is required";
         } else if (
             programShortName.length >
-            MAX_SHORT_NAME_LENGTH /*- (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) - 1*/
+            MAX_SHORT_NAME_LENGTH
         ) {
             response = false;
-            validationErrors.shortName = `This field cannot exceed ${MAX_SHORT_NAME_LENGTH /*-
-                (dePrefix ? dePrefix.length : MAX_PREFIX_LENGTH) -
-                1*/ } characters`;
+            validationErrors.shortName = `This field cannot exceed ${MAX_SHORT_NAME_LENGTH} characters`;
         } else {
             validationErrors.shortName = undefined;
         }
 
-        if (programTET === "") {
+        if (programCode.length > MAX_SHORT_NAME_LENGTH) {
+            response = false;
+            validationErrors.code = `This field cannot exceed ${MAX_SHORT_NAME_LENGTH} characters`;
+        } else {
+            validationErrors.code = undefined;
+        }
+
+        if (programTET === "" && pgrTypePCA !== 'event') {
             response = false;
             validationErrors.programTET = "This field is required";
         } else {
             validationErrors.programTET = undefined;
         }
 
-        if (pgrTypePCA === "tracker" && pgrTypePCA !== "hnqis") {
+        setBasicValidated(response);
+
+        // * HNQIS2 Settings Validation * //
+        if ((pgrTypePCA === "tracker" || pgrTypePCA === "event") && pgrTypePCA !== "hnqis") {
             validationErrors.healthArea =
                 validationErrors.ouTableRow =
                 validationErrors.ouMapPolygon =
                 undefined;
         } else {
-            let hnqisValidation = h2SettingsRef.current.handleFormValidation()
+            const hnqisValidation = h2SettingsRef.current.handleFormValidation()
+            setHnqisValidated(hnqisValidation);
             response = response && hnqisValidation;
         }
         setValidationErrors({ ...validationErrors });
@@ -377,33 +523,104 @@ const ProgramNew = (props) => {
                     props.data?.programTrackedEntityAttributes?.map(
                         (tea) => tea.trackedEntityAttribute.id
                     ) || [];
-                setProgramTEAs({ ...programTEAs });
-            }
-        });
+                //setProgramTEAs({ ...programTEAs });
 
-        findCategoryCombos().then((ccdata) => {
-            if (ccdata?.results?.categoryCombos)
-                setProgramCategoryCombos(ccdata.results.categoryCombos);
+                // ? Existing TEAs in the program
+
+                const existingTEAs = props.data ?
+                    props.data.programTrackedEntityAttributes.map(tea => ({
+                        trackedEntityAttribute: tea.trackedEntityAttribute,
+                        valueType: tea.valueType,
+                        allowFutureDate: tea.allowFutureDate,
+                        displayInList: tea.displayInList,
+                        mandatory: tea.mandatory,
+                        searchable: tea.searchable,
+                        renderType: tea.renderType
+                    })) : []
+
+                const availableTEAs = data.results.trackedEntityAttributes.filter(
+                    tea => !existingTEAs.map(tea => tea.trackedEntityAttribute.id).includes(tea.id)
+                ).map(
+                    tea => ({
+                        trackedEntityAttribute: { id: tea.id, name: tea.name },
+                        valueType: tea.valueType,
+                        allowFutureDate: false,
+                        displayInList: false,
+                        mandatory: false,
+                        searchable: false
+                    })
+                )
+
+                const teaOptions = {
+                    available: availableTEAs.concat(existingTEAs),
+                    selected: existingTEAs.map(tea => tea.trackedEntityAttribute.id)
+                }
+
+                // ! Enforce Tracked Entity Type Attributes for existing programs
+                if (props?.data?.trackedEntityType?.trackedEntityTypeAttributes) {
+                    teaOptions.selected = teaOptions.selected.concat(
+                        props.data.trackedEntityType.trackedEntityTypeAttributes.map(
+                            att => att.trackedEntityAttribute.id
+                        ).filter(
+                            id => !teaOptions.selected.includes(id)
+                        )
+                    )
+                }
+
+                setProgramTEAs({ ...teaOptions })
+
+
+                // ? Assigned TEAs but not used in the form
+                const assignedAtts = props.data && props.data.programSections ?
+                    teaOptions.selected.filter(
+                        teaId => !props.data.programSections.map(
+                            section => section.trackedEntityAttributes.map(tea => tea.id)
+                        ).flat().includes(teaId)
+                    ).map(
+                        assignedTea => teaOptions.available.find(
+                            tea => tea.trackedEntityAttribute.id === assignedTea
+                        )
+                    )
+                    : [];
+
+                setAssignedAttributes(assignedAtts);
+
+                // ! REMOVE form attributes not assigned to program
+                attributesFormSections.forEach(section => {
+                    section.trackedEntityAttributes = section.trackedEntityAttributes.filter(
+                        tea => teaOptions.selected.includes(tea.id)
+                    )
+                })
+                setAttributesFormSections([...attributesFormSections])
+            }
         });
     };
 
     useEffect(() => {
-        if (props.programType === "tracker") {
-            fetchTrackerMetadata();
+        if (pgrTypePCA === "tracker" || pgrTypePCA === "event") {
+            if (pgrTypePCA === "tracker") { fetchTrackerMetadata() }
+            findCategoryCombos().then((ccdata) => {
+                if (ccdata?.results?.categoryCombos) {
+                    setProgramCategoryCombos([{ name: "default", id: "" }].concat(ccdata.results.categoryCombos));
+                }
+            });
         }
-    }, []);
+    }, [pgrTypePCA]);
+
+    /*useEffect(() => {
+        //TODO: Set backup TEAs
+    }, [])*/
 
     function submission() {
         setSentForm(true);
         props.setNotification(undefined);
-        //let prgTypeId = 'yB5tFAAN7bI';
-        let dataIsValid = formDataIsValid();
+        const dataIsValid = formDataIsValid();
         if (!dataIsValid) {
             setSentForm(false);
             return;
         }
-        
-        let useCompetency = pgrTypePCA === "hnqis" ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass ==='Yes':undefined;
+
+        const useCompetency = pgrTypePCA === "hnqis" ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass === 'Yes' : undefined;
 
         //Validating available prefix
         checkForExistingPrefix({
@@ -416,24 +633,28 @@ const ProgramNew = (props) => {
                 setSentForm(false);
                 return;
             }
-
             if (!metadataRequest.called && dataIsValid) {
-                let prgrm = props.data
+                const prgrm = props.data
                     ? DeepCopy(props.data)
                     : DeepCopy(Program);
                 let programStages = undefined;
                 let programStageSections = undefined;
+                let programSections = [];
 
                 prgrm.name = programName;
                 prgrm.shortName = programShortName;
-                prgrm.id = programId;
+                prgrm.code = programCode;
+                prgrm.id = programId || uidPool.shift();
 
-                let auxstyle = {};
-                if (programIcon) auxstyle.icon = programIcon;
-                if (programColor) auxstyle.color = programColor;
+                const auxstyle = {};
+                if (programIcon) { auxstyle.icon = programIcon }
+                if (programColor) { auxstyle.color = programColor }
 
-                if (Object.keys(auxstyle).length > 0) prgrm.style = auxstyle
-                else prgrm.style = undefined
+                if (Object.keys(auxstyle).length > 0) {
+                    prgrm.style = auxstyle;
+                } else {
+                    prgrm.style = undefined;
+                }
 
                 if (pgrTypePCA === "hnqis") {
                     //HNQIS2 Programs
@@ -456,7 +677,7 @@ const ProgramNew = (props) => {
 
                         assessmentStage = DeepCopy(PS_AssessmentStage);
                         assessmentStage.id = assessmentId;
-                        assessmentStage.name = "Assessment [" + programId + "]"; //! Not adding the ID may result in an error
+                        assessmentStage.name = "Assessment [" + prgrm.id + "]"; //! Not adding the ID may result in an error
                         assessmentStage.programStageSections.push({
                             id: defaultSectionId,
                         });
@@ -466,32 +687,29 @@ const ProgramNew = (props) => {
                         assessmentStage.programStageSections.push({
                             id: scoresSectionId,
                         });
-                        assessmentStage.program.id = programId;
+                        assessmentStage.program.id = prgrm.id;
 
                         actionPlanStage = DeepCopy(PS_ActionPlanStage);
                         actionPlanStage.id = actionPlanId;
                         actionPlanStage.name =
-                            "Action Plan [" + programId + "]"; //! Not adding the ID may result in an error
-                        actionPlanStage.program.id = programId;
+                            "Action Plan [" + prgrm.id + "]"; //! Not adding the ID may result in an error
+                        actionPlanStage.program.id = prgrm.id;
 
                         defaultSection = DeepCopy(PSS_Default);
                         defaultSection.id = defaultSectionId;
                         defaultSection.programStage.id = assessmentId;
-                        //defaultSection.name = defaultSection.name
 
                         criticalSteps = DeepCopy(PSS_CriticalSteps);
                         criticalSteps.id = stepsSectionId;
                         criticalSteps.programStage.id = assessmentId;
-                        //criticalSteps.name = criticalSteps.name
 
                         scores = DeepCopy(PSS_Scores);
                         scores.id = scoresSectionId;
-                        scores.name = scores.name;
                         scores.programStage.id = assessmentId;
                     } else {
-                        assessmentStage = prgrm.programStages.find(section => section.name.toLowerCase().includes('assessment'))
-                        let exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS]
-                        excludedStageDEs = assessmentStage.programStageDataElements.filter(elem => !exclusionsDEs.includes(elem.dataElement.id))
+                        assessmentStage = prgrm.programStages.find(section => section.name.toLowerCase().includes('assessment'));
+                        const exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS];
+                        excludedStageDEs = assessmentStage.programStageDataElements.filter(elem => !exclusionsDEs.includes(elem.dataElement.id));
                     }
 
                     prgrm.programTrackedEntityAttributes = DeepCopy(HnqisProgramConfigs.programTrackedEntityAttributes);
@@ -508,7 +726,7 @@ const ProgramNew = (props) => {
                                     section.dataElements.find(
                                         (de) => de.id === CRITICAL_STEPS
                                     ) || section.name === "Critical Steps Calculations"
-                            );
+                                );
                         }
 
                         prgrm.programStages = prgrm.programStages.map((ps) => ({
@@ -564,7 +782,7 @@ const ProgramNew = (props) => {
 
                     createOrUpdateMetaData(prgrm.attributeValues);
 
-                    if (assessmentStage?.programStageDataElements.length == 0 || props.data)
+                    if (assessmentStage?.programStageDataElements.length == 0 || props.data) {
                         assessmentStage.programStageDataElements = excludedStageDEs.concat(criticalSteps.dataElements.map((de, index) => ({
                             sortOrder: index + excludedStageDEs.length,
                             compulsory: false,
@@ -572,6 +790,7 @@ const ProgramNew = (props) => {
                             programStage: { id: assessmentStage.id },
                             dataElement: de
                         })));
+                    }
 
                     if (!props.data) {
                         programStages = [assessmentStage, actionPlanStage];
@@ -588,41 +807,67 @@ const ProgramNew = (props) => {
                     }
                 } else {
                     //Tracker Programs
-                    prgrm.trackedEntityType = { id: programTET.id };
-                    prgrm.programTrackedEntityAttributes = [];
-                    prgrm.attributeValues = [];
+                    if (pgrTypePCA === "tracker") {
+                        prgrm.trackedEntityType = { id: programTET.id };
+                        prgrm.programTrackedEntityAttributes = [];
+                        // PROGRAM TRACKED ENTITY ATTRIBUTES & PROGRAM SECTIONS
+
+                        prgrm.programTrackedEntityAttributes = programTEAs.selected.map(
+                            (teaId, idx) => {
+                                const t = programTEAs.available.find(tea => tea.trackedEntityAttribute.id === teaId);
+                                t.sortOrder = idx;
+                                return t;
+                            }
+                        )
+
+                        if (useSections) {
+                            programSections = attributesFormSections.map((section, idx) => {
+                                section.sortOrder = idx;
+                                section.program = { id: prgrm.id };
+                                return section;
+                            })
+                        }
+
+                        prgrm.programSections = programSections.map(section => ({ id: section.id }));
+                    }
+                    if (pgrTypePCA === "event") {
+                        prgrm.withoutRegistration = true;
+                        prgrm.programType = 'WITHOUT_REGISTRATION';
+
+
+                        const editStage = props.data ? props.data.programStages[0] : DeepCopy(EventStage);
+                        if (!props.data) {
+                            editStage.id = uidPool.shift();
+                        }
+                        editStage.name = prgrm.name;
+                        editStage.validationStrategy = validationStrategy;
+                        editStage.program = { id: prgrm.id };
+                        prgrm.programStages = [{ id: editStage.id }];
+                        programStages = [editStage];
+                    }
+
+                    prgrm.attributeValues = prgrm.attributeValues || [];
                     prgrm.categoryCombo =
-                        categoryCombo !== ""
+                        categoryCombo && categoryCombo.id !== ""
                             ? { id: categoryCombo.id }
                             : undefined;
-                    programTEAs.selected.forEach((selectedTEA, index) => {
-                        let newTEA = programTEAs.available.find(
-                            (tea) => tea.id === selectedTEA
-                        );
-                        prgrm.programTrackedEntityAttributes.push({
-                            trackedEntityAttribute: { id: newTEA.id },
-                            mandatory: false,
-                            valueType: newTEA.valueType,
-                            searchable: false,
-                            displayInList: true,
-                            sortOrder: index + 1,
-                        });
-                    });
 
                     createOrUpdateMetaData(prgrm.attributeValues);
                 }
 
                 // If editing only send program
-                let metadata = props.data
+                const metadata = props.data
                     ? {
                         programs: [prgrm],
                         programStageSections: programStageSections,
-                        programStages
+                        programStages,
+                        programSections
                     }
                     : {
                         programs: [prgrm],
                         programStages,
                         programStageSections,
+                        programSections
                     };
 
                 metadataRequest.mutate({ data: metadata }).then((response) => {
@@ -648,13 +893,13 @@ const ProgramNew = (props) => {
     }
 
     function createOrUpdateMetaData(attributeValues) {
-        let metaDataArray = attributeValues.filter(
+        const metaDataArray = attributeValues?.filter(
             (av) => av.attribute.id === METADATA
         );
         if (metaDataArray.length > 0) {
             let metaData_value = JSON.parse(metaDataArray[0].value);
             if (pgrTypePCA === "hnqis") {
-                let h1Program = metaData_value.h1Program;
+                const h1Program = metaData_value.h1Program;
                 metaData_value = h2SettingsRef.current.saveMetaData()
                 metaData_value.h1Program = h1Program;
             }
@@ -662,14 +907,14 @@ const ProgramNew = (props) => {
             metaData_value.saveVersion = BUILD_VERSION;
             metaDataArray[0].value = JSON.stringify(metaData_value);
         } else {
-            let attr = { id: METADATA };
+            const attr = { id: METADATA };
             let val = {};
             if (pgrTypePCA === "hnqis") {
                 val = h2SettingsRef.current.saveMetadata();
             }
             val.saveVersion = BUILD_VERSION;
             val.dePrefix = dePrefix;
-            let attributeValue = {
+            const attributeValue = {
                 attribute: attr,
                 value: JSON.stringify(val),
             };
@@ -693,266 +938,362 @@ const ProgramNew = (props) => {
 
     return (
         <>
-            <CustomMUIDialog open={true} maxWidth="md" fullWidth={true}>
+            <CustomMUIDialog open={true} maxWidth="lg" fullWidth={true}>
+                <Snackbar
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    open={!!snackParams}
+                    autoHideDuration={4000}
+                    onClose={() => setSnackParams(false)}
+                >
+                    <Alert onClose={() => setSnackParams(false)} severity={snackParams.severity} sx={{ width: '100%' }}>
+                        {snackParams.content}
+                    </Alert>
+                </Snackbar>
                 <CustomMUIDialogTitle
                     id="customized-dialog-title"
                     onClose={() => hideForm()}
                 >
                     {props.data
-                        ? ("Edit Program " + truncateString(props.data.name))
+                        ? ("Edit Program - " + truncateString(props.data.name))
                         : "Create New Program"}
                 </CustomMUIDialogTitle>
-                <DialogContent dividers style={{ padding: "1em 2em" }}>
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                        }}
-                    >
-                        <FormControl
-                            sx={{ minWidth: "30%" }}
-                            error={validationErrors.pgrType !== undefined}
-                        >
-                            <InputLabel id="label-prgType">
-                                Program Type (*)
-                            </InputLabel>
-                            <Select
-                                labelId="label-prgType"
-                                id="prgTypePCA"
-                                value={pgrTypePCA}
-                                disabled={props.programType !== undefined}
-                                onChange={handleChangePgrType}
-                                label="Program Type (*)"
-                            >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={"tracker"}>
-                                    Tracker Program
-                                </MenuItem>
-                                <MenuItem
-                                    disabled={
-                                        !h2Ready ||
-                                        hnqis2Metadata?.results?.version <
-                                        H2_METADATA_VERSION
-                                    }
-                                    value={"hnqis"}
-                                >
-                                    HNQIS 2.0{" "}
-                                    {hnqis2Metadata?.results?.version <
-                                        H2_METADATA_VERSION && (
-                                            <span
-                                                style={{
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    marginLeft: "8px",
-                                                }}
+                <DialogContent dividers style={{ padding: "1em 2em", height: '65vh', maxHeight: '65vh', overflowX: 'hidden' }}>
+                    <div style={{ marginBottom: '2rem' }}>
+                        <Stepper alternativeLabel nonLinear activeStep={activeStep}>
+                            <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
+                                <StepLabel error={!basicValidated} onClick={() => changeStep(0)}>Basic Settings</StepLabel>
+                            </Step>
+                            {pgrTypePCA === 'hnqis' &&
+                                <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
+                                    <StepLabel error={!hnqisValidated} onClick={() => changeStep(1)} >HNQIS2 Settings</StepLabel>
+                                </Step>
+                            }
+                            {(pgrTypePCA === 'tracker' || pgrTypePCA === 'event') &&
+                                <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
+                                    <StepLabel onClick={() => changeStep(1)}>{pgrTypePCA === 'tracker' ? 'Tracker' : 'Event'} Program Settings</StepLabel>
+                                </Step>
+                            }
+                            {pgrTypePCA === 'tracker' &&
+                                <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
+                                    <StepLabel onClick={() => changeStep(2)}>Tracked Entity Attributes Form</StepLabel>
+                                </Step>
+                            }
+
+                        </Stepper>
+                    </div>
+                    <div className="stepperContent">
+                        {/* BASIC SETTINGS */}
+                        <Slide in={activeStep === 0} direction={activeStep > previousStep ? 'left' : 'right'}>
+                            <div style={{ display: activeStep === 0 ? 'inherit' : 'none' }}>
+                                <div style={{ display: "flex", flexDirection: 'column', justifyContent: "space-between" }}>
+                                    <FormControl sx={{ maxWidth: "30%" }} error={validationErrors.pgrType !== undefined} style={{ marginTop: '1rem' }}>
+                                        <InputLabel id="label-prgType">Program Type (*)</InputLabel>
+                                        <Select
+                                            labelId="label-prgType"
+                                            id="prgTypePCA"
+                                            value={pgrTypePCA}
+                                            disabled={props.programType !== undefined}
+                                            onChange={handleChangePgrType}
+                                            label="Program Type (*)"
+                                        >
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            <MenuItem value={"tracker"}>
+                                                Tracker Program
+                                            </MenuItem>
+                                            <MenuItem value={"event"}>
+                                                Event Program
+                                            </MenuItem>
+                                            <MenuItem
+                                                disabled={
+                                                    !h2Ready ||
+                                                    hnqis2Metadata?.results?.version <
+                                                    H2_METADATA_VERSION
+                                                }
+                                                value={"hnqis"}
                                             >
-                                                [Unavailable]{" "}
-                                                <RemoveCircleOutlineIcon />
-                                            </span>
-                                        )}
-                                </MenuItem>
-                            </Select>
-                            <FormHelperText>
-                                {validationErrors.pgrType}
-                            </FormHelperText>
-                        </FormControl>
-                        <FormControl sx={{ minWidth: "65%" }}>
-                            <TextField
-                                error={validationErrors.prefix !== undefined}
-                                helperText={validationErrors.prefix}
-                                margin="normal"
-                                id="prefix"
-                                label="Program Data Element Prefix (*)"
-                                type="text"
-                                fullWidth
-                                variant="standard"
-                                autoComplete="off"
-                                inputProps={{ maxLength: MAX_PREFIX_LENGTH }}
-                                value={dePrefix}
-                                onChange={handleChangeDePrefix}
-                            />
-                        </FormControl>
-                    </div>
-                    <TextField
-                        error={validationErrors.programName !== undefined}
-                        helperText={validationErrors.programName}
-                        margin="normal"
-                        id="name"
-                        label="Program Name (*)"
-                        type="text"
-                        fullWidth
-                        variant="standard"
-                        autoComplete="off"
-                        inputProps={{
-                            maxLength:
-                                MAX_PROGRAM_NAME_LENGTH /*- dePrefix.length*/,
-                        }}
-                        value={programName}
-                        onChange={handleChangeProgramName}
-                    />
-                    <div
-                        style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                        }}
-                    >
-                        <TextField
-                            error={validationErrors.shortName !== undefined}
-                            helperText={validationErrors.shortName}
-                            margin="normal"
-                            id="shortName"
-                            label="Program Short Name (*)"
-                            type="text"
-                            sx={{ width: "48%" }}
-                            variant="standard"
-                            autoComplete="off"
-                            inputProps={{
-                                maxLength:
-                                    MAX_SHORT_NAME_LENGTH /*- dePrefix.length*/,
-                            }}
-                            value={programShortName}
-                            onChange={handleChangeProgramShortName}
-                        />
-                        <Autocomplete
-                            id="tetSelect"
-                            disabled={pgrTypePCA !== "tracker"}
-                            options={
-                                trackedEntityTypes?.map((tet) => ({
-                                    label: tet.name,
-                                    id: tet.id,
-                                })) || [{ label: "", id: "" }]
-                            }
-                            sx={{ width: "48%" }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    error={
-                                        validationErrors.programTET !==
-                                        undefined
-                                    }
-                                    label="Tracked Entity Type (*)"
-                                    margin="normal"
-                                    variant="standard"
-                                    helperText={validationErrors.programTET}
-                                />
-                            )}
-                            value={programTET}
-                            onChange={programTETChange}
-                            getOptionLabel={(option) => option.label || ""}
-                            isOptionEqualToValue={(option, value) =>
-                                option.id === value.id
-                            }
-                            defaultValue={""}
-                        />
-                    </div>
-                    <StyleManager
-                        icon={programIcon}
-                        setIcon={setProgramIcon}
-                        color={programColor}
-                        setColor={setProgramColor}
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "end",
-                            width: "100%",
-                            minHeight: "5em",
-                            marginTop: "1em",
-                        }}
-                    />
-                    {pgrTypePCA !== "" &&
-                        <>
-                            <hr style={{ marginTop: "0.5em" }} />
-                            <h4
-                                style={{
-                                    marginBottom: "0.25em",
-                                    marginTop: "0.5em",
-                                }}
-                            >
-                                {pgrTypePCA.toUpperCase()} Settings
-                            </h4>
-                        </>
-                    }
-                    {pgrTypePCA === "hnqis" && (
-                        <H2Setting
-                            pcaMetadata={props.pcaMetadata}
-                            ref={h2SettingsRef}
-                            setButtonDisabled={setButtonDisabled}
-                        />
-                    )}
-                    {pgrTypePCA === "tracker" && (
-                        <>
-                            <FormControl
-                                sx={{ minWidth: "100%" }}
-                                error={
-                                    validationErrors.categoryCombo !== undefined
-                                }
-                            >
-                                <Autocomplete
-                                    id="ccSelect"
-                                    disabled={pgrTypePCA !== "tracker"}
-                                    options={programCategoryCombos?.map(
-                                        (pcc) => ({
-                                            label: pcc.name,
-                                            id: pcc.id,
-                                        })
-                                    )}
-                                    sx={{ width: "100%" }}
-                                    renderInput={(params) => (
+                                                HNQIS 2.0{" "}
+                                                {hnqis2Metadata?.results?.version < H2_METADATA_VERSION && (
+                                                    <span
+                                                        style={{
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            marginLeft: "8px",
+                                                        }}
+                                                    >
+                                                        [Unavailable]{" "}
+                                                        <RemoveCircleOutlineIcon />
+                                                    </span>
+                                                )}
+                                            </MenuItem>
+                                        </Select>
+                                        <FormHelperText>
+                                            {validationErrors.pgrType}
+                                        </FormHelperText>
+                                    </FormControl>
+
+                                    <FormControl sx={{ minWidth: "65%" }}>
                                         <TextField
-                                            {...params}
-                                            error={
-                                                validationErrors.categoryCombo !==
-                                                undefined
-                                            }
-                                            label="Category Combination"
+                                            error={validationErrors.prefix !== undefined}
+                                            helperText={validationErrors.prefix || "Please Note: The Prefix will be applied to the Data Elements ONLY during the 'Validate & Save' process"}
+                                            margin="normal"
+                                            id="prefix"
+                                            label="Program Data Element Prefix (*)"
+                                            type="text"
+                                            fullWidth
                                             variant="standard"
-                                            margin="dense"
-                                            helperText={
-                                                validationErrors.categoryCombo
-                                            }
+                                            autoComplete="off"
+                                            inputProps={{ maxLength: MAX_PREFIX_LENGTH }}
+                                            value={dePrefix}
+                                            onChange={handleChangeDePrefix}
                                         />
-                                    )}
-                                    value={categoryCombo}
-                                    onChange={categoryComboChange}
-                                    getOptionLabel={(option) =>
-                                        option.label || ""
+                                    </FormControl>
+                                    <TextField
+                                        error={validationErrors.programName !== undefined}
+                                        helperText={validationErrors.programName}
+                                        margin="normal"
+                                        id="name"
+                                        label="Program Name (*)"
+                                        type="text"
+                                        fullWidth
+                                        variant="standard"
+                                        autoComplete="off"
+                                        inputProps={{
+                                            maxLength:
+                                                MAX_PROGRAM_NAME_LENGTH /*- dePrefix.length*/,
+                                        }}
+                                        value={programName}
+                                        onChange={handleChangeProgramName}
+                                    />
+                                    <TextField
+                                        error={validationErrors.shortName !== undefined}
+                                        helperText={validationErrors.shortName}
+                                        margin="normal"
+                                        id="shortName"
+                                        label="Program Short Name (*)"
+                                        type="text"
+                                        sx={{ width: "100%" }}
+                                        variant="standard"
+                                        autoComplete="off"
+                                        inputProps={{
+                                            maxLength:
+                                                MAX_SHORT_NAME_LENGTH /*- dePrefix.length*/,
+                                        }}
+                                        value={programShortName}
+                                        onChange={handleChangeProgramShortName}
+                                    />
+
+                                    <TextField
+                                        error={validationErrors.code !== undefined}
+                                        helperText={validationErrors.code}
+                                        margin="normal"
+                                        id="code"
+                                        label="Program Code"
+                                        type="text"
+                                        sx={{ width: "100%" }}
+                                        variant="standard"
+                                        autoComplete="off"
+                                        inputProps={{
+                                            maxLength:
+                                                MAX_SHORT_NAME_LENGTH /*- dePrefix.length*/,
+                                        }}
+                                        value={programCode}
+                                        onChange={handleChangeProgramCode}
+                                    />
+
+                                    {pgrTypePCA && pgrTypePCA !== '' && pgrTypePCA !== 'event' &&
+                                        <Autocomplete
+                                            id="tetSelect"
+                                            disabled={pgrTypePCA !== "tracker"}
+                                            options={
+                                                trackedEntityTypes?.map((tet) => ({
+                                                    label: tet.name,
+                                                    id: tet.id,
+                                                })) || [{ label: "", id: "" }]
+                                            }
+                                            sx={{ width: "100%" }}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    error={
+                                                        validationErrors.programTET !==
+                                                        undefined
+                                                    }
+                                                    label="Tracked Entity Type (*)"
+                                                    margin="normal"
+                                                    variant="standard"
+                                                    helperText={validationErrors.programTET}
+                                                />
+                                            )}
+                                            value={programTET}
+                                            onChange={programTETChange}
+                                            getOptionLabel={(option) => option.label || ""}
+                                            isOptionEqualToValue={(option, value) =>
+                                                option.id === value.id
+                                            }
+                                            defaultValue={""}
+                                        />
                                     }
-                                    isOptionEqualToValue={(option, value) =>
-                                        option.id === value.id
-                                    }
-                                    defaultValue={"default"}
-                                />
-                            </FormControl>
-                            <div style={{ marginTop: "1.5em" }}>
-                                <FormLabel
-                                    style={{
-                                        display: "inline-block",
-                                        marginBottom: "8px",
-                                    }}
-                                >
-                                    Program Tracked Entity Attributes
-                                </FormLabel>
-                                <Transfer
-                                    filterable
-                                    onChange={handleChangeTEAs}
-                                    options={programTEAs.available.map(
-                                        (tea) => ({
-                                            label: tea.name,
-                                            value: tea.id,
-                                        })
-                                    )}
-                                    selected={programTEAs.selected}
-                                    optionsWidth="48%"
-                                    selectedWidth="48%"
+                                    <StyleManager
+                                        icon={programIcon}
+                                        setIcon={setProgramIcon}
+                                        color={programColor}
+                                        setColor={setProgramColor}
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "end",
+                                            width: "100%",
+                                            minHeight: "5em",
+                                            marginTop: "1em",
+                                        }}
+                                    />
+
+                                </div>
+                            </div>
+                        </Slide>
+
+                        {/* HNQIS2 SETTINGS */}
+                        <Slide in={pgrTypePCA === 'hnqis' && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
+                            <div style={{ display: pgrTypePCA === 'hnqis' && activeStep === 1 ? 'inherit' : 'none' }}>
+                                <H2Setting
+                                    pcaMetadata={props.pcaMetadata}
+                                    ref={h2SettingsRef}
                                 />
                             </div>
-                        </>
-                    )}
+                        </Slide>
+                        {/* TRACKER PROGRAM SETTINGS */}
+                        <Slide in={(pgrTypePCA === 'tracker' || pgrTypePCA === 'event') && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
+                            <div style={{ display: ((pgrTypePCA === 'tracker' || pgrTypePCA === 'event') && activeStep === 1) ? 'inherit' : 'none' }}>
+                                <FormControl
+                                    sx={{ minWidth: "100%" }}
+                                    error={
+                                        validationErrors.categoryCombo !== undefined
+                                    }
+                                >
+                                    <Autocomplete
+                                        id="ccSelect"
+                                        disabled={(pgrTypePCA !== 'tracker' && pgrTypePCA !== 'event')}
+                                        options={programCategoryCombos?.map(
+                                            (pcc) => ({
+                                                label: pcc.name,
+                                                id: pcc.id,
+                                            })
+                                        )}
+                                        sx={{ width: "100%" }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                error={
+                                                    validationErrors.categoryCombo !==
+                                                    undefined
+                                                }
+                                                label="Category Combination"
+                                                variant="standard"
+                                                margin="dense"
+                                                helperText={
+                                                    validationErrors.categoryCombo
+                                                }
+                                            />
+                                        )}
+                                        value={categoryCombo}
+                                        onChange={categoryComboChange}
+                                        getOptionLabel={(option) =>
+                                            option.label || ""
+                                        }
+                                        isOptionEqualToValue={(option, value) =>
+                                            option.id === value.id
+                                        }
+                                        defaultValue={"default"}
+                                    />
+                                </FormControl>
+                                {pgrTypePCA === 'event' &&
+                                    <FormControl variant="standard" sx={{ width: '100%', marginTop: '1em' }}>
+                                        <InputLabel id="label-validationStrat">Validation Strategy (*)</InputLabel>
+                                        <Select
+                                            labelId="label-validationStrat"
+                                            id="validationStrat"
+                                            value={validationStrategy}
+                                            disabled={pgrTypePCA !== 'event'}
+                                            onChange={validationStrategyChange}
+                                            label="Validation Strategy (*)"
+                                            variant="standard"
+                                        >
+                                            <MenuItem value={"ON_COMPLETE"}>
+                                                On Complete
+                                            </MenuItem>
+                                            <MenuItem value={"ON_UPDATE_AND_INSERT"}>
+                                                On update and insert
+                                            </MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                }
+                                {pgrTypePCA === 'tracker' &&
+                                    <div style={{ marginTop: "1.5em", display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                        <FormLabel
+                                            style={{
+                                                display: "inline-block",
+                                                marginBottom: "8px",
+                                            }}
+                                        >
+                                            Program Tracked Entity Attributes
+                                        </FormLabel>
+                                        <Transfer
+                                            filterable
+                                            onChange={handleChangeTEAs}
+                                            options={programTEAs.available.map(
+                                                (tea) => ({
+                                                    label: tea.trackedEntityAttribute.name,
+                                                    value: tea.trackedEntityAttribute.id,
+                                                })
+                                            )}
+                                            selected={programTEAs.selected}
+                                            optionsWidth="48%"
+                                            selectedWidth="48%"
+                                        />
+
+                                    </div>
+                                }
+                            </div>
+                        </Slide>
+                        {/* TRACKED ENTITY ATTRIBUTES FORM */}
+                        {programTEAs.available.length > 0 &&
+                            <Slide in={pgrTypePCA === 'tracker' && activeStep === 2} direction={activeStep > previousStep ? 'left' : 'right'}>
+                                <div style={{ display: (pgrTypePCA === 'tracker' && activeStep === 2) ? 'inherit' : 'none' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', margin: '1rem 0', alignItems: 'center' }}>
+                                        <FormControlLabel
+                                            control={
+                                                <Switch
+                                                    checked={useSections}
+                                                    onChange={(e) => setUseSections(e.target.checked)}
+                                                    inputProps={{ 'aria-label': 'controlled' }}
+                                                />
+                                            }
+                                            label="Use Form Sections"
+                                        />
+                                        <div>
+                                            {useSections && <Button
+                                                variant='contained'
+
+                                                startIcon={<AddCircleOutlineIcon />}
+                                                onClick={() => { setInputModalOpened(true) }}
+                                            >Add new section</Button>}
+                                        </div>
+                                    </div>
+                                    <AttributesEditor
+                                        useSections={useSections}
+                                        teaOptions={programTEAs}
+                                        setTeaOptions={setProgramTEAs}
+                                        attributesFormSections={attributesFormSections}
+                                        setAttributesFormSections={setAttributesFormSections}
+                                        assignedAttributes={assignedAttributes}
+                                        setAssignedAttributes={setAssignedAttributes}
+                                    />
+                                </div>
+                            </Slide>
+                        }
+                    </div>
                 </DialogContent>
                 <DialogActions style={{ padding: "1em" }}>
                     <Button onClick={() => hideForm()} color="error">
@@ -985,8 +1326,33 @@ const ProgramNew = (props) => {
                     }
                 </DialogActions>
             </CustomMUIDialog>
+            {
+                inputModalOpened &&
+                <InputModal
+                    opened={inputModalOpened}
+                    title={'Form Section Name'}
+                    label={'Name'}
+                    value={''}
+                    onClose={() => setInputModalOpened(false)}
+                    onConfirm={(value) => {
+                        onAddNewSection(value)
+                        setInputModalOpened(false)
+                    }}
+                />
+            }
         </>
     );
 };
+
+ProgramNew.propTypes = {
+    data: PropTypes.object,
+    doSearch: PropTypes.func,
+    pcaMetadata: PropTypes.object,
+    programType: PropTypes.string,
+    programsRefetch: PropTypes.func,
+    readOnly: PropTypes.bool,
+    setNotification: PropTypes.func,
+    setShowProgramForm: PropTypes.func
+}
 
 export default ProgramNew;

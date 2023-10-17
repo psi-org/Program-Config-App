@@ -1,6 +1,6 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { DeepCopy } from '../../configs/Utils';
 import {useEffect} from "react";
+import { DeepCopy } from '../../utils/Utils.js';
 
 const sharingQuery = {
     results: {
@@ -20,8 +20,8 @@ const ObjectSharing = ({element, id, sharing}) => {
         data: ({ data }) => data
     }
 
-    const {loading, data} = useDataQuery(sharingQuery, { variables: {element: element, id: id}});
-    let metadataDM = useDataMutation(metadataMutation, {
+    const { data } = useDataQuery(sharingQuery, { variables: {element: element, id: id}});
+    const metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             console.error(err)
         }
@@ -51,10 +51,11 @@ const ObjectSharing = ({element, id, sharing}) => {
             });
             if (!metadataRequest.called) {
                 metadataRequest.mutate({data: payload}).then(response => {
-                    if (response?.status === "OK")
-                        console.log(`${element.toUpperCase()} Updated successfully`)
-                    else
-                        console.log(`Error while saving - ${element}`)
+                    if (response?.status === "OK"){
+                        console.log(`${element.toUpperCase()} Updated successfully`);
+                    } else{
+                        console.log(`Error while saving - ${element}`);
+                    }
                 });
             }
         }

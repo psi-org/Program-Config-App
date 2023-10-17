@@ -1,5 +1,5 @@
-import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
+import { styled } from '@mui/material/styles';
 
 const CustomMUIDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {

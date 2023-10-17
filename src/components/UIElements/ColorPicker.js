@@ -1,12 +1,13 @@
-import { useState } from "react"
-import {Button } from '@mui/material';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import FormatColorResetIcon from '@mui/icons-material/FormatColorReset';
+import {Button } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import PropTypes from 'prop-types';
+import React, { useState } from "react"
 import { ChromePicker } from 'react-color';
 
 
-const ColorPicker = props => {
+const ColorPicker = (props) => {
 
     const [displayColorPicker,setDisplayColorPicker] = useState(false)
 
@@ -21,13 +22,18 @@ const ColorPicker = props => {
             </IconButton>
         }   
         { displayColorPicker && 
-            <div style={{position: 'absolute',zIndex: '2', right:'0'}}>
+            <div style={{position: 'absolute',zIndex: '2', right:'50%', bottom:'100%'}}>
                 <div style={{position: 'fixed',top: '0px',right: '0px',bottom: '0px',left: '0px'} } onClick={()=>setDisplayColorPicker(false)}/>
-                <ChromePicker color={props.parentColor} onChangeComplete={(color,event)=>props.setParentColor(color.hex)} style={{width:'5rem'}} />
+                <ChromePicker color={props.parentColor} onChangeComplete={(color)=>props.setParentColor(color.hex)} style={{width:'5rem'}} />
             </div> 
         }
     </div>
     )
+}
+
+ColorPicker.propTypes = {
+    parentColor: PropTypes.string,
+    setParentColor: PropTypes.func
 }
 
 export default ColorPicker
