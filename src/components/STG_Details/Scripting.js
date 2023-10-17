@@ -1,6 +1,6 @@
-import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND } from "../../configs/Constants";
-import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../configs/AnalyticsTemplates";
-import { DeepCopy } from "../../configs/Utils";
+import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../configs/AnalyticsTemplates.js";
+import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND } from "../../configs/Constants.js";
+import { DeepCopy, padValue } from "../../utils/Utils.js";
 
 /**
  * 
@@ -9,9 +9,9 @@ import { DeepCopy } from "../../configs/Utils";
  * @description Allocates each feadback order / composite score in an Object (tree structure) that stores all questions for each leaf
  */
 const locateInTree = (question, branch) => {
-    let subLevels = question.subLevels.length;
+    const subLevels = question.subLevels.length;
     if (subLevels > 1) {
-        let currentOrder = question.subLevels.shift();
+        const currentOrder = question.subLevels.shift();
         let subOrder;
         subOrder = branch.childs.find(s => s.order == currentOrder);
         if (!subOrder) {
@@ -34,16 +34,16 @@ const locateInTree = (question, branch) => {
  * @description: Create score expressions for each scoreMap level (composite score)
  */
 const buildScores = (branch) => {
-    let numC = [];
-    let numN = [];
-    let denC = [];
-    let denN = [];
+    const numC = [];
+    const numN = [];
+    const denC = [];
+    const denN = [];
 
     if (branch.questions) {
         branch.questions.forEach((a) => {
             if (a.prgVarName) {
-                let num = `#{${a.prgVarName}}*${a.scoreNum}`;
-                let den = `d2:countIfZeroPos('${a.prgVarName}')*${a.scoreDen}`;
+                const num = `#{${a.prgVarName}}*${a.scoreNum}`;
+                const den = `d2:countIfZeroPos('${a.prgVarName}')*${a.scoreDen}`;
                 if (a.isCritical == "Yes") {
                     numC.push(num);
                     denC.push(den);
@@ -60,7 +60,7 @@ const buildScores = (branch) => {
         return [branch.numC, branch.denC, branch.numN, branch.denN];
     } else {
         branch.childs.forEach(subBranch => {
-            let res = buildScores(subBranch);
+            const res = buildScores(subBranch);
             numC.push(res[0]);
             denC.push(res[1]);
             numN.push(res[2]);
@@ -95,9 +95,9 @@ const buildScores = (branch) => {
 const getScorePR = (composite, branch, programId, stageId, uidPool) => {
 
     //      Breakpoint: No more IDs available
-    if (uidPool.length == 0) return { scorePRs: [], scorePRAs: [] }
+    if (uidPool.length == 0) { return { scorePRs: [], scorePRAs: [] } }
 
-    let currentOrder = composite.subLevels.shift();
+    const currentOrder = composite.subLevels.shift();
     if (currentOrder && composite.subLevels.length >= 0) {
 
         branch = branch.childs.find(s => s.order == currentOrder);
@@ -111,11 +111,11 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
              */
 
             let programRuleUid, actionId, name, data;
-            let programRuleActionType = "ASSIGN";
+            const programRuleActionType = "ASSIGN";
 
             // STEP 1 -
-            let num = [branch.numC, branch.numN].filter(n => n != "").join("+");
-            let den = [branch.denC, branch.denN].filter(n => n != "").join("+");
+            const num = [branch.numC, branch.numN].filter(n => n != "").join("+");
+            const den = [branch.denC, branch.denN].filter(n => n != "").join("+");
             data = `(((${num}) * 100) / (${den}))*100`;
             name = `PR - Calculated - ${composite.feedbackOrder} ${composite.formName}`;
             programRuleUid = uidPool.shift();
@@ -168,12 +168,12 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
             return { scorePRs: [pr_s1, pr_s2], scorePRAs: [pra_s1, pra_s2] }
 
         } else { // Composite Score DOESN'T HAVE scoring questions
-            let data = `''`;
-            let name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
-            let programRuleActionType = "ASSIGN";
+            const data = `''`;
+            const name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
+            const programRuleActionType = "ASSIGN";
 
-            let programRuleUid = uidPool.shift();
-            let actionId = uidPool.shift();
+            const programRuleUid = uidPool.shift();
+            const actionId = uidPool.shift();
 
             const pr = {
                 id: programRuleUid,
@@ -206,8 +206,8 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
  * @returns {Object} : { rules : <Array> , actions : <Array> }
  */
 const buildCriticalScore = (branch, stageId, programId, uidPool) => {
-    let num = (branch.numC != "" ? branch.numC : undefined);
-    let den = (branch.denC != "" ? branch.denC : undefined);
+    const num = (branch.numC != "" ? branch.numC : undefined);
+    const den = (branch.denC != "" ? branch.denC : undefined);
 
     /**
      * Two Steps Assign
@@ -215,8 +215,8 @@ const buildCriticalScore = (branch, stageId, programId, uidPool) => {
      * 2- From Calculated Value to Data Element
      */
 
-    let programRuleActionType = "ASSIGN";
-    let programRuleUid, actionId, pr, name, data, pra;
+    const programRuleActionType = "ASSIGN";
+    let programRuleUid, actionId, name, data;
 
     // STEP 1- 
     programRuleUid = uidPool.shift();
@@ -278,8 +278,8 @@ const buildCriticalScore = (branch, stageId, programId, uidPool) => {
  * @returns {Object}: { rules : <Array> , actions : <Array> }
  */
 const buildNonCriticalScore = (branch, stageId, programId, uidPool) => {
-    let num = (branch.numN != "" ? branch.numN : undefined);
-    let den = (branch.denN != "" ? branch.denN : undefined);
+    const num = (branch.numN != "" ? branch.numN : undefined);
+    const den = (branch.denN != "" ? branch.denN : undefined);
 
     /**
      * Two Steps Assign
@@ -287,8 +287,8 @@ const buildNonCriticalScore = (branch, stageId, programId, uidPool) => {
      * 2- From Calculated Value to Data Element
      */
 
-    let programRuleActionType = "ASSIGN";
-    let programRuleUid, actionId, pr, name, data, pra;
+    const programRuleActionType = "ASSIGN";
+    let programRuleUid, actionId, name, data;
 
     // STEP 1- 
     programRuleUid = uidPool.shift();
@@ -349,7 +349,7 @@ const buildNonCriticalScore = (branch, stageId, programId, uidPool) => {
  * @returns {Object} : { competencyRules : <Array> , competencyActions : <Array> }
  */
 const buildCompetencyRules = (programId, stageId, uidPool) => {
-    let competencyRules = [
+    const competencyRules = [
         {
             name: "PR - Assign Competency - 'Competent but needs improvement'",
             condition: "#{_criticalNewest} == 100 && (#{_NoncriticalNewest}  <  89.9  &&  #{_NoncriticalNewest} >= 79.9)",
@@ -391,20 +391,20 @@ const buildCompetencyRules = (programId, stageId, uidPool) => {
         }
     ];
 
-    let competencyActions = [];
+    const competencyActions = [];
 
     competencyRules.forEach(rule => {
-        let programRuleUid = uidPool.shift();
+        const programRuleUid = uidPool.shift();
 
         rule.id = programRuleUid;
         rule.program.id = programId;
         rule.programStage = { id: stageId }
 
-        let actions = rule.programRuleActions;
+        const actions = rule.programRuleActions;
         rule.programRuleActions = [];
 
         actions.forEach(action => {
-            let actionId = uidPool.shift();
+            const actionId = uidPool.shift();
             action.id = actionId;
             action.programRule = { id: programRuleUid };
             competencyActions.push(action);
@@ -417,9 +417,9 @@ const buildCompetencyRules = (programId, stageId, uidPool) => {
 
 const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass = "Yes", healthArea) => {
 
-    let attributeActions = [];
+    const attributeActions = [];
 
-    let attributeRules = [
+    const attributeRules = [
         {
             name: "PR - Attributes - Assign Health Area",
             displayName: "PR - Assign Health Area",
@@ -502,34 +502,36 @@ const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass =
         }
     ];
 
-    if (useCompetencyClass == "Yes") attributeRules.push(
-        {
-            name: "PR - Attributes - Assign Competency",
-            displayName: "PR - Attributes - Assign Competency",
-            condition: "d2:hasValue('_competencyNewest')",
-            program: { id: "" },
-            description: "_Scripted",
-            programRuleActions: [
-                {
-                    data: "#{_competencyNewest}",
-                    programRuleActionType: "ASSIGN",
-                    trackedEntityAttribute: { id: "ulU9KKgSLYe" }
-                }
-            ]
-        }
-    );
+    if (useCompetencyClass == "Yes") {
+        attributeRules.push(
+            {
+                name: "PR - Attributes - Assign Competency",
+                displayName: "PR - Attributes - Assign Competency",
+                condition: "d2:hasValue('_competencyNewest')",
+                program: { id: "" },
+                description: "_Scripted",
+                programRuleActions: [
+                    {
+                        data: "#{_competencyNewest}",
+                        programRuleActionType: "ASSIGN",
+                        trackedEntityAttribute: { id: "ulU9KKgSLYe" }
+                    }
+                ]
+            }
+        );
+    }
 
     attributeRules.forEach(rule => {
-        let programRuleUid = uidPool.shift();
+        const programRuleUid = uidPool.shift();
 
-        let actions = rule.programRuleActions;
+        const actions = rule.programRuleActions;
         rule.programRuleActions = [];
 
         rule.id = programRuleUid;
         rule.program.id = programId;
 
         actions.forEach(action => {
-            let actionId = uidPool.shift();
+            const actionId = uidPool.shift();
             action.id = actionId;
             action.programRule = { id: programRuleUid };
             attributeActions.push(action);
@@ -546,8 +548,8 @@ const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass =
  * @returns {Object} uniqueScores:Boolean , compositeScores:<Array>, duplicatedScores:<Array>
  */
 export const checkScores = (scores) => {
-    let compositeScores = scores.map(score => score.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value);
-    let duplicatedScores = compositeScores.filter((composite, index) => compositeScores.indexOf(composite) !== index);
+    const compositeScores = scores.map(score => score.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value);
+    const duplicatedScores = compositeScores.filter((composite, index) => compositeScores.indexOf(composite) !== index);
     return {
         uniqueScores: duplicatedScores.length == 0,
         compositeScores,
@@ -559,7 +561,7 @@ export const readQuestionComposites = (sections) => {
     var questionCompositeScores = [];
     sections.forEach(section => {
         section.dataElements.forEach(de => {
-            let composite = de.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value?.split('.').slice(0, -1)
+            const composite = de.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value?.split('.').slice(0, -1)
             if (composite) {
 
                 composite.map((v, i) =>
@@ -567,7 +569,7 @@ export const readQuestionComposites = (sections) => {
                     composite.slice(0, i + 1).join('.')
                 ).forEach(v => {
                     // Check if already included in the Array
-                    if (!questionCompositeScores.includes(v)) questionCompositeScores.push(v)
+                    if (!questionCompositeScores.includes(v)) { questionCompositeScores.push(v) }
                 });
             }
         })
@@ -575,18 +577,17 @@ export const readQuestionComposites = (sections) => {
     return questionCompositeScores.sort()
 }
 
-const hideShowLogic = (hideShowGroup, programId, uidPool) => {
+export const hideShowLogic = (hideShowGroup, programId, uidPool) => {
     var hideShowRules = [], hideShowActions = [];
 
     Object.keys(hideShowGroup).forEach(parentCode => {
         Object.keys(hideShowGroup[parentCode]).forEach(answer => {
 
-            let conditionValue
             // SHOW/HIDE WHEN....IS...
-            let programRuleUid = uidPool.shift();
-            let name = `PR - Show/Hide - Show when ${parentCode} is ${answer}`;
+            const programRuleUid = uidPool.shift();
+            const name = `PR - Show/Hide - Show when ${parentCode} is ${answer}`;
 
-            conditionValue = ["0", "1"].includes(String(answer)) ? answer : `"${answer.replaceAll("'", "")}"`
+            const conditionValue = ["0", "1"].includes(String(answer)) ? answer : `"${answer.replaceAll("'", "")}"`
 
             const pr = {
                 id: programRuleUid,
@@ -598,8 +599,8 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
             };
 
             // MAKE FIELD MANDATORY WHEN....IS...
-            let mfm_uid = uidPool.shift();
-            let mfm_name = `PR - Make Field Mandatory - Make mandatory when ${parentCode} is ${answer}`;
+            const mfm_uid = uidPool.shift();
+            const mfm_name = `PR - Make Field Mandatory - Make mandatory when ${parentCode} is ${answer}`;
 
             const pr_mfm = {
                 id: mfm_uid,
@@ -612,7 +613,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
 
             hideShowGroup[parentCode][answer].forEach(de => {
                 // Show/Hide Logic
-                let actionId = uidPool.shift();
+                const actionId = uidPool.shift();
 
                 const pra = {
                     id: actionId,
@@ -627,7 +628,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
 
                 // Make mandatory Logic
                 if (de.mandatory == "Yes") {
-                    let mandatoryActionId = uidPool.shift();
+                    const mandatoryActionId = uidPool.shift();
                     const pra_mandatory = {
                         id: mandatoryActionId,
                         programRuleActionType: "SETMANDATORYFIELD",
@@ -641,7 +642,7 @@ const hideShowLogic = (hideShowGroup, programId, uidPool) => {
             });
 
             hideShowRules.push(pr);
-            if (pr_mfm.programRuleActions.length > 0) hideShowRules.push(pr_mfm);
+            if (pr_mfm.programRuleActions.length > 0) { hideShowRules.push(pr_mfm) }
 
         });
     });
@@ -653,7 +654,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
     var labelsRules = [], labelsActions = [];
 
     hideShowLabels.forEach(hsRule => {
-        let programRuleUid = uidPool.shift();
+        const programRuleUid = uidPool.shift();
 
         var pr = {
             id: programRuleUid,
@@ -669,13 +670,13 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
             pr.condition = `'true'`;
         } else {
             pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
-            let conditionValue = ["0", "1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'", "")}"`
+            const conditionValue = ["0", "1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'", "")}"`
             pr.condition = `d2:hasValue(#{${hsRule.parent}}) && (#{${hsRule.parent}}==${conditionValue})`;
         }
 
         hsRule.actions.forEach(action => {
 
-            let actionId = uidPool.shift();
+            const actionId = uidPool.shift();
             const pra = {
                 id: actionId,
                 programRuleActionType: "ASSIGN",
@@ -707,13 +708,13 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
     // const scores = sections.find(s => s.name == "Scores");
     // sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
 
-    let programRuleVariables = [];
+    const programRuleVariables = [];
 
     // Data Elements Variables
     sections.forEach((section, secIdx) => {
         section.dataElements.forEach((dataElement, deIdx) => {
             programRuleVariables.push({
-                name: `_S${secIdx + 1}Q${deIdx + 1}`,
+                name: `_S${padValue(secIdx + 1,"00")}Q${padValue(deIdx + 1,"000")}`,
                 programRuleVariableSourceType: "DATAELEMENT_CURRENT_EVENT",
                 useCodeForOptionSet: dataElement.optionSet?.id ? true : false,
                 program: { id: programId },
@@ -733,7 +734,7 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
     });
 
     // Critical Steps Calculations
-    let criticalVariables = [
+    const criticalVariables = [
         {
             name: "_NoncriticalNewest",
             programRuleVariableSourceType: "DATAELEMENT_NEWEST_EVENT_PROGRAM",
@@ -761,7 +762,7 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
     ];
 
     // Competency Class Variable  
-    if (useCompetencyClass == "Yes")
+    if (useCompetencyClass == "Yes") {
         criticalVariables.push(
             {
                 name: "_competencyNewest",
@@ -771,7 +772,7 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
                 dataElement: { id: "NAaHST5ZDTE" }
             }
         );
-
+    }
     return programRuleVariables.concat(criticalVariables)
 }
 
@@ -783,21 +784,21 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
     var hideShowLabels = [{ parent: 'None', condition: 'true', actions: [] }];
 
     const varNameRef = sections.map(sec => sec.dataElements.map(de => {
-        let metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || "{}")
+        const metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || "{}")
         return { id: de.id, varName: metadata.varName }
     })).flat();
 
     //Create Tree Object for Scoring PRs
     sections.forEach((section, secIdx) => {
         section.dataElements.forEach((dataElement, deIdx) => {
-            let order = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
-            //let isCritical = dataElement.attributeValues.find(att => att.attribute.id == CRITICAL_QUESTION)?.value == "Yes";
-            let metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
+            const order = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
+            
+            const metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
             if (order && metadata.scoreNum && metadata.scoreDen) {
                 locateInTree(
                     {
                         subLevels: order.split("."),
-                        prgVarName: `_S${secIdx + 1}Q${deIdx + 1}`,
+                        prgVarName: `_S${padValue(secIdx + 1,"00")}Q${padValue(deIdx + 1,"000")}`,
                         scoreNum: metadata.scoreNum,
                         scoreDen: metadata.scoreDen,
                         isCritical: metadata.isCritical
@@ -808,8 +809,8 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
 
             // Get parents hide/show logic
             if (metadata.parentQuestion !== undefined && metadata.parentValue !== undefined) {
-                let parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
-                let parentValue = String(metadata.parentValue);
+                const parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
+                const parentValue = String(metadata.parentValue);
 
                 !hideShowGroup[parentQuestion] ? hideShowGroup[parentQuestion] = {} : undefined;
                 !hideShowGroup[parentQuestion][parentValue] ? hideShowGroup[parentQuestion][parentValue] = [] : undefined;
@@ -835,18 +836,18 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
     });
 
     //Define Global Scores
-    const globalScores = buildScores(scoreMap);
+    buildScores(scoreMap);
 
     // Request Program Rules for Composite Scores
     compositeValues.forEach(score => {
-        let compositeData = {
+        const compositeData = {
             subLevels: score.split('.'),
             feedbackOrder: score,
             formName: scoresMapping[score].formName,
             prgVarName: '_CS' + score,
             uid: scoresMapping[score].id
         }
-        let { scorePRs, scorePRAs } = getScorePR(compositeData, scoreMap, programId, stageId, uidPool);
+        const { scorePRs, scorePRAs } = getScorePR(compositeData, scoreMap, programId, stageId, uidPool);
         programRules = programRules.concat(scorePRs);
         programRuleActions = programRuleActions.concat(scorePRAs);
     });
@@ -892,7 +893,7 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
     return { programRules, programRuleActions }
 }
 
-export const buildProgramIndicators = (programId, programShortName, uidPool, useCompetency, sharingSettings) => {
+export const buildProgramIndicators = (programId, programShortName, uidPool, useCompetency, sharingSettings, PIAggregationType) => {
 
     // This sectin is for the local analytics
     const indicatorValues = useCompetency === "Yes" ? [
@@ -906,10 +907,10 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
     ];
     const nameComp = useCompetency === "Yes" ? "Competency" : "QoC";
 
-    let indicatorIDs = []
+    const indicatorIDs = []
 
     let programIndicators = indicatorValues.map(value => {
-        let result = DeepCopy(ProgramIndicatorTemplate)
+        const result = DeepCopy(ProgramIndicatorTemplate)
         result.id = uidPool.shift()
         indicatorIDs.push(result.id)
         result.name = programShortName + " - " + nameComp + " - " + value.name
@@ -924,7 +925,7 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
 
     // Global  Analytics - Number of Assesments & Global Score
 
-    let AnalyticNoA = DeepCopy(ProgramIndicatorTemplateNoA)
+    const AnalyticNoA = DeepCopy(ProgramIndicatorTemplateNoA)
     AnalyticNoA.id = uidPool.shift()
     indicatorIDs.push(AnalyticNoA.id)
     AnalyticNoA.name = programShortName + ' - Number of Assessments'
@@ -935,7 +936,7 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
     AnalyticNoA.analyticsPeriodBoundaries[1].sharing = sharingSettings
 
 
-    let AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
+    const AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
     AnalyticGS.id = uidPool.shift()
     indicatorIDs.push(AnalyticGS.id)
     AnalyticGS.name = programShortName + ' - Global Score'
@@ -944,6 +945,7 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
     AnalyticGS.sharing = sharingSettings
     AnalyticGS.analyticsPeriodBoundaries[0].sharing = sharingSettings
     AnalyticGS.analyticsPeriodBoundaries[1].sharing = sharingSettings
+    AnalyticGS.aggregationType = (PIAggregationType && PIAggregationType !== 'AVERAGE') ? PIAggregationType : 'AVERAGE'
 
     programIndicators = programIndicators.concat([AnalyticNoA, AnalyticGS])
 
@@ -952,16 +954,16 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
 }
 
 export const buildH2BaseVisualizations = (programId, programShortName, indicatorIDs, uidPool, useCompetency, currentDashboardId, userOU, ouRoot, stageId, sharingSettings, visualizationLevel, mapLevel) => {
-    let series = []
-    let dataDimensionItems = []
-    let visualizations = []
-    let eventReports = []
-    let androidSettingsVisualizations = []
-    let maps = []
-    let dashboardItems = []
-    let dashboards = []
+    const series = []
+    const dataDimensionItems = []
+    const visualizations = []
+    const eventReports = []
+    const androidSettingsVisualizations = []
+    const maps = []
+    const dashboardItems = []
+    const dashboards = []
 
-    let columnDimensions = []
+    const columnDimensions = []
     columnDimensions[0] = "pe"
     columnDimensions[1] = "ou"
     columnDimensions[2] = GLOBAL_SCORE_ATTRIBUTE
@@ -982,7 +984,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     })
 
     //Competency Classes Pie Chart - (Last 6 months)
-    let chart1 = DeepCopy(compLastSixMonthsPie)
+    const chart1 = DeepCopy(compLastSixMonthsPie)
     chart1.id = uidPool.shift()
     chart1.name = programShortName + " - " + nameComp + " Pie Chart - (Last 6 months)"
     chart1.code = programId + "_Scripted2"
@@ -998,7 +1000,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     })
 
     //Competency Classes - (Last 6 months by Org Units)
-    let table1 = DeepCopy(compLastSixMonthsByOUTable)
+    const table1 = DeepCopy(compLastSixMonthsByOUTable)
     table1.id = uidPool.shift()
     table1.name = programShortName + " - " + nameComp + " - (Last 6 months by Org Units)"
     table1.code = programId + "_Scripted1"
@@ -1014,7 +1016,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     })
 
     //Competency Classes - (Last 6 months)
-    let table2 = DeepCopy(compLastSixMonthsTable)
+    const table2 = DeepCopy(compLastSixMonthsTable)
     table2.id = uidPool.shift()
     table2.name = programShortName + " - " + nameComp + " - (Last 6 months)"
     table2.code = programId + "_Scripted3"
@@ -1030,7 +1032,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     })
 
     //! Average Score by District from last 12 months
-    let avergeScorebyTable = DeepCopy(AverageScoreByDistrictByPivotTable)
+    const avergeScorebyTable = DeepCopy(AverageScoreByDistrictByPivotTable)
     avergeScorebyTable.id = uidPool.shift()
     avergeScorebyTable.name = programShortName + " - Average Score by District from last 12 months"
     avergeScorebyTable.code = programId + "_Scripted4"
@@ -1043,7 +1045,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     avergeScorebyTable.legendSet.id = VISUALIZATIONS_LEGEND
     visualizations.push(avergeScorebyTable)
     // Dashboard - Tables
-    let avergeScorebyTableDash1 = DeepCopy(dashVisualization)
+    const avergeScorebyTableDash1 = DeepCopy(dashVisualization)
     avergeScorebyTableDash1.id = uidPool.shift()
     avergeScorebyTableDash1.type = "REPORT_TABLE"
     avergeScorebyTableDash1.sharing = sharingSettings
@@ -1051,7 +1053,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     dashboardItems.push(avergeScorebyTableDash1)
 
     //!Average Global Score by checklist from last 12 months
-    let AverageGlobalScorebyColumn = DeepCopy(AverageGlobalScoreByColumn)
+    const AverageGlobalScorebyColumn = DeepCopy(AverageGlobalScoreByColumn)
     AverageGlobalScorebyColumn.id = uidPool.shift()
     AverageGlobalScorebyColumn.name = programShortName + " - Average Global Score by checklist from last 12 months"
     AverageGlobalScorebyColumn.code = programId + "_Scripted5"
@@ -1062,7 +1064,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     AverageGlobalScorebyColumn.organisationUnits[0].id = ouRoot
     visualizations.push(AverageGlobalScorebyColumn)
     // Dashboard - Chart
-    let avergeScorebyChartDash1 = DeepCopy(dashVisualization)
+    const avergeScorebyChartDash1 = DeepCopy(dashVisualization)
     avergeScorebyChartDash1.id = uidPool.shift()
     avergeScorebyChartDash1.sharing = sharingSettings
     avergeScorebyChartDash1.type = "CHART"
@@ -1070,7 +1072,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     dashboardItems.push(avergeScorebyChartDash1)
 
     //!Number and Percentage of Assessment by Competency Class (last 4 quarters)
-    let AssessmentByCompetencybyColumn = DeepCopy(AssessmentByCompetencyByColumn)
+    const AssessmentByCompetencybyColumn = DeepCopy(AssessmentByCompetencyByColumn)
     AssessmentByCompetencybyColumn.id = uidPool.shift()
     AssessmentByCompetencybyColumn.name = programShortName + " - Number and Percentage of Assessments by Competency Class (last 4 quarters)"
     AssessmentByCompetencybyColumn.code = programId + "_Scripted6"
@@ -1082,7 +1084,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     AssessmentByCompetencybyColumn.organisationUnits[0].id = ouRoot
     visualizations.push(AssessmentByCompetencybyColumn)
     // Dashboard - Chart
-    let avergeScorebyChartDash2 = DeepCopy(dashVisualization)
+    const avergeScorebyChartDash2 = DeepCopy(dashVisualization)
     avergeScorebyChartDash2.id = uidPool.shift()
     avergeScorebyChartDash2.type = "CHART"
     avergeScorebyChartDash2.sharing = sharingSettings
@@ -1090,7 +1092,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     dashboardItems.push(avergeScorebyChartDash2)
 
     //! Number of Assessment by checklist (last 12 months)
-    let NumberOfAssessmentbyTable = DeepCopy(NumberOfAssessmentByPivotTable)
+    const NumberOfAssessmentbyTable = DeepCopy(NumberOfAssessmentByPivotTable)
     NumberOfAssessmentbyTable.id = uidPool.shift()
     NumberOfAssessmentbyTable.name = programShortName + " - Number of Assessments by checklist (last 12 months)"
     NumberOfAssessmentbyTable.code = programId + "_Scripted7"
@@ -1102,7 +1104,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     NumberOfAssessmentbyTable.organisationUnits[0].id = ouRoot
     visualizations.push(NumberOfAssessmentbyTable)
     // Dashboard - Tables
-    let avergeScorebyTableDash2 = DeepCopy(dashVisualization)
+    const avergeScorebyTableDash2 = DeepCopy(dashVisualization)
     avergeScorebyTableDash2.id = uidPool.shift()
     avergeScorebyTableDash2.type = "REPORT_TABLE"
     avergeScorebyTableDash2.sharing = sharingSettings
@@ -1110,7 +1112,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     dashboardItems.push(avergeScorebyTableDash2)
 
     //! Global Score Map
-    let GlobalScorebyMap = DeepCopy(GlobalScoreByMap)
+    const GlobalScorebyMap = DeepCopy(GlobalScoreByMap)
     GlobalScorebyMap.id = uidPool.shift()
     GlobalScorebyMap.name = programShortName + " - Global Score Map"
     GlobalScorebyMap.code = programId + "_Scripted8"
@@ -1127,7 +1129,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     GlobalScorebyMap.mapViews[1].legendSet.id = VISUALIZATIONS_LEGEND
     maps.push(GlobalScorebyMap)
     //Dashboard - Map
-    let GlobalScorebyMap1 = DeepCopy(dashMap)
+    const GlobalScorebyMap1 = DeepCopy(dashMap)
     GlobalScorebyMap1.id = uidPool.shift()
     GlobalScorebyMap1.type = "MAP"
     GlobalScorebyMap1.sharing = sharingSettings
@@ -1135,7 +1137,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     dashboardItems.push(GlobalScorebyMap1)
 
     //! Global Score Line List    
-    let LineListScore = DeepCopy(LineListGlobalScore)
+    const LineListScore = DeepCopy(LineListGlobalScore)
     LineListScore.id = uidPool.shift()
     LineListScore.name = programShortName + " - Global Score"
     LineListScore.code = programId + "_Scripted9"
@@ -1151,7 +1153,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     LineListScore.organisationUnitLevels = [visualizationLevel]
     eventReports.push(LineListScore)
     //Dashboard - Event Report
-    let GlobalScorebyEventReport1 = DeepCopy(dashEventReport)
+    const GlobalScorebyEventReport1 = DeepCopy(dashEventReport)
     GlobalScorebyEventReport1.id = uidPool.shift()
     GlobalScorebyEventReport1.type = "EVENT_REPORT"
     GlobalScorebyEventReport1.sharing = sharingSettings
@@ -1159,7 +1161,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     dashboardItems.push(GlobalScorebyEventReport1)
 
     //!Dashboard
-    let dashboardsGA = DeepCopy(dashboardsTemplate)
+    const dashboardsGA = DeepCopy(dashboardsTemplate)
     dashboardsGA.id = currentDashboardId || uidPool.shift()
     dashboardsGA.name = programShortName
     dashboardsGA.code = programId

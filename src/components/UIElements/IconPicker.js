@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react"
 import { useDataQuery } from "@dhis2/app-runtime";
-
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import LayersClearIcon from '@mui/icons-material/LayersClear';
-
+import { IconButton } from "@mui/material";
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import CustomMUIDialog from './CustomMUIDialog'
-import CustomMUIDialogTitle from './CustomMUIDialogTitle'
 import TextField from '@mui/material/TextField';
-import { IconButton } from "@mui/material";
+import PropTypes from 'prop-types';
+import React, { useState, useEffect } from "react"
+import CustomMUIDialog from './CustomMUIDialog.js'
+import CustomMUIDialogTitle from './CustomMUIDialogTitle.js'
 
 const queryIcons = {
     results: {
@@ -30,7 +29,7 @@ const IconPicker = ({parentIcon, setParentIcon}) => {
 
     const [iconFilterText, setIconFilterText] = useState('')
     const [iconFilter, setIconFilter] = useState('')
-    const { loading, error, data, refetch: fetchIcons } = useDataQuery(queryIcons, { lazy: true });
+    const { refetch: fetchIcons } = useDataQuery(queryIcons, { lazy: true });
 
     const filterTextChange = data => {
         setIconFilterText(data.target.value)
@@ -38,7 +37,7 @@ const IconPicker = ({parentIcon, setParentIcon}) => {
 
     const displayIcons = () =>{
         setSelectedIcon(parentIcon || '')
-        if(!iconsList)
+        if(!iconsList){
             fetchIcons().then(data => {
                 if (data?.results) {
                     setIconsList(data.results.sort(( a, b ) => {
@@ -47,7 +46,9 @@ const IconPicker = ({parentIcon, setParentIcon}) => {
                     setShowModal(true)
                 }
             })
-        else setShowModal(true)
+        } else {
+            setShowModal(true)
+        }
     }
 
     useEffect(() => {
@@ -55,7 +56,7 @@ const IconPicker = ({parentIcon, setParentIcon}) => {
     }, [iconsList])
     
     useEffect(() => {
-        if(iconsList) filterIcons()
+        if (iconsList) { filterIcons() }
     }, [iconFilter, iconFilterText])
 
     const filterIcons = () =>{
@@ -136,6 +137,11 @@ const IconPicker = ({parentIcon, setParentIcon}) => {
             </CustomMUIDialog>
         }
     </>
+}
+
+IconPicker.propTypes = {
+    parentIcon: PropTypes.string,
+    setParentIcon: PropTypes.func
 }
 
 export default IconPicker;

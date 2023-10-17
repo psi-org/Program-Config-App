@@ -1,11 +1,11 @@
-import LoadingButton from "@mui/lab/LoadingButton";
-import { NoticeBox } from "@dhis2/ui";
 import { useDataMutation, useDataQuery } from '@dhis2/app-runtime'
-import { useState } from "react";
+import { NoticeBox } from "@dhis2/ui";
 import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
-import metadataPackage from './pcaMetadataPackage.json'
-import {NAMESPACE,PCA_METADATA_VERSION,DATASTORE_PCA_METADATA} from '../../configs/Constants'
-import { parseErrorsUL } from "../../configs/Utils";
+import LoadingButton from "@mui/lab/LoadingButton";
+import React, { useState } from "react";
+import {NAMESPACE,PCA_METADATA_VERSION,DATASTORE_PCA_METADATA} from '../../configs/Constants.js'
+import metadataPackage from '../../configs/pcaMetadataPackage.json'
+import { parseErrorsUL } from "../../utils/Utils.js";
 
 const metadataMutation = {
     resource: 'metadata',
@@ -33,7 +33,7 @@ const dataStoreMutationUpdate = {
 
 const MetadataErrorPage = () => {
 
-    let metadataDM = useDataMutation(metadataMutation, {
+    const  metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
             setSentData(false);
             setError(err.details)
@@ -74,14 +74,14 @@ const MetadataErrorPage = () => {
                 setError(response)
             } else {
                 //Success
-                let dsData = {
+                const  dsData = {
                     version:PCA_METADATA_VERSION,
                     date: new Date()
                 }
-                let sendToDataStore = !pcaMetadataData?.results ? dataStoreCreate : dataStoreUpdate
+                const sendToDataStore = !pcaMetadataData?.results ? dataStoreCreate : dataStoreUpdate;
                 sendToDataStore({data:dsData}).then(res => {
-                    if(res.status!= 'OK') setError(res)
-                    else window.location.reload()
+                    if (res.status != 'OK') { setError(res) }
+                    else { window.location.reload() }
                 })
                 
             }
@@ -99,7 +99,7 @@ const MetadataErrorPage = () => {
             <div className="wrapper">
                 <div style={{width: '500px', margin: 'auto', display: 'flex', flexDirection:'column', paddingTop: '1em'}}>
                     {!error && <NoticeBox title="Missing Required Metadata">
-                        <p>The server lacks the necessary Metadata package needed to work correctly.</p>
+                        <p>The server lacks the necessary Metadata package required to work correctly.</p>
                     </NoticeBox>}
 
                     {!error && <LoadingButton

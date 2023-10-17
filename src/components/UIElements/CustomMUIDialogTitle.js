@@ -1,7 +1,8 @@
+import CloseIcon from '@mui/icons-material/Close';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 const CustomMUIDialogTitle = (props) => {
     const { children, onClose, ...other } = props;
@@ -29,7 +30,7 @@ const CustomMUIDialogTitle = (props) => {
 
 CustomMUIDialogTitle.propTypes = {
     children: PropTypes.node,
-    onClose: PropTypes.func.isRequired,
+    onClose: PropTypes.func,
 };
 
 export default CustomMUIDialogTitle;

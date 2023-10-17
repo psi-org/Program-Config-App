@@ -1,5 +1,5 @@
-import * as programActions from  './program';
-import * as programStageActions from  './programStage';
+import * as programActions from  './program.js';
+import * as programStageActions from  './programStage.js';
 
 const actionCreators = {
     ...programActions,

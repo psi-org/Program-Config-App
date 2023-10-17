@@ -1,12 +1,14 @@
 import { useDataQuery } from "@dhis2/app-runtime";
-import { NAMESPACE, DATASTORE_PCA_METADATA, DATASTORE_H2_METADATA, BUILD_VERSION, BUILD_DATE, DATE_FORMAT_OPTIONS, PCA_METADATA_VERSION, H2_METADATA_VERSION } from "../../configs/Constants";
+import DescriptionIcon from '@mui/icons-material/Description';
+import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import Button from '@mui/material/Button';
-import DescriptionIcon from '@mui/icons-material/Description';
-import CustomMUIDialog from './../UIElements/CustomMUIDialog'
-import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle'
-import LogoUrl from "./../../images/PCA-logo.png"
+import PropTypes from 'prop-types';
+import React from 'react';
+import { NAMESPACE, DATASTORE_PCA_METADATA, DATASTORE_H2_METADATA, BUILD_VERSION, BUILD_DATE, DATE_FORMAT_OPTIONS, PCA_METADATA_VERSION, H2_METADATA_VERSION } from "../../configs/Constants.js";
+import LogoUrl from "./../../images/PCA-logo.png";
+import CustomMUIDialog from './../UIElements/CustomMUIDialog.js';
+import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js';
 
 const queryPCAMetadata = {
     results: {
@@ -22,8 +24,8 @@ const queryHNQIS2Metadata = {
 
 const About = (props) => {
 
-    const { data: pcaMetadata, error: pcaMetadataError } = useDataQuery(queryPCAMetadata);
-    const { data: hnqis2Metadata, error: hnqis2MetadataError } = useDataQuery(queryHNQIS2Metadata);
+    const { data: pcaMetadata } = useDataQuery(queryPCAMetadata);
+    const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
 
     return (
         <CustomMUIDialog open={props.aboutModal} maxWidth='md' fullWidth={true} onClose={() => props.setAboutModal(false)}>
@@ -76,6 +78,11 @@ const About = (props) => {
             </DialogActions>
         </CustomMUIDialog>
     )
+}
+
+About.propTypes = {
+    aboutModal: PropTypes.bool,
+    setAboutModal: PropTypes.func
 }
 
 export default About

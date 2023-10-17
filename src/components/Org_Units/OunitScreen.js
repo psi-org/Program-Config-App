@@ -1,8 +1,8 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { OrganisationUnitTree } from "@dhis2/ui";
-import React, { useEffect, useRef, useState } from "react";
-import CustomMUIDialog from "../UIElements/CustomMUIDialog";
-import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle";
+import ClearIcon from "@mui/icons-material/Clear";
+import SearchIcon from "@mui/icons-material/Search";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
     Alert,
     Box,
@@ -13,17 +13,19 @@ import {
     DialogContent,
     FormControl,
     InputLabel,
+    LinearProgress,
     MenuItem,
     Select,
     TextField,
     Tooltip
 } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
-import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
-import ClearIcon from "@mui/icons-material/Clear";
-import SearchIcon from "@mui/icons-material/Search";
-import { parseErrorsJoin, parseErrorsUL, truncateString } from "../../configs/Utils";
+import InputAdornment from "@mui/material/InputAdornment";
+import PropTypes from 'prop-types';
+import React, { useEffect, useRef, useState } from "react";
+import { concatArraysUnique, parseErrorsJoin, parseErrorsUL, truncateString } from "../../utils/Utils.js";
+import CustomMUIDialog from "../UIElements/CustomMUIDialog.js";
+import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle.js";
 
 const orgUnitsQuery = {
     userOrgUnits: {
@@ -53,7 +55,6 @@ const orgUnitsQuery = {
 const ouQuery = {
     results: {
         resource: "organisationUnits",
-        id: ({ id }) => id,
         params: ({ level }) => ({
             paging: false,
             fields: ["id", "path"],
@@ -65,7 +66,6 @@ const ouQuery = {
 const ouGroupQuery = {
     results: {
         resource: "organisationUnits",
-        id: ({ id }) => id,
         params: ({ groupId }) => ({
             paging: false,
             fields: ["id", "path"],
@@ -115,7 +115,6 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const [orgUnitGroup, setOrgUnitGroup] = useState("");
     const [hasChanges, setHasChanges] = useState(false);
     const [content, setContent] = useState("form");
-    const [importStatus, setImportStatus] = useState({});
     const [selectedOrgUnits, setSelectedOrgUnits] = useState([]);
     const [orgUnitPathSelected, setOrgUnitPathSelected] = useState([]);
     const [orgUnitTreeRoot, setOrgUnitTreeRoot] = useState([]);
@@ -124,6 +123,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const [filterValue, setFilterValue] = useState('');
     const [filterLoading, setFilterLoading] = useState(false);
     const [fetchErrors, setFetchErrors] = useState(undefined);
+    const [loadingBulkAction, setLoadingBulkAction] = useState(false);
 
     const { loading: ouMetadataLoading, data: ouMetadata } =
         useDataQuery(orgUnitsQuery);
@@ -160,27 +160,39 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     let userOrgUnits;
 
+    const cutOrgUnitsPath = (route) => {
+        const routeParts = route.split('/');
+        let routeCut = '/';
+        for (let index = 1; index < routeParts.length; index++) {
+            if (userOrgUnits.includes(routeParts[index])) {
+                break;
+            } else {
+                routeCut = routeCut + routeParts[index] + '/'
+            }
+        }
+        return route.replace(routeCut, '/');
+    }
+
     useEffect(() => {
-        if (!poLoading) {
-            let ouPaths = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path)];
-            let ouExpanded = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path.split('/').slice(0, -1).join('/'))]
-            let ouIds = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.id)];
+        if (!poLoading && userOrgUnits) {
+            const ouPaths = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.path)];
+            const ouIds = [...prgOrgUnitData.results?.organisationUnits.map((ou) => ou.id)];
             if (ouPaths.length > 0 && ouIds.length > 0) {
                 setOrgUnitPathSelected(ouPaths);
-                setOrgUnitExpanded(ouExpanded)
                 setSelectedOrgUnits(ouIds);
             } else {
                 ouTreeRootInit();
             }
         }
-    }, [ouMetadata, prgOrgUnitData]);
+    }, [ouMetadata, prgOrgUnitData, userOrgUnits]);
 
     useEffect(() => {
-        if (orgUnitPathSelected.length > 0)
+        if (orgUnitPathSelected.length > 0) {
             ouTreeRootInit();
+        }
     }, [orgUnitPathSelected, selectedOrgUnits])
 
-    let ouTreeRootInit = () => {
+    const ouTreeRootInit = () => {
         if (!ouMetadataLoading) {
             setOrgUnitTreeRoot([
                 ...ouMetadata.userOrgUnits?.organisationUnits.map(
@@ -227,21 +239,20 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     const doSearch = () => {
         setFilterLoading(true)
-        let filterString = filterRef.current.value;
-        if (filterString) {
+        const filterString = filterRef.current.value;
+        if (filterString && filterString.trim() !== '') {
             setFilterValue(filterString)
             searchOunits.refetch({ filterString: filterString })
                 .then((data) => {
                     if (data?.results) {
-                        setOrgUnitTreeRoot([]);
-                        let filterResults = [
+                        const filterResults = [
                             ...data.results?.organisationUnits.map(
                                 (ou) => ou.path
                             ),
-                        ];
+                        ].map(cutOrgUnitsPath)
                         setOrgUnitFiltered(filterResults);
-                        setOrgUnitExpanded(filterResults);
                         setOrgUnitTreeRoot(userOrgUnits);
+                        setOrgUnitExpanded(filterResults);
                     }
                     setFilterLoading(false)
                 });
@@ -252,7 +263,6 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
     const resetSearch = () => {
         setFilterValue("")
-        setOrgUnitTreeRoot([]);
         setOrgUnitFiltered([]);
         setOrgUnitExpanded([]);
         setOrgUnitTreeRoot(userOrgUnits);
@@ -260,61 +270,61 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     }
 
     const ouLevelAssignmentHandler = () => {
-        let id = userOrgUnits[0];
-        let oulevel = parseInt(orgUnitLevel) - 1; //TODO: not sure why i am substracting it over here
+        const id = userOrgUnits[0];
+        setLoadingBulkAction(true);
+        const oulevel = parseInt(orgUnitLevel);
         oUnits.refetch({ id: id, level: oulevel }).then((data) => {
-            if (data) {
-                selectOrgUnits(data);
-            }
+            if (data) { selectOrgUnits(data) }
+            setLoadingBulkAction(false);
         });
     };
 
     const ouLevelRemovalHandler = () => {
-        let id = userOrgUnits[0];
-        let oulevel = parseInt(orgUnitLevel) - 1; //TODO: not sure why i am substracting it over here
+        const id = userOrgUnits[0];
+        setLoadingBulkAction(true);
+        const oulevel = parseInt(orgUnitLevel);
         oUnits.refetch({ id: id, level: oulevel }).then((data) => {
-            if (data) {
-                deselectOrgUnits(data);
-            }
+            if (data) { deselectOrgUnits(data) }
+            setLoadingBulkAction(false);
         });
     };
 
     const ouGroupAssignmentHandler = () => {
-        let id = userOrgUnits[0];
+        const id = userOrgUnits[0];
+        setLoadingBulkAction(true);
         oUnitsByGroups
             .refetch({ id: id, groupId: orgUnitGroup })
             .then((data) => {
-                if (data) {
-                    selectOrgUnits(data);
-                }
+                if (data) { selectOrgUnits(data) }
+                setLoadingBulkAction(false);
             });
     };
 
     const ouGroupRemovalHandler = () => {
-        let id = userOrgUnits[0];
+        const id = userOrgUnits[0];
+        setLoadingBulkAction(true);
         oUnitsByGroups
             .refetch({ id: id, groupId: orgUnitGroup })
             .then((data) => {
-                if (data) {
-                    deselectOrgUnits(data);
-                }
+                if (data) { deselectOrgUnits(data) }
+                setLoadingBulkAction(false);
             });
     };
 
     const selectOrgUnits = (data) => {
-        setSelectedOrgUnits((prevState) => [
-            ...prevState,
-            ...data.results?.organisationUnits.map((ou) => ou.id),
-        ]);
-        setOrgUnitPathSelected((prevState) => [
-            ...prevState,
-            ...data.results?.organisationUnits.map((ou) => ou.path),
-        ]);
+        const ounits = data.results?.organisationUnits || [];
+
+        const ounitsIdList = ounits.map((ou) => ou.id);
+        const ounitsPathList = ounits.map((ou) => ou.path);
+
+        setSelectedOrgUnits((prevState) => concatArraysUnique(prevState, ounitsIdList));
+        setOrgUnitPathSelected((prevState) => concatArraysUnique(prevState, ounitsPathList));
+
         setHasChanges(true);
     };
 
     const deselectOrgUnits = (data) => {
-        const ounits = data.results?.organisationUnits;
+        const ounits = data.results?.organisationUnits || [];
         setSelectedOrgUnits((prevState) =>
             prevState.filter((ou) => !ounits.find((ou2) => ou2.id === ou))
         );
@@ -327,7 +337,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     const orgUnitAssignmentHandler = () => {
         setContent("loading");
         if (!metadataLoading) {
-            let metadata = {};
+            const metadata = {};
             metadata.programs = prgMetaData.results?.programs;
             metadata.programs[0].organisationUnits = selectedOrgUnits.map(
                 (ounit) => {
@@ -388,6 +398,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                         margin="dense"
                                         id={"filterOrgUnitName"}
                                         label={"Filter Organisation Units by UID, Code or Name"}
+                                        helperText={"Please Note: The Organisation Unit Tree is not automatically expanded after filtering"}
                                         variant="outlined"
                                         inputRef={filterRef}
                                         value={filterValue}
@@ -397,6 +408,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                 doSearch();
                                             }
                                         }}
+                                        disabled={loadingBulkAction}
                                         sx={{ width: "100%" }}
                                         autoComplete={"off"}
                                         InputProps={{
@@ -405,16 +417,17 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                     <Tooltip
                                                         title="Clear Filter"
                                                         placement="left"
-                                                    >
-                                                        <IconButton
-                                                            onClick={() => {
-                                                                resetSearch();
-                                                            }}
-                                                            style={{ marginRight: "0.5em" }}
-                                                            disabled={filterLoading}
-                                                        >
-                                                            <ClearIcon />
-                                                        </IconButton>
+                                                    ><span>
+                                                            <IconButton
+                                                                onClick={() => {
+                                                                    resetSearch();
+                                                                }}
+                                                                style={{ marginRight: "0.5em" }}
+                                                                disabled={filterLoading || loadingBulkAction}
+                                                            >
+                                                                <ClearIcon />
+                                                            </IconButton>
+                                                        </span>
                                                     </Tooltip>
                                                     <LoadingButton
                                                         onClick={() => {
@@ -423,7 +436,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                         startIcon={<SearchIcon />}
                                                         variant="contained"
                                                         color="primary"
-                                                        loading={filterLoading}
+                                                        loading={filterLoading || loadingBulkAction}
                                                     >
                                                         Filter
                                                     </LoadingButton>
@@ -434,7 +447,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
 
                                     <div style={{ marginTop: "10px" }}>
                                         {" "}
-                                        {selectedOrgUnits.length} Organisation units
+                                        {selectedOrgUnits.length} Organisation Units
                                         selected{" "}
                                     </div>
                                     {!poLoading && orgUnitTreeRoot.length > 0 && (
@@ -458,25 +471,25 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                 roots={orgUnitTreeRoot}
                                                 onChange={orgUnitSelectionHandler}
                                                 selected={orgUnitPathSelected}
-                                                initiallyExpanded={orgUnitExpanded}
                                                 filter={orgUnitFiltered}
+                                                highlighted={orgUnitExpanded}
                                             />
                                         </div>
                                     )}
                                     <div
                                         style={{
-                                            width: "400px",
+                                            width: "450px",
                                             background: "white",
                                             marginLeft: "1rem",
                                             marginTop: "1rem",
                                             display: "inline-block",
                                         }}
                                     >
-                                        <span>For Organisation units within</span>
-                                        <div style={{ flexDirection: "row" }}>
+                                        <span>Select Organisation Units within:</span>
+                                        <div style={{ flexDirection: "row", marginTop: '1em' }}>
                                             <FormControl
                                                 variant={"standard"}
-                                                style={{ width: "200px" }}
+                                                style={{ width: "250px" }}
                                             >
                                                 <InputLabel
                                                     id={
@@ -533,7 +546,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                 }}
                                             >
                                                 <Button
-                                                    disabled={!orgUnitLevel}
+                                                    disabled={!orgUnitLevel || loadingBulkAction || filterLoading}
                                                     onClick={
                                                         ouLevelAssignmentHandler
                                                     }
@@ -541,17 +554,17 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                     SELECT
                                                 </Button>
                                                 <Button
-                                                    disabled={!orgUnitLevel}
+                                                    disabled={!orgUnitLevel || loadingBulkAction || filterLoading}
                                                     onClick={ouLevelRemovalHandler}
                                                 >
                                                     DESELECT
                                                 </Button>
                                             </ButtonGroup>
                                         </div>
-                                        <div style={{ flexDirection: "row" }}>
+                                        <div style={{ flexDirection: "row", marginTop: '1em' }}>
                                             <FormControl
                                                 variant={"standard"}
-                                                style={{ width: "200px" }}
+                                                style={{ width: "250px" }}
                                             >
                                                 <InputLabel
                                                     id={
@@ -608,7 +621,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                 }}
                                             >
                                                 <Button
-                                                    disabled={!orgUnitGroup}
+                                                    disabled={!orgUnitGroup || loadingBulkAction || filterLoading}
                                                     onClick={
                                                         ouGroupAssignmentHandler
                                                     }
@@ -616,31 +629,31 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                                                     SELECT
                                                 </Button>
                                                 <Button
-                                                    disabled={!orgUnitGroup}
+                                                    disabled={!orgUnitGroup || loadingBulkAction || filterLoading}
                                                     onClick={ouGroupRemovalHandler}
                                                 >
                                                     DESELECT
                                                 </Button>
                                             </ButtonGroup>
                                         </div>
+                                        {loadingBulkAction &&
+                                            <div style={{ width: '100%', marginTop: '1em' }}>
+                                                <p>Loading Data</p>
+                                                <LinearProgress />
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
                         )}
                         {content === "status" && (
                             <div>
-                                <b>Import Status</b>
-                                <hr />
-                                <p>Created: {importStatus.created}</p>
-                                <p>Updated: {importStatus.updated}</p>
-                                <p>Deleted: {importStatus.deleted}</p>
-                                <p>Ignored: {importStatus.ignored}</p>
-                                <p>Total: {importStatus.total}</p>
+                                <b>Something went wrong!</b>
                             </div>
                         )}
                         {fetchErrors &&
                             <Alert severity="error" style={{ marginTop: "10px", maxHeight: "100px", overflow: 'auto' }}>
-                                <p>Assign Organisation Units feature  disabled due to the following errors:</p>
+                                <p>Assign Organisation Units feature disabled due to the following errors:</p>
                                 {fetchErrors}
                             </Alert>
                         }
@@ -654,7 +667,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                         <Button
                             onClick={orgUnitAssignmentHandler}
                             color={"primary"}
-                            disabled={!!fetchErrors}
+                            disabled={!!fetchErrors || loadingBulkAction}
                         >
                             Apply
                         </Button>
@@ -676,5 +689,12 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
         </>
     );
 };
+
+OunitScreen.propTypes = {
+    id: PropTypes.string,
+    readOnly: PropTypes.bool,
+    setNotification: PropTypes.func,
+    setOrgUnitProgram: PropTypes.func
+}
 
 export default OunitScreen;
