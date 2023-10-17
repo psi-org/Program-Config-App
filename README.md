@@ -1,6 +1,6 @@
 # Program Configuration App
 
-<img src=".\src\images\PCA-Logo.png" width="100px" alt="PCA Logo">
+<img src="https://github.com/psi-org/Program-Config-App/blob/main/src/images/PCA-logo.png" width="100px" alt="PCA Logo">
 
 ### Introduction
 The Program Config App (PCA) can be used as a generic DHIS2 Program Configuration wizard that simplifies the process of creating, editing, and maintaining DHIS2 programs and all related metadata. Users are presented with a unified interface from which they can add pre-existing or new Data Elements or Attributes to a Program individually or in bulk, add or edit Options Sets, apply Organisation Units access, configure Sharing Settings for multiple objects, as well as Import and Export Program configurations, and much more.
