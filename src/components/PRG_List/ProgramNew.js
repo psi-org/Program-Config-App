@@ -1,6 +1,7 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { Transfer } from "@dhis2/ui";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import InfoIcon from '@mui/icons-material/Info';
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -137,10 +138,21 @@ const queryHNQIS2Metadata = {
     },
 };
 
+const queryCurrentUser = {
+    results: {
+        resource: 'me',
+        params: {
+            fields: ['id', 'authorities']
+        }
+    },
+}
+
 const ProgramNew = (props) => {
 
     const h2Ready = localStorage.getItem("h2Ready") === "true";
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
+    const { data: currentUser } = useDataQuery(queryCurrentUser);
+    const [createPublicObjects, setCreatePublicObjects] = useState(false);
 
     // Create Mutation
     const metadataDM = useDataMutation(metadataMutation, {
@@ -606,6 +618,11 @@ const ProgramNew = (props) => {
             });
         }
     }, [pgrTypePCA]);
+
+    useEffect(() => {
+        setCreatePublicObjects(currentUser?.results?.authorities?.some(auth => ['F_PROGRAM_PUBLIC_ADD', 'ALL'].includes(auth)));
+    }, [currentUser])
+    
 
     /*useEffect(() => {
         //TODO: Set backup TEAs
@@ -1261,10 +1278,11 @@ const ProgramNew = (props) => {
                         {programTEAs.available.length > 0 &&
                             <Slide in={pgrTypePCA === 'tracker' && activeStep === 2} direction={activeStep > previousStep ? 'left' : 'right'}>
                                 <div style={{ display: (pgrTypePCA === 'tracker' && activeStep === 2) ? 'inherit' : 'none' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', margin: '1rem 0', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', margin: '1rem 0' + (!createPublicObjects ? ' 0 0' : ''), alignItems: 'center' }}>
                                         <FormControlLabel
                                             control={
                                                 <Switch
+                                                    disabled={!createPublicObjects}
                                                     checked={useSections}
                                                     onChange={(e) => setUseSections(e.target.checked)}
                                                     inputProps={{ 'aria-label': 'controlled' }}
@@ -1274,13 +1292,19 @@ const ProgramNew = (props) => {
                                         />
                                         <div>
                                             {useSections && <Button
+                                                disabled={!createPublicObjects}
                                                 variant='contained'
-
                                                 startIcon={<AddCircleOutlineIcon />}
                                                 onClick={() => { setInputModalOpened(true) }}
                                             >Add new section</Button>}
                                         </div>
                                     </div>
+                                    {!createPublicObjects &&
+                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1em', color: 'rgba(0, 0, 0, 0.5)'}}>
+                                            <InfoIcon />
+                                            <label style={{marginLeft: '0.5em'}}>TEA Sections are considered Public Objects. Currently, your User does not have permission to create Public Objects.</label>
+                                        </div>
+                                    }
                                     <AttributesEditor
                                         useSections={useSections}
                                         teaOptions={programTEAs}

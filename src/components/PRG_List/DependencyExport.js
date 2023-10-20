@@ -11,7 +11,7 @@ import Tab from '@mui/material/Tab';
 import Tabs, { tabsClasses } from '@mui/material/Tabs';
 import PropTypes from 'prop-types';
 import React, { useState } from "react";
-import { DHIS2_KEY_MAP, DHIS2_PRIMARY_COLOR, EXPORT_HNQIS_PRESETS, EXPORT_PRESETS, H2_ENABLED_IMPORT_REMOVE_KEYS, H2_ATTRIBUTES_TO_KEEP, JSON_ATTRIBUTE_SETTINGS, PROGRAM_TYPE_OPTIONS, PROGRAM_TYPE_OPTION_SET } from "../../configs/Constants.js";
+import { DHIS2_KEY_MAP, DHIS2_PRIMARY_COLOR, EXPORT_HNQIS_PRESETS, EXPORT_PRESETS, H2_ENABLED_IMPORT_REMOVE_KEYS, H2_ATTRIBUTES_TO_KEEP, JSON_ATTRIBUTE_SETTINGS } from "../../configs/Constants.js";
 import { DeepCopy, changeAttributeValue, getJSONKeyTree, removeKey } from "../../utils/Utils.js";
 import SelectOptions from "../UIElements/SelectOptions.js";
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
@@ -106,10 +106,8 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
         prgMetadata.programSections = prgSections;
         prgMetadata.legendSets = legendSets;
         prgMetadata.optionSets = prgMetadata.optionSets ?? [];
-        prgMetadata.optionSets.push(PROGRAM_TYPE_OPTION_SET);
 
         prgMetadata.options = prgMetadata.options ?? [];
-        prgMetadata.options = prgMetadata.options.concat(PROGRAM_TYPE_OPTIONS);
 
         setProgramMetadata(prgMetadata);
         const keyTree = getJSONKeyTree(prgMetadata);

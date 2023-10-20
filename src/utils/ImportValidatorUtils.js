@@ -1,6 +1,6 @@
 import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "../configs/Constants.js";
 import { getVarNameFromParentUid } from "./ExcelUtils.js";
-import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isNum, isValidCorrelative, isValidParentName, setPCAMetadata } from "./Utils.js";
+import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isNum, isValidCorrelative, isValidParentName, padValue, setPCAMetadata } from "./Utils.js";
 
 export const HNQIS2_VALIDATION_SETTINGS = {
     sections: {
@@ -503,7 +503,6 @@ export const parentExists = ({ metadata, dataElementsList }) => {
     if (!metadata.parentQuestion || metadata.parentQuestion === "") {
         return true;
     }
-    console.log(metadata)
     return dataElementsList.find(dataElement => {
         const deMetadata = getPCAMetadataDE(dataElement);
         return (deMetadata.varName === metadata.parentQuestion || dataElement.id === metadata.parentQuestion);
@@ -735,10 +734,25 @@ const mapAttributes = (attributes) => {
     }))
 }
 
-const mapStage = (stage) => {
+const mapDataElements = (dataElements, stage, { stageNumber, sectionIdx }) => { 
+    return dataElements.map((de, deIdx) => {
+        const metadata = getPCAMetadataDE(de);
+        metadata.varName = metadata.varName || `_PS${padValue(stageNumber, "00")}_S${padValue(sectionIdx + 1, "00")}E${padValue(deIdx + 1, "000")}`;
+        de.parentName = metadata.varName;
+        if (metadata.parentQuestion) {
+            metadata.parentQuestion = getVarNameFromParentUid(metadata.parentQuestion, stage, false);
+            de.parentQuestion = metadata.parentQuestion;
+        }
+        setPCAMetadata(de, metadata)
+        return de;
+    })
+}
+
+const mapStage = (stage, stageNumber) => {
+
     return stage.programStageSections && stage.programStageSections.length > 0 ?
         // Stage with sections
-        stage.programStageSections.map(section => ({
+        stage.programStageSections.map((section, sectionIdx) => ({
             id: section.id,
             name: section.name,
             displayName: section.displayName,
@@ -747,16 +761,7 @@ const mapStage = (stage) => {
             isBasicForm: false,
             newValues: 0,
             updatedValues: section.dataElements.length,
-            dataElements: section.dataElements.map(de => {
-                const metadata = getPCAMetadataDE(de);
-                de.parentName = metadata.varName;
-                if (metadata.parentQuestion) {
-                    metadata.parentQuestion = getVarNameFromParentUid(metadata.parentQuestion, stage, false);
-                    setPCAMetadata(de, metadata)
-                    de.parentQuestion = metadata.parentQuestion;
-                }
-                return de;
-            })
+            dataElements: mapDataElements(section.dataElements, stage, { stageNumber, sectionIdx })
         })) :
         // Stage without sections
         [{
@@ -768,7 +773,7 @@ const mapStage = (stage) => {
             isBasicForm: true,
             newValues: 0,
             updatedValues: stage.programStageDataElements.length,
-            dataElements: stage.programStageDataElements.map(psde => psde.dataElement)
+            dataElements: mapDataElements(stage.programStageDataElements.map(psde => psde.dataElement), stage, { stageNumber, sectionIdx: 1})
         }]
 }
 
@@ -810,7 +815,7 @@ const extractStages = (input) => {
         name: stage.name,
         stageNumber: idx + 1,
         formType: stage.formType,
-        importedSections: mapStage(stage)
+        importedSections: mapStage(stage, idx + 1)
     }))
 }
 

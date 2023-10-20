@@ -169,7 +169,7 @@ const ValidateTracker = (
 }
 
 ValidateTracker.propTypes = {
-    importResults: PropTypes.object,
+    importResults: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
     programMetadata: PropTypes.object,
     setErrorReports: PropTypes.func,
     setImportResults: PropTypes.func,

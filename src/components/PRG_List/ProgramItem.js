@@ -12,6 +12,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import ShareIcon from '@mui/icons-material/Share';
 import StorageIcon from '@mui/icons-material/Storage';
 import UpgradeIcon from '@mui/icons-material/SwitchAccessShortcutAdd';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { IconButton, Slide, Snackbar, Tooltip } from "@mui/material";
 import Popover from '@mui/material/Popover';
 import PropTypes from 'prop-types';
@@ -116,6 +117,11 @@ const ProgramItem = ({
 
 
                 <div className="ml_item-desc">
+                    {programType !== 'HNQIS' && !(pcaMetadata.dePrefix && pcaMetadata.dePrefix !== '') &&
+                        <Tooltip title={`A Data Element Prefix is not defined for this Program. Please edit the Program Settings to add a Prefix.`}>
+                            <WarningAmberIcon color="warning" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
+                        </Tooltip>
+                    }
                     {programType !== 'HNQIS' && pcaMetadata.buildVersion && !versionIsValid(pcaMetadata.buildVersion, BUILD_VERSION, BUILD_VERSION) &&
                         <Tooltip title={`This Program's logic was built in version ${pcaMetadata.buildVersion}, please ${programType === 'HNQIS2' ? "'Set Up Program'" : "'Build Program Rules'"} again to update it.`}>
                             <NewReleasesIcon color="error" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
