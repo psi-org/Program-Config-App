@@ -277,6 +277,7 @@ const DataElementManager = (props) => {
                         <TabPanel value={tabValue} index={1}>
                             <DataElementForm
                                 program={props.program}
+                                dePrefix={props.dePrefix}
                                 programStageDataElement={{}}
                                 section={{}}
                                 setDeToEdit={undefined}
@@ -312,6 +313,7 @@ const DataElementManager = (props) => {
 }
 
 DataElementManager.propTypes = {
+    dePrefix: PropTypes.string,
     deRef: PropTypes.object,
     hnqisMode: PropTypes.bool,
     program: PropTypes.string,

@@ -1202,6 +1202,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     saveAdd={saveAdd}
                     hnqisMode={hnqisMode}
                     setSaveStatus={setSaveStatus}
+                    dePrefix={programMetadata.dePrefix || 'XXXXXXXXXXX'}
                 />
             }
         </div>
