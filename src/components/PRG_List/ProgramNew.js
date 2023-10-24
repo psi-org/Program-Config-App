@@ -1,6 +1,7 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { Transfer } from "@dhis2/ui";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import InfoIcon from '@mui/icons-material/Info';
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
@@ -145,6 +146,12 @@ const queryCurrentUser = {
             fields: ['id', 'authorities']
         }
     },
+}
+
+const stepsLimit = {
+    hnqis: 1,
+    tracker: 2,
+    event: 1
 }
 
 const ProgramNew = (props) => {
@@ -445,8 +452,10 @@ const ProgramNew = (props) => {
     }
 
     function hideForm() {
-        props.data.programSections = programBackup.programSections;
-        props.data.programTrackedEntityAttributes = programBackup.programTrackedEntityAttributes;
+        if (props.data) {
+            props.data.programSections = programBackup.programSections;
+            props.data.programTrackedEntityAttributes = programBackup.programTrackedEntityAttributes;
+        }
         props.setShowProgramForm(false);
     }
 
@@ -1338,7 +1347,16 @@ const ProgramNew = (props) => {
                                 </Button>
                             </span>
                         </Tooltip>}
-                    {!props.readOnly &&
+                    {activeStep < stepsLimit[pgrTypePCA] &&
+                        <Button
+                            onClick={() => setActiveStep(activeStep + 1)}
+                            variant="outlined"
+                            startIcon={<ArrowForwardIcon />}
+                        >
+                            Next Step
+                        </Button>
+                    }
+                    {!props.readOnly && activeStep === stepsLimit[pgrTypePCA] &&
                         <LoadingButton
                             onClick={() => submission()}
                             disabled={buttonDisabled}

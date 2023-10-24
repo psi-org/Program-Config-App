@@ -885,7 +885,7 @@ const H2Convert = ({
                         </>
                     )}
                     {sectionsData && (
-                        <>
+                        <div>
                             <p
                                 style={{
                                     fontSize: "1.2em",
@@ -1091,7 +1091,7 @@ const H2Convert = ({
                                     </Accordion>
                                 )}
                             </div>
-                        </>
+                        </div>
                     )}
                 </DialogContent>
 
