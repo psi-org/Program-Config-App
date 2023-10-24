@@ -63,7 +63,7 @@ const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, sectio
         <>
             <Draggable
                 key={dataElement.id || index}
-                draggableId={dataElement.id || dataElement.formName.slice(-15)}
+                draggableId={dataElement.id || dataElement.formName?.slice(-15) || index}
                 index={index}
                 isDragDisabled={dataElement.importStatus != undefined || DEActions.deToEdit !== '' || !isSectionMode || readOnly}
             >

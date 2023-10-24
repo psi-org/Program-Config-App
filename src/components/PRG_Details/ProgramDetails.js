@@ -134,7 +134,6 @@ const ProgramDetails = () => {
     const [notification, setNotification] = useState(undefined);
     const [snackSeverity, setSnackSeverity] = useState(undefined);
     const [newStage, setNewStage] = useState();
-    const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
     const [importerEnabled, setImporterEnabled] = useState(false);
     const [exportToExcel, setExportToExcel] = useState(false);
     const [saveStatus, setSaveStatus] = useState('Validate');
@@ -342,20 +341,7 @@ const ProgramDetails = () => {
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns" style={{ display: 'flex', alignItems: 'center' }}>
-                    {!hnqisMode && !data.results.withoutRegistration &&
-                        <>
-                            <MuiButton
-                                variant="outlined"
-                                color='inherit'
-                                startIcon={<AddCircleOutlineIcon />}
-                                onClick={() => setShowStageForm(true)}
-                                disabled={showStageForm || importResults !== undefined}>
-                                Add Program Stage
-                            </MuiButton>
-                        </>
-                    }
-                    {
-                        !hnqisMode && !readOnly &&
+                    {!hnqisMode && !readOnly &&
                         <>
                             <Button
                                 color='inherit'
@@ -375,8 +361,6 @@ const ProgramDetails = () => {
                             >Build Program Rules</Button>
 
                             <ImportDownloadButton
-                                value={selectedIndexTemplate}
-                                setValue={setSelectedIndexTemplate}
                                 disabled={exportToExcel}
                                 setImporterEnabled={setImporterEnabled}
                                 setExportToExcel={setExportToExcel}
@@ -391,19 +375,34 @@ const ProgramDetails = () => {
                     }
                 </div>
             </div>
-            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', alignItems: 'center' }}>
-                <span style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                }}>
-                    {!data.results.withoutRegistration ? 'Program Stages for Program ' : 'Event Program '}
-                    <strong style={{ maxWidth: '100%' }}>
-                        {data.results.displayName}
-                    </strong>
-                </span>
-                {readOnly &&
-                    <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
+            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <span style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                    }}>
+                        {!data.results.withoutRegistration ? 'Program Stages for Program ' : 'Event Program '}
+                        <strong style={{ maxWidth: '100%' }}>
+                            {data.results.displayName}
+                        </strong>
+                    </span>
+
+                    {readOnly &&
+                        <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
+                    }
+                </div>
+                
+
+                {!hnqisMode && !data.results.withoutRegistration &&
+                    <MuiButton
+                        variant="contained"
+                        color='primary'
+                        startIcon={<AddCircleOutlineIcon />}
+                        onClick={() => setShowStageForm(true)}
+                        disabled={showStageForm || importResults !== undefined}>
+                        Add Program Stage
+                    </MuiButton>
                 }
             </div>
             {!hnqisMode && saveAndBuild &&

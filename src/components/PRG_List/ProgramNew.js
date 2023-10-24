@@ -153,6 +153,7 @@ const ProgramNew = (props) => {
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
     const { data: currentUser } = useDataQuery(queryCurrentUser);
     const [createPublicObjects, setCreatePublicObjects] = useState(false);
+    const [programBackup, setProgramBackup] = useState();
 
     // Create Mutation
     const metadataDM = useDataMutation(metadataMutation, {
@@ -444,7 +445,8 @@ const ProgramNew = (props) => {
     }
 
     function hideForm() {
-        //TODO: Reset TEAs
+        props.data.programSections = programBackup.programSections;
+        props.data.programTrackedEntityAttributes = programBackup.programTrackedEntityAttributes;
         props.setShowProgramForm(false);
     }
 
@@ -624,9 +626,9 @@ const ProgramNew = (props) => {
     }, [currentUser])
     
 
-    /*useEffect(() => {
-        //TODO: Set backup TEAs
-    }, [])*/
+    useEffect(() => {
+        if (props.data) { setProgramBackup(DeepCopy(props.data)) }
+    }, [])
 
     function submission() {
         setSentForm(true);

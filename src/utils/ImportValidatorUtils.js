@@ -421,10 +421,9 @@ export function validateFeedbacks(hnqisMode, sections) {
 }
 
 export const checkHasFormName = ({ metadata, dataElement }) => {
+    const formName = dataElement.labelFormName || dataElement.formName || '';
     if (metadata.elem !== "") {
-        if (metadata.elemType === "label") { return (!isBlank(dataElement.labelFormName)) }
-        return (!isBlank(dataElement.formName));
-
+        return (!isBlank(formName));
     }
     return true;
 }
@@ -433,7 +432,7 @@ export const checkSectionHasFormName = ({ section }) => !isBlank(section.name);
 
 
 export const checkFormNameLength = ({ metadata, dataElement }) => {
-    const formName = dataElement.labelFormName || dataElement.formName;
+    const formName = dataElement.labelFormName || dataElement.formName || '';
     if (metadata.elem !== "") {
         return (formName.replace(' [C]', '').length <= (MAX_DATA_ELEMENT_NAME_LENGTH) && formName.replace(' [C]', '').length >= MIN_DATA_ELEMENT_NAME_LENGTH)
     }

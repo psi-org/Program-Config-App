@@ -1,47 +1,12 @@
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import PublishIcon from '@mui/icons-material/Publish';
 import { LoadingButton } from '@mui/lab';
-import { Button, ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from '@mui/material';
+import { Button, ButtonGroup } from '@mui/material';
 import PropTypes from 'prop-types';
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 
-const optionsTemplate = ['IMPORT TEMPLATE', 'DOWNLOAD TEMPLATE'];
+const ImportDownloadButton = ({ disabled = false, setImporterEnabled, setExportToExcel, size = 'regular' }) => {
 
-const ImportDownloadButton = ({value, setValue, disabled = false, setImporterEnabled, setExportToExcel, size='regular'}) => {
-
-    const anchorRefTemplate = useRef(null);
-    const [openTemplateBtn, setOpenTemplateBtn] = useState(false);
-
-    const handleMenuItemClickTemplate = (event, index) => {
-        setValue(index);
-        setOpenTemplateBtn(false);
-    };
-
-    const handleToggleTemplate = () => {
-        setOpenTemplateBtn((prevOpen) => !prevOpen);
-    };
-
-    const handleCloseTemplate = (event) => {
-        if (anchorRefTemplate.current && anchorRefTemplate.current.contains(event.target)) {
-            return;
-        }
-
-        setOpenTemplateBtn(false);
-    };
-
-    const handleClickTemplate = (event) => {
-        switch (value) {
-            case 0:
-                setImporterEnabled(true)
-                break;
-            case 1:
-                configuration_download(event)
-                break;
-            default:
-                break;
-        }
-    };
 
     const configuration_download = (e) => {
         e.preventDefault();
@@ -49,70 +14,28 @@ const ImportDownloadButton = ({value, setValue, disabled = false, setImporterEna
     };
 
     return (
-        <>
-            <ButtonGroup disableElevation ref={anchorRefTemplate} aria-label="split button">
-                <LoadingButton
-                    onClick={handleClickTemplate}
-                    startIcon={value === 1 ? <FileDownloadIcon /> : <PublishIcon />}
-                    size={ size }
-                    variant="contained"
-                    color="success"
-                    disabled={disabled}
-                    loadingPosition="start"
-                    loading={disabled}
-                >{optionsTemplate[value]}</LoadingButton>
-                <Button
-                    size={ size }
-                    variant="contained"
-                    color="success"
-                    aria-controls={openTemplateBtn ? 'split-button-menu' : undefined}
-                    aria-expanded={openTemplateBtn ? 'true' : undefined}
-                    aria-label="select merge strategy"
-                    aria-haspopup="menu"
-                    disabled={disabled}
-                    onClick={handleToggleTemplate}
-                >
-                    <ArrowDropDownIcon />
-                </Button>
-            </ButtonGroup>
-            <Popper
-                sx={{
-                    zIndex: 1
-                }}
-
-                open={openTemplateBtn}
-                anchorEl={anchorRefTemplate.current}
-                role={undefined}
-                transition
-                disablePortal
-            >
-                {({ TransitionProps, placement }) => (
-                    <Grow
-                        {...TransitionProps}
-                        style={{
-                            transformOrigin:
-                                placement === 'bottom' ? 'center top' : 'center bottom',
-                        }}
-                    >
-                        <Paper>
-                            <ClickAwayListener onClickAway={handleCloseTemplate}>
-                                <MenuList id="split-button-menu" autoFocusItem>
-                                    {optionsTemplate.map((option, index) => (
-                                        <MenuItem
-                                            key={option}
-                                            selected={index === value}
-                                            onClick={(event) => handleMenuItemClickTemplate(event, index)}
-                                        >
-                                            {option}
-                                        </MenuItem>
-                                    ))}
-                                </MenuList>
-                            </ClickAwayListener>
-                        </Paper>
-                    </Grow>
-                )}
-            </Popper>
-        </>
+        <ButtonGroup
+            disableElevation>
+            <LoadingButton
+                onClick={configuration_download}
+                startIcon={<FileDownloadIcon />}
+                size={size}
+                variant="contained"
+                color="success"
+                disabled={disabled}
+                loadingPosition="start"
+                loading={disabled}
+            >DOWNLOAD</LoadingButton>
+            <Button
+                style={{ marginLeft: '1px' }}
+                onClick={() => setImporterEnabled(true)}
+                startIcon={<PublishIcon />}
+                size={size}
+                variant="contained"
+                color="success"
+                disabled={disabled}
+            >IMPORT</Button>
+        </ButtonGroup>
     )
 }
 
@@ -120,9 +43,7 @@ ImportDownloadButton.propTypes = {
     disabled: PropTypes.bool,
     setExportToExcel: PropTypes.func,
     setImporterEnabled: PropTypes.func,
-    setValue: PropTypes.func,
-    size: PropTypes.string,
-    value: PropTypes.number
+    size: PropTypes.string
 }
 
 export default ImportDownloadButton

@@ -115,7 +115,7 @@ const processStageData = (
             if (hnqisMode) {
                 formName = DE_metadata.elemType == 'label' ? DE_metadata.labelFormName : dataElement.formName;
 
-                formName = formName.replaceAll(' [C]', '');
+                formName = formName?.replaceAll(' [C]', '') || '';
                 if (DE_metadata.isCritical == 'Yes') { formName += ' [C]' }
                 DE_metadata.elemType == 'label' ? DE_metadata.labelFormName = formName : dataElement.formName = formName;
             } else {

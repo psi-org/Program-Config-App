@@ -17,10 +17,10 @@ import DialogContent from "@mui/material/DialogContent";
 import LinearProgress from "@mui/material/LinearProgress";
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from "react";
-import { QUESTION_TYPE_ATTRIBUTE, DE_TYPE_ATTRIBUTE, HEADER_ATTRIBUTE, QUESTION_PARENT_ATTRIBUTE, QUESTION_PARENT_OPTIONS_ATTRIBUTE, COMPOSITIVE_SCORE_ATTRIBUTE, SCORE_NUM_ATTRIBUTE, SCORE_DEN_ATTRIBUTE, QUESTION_ORDER_ATTRIBUTE, METADATA, FEEDBACK_ORDER, COMPETENCY_ATTRIBUTE, COMPETENCY_CLASS, FEEDBACK_TEXT, LEGEND_YES_NO, H1_QUESTION_HIDE_GROUP, H1_QUESTION_HIDE_TYPE } from "../../configs/Constants.js";
+import { QUESTION_TYPE_ATTRIBUTE, DE_TYPE_ATTRIBUTE, HEADER_ATTRIBUTE, QUESTION_PARENT_ATTRIBUTE, QUESTION_PARENT_OPTIONS_ATTRIBUTE, COMPOSITIVE_SCORE_ATTRIBUTE, SCORE_NUM_ATTRIBUTE, SCORE_DEN_ATTRIBUTE, QUESTION_ORDER_ATTRIBUTE, METADATA, FEEDBACK_ORDER, COMPETENCY_CLASS, FEEDBACK_TEXT, LEGEND_YES_NO, H1_QUESTION_HIDE_GROUP, H1_QUESTION_HIDE_TYPE } from "../../configs/Constants.js";
 import { parseErrorsJoin, parseErrorsUL, DeepCopy, padValue } from "../../utils/Utils.js";
 import AlertDialogSlide from "../UIElements/AlertDialogSlide.js";
-import { Program, HnqisProgramConfigs, PS_AssessmentStage, PS_ActionPlanStage, PSS_CriticalSteps, PSS_Scores } from "./../../configs/ProgramTemplate.js";
+import { Program, HnqisProgramConfigs, PS_AssessmentStage, PS_ActionPlanStage, PSS_CriticalSteps, PSS_Scores, COMPETENCY_TEA } from "./../../configs/ProgramTemplate.js";
 import CustomMUIDialog from "./../UIElements/CustomMUIDialog.js";
 import CustomMUIDialogTitle from "./../UIElements/CustomMUIDialogTitle.js";
 import H2Setting from "./H2Setting.js";
@@ -358,8 +358,6 @@ const H2Convert = ({
             });
         });
 
-        console.log(questionHideGroups)
-
         let newSections = sections.map((section, sectionIndex) => {
             section.dataElements = section.dataElements
                 .sort(
@@ -633,6 +631,8 @@ const H2Convert = ({
 
             const pcaMetadataVal = h2SettingsRef.current.saveMetaData();
             const useCompetency = pcaMetadataVal?.useCompetencyClass === 'Yes';
+
+            console.log(pcaMetadataVal, useCompetency);
             
             pcaMetadataVal.h1Program = programOld.id;
             pcaMetadataVal.dePrefix = programOld.shortName.slice(0, 22) + " H2";
@@ -686,24 +686,12 @@ const H2Convert = ({
             scores.dataElements = newScores;
 
             if (!useCompetency) {
-                const indexA = prgrm.programTrackedEntityAttributes.findIndex(
-                    (attr) => {
-                        return (
-                            attr.trackedEntityAttribute.id ===
-                            COMPETENCY_ATTRIBUTE
-                        );
-                    }
-                );
-                prgrm.programTrackedEntityAttributes.splice(indexA, 1);
-
-                prgrm.programStages = prgrm.programStages.map((ps) => ({
-                    id: ps.id,
-                }));
-
                 const indexB = criticalSteps.dataElements.findIndex((de) => {
                     return de.id === COMPETENCY_CLASS;
                 });
                 criticalSteps.dataElements.splice(indexB, 1);
+            } else {
+                prgrm.programTrackedEntityAttributes.push(DeepCopy(COMPETENCY_TEA));
             }
 
             assessmentStage.programStageDataElements = program_programStageDataElements.map((psde) => {
