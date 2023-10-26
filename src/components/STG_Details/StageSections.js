@@ -1114,31 +1114,39 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                         {
                             createMetadata.data && createMetadata.data.status == 'ERROR' && <ErrorReports errors={parseErrors(createMetadata.data)} />
                         }
-                        <Droppable droppableId="dpb-sections" type="SECTION" isDropDisabled={readOnly}>
-                            {(provided) => (
-                                <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
-                                    {
-                                        sections.map((pss, idx) => {
-                                            return <DraggableSection
-                                                program={programStage.program.id}
-                                                stageSection={pss}
-                                                editStatus={addedSection?.index === idx && addedSection}
-                                                stageDataElements={programStageDataElements}
-                                                DEActions={DEActions}
-                                                index={idx}
-                                                key={pss.id || idx}
-                                                SectionActions={SectionActions}
-                                                hnqisMode={hnqisMode}
-                                                isSectionMode={isSectionMode}
-                                                readOnly={readOnly}
-                                                setSaveStatus={setSaveStatus}
-                                            />
-                                        })
-                                    }
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
+                        {!programMetadata &&
+                            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '1em' }}>
+                                <CircularLoader />
+                            </div>
+                        }
+                        {programMetadata &&
+                            <Droppable droppableId="dpb-sections" type="SECTION" isDropDisabled={readOnly}>
+                                {(provided) => (
+                                    <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
+                                        {
+                                            sections.map((pss, idx) => {
+                                                return <DraggableSection
+                                                    program={programStage.program.id}
+                                                    dePrefix={programMetadata.dePrefix || 'XXXXXXXXXXX'}
+                                                    stageSection={pss}
+                                                    editStatus={addedSection?.index === idx && addedSection}
+                                                    stageDataElements={programStageDataElements}
+                                                    DEActions={DEActions}
+                                                    index={idx}
+                                                    key={pss.id || idx}
+                                                    SectionActions={SectionActions}
+                                                    hnqisMode={hnqisMode}
+                                                    isSectionMode={isSectionMode}
+                                                    readOnly={readOnly}
+                                                    setSaveStatus={setSaveStatus}
+                                                />
+                                            })
+                                        }
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        }
                         {hnqisMode && (isSectionMode) &&
                             <>
                                 <CriticalCalculations stageSection={criticalSection} ikey={criticalSection?.id || "crit"} />
