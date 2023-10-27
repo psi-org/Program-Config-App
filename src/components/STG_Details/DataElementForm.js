@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react"
-import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES_H2, AGG_TYPES, MAX_SHORT_NAME_LENGTH, VALUE_TYPES_TRACKER } from '../../configs/Constants.js';
+import { FEEDBACK_TEXT, FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES_H2, AGG_TYPES, MAX_SHORT_NAME_LENGTH, VALUE_TYPES_TRACKER, MAX_FORM_NAME_LENGTH } from '../../configs/Constants.js';
 import AlertDialogSlide from '../UIElements/AlertDialogSlide.js';
 import SelectOptions from '../UIElements/SelectOptions.js';
 import StyleManager from '../UIElements/StyleManager.js';
@@ -58,7 +58,7 @@ const queryId = {
     }
 };
 
-const DataElementForm = ({ program, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisMode, setSaveStatus }) => {
+const DataElementForm = ({ program, dePrefix, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisMode, setSaveStatus }) => {
 
     const de = programStageDataElement.dataElement;
 
@@ -245,6 +245,9 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 
         let response = true;
 
+        const correlativeLength = hnqisMode ? 9 : 14; //? _S01Q001_ or _PS01_S01E001_
+        const prefixLength = autoNaming ? dePrefix.length + correlativeLength : 0;
+
         if (valueType.trim() === '') {
             response = false
             validationErrors.valueType = 'A Value Type or Option Set must be specified'
@@ -262,9 +265,9 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
         if (formName.trim() === '') {
             response = false
             validationErrors.formName = 'This field is required'
-        } else if (formName.length < MIN_NAME_LENGTH || formName.length > MAX_DATA_ELEMENT_NAME_LENGTH) {
+        } else if (formName.length < MIN_NAME_LENGTH || formName.length > (MAX_FORM_NAME_LENGTH-prefixLength)) {
             response = false
-            validationErrors.formName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters`
+            validationErrors.formName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH - prefixLength} characters`
         } else {
             validationErrors.formName = undefined
         }
@@ -273,9 +276,9 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
             if (elementName.trim() === '') {
                 response = false
                 validationErrors.elementName = 'This field is required'
-            } else if (elementName.length < MIN_NAME_LENGTH || elementName.length > MAX_DATA_ELEMENT_NAME_LENGTH) {
+            } else if (elementName.length < MIN_NAME_LENGTH || elementName.length > MAX_FORM_NAME_LENGTH) {
                 response = false
-                validationErrors.elementName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters`
+                validationErrors.elementName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters`
             } else {
                 validationErrors.elementName = undefined
             }
@@ -995,12 +998,13 @@ const DataElementForm = ({ program, programStageDataElement, section, setDeToEdi
 }
 
 DataElementForm.propTypes = {
+    dePrefix: PropTypes.string,
     hnqisMode: PropTypes.bool,
     program: PropTypes.string,
     programStageDataElement: PropTypes.object,
     save: PropTypes.func,
     saveFlag: PropTypes.bool,
-    section: PropTypes.string,
+    section: PropTypes.object,
     setDeToEdit: PropTypes.func,
     setSaveFlag: PropTypes.func,
     setSaveStatus: PropTypes.func

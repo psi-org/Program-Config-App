@@ -254,7 +254,14 @@ const StageNew = (props) => {
     return <>
         <CustomMUIDialog open={true} maxWidth='md' fullWidth={true} >
             <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
-                {props.data?('Edit Program Stage '+props.data.name):('Create New Program Stage in Program '+props.programName)}
+                <div style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '90%'
+                }}>
+                    {props.data ? ('Edit Program Stage ' + props.data.name) : ('Create New Program Stage in Program ' + props.programName)}
+                </div>
             </CustomMUIDialogTitle >
             <DialogContent dividers style={{ padding: '1em 2em' }}>
                 <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

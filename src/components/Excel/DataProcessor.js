@@ -140,7 +140,7 @@ const DataProcessor = (props) => {
             programSection.dataElements.forEach((dataElement) => {
                 const  row = {};
 
-                row.form_name = dataElement.formName.replaceAll(' [C]','');
+                row.form_name = dataElement.formName?.replaceAll(' [C]','') || '';
                 row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : undefined;
                 row.optionSet = (typeof dataElement.optionSet !== 'undefined') ? dataElement.optionSet.name : undefined;
                 row.legend = (typeof dataElement.legendSet !== 'undefined') ? dataElement.legendSet.name : undefined;

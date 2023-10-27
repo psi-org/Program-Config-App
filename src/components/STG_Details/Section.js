@@ -21,7 +21,7 @@ import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import DraggableDataElement from "./DataElement.js";
 
-const DraggableSection = ({ program, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode, readOnly, setSaveStatus }) => {
+const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -132,6 +132,7 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
                                     stageSection.dataElements.map((de, i) => {
                                         return <DraggableDataElement
                                             program={program}
+                                            dePrefix={dePrefix}
                                             dataElement={de}
                                             stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)}
                                             DEActions={DEActions}
@@ -178,6 +179,7 @@ const DraggableSection = ({ program, stageSection, stageDataElements, DEActions,
 DraggableSection.propTypes = {
     DEActions: PropTypes.object,
     SectionActions: PropTypes.object,
+    dePrefix: PropTypes.string,
     editStatus: PropTypes.oneOfType([PropTypes.object,PropTypes.bool]),
     hnqisMode: PropTypes.bool,
     index: PropTypes.number,

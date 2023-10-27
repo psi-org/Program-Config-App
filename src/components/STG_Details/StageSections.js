@@ -198,7 +198,7 @@ const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     // Globals
     const programId = programStage.program.id;
-    const [isSectionMode, setIsSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0);
+    const [isSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0);
     const { data: androidSettings, refetch: refreshAndroidSettings } = useDataQuery(queryAndroidSettings);
     const { data: currentUser } = useDataQuery(queryCurrentUser);
     const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings, {
@@ -240,8 +240,6 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     const anchorRef = useRef(null);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
-    const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
-
     useEffect(() => {
         if (currentUser) {
             setAllAuth(currentUser.results.authorities.includes('ALL'))
@@ -257,7 +255,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 
     // States
     const [removedElements, setRemovedElements] = useState([])
-    const [originalProgramStageDataElements, setOriginalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
+    const [originalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
     const [sections, setSections] = useState((isSectionMode)
         ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
         : [buildBasicFormStage(programStage.programStageDataElements)]
@@ -878,8 +876,6 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                         }
                         {hnqisMode && isSectionMode &&
                             <ImportDownloadButton
-                                value={selectedIndexTemplate}
-                                setValue={setSelectedIndexTemplate}
                                 disabled={exportToExcel}
                                 setImporterEnabled={setImporterEnabled}
                                 setExportToExcel={setExportToExcel}
@@ -1118,31 +1114,39 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                         {
                             createMetadata.data && createMetadata.data.status == 'ERROR' && <ErrorReports errors={parseErrors(createMetadata.data)} />
                         }
-                        <Droppable droppableId="dpb-sections" type="SECTION" isDropDisabled={readOnly}>
-                            {(provided) => (
-                                <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
-                                    {
-                                        sections.map((pss, idx) => {
-                                            return <DraggableSection
-                                                program={programStage.program.id}
-                                                stageSection={pss}
-                                                editStatus={addedSection?.index === idx && addedSection}
-                                                stageDataElements={programStageDataElements}
-                                                DEActions={DEActions}
-                                                index={idx}
-                                                key={pss.id || idx}
-                                                SectionActions={SectionActions}
-                                                hnqisMode={hnqisMode}
-                                                isSectionMode={isSectionMode}
-                                                readOnly={readOnly}
-                                                setSaveStatus={setSaveStatus}
-                                            />
-                                        })
-                                    }
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
+                        {!programMetadata &&
+                            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '1em' }}>
+                                <CircularLoader />
+                            </div>
+                        }
+                        {programMetadata &&
+                            <Droppable droppableId="dpb-sections" type="SECTION" isDropDisabled={readOnly}>
+                                {(provided) => (
+                                    <div {...provided.droppableProps} ref={provided.innerRef} className="list-ml_item">
+                                        {
+                                            sections.map((pss, idx) => {
+                                                return <DraggableSection
+                                                    program={programStage.program.id}
+                                                    dePrefix={programMetadata.dePrefix || 'XXXXXXXXXXX'}
+                                                    stageSection={pss}
+                                                    editStatus={addedSection?.index === idx && addedSection}
+                                                    stageDataElements={programStageDataElements}
+                                                    DEActions={DEActions}
+                                                    index={idx}
+                                                    key={pss.id || idx}
+                                                    SectionActions={SectionActions}
+                                                    hnqisMode={hnqisMode}
+                                                    isSectionMode={isSectionMode}
+                                                    readOnly={readOnly}
+                                                    setSaveStatus={setSaveStatus}
+                                                />
+                                            })
+                                        }
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        }
                         {hnqisMode && (isSectionMode) &&
                             <>
                                 <CriticalCalculations stageSection={criticalSection} ikey={criticalSection?.id || "crit"} />
@@ -1206,6 +1210,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     saveAdd={saveAdd}
                     hnqisMode={hnqisMode}
                     setSaveStatus={setSaveStatus}
+                    dePrefix={programMetadata.dePrefix || 'XXXXXXXXXXX'}
                 />
             }
         </div>
