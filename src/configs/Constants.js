@@ -25,20 +25,20 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.0.0"
+const BUILD_VERSION = "2.0.1"
 const BUILD_DATE = "October, 2023"
 const MIN_VERSION = "2.37.x"
 const MAX_VERSION = "2.40.x"
 
-const PCA_METADATA_VERSION = "1.1.2";
+const PCA_METADATA_VERSION = "1.2.0";
 const H2_METADATA_VERSION = "1.1.2";
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
 
 //* PCA Metadata Package
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI", "haUflNqP85K"];
-const PCA_OPTION_SETS = ["TOcCuCN2CLm"];
-const PCA_OPTIONS = ["Ip3IqzzqgLN", "Jz4YKD15lnK", "QR0HHcQri91", "v9XPATv6G3N"];
+const PCA_OPTION_SETS = [];
+const PCA_OPTIONS = [];
 const PCA_USER_ROLES = ["QbYqOgwk5fJ", "JDmJ4ADTaDq"];
 
 //* HNQIS2 Tracked Entity Attributes
@@ -94,6 +94,9 @@ const H1_COMPLETION_DATE3 = "LPFqIi0Ml4a";
 const H1_ACTION_PLAN_OLD = "Im5C86I2ObV";   // ?Interpreted as Action 1
 const H1_ACTION1_OLD = "ibpjjNJLn44";       // ?Interpreted as Action 2
 const H1_ACTION2_OLD = "bwwyHVzxnTZ";       // ?Interpreted as Action 3
+
+const H1_QUESTION_HIDE_TYPE = "mvGz6QTxEQq";
+const H1_QUESTION_HIDE_GROUP = "LsjVjwl69sP";
 
 //* HNQIS2 Metadata Package
 const H2_REQUIRED = {
@@ -414,57 +417,6 @@ const DHIS2_KEY_MAP = {
     "visualizations": "Visualization",
 };
 
-//* Program Types besides Tracker and Event
-const PROGRAM_TYPE_OPTIONS = [
-    {
-        "code": "HNQIS",
-        "name": "HNQIS",
-        "id": "Ip3IqzzqgLN",
-        "sortOrder": 1,
-        "optionSet": { "id": "TOcCuCN2CLm" },
-        "translations": []
-    },
-    {
-        "code": "HNQIS2",
-        "name": "HNQIS 2.0",
-        "id": "Jz4YKD15lnK",
-        "sortOrder": 2,
-        "optionSet": { "id": "TOcCuCN2CLm" },
-        "translations": []
-    },
-    {
-        "code": "RDQA",
-        "name": "RDQA",
-        "id": "QR0HHcQri91",
-        "sortOrder": 3,
-        "optionSet": { "id": "TOcCuCN2CLm" },
-        "translations": []
-    },
-    {
-        "code": "EDS",
-        "name": "EDS",
-        "id": "v9XPATv6G3N",
-        "sortOrder": 4,
-        "optionSet": { "id": "TOcCuCN2CLm" },
-        "translations": []
-    }
-];
-
-const PROGRAM_TYPE_OPTION_SET = {
-    "name": "DB - Program Type",
-    "id": "TOcCuCN2CLm",
-    "version": 7,
-    "valueType": "TEXT",
-    "attributeValues": [],
-    "translations": [],
-    "options": [
-        { "id": "Ip3IqzzqgLN" },
-        { "id": "Jz4YKD15lnK" },
-        { "id": "QR0HHcQri91" },
-        { "id": "v9XPATv6G3N" }
-    ]
-};
-
 //* JSON Metadata Export related
 
 const EXPORT_PRESETS = [
@@ -593,6 +545,8 @@ export {
     H1_DUE_DATE2,
     H1_DUE_DATE3,
     H1_OVERALL_SCORE,
+    H1_QUESTION_HIDE_GROUP,
+    H1_QUESTION_HIDE_TYPE,
     H1_RESPONSIBLE1,
     H1_RESPONSIBLE2,
     H1_RESPONSIBLE3,
@@ -630,8 +584,6 @@ export {
     PCA_OPTIONS,
     PCA_USER_ROLES,
     PERIOD_TYPES,
-    PROGRAM_TYPE_OPTION_SET,
-    PROGRAM_TYPE_OPTIONS,
     QUESTION_ORDER_ATTRIBUTE,
     QUESTION_PARENT_ATTRIBUTE,
     QUESTION_PARENT_OPTIONS_ATTRIBUTE,

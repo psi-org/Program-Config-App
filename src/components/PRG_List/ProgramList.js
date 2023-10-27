@@ -1,6 +1,7 @@
 import { useDataQuery } from "@dhis2/app-runtime";
 import { Chip, CircularLoader, NoticeBox, Pagination, FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import BuildIcon from '@mui/icons-material/Build';
 import ClearIcon from '@mui/icons-material/Clear';
 import InfoIcon from '@mui/icons-material/Info';
 import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
@@ -184,26 +185,38 @@ const ProgramList = () => {
                     <MuiButton
                         variant="outlined"
                         color="inherit"
+                        size="large"
                         startIcon={<AddCircleOutlineIcon />}
                         onClick={() => setShowProgramForm(true)}
                         disabled={showProgramForm}
+                        sx={{verticalAlign: 'center'}}
                     >
                         Add Program
                     </MuiButton>
-                    <IconButton
+                    <MuiButton
+                        variant="text"
                         color="inherit"
+                        size="large"
+                        startIcon={<SettingsIcon />}
                         onClick={() => {
                             setRef(document.getElementById("settingsMenu"));
                             setSettingsMenu(!settingsMenu);
                         }}
                         id={"settingsMenu"}
                     >
-                        <SettingsIcon />
-                    </IconButton>
+                        Settings
+                    </MuiButton>
                     {settingsMenu && (
                         <Layer onClick={() => setSettingsMenu(!settingsMenu)}>
                             <Popper reference={ref} placement="bottom-end">
                                 <FlyoutMenu>
+                                    <MenuItem
+                                        label="System Objects"
+                                        disabled={true}
+                                        icon={<BuildIcon />}
+                                        onClick={() => {
+                                        }}
+                                    />
                                     <MenuItem
                                         label="About PCA"
                                         icon={<InfoIcon />}
@@ -283,7 +296,9 @@ const ProgramList = () => {
                 </div>
             </div>
             <div>
-                <div className="title" style={{ padding: '1.5em 1em 0' }}>List of Programs</div>
+                <div className="title" style={{ padding: '1.5em 1em 0'}}>
+                    <span>List of Programs</span>
+                </div>
 
                 <div style={{ display: "flex", alignItems: "center", padding: '0 1.2em' }}>
                     <TextField
@@ -299,7 +314,7 @@ const ProgramList = () => {
                                 doSearch();
                             }
                         }}
-                        sx={{ width: "100%" }}
+                        sx={{ width: "100%"}}
                         autoComplete="off"
                         InputProps={{
                             endAdornment: (
@@ -323,7 +338,7 @@ const ProgramList = () => {
                                         }}
                                         startIcon={<SearchIcon />}
                                         variant="contained"
-                                        color="primary"
+                                        color="info"
                                     >
                                         Search
                                     </MuiButton>

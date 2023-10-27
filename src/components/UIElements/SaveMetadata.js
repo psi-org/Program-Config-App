@@ -104,14 +104,18 @@ const processStageData = (
 
             const DE_metadata = JSON.parse(dataElement.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
 
-            const newVarName = hnqisMode ? `_S${padValue(secIdx + 1,"00")}Q${padValue(deIdx + 1,"000")}` : `_PS${padValue(stageIndex + 1,"00")}_S${padValue(secIdx + 1,"00")}E${padValue(deIdx + 1,"000")}`;
-            const newCode = `${programMetadata.dePrefix || section.id}${newVarName}`;
+            const newVarName = hnqisMode ? `_S${padValue(secIdx + 1, "00")}Q${padValue(deIdx + 1, "000")}` : `_PS${padValue(stageIndex + 1, "00")}_S${padValue(secIdx + 1, "00")}E${padValue(deIdx + 1, "000")}`;
+            const prefixOption = section.id === 'basic-form' ? programStage.id : section.id;
+            const newCode = `${programMetadata.dePrefix || prefixOption}${newVarName}`;
+            // generate a 11 character code that can include digits and letters
+
+
 
             let formName = ""
             if (hnqisMode) {
                 formName = DE_metadata.elemType == 'label' ? DE_metadata.labelFormName : dataElement.formName;
 
-                formName = formName.replaceAll(' [C]', '');
+                formName = formName?.replaceAll(' [C]', '') || '';
                 if (DE_metadata.isCritical == 'Yes') { formName += ' [C]' }
                 DE_metadata.elemType == 'label' ? DE_metadata.labelFormName = formName : dataElement.formName = formName;
             } else {

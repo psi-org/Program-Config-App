@@ -59,17 +59,18 @@ const HnqisProgramConfigs = {
             "searchable": false,
             "displayInList": true,
             "sortOrder": 4
-        },
-        {
-            "trackedEntityAttribute": { "id": "ulU9KKgSLYe" },
-            "mandatory": false,
-            "valueType": "TEXT",
-            "searchable": false,
-            "displayInList": false,
-            "sortOrder": 5
         }
     ],
     "userGroupAccesses": []
+}
+
+const COMPETENCY_TEA = {
+    "trackedEntityAttribute": { "id": "ulU9KKgSLYe" },
+    "mandatory": false,
+    "valueType": "TEXT",
+    "searchable": false,
+    "displayInList": false,
+    "sortOrder": 5
 }
 
 const PS_AssessmentStage = {
@@ -178,6 +179,7 @@ const PS_Generic = {
 }
 
 module.exports = {
+    COMPETENCY_TEA,
     Program,
     EventStage,
     HnqisProgramConfigs,

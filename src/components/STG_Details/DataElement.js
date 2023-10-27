@@ -21,7 +21,7 @@ import ValidationMessages from "../UIElements/ValidationMessages.js";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import DataElementForm from "./DataElementForm.js";
 
-const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, section, index, hnqisMode, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
+const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActions, section, index, hnqisMode, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -63,7 +63,7 @@ const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, sectio
         <>
             <Draggable
                 key={dataElement.id || index}
-                draggableId={dataElement.id || dataElement.formName.slice(-15)}
+                draggableId={dataElement.id || dataElement.formName?.slice(-15) || index}
                 index={index}
                 isDragDisabled={dataElement.importStatus != undefined || DEActions.deToEdit !== '' || !isSectionMode || readOnly}
             >
@@ -73,13 +73,21 @@ const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, sectio
                             <div className="ml_item-icon" style={{ display: 'flex', alignItems: 'center' }}>
                                 {!hnqisMode ? <DEIcon /> : (metadata.elemType === 'label' ? <LabelIcon /> : <QuizIcon />)}
                             </div>
-                            <div className="ml_item-title">
+                            <div className="ml_item-title" style={{ maxWidth: '80vw' }}>
                                 {deImportStatus}
                                 {
                                     renderFormName ? renderFormName :
                                         (
-                                            (dataElement.formName && dataElement.formName?.replaceAll(' ', '') !== '') ?
-                                                dataElement.formName :
+                                            (dataElement.formName && dataElement.formName?.replaceAll(' ', '') !== '')
+                                                ?
+                                                <div style={{
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap'
+                                                }}>
+                                                    {dataElement.formName}
+                                                </div>
+                                                :
                                                 <span style={{ display: 'flex', alignItems: 'center' }}>
                                                     <em style={{ marginRight: '0.5em' }}>{dataElement.name}</em>
                                                     <Tooltip title="No Form Name provided" placement="right" color="warning">
@@ -114,6 +122,7 @@ const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, sectio
                         {DEActions.deToEdit === dataElement.id &&
                             <DataElementForm
                                 program={program}
+                                dePrefix={dePrefix}
                                 programStageDataElement={stageDE}
                                 section={section}
                                 setDeToEdit={DEActions.setEdit}
@@ -148,6 +157,7 @@ const DraggableDataElement = ({ program, dataElement, stageDE, DEActions, sectio
 DraggableDataElement.propTypes = {
     DEActions: PropTypes.object,
     dataElement: PropTypes.object,
+    dePrefix: PropTypes.string,
     deStatus: PropTypes.object,
     hnqisMode: PropTypes.bool,
     index: PropTypes.number,

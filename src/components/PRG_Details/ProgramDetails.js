@@ -3,7 +3,7 @@ import { Chip, CircularLoader, NoticeBox, IconCheckmarkCircle24, IconCross24 } f
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ConstructionIcon from '@mui/icons-material/Construction';
-import { Button, DialogActions, DialogContent } from "@mui/material";
+import { Button, DialogActions, DialogContent, Tooltip } from "@mui/material";
 import MuiAlert from '@mui/material/Alert';
 import MuiButton from '@mui/material/Button';
 import MuiChip from '@mui/material/Chip';
@@ -110,7 +110,7 @@ const ProgramDetails = () => {
     }
 
     const program = useSelector(state => state.program);
-    
+
     const metadataDM = useDataMutation(createMutation, {
         onError: (err) => {
             console.error(err)
@@ -134,7 +134,6 @@ const ProgramDetails = () => {
     const [notification, setNotification] = useState(undefined);
     const [snackSeverity, setSnackSeverity] = useState(undefined);
     const [newStage, setNewStage] = useState();
-    const [selectedIndexTemplate, setSelectedIndexTemplate] = useState(0);
     const [importerEnabled, setImporterEnabled] = useState(false);
     const [exportToExcel, setExportToExcel] = useState(false);
     const [saveStatus, setSaveStatus] = useState('Validate');
@@ -150,7 +149,7 @@ const ProgramDetails = () => {
     useEffect(() => {
         if (notification) { setSnackSeverity(notification.severity) }
     }, [notification])
-    
+
     // Get Ids
     const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: 0 } });
     //setUidPool(idsQuery.data?.results.codes);
@@ -246,7 +245,7 @@ const ProgramDetails = () => {
             setSaveAndBuild('Run');
 
             const programStages = programConfig.results?.programStages;
-            const n = (programStages?.reduce((acu, cur) => acu + (cur.programStageDataElements?.length || 0), 0) || 0)*2;
+            const n = (programStages?.reduce((acu, cur) => acu + (cur.programStageDataElements?.length || 0), 0) || 0) * 2;
 
             idsQuery.refetch({ n }).then(uidData => {
                 if (uidData) {
@@ -263,7 +262,7 @@ const ProgramDetails = () => {
                             : [{
                                 dataElements: stage.programStageDataElements.map(psde => psde.dataElement)
                             }];
-                        
+
                         const varNameRef = stageSections.map(sec => sec.dataElements.map(de => {
                             const metadata = getPCAMetadataDE(de)
                             return { id: de.id, varName: metadata.varName }
@@ -342,20 +341,7 @@ const ProgramDetails = () => {
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns" style={{ display: 'flex', alignItems: 'center' }}>
-                    {!hnqisMode && !data.results.withoutRegistration &&
-                        <>
-                            <MuiButton
-                                variant="outlined"
-                                color='inherit'
-                                startIcon={<AddCircleOutlineIcon />}
-                                onClick={() => setShowStageForm(true)}
-                                disabled={showStageForm || importResults !== undefined}>
-                                Add Program Stage
-                            </MuiButton>
-                        </>
-                    }
-                    {
-                        !hnqisMode && !readOnly &&
+                    {!hnqisMode && !readOnly &&
                         <>
                             <Button
                                 color='inherit'
@@ -375,8 +361,6 @@ const ProgramDetails = () => {
                             >Build Program Rules</Button>
 
                             <ImportDownloadButton
-                                value={selectedIndexTemplate}
-                                setValue={setSelectedIndexTemplate}
                                 disabled={exportToExcel}
                                 setImporterEnabled={setImporterEnabled}
                                 setExportToExcel={setExportToExcel}
@@ -391,29 +375,49 @@ const ProgramDetails = () => {
                     }
                 </div>
             </div>
-            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'start', alignItems: 'center' }}>
-                <span style={{
+            <div className="title" style={{ padding: '1.5em 1em 0', overflow: 'hidden', display: 'flex', maxWidth: '100vw', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
+                    maxWidth: '75%'
                 }}>
-                    {!data.results.withoutRegistration ? 'Program Stages for Program ' : 'Event Program '}
-                    <strong style={{ maxWidth: '100%' }}>
-                        {data.results.displayName}
-                    </strong>
-                </span>
-                {readOnly &&
-                    <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
+
+                    <span>
+                        {!data.results.withoutRegistration ? 'Program Stages for Program ' : 'Event Program '}
+                        <Tooltip title={data.results.displayName} placement="bottom">
+                            <strong style={{ maxWidth: '100%' }}>
+                                {data.results.displayName}
+                            </strong>
+                        </Tooltip>
+                    </span>
+
+                    {readOnly &&
+                        <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
+                    }
+                </div>
+
+
+                {!hnqisMode && !data.results.withoutRegistration &&
+                    <MuiButton
+                        variant="contained"
+                        color='primary'
+                        startIcon={<AddCircleOutlineIcon />}
+                        onClick={() => setShowStageForm(true)}
+                        disabled={showStageForm || importResults !== undefined}>
+                        Add Program Stage
+                    </MuiButton>
                 }
             </div>
-            {!hnqisMode && saveAndBuild &&
+            {
+                !hnqisMode && saveAndBuild &&
 
                 <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
                     <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => { if ((saveAndBuild === 'Completed') || (createMetadata?.data?.status === 'ERROR')) { setSaveAndBuild(false); setProgressSteps(0); } }}>
                         Setting Up Program Rules for {data.results.displayName}
                     </CustomMUIDialogTitle >
                     <DialogContent dividers style={{ padding: '1em 2em' }}>
-                        {(progressSteps > 0) && 
+                        {(progressSteps > 0) &&
                             <div className="progressItem">
                                 {progressSteps === 1 && <CircularLoader small />}
                                 {progressSteps === 1 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
@@ -421,7 +425,7 @@ const ProgramDetails = () => {
                                 <p style={{ maxWidth: '90%' }}> Fetching IDs</p>
                             </div>
                         }
-                        {(progressSteps > 1) && 
+                        {(progressSteps > 1) &&
                             <div className="progressItem">
                                 {progressSteps === 2 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
                                 {progressSteps === 2 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
@@ -429,7 +433,7 @@ const ProgramDetails = () => {
                                 <p style={{ maxWidth: '90%' }}> Building new Metadata</p>
                             </div>
                         }
-                        {(progressSteps > 2) && 
+                        {(progressSteps > 2) &&
                             <div className="progressItem">
                                 {progressSteps === 3 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
                                 {progressSteps === 3 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
@@ -437,7 +441,7 @@ const ProgramDetails = () => {
                                 <p style={{ maxWidth: '90%' }}> Deleting old Metadata</p>
                             </div>
                         }
-                        {(progressSteps > 3) && 
+                        {(progressSteps > 3) &&
                             <div className="progressItem">
                                 {progressSteps === 4 && createMetadata?.data?.status !== "ERROR" && <CircularLoader small />}
                                 {progressSteps === 4 && createMetadata?.data?.status === "ERROR" && <IconCross24 color={'#d63031'} />}
@@ -445,7 +449,7 @@ const ProgramDetails = () => {
                                 <p style={{ maxWidth: '90%' }}> Importing new Metadata</p>
                             </div>
                         }
-                        {(progressSteps > 4) && 
+                        {(progressSteps > 4) &&
                             <div className="progressItem">
                                 <IconCheckmarkCircle24 color={'#00b894'} />
                                 <p> Process completed</p>
@@ -504,7 +508,7 @@ const ProgramDetails = () => {
                                             setNotification={setNotification}
                                             stagesRefetch={refetch}
                                             setNewStage={setNewStage}
-                                            editStatus={newStage?.stage === programStage.id?(newStage?.mode||''):''}
+                                            editStatus={newStage?.stage === programStage.id ? (newStage?.mode || '') : ''}
                                             hnqisMode={hnqisMode}
                                             eventMode={data.results.withoutRegistration}
                                         />
@@ -561,7 +565,7 @@ const ProgramDetails = () => {
                     />
                 }
             </div>
-        </div>
+        </div >
     );
 }
 

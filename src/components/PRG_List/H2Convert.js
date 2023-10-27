@@ -17,10 +17,10 @@ import DialogContent from "@mui/material/DialogContent";
 import LinearProgress from "@mui/material/LinearProgress";
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from "react";
-import { QUESTION_TYPE_ATTRIBUTE, DE_TYPE_ATTRIBUTE, HEADER_ATTRIBUTE, QUESTION_PARENT_ATTRIBUTE, QUESTION_PARENT_OPTIONS_ATTRIBUTE, COMPOSITIVE_SCORE_ATTRIBUTE, SCORE_NUM_ATTRIBUTE, SCORE_DEN_ATTRIBUTE, QUESTION_ORDER_ATTRIBUTE, METADATA, FEEDBACK_ORDER, COMPETENCY_ATTRIBUTE, COMPETENCY_CLASS, FEEDBACK_TEXT, LEGEND_YES_NO } from "../../configs/Constants.js";
+import { QUESTION_TYPE_ATTRIBUTE, DE_TYPE_ATTRIBUTE, HEADER_ATTRIBUTE, QUESTION_PARENT_ATTRIBUTE, QUESTION_PARENT_OPTIONS_ATTRIBUTE, COMPOSITIVE_SCORE_ATTRIBUTE, SCORE_NUM_ATTRIBUTE, SCORE_DEN_ATTRIBUTE, QUESTION_ORDER_ATTRIBUTE, METADATA, FEEDBACK_ORDER, COMPETENCY_CLASS, FEEDBACK_TEXT, LEGEND_YES_NO, H1_QUESTION_HIDE_GROUP, H1_QUESTION_HIDE_TYPE } from "../../configs/Constants.js";
 import { parseErrorsJoin, parseErrorsUL, DeepCopy, padValue } from "../../utils/Utils.js";
 import AlertDialogSlide from "../UIElements/AlertDialogSlide.js";
-import { Program, HnqisProgramConfigs, PS_AssessmentStage, PS_ActionPlanStage, PSS_CriticalSteps, PSS_Scores } from "./../../configs/ProgramTemplate.js";
+import { Program, HnqisProgramConfigs, PS_AssessmentStage, PS_ActionPlanStage, PSS_CriticalSteps, PSS_Scores, COMPETENCY_TEA } from "./../../configs/ProgramTemplate.js";
 import CustomMUIDialog from "./../UIElements/CustomMUIDialog.js";
 import CustomMUIDialogTitle from "./../UIElements/CustomMUIDialogTitle.js";
 import H2Setting from "./H2Setting.js";
@@ -343,6 +343,20 @@ const H2Convert = ({
 
         const program_dataElements = [];
         const program_programStageDataElements = [];
+        const questionHideGroups = {}; // {parent: <id>, children: [<id>, <id>,...]}
+
+        //* Mapping Parents-Children in the Hide Group way
+        sections.forEach((section) => {
+            section.dataElements.forEach((de) => {
+                const hideGroup = de.metadata[H1_QUESTION_HIDE_GROUP];
+                const hideType = de.metadata[H1_QUESTION_HIDE_TYPE];
+                if (hideGroup && hideType) {
+                    if (hideType === "PARENT") {
+                        questionHideGroups[hideGroup] = de.programStageDataElement.dataElement.id;
+                    }
+                }
+            });
+        });
 
         let newSections = sections.map((section, sectionIndex) => {
             section.dataElements = section.dataElements
@@ -352,10 +366,10 @@ const H2Convert = ({
                         parseInt(b.metadata[QUESTION_ORDER_ATTRIBUTE])
                 )
                 .filter(
-                    (de) =>
-                        de.programStageDataElement.dataElement.formName
-                            .toLowerCase()
-                            .replaceAll(" ", "") !== "endoftab"
+                    (de) => {
+                        const testDE = de.programStageDataElement.dataElement.formName || '';
+                        return testDE.toLowerCase().replaceAll(" ", "") !== "endoftab"
+                    }
                 )
                 .map((de, deIndex) => {
                     // SAVE PROGRAM STAGE DATA ELEMENT
@@ -434,13 +448,23 @@ const H2Convert = ({
                         dataElement.displayDescription = undefined;
                     }
 
-                    const parentValue = optionsMap.find(
+                    let parentQuestion = de.metadata[QUESTION_PARENT_ATTRIBUTE];
+                    let parentValue = optionsMap.find(
                         (option) =>
                             option.id ===
                             de.metadata[
                                 QUESTION_PARENT_OPTIONS_ATTRIBUTE
                             ]?.split(",")[0]
                     )?.code;
+
+                    const hideGroup = de.metadata[H1_QUESTION_HIDE_GROUP];
+                    const hideType = de.metadata[H1_QUESTION_HIDE_TYPE];
+
+                    if (!parentQuestion && hideGroup && hideType === "CHILD") {
+                        parentQuestion = questionHideGroups[hideGroup];
+                        parentValue = 1;
+                    }
+
                     const pcaMetadata = {
                         elemType: "question",
                         isCompulsory: de.programStageDataElement.compulsory
@@ -450,7 +474,7 @@ const H2Convert = ({
                             ? "Yes"
                             : "No",
                         varName: `_S${padValue(sectionIndex + 1, "00")}Q${padValue(deIndex + 1,"000")}`,
-                        parentQuestion: de.metadata[QUESTION_PARENT_ATTRIBUTE],
+                        parentQuestion,
                         parentValue: parseFloat(parentValue) || parentValue,
                         scoreNum:
                             parseFloat(de.metadata[SCORE_NUM_ATTRIBUTE]) ||
@@ -607,6 +631,8 @@ const H2Convert = ({
 
             const pcaMetadataVal = h2SettingsRef.current.saveMetaData();
             const useCompetency = pcaMetadataVal?.useCompetencyClass === 'Yes';
+
+            console.log(pcaMetadataVal, useCompetency);
             
             pcaMetadataVal.h1Program = programOld.id;
             pcaMetadataVal.dePrefix = programOld.shortName.slice(0, 22) + " H2";
@@ -660,24 +686,12 @@ const H2Convert = ({
             scores.dataElements = newScores;
 
             if (!useCompetency) {
-                const indexA = prgrm.programTrackedEntityAttributes.findIndex(
-                    (attr) => {
-                        return (
-                            attr.trackedEntityAttribute.id ===
-                            COMPETENCY_ATTRIBUTE
-                        );
-                    }
-                );
-                prgrm.programTrackedEntityAttributes.splice(indexA, 1);
-
-                prgrm.programStages = prgrm.programStages.map((ps) => ({
-                    id: ps.id,
-                }));
-
                 const indexB = criticalSteps.dataElements.findIndex((de) => {
                     return de.id === COMPETENCY_CLASS;
                 });
                 criticalSteps.dataElements.splice(indexB, 1);
+            } else {
+                prgrm.programTrackedEntityAttributes.push(DeepCopy(COMPETENCY_TEA));
             }
 
             assessmentStage.programStageDataElements = program_programStageDataElements.map((psde) => {
@@ -871,7 +885,7 @@ const H2Convert = ({
                         </>
                     )}
                     {sectionsData && (
-                        <>
+                        <div>
                             <p
                                 style={{
                                     fontSize: "1.2em",
@@ -1077,7 +1091,7 @@ const H2Convert = ({
                                     </Accordion>
                                 )}
                             </div>
-                        </>
+                        </div>
                     )}
                 </DialogContent>
 

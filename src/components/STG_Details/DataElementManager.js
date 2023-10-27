@@ -1,7 +1,9 @@
 import { useDataQuery } from '@dhis2/app-runtime'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { IconButton, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
@@ -208,6 +210,22 @@ const DataElementManager = (props) => {
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position='end'>
+                                                <Tooltip
+                                                    title="Clear Search"
+                                                    placement="left"
+                                                >
+                                                    <IconButton
+                                                        onClick={() => {
+                                                            setRows([]);
+                                                            setTotalRows(0);
+                                                            setPage(1);
+                                                            setFilterValue('');
+                                                        }}
+                                                        style={{ marginRight: "0.5em" }}
+                                                    >
+                                                        <ClearIcon />
+                                                    </IconButton>
+                                                </Tooltip>
                                                 <Button onClick={() => {
                                                     if (filterValue!=='') {
                                                         if (page === 1) {
@@ -259,6 +277,7 @@ const DataElementManager = (props) => {
                         <TabPanel value={tabValue} index={1}>
                             <DataElementForm
                                 program={props.program}
+                                dePrefix={props.dePrefix}
                                 programStageDataElement={{}}
                                 section={{}}
                                 setDeToEdit={undefined}
@@ -294,6 +313,7 @@ const DataElementManager = (props) => {
 }
 
 DataElementManager.propTypes = {
+    dePrefix: PropTypes.string,
     deRef: PropTypes.object,
     hnqisMode: PropTypes.bool,
     program: PropTypes.string,
