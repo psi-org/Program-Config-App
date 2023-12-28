@@ -25,13 +25,13 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.0.1"
-const BUILD_DATE = "October, 2023"
+const BUILD_VERSION = "2.0.2"
+const BUILD_DATE = "January, 2024"
 const MIN_VERSION = "2.37.x"
 const MAX_VERSION = "2.40.x"
 
 const PCA_METADATA_VERSION = "1.2.0";
-const H2_METADATA_VERSION = "1.1.2";
+const H2_METADATA_VERSION = "1.1.3";
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
 
@@ -131,6 +131,7 @@ const H2_REQUIRED = {
         "OqRNLt5Nbub",
         "MstdLcCaYZW",
         "Jhn703YNPa1",
+        "jHAilN60gsN"
     ],
     trackedEntityTypes: [ASSESSMENT_TET],
     trackedEntityAttributes: [

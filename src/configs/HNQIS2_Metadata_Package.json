@@ -273,6 +273,15 @@
             "translations": []
         },
         {
+            "code": "WASH",
+            "name": "WASH",
+            "id": "jHAilN60gsN",
+            "sortOrder": 19,
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            }
+        },
+        {
             "code": "VMMC",
             "name": "VMMC",
             "id": "Jhn703YNPa1",
@@ -361,6 +370,7 @@
                 {"id": "e10afvAkkPR"},
                 {"id": "OqRNLt5Nbub"},
                 {"id": "MstdLcCaYZW"},
+                {"id": "jHAilN60gsN"},
                 {"id": "Jhn703YNPa1"}
             ]
         },
