@@ -183,7 +183,18 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
 
     const compulsoryChange = (data) => setCompulsory(data.target.checked)
 
-    const autoNamingChange = (data) => setAutoNaming(data.target.checked)
+    const removeNamingValidationErrors = () => {
+        validationErrors.formName = undefined
+        validationErrors.elementName = undefined
+        validationErrors.shortName = undefined
+        validationErrors.elementCode = undefined
+        setValidationErrors({ ...validationErrors })
+    }
+
+    const autoNamingChange = (data) => {
+        removeNamingValidationErrors()
+        setAutoNaming(data.target.checked)
+    }
 
     const displayInReportsChange = (data) => setDisplayInReports(data.target.checked)
 
@@ -218,20 +229,21 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     const descriptionChange = (data) => setDescription(data.target.value)
 
     const criticalChange = (data) => setCritical(data.target.checked)
-
-    const numeratorChange = data => {
+    
+    const removeScoringValidationErrors = () => {
         validationErrors.numerator = undefined
         validationErrors.denominator = undefined
         validationErrors.feedbackOrder = undefined
         setValidationErrors({ ...validationErrors })
+    }
+
+    const numeratorChange = data => {
+        removeScoringValidationErrors()
         setNumerator(data.target.value)
     }
 
     const denominatorChange = data => {
-        validationErrors.numerator = undefined
-        validationErrors.denominator = undefined
-        validationErrors.feedbackOrder = undefined
-        setValidationErrors({ ...validationErrors })
+        removeScoringValidationErrors()
         setDenominator(data.target.value)
     }
 
@@ -262,16 +274,6 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
             validationErrors.aggType = undefined
         }
 
-        if (formName.trim() === '') {
-            response = false
-            validationErrors.formName = 'This field is required'
-        } else if (formName.length < MIN_NAME_LENGTH || formName.length > (MAX_FORM_NAME_LENGTH-prefixLength)) {
-            response = false
-            validationErrors.formName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH - prefixLength} characters`
-        } else {
-            validationErrors.formName = undefined
-        }
-
         if (!autoNaming) {
             if (elementName.trim() === '') {
                 response = false
@@ -299,7 +301,18 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
             } else {
                 validationErrors.elementCode = undefined
             }
+            validationErrors.formName = undefined
         } else {
+            if (formName.trim() === '') {
+                response = false
+                validationErrors.formName = 'This field is required'
+            } else if (formName.length < MIN_NAME_LENGTH || formName.length > (MAX_FORM_NAME_LENGTH - prefixLength)) {
+                response = false
+                validationErrors.formName = `This field must contain between ${MIN_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH - prefixLength} characters`
+            } else {
+                validationErrors.formName = undefined
+            }
+
             validationErrors.elementName = undefined
             validationErrors.shortName = undefined
             validationErrors.elementCode = undefined
@@ -703,7 +716,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                         autoComplete='off'
                         fullWidth
                         margin="normal"
-                        label="Form Name (*)"
+                        label={"Form Name" + (autoNaming ? " (*)" : "")}
                         variant="standard"
                         value={formName}
                         onChange={formNameChange}
