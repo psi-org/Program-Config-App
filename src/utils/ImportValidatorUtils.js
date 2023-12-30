@@ -690,16 +690,16 @@ export const validateDataElement = (dataElement, errorDetails, dataElementsList)
 
     const errors = [];
     const metadata = getPCAMetadataDE(dataElement);
-
-    validate(validations.checkHasCorrelative, hasCorrelative, { metadata }, errors);
-    validate(validations.checkHasFormName, checkHasProperty, { object: dataElement, property: 'formName' }, errors);
     validate(validations.checkFormNameLength, checkPropertyLength, { object: dataElement, property: 'formName', min: MIN_DATA_ELEMENT_NAME_LENGTH, max: MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH }, errors);
+    validate(validations.checkHasCorrelative, hasCorrelative, { metadata }, errors);
     if (metadata.autoNaming === 'No') {
         validate(validations.checkHasName, checkHasProperty, { object: dataElement, property: 'name' }, errors);
         validate(validations.checkNameLength, checkPropertyLength, { object: dataElement, property: 'name', min: MIN_DATA_ELEMENT_NAME_LENGTH, max: MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH }, errors);
         validate(validations.checkHasShortName, checkHasProperty, { object: dataElement, property: 'shortName' }, errors);
         validate(validations.checkShortNameLength, checkPropertyLength, { object: dataElement, property: 'shortName', min: 0, max: MAX_SHORT_NAME_LENGTH }, errors);
         validate(validations.checkCodeLength, checkPropertyLength, { object: dataElement, property: 'code', min: 0, max: MAX_SHORT_NAME_LENGTH }, errors);
+    } else {
+        validate(validations.checkHasFormName, checkHasProperty, { object: dataElement, property: 'formName' }, errors);
     }
     validate(validations.checkHasValueType, checkHasProperty, { object: dataElement, property: 'valueType' }, errors);
     validate(validations.checkHasParentLogic, hasBothParentLogicComponents, { metadata }, errors);
