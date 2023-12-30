@@ -224,8 +224,8 @@ export const TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS = {
         prompt: 'Correlative not defined.'
     },
     formNameNotDefined: {
-        formula: 'AND(ISBLANK($D3),NOT(ISBLANK($A3)))',
-        dynamicFormula: 'AND(ISBLANK($D_ROWNUM_),NOT(ISBLANK($A_ROWNUM_)))',
+        formula: 'AND(ISBLANK($D3),NOT(ISBLANK($A3)),$C3="Yes")',
+        dynamicFormula: 'AND(ISBLANK($D_ROWNUM_),NOT(ISBLANK($A_ROWNUM_)),$C_ROWNUM_="Yes")',
         prompt: 'Form Name not defined.'
     },
     nameNotDefined: {
@@ -244,8 +244,8 @@ export const TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS = {
         prompt: 'Structure not defined.'
     },
     formNameOutOfRange: {
-        formula: `AND(NOT(ISBLANK($A3)),OR(LEN($D3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($D3)>${MAX_FORM_NAME_LENGTH}))`,
-        dynamicFormula: `AND(NOT(ISBLANK($A_ROWNUM_)),OR(LEN($D_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($D_ROWNUM_)>${MAX_FORM_NAME_LENGTH}))`,
+        formula: `AND(NOT(ISBLANK($A3)),NOT(ISBLANK($D3)),OR(LEN($D3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($D3)>${MAX_FORM_NAME_LENGTH}))`,
+        dynamicFormula: `AND(NOT(ISBLANK($A_ROWNUM_)),NOT(ISBLANK($D_ROWNUM_)),OR(LEN($D_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($D_ROWNUM_)>${MAX_FORM_NAME_LENGTH}))`,
         prompt: `Form Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_FORM_NAME_LENGTH} characters).`
     },
     nameOutOfRange: {
