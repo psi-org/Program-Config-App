@@ -38,7 +38,7 @@ const About = (props) => {
                     <div><strong>Version Build date</strong> : {BUILD_DATE}</div>
                     <div><strong>DHIS2 Server version</strong> : {localStorage.getItem('SERVER_VERSION')}</div>
                     <div>
-                        <span><strong>Program Configuration App metadata</strong> {!pcaMetadata?.results && <span style={{ color: 'red' }}>Not Found</span>}</span>
+                        <span><strong>Program Configuration App Metadata</strong> {!pcaMetadata?.results && <span style={{ color: 'red' }}>Not Found</span>}</span>
                         {pcaMetadata?.results && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1em', margin: '0.5em 0 0 1em' }}>
                                 <div>

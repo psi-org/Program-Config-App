@@ -791,6 +791,7 @@ const ProgramNew = (props) => {
                             { id: NON_CRITICAL_STEPS },
                             { id: COMPETENCY_CLASS },
                         ];
+
                         prgrm.programTrackedEntityAttributes =
                             prgrm.programTrackedEntityAttributes.filter(
                                 (ptea) =>
@@ -954,7 +955,9 @@ const ProgramNew = (props) => {
         const index = programTrackedEntityAttributes.findIndex((attr) => {
             return attr.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE;
         });
-        programTrackedEntityAttributes.splice(index, 1);
+        if (index > -1) {
+            programTrackedEntityAttributes.splice(index, 1);
+        }
     }
 
     function removeCompetencyClass(dataElements) {
