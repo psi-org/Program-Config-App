@@ -332,8 +332,8 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
         prompt: 'Data Element configured as Label.'
     },
     feedbackOrderNotDefined: {
-        formula: 'OR(AND(OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3)), AND($B3="score", ISBLANK($K3)))',
-        dynamicFormula: 'OR(AND(OR(NOT(ISBLANK($I_ROWNUM_)),NOT(ISBLANK($J_ROWNUM_))), ISBLANK($K_ROWNUM_)), AND($B_ROWNUM_="score", ISBLANK($K_ROWNUM_)))',
+        formula: 'OR(AND($B3="question", OR(NOT(ISBLANK($I3)),NOT(ISBLANK($J3))), ISBLANK($K3)), AND($B3="score", ISBLANK($K3)))',
+        dynamicFormula: 'OR(AND($B_ROWNUM_="question", OR(NOT(ISBLANK($I_ROWNUM_)),NOT(ISBLANK($J_ROWNUM_))), ISBLANK($K_ROWNUM_)), AND($B_ROWNUM_="score", ISBLANK($K_ROWNUM_)))',
         prompt: 'Feedback Order not defined.'
     },
     incompleteScoring: {

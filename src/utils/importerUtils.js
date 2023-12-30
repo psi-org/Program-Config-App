@@ -239,15 +239,6 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
             : '';
     parsedDE.domainType = 'TRACKER';
 
-    if (data[HNQIS2_TEMPLATE_MAP.optionSet] && data[HNQIS2_TEMPLATE_MAP.optionSet] !== "") {
-        const os = getObjectByProperty(data[HNQIS2_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
-        if (os) {
-            parsedDE.optionSet = { id: os.id };
-            parsedDE.optionSetValue = true;
-            data[HNQIS2_TEMPLATE_MAP.valueType] = os.valueType;
-        }
-    }
-
     if (type == 'score') {
         code = programPrefix + '_CS' + data[HNQIS2_TEMPLATE_MAP.feedbackOrder];
         aggType = 'AVERAGE';
@@ -273,15 +264,40 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
     parsedDE.aggregationType = aggType;
 
     parsedDE.parentName = data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???';
+
     parsedDE.attributeValues = (existingDe?.attributeValues?.filter(att =>
         ![FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA].includes(att.attribute.id)
     ) || []);
 
-    if (data[HNQIS2_TEMPLATE_MAP.legend] && data[HNQIS2_TEMPLATE_MAP.legend] !== "") {
-        parsedDE.legendSet = { id: getObjectIdByProperty(data[HNQIS2_TEMPLATE_MAP.legend], legendSets, 'legendSet') };
-        parsedDE.legendSets = [
-            { id: getObjectIdByProperty(data[HNQIS2_TEMPLATE_MAP.legend], legendSets, 'legendSet') }
-        ];
+    const metadata = {
+        elemType: type,
+        varName: data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???',
+        autoNaming: 'Yes'
+    };
+
+    if (type === 'question') {
+
+        metadata.isCompulsory = data[HNQIS2_TEMPLATE_MAP.isCompulsory] || "No"
+        metadata.isCritical = data[HNQIS2_TEMPLATE_MAP.isCritical] || "No"
+
+        if (data[HNQIS2_TEMPLATE_MAP.optionSet] && data[HNQIS2_TEMPLATE_MAP.optionSet] !== "") {
+            const os = getObjectByProperty(data[HNQIS2_TEMPLATE_MAP.optionSet], optionSets, 'optionSet');
+            if (os) {
+                parsedDE.optionSet = { id: os.id };
+                parsedDE.optionSetValue = true;
+                data[HNQIS2_TEMPLATE_MAP.valueType] = os.valueType;
+            }
+        }
+
+        if (data[HNQIS2_TEMPLATE_MAP.legend] && data[HNQIS2_TEMPLATE_MAP.legend] !== "") {
+            parsedDE.legendSet = { id: getObjectIdByProperty(data[HNQIS2_TEMPLATE_MAP.legend], legendSets, 'legendSet') };
+            parsedDE.legendSets = [
+                { id: getObjectIdByProperty(data[HNQIS2_TEMPLATE_MAP.legend], legendSets, 'legendSet') }
+            ];
+        }
+
+        if (data[HNQIS2_TEMPLATE_MAP.scoreNum] !== "") { metadata.scoreNum = data[HNQIS2_TEMPLATE_MAP.scoreNum] }
+        if (data[HNQIS2_TEMPLATE_MAP.scoreDen] !== "") { metadata.scoreDen = data[HNQIS2_TEMPLATE_MAP.scoreDen] }
     }
 
     if (data[HNQIS2_TEMPLATE_MAP.feedbackOrder] && data[HNQIS2_TEMPLATE_MAP.feedbackOrder] !== "") {
@@ -291,17 +307,6 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
     if (data[HNQIS2_TEMPLATE_MAP.feedbackText] && data[HNQIS2_TEMPLATE_MAP.feedbackText] !== "") {
         parsedDE.attributeValues.push(buildAttributeValue(FEEDBACK_TEXT, data[HNQIS2_TEMPLATE_MAP.feedbackText]))
     }
-
-    const metadata = {
-        isCompulsory: data[HNQIS2_TEMPLATE_MAP.isCompulsory] || "No",
-        isCritical: data[HNQIS2_TEMPLATE_MAP.isCritical] || "No",
-        elemType: type,
-        varName: data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???',
-        autoNaming: 'Yes'
-    };
-
-    if (data[HNQIS2_TEMPLATE_MAP.scoreNum] !== "") { metadata.scoreNum = data[HNQIS2_TEMPLATE_MAP.scoreNum] }
-    if (data[HNQIS2_TEMPLATE_MAP.scoreDen] !== "") { metadata.scoreDen = data[HNQIS2_TEMPLATE_MAP.scoreDen] }
 
     if (data[HNQIS2_TEMPLATE_MAP.parentQuestion] !== "") {
         metadata.parentQuestion = data[HNQIS2_TEMPLATE_MAP.parentQuestion];
