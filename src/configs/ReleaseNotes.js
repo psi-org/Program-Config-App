@@ -27,7 +27,7 @@ export const ReleaseNotes = [
     },
     {
         "version": "v1.5",
-        "date": "2024-01-01",
+        "date": "2023-12-30",
         "description": "- Updated some Conditional Formatting Rules related to Label Data Elements."
     }
 ]
