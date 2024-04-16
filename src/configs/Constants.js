@@ -34,6 +34,7 @@ const PCA_METADATA_VERSION = "1.2.0";
 const H2_METADATA_VERSION = "1.1.3";
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
+const LIGHT_BLUE_COLOR = "#66aee5";
 
 //* PCA Metadata Package
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI", "haUflNqP85K"];
@@ -146,6 +147,7 @@ const H2_REQUIRED = {
 };
 
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false, localeMatcher: 'best fit', };
+const ABOUT_DATE_FORMAT_OPTIONS = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false, localeMatcher: 'best fit', };
 const SHORT_DATE_FORMAT_OPTIONS = { localeMatcher: 'best fit', hour12: false, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }
 
 const NAMESPACE = "programconfigapp";
@@ -502,6 +504,7 @@ const newTagStyle = { minWidth: '6em', maxWidth: '6em', display: 'flex', justify
 const updatedTagStyle = { minWidth: '8em', maxWidth: '8em', display: 'flex', justifyContent: 'center' };
 
 export {
+    ABOUT_DATE_FORMAT_OPTIONS,
     ACTION_PLAN_ACTION,
     ACTION_PLAN_DUE_DATE,
     ACTION_PLAN_RESPONSIBLE,
@@ -559,6 +562,7 @@ export {
     JSON_ATTRIBUTE_SETTINGS,
     LEGEND_YES_NO,
     LEGEND_YES_PARTIAL_NO,
+    LIGHT_BLUE_COLOR,
     MAX_DATA_ELEMENT_NAME_LENGTH,
     MAX_FORM_NAME_LENGTH,
     MAX_PREFIX_LENGTH,
