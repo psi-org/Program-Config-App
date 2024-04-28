@@ -12,7 +12,7 @@ import Paper from '@mui/material/Paper';
 import Tab from '@mui/material/Tab';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { NAMESPACE, DATASTORE_PCA_METADATA, DATASTORE_H2_METADATA, BUILD_VERSION, BUILD_DATE, PCA_METADATA_VERSION, H2_METADATA_VERSION, DHIS2_PRIMARY_COLOR, ABOUT_DATE_FORMAT_OPTIONS } from "../../configs/Constants.js";
+import { NAMESPACE, DATASTORE_PCA_METADATA, DATASTORE_H2_METADATA, BUILD_VERSION, BUILD_DATE, PCA_METADATA_VERSION, H2_METADATA_VERSION, DHIS2_PRIMARY_COLOR, ABOUT_DATE_FORMAT_OPTIONS, MIN_VERSION, MAX_VERSION } from "../../configs/Constants.js";
 import PSILogo from "./../../images/PSI-logo.png";
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js';
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js';
@@ -29,7 +29,7 @@ const queryHNQIS2Metadata = {
     }
 };
 
-const aboutTabStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '0' }
+const aboutTabStyle = { display: 'grid', gridTemplateColumns: '3fr 4fr', padding: '0' }
 
 const technologies = [
     { name: 'React', url: 'https://react.dev/', license: 'MIT', licenseUrl: 'https://opensource.org/license/mit' },
@@ -117,10 +117,13 @@ const About = (props) => {
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1em 4em', gap: '0.5em' }}>
                                 <img src={PSILogo} alt="PSI Logo" style={{ width: '10em', maxWidth: '10em' }} />
-                                <p style={{ marginTop: '1em', width: '100%', textAlign: 'justify' }}>
-                                    The Program Configuration App is financed
+                                <p style={{ marginTop: '1em', width: '100%', textAlign: 'justify', fontWeight: 'bold' }}>
+                                    The Program Configuration App is developed
                                     by <a href="https://www.psi.org/" target="_blank" rel="noreferrer">Population Services International (PSI)</a> in collaboration with <a href="https://www.knowtechture.com/" target="_blank" rel="noreferrer" >KnowTechTure SL</a>.
                                 </p>
+                                <Alert severity="info" sx={{ marginTop: '1em', textAlign: 'justify' }}>
+                                    This version of the PCA is compatible with DHIS2 versions between {MIN_VERSION.replace(".x", "")} and {MAX_VERSION.replace(".x", "")}.
+                                </Alert>
                             </div>
                         </TabPanel>
                         <TabPanel value="2">
