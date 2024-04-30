@@ -285,7 +285,7 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
             if (os) {
                 parsedDE.optionSet = { id: os.id };
                 parsedDE.optionSetValue = true;
-                data[HNQIS2_TEMPLATE_MAP.valueType] = os.valueType;
+                parsedDE.valueType = os.valueType;
             }
         }
 
@@ -322,6 +322,7 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
             value: JSON.stringify(metadata)
         }
     );
+
 
     return parsedDE;
 };

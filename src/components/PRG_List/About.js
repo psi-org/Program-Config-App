@@ -117,7 +117,7 @@ const About = (props) => {
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1em 4em', gap: '0.5em' }}>
                                 <img src={PSILogo} alt="PSI Logo" style={{ width: '10em', maxWidth: '10em' }} />
-                                <p style={{ marginTop: '1em', width: '100%', textAlign: 'justify', fontWeight: 'bold' }}>
+                                <p style={{ marginTop: '1em', width: '100%', fontWeight: 'bold' }}>
                                     The Program Configuration App is developed
                                     by <a href="https://www.psi.org/" target="_blank" rel="noreferrer">Population Services International (PSI)</a> in collaboration with <a href="https://www.knowtechture.com/" target="_blank" rel="noreferrer" >KnowTechTure SL</a>.
                                 </p>
@@ -170,7 +170,7 @@ const About = (props) => {
             </DialogContent>
             <DialogActions style={{ display: 'flex', justifyContent: 'space-between', padding: '1em' }}>
                 <span><Button variant='text' target='_blank' href='https://psi.atlassian.net/wiki/spaces/PCA/overview?homepageId=37716432' startIcon={<DescriptionIcon />}>PCA documentation</Button></span>
-                <Button color={'error'} variant={'outlined'} onClick={() => props.setAboutModal(false)}>Close</Button>
+                <Button color={'primary'} variant={'outlined'} onClick={() => props.setAboutModal(false)}>Close</Button>
             </DialogActions>
         </CustomMUIDialog>
     )
