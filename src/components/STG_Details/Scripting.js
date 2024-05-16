@@ -1,5 +1,5 @@
 import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../configs/AnalyticsTemplates.js";
-import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND } from "../../configs/Constants.js";
+import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND, NON_CRITICAL_STEPS, CRITICAL_STEPS } from "../../configs/Constants.js";
 import { DeepCopy, padValue } from "../../utils/Utils.js";
 
 /**
@@ -415,7 +415,7 @@ const buildCompetencyRules = (programId, stageId, uidPool) => {
     return { competencyRules, competencyActions }
 }
 
-const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass = "Yes", healthArea) => {
+const buildAttributesRules = (programId, uidPool, useCompetencyClass = "Yes", healthArea) => {
 
     const attributeActions = [];
 
@@ -448,7 +448,7 @@ const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass =
                 }
             ]
         },
-        {
+        /*{
             name: "PR - Attributes - Assign Global Score",
             displayName: "PR - Attributes - Assign Global Score",
             condition: scoreMap.numC != "" ? "d2:hasValue(#{_criticalNewest})" : "d2:hasValue(#{_NoncriticalNewest})",
@@ -461,7 +461,7 @@ const buildAttributesRules = (programId, uidPool, scoreMap, useCompetencyClass =
                     trackedEntityAttribute: { id: "NQdpdST0Gcx" }
                 }
             ]
-        },
+        },*/
         {
             name: "PR - Attributes - Assign OU",
             displayName: "PR - Attributes - Assign OU",
@@ -739,13 +739,13 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
             name: "_NoncriticalNewest",
             programRuleVariableSourceType: "DATAELEMENT_NEWEST_EVENT_PROGRAM",
             program: { id: programId },
-            dataElement: { id: "pzWDtDUorBt" }
+            dataElement: { id: NON_CRITICAL_STEPS }
         },
         {
             name: "_criticalNewest",
             programRuleVariableSourceType: "DATAELEMENT_NEWEST_EVENT_PROGRAM",
             program: { id: programId },
-            dataElement: { id: "VqBfZjZhKkU" },
+            dataElement: { id: CRITICAL_STEPS },
         },
         {
             name: "_CV_NonCriticalQuestions",
@@ -837,7 +837,7 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
 
     //Define Global Scores
     buildScores(scoreMap);
-
+    
     // Request Program Rules for Composite Scores
     compositeValues.forEach(score => {
         const compositeData = {
@@ -862,7 +862,7 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
 
     // Attributes
 
-    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, scoreMap, useCompetencyClass, healthArea); //Define: useCompetencyClass & healthArea
+    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, useCompetencyClass, healthArea); //Define: useCompetencyClass & healthArea
 
     // Hide/Show Logic
 
@@ -890,11 +890,12 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
         labelsActions
     );
 
-    return { programRules, programRuleActions }
+    return { programRules, programRuleActions, scoreMap }
 }
 
-export const buildProgramIndicators = (programId, programShortName, uidPool, useCompetency, sharingSettings, PIAggregationType) => {
+export const buildProgramIndicators = (programId, programStage, scoreMap, uidPool, useCompetency, sharingSettings, PIAggregationType) => {
 
+    const programShortName = programStage.program.shortName;
     // This sectin is for the local analytics
     const indicatorValues = useCompetency === "Yes" ? [
         { name: 'C', condition: `A{${COMPETENCY_ATTRIBUTE}} == "competent"` },
@@ -935,12 +936,14 @@ export const buildProgramIndicators = (programId, programShortName, uidPool, use
     AnalyticNoA.analyticsPeriodBoundaries[0].sharing = sharingSettings
     AnalyticNoA.analyticsPeriodBoundaries[1].sharing = sharingSettings
 
-
+    //!"pzWDtDUorBt" NCrit
+    //?"VqBfZjZhKkU" Crit
     const AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
     AnalyticGS.id = uidPool.shift()
     indicatorIDs.push(AnalyticGS.id)
     AnalyticGS.name = programShortName + ' - Global Score'
     AnalyticGS.shortName = 'Global Score [' + programId + ']'
+    AnalyticGS.expression = `#{${programStage.id}.${scoreMap.numC == ""?NON_CRITICAL_STEPS:CRITICAL_STEPS}}`
     AnalyticGS.program.id = programId
     AnalyticGS.sharing = sharingSettings
     AnalyticGS.analyticsPeriodBoundaries[0].sharing = sharingSettings

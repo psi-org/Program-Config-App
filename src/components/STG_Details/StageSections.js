@@ -679,8 +679,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                         setProgressSteps(4);
 
                         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
-                        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea);
-                        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass, sharingSettings, programMetadata.programIndicatorsAggType);
+                        const { programRules, programRuleActions, scoreMap } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea);
+                        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage, scoreMap, uidPool, programMetadata.useCompetencyClass, sharingSettings, programMetadata.programIndicatorsAggType);
                         const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, sharingSettings, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap);
                         const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports };
 

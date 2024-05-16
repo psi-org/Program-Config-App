@@ -450,7 +450,7 @@ export const ProgramIndicatorTemplateGS = {
     "shortName": "<Short Name> - GS",
     "description": "_H2Analytics",
     "aggregationType": "AVERAGE",
-    "expression": "A{NQdpdST0Gcx}",
+    "expression": "#{AssessmentID.CriticalStepsID}",
     "sharing": {
         "owner": "id",
         "external": false,
@@ -458,9 +458,9 @@ export const ProgramIndicatorTemplateGS = {
         "userGroups": {},
         "public": "--------"
     },
-    "filter": "d2:hasValue(A{NQdpdST0Gcx})",
+    "filter": "true",
     "decimals": 0,
-    "analyticsType": "ENROLLMENT",
+    "analyticsType": "EVENT",
     "program": { "id": "<Program Id>" },
     "analyticsPeriodBoundaries": [
         {
