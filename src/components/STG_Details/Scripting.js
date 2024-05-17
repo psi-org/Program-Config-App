@@ -475,34 +475,24 @@ const buildAttributesRules = (programId, uidPool, useCompetencyClass = "Yes", he
                     trackedEntityAttribute: { id: "nHg1hGgtJwm" }
                 }
             ]
-        },
-        {
-            name: `PR - Attributes - ${useCompetencyClass == "Yes" ? 'CompClass &' : ''} GlobalScore `,
-            displayName: `PR - Attributes - ${useCompetencyClass == "Yes" ? 'CompClass &' : ''} GlobalScore `,
-            description: "_Scripted",
-            condition: "!d2:hasValue(#{_criticalNewest}) || !d2:hasValue(#{_NoncriticalNewest})",
-            program: { id: "" },
-            programRuleActions: (useCompetencyClass == "Yes") ?
-                [
-                    {
-                        programRuleActionType: "HIDEFIELD",
-                        trackedEntityAttribute: { id: "NQdpdST0Gcx" }
-                    },
-                    {
-                        programRuleActionType: "HIDEFIELD",
-                        trackedEntityAttribute: { id: "ulU9KKgSLYe" }
-                    }
-                ] :
-                [
-                    {
-                        programRuleActionType: "HIDEFIELD",
-                        trackedEntityAttribute: { id: "NQdpdST0Gcx" }
-                    }
-                ]
         }
     ];
 
     if (useCompetencyClass == "Yes") {
+        attributeRules.push({
+            name: `PR - Attributes - CompClass `,
+            displayName: `PR - Attributes - CompClass `,
+            description: "_Scripted",
+            condition: "!d2:hasValue(#{_criticalNewest}) || !d2:hasValue(#{_NoncriticalNewest})",
+            program: { id: "" },
+            programRuleActions: [
+                {
+                    programRuleActionType: "HIDEFIELD",
+                    trackedEntityAttribute: { id: "ulU9KKgSLYe" }
+                }
+            ]
+        });
+
         attributeRules.push(
             {
                 name: "PR - Attributes - Assign Competency",
@@ -714,7 +704,7 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
     sections.forEach((section, secIdx) => {
         section.dataElements.forEach((dataElement, deIdx) => {
             programRuleVariables.push({
-                name: `_S${padValue(secIdx + 1,"00")}Q${padValue(deIdx + 1,"000")}`,
+                name: `_S${padValue(secIdx + 1, "00")}Q${padValue(deIdx + 1, "000")}`,
                 programRuleVariableSourceType: "DATAELEMENT_CURRENT_EVENT",
                 useCodeForOptionSet: dataElement.optionSet?.id ? true : false,
                 program: { id: programId },
@@ -792,13 +782,13 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
     sections.forEach((section, secIdx) => {
         section.dataElements.forEach((dataElement, deIdx) => {
             const order = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
-            
+
             const metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
             if (order && metadata.scoreNum && metadata.scoreDen) {
                 locateInTree(
                     {
                         subLevels: order.split("."),
-                        prgVarName: `_S${padValue(secIdx + 1,"00")}Q${padValue(deIdx + 1,"000")}`,
+                        prgVarName: `_S${padValue(secIdx + 1, "00")}Q${padValue(deIdx + 1, "000")}`,
                         scoreNum: metadata.scoreNum,
                         scoreDen: metadata.scoreDen,
                         isCritical: metadata.isCritical
@@ -837,7 +827,7 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
 
     //Define Global Scores
     buildScores(scoreMap);
-    
+
     // Request Program Rules for Composite Scores
     compositeValues.forEach(score => {
         const compositeData = {
@@ -936,14 +926,12 @@ export const buildProgramIndicators = (programId, programStage, scoreMap, uidPoo
     AnalyticNoA.analyticsPeriodBoundaries[0].sharing = sharingSettings
     AnalyticNoA.analyticsPeriodBoundaries[1].sharing = sharingSettings
 
-    //!"pzWDtDUorBt" NCrit
-    //?"VqBfZjZhKkU" Crit
     const AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
     AnalyticGS.id = uidPool.shift()
     indicatorIDs.push(AnalyticGS.id)
     AnalyticGS.name = programShortName + ' - Global Score'
     AnalyticGS.shortName = 'Global Score [' + programId + ']'
-    AnalyticGS.expression = `#{${programStage.id}.${scoreMap.numC == ""?NON_CRITICAL_STEPS:CRITICAL_STEPS}}`
+    AnalyticGS.expression = `#{${programStage.id}.${scoreMap.numC == "" ? NON_CRITICAL_STEPS : CRITICAL_STEPS}}`
     AnalyticGS.program.id = programId
     AnalyticGS.sharing = sharingSettings
     AnalyticGS.analyticsPeriodBoundaries[0].sharing = sharingSettings
@@ -953,10 +941,10 @@ export const buildProgramIndicators = (programId, programStage, scoreMap, uidPoo
     programIndicators = programIndicators.concat([AnalyticNoA, AnalyticGS])
 
     //Return
-    return { programIndicators, indicatorIDs }
+    return { programIndicators, indicatorIDs, gsInd: AnalyticGS.id }
 }
 
-export const buildH2BaseVisualizations = (programId, programShortName, indicatorIDs, uidPool, useCompetency, currentDashboardId, userOU, ouRoot, stageId, sharingSettings, visualizationLevel, mapLevel) => {
+export const buildH2BaseVisualizations = (programId, programShortName, { gsInd, indicatorIDs }, uidPool, useCompetency, currentDashboardId, userOU, ouRoot, stageId, sharingSettings, visualizationLevel, mapLevel, actionPlanID) => {
     const series = []
     const dataDimensionItems = []
     const visualizations = []
@@ -969,7 +957,7 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     const columnDimensions = []
     columnDimensions[0] = "pe"
     columnDimensions[1] = "ou"
-    columnDimensions[2] = GLOBAL_SCORE_ATTRIBUTE
+    columnDimensions[2] = gsInd
     columnDimensions[3] = ACTION_PLAN_ACTION
 
     const timestamp = new Date().toISOString();
@@ -1147,13 +1135,14 @@ export const buildH2BaseVisualizations = (programId, programShortName, indicator
     LineListScore.publicAccess = sharingSettings.public
     LineListScore.program.id = programId
     LineListScore.sharing = sharingSettings
-    LineListScore.programStage.id = stageId
+    LineListScore.programStage.id = actionPlanID
     LineListScore.columnDimensions = columnDimensions
-    LineListScore.dataElementDimensions[0].programStage.id = stageId
+    LineListScore.dataElementDimensions[0].programStage.id = actionPlanID
     LineListScore.dataElementDimensions[0].dataElement.id = ACTION_PLAN_ACTION
-    LineListScore.attributeDimensions[0].attribute.id = GLOBAL_SCORE_ATTRIBUTE
+    LineListScore.programIndicatorDimensions[0].programIndicator.id = gsInd
     LineListScore.organisationUnits[0].id = ouRoot
     LineListScore.organisationUnitLevels = [visualizationLevel]
+
     eventReports.push(LineListScore)
     //Dashboard - Event Report
     const GlobalScorebyEventReport1 = DeepCopy(dashEventReport)

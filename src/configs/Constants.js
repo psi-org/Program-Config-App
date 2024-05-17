@@ -31,7 +31,7 @@ const MIN_VERSION = "2.36.x"
 const MAX_VERSION = "2.40.x"
 
 const PCA_METADATA_VERSION = "1.2.0";
-const H2_METADATA_VERSION = "1.1.3";
+const H2_METADATA_VERSION = "1.1.4";
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
 const LIGHT_BLUE_COLOR = "#66aee5";

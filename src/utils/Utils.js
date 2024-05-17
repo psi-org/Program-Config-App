@@ -55,9 +55,22 @@ function characterPos(chr) {
     return chr.charCodeAt(0);
 }
 
-export function versionIsValid(serverVersion, limitMin, limitMax) {
-    const coercedVersion = coerce(serverVersion).version;
+export function versionIsValid(compareVersion, limitMin, limitMax) {
+    if (!compareVersion) { compareVersion = "0" }
+    const coercedVersion = coerce(compareVersion).version;
     return satisfies(coercedVersion, `>=${limitMin} <=${limitMax}`);
+}
+
+export function versionGTE(compareVersion, limitMin) {
+    if (!compareVersion) { compareVersion = "0" }
+    const coercedVersion = coerce(compareVersion).version;
+    return satisfies(coercedVersion, `>=${limitMin}`);
+}
+
+export function versionLTE(compareVersion, limitMax) {
+    if (!compareVersion) { compareVersion = "0" }
+    const coercedVersion = coerce(compareVersion).version;
+    return satisfies(coercedVersion, `<=${limitMax}`);
 }
 
 export function parseErrors(response) {

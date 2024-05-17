@@ -26,9 +26,9 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Link } from "react-router-dom";
-import { BUILD_VERSION, FEEDBACK_ORDER, METADATA } from "../../configs/Constants.js";
+import { BUILD_VERSION, DATASTORE_H2_METADATA, FEEDBACK_ORDER, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, truncateString } from "../../utils/Utils.js";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessor from "../Excel/DataProcessor.js";
 import Importer from "../Excel/Importer.js";
 import ErrorReports from "../UIElements/ErrorReports.js";
@@ -122,7 +122,7 @@ const queryEventReport = {
     results: {
         resource: 'eventReports',
         params: ({ programId }) => ({
-            fields: ['id', 'name'],
+            fields: ['*'],
             filter: [`code:like:${programId}_Scripted`]
         })
     }
@@ -162,8 +162,8 @@ const queryPCAMetadata = {
             filter: [`id:eq:${programId}`]
         })
     }
-
 }
+
 const queryOrganizationsUnit = {
     results: {
         resource: 'organisationUnitLevels',
@@ -193,9 +193,18 @@ const queryCurrentUser = {
     },
 }
 
+const queryHNQIS2Metadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}`
+    }
+};
+
 const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 
 const StageSections = ({ programStage, hnqisMode, readOnly }) => {
+
+    const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
+
     // Globals
     const programId = programStage.program.id;
     const [isSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0);
@@ -594,6 +603,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     const run = () => {
         if (!savedAndValidated) { return }
         //--------------------- NEW METADATA --------------------//
+        const actionPlanID = programStage.program.programStages.filter(ps => ps.id != programStage.id)[0].id;
+
         setProgressSteps(1);
         const programConfig = programAttributes.results?.programs[0];
         const pcaMetadata = JSON.parse(programConfig?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}");
@@ -680,8 +691,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 
                         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
                         const { programRules, programRuleActions, scoreMap } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea);
-                        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage, scoreMap, uidPool, programMetadata.useCompetencyClass, sharingSettings, programMetadata.programIndicatorsAggType);
-                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, sharingSettings, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap);
+                        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicators(programId, programStage, scoreMap, uidPool, programMetadata.useCompetencyClass, sharingSettings, programMetadata.programIndicatorsAggType);
+                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, { gsInd, indicatorIDs }, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, sharingSettings, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap, actionPlanID);
                         const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports };
 
                         // IV. Delete old metadata
@@ -704,35 +715,48 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                         };
 
                         // V. Import new metadata
+                        createMetadata.mutate({
+                            data: {
+                                eventReports: eventReportDQ.data.results.eventReports.map(er => {
+                                    er.columnDimensions = ["pe", "ou"]
+                                    er.dataElementDimensions = [];
+                                    er.programIndicatorDimensions = [];
+                                    return er;
+                                })
+                            }
+                        }).then(updateEventReportResp => {
 
-                        deleteMetadata({ data: oldMetadata }).then((res) => {
-                            if (res.status == 'OK') {
-                                setProgressSteps(6);
+                            if (updateEventReportResp.status == 'OK') {
+                                deleteMetadata({ data: oldMetadata }).then((res) => {
+                                    if (res.status == 'OK') {
+                                        setProgressSteps(6);
 
-                                createMetadata.mutate({ data: metadata }).then(response => {
+                                        createMetadata.mutate({ data: metadata }).then(response => {
 
-                                    if (response.status == 'OK') {
-                                        setProgressSteps(7);
+                                            if (response.status == 'OK') {
+                                                setProgressSteps(7);
 
-                                        // VI. Enable in-app analytics
-                                        refreshAndroidSettings().then(androidSettings => {
-                                            if (androidSettings?.results) {
+                                                // VI. Enable in-app analytics
+                                                refreshAndroidSettings().then(androidSettings => {
+                                                    if (androidSettings?.results) {
 
-                                                const settings = buildAndroidSettings(androidSettings, uidPool.shift(), androidSettingsVisualizations)
-                                                androidSettingsUpdate({ data: settings.results }).then(res => {
-                                                    if (res.status === 'OK') { setAndroidSettingsError(undefined) }
-                                                    updateProgramBuildVersion(programId)
+                                                        const settings = buildAndroidSettings(androidSettings, uidPool.shift(), androidSettingsVisualizations)
+                                                        androidSettingsUpdate({ data: settings.results }).then(res => {
+                                                            if (res.status === 'OK') { setAndroidSettingsError(undefined) }
+                                                            updateProgramBuildVersion(programId)
+                                                        })
+
+                                                    } else {
+                                                        updateProgramBuildVersion(programId)
+                                                    }
                                                 })
 
-                                            } else {
-                                                updateProgramBuildVersion(programId)
                                             }
-                                        })
-
+                                        });
                                     }
+
                                 });
                             }
-
                         });
                     }
                 }
@@ -785,6 +809,14 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 
         setOpen(false);
     };
+
+    if (hnqisMode || !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+        return (<>
+            <NoticeBox title="Check HNQIS2 Metadata" error>
+                <p>The latest PCA Metadata Package is required to access to this HNQIS2 Program.</p>
+            </NoticeBox>
+        </>);
+    }
 
     return (
         <div className="cont_stage">

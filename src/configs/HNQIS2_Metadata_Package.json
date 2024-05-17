@@ -518,24 +518,6 @@
             "translations": []
         },
         {
-            "id": "NQdpdST0Gcx",
-            "name": "HNQIS - Global Score",
-            "shortName": "HNQIS - Global Score",
-            "aggregationType": "NONE",
-            "displayInListNoProgram": false,
-            "pattern": "",
-            "skipSynchronization": false,
-            "generated": false,
-            "displayOnVisitSchedule": false,
-            "valueType": "NUMBER",
-            "formName": "Global Score",
-            "orgunitScope": false,
-            "confidential": false,
-            "unique": false,
-            "inherit": false,
-            "translations": []
-        },
-        {
             "id": "nHg1hGgtJwm",
             "name": "HNQIS - Organization Unit",
             "shortName": "HNQIS - Org Unit",
@@ -678,25 +660,6 @@
                         "manage": true
                     },
                     "trackedEntityAttribute": {"id": "UlUYUyZJ6o9"},
-                    "trackedEntityType": {"id": "oNwpeWkfoWc"}
-                },
-                {
-                    "id": "MWI76z3SUQM",
-                    "name": "Assessment HNQIS HNQIS - Global Score",
-                    "externalAccess": false,
-                    "valueType": "TEXT",
-                    "searchable": false,
-                    "displayInList": true,
-                    "favorite": false,
-                    "access": {
-                        "read": true,
-                        "update": true,
-                        "externalize": true,
-                        "delete": true,
-                        "write": true,
-                        "manage": true
-                    },
-                    "trackedEntityAttribute": {"id": "NQdpdST0Gcx"},
                     "trackedEntityType": {"id": "oNwpeWkfoWc"}
                 }
             ],

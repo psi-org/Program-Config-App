@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from "react"
 import { NAMESPACE, DATASTORE_H2_METADATA, H2_METADATA_VERSION, DATE_FORMAT_OPTIONS } from "../../configs/Constants.js";
 import H2MetadataJSON from '../../configs/HNQIS2_Metadata_Package.json'
-import { parseErrorsUL } from '../../utils/Utils.js'
+import { parseErrorsUL, versionGTE } from '../../utils/Utils.js'
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 
@@ -110,8 +110,8 @@ const H2Metadata = (props) => {
                     {hnqis2Metadata?.results &&
                         <>
                             <p><strong>Installation date: </strong>{new Date(hnqis2Metadata.results.date).toLocaleString("en-US", DATE_FORMAT_OPTIONS)} </p>
-                            <NoticeBox error={!h2Ready || hnqis2Metadata?.results?.version < H2_METADATA_VERSION} title="Minimum Metadata Package Status">
-                                <p>{h2Ready ? (hnqis2Metadata?.results?.version < H2_METADATA_VERSION ? "The required Metadata Package is outdated, please install the newest version." : "The required Metadata Package is available.") : "The required Metadata Package is incomplete or corrupted, please reinstall it."}</p>
+                        <NoticeBox error={!h2Ready || !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION) } title="Minimum Metadata Package Status">
+                            <p>{h2Ready ? (!versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION) ? "The required Metadata Package is outdated, please install the newest version." : "The required Metadata Package is available.") : "The required Metadata Package is incomplete or corrupted, please reinstall it."}</p>
                             </NoticeBox>
                         </>
                     }
