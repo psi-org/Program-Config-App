@@ -810,10 +810,10 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setOpen(false);
     };
 
-    if (hnqisMode || !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+    if (hnqisMode && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
         return (<>
             <NoticeBox title="Check HNQIS2 Metadata" error>
-                <p>The latest PCA Metadata Package is required to access to this HNQIS2 Program.</p>
+                <p>The latest PCA Metadata Package is required to access this HNQIS2 Program.</p>
             </NoticeBox>
         </>);
     }
