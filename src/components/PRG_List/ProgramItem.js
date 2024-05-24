@@ -106,11 +106,11 @@ const ProgramItem = ({
         setSearchLocalStorage();
     }
 
-    let requiredUpgradeBadge = (programType === 'HNQIS2' && versionGTE(pcaMetadata.buildVersion, REQUIRED_H2_PROGRAM_BUILD_VERSION))
-        ? null
-        : <Tooltip title={`URGENT UPGRADE REQUIRED. This program is outdated and will not work properly. Please 'Set Up Program' again to upgrade to the latest version.`}>
+    const requiredUpgradeBadge = (programType === 'HNQIS2' && pcaMetadata.buildVersion && !versionGTE(pcaMetadata.buildVersion, REQUIRED_H2_PROGRAM_BUILD_VERSION))
+        ? <Tooltip title={`IMPORTANT UPGRADE REQUIRED. This program was built using an older version of the PCA with deprecated logic and will not work properly. Please 'Set Up Program' again to fix this issue.`}>
             <SyncProblemIcon sx={{ fontSize: 35, color: '#FE3636' }} style={{ marginRight: "0.3em", cursor: 'pointer' }} />
-        </Tooltip>;
+        </Tooltip>
+        :null;
 
     return (
         <>
@@ -139,15 +139,15 @@ const ProgramItem = ({
 
 
                 <div className="ml_item-desc">
-                    {requiredUpgradeBadge}
                     {programType === 'HNQIS2' && !isEnabled() &&
                         <Tooltip title={`This HNQIS2 Program cannot be accessed as it requires the latest HNQIS2 Metadata Package. Go to Settings > HNQIS 2.0 Status for more information.`}>
-                            <LockIcon style={{marginRight: "0.3em", cursor: 'pointer' }} />
+                            <LockIcon style={{ marginRight: "0.3em", cursor: 'pointer' }} />
                         </Tooltip>
                     }
+                    {requiredUpgradeBadge}
                     {programType !== 'HNQIS' && pcaMetadata.buildVersion && !versionIsValid(pcaMetadata.buildVersion, BUILD_VERSION, BUILD_VERSION) &&
                         <Tooltip title={`This Program's logic was built in version ${pcaMetadata.buildVersion}, please ${programType === 'HNQIS2' ? "'Set Up Program'" : "'Build Program Rules'"} again to update it.`}>
-                            <NewReleasesIcon sx={{ fontSize: 30, color: '#FE9136' }} style={{ marginRight: "0.3em",cursor: 'pointer' }} />
+                            <NewReleasesIcon sx={{ fontSize: 30, color: '#FEBB36' }} style={{ marginRight: "0.3em",cursor: 'pointer' }} />
                         </Tooltip>
                     }
                     {programType !== 'HNQIS' && !pcaMetadata.buildVersion &&

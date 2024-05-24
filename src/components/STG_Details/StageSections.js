@@ -129,15 +129,27 @@ const queryEventReport = {
 };
 
 
-const updateAndroidSettings = {
+const updateAndroidSettingsAnalytics = {
     resource: `dataStore/ANDROID_SETTINGS_APP/analytics`,
     type: 'update',
     data: ({ data }) => data
 };
 
-const queryAndroidSettings = {
+const queryAndroidSettingsAnalytics = {
     results: {
         resource: `dataStore/ANDROID_SETTINGS_APP/analytics`
+    }
+};
+
+const updateAndroidSettingsSynchronization = {
+    resource: `dataStore/ANDROID_SETTINGS_APP/synchronization`,
+    type: 'update',
+    data: ({ data }) => data
+};
+
+const queryAndroidSettingsSynchronization = {
+    results: {
+        resource: `dataStore/ANDROID_SETTINGS_APP/synchronization?encrypt=true`
     }
 };
 
@@ -208,13 +220,22 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     // Globals
     const programId = programStage.program.id;
     const [isSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0);
-    const { data: androidSettings, refetch: refreshAndroidSettings } = useDataQuery(queryAndroidSettings);
     const { data: currentUser } = useDataQuery(queryCurrentUser);
-    const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings, {
+
+    const { data: androidSettings, refetch: refreshAndroidSettings } = useDataQuery(queryAndroidSettingsAnalytics);
+    const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettingsAnalytics, {
         onError: (err) => {
             setAndroidSettingsError(err.details || err)
         }
     });
+
+    const { data: androidSettingsSync, refetch: refreshAndroidSettingsSync } = useDataQuery(queryAndroidSettingsSynchronization);
+    const [androidSettingsSyncUpdate, { error: androidSettingsSyncUpdateError }] = useDataMutation(updateAndroidSettingsSynchronization, {
+        onError: (err) => {
+            setAndroidSettingsError(err.details || err)
+        }
+    });
+
     const [androidSettingsError, setAndroidSettingsError] = useState(undefined);
     const [programSettingsError, setProgramSettingsError] = useState(undefined);
     const { refetch: setOuLevel } = useDataQuery(queryOrganizationsUnit, { lazy: true, variables: { ouLevel: undefined } });
@@ -600,6 +621,37 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         return settings;
     }
 
+    const executeStep7 = (androidSettingsVisualizations) => {
+        // VI. Enable in-app analytics
+        refreshAndroidSettings().then(androidSettings => {
+            if (androidSettings?.results) {
+
+                const settings = buildAndroidSettings(androidSettings, uidPool.shift(), androidSettingsVisualizations)
+                androidSettingsUpdate({ data: settings.results }).then(res => {
+                    if (res.status === 'OK') {
+
+                        //* Add Synchronization update if this worked (Means that the Android Settings App is working)
+                        
+                        setAndroidSettingsError(undefined)
+                    }
+                    updateProgramBuildVersion(programId)
+                })
+
+            } else {
+                updateProgramBuildVersion(programId)
+            }
+        })
+    }
+
+    const executeStep6 = ({ metadata, androidSettingsVisualizations }) => {
+        createMetadata.mutate({ data: metadata }).then(response => {
+            if (response.status == 'OK') {
+                setProgressSteps(7);
+                executeStep7(androidSettingsVisualizations);
+            }
+        });
+    }
+
     const run = () => {
         if (!savedAndValidated) { return }
         //--------------------- NEW METADATA --------------------//
@@ -730,31 +782,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                 deleteMetadata({ data: oldMetadata }).then((res) => {
                                     if (res.status == 'OK') {
                                         setProgressSteps(6);
-
-                                        createMetadata.mutate({ data: metadata }).then(response => {
-
-                                            if (response.status == 'OK') {
-                                                setProgressSteps(7);
-
-                                                // VI. Enable in-app analytics
-                                                refreshAndroidSettings().then(androidSettings => {
-                                                    if (androidSettings?.results) {
-
-                                                        const settings = buildAndroidSettings(androidSettings, uidPool.shift(), androidSettingsVisualizations)
-                                                        androidSettingsUpdate({ data: settings.results }).then(res => {
-                                                            if (res.status === 'OK') { setAndroidSettingsError(undefined) }
-                                                            updateProgramBuildVersion(programId)
-                                                        })
-
-                                                    } else {
-                                                        updateProgramBuildVersion(programId)
-                                                    }
-                                                })
-
-                                            }
-                                        });
+                                        executeStep6({ metadata, androidSettingsVisualizations });
                                     }
-
                                 });
                             }
                         });
@@ -763,6 +792,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
             })
         }
     }
+
     const parseErrors = (e) => {
         const data = e.typeReports.map(tr => {
             const type = tr.klass.split('.').pop()
