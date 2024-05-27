@@ -262,8 +262,16 @@ const H2Setting = forwardRef((props, ref) => {
             validationErrors.aggregationType =
                 aggregationType === "" ? "This field is required" : undefined;
             
-            validationErrors.teiDownloadAmount =
-                teiDownloadAmount === "" ? "This field is required" : undefined;
+            
+            if (teiDownloadAmount === "") {
+                validationErrors.teiDownloadAmount = "This field is required";
+            } else if (teiDownloadAmount < 0 || teiDownloadAmount > 500) {
+                validationErrors.teiDownloadAmount = "This field must contain a value between 0 and 500.";
+                response = false;
+            } else {
+                validationErrors.teiDownloadAmount = undefined;
+            }
+            
             return response;
         },
 
@@ -485,7 +493,7 @@ const H2Setting = forwardRef((props, ref) => {
                                 fullWidth
                                 variant="standard"
                                 autoComplete="off"
-                                inputProps={{ min: 0 }}
+                                inputProps={{ min: 0, max: 500 }}
                                 value={teiDownloadAmount}
                                 onChange={teiAmountChange}
                             />

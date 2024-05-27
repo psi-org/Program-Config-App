@@ -229,7 +229,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         }
     });
 
-    const { data: androidSettingsSync, refetch: refreshAndroidSettingsSync } = useDataQuery(queryAndroidSettingsSynchronization);
+    const { refetch: refreshAndroidSettingsSync } = useDataQuery(queryAndroidSettingsSynchronization);
     const [androidSettingsSyncUpdate, { error: androidSettingsSyncUpdateError }] = useDataMutation(updateAndroidSettingsSynchronization, {
         onError: (err) => {
             setAndroidSettingsError(err.details || err)
@@ -565,8 +565,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 
 
     useEffect(() => {
-        if (androidSettingsError) { updateProgramBuildVersion(programId) }
-    }, [androidSettingsUpdateError])
+        if (androidSettingsError || androidSettingsSyncUpdateError) { updateProgramBuildVersion(programId) }
+    }, [androidSettingsUpdateError, androidSettingsSyncUpdateError])
 
     const updateProgramBuildVersion = (programId) => {
         getProgramSettings({ programId }).then(res => {
@@ -621,7 +621,38 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         return settings;
     }
 
-    const executeStep7 = (androidSettingsVisualizations) => {
+    const executeStep7B = () => {
+        // VI. Enable in-app analytics
+        refreshAndroidSettingsSync().then(androidSettings => {
+            if (androidSettings?.results) {
+                const settings = androidSettings.results;
+                const teiAmount = programMetadata?.teiDownloadAmount || 5;
+
+                settings.programSettings.specificSettings[programId] = {
+                    enrollmentDateDownload: "ANY",
+                    enrollmentDownload: "ONLY_ACTIVE",
+                    id: programId,
+                    name: programStage.program.name,
+                    settingDownload: "ALL_ORG_UNITS",
+                    summarySettings: `${teiAmount} TEI all OU`,
+                    teiDownload: teiAmount,
+                    updateDownload: "ANY"
+                }
+
+                androidSettingsSyncUpdate({ data: settings }).then(res => {
+                    if (res.status === 'OK') {
+                        setAndroidSettingsError(undefined)
+                    }
+                    updateProgramBuildVersion(programId)
+                })
+
+            } else {
+                updateProgramBuildVersion(programId)
+            }
+        })
+    }
+
+    const executeStep7A = (androidSettingsVisualizations) => {
         // VI. Enable in-app analytics
         refreshAndroidSettings().then(androidSettings => {
             if (androidSettings?.results) {
@@ -629,12 +660,10 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                 const settings = buildAndroidSettings(androidSettings, uidPool.shift(), androidSettingsVisualizations)
                 androidSettingsUpdate({ data: settings.results }).then(res => {
                     if (res.status === 'OK') {
-
-                        //* Add Synchronization update if this worked (Means that the Android Settings App is working)
-                        
-                        setAndroidSettingsError(undefined)
+                        executeStep7B();
+                    } else {
+                        updateProgramBuildVersion(programId)
                     }
-                    updateProgramBuildVersion(programId)
                 })
 
             } else {
@@ -647,7 +676,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         createMetadata.mutate({ data: metadata }).then(response => {
             if (response.status == 'OK') {
                 setProgressSteps(7);
-                executeStep7(androidSettingsVisualizations);
+                executeStep7A(androidSettingsVisualizations);
             }
         });
     }
