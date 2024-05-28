@@ -446,8 +446,8 @@ export const ProgramIndicatorTemplateNoA = {
 
 export const ProgramIndicatorTemplateGS = {
     "id": "<indicatorId>",
-    "name": "<Short Name> - Global Score",
-    "shortName": "<Short Name> - GS",
+    "name": "Global Score <Program Id>",
+    "shortName": "Global Score <Program Id>",
     "aggregationType": "AVERAGE",
     "displayInForm": true,
     "description": "_H2Analytics",
@@ -459,6 +459,7 @@ export const ProgramIndicatorTemplateGS = {
         "userGroups": {},
         "public": "--------"
     },
+    "decimals": 2,
     "filter": "true",
     "analyticsType": "EVENT",
     "favorite": false,

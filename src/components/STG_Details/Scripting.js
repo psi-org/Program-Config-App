@@ -929,8 +929,8 @@ export const buildProgramIndicators = (programId, programStage, scoreMap, uidPoo
     const AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
     AnalyticGS.id = uidPool.shift()
     indicatorIDs.push(AnalyticGS.id)
-    AnalyticGS.name = programShortName + ' - Global Score'
-    AnalyticGS.shortName = 'Global Score [' + programId + ']'
+    AnalyticGS.name = `Global Score [${programId}]`
+    AnalyticGS.shortName = `Global Score [${programId}]`
     AnalyticGS.expression = `#{${programStage.id}.${scoreMap.numC == "" ? NON_CRITICAL_STEPS : CRITICAL_STEPS}}`
     AnalyticGS.program.id = programId
     AnalyticGS.sharing = sharingSettings
