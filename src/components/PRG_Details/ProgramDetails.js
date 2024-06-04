@@ -105,7 +105,7 @@ const queryHNQIS2Metadata = {
 
 const ProgramDetails = () => {
 
-    const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
+    const { data: hnqis2Metadata, loading: metadataLoading  } = useDataQuery(queryHNQIS2Metadata);
 
     const h2Ready = localStorage.getItem('h2Ready') === 'true';
 
@@ -340,7 +340,7 @@ const ProgramDetails = () => {
         })
     }
 
-    if (hnqisMode && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+    if (hnqisMode && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
         return (<>
             <NoticeBox title="Check HNQIS2 Metadata" error>
                 <p>The latest PCA Metadata Package is required to access this HNQIS2 Program.</p>
