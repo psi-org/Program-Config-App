@@ -5,14 +5,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
+import LockIcon from '@mui/icons-material/Lock';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 import NewReleasesIcon from '@mui/icons-material/NewReleases';
 import PublicIcon from '@mui/icons-material/Public';
 import RestoreIcon from '@mui/icons-material/Restore';
 import ShareIcon from '@mui/icons-material/Share';
 import StorageIcon from '@mui/icons-material/Storage';
+import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import UpgradeIcon from '@mui/icons-material/SwitchAccessShortcutAdd';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import WarningIcon from '@mui/icons-material/Warning';
 import { IconButton, Slide, Snackbar, Tooltip } from "@mui/material";
 import Popover from '@mui/material/Popover';
 import PropTypes from 'prop-types';
@@ -21,9 +23,9 @@ import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import tinycolor from 'tinycolor2';
-import { BUILD_VERSION, DATE_FORMAT_OPTIONS, METADATA } from "../../configs/Constants.js";
+import { BUILD_VERSION, DATE_FORMAT_OPTIONS, METADATA, REQUIRED_H2_PROGRAM_BUILD_VERSION } from "../../configs/Constants.js";
 import actionCreators from "../../state/action-creators";
-import { versionIsValid } from "../../utils/Utils.js";
+import { versionIsValid, versionGTE } from "../../utils/Utils.js";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import ProgramNew from "./ProgramNew.js";
 
@@ -44,7 +46,8 @@ const ProgramItem = ({
     doSearch,
     convertToH2,
     transferDataH2,
-    setSearchLocalStorage
+    setSearchLocalStorage,
+    h2Valid
 }) => {
 
     const [showNotification, setShowNotification] = useState(false);
@@ -90,10 +93,29 @@ const ProgramItem = ({
     const openPop = Boolean(anchorEl);
     const id = openPop ? "simple-popover" : undefined;
 
+    const isEnabled = () => {
+        if (programType === 'HNQIS2' && !h2Valid) { return false };
+        return true;
+    }
+
+    const handleSelectProgram = () => {
+        if (!isEnabled()) { return };
+
+        setProgram(program.id);
+        history.push('/program/' + program.id);
+        setSearchLocalStorage();
+    }
+
+    const requiredUpgradeBadge = (programType === 'HNQIS2' && pcaMetadata.buildVersion && !versionGTE(pcaMetadata.buildVersion, REQUIRED_H2_PROGRAM_BUILD_VERSION))
+        ? <Tooltip title={`IMPORTANT UPGRADE REQUIRED. This program was built using an older version of the PCA with deprecated logic and will not work properly. Please 'Set Up Program' again to fix this issue.`}>
+            <SyncProblemIcon sx={{ fontSize: 35, color: '#FE3636' }} style={{ marginRight: "0.3em", cursor: 'pointer' }} />
+        </Tooltip>
+        :null;
+
     return (
         <>
-            <div className="ml_item" style={{ color: "#333333", backgroundColor: "#F8F8F8", border: "0.5px solid #D5DDE5", borderRadius: "4px", padding: '5px', width: '100%', maxWidth: '100%' }}>
-                <div className="ml_list-icon" style={{ cursor: 'pointer' }} onClick={() => { setProgram(program.id); history.push('/program/' + program.id); }}>
+            <div className="ml_item" style={{ color: "#333333", backgroundColor: "#F8F8F8", border: "0.5px solid #D5DDE5", borderRadius: "4px", padding: '5px', width: '100%', maxWidth: '100%', opacity: isEnabled() ? "1" : "0.65" }}>
+                <div className="ml_list-icon" style={{ cursor: isEnabled() ? 'pointer' : 'default' }} onClick={handleSelectProgram}>
                     <div className="ml_item-desc" style={{ width: '3.2em' }}>
                         <div style={{ backgroundColor: (program.style?.color || '#e0e0e0'), width: '3em', height: '3em', minWidth: '3em', minHeight: '3em', border: '1px solid #DDD', borderRadius: '10%', padding: '0' }}>
                             <img
@@ -103,7 +125,7 @@ const ProgramItem = ({
                         </div>
                     </div>
                 </div>
-                <div className="ml_item-title" style={{ overflow: 'hidden', cursor: 'pointer' }} onClick={() => { setProgram(program.id); history.push('/program/' + program.id); setSearchLocalStorage(); }}>
+                <div className="ml_item-title" style={{ overflow: 'hidden', cursor: isEnabled() ? 'pointer' : 'default' }} onClick={handleSelectProgram}>
                     <Tooltip title={program.name} placement="bottom-start" arrow>
                         <span style={{
                             overflow: 'hidden',
@@ -117,23 +139,29 @@ const ProgramItem = ({
 
 
                 <div className="ml_item-desc">
-                    {programType !== 'HNQIS' && !(pcaMetadata.dePrefix && pcaMetadata.dePrefix !== '') &&
-                        <Tooltip title={`A Data Element Prefix is not defined for this Program. Please edit the Program Settings to add a Prefix.`}>
-                            <WarningAmberIcon color="warning" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
+                    {programType === 'HNQIS2' && !isEnabled() &&
+                        <Tooltip title={`This HNQIS2 Program cannot be accessed as it requires the latest HNQIS2 Metadata Package. Go to Settings > HNQIS 2.0 Status for more information.`}>
+                            <LockIcon style={{ marginRight: "0.3em", cursor: 'pointer' }} />
                         </Tooltip>
                     }
+                    {requiredUpgradeBadge}
                     {programType !== 'HNQIS' && pcaMetadata.buildVersion && !versionIsValid(pcaMetadata.buildVersion, BUILD_VERSION, BUILD_VERSION) &&
                         <Tooltip title={`This Program's logic was built in version ${pcaMetadata.buildVersion}, please ${programType === 'HNQIS2' ? "'Set Up Program'" : "'Build Program Rules'"} again to update it.`}>
-                            <NewReleasesIcon color="error" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
+                            <NewReleasesIcon sx={{ fontSize: 30, color: '#FEBB36' }} style={{ marginRight: "0.3em",cursor: 'pointer' }} />
                         </Tooltip>
                     }
                     {programType !== 'HNQIS' && !pcaMetadata.buildVersion &&
                         <Tooltip title={"This Program's logic hasn't been built yet."}>
-                            <NewReleasesIcon color="error" style={{ marginRight: "0.5em", cursor: 'pointer' }} />
+                            <NewReleasesIcon sx={{ fontSize: 30, color: '#FE9136' }} style={{ marginRight: "0.3em",cursor: 'pointer' }} />
+                        </Tooltip>
+                    }
+                    {programType !== 'HNQIS' && !(pcaMetadata.dePrefix && pcaMetadata.dePrefix !== '') &&
+                        <Tooltip title={`A Data Element Prefix is not defined for this Program. Please edit the Program Settings to add a Prefix.`}>
+                            <WarningIcon sx={{ fontSize: 30, color: '#FEBB36' }} style={{ marginRight: "0.3em",cursor: 'pointer' }} />
                         </Tooltip>
                     }
                     <IconButton
-                        style={{ marginRight: "0.5em" }}
+                        sx={{ fontSize: 30, marginRight: "0.5em" }}
                         onClick={handleOpen}
                         aria-describedby={id}
                     >
@@ -451,6 +479,7 @@ ProgramItem.propTypes = {
     deleteProgram: PropTypes.func,
     doSearch: PropTypes.func,
     downloadMetadata: PropTypes.func,
+    h2Valid: PropTypes.bool,
     prgTypeId: PropTypes.string,
     program: PropTypes.object,
     refetch: PropTypes.func,

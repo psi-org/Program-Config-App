@@ -446,11 +446,12 @@ export const ProgramIndicatorTemplateNoA = {
 
 export const ProgramIndicatorTemplateGS = {
     "id": "<indicatorId>",
-    "name": "<Short Name> - Global Score",
-    "shortName": "<Short Name> - GS",
-    "description": "_H2Analytics",
+    "name": "Global Score <Program Id>",
+    "shortName": "Global Score <Program Id>",
     "aggregationType": "AVERAGE",
-    "expression": "A{NQdpdST0Gcx}",
+    "displayInForm": true,
+    "description": "_H2Analytics",
+    "expression": "#{AssessmentID.CriticalStepsID}",
     "sharing": {
         "owner": "id",
         "external": false,
@@ -458,35 +459,37 @@ export const ProgramIndicatorTemplateGS = {
         "userGroups": {},
         "public": "--------"
     },
-    "filter": "d2:hasValue(A{NQdpdST0Gcx})",
-    "decimals": 0,
-    "analyticsType": "ENROLLMENT",
+    "decimals": 2,
+    "filter": "true",
+    "analyticsType": "EVENT",
+    "favorite": false,
+    "dimensionItemType": "PROGRAM_INDICATOR",
     "program": { "id": "<Program Id>" },
     "analyticsPeriodBoundaries": [
         {
             "externalAccess": false,
-            "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
-            "boundaryTarget": "ENROLLMENT_DATE",
+            "offsetPeriodType": "Monthly",
+            "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+            "boundaryTarget": "EVENT_DATE",
+            "favorite": false,
+            "offsetPeriods": -12,
             "sharing": {
+                "userGroups": {},
                 "external": false,
-                "users": {},
-                "userGroups": {}
-            },
-            "favorite": false
+                "users": {}
+            }
         },
         {
             "externalAccess": false,
             "offsetPeriodType": "Monthly",
-            "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
-            "boundaryTarget": "ENROLLMENT_DATE",
-            "sharing": {
-                "external": false,
-                "users": {},
-                "userGroups": {}
-            },
+            "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+            "boundaryTarget": "EVENT_DATE",
             "favorite": false,
-            "offsetPeriods": "-12"
-
+            "sharing": {
+                "userGroups": {},
+                "external": false,
+                "users": {}
+            }
         }
     ]
 }
@@ -1292,6 +1295,7 @@ export const dashMap = {
 export const LineListGlobalScore = {
     "name": "Test action_plan",
     "publicAccess": "--------",
+    "type": "LINE_LIST",
     "code": "<ProgramId>_Scripted9",
     "userOrganisationUnitChildren": false,
     "subscribed": false,
@@ -1321,7 +1325,7 @@ export const LineListGlobalScore = {
     "collapseDataDimensions": false,
     "userOrganisationUnitGrandChildren": false,
     "hideSubtitle": false,
-    "outputType": "EVENT",
+    "outputType": "ENROLLMENT",
     "externalAccess": false,
     "colSubTotals": true,
     "showHierarchy": false,
@@ -1390,10 +1394,10 @@ export const LineListGlobalScore = {
         "id": "<stage id>"
     },
     "dataElementGroupSetDimensions": [],
-    "attributeDimensions": [
+    "programIndicatorDimensions": [
         {
-            "attribute": {
-                "id": "<attribute DE id"
+            "programIndicator": {
+                "id": "<Global Score Indicator ID>"
             }
         }
     ],

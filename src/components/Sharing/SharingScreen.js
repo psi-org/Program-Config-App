@@ -699,7 +699,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                             {/*<Button onClick={()=>hideForm()} variant="outlined" startIcon={<CloseIcon />}>Close</Button>*/}
                             <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
                                 <Button onClick={handleClick}
-                                    disabled={readOnly || !!fetchErrors}>{btnOptions[selectedIndex]}</Button>
+                                    disabled={readOnly || !!fetchErrors || !metadata}>{btnOptions[selectedIndex]}</Button>
                                 <Button
                                     size="small"
                                     aria-controls={open ? 'split-button-menu' : undefined}
