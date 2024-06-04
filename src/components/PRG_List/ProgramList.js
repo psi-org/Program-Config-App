@@ -15,7 +15,8 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import React, { useState, useEffect } from "react";
-import { formatAlert } from "../../utils/Utils.js";
+import { DATASTORE_H2_METADATA, H2_METADATA_VERSION, NAMESPACE } from "../../configs/Constants.js";
+import { formatAlert, versionGTE } from "../../utils/Utils.js";
 import OunitScreen from "../Org_Units/OunitScreen.js";
 import BackupScreen from "../PRG_List/BackupScreen.js";
 import RestoreScreen from "../PRG_List/RestoreScreen.js";
@@ -36,6 +37,12 @@ const queryProgramType = {
             filter: ['code:eq:PROGRAM_TYPE']
         }
     }
+};
+
+const queryHNQIS2Metadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}`,
+    },
 };
 
 const query = {
@@ -66,6 +73,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const ProgramList = () => {
+
+    const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
 
     //console.log(semverCoerce("2.37-SNAPSHOT"))
     // Export Program Metadata //
@@ -374,6 +383,7 @@ const ProgramList = () => {
                                     convertToH2={convertToH2}
                                     transferDataH2={transferDataH2}
                                     setSearchLocalStorage={setSearchLocalStorageWithCurrentValues}
+                                    h2Valid={versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)}
                                 />
                             );
                         })}

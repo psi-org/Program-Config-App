@@ -12,10 +12,10 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { bindActionCreators } from "redux";
-import { BUILD_VERSION, METADATA } from "../../configs/Constants.js";
+import { BUILD_VERSION, DATASTORE_H2_METADATA, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import actionCreators from "../../state/action-creators";
-import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, padValue, setPCAMetadata, truncateString } from "../../utils/Utils.js";
+import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, padValue, setPCAMetadata, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessorTracker from "../Excel/DataProcessorTracker.js";
 import Importer from "../Excel/Importer.js";
 import ValidateTracker from "../PRG_Details/ValidateTracker.js";
@@ -97,7 +97,15 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
+const queryHNQIS2Metadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}`
+    }
+};
+
 const ProgramDetails = () => {
+
+    const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
 
     const h2Ready = localStorage.getItem('h2Ready') === 'true';
 
@@ -330,6 +338,14 @@ const ProgramDetails = () => {
             })
 
         })
+    }
+
+    if (hnqisMode && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+        return (<>
+            <NoticeBox title="Check HNQIS2 Metadata" error>
+                <p>The latest PCA Metadata Package is required to access this HNQIS2 Program.</p>
+            </NoticeBox>
+        </>);
     }
 
     return (

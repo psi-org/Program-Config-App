@@ -26,9 +26,9 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Link } from "react-router-dom";
-import { BUILD_VERSION, FEEDBACK_ORDER, METADATA } from "../../configs/Constants.js";
+import { BUILD_VERSION, DATASTORE_H2_METADATA, FEEDBACK_ORDER, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, truncateString } from "../../utils/Utils.js";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessor from "../Excel/DataProcessor.js";
 import Importer from "../Excel/Importer.js";
 import ErrorReports from "../UIElements/ErrorReports.js";
@@ -122,22 +122,34 @@ const queryEventReport = {
     results: {
         resource: 'eventReports',
         params: ({ programId }) => ({
-            fields: ['id', 'name'],
+            fields: ['*'],
             filter: [`code:like:${programId}_Scripted`]
         })
     }
 };
 
 
-const updateAndroidSettings = {
+const updateAndroidSettingsAnalytics = {
     resource: `dataStore/ANDROID_SETTINGS_APP/analytics`,
     type: 'update',
     data: ({ data }) => data
 };
 
-const queryAndroidSettings = {
+const queryAndroidSettingsAnalytics = {
     results: {
         resource: `dataStore/ANDROID_SETTINGS_APP/analytics`
+    }
+};
+
+const updateAndroidSettingsSynchronization = {
+    resource: `dataStore/ANDROID_SETTINGS_APP/synchronization`,
+    type: 'update',
+    data: ({ data }) => data
+};
+
+const queryAndroidSettingsSynchronization = {
+    results: {
+        resource: `dataStore/ANDROID_SETTINGS_APP/synchronization?encrypt=true`
     }
 };
 
@@ -162,8 +174,8 @@ const queryPCAMetadata = {
             filter: [`id:eq:${programId}`]
         })
     }
-
 }
+
 const queryOrganizationsUnit = {
     results: {
         resource: 'organisationUnitLevels',
@@ -193,19 +205,37 @@ const queryCurrentUser = {
     },
 }
 
+const queryHNQIS2Metadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}`
+    }
+};
+
 const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 
 const StageSections = ({ programStage, hnqisMode, readOnly }) => {
+
+    const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
+
     // Globals
     const programId = programStage.program.id;
     const [isSectionMode] = useState(programStage.formType === "SECTION" || programStage.programStageDataElements.length === 0);
-    const { data: androidSettings, refetch: refreshAndroidSettings } = useDataQuery(queryAndroidSettings);
     const { data: currentUser } = useDataQuery(queryCurrentUser);
-    const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettings, {
+
+    const { data: androidSettings, refetch: refreshAndroidSettings } = useDataQuery(queryAndroidSettingsAnalytics);
+    const [androidSettingsUpdate, { error: androidSettingsUpdateError }] = useDataMutation(updateAndroidSettingsAnalytics, {
         onError: (err) => {
             setAndroidSettingsError(err.details || err)
         }
     });
+
+    const { refetch: refreshAndroidSettingsSync } = useDataQuery(queryAndroidSettingsSynchronization);
+    const [androidSettingsSyncUpdate, { error: androidSettingsSyncUpdateError }] = useDataMutation(updateAndroidSettingsSynchronization, {
+        onError: (err) => {
+            setAndroidSettingsError(err.details || err)
+        }
+    });
+
     const [androidSettingsError, setAndroidSettingsError] = useState(undefined);
     const [programSettingsError, setProgramSettingsError] = useState(undefined);
     const { refetch: setOuLevel } = useDataQuery(queryOrganizationsUnit, { lazy: true, variables: { ouLevel: undefined } });
@@ -535,8 +565,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 
 
     useEffect(() => {
-        if (androidSettingsError) { updateProgramBuildVersion(programId) }
-    }, [androidSettingsUpdateError])
+        if (androidSettingsError || androidSettingsSyncUpdateError) { updateProgramBuildVersion(programId) }
+    }, [androidSettingsUpdateError, androidSettingsSyncUpdateError])
 
     const updateProgramBuildVersion = (programId) => {
         getProgramSettings({ programId }).then(res => {
@@ -591,9 +621,71 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         return settings;
     }
 
+    const executeStep7B = () => {
+        // VI. Enable in-app analytics
+        refreshAndroidSettingsSync().then(androidSettings => {
+            if (androidSettings?.results) {
+                const settings = androidSettings.results;
+                const teiAmount = programMetadata?.teiDownloadAmount || 5;
+
+                settings.programSettings.specificSettings[programId] = {
+                    enrollmentDateDownload: "ANY",
+                    enrollmentDownload: "ONLY_ACTIVE",
+                    id: programId,
+                    name: programStage.program.name,
+                    settingDownload: "ALL_ORG_UNITS",
+                    summarySettings: `${teiAmount} TEI all OU`,
+                    teiDownload: teiAmount,
+                    updateDownload: "ANY"
+                }
+
+                androidSettingsSyncUpdate({ data: settings }).then(res => {
+                    if (res.status === 'OK') {
+                        setAndroidSettingsError(undefined)
+                    }
+                    updateProgramBuildVersion(programId)
+                })
+
+            } else {
+                updateProgramBuildVersion(programId)
+            }
+        })
+    }
+
+    const executeStep7A = (androidSettingsVisualizations) => {
+        // VI. Enable in-app analytics
+        refreshAndroidSettings().then(androidSettings => {
+            if (androidSettings?.results) {
+
+                const settings = buildAndroidSettings(androidSettings, uidPool.shift(), androidSettingsVisualizations)
+                androidSettingsUpdate({ data: settings.results }).then(res => {
+                    if (res.status === 'OK') {
+                        executeStep7B();
+                    } else {
+                        updateProgramBuildVersion(programId)
+                    }
+                })
+
+            } else {
+                updateProgramBuildVersion(programId)
+            }
+        })
+    }
+
+    const executeStep6 = ({ metadata, androidSettingsVisualizations }) => {
+        createMetadata.mutate({ data: metadata }).then(response => {
+            if (response.status == 'OK') {
+                setProgressSteps(7);
+                executeStep7A(androidSettingsVisualizations);
+            }
+        });
+    }
+
     const run = () => {
         if (!savedAndValidated) { return }
         //--------------------- NEW METADATA --------------------//
+        const actionPlanID = programStage.program.programStages.filter(ps => ps.id != programStage.id)[0].id;
+
         setProgressSteps(1);
         const programConfig = programAttributes.results?.programs[0];
         const pcaMetadata = JSON.parse(programConfig?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}");
@@ -679,9 +771,9 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                         setProgressSteps(4);
 
                         const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
-                        const { programRules, programRuleActions } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea);
-                        const { programIndicators, indicatorIDs } = buildProgramIndicators(programId, programStage.program.shortName, uidPool, programMetadata.useCompetencyClass, sharingSettings, programMetadata.programIndicatorsAggType);
-                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, indicatorIDs, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, sharingSettings, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap);
+                        const { programRules, programRuleActions, scoreMap } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea);
+                        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicators(programId, programStage, scoreMap, uidPool, programMetadata.useCompetencyClass, sharingSettings, programMetadata.programIndicatorsAggType);
+                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, { gsInd, indicatorIDs }, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, sharingSettings, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap, actionPlanID);
                         const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports };
 
                         // IV. Delete old metadata
@@ -704,41 +796,32 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                         };
 
                         // V. Import new metadata
+                        createMetadata.mutate({
+                            data: {
+                                eventReports: eventReportDQ.data.results.eventReports.map(er => {
+                                    er.columnDimensions = ["pe", "ou"]
+                                    er.dataElementDimensions = [];
+                                    er.programIndicatorDimensions = [];
+                                    return er;
+                                })
+                            }
+                        }).then(updateEventReportResp => {
 
-                        deleteMetadata({ data: oldMetadata }).then((res) => {
-                            if (res.status == 'OK') {
-                                setProgressSteps(6);
-
-                                createMetadata.mutate({ data: metadata }).then(response => {
-
-                                    if (response.status == 'OK') {
-                                        setProgressSteps(7);
-
-                                        // VI. Enable in-app analytics
-                                        refreshAndroidSettings().then(androidSettings => {
-                                            if (androidSettings?.results) {
-
-                                                const settings = buildAndroidSettings(androidSettings, uidPool.shift(), androidSettingsVisualizations)
-                                                androidSettingsUpdate({ data: settings.results }).then(res => {
-                                                    if (res.status === 'OK') { setAndroidSettingsError(undefined) }
-                                                    updateProgramBuildVersion(programId)
-                                                })
-
-                                            } else {
-                                                updateProgramBuildVersion(programId)
-                                            }
-                                        })
-
+                            if (updateEventReportResp.status == 'OK') {
+                                deleteMetadata({ data: oldMetadata }).then((res) => {
+                                    if (res.status == 'OK') {
+                                        setProgressSteps(6);
+                                        executeStep6({ metadata, androidSettingsVisualizations });
                                     }
                                 });
                             }
-
                         });
                     }
                 }
             })
         }
     }
+
     const parseErrors = (e) => {
         const data = e.typeReports.map(tr => {
             const type = tr.klass.split('.').pop()
@@ -785,6 +868,14 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 
         setOpen(false);
     };
+
+    if (hnqisMode && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+        return (<>
+            <NoticeBox title="Check HNQIS2 Metadata" error>
+                <p>The latest PCA Metadata Package is required to access this HNQIS2 Program.</p>
+            </NoticeBox>
+        </>);
+    }
 
     return (
         <div className="cont_stage">

@@ -25,13 +25,15 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.0.3"
-const BUILD_DATE = "May 2, 2024"
+const BUILD_VERSION = "2.0.4"
+const BUILD_DATE = "May 30, 2024"
 const MIN_VERSION = "2.36.x"
 const MAX_VERSION = "2.40.x"
 
 const PCA_METADATA_VERSION = "1.2.0";
-const H2_METADATA_VERSION = "1.1.3";
+const H2_METADATA_VERSION = "1.1.4";
+
+const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.4";
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
 const LIGHT_BLUE_COLOR = "#66aee5";
@@ -530,7 +532,6 @@ export {
     ELEM_TYPES,
     EXPORT_HNQIS_PRESETS,
     EXPORT_PRESETS,
-    H2_ENABLED_IMPORT_REMOVE_KEYS,
     FEATURE_TYPES,
     FEEDBACK_ORDER,
     FEEDBACK_TEXT,
@@ -555,6 +556,7 @@ export {
     H1_RESPONSIBLE2,
     H1_RESPONSIBLE3,
     H2_ATTRIBUTES_TO_KEEP,
+    H2_ENABLED_IMPORT_REMOVE_KEYS,
     H2_METADATA_VERSION,
     H2_REQUIRED,
     HEADER_ATTRIBUTE,
@@ -595,6 +597,7 @@ export {
     QUESTION_TYPE_ATTRIBUTE,
     RENDER_TYPES,
     REPORT_DATE_TO_USE,
+    REQUIRED_H2_PROGRAM_BUILD_VERSION,
     SCORE_DEN_ATTRIBUTE,
     SCORE_NUM_ATTRIBUTE,
     SHORT_DATE_FORMAT_OPTIONS,

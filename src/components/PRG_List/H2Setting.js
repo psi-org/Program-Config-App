@@ -1,6 +1,6 @@
 import { useDataQuery } from "@dhis2/app-runtime";
 import { OrganisationUnitTree } from "@dhis2/ui";
-import { Alert, FormLabel } from "@mui/material";
+import { Alert, FormLabel, TextField } from "@mui/material";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -49,6 +49,16 @@ const ouUnitQuery = {
     },
 };
 
+const fieldSetStyle = {
+    borderRadius: "0.5em",
+    padding: "10px",
+    border: "1px solid rgb(189, 189, 189)",
+    marginTop: '0.5em',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+}
+
 const H2Setting = forwardRef((props, ref) => {
     let id;
     const { loading: ouMetadataLoading, data: ouMetadata } = useDataQuery(orgUnitsQuery);
@@ -65,6 +75,7 @@ const H2Setting = forwardRef((props, ref) => {
     const [ouLevels, setOULevels] = useState();
     const [aggregationType, setAggregationType] = useState(props.pcaMetadata?.programIndicatorsAggType || 'AVERAGE');
     const [useCompetency, setUseCompetency] = useState(props.pcaMetadata?.useCompetencyClass === "Yes");
+    const [teiDownloadAmount, setTeiDownloadAmount] = useState(props.pcaMetadata?.teiDownloadAmount || 5);
 
     const [useUserOrgUnit, setUseUserOrgUnit] = useState(props.pcaMetadata?.useUserOrgUnit === "Yes");
     const [ouTableRow, setOUTableRow] = useState(props.pcaMetadata?.ouLevelTable || "");
@@ -77,7 +88,8 @@ const H2Setting = forwardRef((props, ref) => {
         ouTableRow: undefined,
         ouMapPolygon: undefined,
         orgUnitRoot: undefined,
-        aggregationType: undefined
+        aggregationType: undefined,
+        teiDownloadAmount: undefined
     })
 
     useEffect(() => {
@@ -120,6 +132,12 @@ const H2Setting = forwardRef((props, ref) => {
         setAggregationType(event.target.value);
     };
 
+    const teiAmountChange = (event) => {
+        validationErrors.teiDownloadAmount = undefined;
+        setValidationErrors({ ...validationErrors });
+        setTeiDownloadAmount(event.target.value);
+    };
+
     let healthAreaOptions = [];
     let ouLevelOptions = [];
 
@@ -145,7 +163,7 @@ const H2Setting = forwardRef((props, ref) => {
                 setter("");
             }
         };
-    
+
         const fetchDataAndSetState = async () => {
             const data = await ouLevelRefetch({ id: props.pcaMetadata?.ouRoot });
             if (data.result) {
@@ -157,13 +175,13 @@ const H2Setting = forwardRef((props, ref) => {
                 setSelectedOrgUnits([props.pcaMetadata?.ouRoot]);
             }
         };
-    
+
         const fetchOrgUnits = async () => {
             try {
                 if (!ouMetadataLoading && props.pcaMetadata?.ouRoot) {
                     checkAndResetValues(props.pcaMetadata?.ouLevelTable, setOUTableRow);
                     checkAndResetValues(props.pcaMetadata?.ouLevelMap, setOUMapPolygon);
-    
+
                     await fetchDataAndSetState();
                 } else {
                     ouTreeNLevelInit();
@@ -174,9 +192,9 @@ const H2Setting = forwardRef((props, ref) => {
                 setOULevels(ouMetadata);
             }
         };
-    
+
         fetchOrgUnits();
-    }, [ouMetadata]);    
+    }, [ouMetadata]);
 
     useEffect(() => {
         if ((!ouLevelLoading && orgUnitPathSelected.length > 0) || noOULevelFound) {
@@ -215,28 +233,45 @@ const H2Setting = forwardRef((props, ref) => {
 
     useImperativeHandle(ref, () => ({
         handleFormValidation() {
+            console.log(teiDownloadAmount === "")
             let response = true;
             if (
                 healthArea === "" ||
                 ouTableRow === "" ||
                 ouMapPolygon === "" ||
                 aggregationType === "" ||
-                selectedOrgUnits.length === 0
+                selectedOrgUnits.length === 0 ||
+                teiDownloadAmount === ""
             ) {
                 response = false;
             }
             validationErrors.healthArea =
                 healthArea === "" ? "This field is required" : undefined;
+            
             validationErrors.ouTableRow =
                 ouTableRow === "" ? "This field is required" : undefined;
+            
             validationErrors.ouMapPolygon =
                 ouMapPolygon === "" ? "This field is required" : undefined;
+            
             validationErrors.orgUnitRoot =
                 selectedOrgUnits.length === 0
                     ? "This field is required"
                     : undefined;
+            
             validationErrors.aggregationType =
                 aggregationType === "" ? "This field is required" : undefined;
+            
+            
+            if (teiDownloadAmount === "") {
+                validationErrors.teiDownloadAmount = "This field is required";
+            } else if (teiDownloadAmount < 0 || teiDownloadAmount > 500) {
+                validationErrors.teiDownloadAmount = "This field must contain a value between 0 and 500.";
+                response = false;
+            } else {
+                validationErrors.teiDownloadAmount = undefined;
+            }
+            
             return response;
         },
 
@@ -251,6 +286,7 @@ const H2Setting = forwardRef((props, ref) => {
             data.ouLevelTable = ouTableRow;
             data.ouLevelMap = ouMapPolygon;
             data.programIndicatorsAggType = aggregationType;
+            data.teiDownloadAmount = teiDownloadAmount;
             return data;
         }
     }))
@@ -276,7 +312,7 @@ const H2Setting = forwardRef((props, ref) => {
                 >
                     <div
                         style={{
-                            width: "40%",
+                            width: "35%",
                             display: "flex",
                             flexDirection: "column",
                             alignSelf: "stretch",
@@ -323,89 +359,102 @@ const H2Setting = forwardRef((props, ref) => {
                     </div>
                     <div
                         style={{
-                            width: "55%",
+                            width: "60%",
                             flexDirection: "column",
                             justifyContent: "space-between",
                         }}
                     >
-                        <SelectOptions
-                            useError={
-                                validationErrors.ouTableRow !==
-                                undefined
-                            }
-                            helperText={validationErrors.ouTableRow}
-                            label={
-                                "Org Unit Level for the Dashboard Visualizations (*)"
-                            }
-                            items={ouLevelOptions}
-                            handler={ouTableRowChange}
-                            styles={{ width: "100%" }}
-                            value={ouTableRow}
-                            defaultOption={
-                                "Select Org Unit Level"
-                            }
-                        />
-                        <SelectOptions
-                            useError={
-                                validationErrors.ouMapPolygon !==
-                                undefined
-                            }
-                            helperText={validationErrors.ouMapPolygon}
-                            label={
-                                "Org Unit Level for the Dashboard Maps (*)"
-                            }
-                            items={ouLevelOptions}
-                            handler={ouMapPolygonChange}
-                            styles={{ width: "100%" }}
-                            value={ouMapPolygon}
-                            defaultOption={
-                                "Select Org Unit Level"
-                            }
-                        />
+                        <div style={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between'}}>
+                            <fieldset
+                                style={{
+                                    ...fieldSetStyle,
+                                    flexDirection: "column",
+                                    width: '49%',
+                                    maxWidth: '49%',
+                                    minWidth: '49%'
+                                }}
+                            >
+                                <legend style={{ color: 'rgba(0, 0, 0, 0.6)'}}>Generated Dashboard Settings</legend>
+                                <SelectOptions
+                                    useError={
+                                        validationErrors.ouTableRow !==
+                                        undefined
+                                    }
+                                    helperText={validationErrors.ouTableRow}
+                                    label={
+                                        "Org Unit Level for the Dashboard Visualizations (*)"
+                                    }
+                                    items={ouLevelOptions}
+                                    handler={ouTableRowChange}
+                                    styles={{ width: "100%" }}
+                                    value={ouTableRow}
+                                    defaultOption={
+                                        "Select Org Unit Level"
+                                    }
+                                />
+                                <SelectOptions
+                                    useError={
+                                        validationErrors.ouMapPolygon !==
+                                        undefined
+                                    }
+                                    helperText={validationErrors.ouMapPolygon}
+                                    label={
+                                        "Org Unit Level for the Dashboard Maps (*)"
+                                    }
+                                    items={ouLevelOptions}
+                                    handler={ouMapPolygonChange}
+                                    styles={{ width: "100%" }}
+                                    value={ouMapPolygon}
+                                    defaultOption={
+                                        "Select Org Unit Level"
+                                    }
+                                />
+                            </fieldset>
+                            <fieldset
+                                style={{
+                                    ...fieldSetStyle,
+                                    flexDirection: "column",
+                                    width: '49%',
+                                    maxWidth: '49%',
+                                    minWidth: '49%'
+                                }}
+                            >
+                                <legend style={{ color: 'rgba(0, 0, 0, 0.6)' }}>Analytics Settings</legend>
+                                <FormControlLabel
+                                    style={{marginTop: '1em'}}
+                                    control={
+                                        <Switch
+                                            checked={useUserOrgUnit}
+                                            onChange={handleUserOrgUnit}
+                                            name="userOrgUnit"
+                                        />
+                                    }
+                                    label="Use User Org Units for Analytics when possible"
+                                />
+                                <SelectOptions
+                                    useError={
+                                        validationErrors.aggregationType !==
+                                        undefined
+                                    }
+                                    helperText={validationErrors.aggregationType}
+                                    label={
+                                        "Aggregation Type for Program Indicators (*)"
+                                    }
+                                    items={AGG_TYPES_H2_PI}
+                                    handler={aggregationTypeChange}
+                                    styles={{ width: "100%" }}
+                                    value={aggregationType}
+                                    defaultOption={
+                                        "Select Aggregation Type"
+                                    }
+                                />
+                            </fieldset>
+                        </div>
+                        
                         <fieldset
-                            style={{
-                                borderRadius: "0.5em",
-                                padding: "10px",
-                                border: "1px solid rgb(189, 189, 189)",
-                                marginTop: '1em'
-                            }}
+                            style={{ ...fieldSetStyle, display: 'flex', justifyContent: 'space-between' }}
                         >
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={useUserOrgUnit}
-                                        onChange={handleUserOrgUnit}
-                                        name="userOrgUnit"
-                                    />
-                                }
-                                label="Use User Org Units for Analytics when possible"
-                            />
-                            <SelectOptions
-                                useError={
-                                    validationErrors.aggregationType !==
-                                    undefined
-                                }
-                                helperText={validationErrors.aggregationType}
-                                label={
-                                    "Agg Type for Program Indicators (*)"
-                                }
-                                items={AGG_TYPES_H2_PI}
-                                handler={aggregationTypeChange}
-                                styles={{ width: "100%" }}
-                                value={aggregationType}
-                                defaultOption={
-                                    "Select Aggregation Type"
-                                }
-                            />
-                        </fieldset>
-                        <fieldset
-                            style={{
-                                borderRadius: "0.5em",
-                                padding: "10px",
-                                border: "1px solid rgb(189, 189, 189)",
-                                marginTop: '1em'
-                            }}
-                        >
+                            <legend style={{ color: 'rgba(0, 0, 0, 0.6)' }}>Core HNQIS Settings</legend>
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -425,9 +474,28 @@ const H2Setting = forwardRef((props, ref) => {
                                 label={"Program Health Area (*)"}
                                 items={healthAreaOptions}
                                 handler={healthAreaChange}
-                                styles={{ width: "100%" }}
+                                styles={{ width: "60%" }}
                                 value={healthArea}
                                 defaultOption="Select Health Area"
+                            />
+                        </fieldset>
+                        <fieldset
+                            style={fieldSetStyle}
+                        >
+                            <legend style={{ color: 'rgba(0, 0, 0, 0.6)' }}>Android Capture App Settings</legend>
+                            <TextField
+                                error={validationErrors.teiDownloadAmount !== undefined}
+                                helperText={validationErrors.teiDownloadAmount}
+                                margin="normal"
+                                id="teiDownloadAmount"
+                                label="Max TEI Download Amount (*)"
+                                type="number"
+                                fullWidth
+                                variant="standard"
+                                autoComplete="off"
+                                inputProps={{ min: 0, max: 500 }}
+                                value={teiDownloadAmount}
+                                onChange={teiAmountChange}
                             />
                         </fieldset>
                     </div>

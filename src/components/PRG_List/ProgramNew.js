@@ -354,13 +354,13 @@ const ProgramNew = (props) => {
     // * STEPPER * //
 
     const [activeStep, setActiveStep] = useState(0);
-    let previousStep = 0;
+    const [previousStep, setPreviousStep] = useState(0);
     const [basicValidated, setBasicValidated] = useState(true);
     const [hnqisValidated, setHnqisValidated] = useState(true);
 
     const containerRef = useRef(null);
     const changeStep = (step) => {
-        previousStep = activeStep;
+        setPreviousStep(activeStep);
         setActiveStep(step);
     }
 
