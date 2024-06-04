@@ -215,7 +215,7 @@ const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 
 const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 
-    const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
+    const { data: hnqis2Metadata, loading: metadataLoading } = useDataQuery(queryHNQIS2Metadata);
 
     // Globals
     const programId = programStage.program.id;
@@ -869,7 +869,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setOpen(false);
     };
 
-    if (hnqisMode && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+    if (hnqisMode && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
         return (<>
             <NoticeBox title="Check HNQIS2 Metadata" error>
                 <p>The latest PCA Metadata Package is required to access this HNQIS2 Program.</p>
