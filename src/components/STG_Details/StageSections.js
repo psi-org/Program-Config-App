@@ -609,13 +609,14 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         settings.results.dhisVisualizations.home = settings.results.dhisVisualizations.home.filter(setting =>
             setting.program !== programId
         )
-
-        settings.results.dhisVisualizations.home.push({
-            id: newUID,
-            name: programStage.program.name,
-            program: programId,
-            visualizations: androidSettingsVisualizations
-        })
+        if (programMetadata?.createAndroidAnalytics === 'Yes') {
+            settings.results.dhisVisualizations.home.push({
+                id: newUID,
+                name: programStage.program.name,
+                program: programId,
+                visualizations: androidSettingsVisualizations
+            })
+        }
 
         settings.results.lastUpdated = new Date().toISOString();
         return settings;
@@ -1153,7 +1154,18 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                 {progressSteps !== 7 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 7 && !androidSettings && <IconWarning24 color={'#ffbb00'} />}
                                 {progressSteps !== 7 && androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p style={{ maxWidth: '90%' }}> Enabling in-app analytics {!androidSettings ? "(Android Settings app not enabled)" : (androidSettingsError ? '(Error: ' + (androidSettingsError.httpStatus === 'Forbidden' ? 'You don\'t have permissions to update the Android Settings in this server' : androidSettingsError.message) + ')' : "")}</p>
+                                <p style={{ maxWidth: '90%' }}>
+                                    {programMetadata?.createAndroidAnalytics === 'Yes' ? 'Enabling in-app analytics' : 'Applying Android Settings'}
+                                    {
+                                        !androidSettings
+                                            ? "(Android Settings app not enabled)"
+                                            : (androidSettingsError
+                                                ? '(Error: ' + (androidSettingsError.httpStatus === 'Forbidden'
+                                                    ? 'You don\'t have permissions to update the Android Settings in this server'
+                                                    : androidSettingsError.message) + ')'
+                                                : "")
+                                    }
+                                </p>
                             </div>
                         }
                         {(progressSteps > 7) && !programSettingsError &&

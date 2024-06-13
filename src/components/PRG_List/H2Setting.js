@@ -75,6 +75,7 @@ const H2Setting = forwardRef((props, ref) => {
     const [ouLevels, setOULevels] = useState();
     const [aggregationType, setAggregationType] = useState(props.pcaMetadata?.programIndicatorsAggType || 'AVERAGE');
     const [useCompetency, setUseCompetency] = useState(props.pcaMetadata?.useCompetencyClass === "Yes");
+    const [createAndroidAnalytics, setCreateAndroidAnalytics] = useState(props.pcaMetadata?.createAndroidAnalytics === "Yes");
     const [teiDownloadAmount, setTeiDownloadAmount] = useState(props.pcaMetadata?.teiDownloadAmount || 5);
 
     const [useUserOrgUnit, setUseUserOrgUnit] = useState(props.pcaMetadata?.useUserOrgUnit === "Yes");
@@ -106,6 +107,10 @@ const H2Setting = forwardRef((props, ref) => {
 
     const handleChangeComp = (event) => {
         setUseCompetency(event.target.checked);
+    };
+
+    const handleChangeAndroidAnalytics = (event) => {
+        setCreateAndroidAnalytics(event.target.checked);
     };
 
     const healthAreaChange = (event) => {
@@ -276,17 +281,19 @@ const H2Setting = forwardRef((props, ref) => {
         },
 
         saveMetaData() {
-            const data = {};
-            data.saveVersion = BUILD_VERSION;
-            data.buildVersion = props.pcaMetadata?.buildVersion;
-            data.useCompetencyClass = useCompetency ? "Yes" : "No";
-            data.healthArea = healthArea;
-            data.ouRoot = selectedOrgUnits[0];
-            data.useUserOrgUnit = useUserOrgUnit ? "Yes" : "No";
-            data.ouLevelTable = ouTableRow;
-            data.ouLevelMap = ouMapPolygon;
-            data.programIndicatorsAggType = aggregationType;
-            data.teiDownloadAmount = teiDownloadAmount;
+            const data = {
+                saveVersion:  BUILD_VERSION,
+                buildVersion:  props.pcaMetadata?.buildVersion,
+                useCompetencyClass:  useCompetency ? "Yes" : "No",
+                healthArea:  healthArea,
+                ouRoot:  selectedOrgUnits[0],
+                useUserOrgUnit:  useUserOrgUnit ? "Yes" : "No",
+                ouLevelTable:  ouTableRow,
+                ouLevelMap:  ouMapPolygon,
+                programIndicatorsAggType:  aggregationType,
+                createAndroidAnalytics:  createAndroidAnalytics ? "Yes" : "No",
+                teiDownloadAmount:  teiDownloadAmount
+            };
             return data;
         }
     }))
@@ -483,6 +490,16 @@ const H2Setting = forwardRef((props, ref) => {
                             style={fieldSetStyle}
                         >
                             <legend style={{ color: 'rgba(0, 0, 0, 0.6)' }}>Android Capture App Settings</legend>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={createAndroidAnalytics}
+                                        onChange={handleChangeAndroidAnalytics}
+                                        name="createAnalytics"
+                                    />
+                                }
+                                label="Create Android Dashboard Analytics"
+                            />
                             <TextField
                                 error={validationErrors.teiDownloadAmount !== undefined}
                                 helperText={validationErrors.teiDownloadAmount}
