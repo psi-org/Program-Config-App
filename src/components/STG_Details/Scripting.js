@@ -693,7 +693,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
  * @param {String} useCompetencyClass: Flag to include or not the competency class realated items
  * @returns {Array} programRuleVariables: <Array>{name,programRuleVariableSourceType,useCodeForOptionSet,program,|dataElement|}
  */
-export const buildProgramRuleVariables = (sections, compositeScores, programId, useCompetencyClass = "Yes") => {
+export const buildProgramRuleVariables = ({ sections, compositeScores, programId, useCompetencyClass = "Yes", uidPool }) => {
     // const criticalStepCalculations = sections.find(s => s.name == "Critical Step Calculations");
     // const scores = sections.find(s => s.name == "Scores");
     // sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
@@ -704,6 +704,7 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
     sections.forEach((section, secIdx) => {
         section.dataElements.forEach((dataElement, deIdx) => {
             programRuleVariables.push({
+                id: uidPool.shift(),
                 name: `_S${padValue(secIdx + 1, "00")}Q${padValue(deIdx + 1, "000")}`,
                 programRuleVariableSourceType: "DATAELEMENT_CURRENT_EVENT",
                 useCodeForOptionSet: dataElement.optionSet?.id ? true : false,
@@ -716,6 +717,7 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
     // Calculated Values
     compositeScores.forEach(cs => {
         programRuleVariables.push({
+            id: uidPool.shift(),
             name: `_CV_CS${cs}`,
             programRuleVariableSourceType: "CALCULATED_VALUE",
             useCodeForOptionSet: false,
@@ -726,24 +728,28 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
     // Critical Steps Calculations
     const criticalVariables = [
         {
+            id: uidPool.shift(),
             name: "_NoncriticalNewest",
             programRuleVariableSourceType: "DATAELEMENT_NEWEST_EVENT_PROGRAM",
             program: { id: programId },
             dataElement: { id: NON_CRITICAL_STEPS }
         },
         {
+            id: uidPool.shift(),
             name: "_criticalNewest",
             programRuleVariableSourceType: "DATAELEMENT_NEWEST_EVENT_PROGRAM",
             program: { id: programId },
             dataElement: { id: CRITICAL_STEPS },
         },
         {
+            id: uidPool.shift(),
             name: "_CV_NonCriticalQuestions",
             programRuleVariableSourceType: "CALCULATED_VALUE",
             useCodeForOptionSet: "false",
             program: { id: programId }
         },
         {
+            id: uidPool.shift(),
             name: "_CV_CriticalQuestions",
             programRuleVariableSourceType: "CALCULATED_VALUE",
             useCodeForOptionSet: "false",
@@ -755,6 +761,7 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
     if (useCompetencyClass == "Yes") {
         criticalVariables.push(
             {
+                id: uidPool.shift(),
                 name: "_competencyNewest",
                 programRuleVariableSourceType: "DATAELEMENT_NEWEST_EVENT_PROGRAM",
                 useCodeForOptionSet: true,
@@ -766,7 +773,7 @@ export const buildProgramRuleVariables = (sections, compositeScores, programId, 
     return programRuleVariables.concat(criticalVariables)
 }
 
-export const buildProgramRules = (sections, stageId, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea = "FP", scoreMap = { childs: [] }) => {
+export const buildProgramRules = ({ sections, stageId, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea = "FP", scoreMap = { childs: [] } }) => {
 
     var programRules = [];
     var programRuleActions = [];
@@ -883,7 +890,7 @@ export const buildProgramRules = (sections, stageId, programId, compositeValues,
     return { programRules, programRuleActions, scoreMap }
 }
 
-export const buildProgramIndicators = (programId, programStage, scoreMap, uidPool, useCompetency, sharingSettings, PIAggregationType) => {
+export const buildProgramIndicators = ({ programId, programStage, scoreMap, uidPool, useCompetency, sharingSettings, PIAggregationType }) => {
 
     const programShortName = programStage.program.shortName;
     // This sectin is for the local analytics
@@ -944,7 +951,7 @@ export const buildProgramIndicators = (programId, programStage, scoreMap, uidPoo
     return { programIndicators, indicatorIDs, gsInd: AnalyticGS.id }
 }
 
-export const buildH2BaseVisualizations = (programId, programShortName, { gsInd, indicatorIDs }, uidPool, useCompetency, currentDashboardId, userOU, ouRoot, stageId, sharingSettings, visualizationLevel, mapLevel, actionPlanID) => {
+export const buildH2BaseVisualizations = ({ programId, programShortName, gsInd, indicatorIDs, uidPool, useCompetency, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel, actionPlanID}) => {
     const series = []
     const dataDimensionItems = []
     const visualizations = []

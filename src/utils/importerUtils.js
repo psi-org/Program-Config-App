@@ -221,9 +221,6 @@ export const buildTrackerSummary = (mode, stages) => {
 export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, legendSets, dataElementsPool }) => {
     let code = "";
 
-    let aggType;
-    
-
     const existingDe = dataElementsPool[data[HNQIS2_TEMPLATE_MAP.dataElementId]] || {};
 
     const parsedDE = JSON.parse(JSON.stringify(existingDe));
@@ -241,27 +238,21 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
 
     if (type == 'score') {
         code = programPrefix + '_CS' + data[HNQIS2_TEMPLATE_MAP.feedbackOrder];
-        aggType = 'AVERAGE';
+        parsedDE.aggregationType = 'AVERAGE';
         data[HNQIS2_TEMPLATE_MAP.valueType] = 'NUMBER';
     } else {
-        if (type == 'label') { data[HNQIS2_TEMPLATE_MAP.valueType] = 'LONG_TEXT' }
+        if (type == 'label') {
+            data[HNQIS2_TEMPLATE_MAP.valueType] = 'LONG_TEXT';
+            parsedDE.aggregationType = 'NONE';
+        }
 
         code = programPrefix + (data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???');
-        switch (data[HNQIS2_TEMPLATE_MAP.valueType]) {
-            case 'TEXT':
-            case 'LONG_TEXT':
-                aggType = 'NONE';
-                break;
-            default:
-                aggType = 'SUM';
-        }
     }
 
     parsedDE.code = code;
     parsedDE.name = (code + data[HNQIS2_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH);
     parsedDE.shortName = (code + data[HNQIS2_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH);
     parsedDE.valueType = data[HNQIS2_TEMPLATE_MAP.valueType];
-    parsedDE.aggregationType = aggType;
 
     parsedDE.parentName = data[HNQIS2_TEMPLATE_MAP.parentName]?.result || '???';
 
@@ -287,6 +278,15 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
                 parsedDE.optionSetValue = true;
                 parsedDE.valueType = os.valueType;
             }
+        }
+
+        switch (parsedDE.valueType) {
+            case 'TEXT':
+            case 'LONG_TEXT':
+                parsedDE.aggregationType = 'NONE';
+                break;
+            default:
+                parsedDE.aggregationType = 'SUM';
         }
 
         if (data[HNQIS2_TEMPLATE_MAP.legend] && data[HNQIS2_TEMPLATE_MAP.legend] !== "") {

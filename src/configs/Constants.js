@@ -155,6 +155,7 @@ const SHORT_DATE_FORMAT_OPTIONS = { localeMatcher: 'best fit', hour12: false, ye
 const NAMESPACE = "programconfigapp";
 const BACKUPS_NAMESPACE = `${NAMESPACE}_backups`;
 const TRANSFERRED_EVENTS_NAMESPACE = `${NAMESPACE}_transferred`;
+const GENERATED_OBJECTS_NAMESPACE = `dataStore/${NAMESPACE}/generatedObjects`;
 const DATASTORE_PCA_METADATA = "PCAMetadata";
 const DATASTORE_H2_METADATA = "H2Metadata";
 
@@ -535,6 +536,7 @@ export {
     FEATURE_TYPES,
     FEEDBACK_ORDER,
     FEEDBACK_TEXT,
+    GENERATED_OBJECTS_NAMESPACE,
     GLOBAL_SCORE_ATTRIBUTE,
     H1_ACTION_PLAN_OLD,
     H1_ACTION1_OLD,

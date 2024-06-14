@@ -403,3 +403,7 @@ export const padValue = (value, format) => {
     
     return format.slice(0, sliceLength) + valueText;
 }
+
+export const mapIdArray = (arr) => {
+    return arr.map(elem => ({ id: elem.id }));
+}

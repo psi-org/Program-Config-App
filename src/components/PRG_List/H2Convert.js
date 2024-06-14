@@ -631,8 +631,6 @@ const H2Convert = ({
 
             const pcaMetadataVal = h2SettingsRef.current.saveMetaData();
             const useCompetency = pcaMetadataVal?.useCompetencyClass === 'Yes';
-
-            console.log(pcaMetadataVal, useCompetency);
             
             pcaMetadataVal.h1Program = programOld.id;
             pcaMetadataVal.dePrefix = programOld.shortName.slice(0, 22) + " H2";

@@ -238,7 +238,6 @@ const H2Setting = forwardRef((props, ref) => {
 
     useImperativeHandle(ref, () => ({
         handleFormValidation() {
-            console.log(teiDownloadAmount === "")
             let response = true;
             if (
                 healthArea === "" ||
