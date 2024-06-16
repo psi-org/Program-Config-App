@@ -155,7 +155,7 @@ const SHORT_DATE_FORMAT_OPTIONS = { localeMatcher: 'best fit', hour12: false, ye
 const NAMESPACE = "programconfigapp";
 const BACKUPS_NAMESPACE = `${NAMESPACE}_backups`;
 const TRANSFERRED_EVENTS_NAMESPACE = `${NAMESPACE}_transferred`;
-const GENERATED_OBJECTS_NAMESPACE = `dataStore/${NAMESPACE}/generatedObjects`;
+const GENERATED_OBJECTS_NAMESPACE = `${NAMESPACE}_generatedObjects`;
 const DATASTORE_PCA_METADATA = "PCAMetadata";
 const DATASTORE_H2_METADATA = "H2Metadata";
 
