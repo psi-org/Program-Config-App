@@ -25,7 +25,7 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.0.4"
+const BUILD_VERSION = "2.0.5"
 const BUILD_DATE = "Jun 3, 2024"
 const MIN_VERSION = "2.36.x"
 const MAX_VERSION = "2.40.x"
@@ -33,7 +33,7 @@ const MAX_VERSION = "2.40.x"
 const PCA_METADATA_VERSION = "1.2.0";
 const H2_METADATA_VERSION = "1.1.4";
 
-const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.4";
+const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.5";
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
 const LIGHT_BLUE_COLOR = "#66aee5";

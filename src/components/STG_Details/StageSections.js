@@ -903,30 +903,31 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                             // Setting new UIDs
                             data[programId] = programRefereces;
 
-                            sendToDataStore({ data }).then(res => {
-                                if (res.status != 'OK') {
-                                    console.log("ERROR >:'(")
+
+                            // V. Delete old metadata
+                            setProgressSteps(5);
+
+                            const programRulesDel = toDeleteReferences?.programRules || mapIdArray(prDQ.data.results.programRules);
+                            const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(prvDQ.data.results.programRuleVariables);
+                            const programIndicatorsDel = toDeleteReferences?.programIndicators || mapIdArray(pIndDQ.data.results.programIndicators);
+                            const visualizationsDel = toDeleteReferences?.visualizations || mapIdArray(visualizationsDQ.data.results.visualizations);
+                            const eventReportsDel = toDeleteReferences?.eventReports || mapIdArray(eventReportDQ.data.results.eventReports);
+                            const mapsDel = toDeleteReferences?.maps || mapIdArray(mapsDQ.data.results.maps);
+
+                            const oldMetadata = {
+                                programRules: (programRulesDel.length > 0 ? programRulesDel : undefined),
+                                programRuleVariables: (programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined),
+                                programIndicators: (programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined),
+                                visualizations: (visualizationsDel.length > 0 ? visualizationsDel : undefined),
+                                eventReports: (eventReportsDel.length > 0 ? eventReportsDel : undefined),
+                                maps: (mapsDel.length > 0 ? mapsDel : undefined)
+                            };
+
+                            // VI. Import new metadata
+                            sendToDataStore({ data }).then(dataStoreResp => {
+                                if (dataStoreResp.status != 'OK') {
+                                    console.error(dataStoreResp);
                                 } else {
-                                    // V. Delete old metadata
-                                    setProgressSteps(5);
-
-                                    const programRulesDel = mapIdArray(prDQ.data.results.programRules);
-                                    const programRuleVariablesDel = mapIdArray(prvDQ.data.results.programRuleVariables);
-                                    const programIndicatorsDel = mapIdArray(pIndDQ.data.results.programIndicators);
-                                    const visualizationsDel = mapIdArray(visualizationsDQ.data.results.visualizations);
-                                    const eventReportsDel = mapIdArray(eventReportDQ.data.results.eventReports);
-                                    const mapsDel = mapIdArray(mapsDQ.data.results.maps);
-
-                                    const oldMetadata = {
-                                        programRules: toDeleteReferences.programRules || (programRulesDel.length > 0 ? programRulesDel : undefined),
-                                        programRuleVariables: toDeleteReferences.programRuleVariables || (programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined),
-                                        programIndicators: toDeleteReferences.programIndicators || (programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined),
-                                        visualizations: toDeleteReferences.visualizations || (visualizationsDel.length > 0 ? visualizationsDel : undefined),
-                                        eventReports: toDeleteReferences.eventReports || (eventReportsDel.length > 0 ? eventReportsDel : undefined),
-                                        maps: toDeleteReferences.maps || (mapsDel.length > 0 ? mapsDel : undefined)
-                                    };
-
-                                    // VI. Import new metadata
                                     createMetadata.mutate({
                                         data: {
                                             eventReports: eventReportDQ.data.results.eventReports.map(er => {
@@ -937,7 +938,6 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                             })
                                         }
                                     }).then(updateEventReportResp => {
-
                                         if (updateEventReportResp.status == 'OK') {
                                             deleteMetadata({ data: oldMetadata }).then((res) => {
                                                 if (res.status == 'OK') {
