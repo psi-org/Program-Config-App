@@ -1,55 +1,57 @@
-import { FlyoutMenu, MenuItem, Popper, Layer } from "@dhis2/ui";
+import { Popper, List, ListItem, ListItemText, Paper } from '@mui/material';
 import PropTypes from 'prop-types';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, memo } from 'react';
 
-const Suggestions = ({ usersNGroups, keyword, setSearch, addEntity, posRef }) => {
+const filterEntities = (entities, keyword, type, selectUserOrGroup) => {
+  return entities.filter(entity => {
+    const name = entity.displayName?.toLowerCase() || '';
+    const username = entity.userCredentials?.username?.toLowerCase() || '';
+    return name.includes(keyword) || username.includes(keyword);
+  }).map(entity => (
+    <ListItem button key={entity.id} onClick={() => selectUserOrGroup(type, entity)}>
+      <ListItemText primary={entity.displayName} />
+    </ListItem>
+  ));
+};
 
-    const [results,setResults] = useState([])
+const Suggestions = memo(({ usersNGroups, keyword, setSearch, addEntity, inputRef }) => {
+  const [results, setResults] = useState([]);
 
-    useEffect(()=>{
-        const keyVal = keyword.trim().toLowerCase();
-
-        const nUsers = usersNGroups?.userData.users?.filter((user) => { 
-            return String(user.displayName?.toLowerCase()||'').includes(keyVal) || String(user.userCredentials.username?.toLowerCase()||'').includes(keyVal)
-        })?.map(user => (
-            <MenuItem label={user.displayName} key={user.id} onClick={() => {selectUserOrGroup("userAccesses", user)}}/>
-        ))||[];
-
-        const nUserGroups = usersNGroups?.userGroupData.userGroups?.filter((userGroup) => { 
-            return String(userGroup.displayName?.toLowerCase()||'').includes(keyVal)
-        })?.map(userGroup => (
-            <MenuItem label={userGroup.displayName} key={userGroup.id} onClick={()=>{selectUserOrGroup("userGroupAccesses", userGroup)}}/>
-        ))||[];
-
-        setResults([...nUsers].concat([...nUserGroups]));
-
-    },[keyword])
-
-    const selectUserOrGroup = (type, entity) => {
-        addEntity(type, entity);
-        setSearch(undefined);
+  useEffect(() => {
+    const keyVal = keyword.trim().toLowerCase();
+    if (!keyVal) {
+      setResults([]);
+      return;
     }
 
-    return <>
-        {
-            (results?.length > 0) &&
-                <Layer onClick={()=>setSearch(undefined)}>
-                    <Popper reference={posRef} placement={"bottom-start"} style={{ width: 300 }}>
-                        <FlyoutMenu width={"350px"}>
-                            { results }
-                        </FlyoutMenu>
-                    </Popper>
-                </Layer>
-        }
-            </>
-}
+    const nUsers = filterEntities(usersNGroups?.userData?.users || [], keyVal, "userAccesses", selectUserOrGroup);
+    const nUserGroups = filterEntities(usersNGroups?.userGroupData?.userGroups || [], keyVal, "userGroupAccesses", selectUserOrGroup);
+
+    setResults(nUsers.concat(nUserGroups));
+  }, [keyword, usersNGroups]);
+
+  const selectUserOrGroup = (type, entity) => {
+    addEntity(type, entity);
+    setSearch(undefined);
+  };
+
+  return (
+    <Popper open={results.length > 0} anchorEl={inputRef.current} placement="bottom-start" style={{ zIndex: 1300 }}>
+      <Paper>
+        <List>
+          {results}
+        </List>
+      </Paper>
+    </Popper>
+  );
+});
 
 Suggestions.propTypes = {
-    addEntity: PropTypes.func,
-    keyword: PropTypes.string,
-    posRef: PropTypes.object,
-    setSearch: PropTypes.func,
-    usersNGroups: PropTypes.object,
-}
+  addEntity: PropTypes.func.isRequired,
+  keyword: PropTypes.string,
+  setSearch: PropTypes.func.isRequired,
+  usersNGroups: PropTypes.object.isRequired,
+  inputRef: PropTypes.object.isRequired
+};
 
 export default Suggestions;
