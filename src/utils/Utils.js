@@ -335,7 +335,8 @@ export const getProgramQuery = () => {
         'userAccesses',
         'userGroupAccesses',
         'sharing',
-        'openDaysAfterCoEndDate'
+        'openDaysAfterCoEndDate',
+        'notificationTemplates'
     ];
 }
 
@@ -402,4 +403,8 @@ export const padValue = (value, format) => {
     if (sliceLength < 1) { return valueText }
     
     return format.slice(0, sliceLength) + valueText;
+}
+
+export const mapIdArray = (arr) => {
+    return arr.map(elem => ({ id: elem.id }));
 }
