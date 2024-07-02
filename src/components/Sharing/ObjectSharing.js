@@ -13,7 +13,6 @@ const sharingQuery = {
 }
 
 const ObjectSharing = ({element, id, sharing}) => {
-    console.log("ObjectSharing: ", element, " ", id, " sharing: ", sharing);
     const metadataMutation = {
         resource: `sharing?type=${element}&id=${id}`,
         type: 'update',

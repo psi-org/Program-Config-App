@@ -26,9 +26,9 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Link } from "react-router-dom";
-import { BUILD_VERSION, DATASTORE_H2_METADATA, FEEDBACK_ORDER, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
+import { BUILD_VERSION, DATASTORE_H2_METADATA, FEEDBACK_ORDER, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, truncateString, versionGTE } from "../../utils/Utils.js";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, mapIdArray, parseErrorsJoin, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessor from "../Excel/DataProcessor.js";
 import Importer from "../Excel/Importer.js";
 import ErrorReports from "../UIElements/ErrorReports.js";
@@ -163,7 +163,6 @@ const queryDashboards = {
     }
 };
 
-
 /*------------------------------------------------------ */
 const queryPCAMetadata = {
     results: {
@@ -214,6 +213,26 @@ const queryHNQIS2Metadata = {
 const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 
 const StageSections = ({ programStage, hnqisMode, readOnly }) => {
+
+    const queryDataStore = {
+        results: {
+            resource: `dataStore/${GENERATED_OBJECTS_NAMESPACE}/${programStage.program.id}`,
+        },
+    };
+
+    const dsCreateMutation = {
+        resource: `dataStore/${GENERATED_OBJECTS_NAMESPACE}/${programStage.program.id}`,
+        type: "create",
+        data: ({ data }) => data,
+    };
+
+    const dsUpdateMutation = {
+        resource: `dataStore/${GENERATED_OBJECTS_NAMESPACE}/${programStage.program.id}`,
+        type: "update",
+        data: ({ data }) => data,
+    };
+
+    //const { loading: dsLoading, data: dsData } = useDataQuery(queryDataStore);
 
     const { data: hnqis2Metadata, loading: metadataLoading } = useDataQuery(queryHNQIS2Metadata);
 
@@ -449,6 +468,21 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         }
     })[0];
 
+    // ***** DATASTORE ***** //
+
+    const { refetch: getDataStore } = useDataQuery(queryDataStore);
+
+    const [dataStoreCreate] = useDataMutation(dsCreateMutation, {
+        onError: (err) => {
+            console.log(err);
+        }
+    });
+    const [dataStoreUpdate] = useDataMutation(dsUpdateMutation, {
+        onError: (err) => {
+            console.log(err);
+        }
+    });
+
     // Get Ids
     const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: programStage.programStageDataElements.length * 5 } });
     //setUidPool(idsQuery.data?.results.codes);
@@ -484,7 +518,12 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         const visualizationsAmount = 3 + 5;
         const androidSettingsAmount = 1;
 
-        let n = (sections.reduce((prev, acu) => prev + acu.dataElements.length, 0) + scoresSection?.dataElements?.length + criticalSection?.dataElements?.length) * 5 + programIndicatorsAmount + visualizationsAmount + androidSettingsAmount;
+        let n = (
+            (sections.reduce((prev, acu) => prev + acu.dataElements.length, 10) * 3) //Tripled to create Program Rule Variables
+            + ((scoresSection?.dataElements?.length || 10) * 2) //Doubled to create Program Rule Variables
+            + ((criticalSection?.dataElements?.length || 10) * 5)
+        ) + programIndicatorsAmount + visualizationsAmount + androidSettingsAmount;
+
         //No Sections , get minimum ids for core Program Rules
         if (isNaN(n) || n < 50) { n = 50 }
 
@@ -498,6 +537,17 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     useEffect(() => {
         getUIDs()
     }, [sections]);
+
+    /*useEffect(() => {
+        if (!dsLoading && !dsData?.results) {
+            const setUpDataStore = async () => {
+                await dataStoreCreate({
+                    data: {},
+                });
+            }
+            setUpDataStore();
+        }
+    }, [dsLoading, dsData]);*/
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
@@ -609,13 +659,14 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         settings.results.dhisVisualizations.home = settings.results.dhisVisualizations.home.filter(setting =>
             setting.program !== programId
         )
-
-        settings.results.dhisVisualizations.home.push({
-            id: newUID,
-            name: programStage.program.name,
-            program: programId,
-            visualizations: androidSettingsVisualizations
-        })
+        if (programMetadata?.createAndroidAnalytics === 'Yes') {
+            settings.results.dhisVisualizations.home.push({
+                id: newUID,
+                name: programStage.program.name,
+                program: programId,
+                visualizations: androidSettingsVisualizations
+            })
+        }
 
         settings.results.lastUpdated = new Date().toISOString();
         return settings;
@@ -672,11 +723,17 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         })
     }
 
-    const executeStep6 = ({ metadata, androidSettingsVisualizations }) => {
+    const executeStep6 = ({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData }) => {
         createMetadata.mutate({ data: metadata }).then(response => {
             if (response.status == 'OK') {
-                setProgressSteps(7);
-                executeStep7A(androidSettingsVisualizations);
+                sendToDataStore({ data: dataStoreData }).then(dataStoreResp => {
+                    if (dataStoreResp.status != 'OK') {
+                        console.error(dataStoreResp);
+                    } else {
+                        setProgressSteps(7);
+                        executeStep7A(androidSettingsVisualizations);
+                    }
+                })
             }
         });
     }
@@ -770,52 +827,138 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                         // Also, Program Indicators and Visualizations
                         setProgressSteps(4);
 
-                        const programRuleVariables = buildProgramRuleVariables(sections, compositeScores, programId, programMetadata.useCompetencyClass);
-                        const { programRules, programRuleActions, scoreMap } = buildProgramRules(sections, programStage.id, programId, compositeScores, scoresMapping, uidPool, programMetadata.useCompetencyClass, programMetadata.healthArea);
-                        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicators(programId, programStage, scoreMap, uidPool, programMetadata.useCompetencyClass, sharingSettings, programMetadata.programIndicatorsAggType);
-                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(programId, programStage.program.shortName, { gsInd, indicatorIDs }, uidPool, programMetadata.useCompetencyClass, dashboardsDQ?.data?.results?.dashboards[0]?.id, pcaMetadata.useUserOrgUnit, pcaMetadata.ouRoot, programStage.id, sharingSettings, pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap, actionPlanID);
-                        const metadata = { programRuleVariables, programRules, programRuleActions, programIndicators, visualizations, maps, dashboards, eventReports };
+                        const programRuleVariables = buildProgramRuleVariables(
+                            {
+                                sections,
+                                compositeScores,
+                                programId,
+                                useCompetencyClass: programMetadata.useCompetencyClass,
+                                uidPool
+                            }
+                        );
 
-                        // IV. Delete old metadata
-                        setProgressSteps(5);
+                        const { programRules, programRuleActions, scoreMap } = buildProgramRules(
+                            {
+                                sections,
+                                stageId: programStage.id,
+                                programId,
+                                compositeValues: compositeScores,
+                                scoresMapping,
+                                uidPool,
+                                useCompetencyClass: programMetadata.useCompetencyClass,
+                                healthArea: programMetadata.healthArea
+                            }
+                        );
 
-                        const programRulesDel = prDQ.data.results.programRules.map(pr => ({ id: pr.id }));
-                        const programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
-                        const programIndicatorsDel = pIndDQ.data.results.programIndicators.map(pInd => ({ id: pInd.id }));
-                        const visualizationsDel = visualizationsDQ.data.results.visualizations.map(vis => ({ id: vis.id }));
-                        const eventReportsDel = eventReportDQ.data.results.eventReports.map(er => ({ id: er.id }));
-                        const mapsDel = mapsDQ.data.results.maps.map(mp => ({ id: mp.id }));
+                        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicators(
+                            {
+                                programId,
+                                programStage,
+                                scoreMap,
+                                uidPool,
+                                useCompetency: programMetadata.useCompetencyClass,
+                                sharingSettings,
+                                PIAggregationType: programMetadata.programIndicatorsAggType
+                            }
+                        );
 
-                        const oldMetadata = {
-                            programRules: programRulesDel.length > 0 ? programRulesDel : undefined,
-                            programRuleVariables: programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined,
-                            programIndicators: programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined,
-                            visualizations: visualizationsDel.length > 0 ? visualizationsDel : undefined,
-                            eventReports: eventReportsDel.length > 0 ? eventReportsDel : undefined,
-                            maps: mapsDel.length > 0 ? mapsDel : undefined
+                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(
+                            {
+                                programId,
+                                programShortName: programStage.program.shortName,
+                                gsInd,
+                                indicatorIDs,
+                                uidPool,
+                                useCompetency: programMetadata.useCompetencyClass,
+                                currentDashboardId: dashboardsDQ?.data?.results?.dashboards[0]?.id,
+                                userOU: pcaMetadata.useUserOrgUnit,
+                                ouRoot: pcaMetadata.ouRoot,
+                                sharingSettings,
+                                visualizationLevel: pcaMetadata.ouLevelTable,
+                                mapLevel: pcaMetadata.ouLevelMap,
+                                actionPlanID
+                            }
+                        );
+
+                        const metadata = {
+                            programRuleVariables,
+                            programRules,
+                            programRuleActions,
+                            programIndicators,
+                            visualizations,
+                            maps,
+                            dashboards,
+                            eventReports
                         };
 
-                        // V. Import new metadata
-                        createMetadata.mutate({
-                            data: {
-                                eventReports: eventReportDQ.data.results.eventReports.map(er => {
-                                    er.columnDimensions = ["pe", "ou"]
-                                    er.dataElementDimensions = [];
-                                    er.programIndicatorDimensions = [];
-                                    return er;
-                                })
-                            }
-                        }).then(updateEventReportResp => {
+                        // IV. Prepare Datastore references 
+                        getDataStore().then((dataStoreResult) => {
+                            const programRefereces = {
+                                programRules: mapIdArray(programRules),
+                                programRuleVariables: mapIdArray(programRuleVariables),
+                                programIndicators: mapIdArray(programIndicators),
+                                visualizations: mapIdArray(visualizations),
+                                eventReports: mapIdArray(eventReports),
+                                maps: mapIdArray(maps),
+                                dashboards: mapIdArray(dashboards)
+                            };
 
-                            if (updateEventReportResp.status == 'OK') {
-                                deleteMetadata({ data: oldMetadata }).then((res) => {
-                                    if (res.status == 'OK') {
-                                        setProgressSteps(6);
-                                        executeStep6({ metadata, androidSettingsVisualizations });
-                                    }
-                                });
+                            let dataStoreData;
+                            let sendToDataStore;
+
+                            if (!dataStoreResult?.results) {
+                                sendToDataStore = dataStoreCreate;
+                                dataStoreData = {};
+                            } else {
+                                sendToDataStore = dataStoreUpdate;
+                                dataStoreData = dataStoreResult.results;
                             }
-                        });
+
+                            // Saving UIDs of old objects
+                            const toDeleteReferences = DeepCopy(dataStoreData);
+                            // Setting new UIDs
+                            dataStoreData = programRefereces;
+
+                            // V. Delete old metadata
+                            setProgressSteps(5);
+
+                            const programRulesDel = toDeleteReferences?.programRules || mapIdArray(prDQ.data.results.programRules);
+                            const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(prvDQ.data.results.programRuleVariables);
+                            const programIndicatorsDel = toDeleteReferences?.programIndicators || mapIdArray(pIndDQ.data.results.programIndicators);
+                            const visualizationsDel = toDeleteReferences?.visualizations || mapIdArray(visualizationsDQ.data.results.visualizations);
+                            const eventReportsDel = toDeleteReferences?.eventReports || mapIdArray(eventReportDQ.data.results.eventReports);
+                            const mapsDel = toDeleteReferences?.maps || mapIdArray(mapsDQ.data.results.maps);
+
+                            const oldMetadata = {
+                                programRules: (programRulesDel.length > 0 ? programRulesDel : undefined),
+                                programRuleVariables: (programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined),
+                                programIndicators: (programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined),
+                                visualizations: (visualizationsDel.length > 0 ? visualizationsDel : undefined),
+                                eventReports: (eventReportsDel.length > 0 ? eventReportsDel : undefined),
+                                maps: (mapsDel.length > 0 ? mapsDel : undefined)
+                            };
+
+                            // VI. Import new metadata
+                            createMetadata.mutate({
+                                data: {
+                                    eventReports: eventReportDQ.data.results.eventReports.map(er => {
+                                        er.columnDimensions = ["pe", "ou"]
+                                        er.dataElementDimensions = [];
+                                        er.programIndicatorDimensions = [];
+                                        return er;
+                                    })
+                                }
+                            }).then(updateEventReportResp => {
+                                if (updateEventReportResp.status == 'OK') {
+                                    deleteMetadata({ data: oldMetadata }).then((res) => {
+                                        if (res.status == 'OK') {
+                                            setProgressSteps(6);
+                                            executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
+                                        }
+                                    });
+                                }
+                            });
+                        })
                     }
                 }
             })
@@ -849,7 +992,6 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
             default:
                 break;
         }
-        //console.info(`You clicked ${options[selectedIndex]}`);
     };
 
     const handleMenuItemClick = (index) => {
@@ -1153,7 +1295,18 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                 {progressSteps !== 7 && androidSettings && androidSettingsError && <IconCross24 color={'#d63031'} />}
                                 {progressSteps !== 7 && !androidSettings && <IconWarning24 color={'#ffbb00'} />}
                                 {progressSteps !== 7 && androidSettings && !androidSettingsError && <IconCheckmarkCircle24 color={'#00b894'} />}
-                                <p style={{ maxWidth: '90%' }}> Enabling in-app analytics {!androidSettings ? "(Android Settings app not enabled)" : (androidSettingsError ? '(Error: ' + (androidSettingsError.httpStatus === 'Forbidden' ? 'You don\'t have permissions to update the Android Settings in this server' : androidSettingsError.message) + ')' : "")}</p>
+                                <p style={{ maxWidth: '90%' }}>
+                                    {programMetadata?.createAndroidAnalytics === 'Yes' ? 'Enabling in-app analytics' : 'Applying Android Settings'}
+                                    {
+                                        !androidSettings
+                                            ? "(Android Settings app not enabled)"
+                                            : (androidSettingsError
+                                                ? '(Error: ' + (androidSettingsError.httpStatus === 'Forbidden'
+                                                    ? 'You don\'t have permissions to update the Android Settings in this server'
+                                                    : androidSettingsError.message) + ')'
+                                                : "")
+                                    }
+                                </p>
                             </div>
                         }
                         {(progressSteps > 7) && !programSettingsError &&

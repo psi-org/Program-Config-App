@@ -25,15 +25,15 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.0.4"
-const BUILD_DATE = "May 30, 2024"
+const BUILD_VERSION = "2.0.5"
+const BUILD_DATE = "Jul 2, 2024"
 const MIN_VERSION = "2.36.x"
 const MAX_VERSION = "2.40.x"
 
 const PCA_METADATA_VERSION = "1.2.0";
 const H2_METADATA_VERSION = "1.1.4";
 
-const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.4";
+const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.5";
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
 const LIGHT_BLUE_COLOR = "#66aee5";
@@ -155,6 +155,7 @@ const SHORT_DATE_FORMAT_OPTIONS = { localeMatcher: 'best fit', hour12: false, ye
 const NAMESPACE = "programconfigapp";
 const BACKUPS_NAMESPACE = `${NAMESPACE}_backups`;
 const TRANSFERRED_EVENTS_NAMESPACE = `${NAMESPACE}_transferred`;
+const GENERATED_OBJECTS_NAMESPACE = `${NAMESPACE}_generatedObjects`;
 const DATASTORE_PCA_METADATA = "PCAMetadata";
 const DATASTORE_H2_METADATA = "H2Metadata";
 
@@ -535,6 +536,7 @@ export {
     FEATURE_TYPES,
     FEEDBACK_ORDER,
     FEEDBACK_TEXT,
+    GENERATED_OBJECTS_NAMESPACE,
     GLOBAL_SCORE_ATTRIBUTE,
     H1_ACTION_PLAN_OLD,
     H1_ACTION1_OLD,
