@@ -335,7 +335,8 @@ export const getProgramQuery = () => {
         'userAccesses',
         'userGroupAccesses',
         'sharing',
-        'openDaysAfterCoEndDate'
+        'openDaysAfterCoEndDate',
+        'notificationTemplates'
     ];
 }
 
