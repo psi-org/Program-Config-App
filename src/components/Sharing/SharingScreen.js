@@ -150,7 +150,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
             resource: 'programs/' + id + '/metadata.json'
         }
     }
-
+    const suggestionsRef = useRef(null);
     const [search, setSearch] = useState(undefined);
     const [usrGrp, setUsrGrp] = useState(undefined);
     const [optionOpen, setOptionOpen] = useState(undefined);
@@ -212,6 +212,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
         payload = data.results;
         if (!entityLoading && !entityErrors) {
             usersNGroups = availableUserGroups();
+
         } else if (entityErrors) {
             userAccessRestricted = true;
         }
@@ -636,8 +637,12 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                                     marginRight: "16px",
                                     height: '3em'
                                 }}>
-                                    <input type={"text"} autoComplete={"off"} id={"userNGroup"}
-                                        onChange={handleSuggestions} value={usrGrp || ""} style={{
+                                    <input type={"text"} 
+                                        autoComplete={"off"} 
+                                        id={"userNGroup"}
+                                        onChange={handleSuggestions} 
+                                        value={usrGrp || ""} 
+                                        style={{
                                             appearance: "textfield",
                                             padding: "0px",
                                             position: "relative",
@@ -649,19 +654,21 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
                                             opacity: 1,
                                             height: "100%",
                                             width: "100%"
-                                        }} placeholder={"Enter Names"} disabled={userAccessRestricted} />
+                                        }} placeholder={"Enter Names"} 
+                                        disabled={userAccessRestricted} 
+                                        ref={suggestionsRef}
+                                    />
                                 </div>
 
-                                {search &&
+                                {search && (
                                     <Suggestions
                                         usersNGroups={DeepCopy(usersNGroups)}
                                         keyword={search}
                                         setSearch={setSearch}
                                         addEntity={addEntity}
-                                        posRef={document.getElementById("userNGroup")}
+                                        inputRef={suggestionsRef}
                                     />
-                                }
-
+                                )}
                                 <div id={'newPermission'} style={{ padding: "auto" }} onClick={() => {
                                     toggle();
                                 }}>
