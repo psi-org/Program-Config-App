@@ -12,10 +12,10 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { bindActionCreators } from "redux";
-import { BUILD_VERSION, DATASTORE_H2_METADATA, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
+import { BUILD_VERSION, DATASTORE_H2_METADATA, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import actionCreators from "../../state/action-creators";
-import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, padValue, setPCAMetadata, truncateString, versionGTE } from "../../utils/Utils.js";
+import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, mapIdArray, padValue, setPCAMetadata, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessorTracker from "../Excel/DataProcessorTracker.js";
 import Importer from "../Excel/Importer.js";
 import ValidateTracker from "../PRG_Details/ValidateTracker.js";
@@ -119,6 +119,24 @@ const ProgramDetails = () => {
 
     const program = useSelector(state => state.program);
 
+    const queryDataStore = {
+        results: {
+            resource: `dataStore/${GENERATED_OBJECTS_NAMESPACE}/${program}`,
+        },
+    };
+
+    const dsCreateMutation = {
+        resource: `dataStore/${GENERATED_OBJECTS_NAMESPACE}/${program}`,
+        type: "create",
+        data: ({ data }) => data,
+    };
+
+    const dsUpdateMutation = {
+        resource: `dataStore/${GENERATED_OBJECTS_NAMESPACE}/${program}`,
+        type: "update",
+        data: ({ data }) => data,
+    };
+
     const metadataDM = useDataMutation(createMutation, {
         onError: (err) => {
             console.error(err)
@@ -157,6 +175,21 @@ const ProgramDetails = () => {
     useEffect(() => {
         if (notification) { setSnackSeverity(notification.severity) }
     }, [notification])
+
+    // ***** DATASTORE ***** //
+
+    const { refetch: getDataStore } = useDataQuery(queryDataStore);
+
+    const [dataStoreCreate] = useDataMutation(dsCreateMutation, {
+        onError: (err) => {
+            console.log(err);
+        }
+    });
+    const [dataStoreUpdate] = useDataMutation(dsUpdateMutation, {
+        onError: (err) => {
+            console.log(err);
+        }
+    });
 
     // Get Ids
     const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: 0 } });
@@ -253,7 +286,7 @@ const ProgramDetails = () => {
             setSaveAndBuild('Run');
 
             const programStages = programConfig.results?.programStages;
-            const n = (programStages?.reduce((acu, cur) => acu + (cur.programStageDataElements?.length || 0), 0) || 0) * 2;
+            const n = (programStages?.reduce((acu, cur) => acu + (cur.programStageDataElements?.length || 0), 0) || 0) * 4;
 
             idsQuery.refetch({ n }).then(uidData => {
                 if (uidData) {
@@ -280,6 +313,7 @@ const ProgramDetails = () => {
                             section.dataElements.forEach((dataElement, deIdx) => {
 
                                 programRuleVariables.push({
+                                    id: uidPool.shift(),
                                     name: `_PS${padValue(stgIdx + 1, "00")}_S${padValue(secIdx + 1, "00")}E${padValue(deIdx + 1, "000")}`,
                                     programRuleVariableSourceType: "DATAELEMENT_CURRENT_EVENT",
                                     useCodeForOptionSet: dataElement.optionSet?.id ? true : false,
@@ -297,10 +331,8 @@ const ProgramDetails = () => {
                                     !hideShowGroup[parentQuestion][parentValue] ? hideShowGroup[parentQuestion][parentValue] = [] : undefined;
                                     !hideShowGroup[parentQuestion][parentValue].push({ id: dataElement.id, mandatory: metadata.isCompulsory });
                                 }
-
                             });
                         });
-
                     });
 
                     const { hideShowRules, hideShowActions } = hideShowLogic(hideShowGroup, program, uidPool);
@@ -309,29 +341,58 @@ const ProgramDetails = () => {
 
                     setProgressSteps(3);
 
-                    const programRulesDel = prDQ.data.results.programRules.map(pr => ({ id: pr.id }));
-                    const programRuleVariablesDel = prvDQ.data.results.programRuleVariables.map(prv => ({ id: prv.id }));
+                    getDataStore().then((dataStoreResult) => {
+                        const programRefereces = {
+                            programRules: mapIdArray(hideShowRules),
+                            programRuleVariables: mapIdArray(programRuleVariables),
+                        };
 
-                    const oldMetadata = {
-                        programRules: programRulesDel.length > 0 ? programRulesDel : undefined,
-                        programRuleVariables: programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined
-                    };
+                        let dataStoreData;
+                        let sendToDataStore;
 
-                    deleteMetadata({ data: oldMetadata }).then((res) => {
-                        if (res.status == 'OK') {
-                            setProgressSteps(4);
-
-                            createMetadata.mutate({ data: metadata }).then(response => {
-
-                                if (response.status == 'OK') {
-                                    setProgressSteps(5);
-
-                                    updateProgramBuildVersion(program, pcaMetadata);
-
-                                }
-                            });
+                        if (!dataStoreResult?.results) {
+                            sendToDataStore = dataStoreCreate;
+                            dataStoreData = {};
+                        } else {
+                            sendToDataStore = dataStoreUpdate;
+                            dataStoreData = dataStoreResult.results;
                         }
 
+                        // Saving UIDs of old objects
+                        const toDeleteReferences = DeepCopy(dataStoreData);
+
+                        const fallbackRuleVariables = prvDQ.data.results.programRuleVariables.filter(prv => {
+                            return prv.name[0] == "_";
+                        });
+
+                        const programRulesDel = toDeleteReferences?.programRules || mapIdArray(prDQ.data.results.programRules);
+                        const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(fallbackRuleVariables);
+
+                        const oldMetadata = {
+                            programRules: (programRulesDel.length > 0 ? programRulesDel : undefined),
+                            programRuleVariables: (programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined),
+                        };
+
+                        // Setting new UIDs
+                        dataStoreData = programRefereces;
+                        deleteMetadata({ data: oldMetadata }).then((res) => {
+                            if (res.status == 'OK') {
+                                setProgressSteps(4);
+                                createMetadata.mutate({ data: metadata }).then(response => {
+                                    if (response.status == 'OK') {
+                                        sendToDataStore({ data: dataStoreData }).then(dataStoreResp => {
+                                            if (dataStoreResp.status != 'OK') {
+                                                console.error(dataStoreResp);
+                                            } else {
+                                                setProgressSteps(5);
+                                                updateProgramBuildVersion(program, pcaMetadata);
+                                            }
+                                        })
+                                    }
+                                });
+                            }
+
+                        });
                     });
 
                 }

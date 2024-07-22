@@ -1404,7 +1404,7 @@ export const LineListGlobalScore = {
     "columnDimensions": [
         "pe",
         "ou",
-        "NQdpdST0Gcx",
+        "",
         "F0Qcr8ANr7t"
     ],
     "columns": [],

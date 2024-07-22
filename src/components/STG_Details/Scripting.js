@@ -1,5 +1,5 @@
 import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../configs/AnalyticsTemplates.js";
-import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, GLOBAL_SCORE_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND, NON_CRITICAL_STEPS, CRITICAL_STEPS } from "../../configs/Constants.js";
+import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND, NON_CRITICAL_STEPS, CRITICAL_STEPS } from "../../configs/Constants.js";
 import { DeepCopy, padValue } from "../../utils/Utils.js";
 
 /**
@@ -899,9 +899,13 @@ export const buildProgramIndicators = ({ programId, programStage, scoreMap, uidP
         { name: 'CNI', condition: `A{${COMPETENCY_ATTRIBUTE}} == "improvement"` },
         { name: 'NC', condition: `A{${COMPETENCY_ATTRIBUTE}} == "notcompetent"` }
     ] : [
-        { name: 'A', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} >= 80.0` },
-        { name: 'B', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} < 80.0 && A{${GLOBAL_SCORE_ATTRIBUTE}} >= 50.0` },
-        { name: 'C', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} < 50.0` }
+        //TODO: Use Global Score Program Indicator instead of the Attribute
+        //{ name: 'A', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} >= 80.0` },
+        //{ name: 'B', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} < 80.0 && A{${GLOBAL_SCORE_ATTRIBUTE}} >= 50.0` },
+        //{ name: 'C', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} < 50.0` }
+        { name: 'A', condition: `false` },
+        { name: 'B', condition: `false` },
+        { name: 'C', condition: `false` }
     ];
     const nameComp = useCompetency === "Yes" ? "Competency" : "QoC";
 
