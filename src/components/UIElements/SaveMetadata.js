@@ -150,9 +150,15 @@ const processStageData = (
             delete dataElement.importStatus;
             new_programStageDataElements.push({
                 compulsory: (DE_metadata.isCompulsory == 'Yes' && !DE_metadata.parentQuestion), // True: mandatory is Yes and has no parents.
-                displayInReports: dataElement.displayInReports,
+                displayInReports: existingPSDE?.displayInReports,
                 sortOrder: psdeSortOrder,
-                dataElement: { id: dataElement.id }
+                dataElement: { id: dataElement.id },
+
+                // Keep original settings if exists
+                allowFutureDate: existingPSDE?.allowFutureDate,
+                allowProvidedElsewhere: existingPSDE?.allowProvidedElsewhere,
+                skipSynchronization: existingPSDE?.skipSynchronization,
+                renderType: existingPSDE?.renderType
             });
             psdeSortOrder += 1
             delete dataElement.displayInReports;
