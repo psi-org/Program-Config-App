@@ -893,19 +893,17 @@ export const buildProgramRules = ({ sections, stageId, programId, compositeValue
 export const buildProgramIndicators = ({ programId, programStage, scoreMap, uidPool, useCompetency, sharingSettings, PIAggregationType }) => {
 
     const programShortName = programStage.program.shortName;
+    const mainScoreDataElement = scoreMap.numC == "" ? NON_CRITICAL_STEPS : CRITICAL_STEPS;
+
     // This sectin is for the local analytics
     const indicatorValues = useCompetency === "Yes" ? [
         { name: 'C', condition: `A{${COMPETENCY_ATTRIBUTE}} == "competent"` },
         { name: 'CNI', condition: `A{${COMPETENCY_ATTRIBUTE}} == "improvement"` },
         { name: 'NC', condition: `A{${COMPETENCY_ATTRIBUTE}} == "notcompetent"` }
     ] : [
-        //TODO: Use Global Score Program Indicator instead of the Attribute
-        //{ name: 'A', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} >= 80.0` },
-        //{ name: 'B', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} < 80.0 && A{${GLOBAL_SCORE_ATTRIBUTE}} >= 50.0` },
-        //{ name: 'C', condition: `A{${GLOBAL_SCORE_ATTRIBUTE}} < 50.0` }
-        { name: 'A', condition: `false` },
-        { name: 'B', condition: `false` },
-        { name: 'C', condition: `false` }
+        { name: 'A', condition: `#{${programStage.id}.${mainScoreDataElement}} >= 80.0` },
+        { name: 'B', condition: `#{${programStage.id}.${mainScoreDataElement}} < 80.0 && #{${programStage.id}.${mainScoreDataElement}} >= 50.0` },
+        { name: 'C', condition: `#{${programStage.id}.${mainScoreDataElement}} < 50.0` }
     ];
     const nameComp = useCompetency === "Yes" ? "Competency" : "QoC";
 
@@ -942,7 +940,7 @@ export const buildProgramIndicators = ({ programId, programStage, scoreMap, uidP
     indicatorIDs.push(AnalyticGS.id)
     AnalyticGS.name = `Global Score [${programId}]`
     AnalyticGS.shortName = `Global Score [${programId}]`
-    AnalyticGS.expression = `#{${programStage.id}.${scoreMap.numC == "" ? NON_CRITICAL_STEPS : CRITICAL_STEPS}}`
+    AnalyticGS.expression = `#{${programStage.id}.${mainScoreDataElement}}`
     AnalyticGS.program.id = programId
     AnalyticGS.sharing = sharingSettings
     AnalyticGS.analyticsPeriodBoundaries[0].sharing = sharingSettings
