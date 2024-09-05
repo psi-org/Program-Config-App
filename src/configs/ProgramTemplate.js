@@ -51,14 +51,6 @@ const HnqisProgramConfigs = {
             "searchable": true,
             "displayInList": true,
             "sortOrder": 3
-        },
-        {
-            "trackedEntityAttribute": { "id": "NQdpdST0Gcx" },
-            "mandatory": false,
-            "valueType": "TEXT",
-            "searchable": false,
-            "displayInList": true,
-            "sortOrder": 4
         }
     ],
     "userGroupAccesses": []

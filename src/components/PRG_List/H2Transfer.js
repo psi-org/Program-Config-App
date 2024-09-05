@@ -18,7 +18,6 @@ import React, { useState, useEffect, useRef } from "react";
 import {
     METADATA,
     COMPETENCY_ATTRIBUTE,
-    GLOBAL_SCORE_ATTRIBUTE,
     ASSESSMENT_DATE_ATTRIBUTE,
     HEALTH_AREA_ATTRIBUTE,
     ORGANISATION_UNIT_ATTRIBUTE,
@@ -29,7 +28,6 @@ import {
     ACTION_PLAN_DUE_DATE,
     ACTION_PLAN_RESPONSIBLE,
     ASSESSMENT_TET,
-    H1_OVERALL_SCORE,
     H1_COMPETENCY_CLASS,
     H1_ACTION1,
     H1_RESPONSIBLE1,
@@ -304,15 +302,7 @@ const H2Transfer = ({
         // *TEI Configuration
         hnqisTEI.orgUnit = event.orgUnit;
         hnqisTEI.trackedEntityType = ASSESSMENT_TET;
-        const globalScore = event.dataValues.find(
-            (dv) => dv.dataElement === H1_OVERALL_SCORE
-        )?.value;
-
         hnqisTEI.attributes = [
-            {
-                attribute: GLOBAL_SCORE_ATTRIBUTE,
-                value: Number(globalScore)>0.01?globalScore:'0', //! Forced Error
-            },
             {
                 attribute: ASSESSMENT_DATE_ATTRIBUTE,
                 value: pasedEventDate,

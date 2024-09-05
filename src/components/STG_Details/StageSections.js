@@ -28,7 +28,7 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Link } from "react-router-dom";
 import { BUILD_VERSION, DATASTORE_H2_METADATA, FEEDBACK_ORDER, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, mapIdArray, parseErrorsJoin, truncateString, versionGTE } from "../../utils/Utils.js";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, mapIdArray, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessor from "../Excel/DataProcessor.js";
 import Importer from "../Excel/Importer.js";
 import ErrorReports from "../UIElements/ErrorReports.js";
@@ -922,8 +922,12 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                             // V. Delete old metadata
                             setProgressSteps(5);
 
+                            const fallbackRuleVariables = prvDQ.data.results.programRuleVariables.filter(prv => {
+                                return prv.name[0] == "_";
+                            });
+
                             const programRulesDel = toDeleteReferences?.programRules || mapIdArray(prDQ.data.results.programRules);
-                            const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(prvDQ.data.results.programRuleVariables);
+                            const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(fallbackRuleVariables);
                             const programIndicatorsDel = toDeleteReferences?.programIndicators || mapIdArray(pIndDQ.data.results.programIndicators);
                             const visualizationsDel = toDeleteReferences?.visualizations || mapIdArray(visualizationsDQ.data.results.visualizations);
                             const eventReportsDel = toDeleteReferences?.eventReports || mapIdArray(eventReportDQ.data.results.eventReports);

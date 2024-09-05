@@ -25,15 +25,15 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.0.5"
-const BUILD_DATE = "Jul 2, 2024"
-const MIN_VERSION = "2.36.x"
-const MAX_VERSION = "2.40.x"
+const BUILD_VERSION = "2.0.6";
+const BUILD_DATE = "Aug 9, 2024";
+const MIN_VERSION = "2.36.x";
+const MAX_VERSION = "2.40.x";
 
-const PCA_METADATA_VERSION = "1.2.0";
+const PCA_METADATA_VERSION = "1.2.1";
 const H2_METADATA_VERSION = "1.1.4";
 
-const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.5";
+const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.6";
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
 const LIGHT_BLUE_COLOR = "#66aee5";
@@ -139,7 +139,6 @@ const H2_REQUIRED = {
     trackedEntityTypes: [ASSESSMENT_TET],
     trackedEntityAttributes: [
         HEALTH_AREA_ATTRIBUTE,
-        GLOBAL_SCORE_ATTRIBUTE,
         ORGANISATION_UNIT_ATTRIBUTE,
         ASSESSMENT_DATE_ATTRIBUTE,
         COMPETENCY_ATTRIBUTE,
