@@ -80,10 +80,10 @@
     ],
     "userRoles": [
         {
-            "name": "_App - Program Configuration App",
+            "name": "App - PCA",
             "id": "QbYqOgwk5fJ",
             "publicAccess": "rw------",
-            "description": "Program Configuration App access and required authorities for basic usage.",
+            "description": "App Role for using the Program Configuration App",
             "authorities": [
                 "F_PROGRAM_PRIVATE_ADD",
                 "F_VISUALIZATION_PUBLIC_ADD",
@@ -117,11 +117,10 @@
             ]
         },
         {
-            "name": "PCA - Administrator",
+            "name": "App - PCA - Administrator",
             "id": "akI7EzBaRaJ",
-            "displayName": "PCA - Administrator",
             "publicAccess": "rw------",
-            "description": "Program Configuration App additional authorities for installing metadata.",
+            "description": "App Role included in the Program Configuration App to allow non-superusers to install required metadata so the PCA can be used",
             "authorities": [
                 "F_ATTRIBUTE_PUBLIC_ADD",
                 "F_TRACKED_ENTITY_ADD",
@@ -131,11 +130,10 @@
             ]
         },
         {
-            "name": "PCA - Users Sharing Management",
+            "name": "App - PCA - Sharing Settings",
             "id": "JDmJ4ADTaDq",
-            "displayName": "PCA - Users Sharing Management",
             "publicAccess": "rw------",
-            "description": "Users view authorities for the Sharing Settings in the Program Configuration App",
+            "description": "App Role included in the Program Configuration App to fully use the Sharing Settings module",
             "authorities": [
                 "F_USER_VIEW"
             ]

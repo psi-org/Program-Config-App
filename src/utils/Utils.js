@@ -288,9 +288,9 @@ export const getPCAMetadataDE = (dataElement) => {
 
 export const getProgramQuery = () => {
     const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,description,displayName,domainType,formName,id,legendSet,legendSets[id,name],name,optionSet[id,name],optionSetValue,sharing,shortName,style,valueType,categoryCombo';
-    const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style`;
+    const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style,allowFutureDate,allowProvidedElsewhere,skipSynchronization,renderType`;
     const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder`;
-    const stagesQuery = `id,name,displayName,formType,programStageSections[${stageSectionsQuery}],description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements[${stageDataElementsQuery}],sortOrder,sharing`
+    const stagesQuery = `id,name,displayName,formType,programStageSections[${stageSectionsQuery}],description,program[id,name],minDaysFromStart,repeatable,periodType,displayGenerateEventBox,autoGenerateEvent,openAfterEnrollment,reportDateToUse,remindCompleted,allowGenerateNextVisit,featureType,attributeValues,publicAccess,notificationTemplates,programStageDataElements[${stageDataElementsQuery}],sortOrder,sharing,style`
     const programSectionsQuery = 'id,name,renderType,sortOrder,program,sharing,translations,attributeValues,trackedEntityAttributes';
     const programTrackedEntityAttributes = 'id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute[id,name],programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccessesattributeValues,displayInList,id,mandatory,name,program,programTrackedEntityAttributeGroups,renderOptionsAsRadio,searchable,sortOrder,trackedEntityAttribute,translations,userAccesses,userGroupAccesses,valueType';
 
