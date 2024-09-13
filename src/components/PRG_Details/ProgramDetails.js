@@ -639,6 +639,7 @@ const ProgramDetails = () => {
                         setSavedAndValidated={setSavedAndValidated}
                         setValidationResults={setValidationResults}
                         setErrorReports={setErrorReports}
+                        setExportToExcel={setExportToExcel}
                     />
                 }
             </div>

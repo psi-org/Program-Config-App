@@ -1434,6 +1434,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     programMetadata={programMetadata}
                     setErrorReports={setErrorReports}
                     stagesList={stagesList}
+                    setExportToExcel={setExportToExcel}
                 />
             }
             {showSectionManager &&

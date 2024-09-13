@@ -19,7 +19,8 @@ const ValidateTracker = (
         setImportResults,
         setSavedAndValidated,
         setSavingMetadata,
-        setValidationResults
+        setValidationResults,
+        setExportToExcel
     }
 ) => {
     const validationResults = {
@@ -161,6 +162,8 @@ const ValidateTracker = (
                     setImportResults={setImportResults}
                     setErrorReports={setErrorReports}
                     saveType={'program'}
+                    fromImport={importResults != false}
+                    setExportToExcel={setExportToExcel}
                 />
             }
         </DialogActions>
@@ -172,6 +175,7 @@ ValidateTracker.propTypes = {
     importResults: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
     programMetadata: PropTypes.object,
     setErrorReports: PropTypes.func,
+    setExportToExcel: PropTypes.func,
     setImportResults: PropTypes.func,
     setSavedAndValidated: PropTypes.func,
     setSavingMetadata: PropTypes.func,
