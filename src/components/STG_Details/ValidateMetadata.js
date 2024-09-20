@@ -213,7 +213,7 @@ const ValidateMetadata = (
                     setErrorReports={setErrorReports}
                     stagesList={stagesList}
                     saveType={'stage'}
-                    fromImport={importResults != false}
+                    fromImport={!!importResults}
                     setExportToExcel={setExportToExcel}
                 />
             }

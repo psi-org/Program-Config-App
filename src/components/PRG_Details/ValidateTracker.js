@@ -162,7 +162,7 @@ const ValidateTracker = (
                     setImportResults={setImportResults}
                     setErrorReports={setErrorReports}
                     saveType={'program'}
-                    fromImport={importResults != false}
+                    fromImport={!!importResults}
                     setExportToExcel={setExportToExcel}
                 />
             }
