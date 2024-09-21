@@ -286,7 +286,7 @@ export const getPCAMetadataDE = (dataElement) => {
     return jsonData ? JSON.parse(jsonData.value) : {};
 }
 
-export const getProgramQuery = () => {
+export const getProgramQuery = (deepQuery = true) => {
     const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,description,displayName,domainType,formName,id,legendSet,legendSets[id,name],name,optionSet[id,name],optionSetValue,sharing,shortName,style,valueType,categoryCombo';
     const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style,allowFutureDate,allowProvidedElsewhere,skipSynchronization,renderType`;
     const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder`;
@@ -357,11 +357,11 @@ export const getProgramQuery = () => {
         'userAccesses',
         'favorites',
         'programRuleVariables',
-        `programTrackedEntityAttributes[${programTrackedEntityAttributes}]`,
+        deepQuery ? `programTrackedEntityAttributes[${programTrackedEntityAttributes}]` :'programTrackedEntityAttributes',
         'notificationTemplates',
         'organisationUnits',
-        `programSections[${programSectionsQuery}]`,
-        `programStages[${stagesQuery}]`
+        deepQuery ? `programSections[${programSectionsQuery}]` :'programSections',
+        deepQuery ? `programStages[${stagesQuery}]` :'programStages'
     ];
 }
 
