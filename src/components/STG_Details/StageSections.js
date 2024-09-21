@@ -28,7 +28,7 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Link } from "react-router-dom";
 import { BUILD_VERSION, DATASTORE_H2_METADATA, FEEDBACK_ORDER, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, mapIdArray, truncateString, versionGTE } from "../../utils/Utils.js";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, getProgramQuery, mapIdArray, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessor from "../Excel/DataProcessor.js";
 import Importer from "../Excel/Importer.js";
 import ErrorReports from "../UIElements/ErrorReports.js";
@@ -190,7 +190,7 @@ const queryProgramSettings = {
         resource: 'programs',
         id: ({ programId }) => programId,
         params: {
-            fields: ['lastUpdated', 'id', 'href', 'created', 'name', 'shortName', 'publicAccess', 'ignoreOverdueEvents', 'skipOffline', 'enrollmentDateLabel', 'onlyEnrollOnce', 'version', 'displayFormName', 'displayEnrollmentDateLabel', 'selectIncidentDatesInFuture', 'maxTeiCountToReturn', 'selectEnrollmentDatesInFuture', 'registration', 'openDaysAfterCoEndDate', 'favorite', 'useFirstStageDuringRegistration', 'displayName', 'completeEventsExpiryDays', 'displayShortName', 'externalAccess', 'withoutRegistration', 'minAttributesRequiredToSearch', 'displayFrontPageList', 'programType', 'accessLevel', 'displayIncidentDate', 'expiryDays', 'categoryCombo', 'sharing', 'access', 'trackedEntityType', 'createdBy', 'user', 'programIndicators', 'translations', 'userGroupAccesses', 'attributeValues', 'userRoles', 'userAccesses', 'favorites', 'programRuleVariables', 'programTrackedEntityAttributes', 'notificationTemplates', 'organisationUnits', 'programSections', 'programStages', 'style']
+            fields: getProgramQuery(false)
         }
     },
 }
@@ -1434,6 +1434,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     programMetadata={programMetadata}
                     setErrorReports={setErrorReports}
                     stagesList={stagesList}
+                    setExportToExcel={setExportToExcel}
                 />
             }
             {showSectionManager &&

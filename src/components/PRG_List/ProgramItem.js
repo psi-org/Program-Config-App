@@ -170,13 +170,13 @@ const ProgramItem = ({
                     <div>{program.programStages.length} Program Stages</div>
                     <div
                         style={{
-                            backgroundColor: typeTag[programType].color,
+                            backgroundColor: typeTag[programType]?.color || typeTag[(!program.withoutRegistration ? "Tracker" : "Event")].color,
                             width: "85px",
                             display: "flex",
                             justifyContent: "center",
                         }}
                     >
-                        {typeTag[programType].text}
+                        {typeTag[programType]?.text || typeTag[(!program.withoutRegistration ? "Tracker" : "Event")].text}
                     </div>
                 </div>
                 <div className="ml_item-cta">

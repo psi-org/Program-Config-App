@@ -1,5 +1,6 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-service-data";
 import { CircularLoader, NoticeBox, Tag } from "@dhis2/ui";
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -415,6 +416,7 @@ const SaveMetadata = (props) => {
     const [typeReports, setTypeReports] = useState({});
     const [programPayload, setProgramPayload] = useState();
     const [programPayloadBackup, setProgramPayloadBackup] = useState();
+    const [importFlag, setImportFlag] = useState(false);
 
     // Create Mutation
     const metadataDM = useDataMutation(metadataMutation, {
@@ -441,14 +443,15 @@ const SaveMetadata = (props) => {
         setErrorStatus(true);
         setTypeReports(parseErrorsSaveMetadata(response));
         setCompleted(true);
-        props.setErrorReports(parseErrorsSaveMetadata(response))
+        props.setErrorReports(parseErrorsSaveMetadata(response));
     };
 
     useEffect(() => {
+        setImportFlag(props.fromImport);
         getProgramPayload({ id: props.programId }).then(payload => {
             setProgramPayload(payload?.results)
             setProgramPayloadBackup(payload?.results)
-        })
+        });
     }, [])
 
     useEffect(() => {
@@ -538,6 +541,12 @@ const SaveMetadata = (props) => {
                     (
                         <div>
                             <p><strong>Process completed! {props.hnqisMode && '"Set up program" button is now enabled'}</strong></p>
+                            {importFlag &&
+                                <p style={{marginTop: '1em'}}>
+                                    <strong>Please Note:</strong>
+                                    As you imported Metadata from an Excel Template, make sure you download an updated Template before making more changes.
+                                </p>
+                            }
                             {typeReports.length > 0 && typeReports.map(tr => {
                                 <div> {tr.klass} | <Tag>{"Created: " + tr.stats.created}</Tag>
                                     <Tag>{"Deleted :" + tr.stats.deleted}</Tag>
@@ -560,7 +569,21 @@ const SaveMetadata = (props) => {
         </DialogContent>
 
         <DialogActions style={{ padding: '1em' }}>
-            <Button variant='outlined' disabled={!completed} onClick={() => { props.setSavingMetadata(false); /* refetchProgramStage() */ }}> Done </Button>
+            {importFlag &&
+                <Button
+                    startIcon={<FileDownloadIcon />}
+                    variant='outlined'
+                    color='success'
+                    disabled={!completed}
+                    onClick={() => {
+                        props.setExportToExcel(true);
+                        props.setSavingMetadata(false);
+                    }}
+                >
+                    Download Template and Close
+                </Button>
+            }
+            <Button variant='outlined' disabled={!completed} onClick={() => { props.setSavingMetadata(false); }}> Done </Button>
         </DialogActions>
 
     </CustomMUIDialog>)
@@ -568,6 +591,7 @@ const SaveMetadata = (props) => {
 
 SaveMetadata.propTypes = {
     criticalSection: PropTypes.object,
+    fromImport: PropTypes.bool,
     hnqisMode: PropTypes.bool,
     importResults: PropTypes.object,
     importedScores: PropTypes.object,
@@ -581,6 +605,7 @@ SaveMetadata.propTypes = {
     removedItems: PropTypes.array,
     saveType: PropTypes.string,
     setErrorReports: PropTypes.func,
+    setExportToExcel: PropTypes.func,
     setImportResults: PropTypes.func,
     setSavedAndValidated: PropTypes.func,
     setSavingMetadata: PropTypes.func,
