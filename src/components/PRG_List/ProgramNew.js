@@ -3,7 +3,7 @@ import { Transfer } from "@dhis2/ui";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import InfoIcon from '@mui/icons-material/Info';
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import LockIcon from '@mui/icons-material/Lock';
 import SendIcon from "@mui/icons-material/Send";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { FormLabel, Slide, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
@@ -31,6 +31,7 @@ import {
     CRITICAL_STEPS,
     DATASTORE_H2_METADATA,
     H2_METADATA_VERSION,
+    HNQIS_TYPES,
     MAX_PREFIX_LENGTH,
     MAX_PROGRAM_NAME_LENGTH,
     MAX_SHORT_NAME_LENGTH,
@@ -49,7 +50,7 @@ import {
     PSS_Default,
     PSS_Scores,
 } from "../../configs/ProgramTemplate.js";
-import { DeepCopy, parseErrorsJoin, truncateString } from "../../utils/Utils.js";
+import { DeepCopy, isHNQIS, parseErrorsJoin, truncateString } from "../../utils/Utils.js";
 import InputModal from "../PRG_Details/InputModal.js";
 import AttributesEditor from "../TEAEditor/AttributesEditor.js";
 import StyleManager from "../UIElements/StyleManager.js";
@@ -150,6 +151,7 @@ const queryCurrentUser = {
 
 const stepsLimit = {
     hnqis: 1,
+    hnqismwi: 1,
     tracker: 2,
     event: 1
 }
@@ -273,7 +275,7 @@ const ProgramNew = (props) => {
         setValidationErrors({ ...validationErrors });
         const value = event.target.value;
         setPgrTypePCA(value);
-        if (value === "hnqis") {
+        if (isHNQIS(value)) {
             setButtonDisabled(false);
             const hnqisTET = trackedEntityTypes.find(
                 (tet) => tet.id === ASSESSMENT_TET
@@ -523,7 +525,7 @@ const ProgramNew = (props) => {
         setBasicValidated(response);
 
         // * HNQIS2 Settings Validation * //
-        if ((pgrTypePCA === "tracker" || pgrTypePCA === "event") && pgrTypePCA !== "hnqis") {
+        if ((pgrTypePCA === "tracker" || pgrTypePCA === "event") && !isHNQIS(pgrTypePCA)) {
             validationErrors.healthArea =
                 validationErrors.ouTableRow =
                 validationErrors.ouMapPolygon =
@@ -648,7 +650,7 @@ const ProgramNew = (props) => {
             return;
         }
 
-        const useCompetency = pgrTypePCA === "hnqis" ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass === 'Yes' : undefined;
+        const useCompetency = isHNQIS(pgrTypePCA) ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass === 'Yes' : undefined;
 
         //Validating available prefix
         checkForExistingPrefix({
@@ -684,7 +686,7 @@ const ProgramNew = (props) => {
                     prgrm.style = undefined;
                 }
 
-                if (pgrTypePCA === "hnqis") {
+                if (isHNQIS(pgrTypePCA)) {
                     //HNQIS2 Programs
                     let assessmentStage = undefined;
                     let actionPlanStage = undefined;
@@ -697,7 +699,7 @@ const ProgramNew = (props) => {
                     if (!props.data) {
                         Object.assign(prgrm, HnqisProgramConfigs);
                         prgrm.attributeValues.push({
-                            value: "HNQIS2",
+                            value: HNQIS_TYPES[pgrTypePCA],
                             attribute: { id: prgTypeId },
                         });
                         prgrm.programStages.push({ id: assessmentId });
@@ -927,7 +929,7 @@ const ProgramNew = (props) => {
         );
         if (metaDataArray.length > 0) {
             let metaData_value = JSON.parse(metaDataArray[0].value);
-            if (pgrTypePCA === "hnqis") {
+            if (isHNQIS(pgrTypePCA)) {
                 const h1Program = metaData_value.h1Program;
                 metaData_value = h2SettingsRef.current.saveMetaData()
                 metaData_value.h1Program = h1Program;
@@ -938,7 +940,7 @@ const ProgramNew = (props) => {
         } else {
             const attr = { id: METADATA };
             let val = {};
-            if (pgrTypePCA === "hnqis") {
+            if (isHNQIS(pgrTypePCA)) {
                 val = h2SettingsRef.current.saveMetadata();
             }
             val.saveVersion = BUILD_VERSION;
@@ -994,7 +996,7 @@ const ProgramNew = (props) => {
                             <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
                                 <StepLabel error={!basicValidated} onClick={() => changeStep(0)}>Basic Settings</StepLabel>
                             </Step>
-                            {pgrTypePCA === 'hnqis' &&
+                            {isHNQIS(pgrTypePCA) &&
                                 <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
                                     <StepLabel error={!hnqisValidated} onClick={() => changeStep(1)} >HNQIS2 Settings</StepLabel>
                                 </Step>
@@ -1044,19 +1046,23 @@ const ProgramNew = (props) => {
                                                 }
                                                 value={"hnqis"}
                                             >
-                                                HNQIS 2.0{" "}
                                                 {hnqis2Metadata?.results?.version < H2_METADATA_VERSION && (
-                                                    <span
-                                                        style={{
-                                                            display: "flex",
-                                                            alignItems: "center",
-                                                            marginLeft: "8px",
-                                                        }}
-                                                    >
-                                                        [Unavailable]{" "}
-                                                        <RemoveCircleOutlineIcon />
-                                                    </span>
+                                                    <LockIcon />
                                                 )}
+                                                HNQIS 2.0{" "}
+                                            </MenuItem>
+                                            <MenuItem
+                                                disabled={
+                                                    !h2Ready ||
+                                                    hnqis2Metadata?.results?.version <
+                                                    H2_METADATA_VERSION
+                                                }
+                                                value={"hnqismwi"}
+                                            >
+                                                {hnqis2Metadata?.results?.version < H2_METADATA_VERSION && (
+                                                    <LockIcon />
+                                                )}
+                                                HNQIS MWI{" "}
                                             </MenuItem>
                                         </Select>
                                         <FormHelperText>
@@ -1092,7 +1098,7 @@ const ProgramNew = (props) => {
                                         autoComplete="off"
                                         inputProps={{
                                             maxLength:
-                                                MAX_PROGRAM_NAME_LENGTH /*- dePrefix.length*/,
+                                                MAX_PROGRAM_NAME_LENGTH,
                                         }}
                                         value={programName}
                                         onChange={handleChangeProgramName}
@@ -1186,10 +1192,11 @@ const ProgramNew = (props) => {
                         </Slide>
 
                         {/* HNQIS2 SETTINGS */}
-                        <Slide in={pgrTypePCA === 'hnqis' && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
-                            <div style={{ display: pgrTypePCA === 'hnqis' && activeStep === 1 ? 'inherit' : 'none' }}>
+                        <Slide in={isHNQIS(pgrTypePCA) && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
+                            <div style={{ display: isHNQIS(pgrTypePCA) && activeStep === 1 ? 'inherit' : 'none' }}>
                                 <H2Setting
                                     pcaMetadata={props.pcaMetadata}
+                                    pgrTypePCA={pgrTypePCA}
                                     ref={h2SettingsRef}
                                 />
                             </div>

@@ -25,15 +25,22 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.0.7";
+const BUILD_VERSION = "2.1.0";
 const BUILD_DATE = "Sep 30, 2024";
 const MIN_VERSION = "2.36.x";
-const MAX_VERSION = "2.40.x";
+const MAX_VERSION = "2.41.x";
 
 const PCA_METADATA_VERSION = "1.2.1";
-const H2_METADATA_VERSION = "1.1.4";
+const H2_METADATA_VERSION = "1.2.0";
 
 const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.6";
+
+const HNQIS_TYPES = {
+    hnqis: "HNQIS2",
+    hnqismwi: "HNQISMWI",
+    HNQIS2: "hnqis",
+    HNQISMWI: "hnqismwi"
+}
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
 const LIGHT_BLUE_COLOR = "#66aee5";
@@ -63,17 +70,24 @@ const ACTION_PLAN_ACTION = "F0Qcr8ANr7t";
 const ACTION_PLAN_DUE_DATE = "DIoqtxbSJIL";
 const ACTION_PLAN_RESPONSIBLE = "nswci5V4j0d";
 
+const MOH_ACTION_PLAN_COMMENT = "OTJPb8MCSaS";
+const MOH_ACTION_PLAN_ACTION = "PGtk17z7FFq";
+const MOH_ACTION_PLAN_DUE_DATE = "eiUtIypcrX0";
+const MOH_ACTION_PLAN_RESPONSIBLE = "X6TmRobUdbV";
+
 //* H2 Tracked Entity Type
 const ASSESSMENT_TET = "oNwpeWkfoWc";
 
 //* H2 Option Sets
 const OPTION_SET_COMPETENCY = "NDfZ129owtz";
 const OPTION_SET_HEALTH_AREAS = "y752HEwvCGi";
+const OPTION_SET_YESNONA = "Ri5XuSekdRg";
 
 //* H2 Legend Sets
 const LEGEND_YES_NO = "RXxPYFwtgf4";
 const LEGEND_YES_PARTIAL_NO = "kqQjtHIc7II";
 const VISUALIZATIONS_LEGEND = "nvVrBnbud3L";
+const LEGEND_COMPLIANT = "F9G1wtBjiOY";
 
 //* H1 Control Data Elements
 const H1_OVERALL_SCORE = "Y8Nmpp7RhXw";
@@ -111,7 +125,7 @@ const H2_REQUIRED = {
         ACTION_PLAN_DUE_DATE,
         ACTION_PLAN_RESPONSIBLE,
     ],
-    optionSets: [OPTION_SET_COMPETENCY, OPTION_SET_HEALTH_AREAS],
+    optionSets: [OPTION_SET_COMPETENCY, OPTION_SET_HEALTH_AREAS, OPTION_SET_YESNONA],
     options: [
         "BNjofUBvlJ8",
         "Ox6VQNmvuS3",
@@ -134,7 +148,10 @@ const H2_REQUIRED = {
         "OqRNLt5Nbub",
         "MstdLcCaYZW",
         "Jhn703YNPa1",
-        "jHAilN60gsN"
+        "jHAilN60gsN",
+        "IVVfVluYFli",
+        "gkLeI6VFJZe",
+        "U2dkoDmopiv"
     ],
     trackedEntityTypes: [ASSESSMENT_TET],
     trackedEntityAttributes: [
@@ -144,7 +161,7 @@ const H2_REQUIRED = {
         COMPETENCY_ATTRIBUTE,
     ],
     attributes: [FEEDBACK_ORDER, FEEDBACK_TEXT],
-    legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND],
+    legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND, LEGEND_COMPLIANT],
 };
 
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false, localeMatcher: 'best fit', };
@@ -562,6 +579,7 @@ export {
     H2_REQUIRED,
     HEADER_ATTRIBUTE,
     HEALTH_AREA_ATTRIBUTE,
+    HNQIS_TYPES,
     JSON_ATTRIBUTE_SETTINGS,
     LEGEND_YES_NO,
     LEGEND_YES_PARTIAL_NO,
@@ -580,6 +598,10 @@ export {
     MIN_DESCRIPTION_LENGTH,
     MIN_NAME_LENGTH,
     MIN_VERSION,
+    MOH_ACTION_PLAN_ACTION,
+    MOH_ACTION_PLAN_COMMENT,
+    MOH_ACTION_PLAN_DUE_DATE,
+    MOH_ACTION_PLAN_RESPONSIBLE,
     NAMESPACE,
     newTagStyle,
     NON_CRITICAL_STEPS,

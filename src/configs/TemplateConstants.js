@@ -186,6 +186,7 @@ export const RENDER_TYPES = ['DEFAULT', 'DROPDOWN', 'VERTICAL_RADIOBUTTONS', 'HO
 
 export const TEMPLATE_PROGRAM_TYPES = {
     hnqis2: 'HNQIS2',
+    hnqismwi: 'HNQISMWI',
     tracker: 'Tracker Program',
     event: 'Event Program'
 }

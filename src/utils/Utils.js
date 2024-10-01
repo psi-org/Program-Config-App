@@ -1,5 +1,5 @@
 import React from 'react';
-import { coerce, gte, lte, satisfies } from 'semver';
+import { coerce, satisfies } from 'semver';
 import { METADATA } from '../configs/Constants.js';
 
 export function splitPosition(position) {
@@ -432,4 +432,12 @@ export const padValue = (value, format) => {
 
 export const mapIdArray = (arr) => {
     return arr.map(elem => ({ id: elem.id }));
+}
+
+export const isHNQIS = (type) => {
+    return (type === "hnqis" || type === "hnqismwi");
+}
+
+export const programIsHNQIS = (type) => {
+    return (type === "HNQIS2" || type === "HNQISMWI");
 }

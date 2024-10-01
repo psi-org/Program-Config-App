@@ -12,8 +12,8 @@ import PublicIcon from '@mui/icons-material/Public';
 import RestoreIcon from '@mui/icons-material/Restore';
 import ShareIcon from '@mui/icons-material/Share';
 import StorageIcon from '@mui/icons-material/Storage';
-import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import UpgradeIcon from '@mui/icons-material/SwitchAccessShortcutAdd';
+import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import WarningIcon from '@mui/icons-material/Warning';
 import { IconButton, Slide, Snackbar, Tooltip } from "@mui/material";
 import Popover from '@mui/material/Popover';
@@ -23,9 +23,9 @@ import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import tinycolor from 'tinycolor2';
-import { BUILD_VERSION, DATE_FORMAT_OPTIONS, METADATA, REQUIRED_H2_PROGRAM_BUILD_VERSION } from "../../configs/Constants.js";
+import { BUILD_VERSION, DATE_FORMAT_OPTIONS, HNQIS_TYPES, METADATA, REQUIRED_H2_PROGRAM_BUILD_VERSION } from "../../configs/Constants.js";
 import actionCreators from "../../state/action-creators";
-import { versionIsValid, versionGTE } from "../../utils/Utils.js";
+import { versionIsValid, versionGTE, programIsHNQIS } from "../../utils/Utils.js";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import ProgramNew from "./ProgramNew.js";
 
@@ -75,6 +75,7 @@ const ProgramItem = ({
     );
     const typeTag = {
         HNQIS2: { color: "#03a9f4", text: "HNQIS 2.0" },
+        HNQISMWI: { color: "#6aa84f", text: "HNQIS MWI" },
         HNQIS: { color: "#00deff", text: "HNQIS 1.X" },
         RDQA: { color: "#00acc1", text: "RDQA" },
         EDS: { color: "#607d8b", text: "EDS" },
@@ -327,7 +328,9 @@ const ProgramItem = ({
                             doSearch={doSearch}
                             data={program}
                             programType={
-                                programType === "HNQIS2" ? "hnqis" : (program.withoutRegistration ? "event" : "tracker")
+                                programIsHNQIS(programType)
+                                    ? HNQIS_TYPES[programType]
+                                    : (program.withoutRegistration ? "event" : "tracker")
                             }
                             pcaMetadata={pcaMetadata}
                             readOnly={!program.access.update}

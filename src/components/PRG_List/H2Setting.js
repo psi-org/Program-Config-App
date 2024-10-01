@@ -461,16 +461,18 @@ const H2Setting = forwardRef((props, ref) => {
                             style={{ ...fieldSetStyle, display: 'flex', justifyContent: 'space-between' }}
                         >
                             <legend style={{ color: 'rgba(0, 0, 0, 0.6)' }}>Core HNQIS Settings</legend>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={useCompetency}
-                                        onChange={handleChangeComp}
-                                        name="competency"
-                                    />
-                                }
-                                label="Use Competency Class"
-                            />
+                            {props.pgrTypePCA === "HNQIS2" &&
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={useCompetency}
+                                            onChange={handleChangeComp}
+                                            name="competency"
+                                        />
+                                    }
+                                    label="Use Competency Class"
+                                />
+                            }
                             <SelectOptions
                                 useError={
                                     validationErrors.healthArea !==
@@ -480,7 +482,7 @@ const H2Setting = forwardRef((props, ref) => {
                                 label={"Program Health Area (*)"}
                                 items={healthAreaOptions}
                                 handler={healthAreaChange}
-                                styles={{ width: "60%" }}
+                                styles={{ width: props.pgrTypePCA === "HNQIS2"?"60%":"100%" }}
                                 value={healthArea}
                                 defaultOption="Select Health Area"
                             />
@@ -525,7 +527,8 @@ const H2Setting = forwardRef((props, ref) => {
 H2Setting.displayName = 'H2Setting';
 
 H2Setting.propTypes = {
-    pcaMetadata: PropTypes.object
+    pcaMetadata: PropTypes.object,
+    pgrTypePCA: PropTypes.string
 }
 
 export default H2Setting
