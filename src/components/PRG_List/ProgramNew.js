@@ -46,9 +46,11 @@ import {
     Program,
     PS_ActionPlanStage,
     PS_AssessmentStage,
+    PSDE_HNQIS_ActionPlan,
+    PSDE_HNQISMWI_ActionPlan,
     PSS_CriticalSteps,
     PSS_Default,
-    PSS_Scores,
+    PSS_Scores
 } from "../../configs/ProgramTemplate.js";
 import { DeepCopy, isHNQIS, parseErrorsJoin, truncateString } from "../../utils/Utils.js";
 import InputModal from "../PRG_Details/InputModal.js";
@@ -61,7 +63,7 @@ import H2Setting from "./H2Setting.js"
 const queryId = {
     results: {
         resource: "system/id.json",
-        params: { limit: 15 },
+        params: { limit: 30 },
     },
 };
 
@@ -444,7 +446,7 @@ const ProgramNew = (props) => {
         updateAssignedAttributes();
     };
 
-    if (uidPool && uidPool.length === 15 && !props.data) {
+    if (uidPool && uidPool.length === 30 && !props.data) {
         setProgramId(uidPool.shift());
         setAssessmentId(uidPool.shift());
         setActionPlanId(uidPool.shift());
@@ -711,12 +713,22 @@ const ProgramNew = (props) => {
                         assessmentStage.programStageSections.push({
                             id: defaultSectionId,
                         });
-                        assessmentStage.programStageSections.push({
-                            id: stepsSectionId,
-                        });
-                        assessmentStage.programStageSections.push({
-                            id: scoresSectionId,
-                        });
+                        if (pgrTypePCA === "hnqis") {
+                            assessmentStage.programStageSections.push({
+                                id: stepsSectionId,
+                            });
+                            assessmentStage.programStageSections.push({
+                                id: scoresSectionId,
+                            });
+
+                            criticalSteps = DeepCopy(PSS_CriticalSteps);
+                            criticalSteps.id = stepsSectionId;
+                            criticalSteps.programStage.id = assessmentId;
+
+                            scores = DeepCopy(PSS_Scores);
+                            scores.id = scoresSectionId;
+                            scores.programStage.id = assessmentId;
+                        }
                         assessmentStage.program.id = prgrm.id;
 
                         actionPlanStage = DeepCopy(PS_ActionPlanStage);
@@ -724,27 +736,40 @@ const ProgramNew = (props) => {
                         actionPlanStage.name =
                             "Action Plan [" + prgrm.id + "]"; //! Not adding the ID may result in an error
                         actionPlanStage.program.id = prgrm.id;
+                        if (pgrTypePCA === "hnqismwi") {
+                            //TODO: Create Criterion Data Element + Option Set and ref it
+                            actionPlanStage.programStageDataElements = [/*{
+                                "sortOrder": 1,
+                                "compulsory": "true",
+                                "programStage": { "id": "apProgramStageId" },
+                                "dataElement": { "id": "" }
+                            }*/].concat(PSDE_HNQISMWI_ActionPlan);
+                            
+                        } else {
+                            actionPlanStage.programStageDataElements = PSDE_HNQIS_ActionPlan;
+                        }
+
+                        actionPlanStage.programStageDataElements = actionPlanStage.programStageDataElements.map(psde => {
+                            psde.programStage = {
+                                id: actionPlanId
+                            }
+                            return psde;
+                        })
 
                         defaultSection = DeepCopy(PSS_Default);
                         defaultSection.id = defaultSectionId;
                         defaultSection.programStage.id = assessmentId;
-
-                        criticalSteps = DeepCopy(PSS_CriticalSteps);
-                        criticalSteps.id = stepsSectionId;
-                        criticalSteps.programStage.id = assessmentId;
-
-                        scores = DeepCopy(PSS_Scores);
-                        scores.id = scoresSectionId;
-                        scores.programStage.id = assessmentId;
                     } else {
                         assessmentStage = prgrm.programStages.find(section => section.name.toLowerCase().includes('assessment'));
-                        const exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS];
-                        excludedStageDEs = assessmentStage.programStageDataElements.filter(elem => !exclusionsDEs.includes(elem.dataElement.id));
+                        if (pgrTypePCA === "hnqis") {
+                            const exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS];
+                            excludedStageDEs = assessmentStage.programStageDataElements.filter(elem => !exclusionsDEs.includes(elem.dataElement.id));
+                        }
                     }
 
                     prgrm.programTrackedEntityAttributes = DeepCopy(HnqisProgramConfigs.programTrackedEntityAttributes);
 
-                    if (!useCompetency) {
+                    if (pgrTypePCA === "hnqis" && !useCompetency) {
                         removeCompetencyAttribute(
                             prgrm.programTrackedEntityAttributes
                         );
@@ -770,7 +795,7 @@ const ProgramNew = (props) => {
                         ];
 
                         removeCompetencyClass(criticalSteps.dataElements);
-                    } else if (useCompetency && props.data) {
+                    } else if (pgrTypePCA === "hnqis" && useCompetency && props.data) {
                         criticalSteps = prgrm.programStages
                             .map((pStage) => pStage.programStageSections)
                             .flat()
@@ -813,7 +838,7 @@ const ProgramNew = (props) => {
 
                     createOrUpdateMetaData(prgrm.attributeValues);
 
-                    if (assessmentStage?.programStageDataElements.length == 0 || props.data) {
+                    if (pgrTypePCA === "hnqis" && (assessmentStage?.programStageDataElements.length == 0 || props.data)) {
                         assessmentStage.programStageDataElements = excludedStageDEs.concat(criticalSteps.dataElements.map((de, index) => ({
                             sortOrder: index + excludedStageDEs.length,
                             compulsory: false,
@@ -826,12 +851,17 @@ const ProgramNew = (props) => {
                     if (!props.data) {
                         programStages = [assessmentStage, actionPlanStage];
                         programStageSections = [
-                            defaultSection,
-                            criticalSteps,
-                            scores,
+                            defaultSection
                         ];
+                        if (pgrTypePCA === "hnqis") {
+                            programStageSections = programStageSections.concat([
+                                criticalSteps,
+                                scores
+                            ]);
+                        }
                     } else {
-                        programStageSections = criticalSteps
+
+                        programStageSections = (criticalSteps && pgrTypePCA === "hnqis")
                             ? [criticalSteps]
                             : undefined;
                         programStages = [assessmentStage];

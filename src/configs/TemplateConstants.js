@@ -30,7 +30,9 @@ export const horizontalCenter = {
 };
 
 export const conditionalError = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'dc3545' } } };
-export const sectionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'f8c291' } } };
+export const sectionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'faa557' } } };
+export const standardHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'f8c291' } } };
+export const criterionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'ffd8b5' } } };
 export const questionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'ffffff' } } };
 export const labelHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'c6e0b4' } } };
 export const otherHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: '99dcff' } } };
@@ -39,6 +41,7 @@ export const disabledHighlighting = { fill: { type: 'pattern', pattern: 'solid',
 export const validWorksheets = ['Instructions', 'Template', 'Release Notes', 'Mapping'];
 
 export const structureValidator = ['"Section,label,question,score"'];
+export const structureValidatorMWI = ['"Section,Standard,Std Overview,Criterion,question,label"'];
 export const teaStructureValidator = ['"Section,TEA"'];
 export const trackerStructureValidator = ['"Section,Data Element"'];
 export const yesNoValidator = ['"Yes,No"'];

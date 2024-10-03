@@ -16,7 +16,10 @@ import {
     verticalMiddle,
     yesNoValidator,
     HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS,
-    getPromptsFormula
+    getPromptsFormula,
+    structureValidatorMWI,
+    standardHighlighting,
+    criterionHighlighting
 } from "../../configs/TemplateConstants.js";
 import {
     addCreator,
@@ -34,6 +37,7 @@ import {
     printObjectArray,
     writeWorkbook
 } from "../../utils/ExcelUtils.js";
+import PropTypes from 'prop-types';
 
 const Exporter = (props) => {
 
@@ -142,7 +146,7 @@ const Exporter = (props) => {
         editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
         editingCell = buildCellObject(ws, "D14:D16");
         editingCell.merge();
-        editingCell.cell.value = 'HNQIS2';
+        editingCell.cell.value = props.hnqisType;
         editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
         fillBackgroundToRange(ws, "C12:C16", "cfe2f3");
 
@@ -796,7 +800,7 @@ const Exporter = (props) => {
             error: 'Please select the valid value from the dropdown',
             errorTitle: 'Invalid Selection',
             showErrorMessage: true,
-            formulae: structureValidator
+            formulae: props.hnqisType === "HNQISMWI" ? structureValidatorMWI : structureValidator
         });
         dataValidation(ws, "D3:D3000", {
             type: 'list',
@@ -1026,6 +1030,16 @@ const Exporter = (props) => {
                 },
                 {
                     type: 'expression',
+                    formulae: ['OR($B3 = "Standard",$B3 = "Std Overview")'],
+                    style: standardHighlighting
+                },
+                {
+                    type: 'expression',
+                    formulae: ['$B3 = "Criterion"'],
+                    style: criterionHighlighting
+                },
+                {
+                    type: 'expression',
                     formulae: ['$B3 = "question"'],
                     style: questionHighlighting
                 },
@@ -1096,5 +1110,22 @@ const Exporter = (props) => {
 
     return null;
 };
+
+Exporter.propTypes = {
+    Configures: PropTypes.array,
+    flag: PropTypes.bool,
+    healthAreaData: PropTypes.array,
+    hnqisType: PropTypes.string,
+    isLoading: PropTypes.func,
+    legendSetData: PropTypes.array,
+    optionData: PropTypes.array,
+    programData: PropTypes.array,
+    programHealthArea: PropTypes.string,
+    programName: PropTypes.string,  
+    programPrefix: PropTypes.string,
+    programShortName: PropTypes.string,
+    setFlag: PropTypes.func, 
+    useCompetencyClass: PropTypes.string
+}
 
 export default Exporter;

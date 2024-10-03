@@ -192,12 +192,14 @@ const DataProcessor = (props) => {
                     programPrefix={programPrefix}
                     useCompetencyClass={useCompetencyClass}
                     programHealthArea={programHealthArea}
+                    hnqisType={props.hnqisType}
                 />}
         </>
     );
 }
 
 DataProcessor.propTypes = {
+    hnqisType: PropTypes.string,
     isLoading: PropTypes.func,
     programName: PropTypes.string,
     programStageSections: PropTypes.array,

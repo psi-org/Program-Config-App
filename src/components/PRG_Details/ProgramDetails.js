@@ -15,7 +15,7 @@ import { bindActionCreators } from "redux";
 import { BUILD_VERSION, DATASTORE_H2_METADATA, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import actionCreators from "../../state/action-creators";
-import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, mapIdArray, padValue, setPCAMetadata, truncateString, versionGTE } from "../../utils/Utils.js";
+import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, mapIdArray, padValue, programIsHNQIS, setPCAMetadata, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessorTracker from "../Excel/DataProcessorTracker.js";
 import Importer from "../Excel/Importer.js";
 import ValidateTracker from "../PRG_Details/ValidateTracker.js";
@@ -237,10 +237,10 @@ const ProgramDetails = () => {
 
     if (loading) { return <span><CircularLoader /></span> }
 
-    const hnqisMode = !!data.results.attributeValues.find(av => av.value === "HNQIS2");
+    const hnqisType = data.results.attributeValues.find(av => programIsHNQIS(av.value))?.value || "";
     const readOnly = !!data.results.attributeValues.find(av => av.value === "HNQIS");
 
-    if (hnqisMode && !h2Ready) {
+    if (!!hnqisType && !h2Ready) {
         return (
             <div style={{ margin: '2em' }}>
                 <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
@@ -401,7 +401,7 @@ const ProgramDetails = () => {
         })
     }
 
-    if (hnqisMode && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+    if (!!hnqisType && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
         return (<>
             <NoticeBox title="Check HNQIS2 Metadata" error>
                 <p>The latest PCA Metadata Package is required to access this HNQIS2 Program.</p>
@@ -418,7 +418,7 @@ const ProgramDetails = () => {
                 </div>
                 <div className="c_srch"></div>
                 <div className="c_btns" style={{ display: 'flex', alignItems: 'center' }}>
-                    {!hnqisMode && !readOnly &&
+                    {!hnqisType && !readOnly &&
                         <>
                             <Button
                                 color='inherit'
@@ -443,7 +443,7 @@ const ProgramDetails = () => {
                                 setExportToExcel={setExportToExcel}
                             />
 
-                            {!hnqisMode && exportToExcel &&
+                            {!hnqisType && exportToExcel &&
                                 <DataProcessorTracker
                                     programId={program}
                                     isLoading={setExportToExcel}
@@ -475,7 +475,7 @@ const ProgramDetails = () => {
                 </div>
 
 
-                {!hnqisMode && !data.results.withoutRegistration &&
+                {!hnqisType && !data.results.withoutRegistration &&
                     <MuiButton
                         variant="contained"
                         color='primary'
@@ -487,7 +487,7 @@ const ProgramDetails = () => {
                 }
             </div>
             {
-                !hnqisMode && saveAndBuild &&
+                !hnqisType && saveAndBuild &&
 
                 <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
                     <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => { if ((saveAndBuild === 'Completed') || (createMetadata?.data?.status === 'ERROR')) { setSaveAndBuild(false); setProgressSteps(0); } }}>
@@ -586,7 +586,7 @@ const ProgramDetails = () => {
                                             stagesRefetch={refetch}
                                             setNewStage={setNewStage}
                                             editStatus={newStage?.stage === programStage.id ? (newStage?.mode || '') : ''}
-                                            hnqisMode={hnqisMode}
+                                            hnqisMode={!!hnqisType}
                                             eventMode={data.results.withoutRegistration}
                                         />
                                     )
@@ -617,7 +617,7 @@ const ProgramDetails = () => {
                         {formatAlert(notification?.message)}
                     </Alert>
                 </Snackbar>
-                {!hnqisMode && importerEnabled &&
+                {!hnqisType && importerEnabled &&
                     <Importer
                         displayForm={setImporterEnabled}
                         setImportResults={setImportResults}

@@ -212,7 +212,7 @@ const queryHNQIS2Metadata = {
 
 const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 
-const StageSections = ({ programStage, hnqisMode, readOnly }) => {
+const StageSections = ({ programStage, hnqisType, readOnly }) => {
 
     const queryDataStore = {
         results: {
@@ -261,7 +261,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     const { refetch: getProgramSettings } = useDataQuery(queryProgramSettings, { lazy: true, variables: { programId } });
 
     // Flags
-    const [saveStatus, setSaveStatus] = useState(hnqisMode ? 'Validate' : 'Save Changes');
+    const [saveStatus, setSaveStatus] = useState(hnqisType ? 'Validate' : 'Save Changes');
     const [saveAndBuild, setSaveAndBuild] = useState(false);
     const [savingMetadata, setSavingMetadata] = useState(false);
     const [savedAndValidated, setSavedAndValidated] = useState(false)
@@ -306,11 +306,11 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     const [removedElements, setRemovedElements] = useState([])
     const [originalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
     const [sections, setSections] = useState((isSectionMode)
-        ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
+        ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisType)]
         : [buildBasicFormStage(programStage.programStageDataElements)]
     );
-    const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
-    const [criticalSection, setCriticalSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations") });
+    const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => !!hnqisType && s.name === "Scores") });
+    const [criticalSection, setCriticalSection] = useState({ ...programStage.programStageSections.find(s => !!hnqisType && s.name === "Critical Steps Calculations") });
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
     const [programMetadata, setProgramMetadata] = useState();
     const [stagesList, setStagesList] = useState();
@@ -369,7 +369,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setProgramStageDataElements(programStageDataElements)
         setSections(sections)
         setDeToEdit('')
-        pushNotification(<span>Data Element edited! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>)
+        pushNotification(<span>Data Element edited! <strong>Remember to {hnqisType ? " Validate and Save!" : " save your changes!"}</strong></span>)
     }
 
     const removeDE = (id, section) => {
@@ -381,8 +381,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
             programStageDataElements.splice(psdeIdx, 1)
             setSections(sections)
             setProgramStageDataElements(programStageDataElements)
-            if (hnqisMode) { setSaveStatus('Validate & Save') }
-            pushNotification(<span>Data Element removed! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
+            if (hnqisType) { setSaveStatus('Validate & Save') }
+            pushNotification(<span>Data Element removed! <strong>Remember to {hnqisType ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
         }
     }
 
@@ -399,7 +399,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setSections(sections)
         setProgramStageDataElements(newProgramStageDataElements)
         setDeManager(false)
-        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>)
+        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to {hnqisType ? " Validate and Save!" : " save your changes!"}</strong></span>)
         setAddedSection({
             index: sectionIndex,
             mode: 'Updated',
@@ -436,8 +436,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setProgramStageDataElements(newPSDEs)
         sections.splice(idx, 1)
         setSections(sections)
-        if (hnqisMode) { setSaveStatus('Validate & Save') }
-        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
+        if (hnqisType) { setSaveStatus('Validate & Save') }
+        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to {hnqisType ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
     }
 
     const SectionActions = {
@@ -580,7 +580,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     result.source.index,
                     result.destination.index
                 );
-                setSaveStatus(hnqisMode ? 'Validate & Save' : 'Save Changes');
+                setSaveStatus(hnqisType ? 'Validate & Save' : 'Save Changes');
                 break;
             case 'DATA_ELEMENT':
                 if (result.source.droppableId == result.destination.droppableId) {
@@ -596,7 +596,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     const element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
                     newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
                 }
-                setSaveStatus(hnqisMode ? 'Validate & Save' : 'Save Changes');
+                setSaveStatus(hnqisType ? 'Validate & Save' : 'Save Changes');
                 break;
             default:
         }
@@ -1015,7 +1015,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setOpen(false);
     };
 
-    if (hnqisMode && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+    if (hnqisType && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
         return (<>
             <NoticeBox title="Check HNQIS2 Metadata" error>
                 <p>The latest PCA Metadata Package is required to access this HNQIS2 Program.</p>
@@ -1048,7 +1048,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                 onClick={() => commit()}
                             > {saveStatus}</Button>
                         }
-                        {hnqisMode && isSectionMode &&
+                        {hnqisType && isSectionMode &&
                             <>
                                 <ButtonGroup disableElevation color='primary' variant="contained" ref={anchorRef} aria-label="split button">
                                     <Button
@@ -1111,7 +1111,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                 </Popper>
                             </>
                         }
-                        {hnqisMode && isSectionMode &&
+                        {hnqisType && isSectionMode &&
                             <ImportDownloadButton
                                 disabled={exportToExcel}
                                 setImporterEnabled={setImporterEnabled}
@@ -1132,7 +1132,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     </ButtonStrip>
                 </div>
             </div>
-            {hnqisMode && importerEnabled &&
+            {hnqisType && importerEnabled &&
                 <Importer
                     displayForm={setImporterEnabled}
                     setImportResults={setImportResults}
@@ -1157,7 +1157,13 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
                 }
             </div>
-            {hnqisMode && exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} />}
+            {!!hnqisType && exportToExcel &&
+                <DataProcessor
+                    programName={programStage.program.name}
+                    ps={programStage}
+                    isLoading={setExportToExcel}
+                    hnqisType={hnqisType}
+                />}
             {
                 createMetadata.loading && <ComponentCover translucent></ComponentCover>
 
@@ -1206,7 +1212,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 
                 </CustomMUIDialog>
             }
-            {hnqisMode && saveAndBuild &&
+            {!!hnqisType && saveAndBuild &&
 
                 <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
                     <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => { if ((saveAndBuild === 'Completed') || (createMetadata?.data?.status === 'ERROR')) { setSaveAndBuild(false); setProgressSteps(0); } }}>
@@ -1383,7 +1389,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                                     index={idx}
                                                     key={pss.id || idx}
                                                     SectionActions={SectionActions}
-                                                    hnqisMode={hnqisMode}
+                                                    hnqisMode={!!hnqisType}
                                                     isSectionMode={isSectionMode}
                                                     readOnly={readOnly}
                                                     setSaveStatus={setSaveStatus}
@@ -1395,7 +1401,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                 )}
                             </Droppable>
                         }
-                        {hnqisMode && (isSectionMode) &&
+                        {hnqisType==="HNQIS2" && (isSectionMode) &&
                             <>
                                 <CriticalCalculations stageSection={criticalSection} ikey={criticalSection?.id || "crit"} />
                                 <Scores stageSection={scoresSection} key={scoresSection?.id || "scores"} program={programId} />
@@ -1418,7 +1424,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
             {
                 savingMetadata &&
                 <ValidateMetadata
-                    hnqisMode={hnqisMode}
+                    hnqisMode={!!hnqisType}
                     newDEQty={importResults ? importResults.questions.new + importResults.scores.new + importResults.sections.new : 0}
                     programStage={programStage}
                     importedSections={sections}
@@ -1446,7 +1452,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     refreshSections={setSections}
                     notify={pushNotification}
                     setAddedSection={setAddedSection}
-                    hnqisMode={hnqisMode}
+                    hnqisMode={!!hnqisType}
                     setSaveStatus={setSaveStatus}
                 />
             }
@@ -1457,7 +1463,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     setDeManager={setDeManager}
                     programStageDataElements={programStageDataElements}
                     saveAdd={saveAdd}
-                    hnqisMode={hnqisMode}
+                    hnqisMode={!!hnqisType}
                     setSaveStatus={setSaveStatus}
                     dePrefix={programMetadata.dePrefix || 'XXXXXXXXXXX'}
                 />
@@ -1467,7 +1473,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 }
 
 StageSections.propTypes = {
-    hnqisMode: PropTypes.bool,
+    hnqisType: PropTypes.string,
     programStage: PropTypes.object,
     readOnly: PropTypes.bool
 }

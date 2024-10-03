@@ -99,27 +99,7 @@ const PS_ActionPlanStage = {
     "name": "Action Plan",
     "openAfterEnrollment": false,
     "program": {"id": "programId"},
-    "programStageDataElements": [
-        {
-            "sortOrder": 1,
-            "compulsory": "true",
-            "programStage": {"id": "ajALrNAeyhF"},
-            "dataElement": {"id": "F0Qcr8ANr7t"}
-        },
-        {
-            "sortOrder": 2,
-            "compulsory": "true",
-            "programStage": {"id": "ajALrNAeyhF"},
-            "dataElement": {"id": "nswci5V4j0d"}
-        },
-        {
-            "sortOrder": 3,
-            "compulsory": "true",
-            "allowFutureDate": "true",
-            "programStage": {"id": "ajALrNAeyhF"},
-            "dataElement": {"id": "DIoqtxbSJIL"}
-        }
-    ],
+    "programStageDataElements": [],
     "programStageSections": [],
     "remindCompleted": false,
     "repeatable": true,
@@ -127,6 +107,56 @@ const PS_ActionPlanStage = {
     "style": {"color": "#00b0ff"},
     "userGroupAccesses": []
 }
+
+const PSDE_HNQIS_ActionPlan = [
+    {
+        "sortOrder": 1,
+        "compulsory": "true",
+        "programStage": { "id": "apProgramStageId" },
+        "dataElement": { "id": "F0Qcr8ANr7t" }
+    },
+    {
+        "sortOrder": 2,
+        "compulsory": "true",
+        "programStage": { "id": "apProgramStageId" },
+        "dataElement": { "id": "nswci5V4j0d" }
+    },
+    {
+        "sortOrder": 3,
+        "compulsory": "true",
+        "allowFutureDate": "true",
+        "programStage": { "id": "apProgramStageId" },
+        "dataElement": { "id": "DIoqtxbSJIL" }
+    }
+];
+
+const PSDE_HNQISMWI_ActionPlan = [
+    {
+        "sortOrder": 2,
+        "compulsory": "true",
+        "programStage": { "id": "apProgramStageId" },
+        "dataElement": { "id": "OTJPb8MCSaS" }
+    },
+    {
+        "sortOrder": 3,
+        "compulsory": "true",
+        "programStage": { "id": "apProgramStageId" },
+        "dataElement": { "id": "PGtk17z7FFq" }
+    },
+    {
+        "sortOrder": 4,
+        "compulsory": "true",
+        "programStage": { "id": "apProgramStageId" },
+        "dataElement": { "id": "eiUtIypcrX0" }
+    },
+    {
+        "sortOrder": 5,
+        "compulsory": "true",
+        "allowFutureDate": "true",
+        "programStage": { "id": "apProgramStageId" },
+        "dataElement": { "id": "X6TmRobUdbV" }
+    }
+];
 
 const PSS_Default = {
     "sortOrder": 10,
@@ -170,15 +200,31 @@ const PS_Generic = {
     "programStageSections": []
 }
 
+const OS_HNQISMWI_Criterion = {
+    "name": "optionSet Name",
+    "id": "optionSetId",
+    "valueType": "TEXT",
+    "favorite": false,
+    "favorites": [],
+    "userGroupAccesses": [],
+    "attributeValues": [],
+    "translations": [],
+    "userAccesses": [],
+    "options": []
+}
+
 module.exports = {
     COMPETENCY_TEA,
-    Program,
     EventStage,
     HnqisProgramConfigs,
-    PS_Generic,
-    PS_AssessmentStage,
+    OS_HNQISMWI_Criterion,
+    Program,
     PS_ActionPlanStage,
-    PSS_Default,
+    PS_AssessmentStage,
+    PS_Generic,
+    PSDE_HNQIS_ActionPlan,
+    PSDE_HNQISMWI_ActionPlan,
     PSS_CriticalSteps,
-    PSS_Scores
+    PSS_Default,
+    PSS_Scores,
 };

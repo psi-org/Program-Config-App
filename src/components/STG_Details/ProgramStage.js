@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import actionCreators from "../../state/action-creators";
-import { DeepCopy } from "../../utils/Utils.js"
+import { DeepCopy, programIsHNQIS } from "../../utils/Utils.js"
 import StageSections from "./StageSections.js";
 
 const query = {
@@ -58,10 +58,10 @@ const ProgramStage = () => {
     }
 
     if (data) {
-        const hnqisMode = !!data.results.program.attributeValues.find(av => av.value === "HNQIS2")
+        const hnqisType = data.results.program.attributeValues.find(av => programIsHNQIS(av.value))?.value || "";
         const readOnly = !!data.results.program.attributeValues.find(av => av.value === "HNQIS")
 
-        if (hnqisMode && !h2Ready) {
+        if (!!hnqisType && !h2Ready) {
             return (
                 <div style={{ margin: '2em' }}>
                     <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
@@ -73,7 +73,7 @@ const ProgramStage = () => {
 
         const programStageData = DeepCopy({ ...data.results })
 
-        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisMode={hnqisMode} readOnly={readOnly || (hnqisMode && programStageData.name.includes('Action Plan'))} />
+        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisType={hnqisType} readOnly={readOnly || (!!hnqisType && programStageData.name.includes('Action Plan'))} />
     }
 
     return <span><CircularLoader /></span>
