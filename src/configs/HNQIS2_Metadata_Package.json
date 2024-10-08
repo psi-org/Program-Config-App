@@ -334,6 +334,46 @@
                 "id": "Ri5XuSekdRg"
             },
             "translations": []
+        },
+        {
+            "code": "100",
+            "name": "Compliant",
+            "id": "taUjIWC98Y2",
+            "sortOrder": 4,
+            "optionSet": {
+                "id": "eKFCHvlnXxm"
+            },
+            "translations": []
+        },
+        {
+            "code": "45",
+            "name": "Partially Compliant",
+            "id": "jPv8u9xUbs3",
+            "sortOrder": 3,
+            "optionSet": {
+                "id": "eKFCHvlnXxm"
+            },
+            "translations": []
+        },
+        {
+            "code": "0",
+            "name": "Not Applicable",
+            "id": "OlAkP1EGLTV",
+            "sortOrder": 1,
+            "optionSet": {
+                "id": "eKFCHvlnXxm"
+            },
+            "translations": []
+        },
+        {
+            "code": "5",
+            "name": "Not Compliant",
+            "id": "Nfxy7d5ajSJ",
+            "sortOrder": 2,
+            "optionSet": {
+                "id": "eKFCHvlnXxm"
+            },
+            "translations": []
         }
     ],
     "optionSets": [
@@ -432,19 +472,27 @@
             "name": "HNQIS MWI - YesNoNA",
             "translations": [],
             "options": [
-                {
-                    "id": "IVVfVluYFli"
-                },
-                {
-                    "id": "gkLeI6VFJZe"
-                },
-                {
-                    "id": "U2dkoDmopiv"
-                }
+                {"id": "IVVfVluYFli"},
+                {"id": "gkLeI6VFJZe"},
+                {"id": "U2dkoDmopiv"}
             ],
             "valueType": "NUMBER",
             "id": "Ri5XuSekdRg",
             "attributeValues": []
+        },
+        {
+            "name": "HNQIS MWI - Compliance Types",
+            "id": "eKFCHvlnXxm",
+            "version": 5,
+            "valueType": "TEXT",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "OlAkP1EGLTV"},
+                {"id": "Nfxy7d5ajSJ"},
+                {"id": "jPv8u9xUbs3"},
+                {"id": "taUjIWC98Y2"}
+            ]
         }
     ],
     "dataElements": [
@@ -1095,6 +1143,50 @@
                     "displayName": "NA",
                     "favorite": false,
                     "id": "Rq7zX9e7ARC",
+                    "attributeValues": []
+                }
+            ],
+            "attributeValues": []
+        },
+        {
+            "id": "OvTfZMpgeAm",
+            "name": "HNQIS - MWI - YesNoNA",
+            "translations": [],
+            "sharing": {
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "legends": [
+                {
+                    "name": "Yes",
+                    "startValue": 1,
+                    "endValue": 2,
+                    "color": "#3BFF00",
+                    "displayName": "Yes",
+                    "favorite": false,
+                    "id": "cqNCw4ge43U",
+                    "attributeValues": []
+                },
+                {
+                    "name": "NA",
+                    "startValue": 0,
+                    "endValue": 1,
+                    "color": "#FFA500",
+                    "displayName": "NA",
+                    "favorite": false,
+                    "id": "EESOVObKd3G",
+                    "attributeValues": []
+                },
+                {
+                    "name": "No",
+                    "startValue": -1,
+                    "endValue": 0,
+                    "color": "#FF2100",
+                    "displayName": "No",
+                    "favorite": false,
+                    "id": "BjIcShWdpcD",
                     "attributeValues": []
                 }
             ],

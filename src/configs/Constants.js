@@ -82,12 +82,14 @@ const ASSESSMENT_TET = "oNwpeWkfoWc";
 const OPTION_SET_COMPETENCY = "NDfZ129owtz";
 const OPTION_SET_HEALTH_AREAS = "y752HEwvCGi";
 const OPTION_SET_YESNONA = "Ri5XuSekdRg";
+const OPTION_SET_COMPLIANCE_TYPES = "eKFCHvlnXxm";
 
 //* H2 Legend Sets
 const LEGEND_YES_NO = "RXxPYFwtgf4";
 const LEGEND_YES_PARTIAL_NO = "kqQjtHIc7II";
 const VISUALIZATIONS_LEGEND = "nvVrBnbud3L";
 const LEGEND_COMPLIANT = "F9G1wtBjiOY";
+const LEGEND_YES_NO_NA = "OvTfZMpgeAm";
 
 //* H1 Control Data Elements
 const H1_OVERALL_SCORE = "Y8Nmpp7RhXw";
@@ -125,7 +127,12 @@ const H2_REQUIRED = {
         ACTION_PLAN_DUE_DATE,
         ACTION_PLAN_RESPONSIBLE,
     ],
-    optionSets: [OPTION_SET_COMPETENCY, OPTION_SET_HEALTH_AREAS, OPTION_SET_YESNONA],
+    optionSets: [
+        OPTION_SET_COMPETENCY,
+        OPTION_SET_HEALTH_AREAS,
+        OPTION_SET_YESNONA,
+        OPTION_SET_COMPLIANCE_TYPES
+    ],
     options: [
         "BNjofUBvlJ8",
         "Ox6VQNmvuS3",
@@ -151,7 +158,11 @@ const H2_REQUIRED = {
         "jHAilN60gsN",
         "IVVfVluYFli",
         "gkLeI6VFJZe",
-        "U2dkoDmopiv"
+        "U2dkoDmopiv",
+        "taUjIWC98Y2",
+        "jPv8u9xUbs3",
+        "OlAkP1EGLTV",
+        "Nfxy7d5ajSJ"
     ],
     trackedEntityTypes: [ASSESSMENT_TET],
     trackedEntityAttributes: [
@@ -161,7 +172,7 @@ const H2_REQUIRED = {
         COMPETENCY_ATTRIBUTE,
     ],
     attributes: [FEEDBACK_ORDER, FEEDBACK_TEXT],
-    legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND, LEGEND_COMPLIANT],
+    legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND, LEGEND_COMPLIANT, LEGEND_YES_NO_NA],
 };
 
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false, localeMatcher: 'best fit', };
