@@ -1137,7 +1137,7 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
                     displayForm={setImporterEnabled}
                     setImportResults={setImportResults}
                     setValidationResults={setValidationResults}
-                    programSpecificType={TEMPLATE_PROGRAM_TYPES.hnqis2}
+                    programSpecificType={hnqisType}
                     previous={{ sections: [...backupData.sections], setSections, scoresSection: DeepCopy(backupData.scoresSection), setScoresSection }}
                     setSaveStatus={setSaveStatus}
                     programMetadata={{ programMetadata, setProgramMetadata }}

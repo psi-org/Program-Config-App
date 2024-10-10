@@ -6,16 +6,52 @@ import DialogContent from '@mui/material/DialogContent';
 import ExcelJS from "exceljs/dist/es5/exceljs.browser";
 import PropTypes from 'prop-types';
 import React, { useState } from "react";
-import { HNQIS2_ORIGIN_SERVER_CELL, HNQIS2_TEMPLATE_HEADERS, HNQIS2_TEMPLATE_VERSION_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_ORIGIN_SERVER_CELL, TRACKER_TEA_HEADERS, TRACKER_TEA_MAP, TRACKER_TEMPLATE_HEADERS, TRACKER_TEMPLATE_VERSION_CELL } from "../../configs/TemplateConstants.js";
+import { HNQIS2_ORIGIN_SERVER_CELL, HNQIS2_TEMPLATE_HEADERS, HNQIS2_TEMPLATE_VERSION_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_ORIGIN_SERVER_CELL, TRACKER_TEA_HEADERS, TRACKER_TEMPLATE_HEADERS, TRACKER_TEMPLATE_VERSION_CELL } from "../../configs/TemplateConstants.js";
 import { getHNQIS2MappingList, getTrackerMappingList } from "../../utils/ExcelUtils.js";
-import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, getProgramDetailsTracker, buildHNQIS2Summary, buildTrackerSummary, isTracker, countChanges, getBasicForm } from "../../utils/importerUtils.js";
-import { setUpProgramStageSections } from "../../utils/Utils.js";
-import { readTemplateData } from '../STG_Details/importReader.js';
+import { getProgramDetailsHNQIS2, fileValidation, serverAndVersionValidation, workbookValidation, handleWorksheetReading, getProgramDetailsTracker, isTrackerType} from "../../utils/importerUtils.js";
 import FileSelector from "../UIElements/FileSelector.js";
 import ImportStatusBox from "../UIElements/ImportStatusBox.js";
 import ImportSummary from "../UIElements/ImportSummary.js";
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
+import { importReadingHNQIS, importReadingHNQISMWI, importReadingTracker } from "./ImportReading.js";
+
+const getSettings = (programType) => {
+    if (isTrackerType(programType)) {
+        return {
+            isTracker: true,
+            mappingDetails: getTrackerMappingList,
+            programDetails: getProgramDetailsTracker,
+            templateVersionCell: TRACKER_TEMPLATE_VERSION_CELL,
+            originServerCell: TRACKER_ORIGIN_SERVER_CELL,
+            templateHeadersList: TRACKER_TEMPLATE_HEADERS,
+            structureColumn: 1,
+            importReading: importReadingTracker
+        }
+    } else if (programType === TEMPLATE_PROGRAM_TYPES.hnqis2) {
+        return {
+            isTracker: false,
+            mappingDetails: getHNQIS2MappingList,
+            programDetails: getProgramDetailsHNQIS2,
+            templateVersionCell: HNQIS2_TEMPLATE_VERSION_CELL,
+            originServerCell: HNQIS2_ORIGIN_SERVER_CELL,
+            templateHeadersList: HNQIS2_TEMPLATE_HEADERS,
+            structureColumn: 2,
+            importReading: importReadingHNQIS
+        }
+    } else if (programType === TEMPLATE_PROGRAM_TYPES.hnqismwi) {
+        return {
+            isTracker: false,
+            mappingDetails: getHNQIS2MappingList,
+            programDetails: getProgramDetailsHNQIS2,
+            templateVersionCell: HNQIS2_TEMPLATE_VERSION_CELL,
+            originServerCell: HNQIS2_ORIGIN_SERVER_CELL,
+            templateHeadersList: HNQIS2_TEMPLATE_HEADERS,
+            structureColumn: 2,
+            importReading: importReadingHNQISMWI
+        }
+    }
+}
 
 //* Tracker Only: currentStagesData
 //* HNQIS Only: setSaveStatus, programMetadata, currentSectionsData, setSavedAndValidated
@@ -69,15 +105,23 @@ const Importer = (
         return result;
     }
 
-    const startImportProcess = (isTracker) => {
+    const startImportProcess = (programType) => {
         setExecutedTasks([]);
         setButtonDisabled(true);
         setImportResults(undefined);
         setValidationResults(undefined);
         setNotificationError(false);
+
+        console.log(programType);
+        const settings = getSettings(programType);
+        
         let indexModifier = 0;
         if (typeof selectedFile !== 'undefined') {
-            if (!tasksHandler({ step: 1, message: 'Validating Template format (XLSX)', initialStatus: false }, fileValidation, { setNotificationError, selectedFile })) { return }
+            if (!tasksHandler(
+                { step: 1, message: 'Validating Template format (XLSX)', initialStatus: false },
+                fileValidation,
+                { setNotificationError, selectedFile }
+            )) { return };
 
             const workbook = new ExcelJS.Workbook();
             const reader = new FileReader();
@@ -90,7 +134,12 @@ const Importer = (
                 const worksheets = tasksHandler(
                     { step: 2, message: 'Validating worksheets in the workbook', initialStatus: true },
                     workbookValidation,
-                    { setNotificationError, workbook: loadedWorkbook, isTracker, programSpecificType }
+                    {
+                        setNotificationError,
+                        workbook: loadedWorkbook,
+                        isTracker: settings.isTracker,
+                        programSpecificType
+                    }
                 );
 
                 if (!worksheets?.status) { return }
@@ -99,10 +148,8 @@ const Importer = (
                 const instructionsWS = worksheets.instructionsWS;
                 const mappingWS = worksheets.mappingWS;
                 const teasWS = worksheets.teasWS;
-                const mappingDetails = isTracker
-                    ? getTrackerMappingList(mappingWS)
-                    : getHNQIS2MappingList(mappingWS);
-                const programDetails = !isTracker ? getProgramDetailsHNQIS2(instructionsWS, mappingDetails) : getProgramDetailsTracker(instructionsWS);
+                const mappingDetails = settings.mappingDetails(mappingWS);
+                const programDetails = settings.programDetails(instructionsWS, mappingDetails);
 
                 if (!tasksHandler(
                     { step: 3, message: 'Validating Template version and origin server', initialStatus: false },
@@ -110,9 +157,9 @@ const Importer = (
                     {
                         setNotificationError,
                         instructionsWS,
-                        isTracker,
-                        templateVersionCell: isTracker ? TRACKER_TEMPLATE_VERSION_CELL : HNQIS2_TEMPLATE_VERSION_CELL,
-                        originServerCell: isTracker ? TRACKER_ORIGIN_SERVER_CELL : HNQIS2_ORIGIN_SERVER_CELL
+                        isTracker: settings.isTracker,
+                        templateVersionCell: settings.templateVersionCell,
+                        originServerCell: settings.originServerCell
                     }
                 )) { return }
 
@@ -147,9 +194,9 @@ const Importer = (
                         currentWorksheet: currentTemplate,
                         setNotificationError,
                         headers,
-                        templateHeadersList: (isTracker ? TRACKER_TEMPLATE_HEADERS : HNQIS2_TEMPLATE_HEADERS),
+                        templateHeadersList: settings.templateHeadersList,
                         startingIndex: (4 + (2 * index) + indexModifier),
-                        structureColumn: (isTracker ? 1 : 2),
+                        structureColumn: settings.structureColumn,
                         isTrackerTemplate: true
                     });
                 
@@ -164,185 +211,33 @@ const Importer = (
 
                 if (stopFlag) { return }
 
-                const importSummaryValues =
-                    isTracker
-                        ? importReadingTracker({ teaData, templateData }, { programDetails, mappingDetails }, programSpecificType)
-                        : importReadingHNQIS(templateData, programDetails, mappingDetails);
+                const importSummaryValues = settings.importReading(
+                    { teaData, templateData },
+                    { programDetails, mappingDetails },
+                    { programSpecificType, programMetadata, currentSectionsData, previous, currentStagesData }
+                );
 
                 if (importSummaryValues.error) {
                     addExecutedTask({ step: 10000, name: importSummaryValues.error, status: 'error' });
                     setNotificationError(true);
-                } else {
-                    setImportSummary(importSummaryValues);
-                    setImportResults(importSummaryValues);
-                    setSaveStatus('Validate & Save');
-                    setSavedAndValidated(false);
+                    return;
                 }
+
+                setImportSummary(importSummaryValues);
+                setImportResults(importSummaryValues);
+                setSaveStatus('Validate & Save');
+                setSavedAndValidated(false);
             }
         }
         setButtonDisabled(false);
     }
 
-    const importReadingHNQIS = (templateData, programDetails, mappingDetails) => {
-        const importSummaryValues = buildHNQIS2Summary();
-        const { importedSections, importedScores } = readTemplateData({
-            templateData: templateData[0].data,
-            currentData: previous,
-            programPrefix: programDetails.dePrefix || programDetails.id,
-            optionSets: mappingDetails.optionSets,
-            legendSets: mappingDetails.legendSets,
-            currentSectionsData,
-            mode: TEMPLATE_PROGRAM_TYPES.hnqis2,
-            importSummaryValues
-        });
-
-        importSummaryValues.program = programDetails;
-        importSummaryValues.mapping = mappingDetails;
-
-        const newScoresSection = previous.scoresSection;
-        newScoresSection.dataElements = importedScores;
-        delete newScoresSection.errors;
-
-        previous.setSections(importedSections);
-        previous.setScoresSection(newScoresSection);
-
-        const programMetadata_new = programMetadata.programMetadata;
-        programMetadata_new.dePrefix = programDetails.dePrefix;
-        programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
-        programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
-        programMetadata.setProgramMetadata(programMetadata_new);
-
-        return importSummaryValues;
-    }
-
-    const importReadingTracker = ({ teaData, templateData }, { programDetails, mappingDetails }, programSpecificType) => {
-        const importSummaryValues = buildTrackerSummary(programSpecificType, currentStagesData.length);
-        const importedStages = [];
-        let importError = undefined;
-        const skippedSections = [];
-
-        currentStagesData.forEach((currentStage, index) => {
-            const stageIndex = templateData.findIndex(elem => elem.stageId === currentStage.id);
-            if (stageIndex === -1) {
-                importError = `The import process has failed. Some Stages are missing in the imported file (${currentStage.name}), please download a new Template and try again.`;
-            } else {
-                importSummaryValues.stages[index].stageName = currentStage.name;
-                importSummaryValues.stages[index].id = currentStage.id;
-                const { importedSections, ignoredSections } = readTemplateData({
-                    currentData: { sections: setUpProgramStageSections(previous.stages.find(stage => stage.id === currentStage.id)), stageNumber: index + 1 },
-                    templateData: templateData[stageIndex].data,
-                    programPrefix: (programDetails.dePrefix) || programDetails.id,
-                    optionSets: mappingDetails.optionSets,
-                    legendSets: mappingDetails.legendSets,
-                    currentSectionsData: setUpProgramStageSections(currentStage.programStageSections),
-                    mode: programSpecificType,
-                    importSummaryValues: importSummaryValues.stages[index]
-                });
-
-                if (ignoredSections.length > 0) { skippedSections.push({ stage: currentStage.name, ignoredSections }) }
-
-                importedStages.push({
-                    id: currentStage.id,
-                    name: currentStage.name,
-                    stageNumber: index + 1,
-                    importedSections
-                });
-            }
-        })
-
-        if (importError) { return { error: importError } }
-
-        const importedProgramSections = [];
-        const ignoredProgramSections = [];
-        if (teaData) {
-            let programSectionIndex = -1;
-            let isBasicForm = false;
-            teaData.forEach((row, rowNum) => {
-                switch (row[TRACKER_TEA_MAP.structure]) {
-                    case 'Section':
-                        if (row[TRACKER_TEA_MAP.programSection] === 'basic-form' && programSectionIndex === -1) { isBasicForm = true }
-                        if ((isBasicForm && importedProgramSections.length > 0)) {
-                            ignoredProgramSections.push({ name: row[TRACKER_TEA_MAP.name], rowNum: rowNum + 3 });
-                            break;
-                        }
-                        programSectionIndex += 1;
-                        importedProgramSections[programSectionIndex] = {
-                            id: row[TRACKER_TEA_MAP.programSection] || undefined,
-                            name: row[TRACKER_TEA_MAP.name],
-                            sortOrder: programSectionIndex,
-                            trackedEntityAttributes: [],
-                            importStatus: row[TRACKER_TEA_MAP.programSection] ? 'update' : 'new',
-                            isBasicForm
-                        }
-                        row[TRACKER_TEA_MAP.programSection] ? importSummaryValues.teaSummary.programSections.updated++ : importSummaryValues.teaSummary.programSections.new++;
-                        break;
-                    case 'TEA':
-                        if (programSectionIndex === -1) {
-                            programSectionIndex += 1;
-                            isBasicForm = true;
-                            importedProgramSections[programSectionIndex] = getBasicForm('TEA');
-                        }
-                        importedProgramSections[programSectionIndex].trackedEntityAttributes.push({
-                            trackedEntityAttribute: { id: row[TRACKER_TEA_MAP.uid]?.result, name: row[TRACKER_TEA_MAP.name] },
-                            valueType: row[TRACKER_TEA_MAP.valueType]?.result,
-                            allowFutureDate: row[TRACKER_TEA_MAP.allowFutureDate] === 'Yes',
-                            displayInList: row[TRACKER_TEA_MAP.displayInList] === 'Yes',
-                            mandatory: row[TRACKER_TEA_MAP.mandatory] === 'Yes',
-                            searchable: row[TRACKER_TEA_MAP.searchable] === 'Yes',
-                            programTrackedEntityAttribute: row[TRACKER_TEA_MAP.programTea]
-                        });
-                        break;
-                }
-            });
-
-            if (ignoredProgramSections.length > 0) { skippedSections.push({ stage: 'Tracked Entity Attributes', ignoredSections: ignoredProgramSections }) }
-
-            const currentTEAData = {
-                sections: []
-            };
-            if (previous.programSections.length === 0) {
-                currentTEAData.sections.push({
-                    id: 'basic-form',
-                    trackedEntityAttributes: previous.teas
-                })
-            } else {
-                previous.programSections.forEach(ps => {
-                    const previousPS = {
-                        id: ps.id,
-                        trackedEntityAttributes: previous.teas.filter(tea =>
-                            ps.trackedEntityAttributes.find(psTEA =>
-                                psTEA.id === tea.trackedEntityAttribute.id
-                            )
-                        )
-                    };
-
-                    currentTEAData.sections.push(previousPS)
-                })
-            }
-
-            countChanges({
-                sections: importedProgramSections,
-                sectionsSummary: importSummaryValues.teaSummary.programSections,
-                countObject: 'trackedEntityAttributes',
-                summaryObject: importSummaryValues.teaSummary.teas,
-                currentData: currentTEAData.sections,
-                impObjId: 'programTrackedEntityAttribute',
-            })
-        }
-
-        importSummaryValues.program = programDetails;
-        importSummaryValues.mapping = mappingDetails;
-        importSummaryValues.configurations = { teas: importedProgramSections, importedStages, skippedSections };
-
-        return importSummaryValues;
-    }
-
-    return (<CustomMUIDialog open={true} maxWidth={isTracker(programSpecificType) ? 'lg' : 'sm'} fullWidth={true} >
+    return (<CustomMUIDialog open={true} maxWidth={isTrackerType(programSpecificType) ? 'lg' : 'sm'} fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
             Template Importer
         </CustomMUIDialogTitle >
-        <DialogContent dividers style={{ display: 'flex', flexDirection: isTracker(programSpecificType) ? 'row' : 'column', justifyContent: 'space-between', padding: '1em 2em' }}>
-            <div style={{ width: isTracker(programSpecificType) ? '49%' : '100%', maxHeight: '30rem', overflow: 'scroll', overflowX: 'hidden' }}>
+        <DialogContent dividers style={{ display: 'flex', flexDirection: isTrackerType(programSpecificType) ? 'row' : 'column', justifyContent: 'space-between', padding: '1em 2em' }}>
+            <div style={{ width: isTrackerType(programSpecificType) ? '49%' : '100%', maxHeight: '30rem', overflow: 'scroll', overflowX: 'hidden' }}>
                 {(currentTask || executedTasks.length > 0) &&
                     <div style={{ width: '100%', marginBottom: '1em' }}>
                         <ImportStatusBox
@@ -368,12 +263,19 @@ const Importer = (
                     ]} />
                 }
 
+                {importSummary && programSpecificType === TEMPLATE_PROGRAM_TYPES.hnqismwi &&
+                    <ImportSummary title='Import Summary' importCategories={[
+                        { name: 'Sections', content: importSummary.sections },
+                        { name: 'Data Elements', content: importSummary.questions }
+                    ]} />
+                }
+
                 {!importSummary &&
                     <FileSelector fileName={fileName} setFile={setFile} acceptedFiles={".xlsx"} />
                 }
             </div>
 
-            {importSummary && isTracker(programSpecificType) &&
+            {importSummary && isTrackerType(programSpecificType) &&
                 <div style={{ width: '49%', maxHeight: '30rem', overflow: 'scroll', overflowX: 'hidden' }}>
                     {importSummary.teaSummary && <ImportSummary title={`Import Summary - Tracked Entity Attributes`} importCategories={[
                         { name: 'Sections', content: importSummary.teaSummary.programSections },
@@ -392,7 +294,7 @@ const Importer = (
 
         <DialogActions style={{ padding: '1em' }}>
             <Button color={!importSummary ? 'error' : 'primary'} variant={!importSummary ? 'text' : 'outlined'} disabled={buttonDisabled} onClick={() => hideForm()}>Close</Button>
-            {!importSummary && <Button variant='outlined' startIcon={<UploadFileIcon />} disabled={buttonDisabled} onClick={() => startImportProcess(isTracker(programSpecificType))}> Import </Button>}
+            {!importSummary && <Button variant='outlined' startIcon={<UploadFileIcon />} disabled={buttonDisabled} onClick={() => startImportProcess(programSpecificType)}> Import </Button>}
         </DialogActions>
 
     </CustomMUIDialog>)

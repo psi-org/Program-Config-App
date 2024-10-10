@@ -12,7 +12,7 @@ const optionSetQuery = {
         params: {
             paging: false,
             fields: ['id', 'name', 'valueType'],
-            filter: ['name:ilike:HNQIS - ']
+            filter: ['name:ilike:HNQIS']
         }
     }
 };

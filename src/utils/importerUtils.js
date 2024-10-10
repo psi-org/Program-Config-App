@@ -1,9 +1,9 @@
 import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA } from "../configs/Constants.js";
 import { ReleaseNotes, ReleaseNotesTracker } from "../configs/ReleaseNotes.js";
 import { HNQIS2_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../configs/TemplateConstants.js";
-import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty } from "./Utils.js";
+import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty, programIsHNQIS } from "./Utils.js";
 
-export const isTracker = (importType) => [TEMPLATE_PROGRAM_TYPES.tracker, TEMPLATE_PROGRAM_TYPES.event].includes(importType);
+export const isTrackerType = (importType) => [TEMPLATE_PROGRAM_TYPES.tracker, TEMPLATE_PROGRAM_TYPES.event].includes(importType);
 
 export const getProgramDetailsHNQIS2 = (ws, mappingDetails) => {
     const program = {};
@@ -101,14 +101,15 @@ export const workbookValidation = (status, task, { setNotificationError, workboo
         }
     });
 
-    const templateIsHNQIS = instructionsWS.getCell(HQNIS2_PROGRAM_TYPE_CELL).value === TEMPLATE_PROGRAM_TYPES.hnqis2;
+    const hnqisProgramTypeCell = instructionsWS.getCell(HQNIS2_PROGRAM_TYPE_CELL).value;
+    const templateIsHNQIS = programIsHNQIS(hnqisProgramTypeCell);
     const templateTracker = getKeyByValue(TEMPLATE_PROGRAM_TYPES, instructionsWS.getCell(TRACKER_PROGRAM_TYPE_CELL).value);
     const templateType = (templateIsHNQIS || !templateTracker)
-        ? TEMPLATE_PROGRAM_TYPES.hnqis2
+        ? hnqisProgramTypeCell
         : instructionsWS.getCell(TRACKER_PROGRAM_TYPE_CELL).value;
-
+    
     if (
-        (templateIsHNQIS && programSpecificType !== TEMPLATE_PROGRAM_TYPES.hnqis2) ||
+        (templateIsHNQIS && programSpecificType !== hnqisProgramTypeCell) ||
         (!templateIsHNQIS && programSpecificType !== TEMPLATE_PROGRAM_TYPES[templateTracker])
     ) {
         task.status = "error";
@@ -199,6 +200,13 @@ export const buildHNQIS2Summary = () => ({
     questions: buildSummaryObject(),
     sections: buildSummaryObject(),
     scores: buildSummaryObject()
+})
+
+export const buildHNQISMWISummary = () => ({
+    sections: buildSummaryObject(),
+    standards: buildSummaryObject(),
+    criterions: buildSummaryObject(),
+    dataElements: buildSummaryObject(),
 })
 
 export const buildTrackerSummary = (mode, stages) => { 

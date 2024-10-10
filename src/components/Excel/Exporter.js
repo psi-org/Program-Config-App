@@ -1,4 +1,5 @@
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
+import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import { ReleaseNotes } from "../../configs/ReleaseNotes.js";
 import {
@@ -19,7 +20,9 @@ import {
     getPromptsFormula,
     structureValidatorMWI,
     standardHighlighting,
-    criterionHighlighting
+    criterionHighlighting,
+    HNQIS2_HEADER_INSTRUCTIONS,
+    HNQISMWI_HEADER_INSTRUCTIONS
 } from "../../configs/TemplateConstants.js";
 import {
     addCreator,
@@ -37,7 +40,6 @@ import {
     printObjectArray,
     writeWorkbook
 } from "../../utils/ExcelUtils.js";
-import PropTypes from 'prop-types';
 
 const Exporter = (props) => {
 
@@ -662,11 +664,11 @@ const Exporter = (props) => {
         }, {
             header: "Critical Step",
             key: "isCritical",
-            width: 15
+            width: 16
         }, {
             header: "Compulsory",
             key: "isCompulsory",
-            width: 15
+            width: 16
         }, {
             header: "Value Type",
             key: "value_type",
@@ -732,27 +734,9 @@ const Exporter = (props) => {
         fillBackgroundToRange(ws, "L1:M1", "c9daf8");
         ws.getRow(1).height = 35;
         ws.getRow(1).alignment = middleCenter;
-        ws.getRow(2).values = {
-            parent_name: `Indentifier to use as reference in the "Parent Question" column`,
-            structure: `Defines what is being configured in the row`,
-            form_name: `Text that will be displayed in the form during Data Entry`,
-            isCritical: "A critical step will count for the Critical Score\n[Default is 'No']",
-            isCompulsory: "A ompulsory Question must be answered to complete an assessment\n[Default is 'No']",
-            value_type: `Determines the type of input if there's no Option Set selected`,
-            optionSet: `Select the Option Set that provides the available answers for this Question (forces Value Type)`,
-            legend: "Select the Legend that will be applied to the Question",
-            score_numerator: "Numerator for scores calculation",
-            score_denominator: "Denominator for scores calculation",
-            compositive_indicator: "This number will generate the feedback tree in the app, accepted values are:1, 1.1, 1.1.1, 1.1.2, 1.1..., 1.2, etc.",
-            parent_question: "Select the Parent Name of the Question that will act as parent",
-            answer_value: `Specify the value that will trigger the "show" rule of the Question`,
-            feedback_text: `Text that will be displayed in the Feedback app for each Question`,
-            description: `Enter the help text that will be displayed to the supervisor during data entry`,
-            program_stage_id: "",
-            program_section_id: "",
-            data_element_id: "",
-            prompts: "Details regarding the cell highlighting on each row."
-        };
+        ws.getRow(2).values = props.hnqisType === "HNQISMWI"
+            ? HNQISMWI_HEADER_INSTRUCTIONS
+            : HNQIS2_HEADER_INSTRUCTIONS;
 
         ws.getCell("A2").note = {
             texts: [{ text: "If the Parent Name is not automatically generated for questions, then drag the formula from another cell in the same column." }],

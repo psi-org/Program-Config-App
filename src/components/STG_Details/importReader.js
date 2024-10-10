@@ -1,4 +1,4 @@
-const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP } = require("../../configs/TemplateConstants.js");
+const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, HNQIS2MWI_TEMPLATE_MAP } = require("../../configs/TemplateConstants.js");
 const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm } = require("../../utils/importerUtils.js");
 
 const readTemplateData = (
@@ -121,6 +121,82 @@ const readTemplateData = (
 
 };
 
+const readTemplateDataMWI = (
+    {
+        templateData,
+        currentData,
+        programPrefix = 'Prefix',
+        optionSets,
+        legendSets,
+        currentSectionsData,
+        importSummaryValues
+    }
+) => {
+
+    let sectionIndex = -1;
+    let isBasicForm = false;
+    const ignoredSections = [];
+    const importedSections = [];
+    const dataElementsPool = currentSectionsData?.map(section => section.dataElements)
+        .flat().reduce((acu, cur) => {
+            acu[cur.id] = { sharing: cur.sharing, attributeValues: cur.attributeValues, style: cur.style, categoryCombo: cur.categoryCombo };
+            return acu;
+        }, {}) || [];
+
+    const dataElementsName = 'questions';
+
+    const templateMap = HNQIS2MWI_TEMPLATE_MAP;
+
+    templateData.forEach((row, rowNum) => {
+        switch (row[templateMap.structure]) {
+            case 'Section':
+            case 'Standard':
+            case 'Criterion':
+                if (row[templateMap.programSection] === 'basic-form' && sectionIndex === -1) { isBasicForm = true }
+                if ((isBasicForm && importedSections.length > 0)) {
+                    ignoredSections.push({ name: row[templateMap.formName], rowNum: rowNum + 3 })
+                    break;
+                }
+                sectionIndex += 1;
+                importedSections[sectionIndex] = {
+                    id: row[templateMap.programSection] || undefined,
+                    name: row[templateMap.formName],
+                    displayName: row[templateMap.formName],
+                    sortOrder: sectionIndex,
+                    dataElements: [],
+                    importStatus: row[templateMap.programSection] ? 'update' : 'new',
+                    isBasicForm
+                }
+                row[templateMap.programSection] ? importSummaryValues.sections.updated++ : importSummaryValues.sections.new++;
+                break;
+            case 'Std Overview':
+            case 'question':
+            case 'label':
+                importedSections[sectionIndex].dataElements.push(mapImportedDEHNQIS2({
+                    data: row,
+                    programPrefix,
+                    type: row[HNQIS2_TEMPLATE_MAP.structure],
+                    optionSets,
+                    legendSets,
+                    dataElementsPool
+                }));
+                break;
+        }
+    });
+
+    countChanges({
+        sections: importedSections,
+        sectionsSummary: importSummaryValues.sections,
+        countObject: 'dataElements',
+        summaryObject: importSummaryValues[dataElementsName],
+        currentData: currentData.sections
+    })
+
+    return { importedSections, ignoredSections };
+
+};
+
 module.exports = {
-    readTemplateData
+    readTemplateData,
+    readTemplateDataMWI
 };
