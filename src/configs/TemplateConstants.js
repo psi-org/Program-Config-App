@@ -93,7 +93,7 @@ export const HNQIS2_HEADER_INSTRUCTIONS = {
 };
 
 //TODO: Remove unused columns in a future release
-export const HNQIS2MWI_TEMPLATE_MAP = {
+export const HNQISMWI_TEMPLATE_MAP = {
     parentName: "Parent Name",
     structure: "Structure",
     formName: "Form Name",

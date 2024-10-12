@@ -1,6 +1,6 @@
-import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA } from "../configs/Constants.js";
+import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA, OPTION_SET_YESNONA } from "../configs/Constants.js";
 import { ReleaseNotes, ReleaseNotesTracker } from "../configs/ReleaseNotes.js";
-import { HNQIS2_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../configs/TemplateConstants.js";
+import { HNQIS2_TEMPLATE_MAP, HNQISMWI_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../configs/TemplateConstants.js";
 import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty, programIsHNQIS } from "./Utils.js";
 
 export const isTrackerType = (importType) => [TEMPLATE_PROGRAM_TYPES.tracker, TEMPLATE_PROGRAM_TYPES.event].includes(importType);
@@ -395,6 +395,92 @@ export const mapImportedDE = ({ data, programPrefix, stageNumber, optionSets, le
     if (data[TRACKER_TEMPLATE_MAP.parentValue] !== "") {
         metadata.parentValue = data[TRACKER_TEMPLATE_MAP.parentValue]
     }
+
+    parsedDE.attributeValues.push(
+        {
+            attribute: { id: METADATA },
+            value: JSON.stringify(metadata)
+        }
+    );
+
+    return parsedDE;
+};
+
+export const mapImportedDEHNQISMWI = ({ data, programPrefix, type, legendSets, dataElementsPool }) => {
+    let code = "";
+
+    const existingDe = dataElementsPool[data[HNQISMWI_TEMPLATE_MAP.dataElementId]] || {};
+
+    const parsedDE = JSON.parse(JSON.stringify(existingDe));
+
+    parsedDE.id = data[HNQISMWI_TEMPLATE_MAP.dataElementId] || undefined;
+    parsedDE.description = data[HNQISMWI_TEMPLATE_MAP.description];
+    parsedDE.formName;
+    if (type == 'label') {
+        parsedDE.formName = '     ';
+    } else if (type == 'Std Overview') {
+        parsedDE.formName = 'Standard Overview';
+    } else {
+        parsedDE.formName = data[HNQISMWI_TEMPLATE_MAP.formName] || '';
+    }
+    
+    parsedDE.domainType = 'TRACKER';
+
+    if (['label', 'Std Overview'].includes(type)) {
+        data[HNQISMWI_TEMPLATE_MAP.valueType] = 'LONG_TEXT';
+        parsedDE.aggregationType = 'NONE';
+    }
+
+    code = programPrefix + (data[HNQISMWI_TEMPLATE_MAP.parentName]?.result || '???');
+
+    parsedDE.code = code;
+    parsedDE.name = (code + data[HNQISMWI_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH);
+    parsedDE.shortName = (code + data[HNQISMWI_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH);
+    parsedDE.valueType = data[HNQISMWI_TEMPLATE_MAP.valueType];
+
+    parsedDE.parentName = data[HNQISMWI_TEMPLATE_MAP.parentName]?.result || '???';
+
+    parsedDE.attributeValues = (existingDe?.attributeValues?.filter(att =>
+        ![FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA].includes(att.attribute.id)
+    ) || []);
+
+    const metadata = {
+        elemType: type,
+        varName: data[HNQISMWI_TEMPLATE_MAP.parentName]?.result || '???',
+        autoNaming: 'Yes'
+    };
+
+    if (type === 'question') {
+
+        metadata.isCompulsory = data[HNQISMWI_TEMPLATE_MAP.isCompulsory] || "Yes"
+
+        parsedDE.optionSet = { id: OPTION_SET_YESNONA };
+        parsedDE.optionSetValue = true;
+        parsedDE.valueType = 'NUMBER';
+
+        parsedDE.aggregationType = 'SUM';
+
+        /*if (data[HNQISMWI_TEMPLATE_MAP.legend] && data[HNQISMWI_TEMPLATE_MAP.legend] !== "") {
+            parsedDE.legendSet = { id: getObjectIdByProperty(data[HNQISMWI_TEMPLATE_MAP.legend], legendSets, 'legendSet') };
+            parsedDE.legendSets = [
+                { id: getObjectIdByProperty(data[HNQISMWI_TEMPLATE_MAP.legend], legendSets, 'legendSet') }
+            ];
+        }*/
+    }
+
+    if (data[HNQISMWI_TEMPLATE_MAP.feedbackText] && data[HNQISMWI_TEMPLATE_MAP.feedbackText] !== "") {
+        parsedDE.attributeValues.push(buildAttributeValue(FEEDBACK_TEXT, data[HNQISMWI_TEMPLATE_MAP.feedbackText]))
+    }
+
+    if (data[HNQISMWI_TEMPLATE_MAP.parentQuestion] !== "") {
+        metadata.parentQuestion = data[HNQISMWI_TEMPLATE_MAP.parentQuestion];
+        parsedDE.parentQuestion = data[HNQISMWI_TEMPLATE_MAP.parentQuestion];   // TO BE REPLACED WITH PARENT DATA ELEMENT'S UID
+    }
+    if (data[HNQISMWI_TEMPLATE_MAP.parentValue] !== "") {
+        metadata.parentValue = data[HNQISMWI_TEMPLATE_MAP.parentValue];
+    }
+
+    if (type == 'label') { metadata.labelFormName = data[HNQISMWI_TEMPLATE_MAP.formName] }
 
     parsedDE.attributeValues.push(
         {

@@ -1,5 +1,5 @@
-const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, HNQIS2MWI_TEMPLATE_MAP } = require("../../configs/TemplateConstants.js");
-const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm } = require("../../utils/importerUtils.js");
+const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, HNQISMWI_TEMPLATE_MAP } = require("../../configs/TemplateConstants.js");
+const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm, mapImportedDEHNQISMWI } = require("../../utils/importerUtils.js");
 
 const readTemplateData = (
     {
@@ -145,10 +145,30 @@ const readTemplateDataMWI = (
 
     const dataElementsName = 'questions';
 
-    const templateMap = HNQIS2MWI_TEMPLATE_MAP;
+    const templateMap = HNQISMWI_TEMPLATE_MAP;
+
+    let sectionNumer = 0;
+    let standardNumber = 0;
+    let criterionNumber = 0;
 
     templateData.forEach((row, rowNum) => {
-        switch (row[templateMap.structure]) {
+        const structure = row[templateMap.structure];
+        let numeration = '';
+        if (structure === 'Section') {
+            sectionNumer++;
+            standardNumber = 0;
+            criterionNumber = 0;
+            numeration = `Section ${sectionNumer}: `;
+        } else if (structure === 'Standard') {
+            standardNumber++;
+            criterionNumber = 0;
+            numeration = `> Standard ${sectionNumer}.${standardNumber}: `;
+        } else if (structure === 'Criterion') {
+            criterionNumber++;
+            numeration = `> > Criterion ${sectionNumer}.${standardNumber}.${criterionNumber}: `;
+        }
+
+        switch (structure) {
             case 'Section':
             case 'Standard':
             case 'Criterion':
@@ -160,8 +180,8 @@ const readTemplateDataMWI = (
                 sectionIndex += 1;
                 importedSections[sectionIndex] = {
                     id: row[templateMap.programSection] || undefined,
-                    name: row[templateMap.formName],
-                    displayName: row[templateMap.formName],
+                    name: numeration+row[templateMap.formName],
+                    displayName: numeration+row[templateMap.formName],
                     sortOrder: sectionIndex,
                     dataElements: [],
                     importStatus: row[templateMap.programSection] ? 'update' : 'new',
@@ -172,11 +192,10 @@ const readTemplateDataMWI = (
             case 'Std Overview':
             case 'question':
             case 'label':
-                importedSections[sectionIndex].dataElements.push(mapImportedDEHNQIS2({
+                importedSections[sectionIndex].dataElements.push(mapImportedDEHNQISMWI({
                     data: row,
                     programPrefix,
                     type: row[HNQIS2_TEMPLATE_MAP.structure],
-                    optionSets,
                     legendSets,
                     dataElementsPool
                 }));
