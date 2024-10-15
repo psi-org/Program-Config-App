@@ -1,3 +1,4 @@
+const { HNQISMWI_ActionPlanElements } = require("../../configs/ProgramTemplate.js");
 const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, HNQISMWI_TEMPLATE_MAP } = require("../../configs/TemplateConstants.js");
 const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm, mapImportedDEHNQISMWI } = require("../../utils/importerUtils.js");
 
@@ -150,6 +151,8 @@ const readTemplateDataMWI = (
     let sectionNumer = 0;
     let standardNumber = 0;
     let criterionNumber = 0;
+    let dataElementNumber = 1;
+    let logicDataElements = [];
 
     templateData.forEach((row, rowNum) => {
         const structure = row[templateMap.structure];
@@ -158,50 +161,79 @@ const readTemplateDataMWI = (
             sectionNumer++;
             standardNumber = 0;
             criterionNumber = 0;
-            numeration = `Section ${sectionNumer}: `;
+            numeration = `Section ${sectionNumer} : `;
         } else if (structure === 'Standard') {
             standardNumber++;
             criterionNumber = 0;
-            numeration = `> Standard ${sectionNumer}.${standardNumber}: `;
+            numeration = `> Standard ${sectionNumer}.${standardNumber} : `;
         } else if (structure === 'Criterion') {
             criterionNumber++;
-            numeration = `> > Criterion ${sectionNumer}.${standardNumber}.${criterionNumber}: `;
+            numeration = `> > Criterion ${sectionNumer}.${standardNumber}.${criterionNumber} : `;
+
+            logicDataElements= JSON.parse(
+                row[templateMap.dataElementId] || JSON.stringify(HNQISMWI_ActionPlanElements)
+            ).map(de => {
+                de.code = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.code}`;
+                de.name = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.name}`;
+                de.shortName = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.shortName}`;
+                de.formName = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.formName}`;
+                return de;
+            });
         }
 
         switch (structure) {
             case 'Section':
             case 'Standard':
-            case 'Criterion':
+            case 'Criterion': {
+                dataElementNumber = 1;
                 if (row[templateMap.programSection] === 'basic-form' && sectionIndex === -1) { isBasicForm = true }
+                
                 if ((isBasicForm && importedSections.length > 0)) {
                     ignoredSections.push({ name: row[templateMap.formName], rowNum: rowNum + 3 })
                     break;
                 }
+
+                importedSections[sectionIndex]?.dataElements?.push(
+                    ...importedSections[sectionIndex].logicDataElements
+                );
+
                 sectionIndex += 1;
+
                 importedSections[sectionIndex] = {
                     id: row[templateMap.programSection] || undefined,
-                    name: numeration+row[templateMap.formName],
-                    displayName: numeration+row[templateMap.formName],
+                    name: numeration + (row[templateMap.formName].replace(/(> > Criterion \d+(\.\d+)*:|> Standard \d+(\.\d+)*:|Section \d+:) /g, "")),
+                    displayName: numeration + (row[templateMap.formName].replace(/(> > Criterion \d+(\.\d+)*:|> Standard \d+(\.\d+)*:|Section \d+:) /g, "")),
                     sortOrder: sectionIndex,
                     dataElements: [],
+                    logicDataElements,
                     importStatus: row[templateMap.programSection] ? 'update' : 'new',
                     isBasicForm
                 }
+
+                logicDataElements = [];
                 row[templateMap.programSection] ? importSummaryValues.sections.updated++ : importSummaryValues.sections.new++;
+                
                 break;
+            }
             case 'Std Overview':
             case 'question':
             case 'label':
+                row[HNQISMWI_TEMPLATE_MAP.feedbackOrder] = `${sectionNumer}.${standardNumber}.${criterionNumber}.${dataElementNumber}`
+                dataElementNumber++;
                 importedSections[sectionIndex].dataElements.push(mapImportedDEHNQISMWI({
                     data: row,
                     programPrefix,
-                    type: row[HNQIS2_TEMPLATE_MAP.structure],
+                    type: row[HNQISMWI_TEMPLATE_MAP.structure],
                     legendSets,
                     dataElementsPool
                 }));
                 break;
         }
     });
+
+    importedSections[sectionIndex]?.dataElements?.push(
+        ...importedSections[sectionIndex].logicDataElements
+    );
 
     countChanges({
         sections: importedSections,

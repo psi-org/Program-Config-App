@@ -110,8 +110,6 @@ const processStageData = (
             const newCode = `${programMetadata.dePrefix || prefixOption}${newVarName}`;
             // generate a 11 character code that can include digits and letters
 
-
-
             let formName = ""
             if (hnqisMode) {
                 formName = DE_metadata.elemType == 'label' ? DE_metadata.labelFormName : dataElement.formName;
@@ -231,7 +229,7 @@ const processStageData = (
 
     //*Update Items with suffix [X] to avoid Update conflicts
     let tempUpdate;
-    const removed = (removedItems && removedItems.length) > 0 ? removedItems.map(de => buildRemovedDE(de)) : [];
+    const removed = (removedItems && removedItems.length > 0) ? removedItems.map(de => buildRemovedDE(de)) : [];
     if (new_dataElements && new_dataElements.length > 0) {
         const toUpdateDE = DeepCopy(new_dataElements);
         tempUpdate = toUpdateDE.map(de => buildRemovedDE(de));
@@ -459,7 +457,7 @@ const SaveMetadata = (props) => {
 
             const programConfigurations = DeepCopy(programPayload);
 
-            const removedItems = (props.saveType === 'stage') ? props.removedItems || [] : props.removedItems?.dataElements || [];
+            const removedItems = (props.saveType === 'stage') ? (props.removedItems || []) : (props.removedItems?.dataElements || []);
             const { tempMetadata, metadata, teaConfigurations } = (props.saveType === 'stage')
                 ? processStageData(
                     {

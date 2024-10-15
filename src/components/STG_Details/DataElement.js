@@ -49,9 +49,6 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
             case 'new':
                 deImportStatus = <Tag positive>New</Tag>;
                 break;
-            // case 'delete':
-            //     deImportStatus = <Tag negative>Removed</Tag>;
-            //     break;
             case 'update':
             default:
                 deImportStatus = <Tag neutral>Updated</Tag>;

@@ -1424,13 +1424,13 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
             {
                 savingMetadata &&
                 <ValidateMetadata
-                    hnqisMode={!!hnqisType}
+                    hnqisType={hnqisType}
                     newDEQty={importResults ? importResults.questions.new + importResults.scores.new + importResults.sections.new : 0}
                     programStage={programStage}
                     importedSections={sections}
                     importedScores={scoresSection}
                     criticalSection={criticalSection}
-                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : removedElements}
+                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems || []) : removedElements}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
                     previous={{ sections: [...backupData.sections], setSections, scoresSection: DeepCopy(backupData.scoresSection), setScoresSection }}

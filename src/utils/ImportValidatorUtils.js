@@ -302,30 +302,32 @@ export const compareFeddbackAandB = (a, b) => {
     return false
 }
 
-export const getFeedbackData = (sections) => sections.map(section => {
-    return section.dataElements.map(de => ({
-        id: de.id,
-        code: de.code,
-        feedbackOrder: de.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
-    }))
-        .filter(de => de.feedbackOrder)
-}).flat().sort((a, b) => {
-    const aStruct = a.feedbackOrder.split(".");
-    const bStruct = b.feedbackOrder.split(".");
+export const getFeedbackData = (sections) =>
+    sections.map(section => {
+        return section.dataElements?.map(de =>
+        ({
+            id: de.id,
+            code: de.code,
+            feedbackOrder: de.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
+        })
+        )?.filter(de => de.feedbackOrder) || [];
+    }).flat().sort((a, b) => {
+        const aStruct = a.feedbackOrder.split(".");
+        const bStruct = b.feedbackOrder.split(".");
 
-    while (true) {
-        const x = aStruct.shift(), y = bStruct.shift();
+        while (true) {
+            const x = aStruct.shift(), y = bStruct.shift();
 
-        if (!x && !y) { break }
-        if (!x && y) { return -1 }
-        if (x && !y) { return 1 }
+            if (!x && !y) { break }
+            if (!x && y) { return -1 }
+            if (x && !y) { return 1 }
 
-        if (parseInt(x) > parseInt(y)) { return 1 }
-        if (parseInt(x) < parseInt(y)) { return -1 }
-    }
+            if (parseInt(x) > parseInt(y)) { return 1 }
+            if (parseInt(x) < parseInt(y)) { return -1 }
+        }
 
-    return 0;
-});
+        return 0;
+    });
 
 export function verifyProgramDetail(importResults, setValidationMessage) {
     if (importResults) {
@@ -583,7 +585,9 @@ export const validateQuestions = (importedScores, dataElement, metadata, dataEle
         validate(validations.checkFormNameLength, checkFormNameLength, { metadata, dataElement }, errors);
         validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element: 'label', valueType: 'LONG_TEXT' }, errors);
         validate(validations.hasFeedbackOrder, hasFeedbackOrder, { metadata, dataElement }, errors);
-        validate(validations.hasVarName, hasVarName, { metadata }, errors);
+        if (!['generated','Std Overview'].includes(metadata.elemType)) {
+            validate(validations.hasVarName, hasVarName, { metadata }, errors);
+        }
         validate(validations.checkHasValueType, checkHasProperty, { object: dataElement, property: 'valueType' }, errors);
         validate(validations.hasBothNumeratorDenominator, hasBothNumeratorDenominator, { metadata, dataElement }, errors);
         validate(validations.validAggregationType, validAggregationType, { metadata, dataElement, element: 'label', aggregationOperation: 'NONE' }, errors);
@@ -733,7 +737,7 @@ const mapAttributes = (attributes) => {
     }))
 }
 
-const mapDataElements = (dataElements, stage, { stageNumber, sectionIdx }) => { 
+const mapDataElements = (dataElements, stage, { stageNumber, sectionIdx }) => {
     return dataElements.map((de, deIdx) => {
         const metadata = getPCAMetadataDE(de);
         metadata.varName = metadata.varName || `_PS${padValue(stageNumber, "00")}_S${padValue(sectionIdx + 1, "00")}E${padValue(deIdx + 1, "000")}`;
@@ -772,7 +776,7 @@ const mapStage = (stage, stageNumber) => {
             isBasicForm: true,
             newValues: 0,
             updatedValues: stage.programStageDataElements.length,
-            dataElements: mapDataElements(stage.programStageDataElements.map(psde => psde.dataElement), stage, { stageNumber, sectionIdx: 1})
+            dataElements: mapDataElements(stage.programStageDataElements.map(psde => psde.dataElement), stage, { stageNumber, sectionIdx: 1 })
         }]
 }
 

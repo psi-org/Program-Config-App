@@ -213,9 +213,116 @@ const OS_HNQISMWI_Criterion = {
     "options": []
 }
 
+const HNQISMWI_ActionPlanElements = [
+    {
+        "name": "Criterion Status",
+        "code": "MWI_AP_DE1",
+        "translations": [],
+        "shortName": "Criterion Status",
+        "formName": "Criterion Status",
+        "legendSets": [{ "id": "F9G1wtBjiOY" }],
+        "aggregationType": "NONE",
+        "valueType": "TEXT",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "optionSet": { "id": "eKFCHvlnXxm" },
+        "attributeValues": [{
+            "attribute": { "id": "haUflNqP85K" },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    },
+    {
+        "name": "Criterion Score",
+        "code": "MWI_AP_DE2",
+        "translations": [],
+        "shortName": "Criterion Score",
+        "formName": "Criterion Score",
+        "legendSets": [],
+        "aggregationType": "NONE",
+        "valueType": "NUMBER",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "attributeValues": [{
+            "attribute": { "id": "haUflNqP85K" },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    },
+    {
+        "name": "Comment",
+        "code": "MWI_AP_DE3",
+        "translations": [],
+        "shortName": "Comment",
+        "formName": "Comment",
+        "legendSets": [],
+        "aggregationType": "NONE",
+        "valueType": "TEXT",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "attributeValues": [{
+            "attribute": { "id": "haUflNqP85K" },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    },
+    {
+        "name": "Action Point",
+        "code": "MWI_AP_DE4",
+        "translations": [],
+        "shortName": "Action Point",
+        "formName": "Action Point",
+        "legendSets": [],
+        "aggregationType": "NONE",
+        "valueType": "TEXT",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "attributeValues": [{
+            "attribute": { "id": "haUflNqP85K" },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    },
+    {
+        "name": "Responsible Person",
+        "code": "MWI_AP_DE5",
+        "translations": [],
+        "shortName": "Responsible Person",
+        "formName": "Responsible Person",
+        "legendSets": [],
+        "aggregationType": "NONE",
+        "valueType": "TEXT",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "attributeValues": [{
+            "attribute": { "id": "haUflNqP85K" },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    },
+    {
+        "name": "Due Date",
+        "code": "MWI_AP_DE6",
+        "translations": [],
+        "shortName": "Due Date",
+        "formName": "Due Date",
+        "legendSets": [],
+        "aggregationType": "NONE",
+        "valueType": "DATE",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "attributeValues": [{
+            "attribute": { "id": "haUflNqP85K" },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    }
+]
+
 module.exports = {
     COMPETENCY_TEA,
     EventStage,
+    HNQISMWI_ActionPlanElements,
     HnqisProgramConfigs,
     OS_HNQISMWI_Criterion,
     Program,
@@ -226,5 +333,5 @@ module.exports = {
     PSDE_HNQISMWI_ActionPlan,
     PSS_CriticalSteps,
     PSS_Default,
-    PSS_Scores,
+    PSS_Scores
 };
