@@ -11,6 +11,7 @@ import { DeepCopy, getPCAMetadataDE, programIsHNQIS } from "../../utils/Utils.js
 import SaveMetadata from "../UIElements/SaveMetadata.js";
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 
 const ValidateMetadata = (
     { 
@@ -60,7 +61,7 @@ const ValidateMetadata = (
                 let feedbacksErrors;
 
                 // CHECK FEEDBACK DATA
-                if (programIsHNQIS('HNQIS2')) {
+                if (programIsHNQIS(hnqisType)) {
                     const validateResults = validateFeedbacks(!!hnqisType, importedSectionsV.concat(importedScoresV))
                     feedbacksErrors = validateResults.feedbacksErrors
                 
@@ -128,7 +129,7 @@ const ValidateMetadata = (
 
                 let score_errors = 0;
                 delete importedScoresV.errors
-                if (hnqisType === 'HNQIS2') {
+                if (hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2) {
                     importedScoresV.dataElements.forEach((dataElement) => {
                         excelRow += 1;
                         const errorDetails = {

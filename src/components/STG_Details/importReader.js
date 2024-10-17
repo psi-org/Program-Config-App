@@ -1,6 +1,7 @@
 const { HNQISMWI_ActionPlanElements } = require("../../configs/ProgramTemplate.js");
 const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, HNQISMWI_TEMPLATE_MAP } = require("../../configs/TemplateConstants.js");
 const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm, mapImportedDEHNQISMWI } = require("../../utils/importerUtils.js");
+const { DeepCopy } = require("../../utils/Utils.js");
 
 const readTemplateData = (
     {
@@ -170,15 +171,20 @@ const readTemplateDataMWI = (
             criterionNumber++;
             numeration = `> > Criterion ${sectionNumer}.${standardNumber}.${criterionNumber} : `;
 
-            logicDataElements= JSON.parse(
-                row[templateMap.dataElementId] || JSON.stringify(HNQISMWI_ActionPlanElements)
-            ).map(de => {
-                de.code = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.code}`;
-                de.name = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.name}`;
-                de.shortName = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.shortName}`;
-                de.formName = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.formName}`;
-                return de;
-            });
+            logicDataElements = row[templateMap.dataElementId]
+                ? JSON.parse(row[templateMap.dataElementId]).map((de, index) => { 
+                    de.code = `${sectionNumer}.${standardNumber}.${criterionNumber} MWI_AP_DE${index + 1}`;
+                    return de;
+                })
+                : (DeepCopy(HNQISMWI_ActionPlanElements).map(de => {
+                    de.code = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.code}`;
+                    de.name = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.name}`;
+                    de.shortName = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.shortName}`;
+                    de.formName = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.formName}`;
+                    return de;
+                }));
+            
+            console.log(logicDataElements);
         }
 
         switch (structure) {
@@ -201,8 +207,8 @@ const readTemplateDataMWI = (
 
                 importedSections[sectionIndex] = {
                     id: row[templateMap.programSection] || undefined,
-                    name: numeration + (row[templateMap.formName].replace(/(> > Criterion \d+(\.\d+)*:|> Standard \d+(\.\d+)*:|Section \d+:) /g, "")),
-                    displayName: numeration + (row[templateMap.formName].replace(/(> > Criterion \d+(\.\d+)*:|> Standard \d+(\.\d+)*:|Section \d+:) /g, "")),
+                    name: numeration + (row[templateMap.formName].replace(/(> > Criterion \d+(\.\d+)*|> Standard \d+(\.\d+)*|Section \d+) : /g, "")),
+                    displayName: numeration + (row[templateMap.formName].replace(/(> > Criterion \d+(\.\d+)*|> Standard \d+(\.\d+)*|Section \d+) : /g, "")),
                     sortOrder: sectionIndex,
                     dataElements: [],
                     logicDataElements,

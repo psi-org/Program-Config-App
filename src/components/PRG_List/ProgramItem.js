@@ -28,6 +28,7 @@ import actionCreators from "../../state/action-creators";
 import { versionIsValid, versionGTE, programIsHNQIS } from "../../utils/Utils.js";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import ProgramNew from "./ProgramNew.js";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
@@ -95,7 +96,7 @@ const ProgramItem = ({
     const id = openPop ? "simple-popover" : undefined;
 
     const isEnabled = () => {
-        if (programType === 'HNQIS2' && !h2Valid) { return false };
+        if (programType === TEMPLATE_PROGRAM_TYPES.hnqis2 && !h2Valid) { return false };
         return true;
     }
 
@@ -107,7 +108,7 @@ const ProgramItem = ({
         setSearchLocalStorage();
     }
 
-    const requiredUpgradeBadge = (programType === 'HNQIS2' && pcaMetadata.buildVersion && !versionGTE(pcaMetadata.buildVersion, REQUIRED_H2_PROGRAM_BUILD_VERSION))
+    const requiredUpgradeBadge = (programType === TEMPLATE_PROGRAM_TYPES.hnqis2 && pcaMetadata.buildVersion && !versionGTE(pcaMetadata.buildVersion, REQUIRED_H2_PROGRAM_BUILD_VERSION))
         ? <Tooltip title={`IMPORTANT UPGRADE REQUIRED. This program was built using an older version of the PCA with deprecated logic and will not work properly. Please 'Set Up Program' again to fix this issue.`}>
             <SyncProblemIcon sx={{ fontSize: 35, color: '#FE3636' }} style={{ marginRight: "0.3em", cursor: 'pointer' }} />
         </Tooltip>
@@ -140,14 +141,14 @@ const ProgramItem = ({
 
 
                 <div className="ml_item-desc">
-                    {programType === 'HNQIS2' && !isEnabled() &&
+                    {programType === TEMPLATE_PROGRAM_TYPES.hnqis2 && !isEnabled() &&
                         <Tooltip title={`This HNQIS2 Program cannot be accessed as it requires the latest HNQIS2 Metadata Package. Go to Settings > HNQIS 2.0 Status for more information.`}>
                             <LockIcon style={{ marginRight: "0.3em", cursor: 'pointer' }} />
                         </Tooltip>
                     }
                     {requiredUpgradeBadge}
                     {programType !== 'HNQIS' && pcaMetadata.buildVersion && !versionIsValid(pcaMetadata.buildVersion, BUILD_VERSION, BUILD_VERSION) &&
-                        <Tooltip title={`This Program's logic was built in version ${pcaMetadata.buildVersion}, please ${programType === 'HNQIS2' ? "'Set Up Program'" : "'Build Program Rules'"} again to update it.`}>
+                        <Tooltip title={`This Program's logic was built in version ${pcaMetadata.buildVersion}, please ${programType === TEMPLATE_PROGRAM_TYPES.hnqis2 ? "'Set Up Program'" : "'Build Program Rules'"} again to update it.`}>
                             <NewReleasesIcon sx={{ fontSize: 30, color: '#FEBB36' }} style={{ marginRight: "0.3em",cursor: 'pointer' }} />
                         </Tooltip>
                     }
@@ -211,7 +212,7 @@ const ProgramItem = ({
                                                 toggle();
                                                 shareProgram(
                                                     program.id,
-                                                    programType === "HNQIS2"
+                                                    programType === TEMPLATE_PROGRAM_TYPES.hnqis2
                                                         ? "hnqis"
                                                         : "tracker"
                                                 );

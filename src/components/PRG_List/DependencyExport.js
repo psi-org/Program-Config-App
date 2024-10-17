@@ -16,6 +16,7 @@ import { DeepCopy, changeAttributeValue, getJSONKeyTree, removeKey } from "../..
 import SelectOptions from "../UIElements/SelectOptions.js";
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 
 const queryLegends = {
     results: {
@@ -335,7 +336,7 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
                                             label={"Target Server"}
                                             useError={false}
                                             defaultOption={false}
-                                            items={EXPORT_PRESETS.concat(programType === 'HNQIS2' ? EXPORT_HNQIS_PRESETS : [])}
+                                            items={EXPORT_PRESETS.concat(programType === TEMPLATE_PROGRAM_TYPES.hnqis2 ? EXPORT_HNQIS_PRESETS : [])}
                                             handler={selectPreset}
                                             value={selectedPreset}
                                             styles={{ width: '100%' }}

@@ -7,9 +7,11 @@ import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from "react";
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants.js";
-import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue } from "../../utils/Utils.js";
+import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue, programIsHNQIS, isLabelType } from "../../utils/Utils.js";
 import CustomMUIDialog from './CustomMUIDialog.js';
 import CustomMUIDialogTitle from './CustomMUIDialogTitle.js';
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
+import { data } from "jquery";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -60,7 +62,7 @@ const buildRemovedDE = (de) => {
 const processStageData = (
     {
         uidPool,
-        hnqisMode,
+        hnqisType,
         programStage,
         importedSections,
         removedItems,
@@ -77,7 +79,7 @@ const processStageData = (
     const new_programStageDataElements = [];
     let isBasicForm = false;
 
-    if (hnqisMode) {
+    if (hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2) {
         criticalSection.dataElements.forEach((de, i) => {
             new_programStageDataElements.push(
                 {
@@ -94,29 +96,53 @@ const processStageData = (
      * Prepare new data elements (payloads)
      * Get program stage data elements for each question
      */
-    let psdeSortOrder = 1
+    let psdeSortOrder = 1;
+    let sectionOrder = 1;
     const stageIndex = stagesList?.findIndex(stage => stage.id === programStage.id) || 0;
-    importedSections.forEach((section, secIdx) => {
+
+    let secIdx = 0;
+    let deIdx = 1;
+
+    importedSections.forEach(section => {
+
+        if (hnqisType === 'HNQISMWI') {
+            if (section.name.match(/Section \d+ : /)) {
+                secIdx += 1;
+                deIdx = 1;
+            }
+        } else {
+            secIdx += 1;
+            deIdx = 1;
+        }
 
         if (section.isBasicForm || section.formType === 'DEFAULT' || section.id === 'basic-form') { isBasicForm = true }
         if (section.importStatus == 'new') { section.id = uidPool.shift() }
 
-        section.dataElements.forEach((dataElement, deIdx) => {
+        section.dataElements.forEach(dataElement => {
+
+            console.log(dataElement);
+
+            let isLogicDE = false;
 
             const DE_metadata = JSON.parse(dataElement.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
 
-            const newVarName = hnqisMode ? `_S${padValue(secIdx + 1, "00")}Q${padValue(deIdx + 1, "000")}` : `_PS${padValue(stageIndex + 1, "00")}_S${padValue(secIdx + 1, "00")}E${padValue(deIdx + 1, "000")}`;
+            const newVarName = programIsHNQIS(hnqisType) ? `_S${padValue(secIdx, "00")}Q${padValue(deIdx, "000")}` : `_PS${padValue(stageIndex + 1, "00")}_S${padValue(secIdx, "00")}E${padValue(deIdx, "000")}`;
             const prefixOption = section.id === 'basic-form' ? programStage.id : section.id;
-            const newCode = `${programMetadata.dePrefix || prefixOption}${newVarName}`;
+            let newCode = `${programMetadata.dePrefix || prefixOption}${newVarName}`;
+
+            if (dataElement.code.match(/MWI_AP_DE/)) {
+                isLogicDE = true;
+                newCode = dataElement.code;
+            }
             // generate a 11 character code that can include digits and letters
 
             let formName = ""
-            if (hnqisMode) {
-                formName = DE_metadata.elemType == 'label' ? DE_metadata.labelFormName : dataElement.formName;
+            if (programIsHNQIS(hnqisType)) {
+                formName = isLabelType(DE_metadata.elemType) ? DE_metadata.labelFormName : dataElement.formName;
 
                 formName = formName?.replaceAll(' [C]', '') || '';
                 if (DE_metadata.isCritical == 'Yes') { formName += ' [C]' }
-                DE_metadata.elemType == 'label' ? DE_metadata.labelFormName = formName : dataElement.formName = formName;
+                isLabelType(DE_metadata.elemType) ? DE_metadata.labelFormName = formName : dataElement.formName = formName;
             } else {
                 formName = dataElement.formName;
             }
@@ -128,9 +154,9 @@ const processStageData = (
             DE_metadata.varName = newVarName;
 
             if (DE_metadata.autoNaming !== 'No') {
-                dataElement.name = name
-                dataElement.shortName = shortName
-                dataElement.code = newCode
+                dataElement.name = name;
+                dataElement.shortName = shortName;
+                dataElement.code = newCode;
             }
 
             // Check if new DE
@@ -143,7 +169,7 @@ const processStageData = (
 
             const existingPSDE = originalStageDataElements?.find(psde => psde.dataElement.id === dataElement.id);
             if (existingPSDE) {
-                dataElement = mergeWithPriority(dataElement, existingPSDE.dataElement)
+                dataElement = mergeWithPriority(dataElement, existingPSDE.dataElement);
             }
 
             delete dataElement.importStatus;
@@ -162,14 +188,18 @@ const processStageData = (
             psdeSortOrder += 1
             delete dataElement.displayInReports;
 
-            if (!hnqisMode) { ['isCritical', 'labelFormName'].forEach(key => delete DE_metadata[key]) }
+            if (!programIsHNQIS(hnqisType)) { ['isCritical', 'labelFormName'].forEach(key => delete DE_metadata[key]) }
 
             setPCAMetadata(dataElement, DE_metadata);
+
+            if(!isLogicDE) {
+                deIdx += 1;
+            }
         });
 
-
         delete section.importStatus;
-        section.sortOrder = secIdx + 1;
+        section.sortOrder = sectionOrder;
+        sectionOrder += 1;
     });
 
     // Map parent name with data element uid
@@ -203,7 +233,7 @@ const processStageData = (
      * Edit imported scores
      * Prepare new scores data elements payload
      */
-    if (hnqisMode) {
+    if (hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2) {
         importedScores.dataElements.forEach((score, scoreIdx) => {
 
             // Check if new DE
@@ -240,7 +270,8 @@ const processStageData = (
     };
 
     //*Replace sections and Data Elements on program stage
-    programStage.programStageSections = !isBasicForm ? [].concat(importedSections, hnqisMode ? importedScores : [], hnqisMode ? criticalSection : []): [];
+    const specialSections = hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2 ? importedScores.concat(criticalSection) : [];
+    programStage.programStageSections = !isBasicForm ? [...importedSections, ...specialSections]: [];
     programStage.programStageDataElements = new_programStageDataElements;
 
     //*PROGRAM UPDATE ==> trackedEntityAttributes, attributeValues[metadata]
@@ -248,8 +279,10 @@ const processStageData = (
     const new_programMetadata = JSON.parse(programPayload.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
     new_programMetadata.dePrefix = programMetadata.dePrefix;
 
-    if (hnqisMode) {
-        new_programMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
+    if (programIsHNQIS(hnqisType)) {
+        if (hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2) {
+            new_programMetadata.useCompetencyClass = programMetadata.useCompetencyClass;
+        }
         new_programMetadata.healthArea = programMetadata.healthArea;
         new_programMetadata.buildVersion = programMetadata.buildVersion;
     }
@@ -269,11 +302,11 @@ const processStageData = (
 
     //* PROGRAM TRACKED ENTITY ATTRIBUTES
     const currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE);
-    if (hnqisMode && new_programMetadata.useCompetencyClass == "Yes" && !currentCompetencyAttribute) {
+    if (hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2 && new_programMetadata.useCompetencyClass == "Yes" && !currentCompetencyAttribute) {
         competencyClassAttribute.program.id = programPayload.id;
         programPayload.programTrackedEntityAttributes.push(competencyClassAttribute);
         criticalSection.dataElements.push({ id: COMPETENCY_CLASS })
-    } else if (hnqisMode && new_programMetadata.useCompetencyClass == "No") {
+    } else if (hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2 && new_programMetadata.useCompetencyClass == "No") {
         programPayload.programTrackedEntityAttributes = programPayload.programTrackedEntityAttributes.filter(att => att.trackedEntityAttribute.id != COMPETENCY_ATTRIBUTE);
         criticalSection.dataElements = criticalSection.dataElements.filter(de => de.id != COMPETENCY_CLASS);
     }
@@ -299,7 +332,7 @@ const processStageData = (
 const processProgramData = (
     {
         uidPool,
-        hnqisMode,
+        hnqisType,
         importedStages,
         importedTEAs,
         importResults,
@@ -335,7 +368,7 @@ const processProgramData = (
         const { tempMetadata, metadata } = processStageData(
             {
                 uidPool,
-                hnqisMode,
+                hnqisType,
                 programStage,
                 importedSections: programStage.importedSections,
                 removedItems: importResults.stages.find(stage => stage.id === programStage.id)?.dataElements?.removedItems || [],
@@ -403,7 +436,7 @@ const processProgramData = (
     };
 }
 
-//* HNQIS/Stage Props: programId, hnqisMode, newObjectsQtty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, stagesList, saveType
+//* HNQIS/Stage Props: programId, hnqisType, newObjectsQtty, programStage, importedSections, importedScores, criticalSection, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, stagesList, saveType
 //* Program Props: programId, newObjectsQtty, importedStages, importedTEAs, setSavingMetadata, setSavedAndValidated, removedItems, programMetadata, setImportResults, setErrorReports, saveType
 
 const SaveMetadata = (props) => {
@@ -462,7 +495,7 @@ const SaveMetadata = (props) => {
                 ? processStageData(
                     {
                         uidPool,
-                        hnqisMode: props.hnqisMode,
+                        hnqisType: props.hnqisType,
                         programStage: props.programStage,
                         importedSections: props.importedSections,
                         importedScores: props.importedScores,
@@ -478,7 +511,7 @@ const SaveMetadata = (props) => {
                 : processProgramData(
                     {
                         uidPool,
-                        hnqisMode: props.hnqisMode,
+                        hnqisType: props.hnqisType,
                         importedStages: props.importedStages,
                         importedTEAs: props.importedTEAs,
                         importResults: props.importResults,
@@ -528,7 +561,7 @@ const SaveMetadata = (props) => {
 
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => props.setSavingMetadata(false)}>
-            {props.hnqisMode ? 'Save Assessment' : 'Save Configurations'}
+            {props.hnqisType ? 'Save Assessment' : 'Save Configurations'}
         </CustomMUIDialogTitle >
         <DialogContent dividers style={{ padding: '1em 2em' }}>
 
@@ -538,7 +571,7 @@ const SaveMetadata = (props) => {
                     successStatus &&
                     (
                         <div>
-                            <p><strong>Process completed! {props.hnqisMode && '"Set up program" button is now enabled'}</strong></p>
+                            <p><strong>Process completed! {props.hnqisType && '"Set up program" button is now enabled'}</strong></p>
                             {importFlag &&
                                 <p style={{marginTop: '1em'}}>
                                     <strong>Please Note:</strong>
@@ -590,7 +623,7 @@ const SaveMetadata = (props) => {
 SaveMetadata.propTypes = {
     criticalSection: PropTypes.object,
     fromImport: PropTypes.bool,
-    hnqisMode: PropTypes.bool,
+    hnqisType: PropTypes.string,
     importResults: PropTypes.object,
     importedScores: PropTypes.object,
     importedSections: PropTypes.array,

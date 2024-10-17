@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { AGG_TYPES_H2_PI, BUILD_VERSION } from "../../configs/Constants.js";
 import SelectOptions from "../UIElements/SelectOptions.js";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 
 const query = {
     results: {
@@ -461,7 +462,7 @@ const H2Setting = forwardRef((props, ref) => {
                             style={{ ...fieldSetStyle, display: 'flex', justifyContent: 'space-between' }}
                         >
                             <legend style={{ color: 'rgba(0, 0, 0, 0.6)' }}>Core HNQIS Settings</legend>
-                            {props.pgrTypePCA === "HNQIS2" &&
+                            {props.pgrTypePCA === TEMPLATE_PROGRAM_TYPES.hnqis2 &&
                                 <FormControlLabel
                                     control={
                                         <Switch
@@ -482,7 +483,7 @@ const H2Setting = forwardRef((props, ref) => {
                                 label={"Program Health Area (*)"}
                                 items={healthAreaOptions}
                                 handler={healthAreaChange}
-                                styles={{ width: props.pgrTypePCA === "HNQIS2"?"60%":"100%" }}
+                                styles={{ width: props.pgrTypePCA === TEMPLATE_PROGRAM_TYPES.hnqis2?"60%":"100%" }}
                                 value={healthArea}
                                 defaultOption="Select Health Area"
                             />

@@ -1,5 +1,5 @@
 import { TEMPLATE_PROGRAM_TYPES, TRACKER_TEA_MAP } from "../../configs/TemplateConstants.js";
-import { buildHNQIS2Summary, buildHNQISMWISummary, buildTrackerSummary, countChanges, getBasicForm } from "../../utils/importerUtils.js";
+import { buildHNQIS2Summary, buildTrackerSummary, countChanges, getBasicForm } from "../../utils/importerUtils.js";
 import { setUpProgramStageSections } from "../../utils/Utils.js";
 import { readTemplateData, readTemplateDataMWI } from "../STG_Details/importReader.js";
 

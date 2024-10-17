@@ -130,15 +130,35 @@ const DataProcessor = (props) => {
             // Skip 'Critical Steps Calculations' Section
             if (programSection.dataElements.find(de => criticalStepsDataElements.includes(de.id))) { return }
 
-            const  row = {};
-            row.structure = "Section";
-            row.form_name = programSection.displayName;
-            row.program_stage_id = program_stage_id;
-            row.program_section_id = program_section_id;
-            Configures.push(row);
+            const tempConfigures = [];
+            const logicDataElements = [];
+
+            const sectionRow = {};
+            
+
+            sectionRow.structure = "Section";
+
+            if (props.hnqisType === 'HNQISMWI' && programSection.displayName.match(/> Standard \d+(\.\d+)*.*/)) {
+                sectionRow.structure = "Standard";
+            } else if (props.hnqisType === 'HNQISMWI' && programSection.displayName.match(/> > Criterion \d+(\.\d+)*.*/)) {
+                sectionRow.structure = "Criterion";
+            }
+
+            sectionRow.form_name = programSection.displayName.replace(/(> > Criterion \d+(\.\d+)*|> Standard \d+(\.\d+)*|Section \d+) : /g, "");
+            sectionRow.program_stage_id = program_stage_id;
+            sectionRow.program_section_id = program_section_id;
 
             programSection.dataElements.forEach((dataElement) => {
-                const  row = {};
+                const row = {};
+                
+                const metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
+                const metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
+                
+                if (metaData.elemType === 'generated') {
+                    logicDataElements.push(dataElement);
+                    return;
+                }
+
 
                 row.form_name = dataElement.formName?.replaceAll(' [C]','') || '';
                 row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : undefined;
@@ -150,8 +170,6 @@ const DataProcessor = (props) => {
                 row.program_section_id = program_section_id;
                 row.data_element_id = dataElement.id;
 
-                const metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
-                const metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
                 row.parentValue = '';
                 row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
                 if (row.structure == 'label') { row.form_name = metaData.labelFormName || '' }
@@ -168,8 +186,15 @@ const DataProcessor = (props) => {
                 const feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_TEXT);
                 row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : undefined;
 
-                Configures.push(row);
+                tempConfigures.push(row);
             });
+
+            if (logicDataElements.length > 0) { 
+                sectionRow.data_element_id = JSON.stringify(logicDataElements); //Stores the DE object instead of an ID
+            }
+
+            Configures.push(sectionRow);
+            Configures.push(...tempConfigures);
         });
     };
 

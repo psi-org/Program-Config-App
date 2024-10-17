@@ -1389,7 +1389,7 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
                                                     index={idx}
                                                     key={pss.id || idx}
                                                     SectionActions={SectionActions}
-                                                    hnqisMode={!!hnqisType}
+                                                    hnqisType={hnqisType}
                                                     isSectionMode={isSectionMode}
                                                     readOnly={readOnly}
                                                     setSaveStatus={setSaveStatus}
@@ -1401,7 +1401,7 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
                                 )}
                             </Droppable>
                         }
-                        {hnqisType==="HNQIS2" && (isSectionMode) &&
+                        {hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2 && (isSectionMode) &&
                             <>
                                 <CriticalCalculations stageSection={criticalSection} ikey={criticalSection?.id || "crit"} />
                                 <Scores stageSection={scoresSection} key={scoresSection?.id || "scores"} program={programId} />
