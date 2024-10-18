@@ -6,12 +6,12 @@ import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react";
 import {  FEEDBACK_ORDER } from "../../configs/Constants.js";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2 } from "../../utils/ImportValidatorUtils.js";
 import { DeepCopy, getPCAMetadataDE, programIsHNQIS } from "../../utils/Utils.js";
 import SaveMetadata from "../UIElements/SaveMetadata.js";
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
-import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 
 const ValidateMetadata = (
     { 
@@ -55,8 +55,6 @@ const ValidateMetadata = (
                 validationResults.sections = sections;
                 validationResults.questions = questions;
                 validationResults.scores = scores;
-
-                console.log(importedSections);
 
                 let feedbacksErrors;
 

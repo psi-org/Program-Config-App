@@ -20,6 +20,7 @@ import InfoBox from './../UIElements/InfoBox.js';
 import ProgramRulesList from './../UIElements/ProgramRulesList.js'
 import MarkDownEditor from './MarkDownEditor.js';
 import RowRadioButtonsGroup from './RowRadioButtonsGroup.js';
+import { isLabelType, programIsHNQIS } from '../../utils/Utils.js';
 
 const optionSetQuery = {
     results: {
@@ -58,7 +59,7 @@ const queryId = {
     }
 };
 
-const DataElementForm = ({ program, dePrefix, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisMode, setSaveStatus }) => {
+const DataElementForm = ({ program, dePrefix, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisType, setSaveStatus }) => {
 
     const de = programStageDataElement.dataElement;
 
@@ -257,7 +258,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
 
         let response = true;
 
-        const correlativeLength = hnqisMode ? 9 : 14; //? _S01Q001_ or _PS01_S01E001_
+        const correlativeLength = programIsHNQIS(hnqisType) ? 9 : 14; //? _S01Q001_ or _PS01_S01E001_
         const prefixLength = autoNaming ? dePrefix.length + correlativeLength : 0;
 
         if (valueType.trim() === '') {
@@ -409,12 +410,12 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
         // METADATA
         // Elem type
         metadata.isCompulsory = compulsory ? "Yes" : "No";
-        if (hnqisMode) {
+        if (programIsHNQIS(hnqisType)) {
             metadata.elemType = structure;
             metadata.isCritical = critical ? "Yes" : "No";
             if (numerator) { metadata.scoreNum = numerator }
             if (denominator) { metadata.scoreDen = denominator }
-            if (structure === 'label') { metadata.labelFormName = formName }
+            if (isLabelType(structure)) { metadata.labelFormName = formName }
         }
         metadata.autoNaming = autoNaming ? 'Yes' : 'No';
 
@@ -432,7 +433,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
         stageDataElement.dataElement.attributeValues = attributeValues;
 
         save(de.id, section, stageDataElement);
-        if (hnqisMode) { setSaveStatus('Validate & Save') }
+        if (programIsHNQIS(hnqisType)) { setSaveStatus('Validate & Save') }
 
     }
 
@@ -460,7 +461,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
 
 
                 let pcaMetadata = {}
-                if(hnqisMode){
+                if(programIsHNQIS(hnqisType)){
                     pcaMetadata = {
                         isCompulsory: compulsory?'Yes':'No',
                         isCritical: critical?'Yes':'No',
@@ -544,7 +545,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                 save(newCreatedDe);
             }
             setSaveFlag(false)
-            if (hnqisMode) { setSaveStatus('Validate & Save') }
+            if (programIsHNQIS(hnqisType)) { setSaveStatus('Validate & Save') }
         }
     }, [saveFlag])
     //End New DE
@@ -558,7 +559,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                 helperText={validationErrors.aggType}
                 items={AGG_TYPES}
                 value={aggType}
-                disabled={hnqisMode}
+                disabled={programIsHNQIS(hnqisType)}
                 handler={aggTypeChange}
                 defaultOption='Leave Empty'
             />
@@ -596,7 +597,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
 
             <Grid container spacing={2} style={{ alignItems: 'center' }}>
                 <Grid item xs={6} style={{ alignItems: 'end' }} >
-                    {hnqisMode &&
+                    {programIsHNQIS(hnqisType) &&
                         <Grid style={{ display: 'flex' }} item>
                             <RowRadioButtonsGroup
                                 label={"HNQIS Element Type"}
@@ -669,7 +670,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             styles={{ width: '40%' }}
                             useError={validationErrors.valueType !== undefined}
                             helperText={validationErrors.valueType}
-                            items={hnqisMode?VALUE_TYPES_H2:VALUE_TYPES_TRACKER}
+                            items={programIsHNQIS(hnqisType)?VALUE_TYPES_H2:VALUE_TYPES_TRACKER}
                             value={valueType}
                             disabled={structure === 'label' || optionSet != null}
                             handler={valueTypeChange} />
@@ -680,7 +681,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             id="optionSetsSelect"
                             disabled={structure === 'label'}
                             options={
-                                serverOptionSets?.results.optionSets.filter(os => !hnqisMode || os.name?.toLowerCase().includes("hnqis")).map(os =>
+                                serverOptionSets?.results.optionSets.filter(os => !programIsHNQIS(hnqisType) || os.name?.toLowerCase().includes("hnqis")).map(os =>
                                     ({ label: os.name, id: os.id, valueType: os.valueType })
                                 ) || []
                             }
@@ -702,10 +703,10 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             </IconButton>
                         </Tooltip>
                     </div>
-                    {hnqisMode && aggTypeContent}
+                    {programIsHNQIS(hnqisType) && aggTypeContent}
                 </Grid>
             </Grid>
-            {!hnqisMode && aggTypeContent}
+            {!programIsHNQIS(hnqisType) && aggTypeContent}
             <FormLabel style={{ marginTop: '1em' }} component="legend">Data Element Appearance</FormLabel>
             <div style={{ display: 'flex' }}>
                 <FormControl sx={{ width: '100%' }}>
@@ -734,10 +735,10 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     margin='0 1em 0 0.5em'
                 />
                 <FormControlLabel
-                    disabled={hnqisMode}
+                    disabled={programIsHNQIS(hnqisType)}
                     control={
                         <Switch
-                            checked={autoNaming || hnqisMode}
+                            checked={autoNaming || programIsHNQIS(hnqisType)}
                             onChange={autoNamingChange}
                         />}
                     label="Automatic Name, Short Name and Code"
@@ -812,7 +813,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                         id="legendSetSelect"
                         disabled={structure === 'label'}
                         sx={{ minWidth: '100%', marginRight: '0.5em' }}
-                        options={serverLegendSets?.results.legendSets.filter(ls => !hnqisMode || ls.name?.toLowerCase().includes("hnqis")).map(ls => ({ label: ls.name, id: ls.id }))/* .concat({label: 'None', id: ''}) */ || [/* {label: 'None', id: ''} */]}
+                        options={serverLegendSets?.results.legendSets.filter(ls => !programIsHNQIS(hnqisType) || ls.name?.toLowerCase().includes("hnqis")).map(ls => ({ label: ls.name, id: ls.id }))/* .concat({label: 'None', id: ''}) */ || [/* {label: 'None', id: ''} */]}
                         renderInput={(params) => <TextField {...params} label="Legend Set" />}
                         value={legendSet}
                         onChange={legendSetChange}
@@ -852,7 +853,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
             </div>
             
             <div>
-                {hnqisMode && <>
+                {programIsHNQIS(hnqisType) && <>
                     <h3 style={{ marginBottom: '0.5em', marginTop: '2em' }}>HNQIS Settings</h3>
 
 
@@ -1012,7 +1013,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
 
 DataElementForm.propTypes = {
     dePrefix: PropTypes.string,
-    hnqisMode: PropTypes.bool,
+    hnqisType: PropTypes.string,
     program: PropTypes.string,
     programStageDataElement: PropTypes.object,
     save: PropTypes.func,

@@ -128,7 +128,6 @@ const readTemplateDataMWI = (
         templateData,
         currentData,
         programPrefix = 'Prefix',
-        optionSets,
         legendSets,
         currentSectionsData,
         importSummaryValues
@@ -173,18 +172,16 @@ const readTemplateDataMWI = (
 
             logicDataElements = row[templateMap.dataElementId]
                 ? JSON.parse(row[templateMap.dataElementId]).map((de, index) => { 
-                    de.code = `${sectionNumer}.${standardNumber}.${criterionNumber} MWI_AP_DE${index + 1}`;
+                    de.code = `${programPrefix} - ${sectionNumer}.${standardNumber}.${criterionNumber} MWI_AP_DE${index + 1}`;
                     return de;
                 })
                 : (DeepCopy(HNQISMWI_ActionPlanElements).map(de => {
-                    de.code = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.code}`;
-                    de.name = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.name}`;
-                    de.shortName = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.shortName}`;
+                    de.code = `${programPrefix} - ${sectionNumer}.${standardNumber}.${criterionNumber} ${de.code}`;
+                    de.name = `${programPrefix} - ${sectionNumer}.${standardNumber}.${criterionNumber} ${de.name}`;
+                    de.shortName = `${programPrefix} - ${sectionNumer}.${standardNumber}.${criterionNumber} ${de.shortName}`;
                     de.formName = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.formName}`;
                     return de;
                 }));
-            
-            console.log(logicDataElements);
         }
 
         switch (structure) {
@@ -233,6 +230,7 @@ const readTemplateDataMWI = (
                     legendSets,
                     dataElementsPool
                 }));
+                console.error(importedSections[sectionIndex].dataElements[importedSections[sectionIndex].dataElements.length - 1]);
                 break;
         }
     });

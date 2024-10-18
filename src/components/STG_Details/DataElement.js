@@ -14,6 +14,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { METADATA } from "../../configs/Constants.js";
+import { isLabelType } from '../../utils/Utils.js';
 import AlertDialogSlide from "../UIElements/AlertDialogSlide.js";
 import BadgeErrors from "../UIElements/BadgeErrors.js";
 import BadgeWarnings from "../UIElements/BadgeWarnings.js";
@@ -21,7 +22,7 @@ import ValidationMessages from "../UIElements/ValidationMessages.js";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import DataElementForm from "./DataElementForm.js";
 
-const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActions, section, index, hnqisMode, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
+const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActions, section, index, hnqisType, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -37,6 +38,8 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
 
     const metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || '{}');
     const renderFormName = metadata?.labelFormName;
+
+    console.log(metadata.elemType);
 
     classNames += " ml_item";
     classNames += (dataElement.importStatus) ? ' import_' + dataElement.importStatus : '';
@@ -68,7 +71,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                         <div id={"de_" + dataElement.id} className={'data-element-header ' + (openMenu ? 'data-element-selected ' : '') + classNames}>
                             <div className="ml_item-icon" style={{ display: 'flex', alignItems: 'center' }}>
-                                {!hnqisMode ? <DEIcon /> : (metadata.elemType === 'label' ? <LabelIcon /> : <QuizIcon />)}
+                                {!hnqisType ? <DEIcon /> : (isLabelType(metadata.elemType) ? <LabelIcon /> : <QuizIcon />)}
                             </div>
                             <div className="ml_item-title" style={{ maxWidth: '80vw' }}>
                                 {deImportStatus}
@@ -124,7 +127,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                                 section={section}
                                 setDeToEdit={DEActions.setEdit}
                                 save={DEActions.update}
-                                hnqisMode={hnqisMode}
+                                hnqisType={hnqisType}
                                 setSaveStatus={setSaveStatus}
                             />
                         }
@@ -156,7 +159,7 @@ DraggableDataElement.propTypes = {
     dataElement: PropTypes.object,
     dePrefix: PropTypes.string,
     deStatus: PropTypes.object,
-    hnqisMode: PropTypes.bool,
+    hnqisType: PropTypes.string,
     index: PropTypes.number,
     isSectionMode: PropTypes.bool,
     program: PropTypes.string,

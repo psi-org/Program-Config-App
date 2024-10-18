@@ -120,8 +120,6 @@ const processStageData = (
 
         section.dataElements.forEach(dataElement => {
 
-            console.log(dataElement);
-
             let isLogicDE = false;
 
             const DE_metadata = JSON.parse(dataElement.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");

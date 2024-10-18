@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import { COMPETENCY_CLASS, CRITICAL_STEPS, FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA, NON_CRITICAL_STEPS } from '../../configs/Constants.js';
 import { getVarNameFromParentUid } from '../../utils/ExcelUtils.js';
-import { getPureValue } from '../../utils/Utils.js';
+import { getPureValue, isLabelType } from '../../utils/Utils.js';
 import Exporter from "./Exporter.js";
 
 const optionSetQuery = {
@@ -172,7 +172,7 @@ const DataProcessor = (props) => {
 
                 row.parentValue = '';
                 row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
-                if (row.structure == 'label') { row.form_name = metaData.labelFormName || '' }
+                if (isLabelType(row.structure)) { row.form_name = metaData.labelFormName || '' }
                 row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: undefined;
                 row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : undefined;
                 row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion, programStage) : undefined;

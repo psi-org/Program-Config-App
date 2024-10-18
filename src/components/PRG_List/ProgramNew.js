@@ -707,7 +707,6 @@ const ProgramNew = (props) => {
                             attribute: { id: prgTypeId },
                         });
                         prgrm.programStages.push({ id: assessmentId });
-                        prgrm.programStages.push({ id: actionPlanId });
 
                         assessmentStage = DeepCopy(PS_AssessmentStage);
                         assessmentStage.id = assessmentId;
@@ -733,59 +732,24 @@ const ProgramNew = (props) => {
                         }
                         assessmentStage.program.id = prgrm.id;
 
-                        actionPlanStage = DeepCopy(PS_ActionPlanStage);
-                        actionPlanStage.id = actionPlanId;
-                        actionPlanStage.name =
-                            "Action Plan [" + prgrm.id + "]"; //! Not adding the ID may result in an error
-                        actionPlanStage.program.id = prgrm.id;
-                        if (pgrTypePCA === "hnqismwi") {
-                            const deCriterionId = uidPool.shift();
-                            const osCriterionId = uidPool.shift();
-
-                            optionSets.push({
-                                name: `HNQIS MWI - ${dePrefix} - Criterion List`,
-                                code: `${prgrm.id}-CRITERION-OS`,
-                                translations: [],
-                                options: [],
-                                valueType: "TEXT",
-                                id: osCriterionId,
-                                attributeValues: []
-                            });
-
-                            dataElements.push({
-                                id: deCriterionId,
-                                name: `${dePrefix} - AP-Criterion`,
-                                shortName: `${dePrefix} - AP-Criterion`,
-                                code: `${prgrm.id}-CRITERION`,
-                                formName: "Criterion",
-                                aggregationType: "NONE",
-                                valueType: "TEXT",
-                                domainType: "TRACKER",
-                                zeroIsSignificant: false,
-                                optionSet: { id: osCriterionId },
-                                translations: [],
-                                legendSets: [],
-                                aggregationLevels: [],
-                                attributeValues: []
-                            },);
-
-                            actionPlanStage.programStageDataElements = [{
-                                sortOrder: 1,
-                                compulsory: true,
-                                programStage: { id: actionPlanId },
-                                dataElement: { id: deCriterionId }
-                            }].concat(PSDE_HNQISMWI_ActionPlan);
-                            
-                        } else {
+                        if (pgrTypePCA === HNQIS_TYPES.hnqis) {
+                            prgrm.programStages.push({ id: actionPlanId });
+                            actionPlanStage = DeepCopy(PS_ActionPlanStage);
+                            actionPlanStage.id = actionPlanId;
+                            actionPlanStage.name = "Action Plan [" + prgrm.id + "]"; //! Not adding the ID may result in an error
+                        
+                            actionPlanStage.program.id = prgrm.id;
+                        
                             actionPlanStage.programStageDataElements = PSDE_HNQIS_ActionPlan;
-                        }
+                        
 
-                        actionPlanStage.programStageDataElements = actionPlanStage.programStageDataElements.map(psde => {
-                            psde.programStage = {
-                                id: actionPlanId
-                            }
-                            return psde;
-                        })
+                            actionPlanStage.programStageDataElements = actionPlanStage.programStageDataElements.map(psde => {
+                                psde.programStage = {
+                                    id: actionPlanId
+                                }
+                                return psde;
+                            })
+                        }
 
                         defaultSection = DeepCopy(PSS_Default);
                         defaultSection.id = defaultSectionId;

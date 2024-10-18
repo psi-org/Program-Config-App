@@ -112,7 +112,6 @@ const Importer = (
         setValidationResults(undefined);
         setNotificationError(false);
 
-        console.log(programType);
         const settings = getSettings(programType);
         
         let indexModifier = 0;

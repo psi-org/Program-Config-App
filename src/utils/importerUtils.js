@@ -1,7 +1,7 @@
-import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA, OPTION_SET_YESNONA } from "../configs/Constants.js";
+import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA, OPTION_SET_YESNONA } from "../configs/Constants.js";
 import { ReleaseNotes, ReleaseNotesTracker } from "../configs/ReleaseNotes.js";
 import { HNQIS2_TEMPLATE_MAP, HNQISMWI_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../configs/TemplateConstants.js";
-import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty, programIsHNQIS } from "./Utils.js";
+import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty, isLabelType, programIsHNQIS } from "./Utils.js";
 
 export const isTrackerType = (importType) => [TEMPLATE_PROGRAM_TYPES.tracker, TEMPLATE_PROGRAM_TYPES.event].includes(importType);
 
@@ -258,7 +258,7 @@ export const mapImportedDEHNQIS2 = ({ data, programPrefix, type, optionSets, leg
     }
 
     parsedDE.code = code;
-    parsedDE.name = (code + data[HNQIS2_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH);
+    parsedDE.name = (code + data[HNQIS2_TEMPLATE_MAP.formName]).slice(0, MAX_DATA_ELEMENT_NAME_LENGTH);
     parsedDE.shortName = (code + data[HNQIS2_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH);
     parsedDE.valueType = data[HNQIS2_TEMPLATE_MAP.valueType];
 
@@ -349,7 +349,7 @@ export const mapImportedDE = ({ data, programPrefix, stageNumber, optionSets, le
 
     parsedDE.id = data[TRACKER_TEMPLATE_MAP.dataElementId] || undefined;
     parsedDE.name = autoNaming
-        ? (code + data[TRACKER_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH)
+        ? (code + data[TRACKER_TEMPLATE_MAP.formName]).slice(0, MAX_DATA_ELEMENT_NAME_LENGTH)
         : data[TRACKER_TEMPLATE_MAP.name];
     parsedDE.shortName = autoNaming
         ? (code + data[TRACKER_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH)
@@ -415,10 +415,10 @@ export const mapImportedDEHNQISMWI = ({ data, programPrefix, type, legendSets, d
 
     parsedDE.id = data[HNQISMWI_TEMPLATE_MAP.dataElementId] || undefined;
     parsedDE.description = data[HNQISMWI_TEMPLATE_MAP.description];
-    parsedDE.formName;
-    if (type == 'label') {
+
+    if (type === 'label') {
         parsedDE.formName = '     ';
-    } else if (type == 'Std Overview') {
+    } else if (type === 'Std Overview') {
         parsedDE.formName = 'Standard Overview';
     } else {
         parsedDE.formName = data[HNQISMWI_TEMPLATE_MAP.formName] || '';
@@ -426,7 +426,7 @@ export const mapImportedDEHNQISMWI = ({ data, programPrefix, type, legendSets, d
     
     parsedDE.domainType = 'TRACKER';
 
-    if (['label', 'Std Overview'].includes(type)) {
+    if (isLabelType(type)) {
         data[HNQISMWI_TEMPLATE_MAP.valueType] = 'LONG_TEXT';
         parsedDE.aggregationType = 'NONE';
     }
@@ -434,8 +434,8 @@ export const mapImportedDEHNQISMWI = ({ data, programPrefix, type, legendSets, d
     code = programPrefix + (data[HNQISMWI_TEMPLATE_MAP.parentName]?.result || '???');
 
     parsedDE.code = code;
-    parsedDE.name = (code + data[HNQISMWI_TEMPLATE_MAP.formName]).slice(0, MAX_FORM_NAME_LENGTH);
-    parsedDE.shortName = (code + data[HNQISMWI_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH);
+    parsedDE.name = (code + '_' + data[HNQISMWI_TEMPLATE_MAP.formName]).slice(0, MAX_DATA_ELEMENT_NAME_LENGTH);
+    parsedDE.shortName = (code + '_' + data[HNQISMWI_TEMPLATE_MAP.formName])?.slice(0, MAX_SHORT_NAME_LENGTH);
     parsedDE.valueType = data[HNQISMWI_TEMPLATE_MAP.valueType];
 
     parsedDE.parentName = data[HNQISMWI_TEMPLATE_MAP.parentName]?.result || '???';
@@ -480,7 +480,7 @@ export const mapImportedDEHNQISMWI = ({ data, programPrefix, type, legendSets, d
         metadata.parentValue = data[HNQISMWI_TEMPLATE_MAP.parentValue];
     }
 
-    if (type == 'label') { metadata.labelFormName = data[HNQISMWI_TEMPLATE_MAP.formName] }
+    if (isLabelType(type)) { metadata.labelFormName = data[HNQISMWI_TEMPLATE_MAP.formName] }
 
     parsedDE.attributeValues.push(
         {

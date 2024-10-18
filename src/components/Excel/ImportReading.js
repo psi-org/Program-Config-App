@@ -175,7 +175,6 @@ export const importReadingHNQISMWI = (
         templateData: templateData[0].data,
         currentData: previous,
         programPrefix: programDetails.dePrefix || programDetails.id,
-        optionSets: mappingDetails.optionSets,
         legendSets: mappingDetails.legendSets,
         currentSectionsData,
         importSummaryValues
@@ -191,8 +190,6 @@ export const importReadingHNQISMWI = (
     programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
     programMetadata_new.healthArea = mappingDetails.healthAreas.find(ha => ha.name == programDetails.healthArea)?.code;
     programMetadata.setProgramMetadata(programMetadata_new);
-
-    console.log(importSummaryValues);
 
     return importSummaryValues;
 }

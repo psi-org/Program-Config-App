@@ -260,7 +260,7 @@ const RENDER_TYPES = [
 ];
 
 //* HNQIS2 Elem Types
-const ELEM_TYPES = [{ label: 'Question', value: 'question' }, { label: 'Label', value: 'label' }];
+const ELEM_TYPES = [{ label: 'Question', value: 'question' }, { label: 'Label', value: 'label' }, { label: 'Std Overview', value: 'Std Overview' }];
 
 //* PCA Dropdowns
 const VALUE_TYPES_H2 = [
