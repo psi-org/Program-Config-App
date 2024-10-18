@@ -434,7 +434,7 @@ export const checkSectionHasFormName = ({ section }) => !isBlank(section.name);
 
 
 export const checkFormNameLength = ({ metadata, dataElement }) => {
-    const formName = dataElement.labelFormName || dataElement.formName || '';
+    const formName = dataElement.formName || '';
     if (metadata.elem !== "") {
         return (formName.replace(' [C]', '').length <= (MAX_DATA_ELEMENT_NAME_LENGTH) && formName.replace(' [C]', '').length >= MIN_DATA_ELEMENT_NAME_LENGTH)
     }

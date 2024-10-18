@@ -230,7 +230,6 @@ const readTemplateDataMWI = (
                     legendSets,
                     dataElementsPool
                 }));
-                console.error(importedSections[sectionIndex].dataElements[importedSections[sectionIndex].dataElements.length - 1]);
                 break;
         }
     });

@@ -1,6 +1,7 @@
 import { FlyoutMenu, MenuItem, Popper, Layer, Tag } from '@dhis2/ui';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DEIcon from '@mui/icons-material/Dns';
 import EditIcon from '@mui/icons-material/Edit';
@@ -22,6 +23,22 @@ import ValidationMessages from "../UIElements/ValidationMessages.js";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import DataElementForm from "./DataElementForm.js";
 
+const getDEIcon = (elemType, hnqisType) => {
+    if (!hnqisType) {
+        return <DEIcon />;
+    }
+
+    if (isLabelType(elemType)) {
+        return <LabelIcon />;
+    }
+
+    if (elemType === 'generated') {
+        return <AutoAwesomeIcon />;
+    }
+
+    return <QuizIcon />;
+}
+
 const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActions, section, index, hnqisType, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
     const [ref, setRef] = useState(undefined);
@@ -38,8 +55,6 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
 
     const metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || '{}');
     const renderFormName = metadata?.labelFormName;
-
-    console.log(metadata.elemType);
 
     classNames += " ml_item";
     classNames += (dataElement.importStatus) ? ' import_' + dataElement.importStatus : '';
@@ -71,7 +86,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                         <div id={"de_" + dataElement.id} className={'data-element-header ' + (openMenu ? 'data-element-selected ' : '') + classNames}>
                             <div className="ml_item-icon" style={{ display: 'flex', alignItems: 'center' }}>
-                                {!hnqisType ? <DEIcon /> : (isLabelType(metadata.elemType) ? <LabelIcon /> : <QuizIcon />)}
+                                {getDEIcon(metadata.elemType, hnqisType)}
                             </div>
                             <div className="ml_item-title" style={{ maxWidth: '80vw' }}>
                                 {deImportStatus}
