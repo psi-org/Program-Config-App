@@ -118,7 +118,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                             </div>
                             <div className="ml_item-cta">
                                 {deStatus && <Chip label={deStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{ marginLeft: '1em' }} />}
-                                {isSectionMode && !readOnly && <img src={move_vert_svg} alt="menu" id={'menu' + dataElement.id} onClick={() => { setRef(document.getElementById('menu' + dataElement.id)); toggle() }} style={{ cursor: 'pointer' }} />}
+                                {isSectionMode && !readOnly && metadata.elemType != 'generated' && <img src={move_vert_svg} alt="menu" id={'menu' + dataElement.id} onClick={() => { setRef(document.getElementById('menu' + dataElement.id)); toggle() }} style={{ cursor: 'pointer' }} />}
                                 {openMenu &&
                                     <Layer onClick={toggle}>
                                         <Popper reference={ref} placement="bottom-end">
@@ -131,7 +131,6 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                                         </Popper>
                                     </Layer>
                                 }
-                                {/*<a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
                             </div>
                         </div>
                         {DEActions.deToEdit === dataElement.id &&

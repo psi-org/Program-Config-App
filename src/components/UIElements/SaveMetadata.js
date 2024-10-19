@@ -128,7 +128,7 @@ const processStageData = (
             const prefixOption = section.id === 'basic-form' ? programStage.id : section.id;
             let newCode = `${programMetadata.dePrefix || prefixOption}${newVarName}`;
 
-            if (dataElement.code.match(/MWI_AP_DE/)) {
+            if (dataElement.code?.match(/MWI_AP_DE/)) {
                 isLogicDE = true;
                 newCode = dataElement.code;
             }
