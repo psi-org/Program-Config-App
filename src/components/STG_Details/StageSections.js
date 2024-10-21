@@ -39,8 +39,8 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 import CriticalCalculations from "./CriticalCalculations.js";
 import DataElementManager from './DataElementManager.js'
+import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Logic_Scripts/Scripting.js";
 import Scores from "./Scores.js";
-import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Scripting.js";
 import DraggableSection from "./Section.js";
 import SectionManager from './SectionManager.js'
 import ValidateMetadata from "./ValidateMetadata.js";
@@ -612,8 +612,6 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
         return;
     };
 
-
-
     useEffect(() => {
         if (androidSettingsError || androidSettingsSyncUpdateError) { updateProgramBuildVersion(programId) }
     }, [androidSettingsUpdateError, androidSettingsSyncUpdateError])
@@ -890,6 +888,9 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
                             dashboards,
                             eventReports
                         };
+
+                        updateProgramBuildVersion(programId); //TODO: Remove this line later
+                        return;
 
                         // IV. Prepare Datastore references 
                         getDataStore().then((dataStoreResult) => {

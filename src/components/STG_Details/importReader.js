@@ -213,6 +213,10 @@ const readTemplateDataMWI = (
                     isBasicForm
                 }
 
+                if (structure === 'Criterion' && row[templateMap.isCritical] === 'Yes') {
+                    importedSections[sectionIndex].description = "*";
+                }
+
                 logicDataElements = [];
                 row[templateMap.programSection] ? importSummaryValues.sections.updated++ : importSummaryValues.sections.new++;
                 

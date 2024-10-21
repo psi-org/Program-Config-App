@@ -19,7 +19,7 @@ import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, mapIdArray, p
 import DataProcessorTracker from "../Excel/DataProcessorTracker.js";
 import Importer from "../Excel/Importer.js";
 import ValidateTracker from "../PRG_Details/ValidateTracker.js";
-import { hideShowLogic } from "../STG_Details/Scripting.js";
+import { hideShowLogic } from "../STG_Details/Logic_Scripts/Scripting.js";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog.js";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle.js";
 import ErrorReports from "../UIElements/ErrorReports.js";

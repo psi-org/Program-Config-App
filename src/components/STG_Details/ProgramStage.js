@@ -16,7 +16,7 @@ const query = {
             fields: [
                 'id', 'name', 'allowGenerateNextVisit', 'publicAccess', 'reportDateToUse', 'formType', 'generatedByEnrollmentDate', 'displayFormName', 'sortOrder', 'hideDueDate', 'enableUserAssignment', 'minDaysFromStart', 'favorite', 'executionDateLabel', 'preGenerateUID', 'displayName', 'externalAccess', 'openAfterEnrollment', 'repeatable', 'remindCompleted', 'displayGenerateEventBox', 'validationStrategy', 'autoGenerateEvent', 'blockEntryForm', 'program[id,name,shortName,attributeValues,withoutRegistration,programStages[id]]', 'style', 'access', 'user', 'translations', 'userGroupAccesses', 'attributeValues', 'userAccesses', 'favorites', 'notificationTemplates', 'sharing',
                 'programStageDataElements[id,name,compulsory,displayInReports,programStage,dataElement[id,name,shortName,style,code,description,sharing,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName],sortOrder,style,categoryCombo,,allowFutureDate,allowProvidedElsewhere,skipSynchronization,renderType]',
-                'programStageSections[id,name,displayName,sortOrder,dataElements[id,name,shortName,style,code,description,sharing,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName]]'
+                'programStageSections[id,name,displayName,description,sortOrder,dataElements[id,name,shortName,style,code,description,sharing,domainType,formName,valueType,aggregationType,optionSetValue,optionSet[id,name],legendSet[id,name],legendSets,attributeValues,displayName]]'
             ]
         }
     }

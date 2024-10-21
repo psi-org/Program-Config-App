@@ -120,7 +120,13 @@ const DataProcessor = (props) => {
     }
 
     const compile_report = () => {
-        const  program_stage_id = programStage.id;
+        const program_stage_id = programStage.id;
+        const mwiFeedbackOrder = {
+            section: 0,
+            standard: 0,
+            criterion: 0,
+            element: 1
+        }
 
         programStage.programStageSections.forEach((programSection) => {
             const  criticalStepsDataElements = [COMPETENCY_CLASS, CRITICAL_STEPS, NON_CRITICAL_STEPS];
@@ -134,14 +140,26 @@ const DataProcessor = (props) => {
             const logicDataElements = [];
 
             const sectionRow = {};
-            
 
             sectionRow.structure = "Section";
 
-            if (props.hnqisType === 'HNQISMWI' && programSection.displayName.match(/> Standard \d+(\.\d+)*.*/)) {
-                sectionRow.structure = "Standard";
-            } else if (props.hnqisType === 'HNQISMWI' && programSection.displayName.match(/> > Criterion \d+(\.\d+)*.*/)) {
-                sectionRow.structure = "Criterion";
+            if (props.hnqisType === 'HNQISMWI') {
+                if (programSection.displayName.match(/Section \d+.*/)) {
+                    sectionRow.compositive_indicator = `${++mwiFeedbackOrder.section}`;
+                    mwiFeedbackOrder.standard = 0;
+                    mwiFeedbackOrder.criterion = 0;
+                    mwiFeedbackOrder.element = 1;
+                } else if (programSection.displayName.match(/> Standard \d+(\.\d+)*.*/)) {
+                    sectionRow.structure = "Standard";
+                    sectionRow.compositive_indicator = `${mwiFeedbackOrder.section}.${++mwiFeedbackOrder.standard}`;
+                    mwiFeedbackOrder.criterion = 0;
+                    mwiFeedbackOrder.element = 1;
+                } else if (programSection.displayName.match(/> > Criterion \d+(\.\d+)*.*/)) {
+                    sectionRow.structure = "Criterion";
+                    sectionRow.compositive_indicator = `${mwiFeedbackOrder.section}.${mwiFeedbackOrder.standard}.${++mwiFeedbackOrder.criterion}`;
+                    sectionRow.isCritical = (programSection.description === "*" ? "Yes" : "No");
+                    mwiFeedbackOrder.element = 1;
+                }
             }
 
             sectionRow.form_name = programSection.displayName.replace(/(> > Criterion \d+(\.\d+)*|> Standard \d+(\.\d+)*|Section \d+) : /g, "");
@@ -158,7 +176,6 @@ const DataProcessor = (props) => {
                     logicDataElements.push(dataElement);
                     return;
                 }
-
 
                 row.form_name = dataElement.formName?.replaceAll(' [C]','') || '';
                 row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : undefined;
@@ -180,8 +197,12 @@ const DataProcessor = (props) => {
                 row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: undefined;
                 row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: undefined;
 
-                const compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_ORDER);
-                row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : undefined;
+                if (props.hnqisType === 'HNQISMWI' && row.structure != 'Std Overview') {  
+                    row.compositive_indicator = `${mwiFeedbackOrder.section}.${mwiFeedbackOrder.standard}.${mwiFeedbackOrder.criterion}.${mwiFeedbackOrder.element++}`;
+                } else {
+                    const compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_ORDER);
+                    row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : undefined;
+                }
 
                 const feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_TEXT);
                 row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : undefined;

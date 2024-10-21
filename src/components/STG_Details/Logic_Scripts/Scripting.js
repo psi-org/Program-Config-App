@@ -1,6 +1,6 @@
-import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../configs/AnalyticsTemplates.js";
-import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND, NON_CRITICAL_STEPS, CRITICAL_STEPS } from "../../configs/Constants.js";
-import { DeepCopy, padValue } from "../../utils/Utils.js";
+import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../../configs/AnalyticsTemplates.js";
+import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND, NON_CRITICAL_STEPS, CRITICAL_STEPS } from "../../../configs/Constants.js";
+import { DeepCopy, padValue } from "../../../utils/Utils.js";
 
 /**
  * 
