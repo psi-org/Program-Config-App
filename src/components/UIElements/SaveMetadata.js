@@ -268,7 +268,7 @@ const processStageData = (
     };
 
     //*Replace sections and Data Elements on program stage
-    const specialSections = hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2 ? importedScores.concat(criticalSection) : [];
+    const specialSections = hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2 ? [importedScores].concat(criticalSection) : [];
     programStage.programStageSections = !isBasicForm ? [...importedSections, ...specialSections]: [];
     programStage.programStageDataElements = new_programStageDataElements;
 
@@ -485,6 +485,7 @@ const SaveMetadata = (props) => {
 
     useEffect(() => {
         if (uidPool && programPayload && !completed && !metadataRequest.called) {
+            console.log(props.importedScores); //!!!!!!!
 
             const programConfigurations = DeepCopy(programPayload);
 

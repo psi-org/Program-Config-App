@@ -585,7 +585,7 @@ export const validateQuestions = (importedScores, dataElement, metadata, dataEle
         validate(validations.checkFormNameLength, checkFormNameLength, { metadata, dataElement }, errors);
         validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element: 'label', valueType: 'LONG_TEXT' }, errors);
         validate(validations.hasFeedbackOrder, hasFeedbackOrder, { metadata, dataElement }, errors);
-        if (metadata.elemType === 'generated') {
+        if (metadata.elemType != 'generated') {
             validate(validations.hasVarName, hasVarName, { metadata }, errors);
         }
         validate(validations.checkHasValueType, checkHasProperty, { object: dataElement, property: 'valueType' }, errors);

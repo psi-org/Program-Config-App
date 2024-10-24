@@ -39,7 +39,7 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 import CriticalCalculations from "./CriticalCalculations.js";
 import DataElementManager from './DataElementManager.js'
-import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Logic_Scripts/Scripting.js";
+import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Logic_Scripts/Scripting.js";//"./Logic_Scripts/HNQISMWI_Scripting.js";
 import Scores from "./Scores.js";
 import DraggableSection from "./Section.js";
 import SectionManager from './SectionManager.js'
@@ -736,6 +736,328 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
         });
     }
 
+    const executeHNQISProcess = ({pcaMetadata, sharingSettings, actionPlanID}) => {
+        // --------------- PROCESSING ---------------- //
+        // Globals, States & more...
+
+        // I. Scores Checking
+        // Requires: scoresSection
+        //      Break point: When duplicated scores found
+        setProgressSteps(2);
+
+        const { uniqueScores, compositeScores, duplicatedScores } = checkScores(scoresSection.dataElements);
+        if (!uniqueScores) { throw { msg: "Duplicated scores", duplicatedScores, status: 400 } }
+        const scoresMapping = scoresSection.dataElements.reduce((acc, cur) => (
+            {
+                ...acc,
+                [cur.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value]: cur
+            }), {});   // { feedbackOrder:deUid, ... }
+
+        // II. Read questions
+        // Requires: sections (with or WITHOUT scores&critical)
+        //      Breakpoint: When a score is missing
+        setProgressSteps(3);
+
+        const questionCompositeScores = readQuestionComposites(sections);
+        const missingComposites = questionCompositeScores.filter(cs => !compositeScores.includes(cs));
+        if (missingComposites.length > 0) { throw { msg: "Some questions Feedback Order don't match any Score item", missingComposites, status: 400 } }
+
+        // III. Build new metadata
+        // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
+        // Also, Program Indicators and Visualizations
+        setProgressSteps(4);
+
+        const programRuleVariables = buildProgramRuleVariables(
+            {
+                sections,
+                compositeScores,
+                programId,
+                useCompetencyClass: programMetadata.useCompetencyClass,
+                uidPool
+            }
+        );
+
+        const { programRules, programRuleActions, scoreMap } = buildProgramRules(
+            {
+                sections,
+                stageId: programStage.id,
+                programId,
+                compositeValues: compositeScores,
+                scoresMapping,
+                uidPool,
+                useCompetencyClass: programMetadata.useCompetencyClass,
+                healthArea: programMetadata.healthArea
+            }
+        );
+
+        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicators(
+            {
+                programId,
+                programStage,
+                scoreMap,
+                uidPool,
+                useCompetency: programMetadata.useCompetencyClass,
+                sharingSettings,
+                PIAggregationType: programMetadata.programIndicatorsAggType
+            }
+        );
+
+        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(
+            {
+                programId,
+                programShortName: programStage.program.shortName,
+                gsInd,
+                indicatorIDs,
+                uidPool,
+                useCompetency: programMetadata.useCompetencyClass,
+                currentDashboardId: dashboardsDQ?.data?.results?.dashboards[0]?.id,
+                userOU: pcaMetadata.useUserOrgUnit,
+                ouRoot: pcaMetadata.ouRoot,
+                sharingSettings,
+                visualizationLevel: pcaMetadata.ouLevelTable,
+                mapLevel: pcaMetadata.ouLevelMap,
+                actionPlanID
+            }
+        );
+
+        const metadata = {
+            programRuleVariables,
+            programRules,
+            programRuleActions,
+            programIndicators,
+            visualizations,
+            maps,
+            dashboards,
+            eventReports
+        };
+
+        // IV. Prepare Datastore references 
+        getDataStore().then((dataStoreResult) => {
+            const programRefereces = {
+                programRules: mapIdArray(programRules),
+                programRuleVariables: mapIdArray(programRuleVariables),
+                programIndicators: mapIdArray(programIndicators),
+                visualizations: mapIdArray(visualizations),
+                eventReports: mapIdArray(eventReports),
+                maps: mapIdArray(maps),
+                dashboards: mapIdArray(dashboards)
+            };
+
+            let dataStoreData;
+            let sendToDataStore;
+
+            if (!dataStoreResult?.results) {
+                sendToDataStore = dataStoreCreate;
+                dataStoreData = {};
+            } else {
+                sendToDataStore = dataStoreUpdate;
+                dataStoreData = dataStoreResult.results;
+            }
+
+            // Saving UIDs of old objects
+            const toDeleteReferences = DeepCopy(dataStoreData);
+            // Setting new UIDs
+            dataStoreData = programRefereces;
+
+            // V. Delete old metadata
+            setProgressSteps(5);
+
+            const fallbackRuleVariables = prvDQ.data.results.programRuleVariables.filter(prv => {
+                return prv.name[0] == "_";
+            });
+
+            const programRulesDel = toDeleteReferences?.programRules || mapIdArray(prDQ.data.results.programRules);
+            const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(fallbackRuleVariables);
+            const programIndicatorsDel = toDeleteReferences?.programIndicators || mapIdArray(pIndDQ.data.results.programIndicators);
+            const visualizationsDel = toDeleteReferences?.visualizations || mapIdArray(visualizationsDQ.data.results.visualizations);
+            const eventReportsDel = toDeleteReferences?.eventReports || mapIdArray(eventReportDQ.data.results.eventReports);
+            const mapsDel = toDeleteReferences?.maps || mapIdArray(mapsDQ.data.results.maps);
+
+            const oldMetadata = {
+                programRules: (programRulesDel.length > 0 ? programRulesDel : undefined),
+                programRuleVariables: (programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined),
+                programIndicators: (programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined),
+                visualizations: (visualizationsDel.length > 0 ? visualizationsDel : undefined),
+                eventReports: (eventReportsDel.length > 0 ? eventReportsDel : undefined),
+                maps: (mapsDel.length > 0 ? mapsDel : undefined)
+            };
+
+            // VI. Import new metadata
+            createMetadata.mutate({
+                data: {
+                    eventReports: eventReportDQ.data.results.eventReports.map(er => {
+                        er.columnDimensions = ["pe", "ou"]
+                        er.dataElementDimensions = [];
+                        er.programIndicatorDimensions = [];
+                        return er;
+                    })
+                }
+            }).then(updateEventReportResp => {
+                if (updateEventReportResp.status == 'OK') {
+                    deleteMetadata({ data: oldMetadata }).then((res) => {
+                        if (res.status == 'OK') {
+                            setProgressSteps(6);
+                            executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    const executeMWIProcess = ({ pcaMetadata, sharingSettings }) => {
+        // --------------- PROCESSING ---------------- //
+        // Globals, States & more...
+
+        // I. Scores Checking
+        // Requires: scoresSection
+        //      Break point: When duplicated scores found
+        setProgressSteps(2);
+
+        // II. Read questions
+        // Requires: sections (with or WITHOUT scores&critical)
+        //      Breakpoint: When a score is missing
+        setProgressSteps(3);
+
+        // III. Build new metadata
+        // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
+        // Also, Program Indicators and Visualizations
+        setProgressSteps(4);
+
+        const programRuleVariables = buildProgramRuleVariables(
+            {
+                sections,
+                programId,
+                useCompetencyClass: programMetadata.useCompetencyClass,
+                uidPool
+            }
+        );
+
+        const { programRules, programRuleActions, scoreMap } = buildProgramRules(
+            {
+                sections,
+                stageId: programStage.id,
+                programId,
+                uidPool,
+                useCompetencyClass: programMetadata.useCompetencyClass,
+                healthArea: programMetadata.healthArea
+            }
+        );
+
+        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicators(
+            {
+                programId,
+                programStage,
+                scoreMap,
+                uidPool,
+                useCompetency: programMetadata.useCompetencyClass,
+                sharingSettings,
+                PIAggregationType: programMetadata.programIndicatorsAggType
+            }
+        );
+
+        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(
+            {
+                programId,
+                programShortName: programStage.program.shortName,
+                gsInd,
+                indicatorIDs,
+                uidPool,
+                useCompetency: programMetadata.useCompetencyClass,
+                currentDashboardId: dashboardsDQ?.data?.results?.dashboards[0]?.id,
+                userOU: pcaMetadata.useUserOrgUnit,
+                ouRoot: pcaMetadata.ouRoot,
+                sharingSettings,
+                visualizationLevel: pcaMetadata.ouLevelTable,
+                mapLevel: pcaMetadata.ouLevelMap
+            }
+        );
+
+        const metadata = {
+            programRuleVariables,
+            programRules,
+            programRuleActions,
+            programIndicators,
+            visualizations,
+            maps,
+            dashboards,
+            eventReports
+        };
+
+        // IV. Prepare Datastore references 
+        getDataStore().then((dataStoreResult) => {
+            const programRefereces = {
+                programRules: mapIdArray(programRules),
+                programRuleVariables: mapIdArray(programRuleVariables),
+                programIndicators: mapIdArray(programIndicators),
+                visualizations: mapIdArray(visualizations),
+                eventReports: mapIdArray(eventReports),
+                maps: mapIdArray(maps),
+                dashboards: mapIdArray(dashboards)
+            };
+
+            let dataStoreData;
+            let sendToDataStore;
+
+            if (!dataStoreResult?.results) {
+                sendToDataStore = dataStoreCreate;
+                dataStoreData = {};
+            } else {
+                sendToDataStore = dataStoreUpdate;
+                dataStoreData = dataStoreResult.results;
+            }
+
+            // Saving UIDs of old objects
+            const toDeleteReferences = DeepCopy(dataStoreData);
+            // Setting new UIDs
+            dataStoreData = programRefereces;
+
+            // V. Delete old metadata
+            setProgressSteps(5);
+
+            const fallbackRuleVariables = prvDQ.data.results.programRuleVariables.filter(prv => {
+                return prv.name[0] == "_";
+            });
+
+            const programRulesDel = toDeleteReferences?.programRules || mapIdArray(prDQ.data.results.programRules);
+            const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(fallbackRuleVariables);
+            const programIndicatorsDel = toDeleteReferences?.programIndicators || mapIdArray(pIndDQ.data.results.programIndicators);
+            const visualizationsDel = toDeleteReferences?.visualizations || mapIdArray(visualizationsDQ.data.results.visualizations);
+            const eventReportsDel = toDeleteReferences?.eventReports || mapIdArray(eventReportDQ.data.results.eventReports);
+            const mapsDel = toDeleteReferences?.maps || mapIdArray(mapsDQ.data.results.maps);
+
+            const oldMetadata = {
+                programRules: (programRulesDel.length > 0 ? programRulesDel : undefined),
+                programRuleVariables: (programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined),
+                programIndicators: (programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined),
+                visualizations: (visualizationsDel.length > 0 ? visualizationsDel : undefined),
+                eventReports: (eventReportsDel.length > 0 ? eventReportsDel : undefined),
+                maps: (mapsDel.length > 0 ? mapsDel : undefined)
+            };
+
+            // VI. Import new metadata
+            createMetadata.mutate({
+                data: {
+                    eventReports: eventReportDQ.data.results.eventReports.map(er => {
+                        er.columnDimensions = ["pe", "ou"]
+                        er.dataElementDimensions = [];
+                        er.programIndicatorDimensions = [];
+                        return er;
+                    })
+                }
+            }).then(updateEventReportResp => {
+                if (updateEventReportResp.status != 'OK') { return; }
+                
+                deleteMetadata({ data: oldMetadata }).then((res) => {
+                    if (res.status != 'OK') { return }
+                    
+                    setProgressSteps(6);
+                    executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
+                });
+            });
+        });
+    }
+
     const run = () => {
         if (!savedAndValidated) { return }
         //--------------------- NEW METADATA --------------------//
@@ -761,11 +1083,11 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
         Object.keys(sharingSettings.users).forEach(key => {
             const access = sharingSettings.users[key]
             access.access = extractMetadataPermissions(access.access)
-        })
+        });
         Object.keys(sharingSettings.userGroups).forEach(key => {
             const access = sharingSettings.userGroups[key]
             access.access = extractMetadataPermissions(access.access)
-        })
+        });
 
         // Set flag to enable/disable actions (buttons)
         setSaveAndBuild('Run');
@@ -777,197 +1099,40 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
             !Object.hasOwn(pcaMetadata, "useUserOrgUnit")) {
             setProgramSettingsError(1);
             setSaveAndBuild("Completed");
-        } else {
-            if (pcaMetadata.useUserOrgUnit == "Yes") { pcaMetadata.useUserOrgUnit = true } else { pcaMetadata.useUserOrgUnit = false }
-
-            //-------------------------------------------------------//
-            setOuLevel({ ouLevel: [pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap] }).then((data) => {
-                if (data?.results?.organisationUnitLevels) {
-                    const valueLevel = data?.results?.organisationUnitLevels
-                    const visualizationLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelTable)
-                    const mapLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelMap)
-
-                    pcaMetadata.ouLevelTable = visualizationLevel?.offlineLevels || visualizationLevel?.level
-                    pcaMetadata.ouLevelMap = mapLevel?.offlineLevels || mapLevel?.level
-
-                    if (visualizationLevel == undefined || mapLevel == undefined) {
-                        setProgramSettingsError(2);
-                        setSaveAndBuild("Completed");
-                    } else {
-
-                        // --------------- PROCESSING ---------------- //
-                        // Globals, States & more...
-
-                        // I. Scores Checking
-                        // Requires: scoresSection
-                        //      Break point: When duplicated scores found
-                        setProgressSteps(2);
-
-                        const { uniqueScores, compositeScores, duplicatedScores } = checkScores(scoresSection.dataElements);
-                        if (!uniqueScores) { throw { msg: "Duplicated scores", duplicatedScores, status: 400 } }
-                        const scoresMapping = scoresSection.dataElements.reduce((acc, cur) => (
-                            {
-                                ...acc,
-                                [cur.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value]: cur
-                            }), {});   // { feedbackOrder:deUid, ... }
-
-                        // II. Read questions
-                        // Requires: sections (with or WITHOUT scores&critical)
-                        //      Breakpoint: When a score is missing
-                        setProgressSteps(3);
-
-                        const questionCompositeScores = readQuestionComposites(sections);
-                        const missingComposites = questionCompositeScores.filter(cs => !compositeScores.includes(cs));
-                        if (missingComposites.length > 0) { throw { msg: "Some questions Feedback Order don't match any Score item", missingComposites, status: 400 } }
-
-                        // III. Build new metadata
-                        // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
-                        // Also, Program Indicators and Visualizations
-                        setProgressSteps(4);
-
-                        const programRuleVariables = buildProgramRuleVariables(
-                            {
-                                sections,
-                                compositeScores,
-                                programId,
-                                useCompetencyClass: programMetadata.useCompetencyClass,
-                                uidPool
-                            }
-                        );
-
-                        const { programRules, programRuleActions, scoreMap } = buildProgramRules(
-                            {
-                                sections,
-                                stageId: programStage.id,
-                                programId,
-                                compositeValues: compositeScores,
-                                scoresMapping,
-                                uidPool,
-                                useCompetencyClass: programMetadata.useCompetencyClass,
-                                healthArea: programMetadata.healthArea
-                            }
-                        );
-
-                        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicators(
-                            {
-                                programId,
-                                programStage,
-                                scoreMap,
-                                uidPool,
-                                useCompetency: programMetadata.useCompetencyClass,
-                                sharingSettings,
-                                PIAggregationType: programMetadata.programIndicatorsAggType
-                            }
-                        );
-
-                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(
-                            {
-                                programId,
-                                programShortName: programStage.program.shortName,
-                                gsInd,
-                                indicatorIDs,
-                                uidPool,
-                                useCompetency: programMetadata.useCompetencyClass,
-                                currentDashboardId: dashboardsDQ?.data?.results?.dashboards[0]?.id,
-                                userOU: pcaMetadata.useUserOrgUnit,
-                                ouRoot: pcaMetadata.ouRoot,
-                                sharingSettings,
-                                visualizationLevel: pcaMetadata.ouLevelTable,
-                                mapLevel: pcaMetadata.ouLevelMap,
-                                actionPlanID
-                            }
-                        );
-
-                        const metadata = {
-                            programRuleVariables,
-                            programRules,
-                            programRuleActions,
-                            programIndicators,
-                            visualizations,
-                            maps,
-                            dashboards,
-                            eventReports
-                        };
-
-                        updateProgramBuildVersion(programId); //TODO: Remove this line later
-                        return;
-
-                        // IV. Prepare Datastore references 
-                        getDataStore().then((dataStoreResult) => {
-                            const programRefereces = {
-                                programRules: mapIdArray(programRules),
-                                programRuleVariables: mapIdArray(programRuleVariables),
-                                programIndicators: mapIdArray(programIndicators),
-                                visualizations: mapIdArray(visualizations),
-                                eventReports: mapIdArray(eventReports),
-                                maps: mapIdArray(maps),
-                                dashboards: mapIdArray(dashboards)
-                            };
-
-                            let dataStoreData;
-                            let sendToDataStore;
-
-                            if (!dataStoreResult?.results) {
-                                sendToDataStore = dataStoreCreate;
-                                dataStoreData = {};
-                            } else {
-                                sendToDataStore = dataStoreUpdate;
-                                dataStoreData = dataStoreResult.results;
-                            }
-
-                            // Saving UIDs of old objects
-                            const toDeleteReferences = DeepCopy(dataStoreData);
-                            // Setting new UIDs
-                            dataStoreData = programRefereces;
-
-                            // V. Delete old metadata
-                            setProgressSteps(5);
-
-                            const fallbackRuleVariables = prvDQ.data.results.programRuleVariables.filter(prv => {
-                                return prv.name[0] == "_";
-                            });
-
-                            const programRulesDel = toDeleteReferences?.programRules || mapIdArray(prDQ.data.results.programRules);
-                            const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(fallbackRuleVariables);
-                            const programIndicatorsDel = toDeleteReferences?.programIndicators || mapIdArray(pIndDQ.data.results.programIndicators);
-                            const visualizationsDel = toDeleteReferences?.visualizations || mapIdArray(visualizationsDQ.data.results.visualizations);
-                            const eventReportsDel = toDeleteReferences?.eventReports || mapIdArray(eventReportDQ.data.results.eventReports);
-                            const mapsDel = toDeleteReferences?.maps || mapIdArray(mapsDQ.data.results.maps);
-
-                            const oldMetadata = {
-                                programRules: (programRulesDel.length > 0 ? programRulesDel : undefined),
-                                programRuleVariables: (programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined),
-                                programIndicators: (programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined),
-                                visualizations: (visualizationsDel.length > 0 ? visualizationsDel : undefined),
-                                eventReports: (eventReportsDel.length > 0 ? eventReportsDel : undefined),
-                                maps: (mapsDel.length > 0 ? mapsDel : undefined)
-                            };
-
-                            // VI. Import new metadata
-                            createMetadata.mutate({
-                                data: {
-                                    eventReports: eventReportDQ.data.results.eventReports.map(er => {
-                                        er.columnDimensions = ["pe", "ou"]
-                                        er.dataElementDimensions = [];
-                                        er.programIndicatorDimensions = [];
-                                        return er;
-                                    })
-                                }
-                            }).then(updateEventReportResp => {
-                                if (updateEventReportResp.status == 'OK') {
-                                    deleteMetadata({ data: oldMetadata }).then((res) => {
-                                        if (res.status == 'OK') {
-                                            setProgressSteps(6);
-                                            executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
-                                        }
-                                    });
-                                }
-                            });
-                        })
-                    }
-                }
-            })
+            return;
         }
+        if (pcaMetadata.useUserOrgUnit == "Yes") {
+            pcaMetadata.useUserOrgUnit = true
+        } else {
+            pcaMetadata.useUserOrgUnit = false
+        }
+
+        //-------------------------------------------------------//
+        setOuLevel({ ouLevel: [pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap] }).then((data) => {
+            if (data?.results?.organisationUnitLevels) {
+                const valueLevel = data?.results?.organisationUnitLevels
+                const visualizationLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelTable)
+                const mapLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelMap)
+
+                pcaMetadata.ouLevelTable = visualizationLevel?.offlineLevels || visualizationLevel?.level
+                pcaMetadata.ouLevelMap = mapLevel?.offlineLevels || mapLevel?.level
+
+                if (visualizationLevel == undefined || mapLevel == undefined) {
+                    setProgramSettingsError(2);
+                    setSaveAndBuild("Completed");
+                    return;
+                }
+
+                switch (hnqisType) {
+                    case TEMPLATE_PROGRAM_TYPES.hnqis2:
+                        executeHNQISProcess({ pcaMetadata, sharingSettings, actionPlanID });
+                        break;
+                    case TEMPLATE_PROGRAM_TYPES.hnqismwi:
+                        executeMWIProcess({ pcaMetadata, sharingSettings });
+                        break;
+                }
+            }
+        })
     }
 
     const parseErrors = (e) => {
