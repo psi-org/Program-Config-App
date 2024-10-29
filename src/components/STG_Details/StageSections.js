@@ -39,6 +39,7 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 import CriticalCalculations from "./CriticalCalculations.js";
 import DataElementManager from './DataElementManager.js'
+import { buildH2BaseVisualizationsMWI, buildProgramIndicatorsMWI, buildProgramRulesMWI, buildProgramRuleVariablesMWI } from "./Logic_Scripts/HNQISMWI_Scripting.js";
 import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Logic_Scripts/Scripting.js";//"./Logic_Scripts/HNQISMWI_Scripting.js";
 import Scores from "./Scores.js";
 import DraggableSection from "./Section.js";
@@ -924,46 +925,38 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
         // Also, Program Indicators and Visualizations
         setProgressSteps(4);
 
-        const programRuleVariables = buildProgramRuleVariables(
-            {
-                sections,
-                programId,
-                useCompetencyClass: programMetadata.useCompetencyClass,
-                uidPool
-            }
-        );
+        const { programRuleVariables, dataElementVarMapping } = buildProgramRuleVariablesMWI({ sections, programId, uidPool });
 
-        const { programRules, programRuleActions, scoreMap } = buildProgramRules(
+        const { programRules, programRuleActions, scoreMap } = buildProgramRulesMWI(
             {
                 sections,
+                programRuleVariables,
+                dataElementVarMapping,
                 stageId: programStage.id,
                 programId,
                 uidPool,
-                useCompetencyClass: programMetadata.useCompetencyClass,
                 healthArea: programMetadata.healthArea
             }
         );
 
-        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicators(
+        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicatorsMWI(
             {
                 programId,
                 programStage,
                 scoreMap,
                 uidPool,
-                useCompetency: programMetadata.useCompetencyClass,
                 sharingSettings,
                 PIAggregationType: programMetadata.programIndicatorsAggType
             }
         );
 
-        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(
+        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizationsMWI(
             {
                 programId,
                 programShortName: programStage.program.shortName,
                 gsInd,
                 indicatorIDs,
                 uidPool,
-                useCompetency: programMetadata.useCompetencyClass,
                 currentDashboardId: dashboardsDQ?.data?.results?.dashboards[0]?.id,
                 userOU: pcaMetadata.useUserOrgUnit,
                 ouRoot: pcaMetadata.ouRoot,
@@ -984,8 +977,14 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
             eventReports
         };
 
+        console.log(metadata);
+        setProgressSteps(8)
+        setSaveAndBuild('Completed');
+        setSavedAndValidated(false);
+
+
         // IV. Prepare Datastore references 
-        getDataStore().then((dataStoreResult) => {
+        /*getDataStore().then((dataStoreResult) => {
             const programRefereces = {
                 programRules: mapIdArray(programRules),
                 programRuleVariables: mapIdArray(programRuleVariables),
@@ -1055,7 +1054,7 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
                     executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
                 });
             });
-        });
+        });*/
     }
 
     const run = () => {

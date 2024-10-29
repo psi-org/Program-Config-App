@@ -124,15 +124,9 @@ const processStageData = (
 
             const DE_metadata = JSON.parse(dataElement.attributeValues?.find(att => att.attribute.id === METADATA)?.value || "{}");
 
-            const newVarName = programIsHNQIS(hnqisType) ? `_S${padValue(secIdx, "00")}Q${padValue(deIdx, "000")}` : `_PS${padValue(stageIndex + 1, "00")}_S${padValue(secIdx, "00")}E${padValue(deIdx, "000")}`;
+            let newVarName = programIsHNQIS(hnqisType) ? `_S${padValue(secIdx, "00")}Q${padValue(deIdx, "000")}` : `_PS${padValue(stageIndex + 1, "00")}_S${padValue(secIdx, "00")}E${padValue(deIdx, "000")}`;
             const prefixOption = section.id === 'basic-form' ? programStage.id : section.id;
             let newCode = `${programMetadata.dePrefix || prefixOption}${newVarName}`;
-
-            if (dataElement.code?.match(/MWI_AP_DE/)) {
-                isLogicDE = true;
-                newCode = dataElement.code;
-            }
-            // generate a 11 character code that can include digits and letters
 
             let formName = ""
             if (programIsHNQIS(hnqisType)) {
@@ -145,6 +139,11 @@ const processStageData = (
                 formName = dataElement.formName;
             }
 
+            if (dataElement.code?.match(/MWI_AP_DE/)) {
+                isLogicDE = true;
+                newCode = dataElement.code;
+                newVarName = `_GEN_${formName}`
+            }
 
             const name = (newCode + '_' + formName).slice(0, MAX_FORM_NAME_LENGTH)
             const shortName = (newCode + '_' + formName).slice(0, MAX_SHORT_NAME_LENGTH)
@@ -485,7 +484,6 @@ const SaveMetadata = (props) => {
 
     useEffect(() => {
         if (uidPool && programPayload && !completed && !metadataRequest.called) {
-            console.log(props.importedScores); //!!!!!!!
 
             const programConfigurations = DeepCopy(programPayload);
 

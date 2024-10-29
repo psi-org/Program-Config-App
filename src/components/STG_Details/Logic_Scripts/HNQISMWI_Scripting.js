@@ -1,421 +1,10 @@
+import { code } from "@uiw/react-md-editor";
 import { ProgramIndicatorTemplate, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, } from "../../../configs/AnalyticsTemplates.js";
 import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE } from "../../../configs/Constants.js";
 import { DeepCopy, padValue } from "../../../utils/Utils.js";
+import { data } from "jquery";
 
-/**
- * 
- * @param {Object} question : { subLevels: <Array> ,prgVarName: STRING,scoreNum: NUMBER, scoreDen: NUMBER,isCritical: STRING [Yes,No] }
- * @param {Object} branch : scoreMap __ Init as --> { childs: [] }
- * @description Allocates each feadback order / composite score in an Object (tree structure) that stores all questions for each leaf
- */
-const locateInTree = (question, branch) => {
-    const subLevels = question.subLevels.length;
-    if (subLevels > 1) {
-        const currentOrder = question.subLevels.shift();
-        let subOrder;
-        subOrder = branch.childs.find(s => s.order == currentOrder);
-        if (!subOrder) {
-            subOrder = { order: currentOrder };
-            (subLevels > 2) ? subOrder.childs = [] : subOrder.questions = [];
-            branch.childs.push(subOrder);
-        }
-        locateInTree(question, subOrder);
-    } else if (subLevels == 1) {
-        /*question.order = */question.subLevels.shift();
-        delete question.subLevels;
-        branch.questions.push(question);
-    }
-}
-
-/**
- * 
- * @param {Object} branch : Init as: scoreMap __ Object (Tree) that contains allocated questions
- * @returns {<Array>} : expressions for [critical Numerator, critical Denominator, non critical numerator, non critical denominator ]
- * @description: Create score expressions for each scoreMap level (composite score)
- */
-const buildScores = (branch) => {
-    const numC = [];
-    const numN = [];
-    const denC = [];
-    const denN = [];
-
-    if (branch.questions) {
-        branch.questions.forEach((a) => {
-            if (a.prgVarName) {
-                const num = `#{${a.prgVarName}}*${a.scoreNum}`;
-                const den = `d2:count('${a.prgVarName}')*${a.scoreDen}`;
-                if (a.isCritical == "Yes") {
-                    numC.push(num);
-                    denC.push(den);
-                } else {
-                    numN.push(num);
-                    denN.push(den);
-                }
-            }
-        });
-        branch.numC = numC.filter(e => e != "").join('+');
-        branch.denC = denC.filter(e => e != "").join('+');
-        branch.numN = numN.filter(e => e != "").join('+');
-        branch.denN = denN.filter(e => e != "").join('+');
-        return [branch.numC, branch.denC, branch.numN, branch.denN];
-    } else {
-        branch.childs.forEach(subBranch => {
-            const res = buildScores(subBranch);
-            numC.push(res[0]);
-            denC.push(res[1]);
-            numN.push(res[2]);
-            denN.push(res[3]);
-        });
-        let tmp;
-
-        tmp = numC.filter(e => e != "");
-        branch.numC = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
-
-        tmp = denC.filter(e => e != "");
-        branch.denC = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
-
-        tmp = numN.filter(e => e != "");
-        branch.numN = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
-
-        tmp = denN.filter(e => e != "");
-        branch.denN = tmp.length > 0 ? "(" + tmp.join('+') + ")" : "";
-
-        return [branch.numC, branch.denC, branch.numN, branch.denN];
-    }
-}
-
-/**
- * 
- * @param {Object} composite : subLevels, feedbackOrder, formName, prgVarName, uid
- * @param {Object} branch : scoreMap - contains Scores Expressions
- * @param {String} programId 
- * @param {Array} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
- * @returns {Object}: scorePRs , scorePRAs for the current composite score
- */
-const getScorePR = (composite, branch, programId, stageId, uidPool) => {
-
-    //      Breakpoint: No more IDs available
-    if (uidPool.length == 0) { return { scorePRs: [], scorePRAs: [] } }
-
-    const currentOrder = composite.subLevels.shift();
-    if (currentOrder && composite.subLevels.length >= 0) {
-
-        branch = branch.childs.find(s => s.order == currentOrder);
-        return getScorePR(composite, branch, programId, stageId, uidPool);                // Output {scorePRs , scorePRAs}
-    } else {
-        if (branch) {     // Composite Score HAS scoring questions
-            /**
-             * Creating PR for Scores - Two steps:
-             * 1- ASSIGN DATA to CALCULATED VALUE
-             * 2- ASSIGN CALCULATED VALUE to DATA ELEMENT
-             */
-
-            let programRuleUid, actionId, name, data;
-            const programRuleActionType = "ASSIGN";
-
-            // STEP 1 -
-            const num = [branch.numC, branch.numN].filter(n => n != "").join("+");
-            const den = [branch.denC, branch.denN].filter(n => n != "").join("+");
-            data = `(((${num}) * 100) / (${den}))*100`;
-            name = `PR - Calculated - ${composite.feedbackOrder} ${composite.formName}`;
-            programRuleUid = uidPool.shift();
-            actionId = uidPool.shift();
-
-            const pr_s1 = {
-                id: programRuleUid,
-                name: name,
-                description: "_Scripted",
-                program: { id: programId },
-                //programStage : {id : stageId},
-                condition: "true",
-                priority: 1,
-                programRuleActions: [{ id: actionId }]
-            };
-
-            const pra_s1 = {
-                id: actionId,
-                programRuleActionType: programRuleActionType,
-                data,
-                content: `#{_CV${composite.prgVarName}}`,
-                programRule: { id: programRuleUid }
-            };
-
-            // STEP 2 -
-
-            name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
-            programRuleUid = uidPool.shift();
-            actionId = uidPool.shift();
-            data = `d2:round(#{_CV${composite.prgVarName}})/100`;
-
-            const pr_s2 = {
-                id: programRuleUid,
-                name: name,
-                description: "_Scripted",
-                program: { id: programId },
-                programStage: { id: stageId },
-                condition: `d2:hasValue('_CV${composite.prgVarName}')`,
-                programRuleActions: [{ id: actionId }]
-            };
-
-            const pra_s2 = {
-                id: actionId,
-                programRuleActionType: programRuleActionType,
-                data,
-                dataElement: { id: composite.uid },
-                programRule: { id: programRuleUid }
-            };
-
-            return { scorePRs: [pr_s1, pr_s2], scorePRAs: [pra_s1, pra_s2] }
-
-        } else { // Composite Score DOESN'T HAVE scoring questions
-            const data = `''`;
-            const name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
-            const programRuleActionType = "ASSIGN";
-
-            const programRuleUid = uidPool.shift();
-            const actionId = uidPool.shift();
-
-            const pr = {
-                id: programRuleUid,
-                name: name,
-                description: "_Scripted",
-                program: { id: programId },
-                programStage: { id: stageId },
-                condition: "true",
-                programRuleActions: [{ id: actionId }]
-            };
-
-            const pra = {
-                id: actionId,
-                programRuleActionType: programRuleActionType,
-                data,
-                dataElement: { id: composite.uid },
-                programRule: { id: programRuleUid }
-            };
-
-            return { scorePRs: [pr], scorePRAs: [pra] }
-        }
-    }
-}
-
-/**
- * 
- * @param {*} branch : scoring map - root level will be used
- * @param {*} programId 
- * @param {*} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
- * @returns {Object} : { rules : <Array> , actions : <Array> }
- */
-const buildCriticalScore = (branch, stageId, programId, uidPool) => {
-    const num = (branch.numC != "" ? branch.numC : undefined);
-    const den = (branch.denC != "" ? branch.denC : undefined);
-
-    /**
-     * Two Steps Assign
-     * 1- From data to Calculated Value
-     * 2- From Calculated Value to Data Element
-     */
-
-    const programRuleActionType = "ASSIGN";
-    let programRuleUid, actionId, name, data;
-
-    // STEP 1- 
-    programRuleUid = uidPool.shift();
-    actionId = uidPool.shift();
-    name = `PR - Calculated - Critical Questions`;
-    data = (num && den) ? `((${num}) * 100) / (${den})` : `100`;
-
-    const pr_s1 = {
-        id: programRuleUid,
-        name,
-        description: "_Scripted",
-        program: { id: programId },
-        //programStage : {id : stageId},
-        condition: "true",
-        priority: 1,
-        programRuleActions: [{ id: actionId }]
-    };
-
-    const pra_s1 = {
-        id: actionId,
-        programRuleActionType,
-        data,
-        content: `#{_CV_CriticalQuestions}`,
-        programRule: { id: programRuleUid }
-    };
-
-    // STEP 2-
-    programRuleUid = uidPool.shift();
-    actionId = uidPool.shift();
-    name = `PR - Score - Critical Questions (%)`;
-
-    const pr_s2 = {
-        id: programRuleUid,
-        name,
-        description: "_Scripted",
-        program: { id: programId },
-        programStage: { id: stageId },
-        condition: `d2:hasValue('_CV_CriticalQuestions')`,
-        programRuleActions: [{ id: actionId }]
-    };
-
-    data = `#{_CV_CriticalQuestions}`;
-    const pra_s2 = {
-        id: actionId,
-        programRuleActionType,
-        data,
-        dataElement: { id: 'VqBfZjZhKkU' },
-        programRule: { id: programRuleUid }
-    };
-
-    return { rules: [pr_s1, pr_s2], actions: [pra_s1, pra_s2] }
-}
-
-/**
- * 
- * @param {*} branch : scoring map - root level will be used
- * @param {*} programId 
- * @param {*} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
- * @returns {Object}: { rules : <Array> , actions : <Array> }
- */
-const buildNonCriticalScore = (branch, stageId, programId, uidPool) => {
-    const num = (branch.numN != "" ? branch.numN : undefined);
-    const den = (branch.denN != "" ? branch.denN : undefined);
-
-    /**
-     * Two Steps Assign
-     * 1- From data to Calculated Value
-     * 2- From Calculated Value to Data Element
-     */
-
-    const programRuleActionType = "ASSIGN";
-    let programRuleUid, actionId, name, data;
-
-    // STEP 1- 
-    programRuleUid = uidPool.shift();
-    actionId = uidPool.shift();
-    name = `PR - Calculated - Non-Critical Questions`;
-    data = (num && den) ? `((${num}) * 100) / (${den})` : `100`;
-
-    const pr_s1 = {
-        id: programRuleUid,
-        name,
-        description: "_Scripted",
-        program: { id: programId },
-        //programStage : {id : stageId},
-        condition: "true",
-        priority: 1,
-        programRuleActions: [{ id: actionId }]
-    };
-
-    const pra_s1 = {
-        id: actionId,
-        programRuleActionType,
-        data,
-        content: `#{_CV_NonCriticalQuestions}`,
-        programRule: { id: programRuleUid }
-    };
-
-    // STEP 2-
-    programRuleUid = uidPool.shift();
-    actionId = uidPool.shift();
-    name = `PR - Score - Non-Critical Questions (%)`;
-    data = `#{_CV_NonCriticalQuestions}`;
-
-    const pr_s2 = {
-        id: programRuleUid,
-        name,
-        description: "_Scripted",
-        program: { id: programId },
-        programStage: { id: stageId },
-        condition: `d2:hasValue('_CV_NonCriticalQuestions')`,
-        programRuleActions: [{ id: actionId }]
-    };
-
-    const pra_s2 = {
-        id: actionId,
-        programRuleActionType,
-        data,
-        dataElement: { id: 'pzWDtDUorBt' },
-        programRule: { id: programRuleUid }
-    };
-
-    return { rules: [pr_s1, pr_s2], actions: [pra_s1, pra_s2] }
-}
-
-/**
- * 
- * @param {*} programId 
- * @param {*} uidPool 
- * @returns {Object} : { competencyRules : <Array> , competencyActions : <Array> }
- */
-const buildCompetencyRules = (programId, stageId, uidPool) => {
-    const competencyRules = [
-        {
-            name: "PR - Assign Competency - 'Competent but needs improvement'",
-            condition: "#{_criticalNewest} == 100 && (#{_NoncriticalNewest}  <  89.9  &&  #{_NoncriticalNewest} >= 79.9)",
-            program: { id: "" },
-            description: "_Scripted",
-            programRuleActions: [
-                {
-                    data: "'improvement'",
-                    programRuleActionType: "ASSIGN",
-                    dataElement: { id: "NAaHST5ZDTE" },
-                }
-            ]
-        },
-        {
-            name: "PR - Assign Competency - 'Competent'",
-            condition: "#{_criticalNewest} == 100 && #{_NoncriticalNewest} >= 89.9",
-            program: { id: "" },
-            description: "_Scripted",
-            programRuleActions: [
-                {
-                    data: "'competent'",
-                    programRuleActionType: "ASSIGN",
-                    dataElement: { id: "NAaHST5ZDTE" }
-                }
-            ]
-        },
-        {
-            name: "PR - Assign Competency - 'Not Competent'",
-            condition: "#{_criticalNewest} < 100  || (#{_NoncriticalNewest}  < 79.9 && #{_NoncriticalNewest} >= 0)",
-            program: { id: "" },
-            description: "_Scripted",
-            programRuleActions: [
-                {
-                    data: "'notcompetent'",
-                    programRuleActionType: "ASSIGN",
-                    dataElement: { id: "NAaHST5ZDTE" }
-                }
-            ]
-        }
-    ];
-
-    const competencyActions = [];
-
-    competencyRules.forEach(rule => {
-        const programRuleUid = uidPool.shift();
-
-        rule.id = programRuleUid;
-        rule.program.id = programId;
-        rule.programStage = { id: stageId }
-
-        const actions = rule.programRuleActions;
-        rule.programRuleActions = [];
-
-        actions.forEach(action => {
-            const actionId = uidPool.shift();
-            action.id = actionId;
-            action.programRule = { id: programRuleUid };
-            competencyActions.push(action);
-            rule.programRuleActions.push({ id: actionId });
-        });
-    });
-
-    return { competencyRules, competencyActions }
-}
-
-const buildAttributesRules = (programId, uidPool, useCompetencyClass = "Yes", healthArea) => {
+const buildAttributesRulesMWI = (programId, uidPool, healthArea) => {
 
     const attributeActions = [];
 
@@ -448,20 +37,6 @@ const buildAttributesRules = (programId, uidPool, useCompetencyClass = "Yes", he
                 }
             ]
         },
-        /*{
-            name: "PR - Attributes - Assign Global Score",
-            displayName: "PR - Attributes - Assign Global Score",
-            condition: scoreMap.numC != "" ? "d2:hasValue(#{_criticalNewest})" : "d2:hasValue(#{_NoncriticalNewest})",
-            program: { id: "" },
-            description: "_Scripted",
-            programRuleActions: [
-                {
-                    data: scoreMap.numC != "" ? "#{_criticalNewest}" : "#{_NoncriticalNewest}",
-                    programRuleActionType: "ASSIGN",
-                    trackedEntityAttribute: { id: "NQdpdST0Gcx" }
-                }
-            ]
-        },*/
         {
             name: "PR - Attributes - Assign OU",
             displayName: "PR - Attributes - Assign OU",
@@ -477,39 +52,6 @@ const buildAttributesRules = (programId, uidPool, useCompetencyClass = "Yes", he
             ]
         }
     ];
-
-    if (useCompetencyClass == "Yes") {
-        attributeRules.push({
-            name: `PR - Attributes - CompClass `,
-            displayName: `PR - Attributes - CompClass `,
-            description: "_Scripted",
-            condition: "!d2:hasValue(#{_criticalNewest}) || !d2:hasValue(#{_NoncriticalNewest})",
-            program: { id: "" },
-            programRuleActions: [
-                {
-                    programRuleActionType: "HIDEFIELD",
-                    trackedEntityAttribute: { id: "ulU9KKgSLYe" }
-                }
-            ]
-        });
-
-        attributeRules.push(
-            {
-                name: "PR - Attributes - Assign Competency",
-                displayName: "PR - Attributes - Assign Competency",
-                condition: "d2:hasValue('_competencyNewest')",
-                program: { id: "" },
-                description: "_Scripted",
-                programRuleActions: [
-                    {
-                        data: "#{_competencyNewest}",
-                        programRuleActionType: "ASSIGN",
-                        trackedEntityAttribute: { id: "ulU9KKgSLYe" }
-                    }
-                ]
-            }
-        );
-    }
 
     attributeRules.forEach(rule => {
         const programRuleUid = uidPool.shift();
@@ -537,7 +79,7 @@ const buildAttributesRules = (programId, uidPool, useCompetencyClass = "Yes", he
  * @param {Array} scores : Data Elements linked to Scores section
  * @returns {Object} uniqueScores:Boolean , compositeScores:<Array>, duplicatedScores:<Array>
  */
-export const checkScores = (scores) => {
+export const checkScoresMWI = (scores) => {
     const compositeScores = scores.map(score => score.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value);
     const duplicatedScores = compositeScores.filter((composite, index) => compositeScores.indexOf(composite) !== index);
     return {
@@ -547,7 +89,7 @@ export const checkScores = (scores) => {
     };
 }
 
-export const readQuestionComposites = (sections) => {
+export const readQuestionCompositesMWI = (sections) => {
     var questionCompositeScores = [];
     sections.forEach(section => {
         section.dataElements.forEach(de => {
@@ -567,7 +109,7 @@ export const readQuestionComposites = (sections) => {
     return questionCompositeScores.sort()
 }
 
-export const hideShowLogic = (hideShowGroup, programId, uidPool) => {
+export const hideShowLogicMWI = (hideShowGroup, programId, uidPool) => {
     var hideShowRules = [], hideShowActions = [];
 
     Object.keys(hideShowGroup).forEach(parentCode => {
@@ -640,7 +182,7 @@ export const hideShowLogic = (hideShowGroup, programId, uidPool) => {
     return { hideShowRules, hideShowActions };
 }
 
-const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
+const labelsRulesLogicMWI = (hideShowLabels, programId, uidPool) => {
     var labelsRules = [], labelsActions = [];
 
     hideShowLabels.forEach(hsRule => {
@@ -693,19 +235,36 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
  * @param {String} useCompetencyClass: Flag to include or not the competency class realated items
  * @returns {Array} programRuleVariables: <Array>{name,programRuleVariableSourceType,useCodeForOptionSet,program,|dataElement|}
  */
-export const buildProgramRuleVariables = ({ sections, compositeScores, programId, uidPool }) => {
+export const buildProgramRuleVariablesMWI = ({ sections, programId, uidPool }) => {
     // const criticalStepCalculations = sections.find(s => s.name == "Critical Step Calculations");
     // const scores = sections.find(s => s.name == "Scores");
     // sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
 
     const programRuleVariables = [];
+    const dataElementVarMapping = {};
+    let secIdx = 0;
+    let deIdx = 1;
 
     // Data Elements Variables
-    sections.forEach((section, secIdx) => {
-        section.dataElements.forEach((dataElement, deIdx) => {
+    sections.forEach(section => {
+        if (section.name.match(/Section \d+ : /)) {
+            secIdx += 1;
+            deIdx = 1;
+        }
+        section.dataElements.forEach(dataElement => {
+            let name;
+
+            if (!dataElement.code?.match(/MWI_AP_DE/)) {
+                name = `_S${padValue(secIdx, "00")}E${padValue(deIdx, "000")}`;
+                deIdx += 1;
+            } else {
+                name = `_GEN_${dataElement.formName}`;
+            }
+
+            dataElementVarMapping[dataElement.id] = name;
             programRuleVariables.push({
                 id: uidPool.shift(),
-                name: `_S${padValue(secIdx + 1, "00")}Q${padValue(deIdx + 1, "000")}`,
+                name,
                 programRuleVariableSourceType: "DATAELEMENT_CURRENT_EVENT",
                 useCodeForOptionSet: dataElement.optionSet?.id ? true : false,
                 program: { id: programId },
@@ -714,60 +273,144 @@ export const buildProgramRuleVariables = ({ sections, compositeScores, programId
         });
     });
 
-    // Calculated Values
-    compositeScores.forEach(cs => {
-        programRuleVariables.push({
-            id: uidPool.shift(),
-            name: `_CV_CS${cs}`,
-            programRuleVariableSourceType: "CALCULATED_VALUE",
-            useCodeForOptionSet: false,
-            program: { id: programId }
-        });
-    });
-
-    return programRuleVariables;
+    return { programRuleVariables, dataElementVarMapping };
 }
 
-export const buildProgramRules = ({ sections, stageId, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea = "FP", scoreMap = { childs: [] } }) => {
+const buildScoringRulesMWI = (
+    { sections, criterionRulesGroup, dataElementVarMapping, programId, uidPool }
+) => {
 
-    var programRules = [];
-    var programRuleActions = [];
-    var hideShowGroup = {};
-    var hideShowLabels = [{ parent: 'None', condition: 'true', actions: [] }];
+    const scoringRules = [];
+    const scoringRuleActions = [];
+
+    sections.forEach(section => {
+        if (!criterionRulesGroup[section.id]) { return; }
+        
+        const parentDataElements = criterionRulesGroup[section.id].parentDataElements;
+        const hasValueSting = parentDataElements.map(de => `d2:hasValue(#{${dataElementVarMapping[de.id]}})`).join(' && ');
+        const questionsSum = parentDataElements.map(de => `#{${dataElementVarMapping[de.id]}}`).join('+');
+        const questionsCountIfValue = parentDataElements.map(de => `(1-d2:countIfValue(#{${dataElementVarMapping[de.id]}}, 0))`).join('+');
+
+        // [NA, Compliant, Non-Compliant, Partially Compliant]
+        const scoringFilter = [
+            {
+                condition: `(${hasValueSting}) && (${questionsCountIfValue}) == 0`,
+                data: '0',
+                tag: 'NA'
+            },
+            {
+                condition: `(${hasValueSting}) && ((${questionsSum})/(${questionsCountIfValue})) == 1`,
+                data: '100',
+                tag: 'C'
+            },
+            {
+                condition: `(${hasValueSting}) && ((${questionsSum})/(${questionsCountIfValue})) == -1`,
+                data: '5',
+                tag: 'NC'
+            },
+            {
+                condition: `(${hasValueSting}) && (${questionsCountIfValue}) > 0 && ((${questionsSum})/(${questionsCountIfValue})) > -1 && ((${questionsSum})/(${questionsCountIfValue})) < 1`,
+                data: '45',
+                tag: 'PC'
+            },
+        ];
+
+        scoringFilter.forEach(f => {
+            const programRuleUid = uidPool.shift();
+            const name = `PR - Scoring - Criterion ${criterionRulesGroup[section.id].criterionNumber} - ${f.tag}`;
+
+            const prActionStatus = {
+                id: uidPool.shift(),
+                programRuleActionType: "ASSIGN",
+                data: f.data,
+                dataElement: { id: criterionRulesGroup[section.id].criterionStatus.id },
+                programRule: { id: programRuleUid }
+            };
+
+            const prActionScore = {
+                id: uidPool.shift(),
+                programRuleActionType: "ASSIGN",
+                data: f.data,
+                dataElement: { id: criterionRulesGroup[section.id].criterionScore.id },
+                programRule: { id: programRuleUid }
+            };
+
+            //TODO: Add hide/show logic for the action plan data elements
+
+            const pr = {
+                id: programRuleUid,
+                name,
+                description: '_Scripted',
+                program: { id: programId },
+                condition: f.condition,
+                programRuleActions: [prActionStatus, prActionScore]
+            };
+
+            scoringRules.push(pr);
+            scoringRuleActions.push(prActionStatus, prActionScore);
+
+        });
+
+    });
+
+    return { scoringRules, scoringRuleActions }
+}
+
+export const buildProgramRulesMWI = (
+    { sections, programRuleVariables, dataElementVarMapping, stageId, programId, uidPool, healthArea = "FP" }
+) => {
+
+    let programRules = [];
+    let programRuleActions = [];
+    const hideShowGroup = {};
+    const criterionRulesGroup = {};
+    const hideShowLabels = [{ parent: 'None', condition: 'true', actions: [] }];
 
     const varNameRef = sections.map(sec => sec.dataElements.map(de => {
-        const metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || "{}")
+        const metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}")
         return { id: de.id, varName: metadata.varName }
     })).flat();
 
     //Create Tree Object for Scoring PRs
-    sections.forEach((section, secIdx) => {
-        section.dataElements.forEach((dataElement, deIdx) => {
-            const order = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
+    sections.forEach(section => {
+        if (section.name.match(/> > Criterion \d+(\.\d+)*.*/) && !criterionRulesGroup[section.id]) {
+            criterionRulesGroup[section.id] = {
+                criterionNumber: section.name.match(/(\d+(\.\d+)*)/)[0],
+                parentDataElements: [],
+                criterionStatus: {},
+                criterionScore: {},
+                actionPlanDataElements: []
+            };
+        }
+        
+        section.dataElements.forEach(dataElement => {
+            //const order = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
 
             const metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
-            if (order && metadata.scoreNum && metadata.scoreDen) {
-                locateInTree(
-                    {
-                        subLevels: order.split("."),
-                        prgVarName: `_S${padValue(secIdx + 1, "00")}Q${padValue(deIdx + 1, "000")}`,
-                        scoreNum: metadata.scoreNum,
-                        scoreDen: metadata.scoreDen,
-                        isCritical: metadata.isCritical
-                    },
-                    scoreMap
-                )
-            }
 
             // Get parents hide/show logic
+            if (dataElement.code?.match(/MWI_AP_DE1/)) {
+                criterionRulesGroup[section.id].criterionStatus = { id: dataElement.id, code: dataElement.code };
+            } else if (dataElement.code?.match(/MWI_AP_DE2/)) {
+                criterionRulesGroup[section.id].criterionScore = { id: dataElement.id, code: dataElement.code };
+            } else if (dataElement.code?.match(/MWI_AP_DE[3-6]/)) {
+                criterionRulesGroup[section.id].actionPlanDataElements.push({ id: dataElement.id, mandatory: true });
+            }
+
+            if (metadata.elemType === 'question') {
+                criterionRulesGroup[section.id]?.parentDataElements.push({ id: dataElement.id, code: dataElement.code })
+            }
+            
             if (metadata.parentQuestion !== undefined && metadata.parentValue !== undefined) {
                 const parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
                 const parentValue = String(metadata.parentValue);
 
+
                 !hideShowGroup[parentQuestion] ? hideShowGroup[parentQuestion] = {} : undefined;
                 !hideShowGroup[parentQuestion][parentValue] ? hideShowGroup[parentQuestion][parentValue] = [] : undefined;
                 !hideShowGroup[parentQuestion][parentValue].push({ id: dataElement.id, mandatory: metadata.isCompulsory });
-
+            
+                
                 if (metadata.labelFormName) {
                     let hsIdx = hideShowLabels.findIndex(hs => hs.parent == parentQuestion && hs.condition == parentValue);
                     if (hsIdx == -1) {
@@ -784,68 +427,48 @@ export const buildProgramRules = ({ sections, stageId, programId, compositeValue
             } else if (metadata.labelFormName) {
                 hideShowLabels[0].actions.push({ id: dataElement.id, text: metadata.labelFormName.replaceAll("\"", "'") });
             }
+            
         });
     });
 
-    //Define Global Scores
-    buildScores(scoreMap);
-
-    // Request Program Rules for Composite Scores
-    compositeValues.forEach(score => {
-        const compositeData = {
-            subLevels: score.split('.'),
-            feedbackOrder: score,
-            formName: scoresMapping[score].formName,
-            prgVarName: '_CS' + score,
-            uid: scoresMapping[score].id
-        }
-        const { scorePRs, scorePRAs } = getScorePR(compositeData, scoreMap, programId, stageId, uidPool);
-        programRules = programRules.concat(scorePRs);
-        programRuleActions = programRuleActions.concat(scorePRAs);
+    const { scoringRules, scoringRuleActions } = buildScoringRulesMWI({
+        sections,
+        criterionRulesGroup,
+        dataElementVarMapping,
+        programId,
+        uidPool
     });
-
-    // Critical Calculations
-    const criticalScore = buildCriticalScore(scoreMap, stageId, programId, uidPool);
-    const nonCriticalScore = buildNonCriticalScore(scoreMap, stageId, programId, uidPool);
-
-    // Competency Class
-
-    const { competencyRules, competencyActions } = (useCompetencyClass == "Yes" ? buildCompetencyRules(programId, stageId, uidPool) : { competencyRules: [], competencyActions: [] });
 
     // Attributes
 
-    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, useCompetencyClass, healthArea); //Define: useCompetencyClass & healthArea
+    const { attributeRules, attributeActions } = buildAttributesRulesMWI(programId, uidPool, healthArea); //Define: useCompetencyClass & healthArea
 
     // Hide/Show Logic
 
-    const { hideShowRules, hideShowActions } = hideShowLogic(hideShowGroup, programId, uidPool);
+    const { hideShowRules, hideShowActions } = hideShowLogicMWI(hideShowGroup, programId, uidPool);
 
     // Labels Assign
 
-    const { labelsRules, labelsActions } = labelsRulesLogic(hideShowLabels, programId, uidPool);
+    const { labelsRules, labelsActions } = labelsRulesLogicMWI(hideShowLabels, programId, uidPool);
 
     programRules = programRules.concat(
-        criticalScore.rules,
-        nonCriticalScore.rules,
-        competencyRules,
+        scoringRules,
         attributeRules,
         hideShowRules,
         labelsRules
     );
 
     programRuleActions = programRuleActions.concat(
-        criticalScore.actions,
-        nonCriticalScore.actions,
-        competencyActions,
+        scoringRuleActions,
         attributeActions,
         hideShowActions,
         labelsActions
     );
 
-    return { programRules, programRuleActions, scoreMap }
+    return { programRules, programRuleActions }
 }
 
-export const buildProgramIndicators = ({ programId, programStage, scoreMap, uidPool, sharingSettings, PIAggregationType }) => {
+export const buildProgramIndicatorsMWI = ({ programId, programStage, uidPool, sharingSettings, PIAggregationType }) => {
 
     const programShortName = programStage.program.shortName;
 
@@ -908,10 +531,9 @@ export const buildProgramIndicators = ({ programId, programStage, scoreMap, uidP
     return {}
 }
 
-export const buildH2BaseVisualizations = ({ a/*programId, programShortName, gsInd, indicatorIDs, uidPool, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel*/}) => {
+export const buildH2BaseVisualizationsMWI = ({ a/*programId, programShortName, gsInd, indicatorIDs, uidPool, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel*/}) => {
     //const series = []
     //const dataDimensionItems = []
-    console.log(a);
     const visualizations = []
     const eventReports = []
     const androidSettingsVisualizations = []
