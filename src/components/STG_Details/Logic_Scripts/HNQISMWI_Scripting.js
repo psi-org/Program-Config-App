@@ -285,8 +285,10 @@ const buildScoringRulesMWI = (
 
     sections.forEach(section => {
         if (!criterionRulesGroup[section.id]) { return; }
-        
+
         const parentDataElements = criterionRulesGroup[section.id].parentDataElements;
+        const actionPlanDataElements = criterionRulesGroup[section.id].actionPlanDataElements;
+
         const hasValueSting = parentDataElements.map(de => `d2:hasValue(#{${dataElementVarMapping[de.id]}})`).join(' && ');
         const questionsSum = parentDataElements.map(de => `#{${dataElementVarMapping[de.id]}}`).join('+');
         const questionsCountIfValue = parentDataElements.map(de => `(1-d2:countIfValue(#{${dataElementVarMapping[de.id]}}, 0))`).join('+');
@@ -315,6 +317,27 @@ const buildScoringRulesMWI = (
             },
         ];
 
+        const prActionPlanId = uidPool.shift();
+        const prActionPlan = {
+            id: prActionPlanId,
+            name: `PR - Hide/Show Action Plan - Criterion ${criterionRulesGroup[section.id].criterionNumber}`,
+            description: '_Scripted',
+            program: { id: programId },
+            condition: `!(${hasValueSting})`,
+            programRuleActions: actionPlanDataElements.map(de => {
+                const hideAction = {
+                    id: uidPool.shift(),
+                    programRuleActionType: "HIDEFIELD",
+                    dataElement: { id: de.id },
+                    programRule: { id: prActionPlanId }
+                };
+
+                scoringRuleActions.push(hideAction);
+                return hideAction;
+            })
+        };
+        scoringRules.push(prActionPlan);
+
         scoringFilter.forEach(f => {
             const programRuleUid = uidPool.shift();
             const name = `PR - Scoring - Criterion ${criterionRulesGroup[section.id].criterionNumber} - ${f.tag}`;
@@ -335,7 +358,29 @@ const buildScoringRulesMWI = (
                 programRule: { id: programRuleUid }
             };
 
-            //TODO: Add hide/show logic for the action plan data elements
+            //TODO: Add hide/show logic for the action plan data elements when no value is selected
+            const additionalActions = [];
+            actionPlanDataElements.forEach(de => {
+                if (['0', '100'].includes(f.data)) {
+                    const hideAction = {
+                        id: uidPool.shift(),
+                        programRuleActionType: "HIDEFIELD",
+                        dataElement: { id: de.id },
+                        programRule: { id: programRuleUid }
+                    };
+                    scoringRuleActions.push(hideAction);
+                    additionalActions.push(hideAction);
+                    return;
+                }
+                const mandatoryAction = {
+                    id: uidPool.shift(),
+                    programRuleActionType: "SETMANDATORYFIELD",
+                    dataElement: { id: de.id },
+                    programRule: { id: programRuleUid }
+                };
+                scoringRuleActions.push(mandatoryAction);
+                additionalActions.push(mandatoryAction);
+            });
 
             const pr = {
                 id: programRuleUid,
@@ -343,7 +388,7 @@ const buildScoringRulesMWI = (
                 description: '_Scripted',
                 program: { id: programId },
                 condition: f.condition,
-                programRuleActions: [prActionStatus, prActionScore]
+                programRuleActions: [prActionStatus, prActionScore, ...additionalActions]
             };
 
             scoringRules.push(pr);
@@ -357,7 +402,7 @@ const buildScoringRulesMWI = (
 }
 
 export const buildProgramRulesMWI = (
-    { sections, programRuleVariables, dataElementVarMapping, stageId, programId, uidPool, healthArea = "FP" }
+    { sections, dataElementVarMapping, programId, uidPool, healthArea = "FP" }
 ) => {
 
     let programRules = [];
@@ -376,13 +421,14 @@ export const buildProgramRulesMWI = (
         if (section.name.match(/> > Criterion \d+(\.\d+)*.*/) && !criterionRulesGroup[section.id]) {
             criterionRulesGroup[section.id] = {
                 criterionNumber: section.name.match(/(\d+(\.\d+)*)/)[0],
+                isCritical: section.description === "*",
                 parentDataElements: [],
                 criterionStatus: {},
                 criterionScore: {},
                 actionPlanDataElements: []
             };
         }
-        
+
         section.dataElements.forEach(dataElement => {
             //const order = dataElement.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value;
 
@@ -400,7 +446,7 @@ export const buildProgramRulesMWI = (
             if (metadata.elemType === 'question') {
                 criterionRulesGroup[section.id]?.parentDataElements.push({ id: dataElement.id, code: dataElement.code })
             }
-            
+
             if (metadata.parentQuestion !== undefined && metadata.parentValue !== undefined) {
                 const parentQuestion = varNameRef.find(de => de.id === String(metadata.parentQuestion)).varName;
                 const parentValue = String(metadata.parentValue);
@@ -409,8 +455,8 @@ export const buildProgramRulesMWI = (
                 !hideShowGroup[parentQuestion] ? hideShowGroup[parentQuestion] = {} : undefined;
                 !hideShowGroup[parentQuestion][parentValue] ? hideShowGroup[parentQuestion][parentValue] = [] : undefined;
                 !hideShowGroup[parentQuestion][parentValue].push({ id: dataElement.id, mandatory: metadata.isCompulsory });
-            
-                
+
+
                 if (metadata.labelFormName) {
                     let hsIdx = hideShowLabels.findIndex(hs => hs.parent == parentQuestion && hs.condition == parentValue);
                     if (hsIdx == -1) {
@@ -427,7 +473,7 @@ export const buildProgramRulesMWI = (
             } else if (metadata.labelFormName) {
                 hideShowLabels[0].actions.push({ id: dataElement.id, text: metadata.labelFormName.replaceAll("\"", "'") });
             }
-            
+
         });
     });
 
@@ -440,15 +486,12 @@ export const buildProgramRulesMWI = (
     });
 
     // Attributes
-
     const { attributeRules, attributeActions } = buildAttributesRulesMWI(programId, uidPool, healthArea); //Define: useCompetencyClass & healthArea
-
+    
     // Hide/Show Logic
-
     const { hideShowRules, hideShowActions } = hideShowLogicMWI(hideShowGroup, programId, uidPool);
-
+    
     // Labels Assign
-
     const { labelsRules, labelsActions } = labelsRulesLogicMWI(hideShowLabels, programId, uidPool);
 
     programRules = programRules.concat(
@@ -465,10 +508,12 @@ export const buildProgramRulesMWI = (
         labelsActions
     );
 
-    return { programRules, programRuleActions }
+    return { programRules, programRuleActions, criterionRulesGroup }
 }
 
-export const buildProgramIndicatorsMWI = ({ programId, programStage, uidPool, sharingSettings, PIAggregationType }) => {
+export const buildProgramIndicatorsMWI = (
+    { programStage, criterionRulesGroup, dataElementVarMapping, uidPool, sharingSettings, PIAggregationType }
+) => {
 
     const programShortName = programStage.program.shortName;
 
@@ -491,8 +536,8 @@ export const buildProgramIndicatorsMWI = ({ programId, programStage, uidPool, sh
         result.id = uidPool.shift()
         indicatorIDs.push(result.id)
         result.name = programShortName + " - " + nameComp + " - " + value.name
-        result.shortName = nameComp + ' - ' + value.name + ' [' + programId + ']'
-        result.program.id = programId
+        result.shortName = nameComp + ' - ' + value.name + ' [' + programStage.program.id + ']'
+        result.program.id = programStage.program.id
         result.sharing = sharingSettings
         result.analyticsPeriodBoundaries[0].sharing = sharingSettings
         result.analyticsPeriodBoundaries[1].sharing = sharingSettings
@@ -505,9 +550,9 @@ export const buildProgramIndicatorsMWI = ({ programId, programStage, uidPool, sh
     const AnalyticNoA = DeepCopy(ProgramIndicatorTemplateNoA)
     AnalyticNoA.id = uidPool.shift()
     indicatorIDs.push(AnalyticNoA.id)
-    AnalyticNoA.name = programShortName + ' - Number of Assessments'
-    AnalyticNoA.shortName = 'Number of Assessments [' + programId + ']'
-    AnalyticNoA.program.id = programId
+    AnalyticNoA.name = programShortName + ' - Number of programStages'
+    AnalyticNoA.shortName = 'Number of programStages [' + programStage.program.id + ']'
+    AnalyticNoA.program.id = programStage.program.id
     AnalyticNoA.sharing = sharingSettings
     AnalyticNoA.analyticsPeriodBoundaries[0].sharing = sharingSettings
     AnalyticNoA.analyticsPeriodBoundaries[1].sharing = sharingSettings
@@ -515,10 +560,10 @@ export const buildProgramIndicatorsMWI = ({ programId, programStage, uidPool, sh
     const AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
     AnalyticGS.id = uidPool.shift()
     indicatorIDs.push(AnalyticGS.id)
-    AnalyticGS.name = `Global Score [${programId}]`
-    AnalyticGS.shortName = `Global Score [${programId}]`
+    AnalyticGS.name = `Global Score [${programStage.program.id}]`
+    AnalyticGS.shortName = `Global Score [${programStage.program.id}]`
     AnalyticGS.expression = `#{${programStage.id}.${mainScoreDataElement}}`
-    AnalyticGS.program.id = programId
+    AnalyticGS.program.id = programStage.program.id
     AnalyticGS.sharing = sharingSettings
     AnalyticGS.analyticsPeriodBoundaries[0].sharing = sharingSettings
     AnalyticGS.analyticsPeriodBoundaries[1].sharing = sharingSettings
@@ -527,11 +572,10 @@ export const buildProgramIndicatorsMWI = ({ programId, programStage, uidPool, sh
     programIndicators = programIndicators.concat([AnalyticNoA, AnalyticGS])*/
 
     //Return
-    //return { programIndicators, indicatorIDs, gsInd: AnalyticGS.id }
-    return {}
+    return { programIndicators: [], indicatorIDs: [] }
 }
 
-export const buildH2BaseVisualizationsMWI = ({ a/*programId, programShortName, gsInd, indicatorIDs, uidPool, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel*/}) => {
+export const buildH2BaseVisualizationsMWI = ({ a/*programId, programShortName, gsInd, indicatorIDs, uidPool, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel*/ }) => {
     //const series = []
     //const dataDimensionItems = []
     const visualizations = []

@@ -1071,9 +1071,13 @@ const Exporter = (props) => {
         printArray2Column(ws, HNQIS2_VALUE_TYPES, "Value Type", "B2", "b6d7a8");
         printArray2Column(ws, RENDER_TYPES, "Render Type", "D2", "b6d7a8");
         printArray2Column(ws, HNQIS2_AGG_OPERATORS, "Agg. Operator", "F2", "a2c4c9");
-        printObjectArray(ws, props.optionData, "H2", "d5a6bd");
-        printObjectArray(ws, props.healthAreaData, "L2", "d5a6bd")
-        printObjectArray(ws, props.legendSetData, "O2", "9fc5e8");
+        if (props.optionData.length > 0) {
+            printObjectArray(ws, props.optionData, "H2", "d5a6bd");
+        }
+        printObjectArray(ws, props.healthAreaData, "L2", "d5a6bd");
+        if (props.legendSetData.length > 0) {
+            printObjectArray(ws, props.legendSetData, "O2", "9fc5e8");
+        }
         printObjectArray(ws, props.programData, "R2", "9fc5e8");
 
         defineName(ws, `B3:B${HNQIS2_VALUE_TYPES.length + 2}`, "Value_Type");

@@ -485,7 +485,7 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
     });
 
     // Get Ids
-    const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: programStage.programStageDataElements.length * 5 } });
+    const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: programStage.programStageDataElements.length } });
     //setUidPool(idsQuery.data?.results.codes);
 
     // Fetch Program Rules from Program
@@ -520,7 +520,7 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
         const androidSettingsAmount = 1;
 
         let n = (
-            (sections.reduce((prev, acu) => prev + acu.dataElements.length, 10) * 3) //Tripled to create Program Rule Variables
+            (sections.reduce((prev, acu) => prev + acu.dataElements.length, 10) * 10) //Tripled to create Program Rule Variables
             + ((scoresSection?.dataElements?.length || 10) * 2) //Doubled to create Program Rule Variables
             + ((criticalSection?.dataElements?.length || 10) * 5)
         ) + programIndicatorsAmount + visualizationsAmount + androidSettingsAmount;
@@ -538,17 +538,6 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
     useEffect(() => {
         getUIDs()
     }, [sections]);
-
-    /*useEffect(() => {
-        if (!dsLoading && !dsData?.results) {
-            const setUpDataStore = async () => {
-                await dataStoreCreate({
-                    data: {},
-                });
-            }
-            setUpDataStore();
-        }
-    }, [dsLoading, dsData]);*/
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
@@ -927,23 +916,21 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
 
         const { programRuleVariables, dataElementVarMapping } = buildProgramRuleVariablesMWI({ sections, programId, uidPool });
 
-        const { programRules, programRuleActions, scoreMap } = buildProgramRulesMWI(
+        const { programRules, programRuleActions, criterionRulesGroup } = buildProgramRulesMWI(
             {
                 sections,
-                programRuleVariables,
                 dataElementVarMapping,
-                stageId: programStage.id,
                 programId,
                 uidPool,
                 healthArea: programMetadata.healthArea
             }
         );
 
-        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicatorsMWI(
+        const { programIndicators, indicatorIDs } = buildProgramIndicatorsMWI(
             {
-                programId,
                 programStage,
-                scoreMap,
+                criterionRulesGroup,
+                dataElementVarMapping,
                 uidPool,
                 sharingSettings,
                 PIAggregationType: programMetadata.programIndicatorsAggType
@@ -954,7 +941,6 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
             {
                 programId,
                 programShortName: programStage.program.shortName,
-                gsInd,
                 indicatorIDs,
                 uidPool,
                 currentDashboardId: dashboardsDQ?.data?.results?.dashboards[0]?.id,
@@ -977,14 +963,8 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
             eventReports
         };
 
-        console.log(metadata);
-        setProgressSteps(8)
-        setSaveAndBuild('Completed');
-        setSavedAndValidated(false);
-
-
         // IV. Prepare Datastore references 
-        /*getDataStore().then((dataStoreResult) => {
+        getDataStore().then((dataStoreResult) => {
             const programRefereces = {
                 programRules: mapIdArray(programRules),
                 programRuleVariables: mapIdArray(programRuleVariables),
@@ -1054,14 +1034,12 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
                     executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
                 });
             });
-        });*/
+        });
     }
 
     const run = () => {
         if (!savedAndValidated) { return }
         //--------------------- NEW METADATA --------------------//
-        const actionPlanID = programStage.program.programStages.filter(ps => ps.id != programStage.id)[0].id;
-
         setProgressSteps(1);
         const programConfig = programAttributes.results?.programs[0];
         const pcaMetadata = JSON.parse(programConfig?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}");
@@ -1124,7 +1102,11 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
 
                 switch (hnqisType) {
                     case TEMPLATE_PROGRAM_TYPES.hnqis2:
-                        executeHNQISProcess({ pcaMetadata, sharingSettings, actionPlanID });
+                        executeHNQISProcess({
+                            pcaMetadata,
+                            sharingSettings,
+                            actionPlanID: programStage.program.programStages.filter(ps => ps.id != programStage.id)[0].id
+                        });
                         break;
                     case TEMPLATE_PROGRAM_TYPES.hnqismwi:
                         executeMWIProcess({ pcaMetadata, sharingSettings });
