@@ -362,6 +362,9 @@ const buildScoringRulesMWI = (
             const additionalActions = [];
             actionPlanDataElements.forEach(de => {
                 if (['0', '100'].includes(f.data)) {
+                    if (de.alwaysDisplay) {
+                        return;
+                    }
                     const hideAction = {
                         id: uidPool.shift(),
                         programRuleActionType: "HIDEFIELD",
@@ -440,7 +443,11 @@ export const buildProgramRulesMWI = (
             } else if (dataElement.code?.match(/MWI_AP_DE2/)) {
                 criterionRulesGroup[section.id].criterionScore = { id: dataElement.id, code: dataElement.code };
             } else if (dataElement.code?.match(/MWI_AP_DE[3-6]/)) {
-                criterionRulesGroup[section.id].actionPlanDataElements.push({ id: dataElement.id, mandatory: true });
+                criterionRulesGroup[section.id].actionPlanDataElements.push({
+                    id: dataElement.id,
+                    mandatory: true,
+                    alwaysDisplay: dataElement.code?.match(/MWI_AP_DE3/) ? true : false
+                });
             }
 
             if (metadata.elemType === 'question') {
