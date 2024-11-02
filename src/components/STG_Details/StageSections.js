@@ -916,7 +916,7 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
 
         const { programRuleVariables, dataElementVarMapping } = buildProgramRuleVariablesMWI({ sections, programId, uidPool });
 
-        const { programRules, programRuleActions, criterionRulesGroup } = buildProgramRulesMWI(
+        const { programRules, programRuleActions, criterionRulesGroup, questionsList } = buildProgramRulesMWI(
             {
                 sections,
                 dataElementVarMapping,
@@ -928,9 +928,10 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
 
         const { programIndicators, indicatorIDs } = buildProgramIndicatorsMWI(
             {
+                sections: sections.map(s => s.id),
                 programStage,
                 criterionRulesGroup,
-                dataElementVarMapping,
+                questionsList,
                 uidPool,
                 sharingSettings,
                 PIAggregationType: programMetadata.programIndicatorsAggType

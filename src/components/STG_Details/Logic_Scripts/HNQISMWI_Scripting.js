@@ -1,8 +1,6 @@
-import { code } from "@uiw/react-md-editor";
-import { ProgramIndicatorTemplate, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, } from "../../../configs/AnalyticsTemplates.js";
-import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE } from "../../../configs/Constants.js";
+import { ProgramIndicatorTemplate, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, MWIProgramIndicatorTemplate, } from "../../../configs/AnalyticsTemplates.js";
+import { FEEDBACK_ORDER, METADATA } from "../../../configs/Constants.js";
 import { DeepCopy, padValue } from "../../../utils/Utils.js";
-import { data } from "jquery";
 
 const buildAttributesRulesMWI = (programId, uidPool, healthArea) => {
 
@@ -410,6 +408,7 @@ export const buildProgramRulesMWI = (
 
     let programRules = [];
     let programRuleActions = [];
+    const questionsList = [];
     const hideShowGroup = {};
     const criterionRulesGroup = {};
     const hideShowLabels = [{ parent: 'None', condition: 'true', actions: [] }];
@@ -452,6 +451,7 @@ export const buildProgramRulesMWI = (
 
             if (metadata.elemType === 'question') {
                 criterionRulesGroup[section.id]?.parentDataElements.push({ id: dataElement.id, code: dataElement.code })
+                questionsList.push(dataElement.id);
             }
 
             if (metadata.parentQuestion !== undefined && metadata.parentValue !== undefined) {
@@ -515,76 +515,85 @@ export const buildProgramRulesMWI = (
         labelsActions
     );
 
-    return { programRules, programRuleActions, criterionRulesGroup }
+    return { programRules, programRuleActions, criterionRulesGroup, questionsList }
+}
+
+const setIndicatorCommonSettings = (indicator, programId, settings) => {
+    indicator.program.id = programId;
+    indicator.sharing = settings.sharingSettings;
+    indicator.analyticsPeriodBoundaries[0].sharing = settings.sharingSettings;
+    indicator.analyticsPeriodBoundaries[1].sharing = settings.sharingSettings;
+    indicator.aggregationType = settings.PIAggregationType || 'AVERAGE';
 }
 
 export const buildProgramIndicatorsMWI = (
-    { programStage, criterionRulesGroup, dataElementVarMapping, uidPool, sharingSettings, PIAggregationType }
+    { programStage, criterionRulesGroup, questionsList, uidPool, sharingSettings, PIAggregationType }
 ) => {
 
-    const programShortName = programStage.program.shortName;
+    //const programShortName = programStage.program.shortName;
+    const criterions = Object.keys(criterionRulesGroup);
+    const criticalCriterions = criterions.filter(criterion => criterionRulesGroup[criterion].isCritical);
 
-    // This sectin is for the local analytics
-    /*const indicatorValues = useCompetency === "Yes" ? [
-        { name: 'C', condition: `A{${COMPETENCY_ATTRIBUTE}} == "competent"` },
-        { name: 'CNI', condition: `A{${COMPETENCY_ATTRIBUTE}} == "improvement"` },
-        { name: 'NC', condition: `A{${COMPETENCY_ATTRIBUTE}} == "notcompetent"` }
-    ] : [
-        { name: 'A', condition: `#{${programStage.id}.${mainScoreDataElement}} >= 80.0` },
-        { name: 'B', condition: `#{${programStage.id}.${mainScoreDataElement}} < 80.0 && #{${programStage.id}.${mainScoreDataElement}} >= 50.0` },
-        { name: 'C', condition: `#{${programStage.id}.${mainScoreDataElement}} < 50.0` }
+    const indicatorIDs = [];
+    const programIndicators = [];
+
+    const indicatorSettings = [
+        {
+            indicatorName: 'MoH Compliant',
+            expression: criterions.map(section => `d2:countIfValue(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}},100)`).join('+')
+        },
+        {
+            indicatorName: 'MoH Critical Criteria',
+            expression: criticalCriterions.map(section => `d2:count(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}})`).join('+')
+        },
+        {
+            indicatorName: 'MoH Critical Criteria Achieved',
+            expression: criticalCriterions.map(section => `d2:countIfValue(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}},100)`).join('+')
+        },
+        {
+            indicatorName: 'MoH Non-Compliant',
+            expression: criterions.map(section => `d2:countIfValue(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}},5)`).join('+')
+        },
+        {
+            indicatorName: 'MoH Not Applicable',
+            expression: criterions.map(section => `d2:countIfValue(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}},0)`).join('+')
+        },
+        {
+            indicatorName: 'MoH Partially Compliant',
+            expression: criterions.map(section => `d2:countIfValue(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}},45)`).join('+')
+        },
+        {
+            indicatorName: 'MoH Score',
+            expression: `(${criterions.map(section => `#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}}`).join('+')})/${criterions.map(section => `(1-d2:countIfValue(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}},0))`).join('+')}`
+        },
+        {
+            indicatorName: 'MoH Total Criteria',
+            expression: criterions.map(section => `d2:count(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}})`).join('+')
+        },
+        {
+            indicatorName: 'MoH Total MOV',
+            expression: questionsList.map(question => `d2:count(#{${programStage.id}.${question}})`).join('+')
+        }
     ];
-    const nameComp = useCompetency === "Yes" ? "Competency" : "QoC";
 
-    const indicatorIDs = []
+    indicatorSettings.forEach(settings => {
+        const indicator = DeepCopy(MWIProgramIndicatorTemplate);
+        indicator.id = uidPool.shift();
+        indicator.name = `${settings.indicatorName} [${programStage.program.id}]`;
+        indicator.shortName = `${settings.indicatorName} [${programStage.program.id}]`;
+        indicator.expression = settings.expression;
+        setIndicatorCommonSettings(indicator, programStage.program.id, { sharingSettings, PIAggregationType });
+        indicatorIDs.push(indicator.id);
+        programIndicators.push(indicator);
+    });
 
-    let programIndicators = indicatorValues.map(value => {
-        const result = DeepCopy(ProgramIndicatorTemplate)
-        result.id = uidPool.shift()
-        indicatorIDs.push(result.id)
-        result.name = programShortName + " - " + nameComp + " - " + value.name
-        result.shortName = nameComp + ' - ' + value.name + ' [' + programStage.program.id + ']'
-        result.program.id = programStage.program.id
-        result.sharing = sharingSettings
-        result.analyticsPeriodBoundaries[0].sharing = sharingSettings
-        result.analyticsPeriodBoundaries[1].sharing = sharingSettings
-        result.filter = value.condition
-        return result
-    })
-
-    // Global  Analytics - Number of Assesments & Global Score
-
-    const AnalyticNoA = DeepCopy(ProgramIndicatorTemplateNoA)
-    AnalyticNoA.id = uidPool.shift()
-    indicatorIDs.push(AnalyticNoA.id)
-    AnalyticNoA.name = programShortName + ' - Number of programStages'
-    AnalyticNoA.shortName = 'Number of programStages [' + programStage.program.id + ']'
-    AnalyticNoA.program.id = programStage.program.id
-    AnalyticNoA.sharing = sharingSettings
-    AnalyticNoA.analyticsPeriodBoundaries[0].sharing = sharingSettings
-    AnalyticNoA.analyticsPeriodBoundaries[1].sharing = sharingSettings
-
-    const AnalyticGS = DeepCopy(ProgramIndicatorTemplateGS)
-    AnalyticGS.id = uidPool.shift()
-    indicatorIDs.push(AnalyticGS.id)
-    AnalyticGS.name = `Global Score [${programStage.program.id}]`
-    AnalyticGS.shortName = `Global Score [${programStage.program.id}]`
-    AnalyticGS.expression = `#{${programStage.id}.${mainScoreDataElement}}`
-    AnalyticGS.program.id = programStage.program.id
-    AnalyticGS.sharing = sharingSettings
-    AnalyticGS.analyticsPeriodBoundaries[0].sharing = sharingSettings
-    AnalyticGS.analyticsPeriodBoundaries[1].sharing = sharingSettings
-    AnalyticGS.aggregationType = (PIAggregationType && PIAggregationType !== 'AVERAGE') ? PIAggregationType : 'AVERAGE'
-
-    programIndicators = programIndicators.concat([AnalyticNoA, AnalyticGS])*/
-
-    //Return
-    return { programIndicators: [], indicatorIDs: [] }
+    return { programIndicators, indicatorIDs }
 }
 
 export const buildH2BaseVisualizationsMWI = ({ a/*programId, programShortName, gsInd, indicatorIDs, uidPool, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel*/ }) => {
     //const series = []
     //const dataDimensionItems = []
+    console.log(a);
     const visualizations = []
     const eventReports = []
     const androidSettingsVisualizations = []
