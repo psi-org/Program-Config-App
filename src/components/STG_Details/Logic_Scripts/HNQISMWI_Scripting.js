@@ -57,7 +57,7 @@ const buildAttributesRulesMWI = (programId, uidPool, healthArea) => {
             description: "_Scripted",
             programRuleActions: [
                 {
-                    data: "d2:concatenate( A{periodStart}, ' - ',A{periodEnd})",
+                    data: "d2:concatenate( A{_periodStart}, ' - ',A{_periodEnd})",
                     programRuleActionType: "ASSIGN",
                     trackedEntityAttribute: { id: ASSESSMENT_PERIOD_ATTRIBUTE }
                 }
@@ -255,14 +255,14 @@ export const buildProgramRuleVariablesMWI = ({ sections, programId, uidPool }) =
     const programRuleVariables = [
         {
             id: uidPool.shift(),
-            name: "periodStart",
+            name: "_periodStart",
             programRuleVariableSourceType: "TEI_ATTRIBUTE",
             program: { id: programId },
             trackedEntityAttribute: { id: PERIOD_START_ATTRIBUTE }
         },
         {
             id: uidPool.shift(),
-            name: "periodEnd",
+            name: "_periodEnd",
             programRuleVariableSourceType: "TEI_ATTRIBUTE",
             program: { id: programId },
             trackedEntityAttribute: { id: PERIOD_END_ATTRIBUTE }
@@ -573,11 +573,11 @@ export const buildProgramIndicatorsMWI = (
         },
         {
             indicatorName: 'MoH Critical Criteria',
-            expression: criticalCriterions.map(section => `d2:count(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}})`).join('+')
+            expression: (criticalCriterions.length > 0)?criticalCriterions.map(section => `d2:count(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}})`).join('+'):'0'
         },
         {
             indicatorName: 'MoH Critical Criteria Achieved',
-            expression: criticalCriterions.map(section => `d2:countIfValue(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}},100)`).join('+')
+            expression: (criticalCriterions.length > 0)?criticalCriterions.map(section => `d2:countIfValue(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}},100)`).join('+'):'0'
         },
         {
             indicatorName: 'MoH Non-Compliant',
