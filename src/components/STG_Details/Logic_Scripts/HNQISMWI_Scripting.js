@@ -1,5 +1,5 @@
-import { ProgramIndicatorTemplate, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, MWIProgramIndicatorTemplate, } from "../../../configs/AnalyticsTemplates.js";
-import { FEEDBACK_ORDER, METADATA } from "../../../configs/Constants.js";
+import { MWIProgramIndicatorTemplate, } from "../../../configs/AnalyticsTemplates.js";
+import { ASSESSMENT_DATE_ATTRIBUTE, ASSESSMENT_PERIOD_ATTRIBUTE, FEEDBACK_ORDER, HEALTH_AREA_ATTRIBUTE, METADATA, ORGANISATION_UNIT_ATTRIBUTE, PERIOD_END_ATTRIBUTE, PERIOD_START_ATTRIBUTE } from "../../../configs/Constants.js";
 import { DeepCopy, padValue } from "../../../utils/Utils.js";
 
 const buildAttributesRulesMWI = (programId, uidPool, healthArea) => {
@@ -17,7 +17,7 @@ const buildAttributesRulesMWI = (programId, uidPool, healthArea) => {
                 {
                     data: `'${healthArea}'`,
                     programRuleActionType: "ASSIGN",
-                    trackedEntityAttribute: { id: "Xe5hUu6KkUT" }
+                    trackedEntityAttribute: { id: HEALTH_AREA_ATTRIBUTE }
                 }
             ]
         },
@@ -31,7 +31,7 @@ const buildAttributesRulesMWI = (programId, uidPool, healthArea) => {
                 {
                     data: "V{enrollment_date}",
                     programRuleActionType: "ASSIGN",
-                    trackedEntityAttribute: { id: "UlUYUyZJ6o9" }
+                    trackedEntityAttribute: { id: ASSESSMENT_DATE_ATTRIBUTE }
                 }
             ]
         },
@@ -45,7 +45,21 @@ const buildAttributesRulesMWI = (programId, uidPool, healthArea) => {
                 {
                     data: "V{orgunit_code}",
                     programRuleActionType: "ASSIGN",
-                    trackedEntityAttribute: { id: "nHg1hGgtJwm" }
+                    trackedEntityAttribute: { id: ORGANISATION_UNIT_ATTRIBUTE }
+                }
+            ]
+        },
+        {
+            name: "PR - Attributes - Assign Reporting Period",
+            displayName: "PR - Attributes - Assign Reporting Period",
+            condition: "true",
+            program: { id: "" },
+            description: "_Scripted",
+            programRuleActions: [
+                {
+                    data: "d2:concatenate( A{periodStart}, ' - ',A{periodEnd})",
+                    programRuleActionType: "ASSIGN",
+                    trackedEntityAttribute: { id: ASSESSMENT_PERIOD_ATTRIBUTE }
                 }
             ]
         }
@@ -238,7 +252,22 @@ export const buildProgramRuleVariablesMWI = ({ sections, programId, uidPool }) =
     // const scores = sections.find(s => s.name == "Scores");
     // sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
 
-    const programRuleVariables = [];
+    const programRuleVariables = [
+        {
+            id: uidPool.shift(),
+            name: "periodStart",
+            programRuleVariableSourceType: "TEI_ATTRIBUTE",
+            program: { id: programId },
+            trackedEntityAttribute: { id: PERIOD_START_ATTRIBUTE }
+        },
+        {
+            id: uidPool.shift(),
+            name: "periodEnd",
+            programRuleVariableSourceType: "TEI_ATTRIBUTE",
+            program: { id: programId },
+            trackedEntityAttribute: { id: PERIOD_END_ATTRIBUTE }
+        }
+    ];
     const dataElementVarMapping = {};
     let secIdx = 0;
     let deIdx = 1;

@@ -42,12 +42,12 @@ import {
 } from "../../configs/Constants.js";
 import {
     EventStage,
+    HNQISMWI_Attributes,
     HnqisProgramConfigs,
     Program,
     PS_ActionPlanStage,
     PS_AssessmentStage,
     PSDE_HNQIS_ActionPlan,
-    PSDE_HNQISMWI_ActionPlan,
     PSS_CriticalSteps,
     PSS_Default,
     PSS_Scores
@@ -714,7 +714,7 @@ const ProgramNew = (props) => {
                         assessmentStage.programStageSections.push({
                             id: defaultSectionId,
                         });
-                        if (pgrTypePCA === "hnqis") {
+                        if (pgrTypePCA === HNQIS_TYPES.HNQIS2) {
                             assessmentStage.programStageSections.push({
                                 id: stepsSectionId,
                             });
@@ -756,7 +756,7 @@ const ProgramNew = (props) => {
                         defaultSection.programStage.id = assessmentId;
                     } else {
                         assessmentStage = prgrm.programStages.find(section => section.name.toLowerCase().includes('assessment'));
-                        if (pgrTypePCA === "hnqis") {
+                        if (pgrTypePCA === HNQIS_TYPES.HNQIS2) {
                             const exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS];
                             excludedStageDEs = assessmentStage.programStageDataElements.filter(elem => !exclusionsDEs.includes(elem.dataElement.id));
                         }
@@ -764,7 +764,16 @@ const ProgramNew = (props) => {
 
                     prgrm.programTrackedEntityAttributes = DeepCopy(HnqisProgramConfigs.programTrackedEntityAttributes);
 
-                    if (pgrTypePCA === "hnqis" && !useCompetency) {
+                    //? MWI TEAs + enrollment date settings
+                    if (pgrTypePCA === HNQIS_TYPES.HNQISMWI) {
+                        prgrm.selectIncidentDatesInFuture = true;
+                        prgrm.selectEnrollmentDatesInFuture = true;
+                        HNQISMWI_Attributes.forEach(attr => {
+                            prgrm.programTrackedEntityAttributes.push(attr);
+                        })
+                    }
+
+                    if (pgrTypePCA === HNQIS_TYPES.HNQIS2 && !useCompetency) {
                         removeCompetencyAttribute(
                             prgrm.programTrackedEntityAttributes
                         );
@@ -790,7 +799,7 @@ const ProgramNew = (props) => {
                         ];
 
                         removeCompetencyClass(criticalSteps.dataElements);
-                    } else if (pgrTypePCA === "hnqis" && useCompetency && props.data) {
+                    } else if (pgrTypePCA === HNQIS_TYPES.HNQIS2 && useCompetency && props.data) {
                         criticalSteps = prgrm.programStages
                             .map((pStage) => pStage.programStageSections)
                             .flat()
@@ -833,7 +842,7 @@ const ProgramNew = (props) => {
 
                     createOrUpdateMetaData(prgrm.attributeValues);
 
-                    if (pgrTypePCA === "hnqis" && (assessmentStage?.programStageDataElements.length == 0 || props.data)) {
+                    if (pgrTypePCA === HNQIS_TYPES.HNQIS2 && (assessmentStage?.programStageDataElements.length == 0 || props.data)) {
                         assessmentStage.programStageDataElements = excludedStageDEs.concat(criticalSteps.dataElements.map((de, index) => ({
                             sortOrder: index + excludedStageDEs.length,
                             compulsory: false,
@@ -848,7 +857,7 @@ const ProgramNew = (props) => {
                         programStageSections = [
                             defaultSection
                         ];
-                        if (pgrTypePCA === "hnqis") {
+                        if (pgrTypePCA === HNQIS_TYPES.HNQIS2) {
                             programStageSections = programStageSections.concat([
                                 criticalSteps,
                                 scores
@@ -856,7 +865,7 @@ const ProgramNew = (props) => {
                         }
                     } else {
 
-                        programStageSections = (criticalSteps && pgrTypePCA === "hnqis")
+                        programStageSections = (criticalSteps && pgrTypePCA === HNQIS_TYPES.HNQIS2)
                             ? [criticalSteps]
                             : undefined;
                         programStages = [assessmentStage];

@@ -1,3 +1,13 @@
+const {
+    ASSIGNED_TO_ATTRIBUTE,
+    PERIOD_START_ATTRIBUTE,
+    PERIOD_END_ATTRIBUTE,
+    ASSESSMENT_PERIOD_ATTRIBUTE,
+    HEALTH_AREA_ATTRIBUTE,
+    ORGANISATION_UNIT_ATTRIBUTE,
+    ASSESSMENT_DATE_ATTRIBUTE
+} = require("./Constants.js")
+
 const Program = {
     "id": "programId",
     "name": "programName",
@@ -29,7 +39,7 @@ const HnqisProgramConfigs = {
     ],
     "programTrackedEntityAttributes": [
         {
-            "trackedEntityAttribute": { "id": "Xe5hUu6KkUT" },
+            "trackedEntityAttribute": { "id": HEALTH_AREA_ATTRIBUTE },
             "mandatory": false,
             "valueType": "TEXT",
             "searchable": false,
@@ -37,7 +47,7 @@ const HnqisProgramConfigs = {
             "sortOrder": 1
         },
         {
-            "trackedEntityAttribute": { "id": "nHg1hGgtJwm" },
+            "trackedEntityAttribute": { "id": ORGANISATION_UNIT_ATTRIBUTE },
             "mandatory": false,
             "valueType": "TEXT",
             "searchable": false,
@@ -45,7 +55,7 @@ const HnqisProgramConfigs = {
             "sortOrder": 2
         },
         {
-            "trackedEntityAttribute": { "id": "UlUYUyZJ6o9" },
+            "trackedEntityAttribute": { "id": ASSESSMENT_DATE_ATTRIBUTE },
             "mandatory": false,
             "valueType": "DATE",
             "searchable": true,
@@ -55,6 +65,43 @@ const HnqisProgramConfigs = {
     ],
     "userGroupAccesses": []
 }
+
+const HNQISMWI_Attributes = [
+    {
+        "trackedEntityAttribute": { "id": ASSIGNED_TO_ATTRIBUTE },
+        "mandatory": true,
+        "valueType": "TEXT",
+        "searchable": true,
+        "displayInList": true,
+        "sortOrder": 4
+    },
+    {
+        "trackedEntityAttribute": { "id": PERIOD_START_ATTRIBUTE },
+        "mandatory": true,
+        "valueType": "DATE",
+        "searchable": true,
+        "allowFutureDate": true,
+        "displayInList": false,
+        "sortOrder": 5
+    },
+    {
+        "trackedEntityAttribute": { "id": PERIOD_END_ATTRIBUTE },
+        "mandatory": true,
+        "valueType": "DATE",
+        "searchable": true,
+        "allowFutureDate": true,
+        "displayInList": false,
+        "sortOrder": 6
+    },
+    {
+        "trackedEntityAttribute": { "id": ASSESSMENT_PERIOD_ATTRIBUTE },
+        "mandatory": true,
+        "valueType": "TEXT",
+        "searchable": true,
+        "displayInList": true,
+        "sortOrder": 7
+    }
+]
 
 const COMPETENCY_TEA = {
     "trackedEntityAttribute": { "id": "ulU9KKgSLYe" },
@@ -127,34 +174,6 @@ const PSDE_HNQIS_ActionPlan = [
         "allowFutureDate": "true",
         "programStage": { "id": "apProgramStageId" },
         "dataElement": { "id": "DIoqtxbSJIL" }
-    }
-];
-
-const PSDE_HNQISMWI_ActionPlan = [
-    {
-        "sortOrder": 2,
-        "compulsory": "true",
-        "programStage": { "id": "apProgramStageId" },
-        "dataElement": { "id": "OTJPb8MCSaS" }
-    },
-    {
-        "sortOrder": 3,
-        "compulsory": "true",
-        "programStage": { "id": "apProgramStageId" },
-        "dataElement": { "id": "PGtk17z7FFq" }
-    },
-    {
-        "sortOrder": 4,
-        "compulsory": "true",
-        "programStage": { "id": "apProgramStageId" },
-        "dataElement": { "id": "eiUtIypcrX0" }
-    },
-    {
-        "sortOrder": 5,
-        "compulsory": "true",
-        "allowFutureDate": "true",
-        "programStage": { "id": "apProgramStageId" },
-        "dataElement": { "id": "X6TmRobUdbV" }
     }
 ];
 
@@ -323,6 +342,7 @@ module.exports = {
     COMPETENCY_TEA,
     EventStage,
     HNQISMWI_ActionPlanElements,
+    HNQISMWI_Attributes,
     HnqisProgramConfigs,
     OS_HNQISMWI_Criterion,
     Program,
@@ -330,7 +350,6 @@ module.exports = {
     PS_AssessmentStage,
     PS_Generic,
     PSDE_HNQIS_ActionPlan,
-    PSDE_HNQISMWI_ActionPlan,
     PSS_CriticalSteps,
     PSS_Default,
     PSS_Scores
