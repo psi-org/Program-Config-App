@@ -1,4 +1,4 @@
-const { HNQISMWI_ActionPlanElements } = require("../../configs/ProgramTemplate.js");
+const { HNQISMWI_ActionPlanElements, HNQISMWI_SectionDataElements } = require("../../configs/ProgramTemplate.js");
 const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, HNQISMWI_TEMPLATE_MAP } = require("../../configs/TemplateConstants.js");
 const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm, mapImportedDEHNQISMWI } = require("../../utils/importerUtils.js");
 const { DeepCopy } = require("../../utils/Utils.js");
@@ -148,7 +148,7 @@ const readTemplateDataMWI = (
 
     const templateMap = HNQISMWI_TEMPLATE_MAP;
 
-    let sectionNumer = 0;
+    let sectionNumber = 0;
     let standardNumber = 0;
     let criterionNumber = 0;
     let dataElementNumber = 1;
@@ -158,28 +158,42 @@ const readTemplateDataMWI = (
         const structure = row[templateMap.structure];
         let numeration = '';
         if (structure === 'Section') {
-            sectionNumer++;
+            sectionNumber++;
             standardNumber = 0;
             criterionNumber = 0;
-            numeration = `Section ${sectionNumer} : `;
+            numeration = `Section ${sectionNumber} : `;
+            logicDataElements = row[templateMap.dataElementId]
+                ? JSON.parse(row[templateMap.dataElementId]).map(de => {
+                    de.formName = `Section ${sectionNumber}`
+                    de.code = `${programPrefix} - Section ${sectionNumber}`;
+                    return de;
+                })
+                : (DeepCopy(HNQISMWI_SectionDataElements).map(de => {
+                    de.code = `${programPrefix} - Section ${sectionNumber}`;
+                    de.name = `${programPrefix} - Section ${sectionNumber}`;
+                    de.shortName = `${programPrefix} - Section ${sectionNumber}`;
+                    de.formName = `Section ${sectionNumber}`
+                    return de;
+                }));
         } else if (structure === 'Standard') {
             standardNumber++;
             criterionNumber = 0;
-            numeration = `> Standard ${sectionNumer}.${standardNumber} : `;
+            numeration = `> Standard ${sectionNumber}.${standardNumber} : `;
         } else if (structure === 'Criterion') {
             criterionNumber++;
-            numeration = `> > Criterion ${sectionNumer}.${standardNumber}.${criterionNumber} : `;
+            numeration = `> > Criterion ${sectionNumber}.${standardNumber}.${criterionNumber} : `;
 
             logicDataElements = row[templateMap.dataElementId]
                 ? JSON.parse(row[templateMap.dataElementId]).map((de, index) => { 
-                    de.code = `${programPrefix} - ${sectionNumer}.${standardNumber}.${criterionNumber} MWI_AP_DE${index + 1}`;
+                    de.formName = `${sectionNumber}.${standardNumber}.${criterionNumber} ${de.formName.replace(/\d+.\d+.\d+ /, "")}`
+                    de.code = `${programPrefix} - ${sectionNumber}.${standardNumber}.${criterionNumber} MWI_AP_DE${index + 1}`;
                     return de;
                 })
                 : (DeepCopy(HNQISMWI_ActionPlanElements).map(de => {
-                    de.code = `${programPrefix} - ${sectionNumer}.${standardNumber}.${criterionNumber} ${de.code}`;
-                    de.name = `${programPrefix} - ${sectionNumer}.${standardNumber}.${criterionNumber} ${de.name}`;
-                    de.shortName = `${programPrefix} - ${sectionNumer}.${standardNumber}.${criterionNumber} ${de.shortName}`;
-                    de.formName = `${sectionNumer}.${standardNumber}.${criterionNumber} ${de.formName}`;
+                    de.code = `${programPrefix} - ${sectionNumber}.${standardNumber}.${criterionNumber} ${de.code}`;
+                    de.name = `${programPrefix} - ${sectionNumber}.${standardNumber}.${criterionNumber} ${de.name}`;
+                    de.shortName = `${programPrefix} - ${sectionNumber}.${standardNumber}.${criterionNumber} ${de.shortName}`;
+                    de.formName = `${sectionNumber}.${standardNumber}.${criterionNumber} ${de.formName}`;
                     return de;
                 }));
         }
@@ -222,11 +236,12 @@ const readTemplateDataMWI = (
                 
                 break;
             }
-            case 'Std Overview':
             case 'question':
             case 'label':
-                row[HNQISMWI_TEMPLATE_MAP.feedbackOrder] = `${sectionNumer}.${standardNumber}.${criterionNumber}.${dataElementNumber}`
+                row[HNQISMWI_TEMPLATE_MAP.feedbackOrder] = `${sectionNumber}.${standardNumber}.${criterionNumber}.${dataElementNumber}`
                 dataElementNumber++;
+            // eslint-disable-next-line no-fallthrough
+            case 'Std Overview':
                 importedSections[sectionIndex].dataElements.push(mapImportedDEHNQISMWI({
                     data: row,
                     programPrefix,

@@ -336,13 +336,33 @@ const HNQISMWI_ActionPlanElements = [
             "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
         }]
     }
-]
+];
+
+const HNQISMWI_SectionDataElements = [
+    {
+        "name": "Section 1",
+        "code": "Section 1",
+        "translations": [],
+        "shortName": "Section 1",
+        "formName": "Section 1",
+        "aggregationType": "NONE",
+        "valueType": "LONG_TEXT",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "domainType": "TRACKER",
+        "attributeValues": [{
+            "attribute": { "id": "haUflNqP85K" },
+            "value": "{\"elemType\":\"holder\",\"isCompulsory\":\"No\"}"
+        }]
+    }
+];
 
 module.exports = {
     COMPETENCY_TEA,
     EventStage,
     HNQISMWI_ActionPlanElements,
     HNQISMWI_Attributes,
+    HNQISMWI_SectionDataElements,
     HnqisProgramConfigs,
     OS_HNQISMWI_Criterion,
     Program,

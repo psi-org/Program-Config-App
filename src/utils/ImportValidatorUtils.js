@@ -1,6 +1,6 @@
 import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "../configs/Constants.js";
 import { getVarNameFromParentUid } from "./ExcelUtils.js";
-import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isNum, isValidCorrelative, isValidParentName, padValue, setPCAMetadata } from "./Utils.js";
+import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isGeneratedType, isNum, isValidCorrelative, isValidParentName, padValue, setPCAMetadata } from "./Utils.js";
 
 export const HNQIS2_VALIDATION_SETTINGS = {
     sections: {
@@ -585,7 +585,7 @@ export const validateQuestions = (importedScores, dataElement, metadata, dataEle
         validate(validations.checkFormNameLength, checkFormNameLength, { metadata, dataElement }, errors);
         validate(validations.structureMatchesValue, structureMatchesValue, { metadata, dataElement, element: 'label', valueType: 'LONG_TEXT' }, errors);
         validate(validations.hasFeedbackOrder, hasFeedbackOrder, { metadata, dataElement }, errors);
-        if (metadata.elemType != 'generated') {
+        if (!isGeneratedType(metadata.elemType)) {
             validate(validations.hasVarName, hasVarName, { metadata }, errors);
         }
         validate(validations.checkHasValueType, checkHasProperty, { object: dataElement, property: 'valueType' }, errors);

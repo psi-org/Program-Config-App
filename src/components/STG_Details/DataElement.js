@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { METADATA } from "../../configs/Constants.js";
-import { isLabelType } from '../../utils/Utils.js';
+import { isGeneratedType, isLabelType } from '../../utils/Utils.js';
 import AlertDialogSlide from "../UIElements/AlertDialogSlide.js";
 import BadgeErrors from "../UIElements/BadgeErrors.js";
 import BadgeWarnings from "../UIElements/BadgeWarnings.js";
@@ -28,12 +28,13 @@ const getDEIcon = (elemType, hnqisType) => {
         return <DEIcon />;
     }
 
-    if (isLabelType(elemType)) {
-        return <LabelIcon />;
+    //*Goes first as 'holder' is both generated and label
+    if (isGeneratedType(elemType)) {
+        return <AutoAwesomeIcon />;
     }
 
-    if (elemType === 'generated') {
-        return <AutoAwesomeIcon />;
+    if (isLabelType(elemType)) {
+        return <LabelIcon />;
     }
 
     return <QuizIcon />;
@@ -118,7 +119,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                             </div>
                             <div className="ml_item-cta">
                                 {deStatus && <Chip label={deStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{ marginLeft: '1em' }} />}
-                                {isSectionMode && !readOnly && metadata.elemType != 'generated' && <img src={move_vert_svg} alt="menu" id={'menu' + dataElement.id} onClick={() => { setRef(document.getElementById('menu' + dataElement.id)); toggle() }} style={{ cursor: 'pointer' }} />}
+                                {isSectionMode && !readOnly && !isGeneratedType(metadata.elemType) && <img src={move_vert_svg} alt="menu" id={'menu' + dataElement.id} onClick={() => { setRef(document.getElementById('menu' + dataElement.id)); toggle() }} style={{ cursor: 'pointer' }} />}
                                 {openMenu &&
                                     <Layer onClick={toggle}>
                                         <Popper reference={ref} placement="bottom-end">

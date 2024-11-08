@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import { COMPETENCY_CLASS, CRITICAL_STEPS, FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA, NON_CRITICAL_STEPS } from '../../configs/Constants.js';
 import { getVarNameFromParentUid } from '../../utils/ExcelUtils.js';
-import { getPureValue, isLabelType } from '../../utils/Utils.js';
+import { getPureValue, isGeneratedType, isLabelType } from '../../utils/Utils.js';
 import Exporter from "./Exporter.js";
 
 const optionSetQuery = {
@@ -172,7 +172,7 @@ const DataProcessor = (props) => {
                 const metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
                 const metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
                 
-                if (metaData.elemType === 'generated') {
+                if (isGeneratedType(metaData.elemType)) {
                     logicDataElements.push(dataElement);
                     return;
                 }
