@@ -7,11 +7,10 @@ import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from "react";
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants.js";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue, programIsHNQIS, isLabelType } from "../../utils/Utils.js";
 import CustomMUIDialog from './CustomMUIDialog.js';
 import CustomMUIDialogTitle from './CustomMUIDialogTitle.js';
-import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { data } from "jquery";
 
 const competencyClassAttribute = {
     "mandatory": false,

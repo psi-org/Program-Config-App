@@ -443,7 +443,7 @@ export const programIsHNQIS = (type) => {
 }
 
 export const isLabelType = (type) => {
-    return (['label', 'Std Overview', 'holder'].includes(type));
+    return (['label', 'Std Overview'].includes(type));
 }
 
 export const isGeneratedType = (type) => {

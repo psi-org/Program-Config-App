@@ -55,7 +55,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
     let classNames = '';
 
     const metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || '{}');
-    const renderFormName = metadata?.labelFormName;
+    const renderFormName = isLabelType(metadata?.elemType)?metadata?.labelFormName:undefined;
 
     classNames += " ml_item";
     classNames += (dataElement.importStatus) ? ' import_' + dataElement.importStatus : '';

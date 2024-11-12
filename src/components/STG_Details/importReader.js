@@ -1,3 +1,4 @@
+const { METADATA } = require("../../configs/Constants.js");
 const { HNQISMWI_ActionPlanElements, HNQISMWI_SectionDataElements } = require("../../configs/ProgramTemplate.js");
 const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP, HNQISMWI_TEMPLATE_MAP } = require("../../configs/TemplateConstants.js");
 const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm, mapImportedDEHNQISMWI } = require("../../utils/importerUtils.js");
@@ -166,6 +167,10 @@ const readTemplateDataMWI = (
                 ? JSON.parse(row[templateMap.dataElementId]).map(de => {
                     de.formName = `Section ${sectionNumber}`
                     de.code = `${programPrefix} - Section ${sectionNumber}`;
+                    de.attributeValues = [{
+                        "attribute": { "id": METADATA },
+                        "value": "{\"elemType\":\"holder\",\"isCompulsory\":\"No\",\"labelFormName\":\"-\"}"
+                    }];
                     return de;
                 })
                 : (DeepCopy(HNQISMWI_SectionDataElements).map(de => {

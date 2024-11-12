@@ -657,7 +657,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
 
         if (hsRule.parent == "None") {
             pr.name = "PR - Assign labels text";
-            pr.condition = `'true'`;
+            pr.condition = `true`;
         } else {
             pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
             const conditionValue = ["0", "1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'", "")}"`

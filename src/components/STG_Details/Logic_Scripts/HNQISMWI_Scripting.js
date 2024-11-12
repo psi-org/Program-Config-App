@@ -121,7 +121,7 @@ export const readQuestionCompositesMWI = (sections) => {
     return questionCompositeScores.sort()
 }
 
-export const hideShowLogicMWI = (hideShowGroup, programId, uidPool) => {
+export const hideShowLogicMWI = ({ hideShowGroup, programId, stageId, uidPool }) => {
     var hideShowRules = [], hideShowActions = [];
 
     Object.keys(hideShowGroup).forEach(parentCode => {
@@ -138,6 +138,7 @@ export const hideShowLogicMWI = (hideShowGroup, programId, uidPool) => {
                 name,
                 description: '_Scripted',
                 program: { id: programId },
+                programStage: { id: stageId },
                 condition: `!d2:hasValue(#{${parentCode}}) || (#{${parentCode}}!=${conditionValue})`,
                 programRuleActions: []
             };
@@ -194,7 +195,7 @@ export const hideShowLogicMWI = (hideShowGroup, programId, uidPool) => {
     return { hideShowRules, hideShowActions };
 }
 
-const labelsRulesLogicMWI = (hideShowLabels, programId, uidPool) => {
+const labelsRulesLogicMWI = ({ hideShowLabels, programId, stageId, uidPool }) => {
     var labelsRules = [], labelsActions = [];
 
     hideShowLabels.forEach(hsRule => {
@@ -205,13 +206,14 @@ const labelsRulesLogicMWI = (hideShowLabels, programId, uidPool) => {
             name: undefined,
             description: '_Scripted',
             program: { id: programId },
+            programStage: { id: stageId },
             condition: undefined,
             programRuleActions: []
         };
 
         if (hsRule.parent == "None") {
             pr.name = "PR - Assign labels text";
-            pr.condition = `'true'`;
+            pr.condition = `true`;
         } else {
             pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
             const conditionValue = ["0", "1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'", "")}"`
@@ -304,7 +306,7 @@ export const buildProgramRuleVariablesMWI = ({ sections, programId, uidPool }) =
 }
 
 const buildScoringRulesMWI = (
-    { sections, criterionRulesGroup, dataElementVarMapping, programId, uidPool }
+    { sections, criterionRulesGroup, dataElementVarMapping, programId, stageId, uidPool }
 ) => {
 
     const scoringRules = [];
@@ -350,6 +352,7 @@ const buildScoringRulesMWI = (
             name: `PR - Hide/Show Action Plan - Criterion ${criterionRulesGroup[section.id].criterionNumber}`,
             description: '_Scripted',
             program: { id: programId },
+            programStage: { id: stageId },
             condition: `!(${hasValueSting})`,
             programRuleActions: actionPlanDataElements.map(de => {
                 const hideAction = {
@@ -417,6 +420,7 @@ const buildScoringRulesMWI = (
                 name,
                 description: '_Scripted',
                 program: { id: programId },
+                programStage: { id: stageId },
                 condition: f.condition,
                 programRuleActions: [prActionStatus, prActionScore, ...additionalActions]
             };
@@ -432,7 +436,7 @@ const buildScoringRulesMWI = (
 }
 
 export const buildProgramRulesMWI = (
-    { sections, dataElementVarMapping, programId, uidPool, healthArea = "FP" }
+    { programStage, sections, dataElementVarMapping, programId, uidPool, healthArea = "FP" }
 ) => {
 
     let programRules = [];
@@ -441,6 +445,7 @@ export const buildProgramRulesMWI = (
     const hideShowGroup = {};
     const criterionRulesGroup = {};
     const hideShowLabels = [{ parent: 'None', condition: 'true', actions: [] }];
+    const stageId = programStage.id;
 
     const varNameRef = sections.map(sec => sec.dataElements.map(de => {
         const metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}")
@@ -518,17 +523,18 @@ export const buildProgramRulesMWI = (
         criterionRulesGroup,
         dataElementVarMapping,
         programId,
+        stageId,
         uidPool
     });
 
     // Attributes
-    const { attributeRules, attributeActions } = buildAttributesRulesMWI(programId, uidPool, healthArea); //Define: useCompetencyClass & healthArea
+    const { attributeRules, attributeActions } = buildAttributesRulesMWI(programId, uidPool, healthArea);
     
     // Hide/Show Logic
-    const { hideShowRules, hideShowActions } = hideShowLogicMWI(hideShowGroup, programId, uidPool);
+    const { hideShowRules, hideShowActions } = hideShowLogicMWI({ hideShowGroup, programId, stageId, uidPool });
     
     // Labels Assign
-    const { labelsRules, labelsActions } = labelsRulesLogicMWI(hideShowLabels, programId, uidPool);
+    const { labelsRules, labelsActions } = labelsRulesLogicMWI({ hideShowLabels, programId, stageId, uidPool });
 
     programRules = programRules.concat(
         scoringRules,
@@ -593,7 +599,7 @@ export const buildProgramIndicatorsMWI = (
         },
         {
             indicatorName: 'MoH Score',
-            expression: `(${criterions.map(section => `#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}}`).join('+')})/${criterions.map(section => `(1-d2:countIfValue(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}},0))`).join('+')}`
+            expression: `(${criterions.map(section => `#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}}`).join('+')})/(${criterions.map(section => `(1-d2:countIfValue(#{${programStage.id}.${criterionRulesGroup[section].criterionScore.id}},0))`).join('+')})`
         },
         {
             indicatorName: 'MoH Total Criteria',

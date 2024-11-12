@@ -5,7 +5,8 @@ const {
     ASSESSMENT_PERIOD_ATTRIBUTE,
     HEALTH_AREA_ATTRIBUTE,
     ORGANISATION_UNIT_ATTRIBUTE,
-    ASSESSMENT_DATE_ATTRIBUTE
+    ASSESSMENT_DATE_ATTRIBUTE,
+    METADATA
 } = require("./Constants.js")
 
 const Program = {
@@ -33,7 +34,7 @@ const HnqisProgramConfigs = {
     "trackedEntityType": { "id": "oNwpeWkfoWc" },
     "attributeValues": [
         {
-            "attribute": { "id": "haUflNqP85K" },
+            "attribute": { "id": METADATA },
             "value": "{\"buildVersion\":\"1.1\",\"useCompetencyClass\":\"Yes\",\"dePrefix\":\"programDEPrefix\"}"
         }
     ],
@@ -247,7 +248,7 @@ const HNQISMWI_ActionPlanElements = [
         "zeroIsSignificant": false,
         "optionSet": { "id": "eKFCHvlnXxm" },
         "attributeValues": [{
-            "attribute": { "id": "haUflNqP85K" },
+            "attribute": { "id": METADATA },
             "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
         }]
     },
@@ -264,7 +265,7 @@ const HNQISMWI_ActionPlanElements = [
         "aggregationLevels": [],
         "zeroIsSignificant": false,
         "attributeValues": [{
-            "attribute": { "id": "haUflNqP85K" },
+            "attribute": { "id": METADATA },
             "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
         }]
     },
@@ -281,7 +282,7 @@ const HNQISMWI_ActionPlanElements = [
         "aggregationLevels": [],
         "zeroIsSignificant": false,
         "attributeValues": [{
-            "attribute": { "id": "haUflNqP85K" },
+            "attribute": { "id": METADATA },
             "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
         }]
     },
@@ -298,7 +299,7 @@ const HNQISMWI_ActionPlanElements = [
         "aggregationLevels": [],
         "zeroIsSignificant": false,
         "attributeValues": [{
-            "attribute": { "id": "haUflNqP85K" },
+            "attribute": { "id": METADATA },
             "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
         }]
     },
@@ -315,7 +316,7 @@ const HNQISMWI_ActionPlanElements = [
         "aggregationLevels": [],
         "zeroIsSignificant": false,
         "attributeValues": [{
-            "attribute": { "id": "haUflNqP85K" },
+            "attribute": { "id": METADATA },
             "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
         }]
     },
@@ -332,7 +333,7 @@ const HNQISMWI_ActionPlanElements = [
         "aggregationLevels": [],
         "zeroIsSignificant": false,
         "attributeValues": [{
-            "attribute": { "id": "haUflNqP85K" },
+            "attribute": { "id": METADATA },
             "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
         }]
     }
@@ -346,13 +347,13 @@ const HNQISMWI_SectionDataElements = [
         "shortName": "Section 1",
         "formName": "Section 1",
         "aggregationType": "NONE",
-        "valueType": "LONG_TEXT",
+        "valueType": "TEXT",
         "aggregationLevels": [],
         "zeroIsSignificant": false,
         "domainType": "TRACKER",
         "attributeValues": [{
-            "attribute": { "id": "haUflNqP85K" },
-            "value": "{\"elemType\":\"holder\",\"isCompulsory\":\"No\"}"
+            "attribute": { "id": METADATA },
+            "value": "{\"elemType\":\"holder\",\"isCompulsory\":\"No\",\"labelFormName\":\"-\"}"
         }]
     }
 ];

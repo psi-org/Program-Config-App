@@ -918,6 +918,7 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
 
         const { programRules, programRuleActions, criterionRulesGroup, questionsList } = buildProgramRulesMWI(
             {
+                programStage,
                 sections,
                 dataElementVarMapping,
                 programId,
