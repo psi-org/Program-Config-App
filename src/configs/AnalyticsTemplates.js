@@ -444,6 +444,49 @@ export const ProgramIndicatorTemplateNoA = {
 
 }
 
+export const MWIProgramIndicatorTemplate = {
+    "id": "<indicatorId>",
+    "name": " <Short Name> - Indicator",
+    "shortName": " <Short Name> - Indicator",
+    "description": "_H2Analytics",
+    "aggregationType": "AVERAGE",
+    "expression": "expr",
+    "sharing": {
+        "owner": "id",
+        "external": false,
+        "users": {},
+        "userGroups": {},
+        "public": "--------"
+    },
+    "filter": "true",
+    "program": { "id": "<Program Id>" },
+    "decimals": 2,
+    "displayInForm": true,
+    "analyticsType": "EVENT",
+    "analyticsPeriodBoundaries": [
+        {
+            "boundaryTarget": "EVENT_DATE",
+            "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+            "favorite": false,
+            "sharing": {
+                "external": false,
+                "users": {},
+                "userGroups": {}
+            },
+        },
+        {
+            "boundaryTarget": "EVENT_DATE",
+            "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+            "favorite": false,
+            "sharing": {
+                "external": false,
+                "users": {},
+                "userGroups": {}
+            },
+        }
+    ]
+}
+
 export const ProgramIndicatorTemplateGS = {
     "id": "<indicatorId>",
     "name": "Global Score <Program Id>",

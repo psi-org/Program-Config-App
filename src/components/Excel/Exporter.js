@@ -1,4 +1,5 @@
 import ExcelJS from 'exceljs/dist/es5/exceljs.browser.js';
+import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import { ReleaseNotes } from "../../configs/ReleaseNotes.js";
 import {
@@ -16,7 +17,12 @@ import {
     verticalMiddle,
     yesNoValidator,
     HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS,
-    getPromptsFormula
+    getPromptsFormula,
+    structureValidatorMWI,
+    standardHighlighting,
+    criterionHighlighting,
+    HNQIS2_HEADER_INSTRUCTIONS,
+    HNQISMWI_HEADER_INSTRUCTIONS
 } from "../../configs/TemplateConstants.js";
 import {
     addCreator,
@@ -142,7 +148,7 @@ const Exporter = (props) => {
         editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
         editingCell = buildCellObject(ws, "D14:D16");
         editingCell.merge();
-        editingCell.cell.value = 'HNQIS2';
+        editingCell.cell.value = props.hnqisType;
         editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
         fillBackgroundToRange(ws, "C12:C16", "cfe2f3");
 
@@ -658,11 +664,11 @@ const Exporter = (props) => {
         }, {
             header: "Critical Step",
             key: "isCritical",
-            width: 15
+            width: 16
         }, {
             header: "Compulsory",
             key: "isCompulsory",
-            width: 15
+            width: 16
         }, {
             header: "Value Type",
             key: "value_type",
@@ -728,27 +734,9 @@ const Exporter = (props) => {
         fillBackgroundToRange(ws, "L1:M1", "c9daf8");
         ws.getRow(1).height = 35;
         ws.getRow(1).alignment = middleCenter;
-        ws.getRow(2).values = {
-            parent_name: `Indentifier to use as reference in the "Parent Question" column`,
-            structure: `Defines what is being configured in the row`,
-            form_name: `Text that will be displayed in the form during Data Entry`,
-            isCritical: "A critical step will count for the Critical Score\n[Default is 'No']",
-            isCompulsory: "A ompulsory Question must be answered to complete an assessment\n[Default is 'No']",
-            value_type: `Determines the type of input if there's no Option Set selected`,
-            optionSet: `Select the Option Set that provides the available answers for this Question (forces Value Type)`,
-            legend: "Select the Legend that will be applied to the Question",
-            score_numerator: "Numerator for scores calculation",
-            score_denominator: "Denominator for scores calculation",
-            compositive_indicator: "This number will generate the feedback tree in the app, accepted values are:1, 1.1, 1.1.1, 1.1.2, 1.1..., 1.2, etc.",
-            parent_question: "Select the Parent Name of the Question that will act as parent",
-            answer_value: `Specify the value that will trigger the "show" rule of the Question`,
-            feedback_text: `Text that will be displayed in the Feedback app for each Question`,
-            description: `Enter the help text that will be displayed to the supervisor during data entry`,
-            program_stage_id: "",
-            program_section_id: "",
-            data_element_id: "",
-            prompts: "Details regarding the cell highlighting on each row."
-        };
+        ws.getRow(2).values = props.hnqisType === "HNQISMWI"
+            ? HNQISMWI_HEADER_INSTRUCTIONS
+            : HNQIS2_HEADER_INSTRUCTIONS;
 
         ws.getCell("A2").note = {
             texts: [{ text: "If the Parent Name is not automatically generated for questions, then drag the formula from another cell in the same column." }],
@@ -796,7 +784,7 @@ const Exporter = (props) => {
             error: 'Please select the valid value from the dropdown',
             errorTitle: 'Invalid Selection',
             showErrorMessage: true,
-            formulae: structureValidator
+            formulae: props.hnqisType === "HNQISMWI" ? structureValidatorMWI : structureValidator
         });
         dataValidation(ws, "D3:D3000", {
             type: 'list',
@@ -1026,6 +1014,16 @@ const Exporter = (props) => {
                 },
                 {
                     type: 'expression',
+                    formulae: ['OR($B3 = "Standard",$B3 = "Std Overview")'],
+                    style: standardHighlighting
+                },
+                {
+                    type: 'expression',
+                    formulae: ['$B3 = "Criterion"'],
+                    style: criterionHighlighting
+                },
+                {
+                    type: 'expression',
                     formulae: ['$B3 = "question"'],
                     style: questionHighlighting
                 },
@@ -1046,7 +1044,11 @@ const Exporter = (props) => {
                     formula: `=${getPromptsFormula(HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS, dataRow)}`
                 }
                 ws.getRow(dataRow).values = configure;
-                ws.getCell("A" + dataRow).value = { formula: '_xlfn.IF(OR(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section",ISBLANK(INDIRECT(_xlfn.CONCAT("B",ROW())))),"",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",TEXT(COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"00"),"Q",TEXT(ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1,"000"))))' };
+                ws.getCell("A" + dataRow).value = {
+                    formula: props.hnqisType === "HNQISMWI"
+                        ? '_xlfn.IF(_xlfn.OR(_xlfn.AND(_xlfn.INDIRECT(_xlfn.CONCAT("B",_xlfn.ROW()))<>"question",_xlfn.INDIRECT(_xlfn.CONCAT("B",_xlfn.ROW()))<>"label",_xlfn.INDIRECT(_xlfn.CONCAT("B",_xlfn.ROW()))<>"Std Overview"),_xlfn.ISBLANK(_xlfn.INDIRECT(_xlfn.CONCAT("B",_xlfn.ROW())))),"",_xlfn.IF(_xlfn.INDIRECT(_xlfn.CONCAT("B",_xlfn.ROW()))="score","",_xlfn.CONCAT("_S",_xlfn.TEXT(_xlfn.COUNTIF(_xlfn.INDIRECT(_xlfn.CONCAT("B1:B",_xlfn.ROW())),"Section"),"00"),"Q",_xlfn.TEXT(_xlfn.ROW()-_xlfn.SUMPRODUCT(_xlfn.MAX(_xlfn.ROW(_xlfn.INDIRECT(_xlfn.CONCAT("B1:B",_xlfn.ROW())))*(_xlfn.INDIRECT(_xlfn.CONCAT("B1:B",_xlfn.ROW()))="Section")))-_xlfn.COUNTIF(_xlfn.INDIRECT(_xlfn.CONCAT("A",_xlfn.SUMPRODUCT(_xlfn.MAX(_xlfn.ROW(_xlfn.INDIRECT(_xlfn.CONCAT("B1:B",_xlfn.ROW())))*(_xlfn.INDIRECT(_xlfn.CONCAT("B1:B",_xlfn.ROW()))="Section")))+1,":A",_xlfn.ROW()-1)),""),"000"))))'
+                        : '_xlfn.IF(OR(INDIRECT(_xlfn.CONCAT("B",ROW()))="Section",ISBLANK(INDIRECT(_xlfn.CONCAT("B",ROW())))),"",_xlfn.IF(INDIRECT(_xlfn.CONCAT("B",ROW()))="score","",_xlfn.CONCAT("_S",TEXT(COUNTIF(_xlfn.INDIRECT(CONCATENATE("B1:B",ROW())),"Section"),"00"),"Q",TEXT(ROW()-ROW($B$1)-SUMPRODUCT(MAX(ROW(INDIRECT(_xlfn.CONCAT("B1:B",ROW())))*("Section"=INDIRECT(_xlfn.CONCAT("B1:B",ROW())))))+1,"000"))))'
+                };
                 if (configure.structure === "Section") {
                     fillBackgroundToRange(ws, "A" + dataRow + ":R" + dataRow, "f8c291")
                 }
@@ -1069,9 +1071,13 @@ const Exporter = (props) => {
         printArray2Column(ws, HNQIS2_VALUE_TYPES, "Value Type", "B2", "b6d7a8");
         printArray2Column(ws, RENDER_TYPES, "Render Type", "D2", "b6d7a8");
         printArray2Column(ws, HNQIS2_AGG_OPERATORS, "Agg. Operator", "F2", "a2c4c9");
-        printObjectArray(ws, props.optionData, "H2", "d5a6bd");
-        printObjectArray(ws, props.healthAreaData, "L2", "d5a6bd")
-        printObjectArray(ws, props.legendSetData, "O2", "9fc5e8");
+        if (props.optionData.length > 0) {
+            printObjectArray(ws, props.optionData, "H2", "d5a6bd");
+        }
+        printObjectArray(ws, props.healthAreaData, "L2", "d5a6bd");
+        if (props.legendSetData.length > 0) {
+            printObjectArray(ws, props.legendSetData, "O2", "9fc5e8");
+        }
         printObjectArray(ws, props.programData, "R2", "9fc5e8");
 
         defineName(ws, `B3:B${HNQIS2_VALUE_TYPES.length + 2}`, "Value_Type");
@@ -1096,5 +1102,22 @@ const Exporter = (props) => {
 
     return null;
 };
+
+Exporter.propTypes = {
+    Configures: PropTypes.array,
+    flag: PropTypes.bool,
+    healthAreaData: PropTypes.array,
+    hnqisType: PropTypes.string,
+    isLoading: PropTypes.func,
+    legendSetData: PropTypes.array,
+    optionData: PropTypes.array,
+    programData: PropTypes.array,
+    programHealthArea: PropTypes.string,
+    programName: PropTypes.string,  
+    programPrefix: PropTypes.string,
+    programShortName: PropTypes.string,
+    setFlag: PropTypes.func, 
+    useCompetencyClass: PropTypes.string
+}
 
 export default Exporter;

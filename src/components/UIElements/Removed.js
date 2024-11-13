@@ -54,6 +54,10 @@ const Removed = ({ removedItems, tagText = 'Data Element(s)' }) => {
                                 tag = '[ Label ]';
                                 displayName = deMetadata.labelFormName;
                                 break;
+                            case 'Std Overview':
+                                tag = '[ Std Overview ]';
+                                displayName = deMetadata.labelFormName;
+                                break;
                             case 'question':
                                 tag = '[ Question ]';
                                 break;

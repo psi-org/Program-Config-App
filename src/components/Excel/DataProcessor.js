@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import { COMPETENCY_CLASS, CRITICAL_STEPS, FEEDBACK_ORDER, FEEDBACK_TEXT, METADATA, NON_CRITICAL_STEPS } from '../../configs/Constants.js';
 import { getVarNameFromParentUid } from '../../utils/ExcelUtils.js';
-import { getPureValue } from '../../utils/Utils.js';
+import { getPureValue, isGeneratedType, isLabelType } from '../../utils/Utils.js';
 import Exporter from "./Exporter.js";
 
 const optionSetQuery = {
@@ -12,7 +12,7 @@ const optionSetQuery = {
         params: {
             paging: false,
             fields: ['id', 'name', 'valueType'],
-            filter: ['name:ilike:HNQIS - ']
+            filter: ['name:ilike:HNQIS']
         }
     }
 };
@@ -120,7 +120,13 @@ const DataProcessor = (props) => {
     }
 
     const compile_report = () => {
-        const  program_stage_id = programStage.id;
+        const program_stage_id = programStage.id;
+        const mwiFeedbackOrder = {
+            section: 0,
+            standard: 0,
+            criterion: 0,
+            element: 1
+        }
 
         programStage.programStageSections.forEach((programSection) => {
             const  criticalStepsDataElements = [COMPETENCY_CLASS, CRITICAL_STEPS, NON_CRITICAL_STEPS];
@@ -130,15 +136,46 @@ const DataProcessor = (props) => {
             // Skip 'Critical Steps Calculations' Section
             if (programSection.dataElements.find(de => criticalStepsDataElements.includes(de.id))) { return }
 
-            const  row = {};
-            row.structure = "Section";
-            row.form_name = programSection.displayName;
-            row.program_stage_id = program_stage_id;
-            row.program_section_id = program_section_id;
-            Configures.push(row);
+            const tempConfigures = [];
+            const logicDataElements = [];
+
+            const sectionRow = {};
+
+            sectionRow.structure = "Section";
+
+            if (props.hnqisType === 'HNQISMWI') {
+                if (programSection.displayName.match(/Section \d+.*/)) {
+                    sectionRow.compositive_indicator = `${++mwiFeedbackOrder.section}`;
+                    mwiFeedbackOrder.standard = 0;
+                    mwiFeedbackOrder.criterion = 0;
+                    mwiFeedbackOrder.element = 1;
+                } else if (programSection.displayName.match(/> Standard \d+(\.\d+)*.*/)) {
+                    sectionRow.structure = "Standard";
+                    sectionRow.compositive_indicator = `${mwiFeedbackOrder.section}.${++mwiFeedbackOrder.standard}`;
+                    mwiFeedbackOrder.criterion = 0;
+                    mwiFeedbackOrder.element = 1;
+                } else if (programSection.displayName.match(/> > Criterion \d+(\.\d+)*.*/)) {
+                    sectionRow.structure = "Criterion";
+                    sectionRow.compositive_indicator = `${mwiFeedbackOrder.section}.${mwiFeedbackOrder.standard}.${++mwiFeedbackOrder.criterion}`;
+                    sectionRow.isCritical = (programSection.description === "*" ? "Yes" : "No");
+                    mwiFeedbackOrder.element = 1;
+                }
+            }
+
+            sectionRow.form_name = programSection.displayName.replace(/(> > Criterion \d+(\.\d+)*|> Standard \d+(\.\d+)*|Section \d+) : /g, "");
+            sectionRow.program_stage_id = program_stage_id;
+            sectionRow.program_section_id = program_section_id;
 
             programSection.dataElements.forEach((dataElement) => {
-                const  row = {};
+                const row = {};
+                
+                const metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
+                const metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
+                
+                if (isGeneratedType(metaData.elemType)) {
+                    logicDataElements.push(dataElement);
+                    return;
+                }
 
                 row.form_name = dataElement.formName?.replaceAll(' [C]','') || '';
                 row.value_type = (typeof dataElement.valueType !=='undefined') ? dataElement.valueType : undefined;
@@ -150,11 +187,9 @@ const DataProcessor = (props) => {
                 row.program_section_id = program_section_id;
                 row.data_element_id = dataElement.id;
 
-                const metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
-                const metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
                 row.parentValue = '';
                 row.structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
-                if (row.structure == 'label') { row.form_name = metaData.labelFormName || '' }
+                if (isLabelType(row.structure)) { row.form_name = metaData.labelFormName || '' }
                 row.score_numerator = (typeof metaData.scoreNum !== 'undefined') ? metaData.scoreNum: undefined;
                 row.score_denominator = (typeof metaData.scoreDen !== 'undefined') ? metaData.scoreDen : undefined;
                 row.parent_question = (typeof metaData.parentQuestion !== 'undefined') ? getVarNameFromParentUid(metaData.parentQuestion, programStage) : undefined;
@@ -162,14 +197,25 @@ const DataProcessor = (props) => {
                 row.isCompulsory = (typeof metaData.isCompulsory !== 'undefined' && row.structure!='score') ? metaData.isCompulsory: undefined;
                 row.isCritical = (typeof metaData.isCritical !== 'undefined' && row.structure!='score') ? metaData.isCritical: undefined;
 
-                const compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_ORDER);
-                row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : undefined;
+                if (props.hnqisType === 'HNQISMWI' && row.structure != 'Std Overview') {  
+                    row.compositive_indicator = `${mwiFeedbackOrder.section}.${mwiFeedbackOrder.standard}.${mwiFeedbackOrder.criterion}.${mwiFeedbackOrder.element++}`;
+                } else {
+                    const compositiveIndicator = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_ORDER);
+                    row.compositive_indicator = (compositiveIndicator.length > 0) ? compositiveIndicator[0].value : undefined;
+                }
 
                 const feedbackText = dataElement.attributeValues.filter(av => av.attribute.id === FEEDBACK_TEXT);
                 row.feedback_text = (feedbackText.length > 0) ? feedbackText[0].value : undefined;
 
-                Configures.push(row);
+                tempConfigures.push(row);
             });
+
+            if (logicDataElements.length > 0) { 
+                sectionRow.data_element_id = JSON.stringify(logicDataElements); //Stores the DE object instead of an ID
+            }
+
+            Configures.push(sectionRow);
+            Configures.push(...tempConfigures);
         });
     };
 
@@ -192,12 +238,14 @@ const DataProcessor = (props) => {
                     programPrefix={programPrefix}
                     useCompetencyClass={useCompetencyClass}
                     programHealthArea={programHealthArea}
+                    hnqisType={props.hnqisType}
                 />}
         </>
     );
 }
 
 DataProcessor.propTypes = {
+    hnqisType: PropTypes.string,
     isLoading: PropTypes.func,
     programName: PropTypes.string,
     programStageSections: PropTypes.array,

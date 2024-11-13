@@ -30,7 +30,9 @@ export const horizontalCenter = {
 };
 
 export const conditionalError = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'dc3545' } } };
-export const sectionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'f8c291' } } };
+export const sectionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'faa557' } } };
+export const standardHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'f8c291' } } };
+export const criterionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'ffd8b5' } } };
 export const questionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'ffffff' } } };
 export const labelHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'c6e0b4' } } };
 export const otherHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: '99dcff' } } };
@@ -39,6 +41,7 @@ export const disabledHighlighting = { fill: { type: 'pattern', pattern: 'solid',
 export const validWorksheets = ['Instructions', 'Template', 'Release Notes', 'Mapping'];
 
 export const structureValidator = ['"Section,label,question,score"'];
+export const structureValidatorMWI = ['"Section,Standard,Std Overview,Criterion,question,label"'];
 export const teaStructureValidator = ['"Section,TEA"'];
 export const trackerStructureValidator = ['"Section,Data Element"'];
 export const yesNoValidator = ['"Yes,No"'];
@@ -65,6 +68,73 @@ export const HNQIS2_TEMPLATE_MAP = {
     programSection: "Program Section Id",
     dataElementId: "Data Element Id",
     prompts: "Errors/Warnings/Info"
+};
+
+export const HNQIS2_HEADER_INSTRUCTIONS = {
+    parent_name: `Indentifier to use as reference in the "Parent Question" column`,
+    structure: `Defines what is being configured in the row`,
+    form_name: `Text that will be displayed in the form during Data Entry`,
+    isCritical: "A critical step will count for the Critical Score\n[Default is 'No']",
+    isCompulsory: "A compulsory Question must be answered to complete an assessment\n[Default is 'No']",
+    value_type: `Determines the type of input if there's no Option Set selected`,
+    optionSet: `Select the Option Set that provides the available answers for this Question (forces Value Type)`,
+    legend: "Select the Legend that will be applied to the Question",
+    score_numerator: "Numerator for scores calculation",
+    score_denominator: "Denominator for scores calculation",
+    compositive_indicator: "This number will generate the feedback tree in the app, accepted values are:1, 1.1, 1.1.1, 1.1.2, 1.1..., 1.2, etc.",
+    parent_question: "Select the Parent Name of the Question that will act as parent",
+    answer_value: `Specify the value that will trigger the "show" rule of the Question`,
+    feedback_text: `Text that will be displayed in the Feedback app for each Question`,
+    description: `Enter the help text that will be displayed to the supervisor during data entry`,
+    program_stage_id: "",
+    program_section_id: "",
+    data_element_id: "",
+    prompts: "Details regarding the cell highlighting on each row."
+};
+
+//TODO: Remove unused columns in a future release
+export const HNQISMWI_TEMPLATE_MAP = {
+    parentName: "Parent Name",
+    structure: "Structure",
+    formName: "Form Name",
+    isCritical: "Critical Step",
+    isCompulsory: "Compulsory",
+    valueType: "Value Type",
+    optionSet: "Option Set",
+    legend: "Legend",
+    scoreNum: "Score Numerator",
+    scoreDen: "Score Denominator",
+    feedbackOrder: "Feedback Order",
+    parentQuestion: "Parent Question",
+    parentValue: "Answer Value",
+    feedbackText: "Feedback Text",
+    description: "Description",
+    programStage: "Program Stage Id",
+    programSection: "Program Section Id",
+    dataElementId: "Data Element Id",
+    prompts: "Errors/Warnings/Info"
+};
+
+export const HNQISMWI_HEADER_INSTRUCTIONS = {
+    parent_name: `Indentifier to use as reference in the "Parent Question" column`,
+    structure: `Defines what is being configured in the row`,
+    form_name: `Text that will be displayed in the form during Data Entry`,
+    isCritical: "A critical step will count for the Critical Criteria\n[Default is 'No']",
+    isCompulsory: "A compulsory Question must be answered to complete an assessment\n[Default is 'Yes']",
+    value_type: `X`,
+    optionSet: `Select the Option Set that provides the available answers for this Question (forces Value Type)`,
+    legend: "Select the Legend that will be applied to the Question",
+    score_numerator: "X",
+    score_denominator: "X",
+    compositive_indicator: "X",
+    parent_question: "Select the Parent Name of the Question that will act as parent",
+    answer_value: `Specify the value that will trigger the "show" rule of the Question`,
+    feedback_text: `Text that will be displayed in the Feedback app for each Question`,
+    description: `Enter the help text that will be displayed to the supervisor during data entry`,
+    program_stage_id: "",
+    program_section_id: "",
+    data_element_id: "",
+    prompts: "Details regarding the cell highlighting on each row."
 };
 
 export const HNQIS2_TEMPLATE_HEADERS = [
@@ -186,9 +256,10 @@ export const RENDER_TYPES = ['DEFAULT', 'DROPDOWN', 'VERTICAL_RADIOBUTTONS', 'HO
 
 export const TEMPLATE_PROGRAM_TYPES = {
     hnqis2: 'HNQIS2',
+    hnqismwi: 'HNQISMWI',
     tracker: 'Tracker Program',
     event: 'Event Program'
-}
+};
 
 export const TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS = {
     structureNotSelected: {
@@ -215,7 +286,7 @@ export const TRACKER_TEA_CONDITIONAL_FORMAT_VALIDATIONS = {
         dynamicFormula: 'AND($A_ROWNUM_ = "TEA", NOT(ISBLANK($C_ROWNUM_)), OR(ISBLANK($E_ROWNUM_), AND($E_ROWNUM_ <> "DATE", $E_ROWNUM_ <> "DATETIME")))',
         prompt: 'Future Date not available for the selected TEA.'
     }
-}
+};
 
 export const TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS = {
     correlativeNotDefined: {
@@ -293,12 +364,12 @@ export const TRACKER_STAGE_CONDITIONAL_FORMAT_VALIDATIONS = {
         dynamicFormula: 'AND($A_ROWNUM_ = "Data Element",NOT(ISNUMBER(MATCH($O_ROWNUM_, B:B, 0))),$O_ROWNUM_<>"")',
         prompt: 'Parent Data Element not found.'
     }
-}
+};
 
 export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
     parentNameNotDefined: {
-        formula: 'AND(ISBLANK($A3),OR($B3="question",$B3="label"))',
-        dynamicFormula: 'AND(ISBLANK($A_ROWNUM_),OR($B_ROWNUM_="question",$B_ROWNUM_="label"))',
+        formula: 'AND(ISBLANK($A3),OR($B3="question",$B3="label",$B3="Standard",$B3="Std Overview",$B3="Criterion"))',
+        dynamicFormula: 'AND(ISBLANK($A_ROWNUM_),OR($B_ROWNUM_="question",$B_ROWNUM_="label",$B_ROWNUM_="Standard",$B_ROWNUM_="Std Overview",$B_ROWNUM_="Criterion"))',
         prompt: 'Parent Name not defined.'
     },
     formNameNotDefined: {
@@ -307,8 +378,8 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
         prompt: 'Form Name not defined.'
     },
     formNameOutOfRange: {
-        formula: `AND(NOT(ISBLANK($B3)),OR(LEN($C3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
-        dynamicFormula: `AND(NOT(ISBLANK($B_ROWNUM_)),OR(LEN($C_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C_ROWNUM_)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
+        formula: `AND(NOT(ISBLANK($B3)),$B3<>"Std Overview",OR(LEN($C3)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C3)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
+        dynamicFormula: `AND(NOT(ISBLANK($B_ROWNUM_)),$B_ROWNUM_<>"Std Overview",OR(LEN($C_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C_ROWNUM_)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
         prompt: `Form Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
     },
     valueTypeNotDefined: {
@@ -356,7 +427,7 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
         dynamicFormula: 'AND(OR($B_ROWNUM_ = "question",$B_ROWNUM_ = "label"),NOT(ISNUMBER(MATCH($L_ROWNUM_, A:A, 0))),$L_ROWNUM_<>"")',
         prompt: 'Parent Question not found.'
     }
-}
+};
 
 export const getPromptsFormula = (validationsList, rowNumber) => {
     let formula = "CONCATENATE(";

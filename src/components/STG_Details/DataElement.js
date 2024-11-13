@@ -1,6 +1,7 @@
 import { FlyoutMenu, MenuItem, Popper, Layer, Tag } from '@dhis2/ui';
 import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DEIcon from '@mui/icons-material/Dns';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,6 +15,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { METADATA } from "../../configs/Constants.js";
+import { isGeneratedType, isLabelType } from '../../utils/Utils.js';
 import AlertDialogSlide from "../UIElements/AlertDialogSlide.js";
 import BadgeErrors from "../UIElements/BadgeErrors.js";
 import BadgeWarnings from "../UIElements/BadgeWarnings.js";
@@ -21,7 +23,24 @@ import ValidationMessages from "../UIElements/ValidationMessages.js";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import DataElementForm from "./DataElementForm.js";
 
-const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActions, section, index, hnqisMode, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
+const getDEIcon = (elemType, hnqisType) => {
+    if (!hnqisType) {
+        return <DEIcon />;
+    }
+
+    //*Goes first as 'holder' is both generated and label
+    if (isGeneratedType(elemType)) {
+        return <AutoAwesomeIcon />;
+    }
+
+    if (isLabelType(elemType)) {
+        return <LabelIcon />;
+    }
+
+    return <QuizIcon />;
+}
+
+const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActions, section, index, hnqisType, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -36,7 +55,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
     let classNames = '';
 
     const metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || '{}');
-    const renderFormName = metadata?.labelFormName;
+    const renderFormName = isLabelType(metadata?.elemType)?metadata?.labelFormName:undefined;
 
     classNames += " ml_item";
     classNames += (dataElement.importStatus) ? ' import_' + dataElement.importStatus : '';
@@ -49,9 +68,6 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
             case 'new':
                 deImportStatus = <Tag positive>New</Tag>;
                 break;
-            // case 'delete':
-            //     deImportStatus = <Tag negative>Removed</Tag>;
-            //     break;
             case 'update':
             default:
                 deImportStatus = <Tag neutral>Updated</Tag>;
@@ -71,7 +87,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
                         <div id={"de_" + dataElement.id} className={'data-element-header ' + (openMenu ? 'data-element-selected ' : '') + classNames}>
                             <div className="ml_item-icon" style={{ display: 'flex', alignItems: 'center' }}>
-                                {!hnqisMode ? <DEIcon /> : (metadata.elemType === 'label' ? <LabelIcon /> : <QuizIcon />)}
+                                {getDEIcon(metadata.elemType, hnqisType)}
                             </div>
                             <div className="ml_item-title" style={{ maxWidth: '80vw' }}>
                                 {deImportStatus}
@@ -103,7 +119,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                             </div>
                             <div className="ml_item-cta">
                                 {deStatus && <Chip label={deStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{ marginLeft: '1em' }} />}
-                                {isSectionMode && !readOnly && <img src={move_vert_svg} alt="menu" id={'menu' + dataElement.id} onClick={() => { setRef(document.getElementById('menu' + dataElement.id)); toggle() }} style={{ cursor: 'pointer' }} />}
+                                {isSectionMode && !readOnly && !isGeneratedType(metadata.elemType) && <img src={move_vert_svg} alt="menu" id={'menu' + dataElement.id} onClick={() => { setRef(document.getElementById('menu' + dataElement.id)); toggle() }} style={{ cursor: 'pointer' }} />}
                                 {openMenu &&
                                     <Layer onClick={toggle}>
                                         <Popper reference={ref} placement="bottom-end">
@@ -116,7 +132,6 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                                         </Popper>
                                     </Layer>
                                 }
-                                {/*<a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)+"/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/"+dataElement.id}><img className="" alt="exp" src={open_external_svg} /></a>*/}
                             </div>
                         </div>
                         {DEActions.deToEdit === dataElement.id &&
@@ -127,7 +142,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                                 section={section}
                                 setDeToEdit={DEActions.setEdit}
                                 save={DEActions.update}
-                                hnqisMode={hnqisMode}
+                                hnqisType={hnqisType}
                                 setSaveStatus={setSaveStatus}
                             />
                         }
@@ -159,7 +174,7 @@ DraggableDataElement.propTypes = {
     dataElement: PropTypes.object,
     dePrefix: PropTypes.string,
     deStatus: PropTypes.object,
-    hnqisMode: PropTypes.bool,
+    hnqisType: PropTypes.string,
     index: PropTypes.number,
     isSectionMode: PropTypes.bool,
     program: PropTypes.string,

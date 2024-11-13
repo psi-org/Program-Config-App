@@ -1261,11 +1261,15 @@ const ExporterTracker = ({
         defineName(ws, `B3:B${trackedEntityAttributesData.length + 2}`, "Tracked_Entity_Attributes_Data");
         defineName(ws, `C3:G${trackedEntityAttributesData.length + 2}`, "selected_TEA_Data");
 
-        printObjectArray(ws, optionData, "I2", "bdd7ee");
+        if (optionData.length > 0) {
+            printObjectArray(ws, optionData, "I2", "bdd7ee");
+        }
         defineName(ws, `I3:I${optionData.length + 2}`, "Option_Sets_Data");
         defineName(ws, `J3:M${optionData.length + 2}`, "selected_Option_Set_Data");
 
-        printObjectArray(ws, legendSetData, "O2", "bdd7ee");
+        if (legendSetData.length > 0) {
+            printObjectArray(ws, legendSetData, "O2", "bdd7ee");
+        }
         defineName(ws, `O3:O${legendSetData.length + 2}`, "Legend_Sets_Data");
 
         printObjectArray(ws, valueTypes, "R2", "bdd7ee");

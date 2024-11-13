@@ -43,6 +43,7 @@ import ObjectSharing from "./ObjectSharing.js";
 import SharingItem from './SharingItem.js';
 import SharingOptions from "./SharingOptions.js";
 import Suggestions from "./Suggestions.js";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 
 const sharingQuery = {
     results: {
@@ -407,7 +408,7 @@ const SharingScreen = ({ element, id, setSharingProgramId, type, setType, readOn
             return av.attribute.id === programTypeId
         })[0]?.value || 'Tracker') : 'Tracker';
 
-        if (programType === "HNQIS2") {
+        if (programType === TEMPLATE_PROGRAM_TYPES.hnqis2) {
             addHNQISElement4Sharing();
             if (hnqisElements.length > 0){
                 setAdditionalElements([...hnqisElements]);

@@ -25,15 +25,22 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.0.7";
+const BUILD_VERSION = "2.1.0";
 const BUILD_DATE = "Sep 30, 2024";
 const MIN_VERSION = "2.36.x";
-const MAX_VERSION = "2.40.x";
+const MAX_VERSION = "2.41.x";
 
 const PCA_METADATA_VERSION = "1.2.1";
-const H2_METADATA_VERSION = "1.1.4";
+const H2_METADATA_VERSION = "1.2.0";
 
 const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.6";
+
+const HNQIS_TYPES = {
+    hnqis: "HNQIS2",
+    hnqismwi: "HNQISMWI",
+    HNQIS2: "hnqis",
+    HNQISMWI: "hnqismwi"
+}
 
 const DHIS2_PRIMARY_COLOR = "#2c6693";
 const LIGHT_BLUE_COLOR = "#66aee5";
@@ -51,6 +58,12 @@ const ASSESSMENT_DATE_ATTRIBUTE = "UlUYUyZJ6o9";
 const HEALTH_AREA_ATTRIBUTE = "Xe5hUu6KkUT";
 const ORGANISATION_UNIT_ATTRIBUTE = "nHg1hGgtJwm";
 
+//* HNQIS MWI Tracked Entity Attributes
+const ASSIGNED_TO_ATTRIBUTE = "wemItmDMB0z";
+const PERIOD_END_ATTRIBUTE = "EG74wAWqH2l";
+const PERIOD_START_ATTRIBUTE = "iQdcdiFQqKP";
+const ASSESSMENT_PERIOD_ATTRIBUTE = "QyeMxnvvRE5";
+
 //* HNQIS2 Attributes
 const FEEDBACK_ORDER = "LP171jpctBm";
 const FEEDBACK_TEXT = "yhKEe6BLEer";
@@ -63,17 +76,26 @@ const ACTION_PLAN_ACTION = "F0Qcr8ANr7t";
 const ACTION_PLAN_DUE_DATE = "DIoqtxbSJIL";
 const ACTION_PLAN_RESPONSIBLE = "nswci5V4j0d";
 
+const MWI_ACTION_PLAN_COMMENT = "OTJPb8MCSaS";
+const MWI_ACTION_PLAN_ACTION = "PGtk17z7FFq";
+const MWI_ACTION_PLAN_DUE_DATE = "eiUtIypcrX0";
+const MWI_ACTION_PLAN_RESPONSIBLE = "X6TmRobUdbV";
+
 //* H2 Tracked Entity Type
 const ASSESSMENT_TET = "oNwpeWkfoWc";
 
 //* H2 Option Sets
 const OPTION_SET_COMPETENCY = "NDfZ129owtz";
 const OPTION_SET_HEALTH_AREAS = "y752HEwvCGi";
+const OPTION_SET_YESNONA = "Ri5XuSekdRg";
+const OPTION_SET_COMPLIANCE_TYPES = "eKFCHvlnXxm";
 
 //* H2 Legend Sets
 const LEGEND_YES_NO = "RXxPYFwtgf4";
 const LEGEND_YES_PARTIAL_NO = "kqQjtHIc7II";
 const VISUALIZATIONS_LEGEND = "nvVrBnbud3L";
+const LEGEND_COMPLIANT = "F9G1wtBjiOY";
+const LEGEND_YES_NO_NA = "OvTfZMpgeAm";
 
 //* H1 Control Data Elements
 const H1_OVERALL_SCORE = "Y8Nmpp7RhXw";
@@ -111,7 +133,12 @@ const H2_REQUIRED = {
         ACTION_PLAN_DUE_DATE,
         ACTION_PLAN_RESPONSIBLE,
     ],
-    optionSets: [OPTION_SET_COMPETENCY, OPTION_SET_HEALTH_AREAS],
+    optionSets: [
+        OPTION_SET_COMPETENCY,
+        OPTION_SET_HEALTH_AREAS,
+        OPTION_SET_YESNONA,
+        OPTION_SET_COMPLIANCE_TYPES
+    ],
     options: [
         "BNjofUBvlJ8",
         "Ox6VQNmvuS3",
@@ -134,7 +161,14 @@ const H2_REQUIRED = {
         "OqRNLt5Nbub",
         "MstdLcCaYZW",
         "Jhn703YNPa1",
-        "jHAilN60gsN"
+        "jHAilN60gsN",
+        "IVVfVluYFli",
+        "gkLeI6VFJZe",
+        "U2dkoDmopiv",
+        "taUjIWC98Y2",
+        "jPv8u9xUbs3",
+        "OlAkP1EGLTV",
+        "Nfxy7d5ajSJ"
     ],
     trackedEntityTypes: [ASSESSMENT_TET],
     trackedEntityAttributes: [
@@ -142,9 +176,13 @@ const H2_REQUIRED = {
         ORGANISATION_UNIT_ATTRIBUTE,
         ASSESSMENT_DATE_ATTRIBUTE,
         COMPETENCY_ATTRIBUTE,
+        ASSIGNED_TO_ATTRIBUTE,
+        PERIOD_END_ATTRIBUTE,
+        PERIOD_START_ATTRIBUTE,
+        ASSESSMENT_PERIOD_ATTRIBUTE
     ],
     attributes: [FEEDBACK_ORDER, FEEDBACK_TEXT],
-    legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND],
+    legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND, LEGEND_COMPLIANT, LEGEND_YES_NO_NA],
 };
 
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false, localeMatcher: 'best fit', };
@@ -232,7 +270,7 @@ const RENDER_TYPES = [
 ];
 
 //* HNQIS2 Elem Types
-const ELEM_TYPES = [{ label: 'Question', value: 'question' }, { label: 'Label', value: 'label' }];
+const ELEM_TYPES = [{ label: 'Question', value: 'question' }, { label: 'Label', value: 'label' }, { label: 'Std Overview', value: 'Std Overview' }];
 
 //* PCA Dropdowns
 const VALUE_TYPES_H2 = [
@@ -513,7 +551,9 @@ export {
     AGG_TYPES_H2_PI,
     AGG_TYPES,
     ASSESSMENT_DATE_ATTRIBUTE,
+    ASSESSMENT_PERIOD_ATTRIBUTE,
     ASSESSMENT_TET,
+    ASSIGNED_TO_ATTRIBUTE,
     BACKUPS_NAMESPACE,
     BUILD_DATE,
     BUILD_VERSION,
@@ -562,6 +602,7 @@ export {
     H2_REQUIRED,
     HEADER_ATTRIBUTE,
     HEALTH_AREA_ATTRIBUTE,
+    HNQIS_TYPES,
     JSON_ATTRIBUTE_SETTINGS,
     LEGEND_YES_NO,
     LEGEND_YES_PARTIAL_NO,
@@ -580,17 +621,25 @@ export {
     MIN_DESCRIPTION_LENGTH,
     MIN_NAME_LENGTH,
     MIN_VERSION,
+    MWI_ACTION_PLAN_ACTION,
+    MWI_ACTION_PLAN_COMMENT,
+    MWI_ACTION_PLAN_DUE_DATE,
+    MWI_ACTION_PLAN_RESPONSIBLE,
     NAMESPACE,
     newTagStyle,
     NON_CRITICAL_STEPS,
     OPTION_SET_COMPETENCY,
+    OPTION_SET_COMPLIANCE_TYPES,
     OPTION_SET_HEALTH_AREAS,
+    OPTION_SET_YESNONA,
     ORGANISATION_UNIT_ATTRIBUTE,
     PCA_ATTRIBUTES,
     PCA_METADATA_VERSION,
     PCA_OPTION_SETS,
     PCA_OPTIONS,
     PCA_USER_ROLES,
+    PERIOD_END_ATTRIBUTE,
+    PERIOD_START_ATTRIBUTE,
     PERIOD_TYPES,
     QUESTION_ORDER_ATTRIBUTE,
     QUESTION_PARENT_ATTRIBUTE,
