@@ -732,7 +732,7 @@ const ProgramNew = (props) => {
                         }
                         assessmentStage.program.id = prgrm.id;
 
-                        if (pgrTypePCA === HNQIS_TYPES.hnqis) {
+                        if (pgrTypePCA === HNQIS_TYPES.HNQIS2) {
                             prgrm.programStages.push({ id: actionPlanId });
                             actionPlanStage = DeepCopy(PS_ActionPlanStage);
                             actionPlanStage.id = actionPlanId;
