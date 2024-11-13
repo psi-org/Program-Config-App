@@ -4,6 +4,8 @@ import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import RuleIcon from '@mui/icons-material/Rule';
+import RuleFolderIcon from '@mui/icons-material/RuleFolder';
 import SegmentIcon from '@mui/icons-material/Segment';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Tooltip } from "@mui/material";
@@ -21,7 +23,21 @@ import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import DraggableDataElement from "./DataElement.js";
 
-const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisMode, editStatus, isSectionMode, readOnly, setSaveStatus }) => {
+const getSectionIcon = (hnqisType, sectionName) => { 
+    if (hnqisType === 'HNQISMWI') {
+        if (sectionName.match(/> Standard \d+(\.\d+)*.*/)) {
+            return <RuleFolderIcon />;
+        } else if (sectionName.match(/> > Criterion \d+(\.\d+)*.*/)) {
+            return <RuleIcon />;
+        } else {
+            return <SegmentIcon />;
+        }
+    } else {
+        return <SegmentIcon />;
+    }
+}
+
+const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisType, editStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
@@ -69,7 +85,7 @@ const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, 
                         }}
                     >
                         <div className="ml_item-icon" style={{ display: 'flex', alignItems: 'center' }}>
-                            <SegmentIcon />
+                            {getSectionIcon(hnqisType, stageSection.displayName)}
                         </div>
                         <div className="ml_item-title" style={{
                             overflow: 'hidden'
@@ -139,7 +155,7 @@ const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, 
                                             section={stageSection.id}
                                             index={i}
                                             key={de.id || i}
-                                            hnqisMode={hnqisMode}
+                                            hnqisType={hnqisType}
                                             deStatus={editStatus?.dataElements?.find(dataElement => dataElement.id === de.id)}
                                             isSectionMode={isSectionMode}
                                             readOnly={readOnly}
@@ -181,7 +197,7 @@ DraggableSection.propTypes = {
     SectionActions: PropTypes.object,
     dePrefix: PropTypes.string,
     editStatus: PropTypes.oneOfType([PropTypes.object,PropTypes.bool]),
-    hnqisMode: PropTypes.bool,
+    hnqisType: PropTypes.string,
     index: PropTypes.number,
     isSectionMode: PropTypes.bool,
     program: PropTypes.string,

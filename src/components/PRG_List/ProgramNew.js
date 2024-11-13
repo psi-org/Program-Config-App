@@ -3,7 +3,7 @@ import { Transfer } from "@dhis2/ui";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import InfoIcon from '@mui/icons-material/Info';
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import LockIcon from '@mui/icons-material/Lock';
 import SendIcon from "@mui/icons-material/Send";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { FormLabel, Slide, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
@@ -31,6 +31,7 @@ import {
     CRITICAL_STEPS,
     DATASTORE_H2_METADATA,
     H2_METADATA_VERSION,
+    HNQIS_TYPES,
     MAX_PREFIX_LENGTH,
     MAX_PROGRAM_NAME_LENGTH,
     MAX_SHORT_NAME_LENGTH,
@@ -41,15 +42,17 @@ import {
 } from "../../configs/Constants.js";
 import {
     EventStage,
+    HNQISMWI_Attributes,
     HnqisProgramConfigs,
     Program,
     PS_ActionPlanStage,
     PS_AssessmentStage,
+    PSDE_HNQIS_ActionPlan,
     PSS_CriticalSteps,
     PSS_Default,
-    PSS_Scores,
+    PSS_Scores
 } from "../../configs/ProgramTemplate.js";
-import { DeepCopy, parseErrorsJoin, truncateString } from "../../utils/Utils.js";
+import { DeepCopy, isHNQIS, parseErrorsJoin, truncateString } from "../../utils/Utils.js";
 import InputModal from "../PRG_Details/InputModal.js";
 import AttributesEditor from "../TEAEditor/AttributesEditor.js";
 import StyleManager from "../UIElements/StyleManager.js";
@@ -60,7 +63,7 @@ import H2Setting from "./H2Setting.js"
 const queryId = {
     results: {
         resource: "system/id.json",
-        params: { limit: 15 },
+        params: { limit: 30 },
     },
 };
 
@@ -150,6 +153,7 @@ const queryCurrentUser = {
 
 const stepsLimit = {
     hnqis: 1,
+    hnqismwi: 1,
     tracker: 2,
     event: 1
 }
@@ -273,7 +277,7 @@ const ProgramNew = (props) => {
         setValidationErrors({ ...validationErrors });
         const value = event.target.value;
         setPgrTypePCA(value);
-        if (value === "hnqis") {
+        if (isHNQIS(value)) {
             setButtonDisabled(false);
             const hnqisTET = trackedEntityTypes.find(
                 (tet) => tet.id === ASSESSMENT_TET
@@ -442,7 +446,7 @@ const ProgramNew = (props) => {
         updateAssignedAttributes();
     };
 
-    if (uidPool && uidPool.length === 15 && !props.data) {
+    if (uidPool && uidPool.length === 30 && !props.data) {
         setProgramId(uidPool.shift());
         setAssessmentId(uidPool.shift());
         setActionPlanId(uidPool.shift());
@@ -523,7 +527,7 @@ const ProgramNew = (props) => {
         setBasicValidated(response);
 
         // * HNQIS2 Settings Validation * //
-        if ((pgrTypePCA === "tracker" || pgrTypePCA === "event") && pgrTypePCA !== "hnqis") {
+        if ((pgrTypePCA === "tracker" || pgrTypePCA === "event") && !isHNQIS(pgrTypePCA)) {
             validationErrors.healthArea =
                 validationErrors.ouTableRow =
                 validationErrors.ouMapPolygon =
@@ -648,7 +652,7 @@ const ProgramNew = (props) => {
             return;
         }
 
-        const useCompetency = pgrTypePCA === "hnqis" ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass === 'Yes' : undefined;
+        const useCompetency = isHNQIS(pgrTypePCA) ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass === 'Yes' : undefined;
 
         //Validating available prefix
         checkForExistingPrefix({
@@ -667,6 +671,8 @@ const ProgramNew = (props) => {
                     : DeepCopy(Program);
                 let programStages = undefined;
                 let programStageSections = undefined;
+                const dataElements = [];
+                const optionSets = [];
                 let programSections = [];
 
                 prgrm.name = programName;
@@ -684,7 +690,7 @@ const ProgramNew = (props) => {
                     prgrm.style = undefined;
                 }
 
-                if (pgrTypePCA === "hnqis") {
+                if (isHNQIS(pgrTypePCA)) {
                     //HNQIS2 Programs
                     let assessmentStage = undefined;
                     let actionPlanStage = undefined;
@@ -697,11 +703,10 @@ const ProgramNew = (props) => {
                     if (!props.data) {
                         Object.assign(prgrm, HnqisProgramConfigs);
                         prgrm.attributeValues.push({
-                            value: "HNQIS2",
+                            value: HNQIS_TYPES[pgrTypePCA],
                             attribute: { id: prgTypeId },
                         });
                         prgrm.programStages.push({ id: assessmentId });
-                        prgrm.programStages.push({ id: actionPlanId });
 
                         assessmentStage = DeepCopy(PS_AssessmentStage);
                         assessmentStage.id = assessmentId;
@@ -709,40 +714,66 @@ const ProgramNew = (props) => {
                         assessmentStage.programStageSections.push({
                             id: defaultSectionId,
                         });
-                        assessmentStage.programStageSections.push({
-                            id: stepsSectionId,
-                        });
-                        assessmentStage.programStageSections.push({
-                            id: scoresSectionId,
-                        });
+                        if (pgrTypePCA === HNQIS_TYPES.HNQIS2) {
+                            assessmentStage.programStageSections.push({
+                                id: stepsSectionId,
+                            });
+                            assessmentStage.programStageSections.push({
+                                id: scoresSectionId,
+                            });
+
+                            criticalSteps = DeepCopy(PSS_CriticalSteps);
+                            criticalSteps.id = stepsSectionId;
+                            criticalSteps.programStage.id = assessmentId;
+
+                            scores = DeepCopy(PSS_Scores);
+                            scores.id = scoresSectionId;
+                            scores.programStage.id = assessmentId;
+                        }
                         assessmentStage.program.id = prgrm.id;
 
-                        actionPlanStage = DeepCopy(PS_ActionPlanStage);
-                        actionPlanStage.id = actionPlanId;
-                        actionPlanStage.name =
-                            "Action Plan [" + prgrm.id + "]"; //! Not adding the ID may result in an error
-                        actionPlanStage.program.id = prgrm.id;
+                        if (pgrTypePCA === HNQIS_TYPES.hnqis) {
+                            prgrm.programStages.push({ id: actionPlanId });
+                            actionPlanStage = DeepCopy(PS_ActionPlanStage);
+                            actionPlanStage.id = actionPlanId;
+                            actionPlanStage.name = "Action Plan [" + prgrm.id + "]"; //! Not adding the ID may result in an error
+                        
+                            actionPlanStage.program.id = prgrm.id;
+                        
+                            actionPlanStage.programStageDataElements = PSDE_HNQIS_ActionPlan;
+                        
+
+                            actionPlanStage.programStageDataElements = actionPlanStage.programStageDataElements.map(psde => {
+                                psde.programStage = {
+                                    id: actionPlanId
+                                }
+                                return psde;
+                            })
+                        }
 
                         defaultSection = DeepCopy(PSS_Default);
                         defaultSection.id = defaultSectionId;
                         defaultSection.programStage.id = assessmentId;
-
-                        criticalSteps = DeepCopy(PSS_CriticalSteps);
-                        criticalSteps.id = stepsSectionId;
-                        criticalSteps.programStage.id = assessmentId;
-
-                        scores = DeepCopy(PSS_Scores);
-                        scores.id = scoresSectionId;
-                        scores.programStage.id = assessmentId;
                     } else {
                         assessmentStage = prgrm.programStages.find(section => section.name.toLowerCase().includes('assessment'));
-                        const exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS];
-                        excludedStageDEs = assessmentStage.programStageDataElements.filter(elem => !exclusionsDEs.includes(elem.dataElement.id));
+                        if (pgrTypePCA === HNQIS_TYPES.HNQIS2) {
+                            const exclusionsDEs = [CRITICAL_STEPS, NON_CRITICAL_STEPS, COMPETENCY_CLASS];
+                            excludedStageDEs = assessmentStage.programStageDataElements.filter(elem => !exclusionsDEs.includes(elem.dataElement.id));
+                        }
                     }
 
                     prgrm.programTrackedEntityAttributes = DeepCopy(HnqisProgramConfigs.programTrackedEntityAttributes);
 
-                    if (!useCompetency) {
+                    //? MWI TEAs + enrollment date settings
+                    if (pgrTypePCA === HNQIS_TYPES.HNQISMWI) {
+                        prgrm.selectIncidentDatesInFuture = true;
+                        prgrm.selectEnrollmentDatesInFuture = true;
+                        HNQISMWI_Attributes.forEach(attr => {
+                            prgrm.programTrackedEntityAttributes.push(attr);
+                        })
+                    }
+
+                    if (pgrTypePCA === HNQIS_TYPES.HNQIS2 && !useCompetency) {
                         removeCompetencyAttribute(
                             prgrm.programTrackedEntityAttributes
                         );
@@ -768,7 +799,7 @@ const ProgramNew = (props) => {
                         ];
 
                         removeCompetencyClass(criticalSteps.dataElements);
-                    } else if (useCompetency && props.data) {
+                    } else if (pgrTypePCA === HNQIS_TYPES.HNQIS2 && useCompetency && props.data) {
                         criticalSteps = prgrm.programStages
                             .map((pStage) => pStage.programStageSections)
                             .flat()
@@ -811,7 +842,7 @@ const ProgramNew = (props) => {
 
                     createOrUpdateMetaData(prgrm.attributeValues);
 
-                    if (assessmentStage?.programStageDataElements.length == 0 || props.data) {
+                    if (pgrTypePCA === HNQIS_TYPES.HNQIS2 && (assessmentStage?.programStageDataElements.length == 0 || props.data)) {
                         assessmentStage.programStageDataElements = excludedStageDEs.concat(criticalSteps.dataElements.map((de, index) => ({
                             sortOrder: index + excludedStageDEs.length,
                             compulsory: false,
@@ -824,12 +855,17 @@ const ProgramNew = (props) => {
                     if (!props.data) {
                         programStages = [assessmentStage, actionPlanStage];
                         programStageSections = [
-                            defaultSection,
-                            criticalSteps,
-                            scores,
+                            defaultSection
                         ];
+                        if (pgrTypePCA === HNQIS_TYPES.HNQIS2) {
+                            programStageSections = programStageSections.concat([
+                                criticalSteps,
+                                scores
+                            ]);
+                        }
                     } else {
-                        programStageSections = criticalSteps
+
+                        programStageSections = (criticalSteps && pgrTypePCA === HNQIS_TYPES.HNQIS2)
                             ? [criticalSteps]
                             : undefined;
                         programStages = [assessmentStage];
@@ -884,20 +920,22 @@ const ProgramNew = (props) => {
                     createOrUpdateMetaData(prgrm.attributeValues);
                 }
 
-                // If editing only send program
-                const metadata = props.data
-                    ? {
-                        programs: [prgrm],
-                        programStageSections: programStageSections,
-                        programStages,
-                        programSections
-                    }
-                    : {
-                        programs: [prgrm],
-                        programStages,
-                        programStageSections,
-                        programSections
-                    };
+                const metadata = {
+                    programs: [prgrm],
+                    programStages,
+                    programStageSections,
+                    programSections,
+                    dataElements,
+                    optionSets,
+                };
+                /*props.data
+                ? {
+                    programs: [prgrm],
+                    programStageSections: programStageSections,
+                    programStages,
+                    programSections
+                }
+                : <current contents of the metadata variable>*/
 
                 metadataRequest.mutate({ data: metadata }).then((response) => {
                     if (response.status != "OK") {
@@ -927,7 +965,7 @@ const ProgramNew = (props) => {
         );
         if (metaDataArray.length > 0) {
             let metaData_value = JSON.parse(metaDataArray[0].value);
-            if (pgrTypePCA === "hnqis") {
+            if (isHNQIS(pgrTypePCA)) {
                 const h1Program = metaData_value.h1Program;
                 metaData_value = h2SettingsRef.current.saveMetaData()
                 metaData_value.h1Program = h1Program;
@@ -938,7 +976,7 @@ const ProgramNew = (props) => {
         } else {
             const attr = { id: METADATA };
             let val = {};
-            if (pgrTypePCA === "hnqis") {
+            if (isHNQIS(pgrTypePCA)) {
                 val = h2SettingsRef.current.saveMetadata();
             }
             val.saveVersion = BUILD_VERSION;
@@ -994,7 +1032,7 @@ const ProgramNew = (props) => {
                             <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
                                 <StepLabel error={!basicValidated} onClick={() => changeStep(0)}>Basic Settings</StepLabel>
                             </Step>
-                            {pgrTypePCA === 'hnqis' &&
+                            {isHNQIS(pgrTypePCA) &&
                                 <Step style={{ cursor: 'pointer' }} container={containerRef.current}>
                                     <StepLabel error={!hnqisValidated} onClick={() => changeStep(1)} >HNQIS2 Settings</StepLabel>
                                 </Step>
@@ -1044,19 +1082,23 @@ const ProgramNew = (props) => {
                                                 }
                                                 value={"hnqis"}
                                             >
-                                                HNQIS 2.0{" "}
                                                 {hnqis2Metadata?.results?.version < H2_METADATA_VERSION && (
-                                                    <span
-                                                        style={{
-                                                            display: "flex",
-                                                            alignItems: "center",
-                                                            marginLeft: "8px",
-                                                        }}
-                                                    >
-                                                        [Unavailable]{" "}
-                                                        <RemoveCircleOutlineIcon />
-                                                    </span>
+                                                    <LockIcon />
                                                 )}
+                                                HNQIS 2.0{" "}
+                                            </MenuItem>
+                                            <MenuItem
+                                                disabled={
+                                                    !h2Ready ||
+                                                    hnqis2Metadata?.results?.version <
+                                                    H2_METADATA_VERSION
+                                                }
+                                                value={"hnqismwi"}
+                                            >
+                                                {hnqis2Metadata?.results?.version < H2_METADATA_VERSION && (
+                                                    <LockIcon />
+                                                )}
+                                                HNQIS MWI{" "}
                                             </MenuItem>
                                         </Select>
                                         <FormHelperText>
@@ -1092,7 +1134,7 @@ const ProgramNew = (props) => {
                                         autoComplete="off"
                                         inputProps={{
                                             maxLength:
-                                                MAX_PROGRAM_NAME_LENGTH /*- dePrefix.length*/,
+                                                MAX_PROGRAM_NAME_LENGTH,
                                         }}
                                         value={programName}
                                         onChange={handleChangeProgramName}
@@ -1186,10 +1228,11 @@ const ProgramNew = (props) => {
                         </Slide>
 
                         {/* HNQIS2 SETTINGS */}
-                        <Slide in={pgrTypePCA === 'hnqis' && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
-                            <div style={{ display: pgrTypePCA === 'hnqis' && activeStep === 1 ? 'inherit' : 'none' }}>
+                        <Slide in={isHNQIS(pgrTypePCA) && activeStep === 1} direction={activeStep > previousStep ? 'left' : 'right'}>
+                            <div style={{ display: isHNQIS(pgrTypePCA) && activeStep === 1 ? 'inherit' : 'none' }}>
                                 <H2Setting
                                     pcaMetadata={props.pcaMetadata}
+                                    pgrTypePCA={pgrTypePCA}
                                     ref={h2SettingsRef}
                                 />
                             </div>

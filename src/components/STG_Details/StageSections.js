@@ -39,8 +39,9 @@ import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 import CriticalCalculations from "./CriticalCalculations.js";
 import DataElementManager from './DataElementManager.js'
+import { buildH2BaseVisualizationsMWI, buildProgramIndicatorsMWI, buildProgramRulesMWI, buildProgramRuleVariablesMWI } from "./Logic_Scripts/HNQISMWI_Scripting.js";
+import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Logic_Scripts/Scripting.js";//"./Logic_Scripts/HNQISMWI_Scripting.js";
 import Scores from "./Scores.js";
-import { checkScores, readQuestionComposites, buildProgramRuleVariables, buildProgramRules, buildProgramIndicators, buildH2BaseVisualizations } from "./Scripting.js";
 import DraggableSection from "./Section.js";
 import SectionManager from './SectionManager.js'
 import ValidateMetadata from "./ValidateMetadata.js";
@@ -212,7 +213,7 @@ const queryHNQIS2Metadata = {
 
 const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 
-const StageSections = ({ programStage, hnqisMode, readOnly }) => {
+const StageSections = ({ programStage, hnqisType, readOnly }) => {
 
     const queryDataStore = {
         results: {
@@ -261,7 +262,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     const { refetch: getProgramSettings } = useDataQuery(queryProgramSettings, { lazy: true, variables: { programId } });
 
     // Flags
-    const [saveStatus, setSaveStatus] = useState(hnqisMode ? 'Validate' : 'Save Changes');
+    const [saveStatus, setSaveStatus] = useState(hnqisType ? 'Validate' : 'Save Changes');
     const [saveAndBuild, setSaveAndBuild] = useState(false);
     const [savingMetadata, setSavingMetadata] = useState(false);
     const [savedAndValidated, setSavedAndValidated] = useState(false)
@@ -306,11 +307,11 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     const [removedElements, setRemovedElements] = useState([])
     const [originalProgramStageDataElements] = useState(programStage.programStageDataElements.reduce((acu, cur) => acu.concat(cur), []))
     const [sections, setSections] = useState((isSectionMode)
-        ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisMode)]
+        ? [...programStage.programStageSections.filter(s => (s.name !== "Scores" && s.name !== "Critical Steps Calculations") || !hnqisType)]
         : [buildBasicFormStage(programStage.programStageDataElements)]
     );
-    const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Scores") });
-    const [criticalSection, setCriticalSection] = useState({ ...programStage.programStageSections.find(s => hnqisMode && s.name === "Critical Steps Calculations") });
+    const [scoresSection, setScoresSection] = useState({ ...programStage.programStageSections.find(s => !!hnqisType && s.name === "Scores") });
+    const [criticalSection, setCriticalSection] = useState({ ...programStage.programStageSections.find(s => !!hnqisType && s.name === "Critical Steps Calculations") });
     const [programStageDataElements, setProgramStageDataElements] = useState([...programStage.programStageDataElements]);
     const [programMetadata, setProgramMetadata] = useState();
     const [stagesList, setStagesList] = useState();
@@ -369,7 +370,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setProgramStageDataElements(programStageDataElements)
         setSections(sections)
         setDeToEdit('')
-        pushNotification(<span>Data Element edited! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>)
+        pushNotification(<span>Data Element edited! <strong>Remember to {hnqisType ? " Validate and Save!" : " save your changes!"}</strong></span>)
     }
 
     const removeDE = (id, section) => {
@@ -381,8 +382,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
             programStageDataElements.splice(psdeIdx, 1)
             setSections(sections)
             setProgramStageDataElements(programStageDataElements)
-            if (hnqisMode) { setSaveStatus('Validate & Save') }
-            pushNotification(<span>Data Element removed! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
+            if (hnqisType) { setSaveStatus('Validate & Save') }
+            pushNotification(<span>Data Element removed! <strong>Remember to {hnqisType ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
         }
     }
 
@@ -399,7 +400,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setSections(sections)
         setProgramStageDataElements(newProgramStageDataElements)
         setDeManager(false)
-        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>)
+        pushNotification(<span>{params.newDataElements.length} Data Element{params.newDataElements.length > 1 ? 's' : ''} added! <strong>Remember to {hnqisType ? " Validate and Save!" : " save your changes!"}</strong></span>)
         setAddedSection({
             index: sectionIndex,
             mode: 'Updated',
@@ -436,8 +437,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setProgramStageDataElements(newPSDEs)
         sections.splice(idx, 1)
         setSections(sections)
-        if (hnqisMode) { setSaveStatus('Validate & Save') }
-        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
+        if (hnqisType) { setSaveStatus('Validate & Save') }
+        pushNotification(<span>{`Section '${section.name}' removed! `}<strong>Remember to {hnqisType ? " Validate and Save!" : " save your changes!"}</strong></span>, "info")
     }
 
     const SectionActions = {
@@ -484,7 +485,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     });
 
     // Get Ids
-    const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: programStage.programStageDataElements.length * 5 } });
+    const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: programStage.programStageDataElements.length } });
     //setUidPool(idsQuery.data?.results.codes);
 
     // Fetch Program Rules from Program
@@ -519,7 +520,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         const androidSettingsAmount = 1;
 
         let n = (
-            (sections.reduce((prev, acu) => prev + acu.dataElements.length, 10) * 3) //Tripled to create Program Rule Variables
+            (sections.reduce((prev, acu) => prev + acu.dataElements.length, 10) * 10) //Tripled to create Program Rule Variables
             + ((scoresSection?.dataElements?.length || 10) * 2) //Doubled to create Program Rule Variables
             + ((criticalSection?.dataElements?.length || 10) * 5)
         ) + programIndicatorsAmount + visualizationsAmount + androidSettingsAmount;
@@ -537,17 +538,6 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     useEffect(() => {
         getUIDs()
     }, [sections]);
-
-    /*useEffect(() => {
-        if (!dsLoading && !dsData?.results) {
-            const setUpDataStore = async () => {
-                await dataStoreCreate({
-                    data: {},
-                });
-            }
-            setUpDataStore();
-        }
-    }, [dsLoading, dsData]);*/
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
@@ -580,7 +570,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     result.source.index,
                     result.destination.index
                 );
-                setSaveStatus(hnqisMode ? 'Validate & Save' : 'Save Changes');
+                setSaveStatus(hnqisType ? 'Validate & Save' : 'Save Changes');
                 break;
             case 'DATA_ELEMENT':
                 if (result.source.droppableId == result.destination.droppableId) {
@@ -596,7 +586,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     const element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
                     newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
                 }
-                setSaveStatus(hnqisMode ? 'Validate & Save' : 'Save Changes');
+                setSaveStatus(hnqisType ? 'Validate & Save' : 'Save Changes');
                 break;
             default:
         }
@@ -611,8 +601,6 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setSavingMetadata(true);
         return;
     };
-
-
 
     useEffect(() => {
         if (androidSettingsError || androidSettingsSyncUpdateError) { updateProgramBuildVersion(programId) }
@@ -738,11 +726,322 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         });
     }
 
+    const executeHNQISProcess = ({pcaMetadata, sharingSettings, actionPlanID}) => {
+        // --------------- PROCESSING ---------------- //
+        // Globals, States & more...
+
+        // I. Scores Checking
+        // Requires: scoresSection
+        //      Break point: When duplicated scores found
+        setProgressSteps(2);
+
+        const { uniqueScores, compositeScores, duplicatedScores } = checkScores(scoresSection.dataElements);
+        if (!uniqueScores) { throw { msg: "Duplicated scores", duplicatedScores, status: 400 } }
+        const scoresMapping = scoresSection.dataElements.reduce((acc, cur) => (
+            {
+                ...acc,
+                [cur.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value]: cur
+            }), {});   // { feedbackOrder:deUid, ... }
+
+        // II. Read questions
+        // Requires: sections (with or WITHOUT scores&critical)
+        //      Breakpoint: When a score is missing
+        setProgressSteps(3);
+
+        const questionCompositeScores = readQuestionComposites(sections);
+        const missingComposites = questionCompositeScores.filter(cs => !compositeScores.includes(cs));
+        if (missingComposites.length > 0) { throw { msg: "Some questions Feedback Order don't match any Score item", missingComposites, status: 400 } }
+
+        // III. Build new metadata
+        // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
+        // Also, Program Indicators and Visualizations
+        setProgressSteps(4);
+
+        const programRuleVariables = buildProgramRuleVariables(
+            {
+                sections,
+                compositeScores,
+                programId,
+                useCompetencyClass: programMetadata.useCompetencyClass,
+                uidPool
+            }
+        );
+
+        const { programRules, programRuleActions, scoreMap } = buildProgramRules(
+            {
+                sections,
+                stageId: programStage.id,
+                programId,
+                compositeValues: compositeScores,
+                scoresMapping,
+                uidPool,
+                useCompetencyClass: programMetadata.useCompetencyClass,
+                healthArea: programMetadata.healthArea
+            }
+        );
+
+        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicators(
+            {
+                programId,
+                programStage,
+                scoreMap,
+                uidPool,
+                useCompetency: programMetadata.useCompetencyClass,
+                sharingSettings,
+                PIAggregationType: programMetadata.programIndicatorsAggType
+            }
+        );
+
+        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(
+            {
+                programId,
+                programShortName: programStage.program.shortName,
+                gsInd,
+                indicatorIDs,
+                uidPool,
+                useCompetency: programMetadata.useCompetencyClass,
+                currentDashboardId: dashboardsDQ?.data?.results?.dashboards[0]?.id,
+                userOU: pcaMetadata.useUserOrgUnit,
+                ouRoot: pcaMetadata.ouRoot,
+                sharingSettings,
+                visualizationLevel: pcaMetadata.ouLevelTable,
+                mapLevel: pcaMetadata.ouLevelMap,
+                actionPlanID
+            }
+        );
+
+        const metadata = {
+            programRuleVariables,
+            programRules,
+            programRuleActions,
+            programIndicators,
+            visualizations,
+            maps,
+            dashboards,
+            eventReports
+        };
+
+        // IV. Prepare Datastore references 
+        getDataStore().then((dataStoreResult) => {
+            const programRefereces = {
+                programRules: mapIdArray(programRules),
+                programRuleVariables: mapIdArray(programRuleVariables),
+                programIndicators: mapIdArray(programIndicators),
+                visualizations: mapIdArray(visualizations),
+                eventReports: mapIdArray(eventReports),
+                maps: mapIdArray(maps),
+                dashboards: mapIdArray(dashboards)
+            };
+
+            let dataStoreData;
+            let sendToDataStore;
+
+            if (!dataStoreResult?.results) {
+                sendToDataStore = dataStoreCreate;
+                dataStoreData = {};
+            } else {
+                sendToDataStore = dataStoreUpdate;
+                dataStoreData = dataStoreResult.results;
+            }
+
+            // Saving UIDs of old objects
+            const toDeleteReferences = DeepCopy(dataStoreData);
+            // Setting new UIDs
+            dataStoreData = programRefereces;
+
+            // V. Delete old metadata
+            setProgressSteps(5);
+
+            const fallbackRuleVariables = prvDQ.data.results.programRuleVariables.filter(prv => {
+                return prv.name[0] == "_";
+            });
+
+            const programRulesDel = toDeleteReferences?.programRules || mapIdArray(prDQ.data.results.programRules);
+            const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(fallbackRuleVariables);
+            const programIndicatorsDel = toDeleteReferences?.programIndicators || mapIdArray(pIndDQ.data.results.programIndicators);
+            const visualizationsDel = toDeleteReferences?.visualizations || mapIdArray(visualizationsDQ.data.results.visualizations);
+            const eventReportsDel = toDeleteReferences?.eventReports || mapIdArray(eventReportDQ.data.results.eventReports);
+            const mapsDel = toDeleteReferences?.maps || mapIdArray(mapsDQ.data.results.maps);
+
+            const oldMetadata = {
+                programRules: (programRulesDel.length > 0 ? programRulesDel : undefined),
+                programRuleVariables: (programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined),
+                programIndicators: (programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined),
+                visualizations: (visualizationsDel.length > 0 ? visualizationsDel : undefined),
+                eventReports: (eventReportsDel.length > 0 ? eventReportsDel : undefined),
+                maps: (mapsDel.length > 0 ? mapsDel : undefined)
+            };
+
+            // VI. Import new metadata
+            createMetadata.mutate({
+                data: {
+                    eventReports: eventReportDQ.data.results.eventReports.map(er => {
+                        er.columnDimensions = ["pe", "ou"]
+                        er.dataElementDimensions = [];
+                        er.programIndicatorDimensions = [];
+                        return er;
+                    })
+                }
+            }).then(updateEventReportResp => {
+                if (updateEventReportResp.status == 'OK') {
+                    deleteMetadata({ data: oldMetadata }).then((res) => {
+                        if (res.status == 'OK') {
+                            setProgressSteps(6);
+                            executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    const executeMWIProcess = ({ pcaMetadata, sharingSettings }) => {
+        // --------------- PROCESSING ---------------- //
+        // Globals, States & more...
+
+        // I. Scores Checking
+        // Requires: scoresSection
+        //      Break point: When duplicated scores found
+        setProgressSteps(2);
+
+        // II. Read questions
+        // Requires: sections (with or WITHOUT scores&critical)
+        //      Breakpoint: When a score is missing
+        setProgressSteps(3);
+
+        // III. Build new metadata
+        // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
+        // Also, Program Indicators and Visualizations
+        setProgressSteps(4);
+
+        const { programRuleVariables, dataElementVarMapping } = buildProgramRuleVariablesMWI({ sections, programId, uidPool });
+
+        const { programRules, programRuleActions, criterionRulesGroup, questionsList } = buildProgramRulesMWI(
+            {
+                programStage,
+                sections,
+                dataElementVarMapping,
+                programId,
+                uidPool,
+                healthArea: programMetadata.healthArea
+            }
+        );
+
+        const { programIndicators, indicatorIDs } = buildProgramIndicatorsMWI(
+            {
+                sections: sections.map(s => s.id),
+                programStage,
+                criterionRulesGroup,
+                questionsList,
+                uidPool,
+                sharingSettings,
+                PIAggregationType: programMetadata.programIndicatorsAggType
+            }
+        );
+
+        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizationsMWI(
+            {
+                programId,
+                programShortName: programStage.program.shortName,
+                indicatorIDs,
+                uidPool,
+                currentDashboardId: dashboardsDQ?.data?.results?.dashboards[0]?.id,
+                userOU: pcaMetadata.useUserOrgUnit,
+                ouRoot: pcaMetadata.ouRoot,
+                sharingSettings,
+                visualizationLevel: pcaMetadata.ouLevelTable,
+                mapLevel: pcaMetadata.ouLevelMap
+            }
+        );
+
+        const metadata = {
+            programRuleVariables,
+            programRules,
+            programRuleActions,
+            programIndicators,
+            visualizations,
+            maps,
+            dashboards,
+            eventReports
+        };
+
+        // IV. Prepare Datastore references 
+        getDataStore().then((dataStoreResult) => {
+            const programRefereces = {
+                programRules: mapIdArray(programRules),
+                programRuleVariables: mapIdArray(programRuleVariables),
+                programIndicators: mapIdArray(programIndicators),
+                visualizations: mapIdArray(visualizations),
+                eventReports: mapIdArray(eventReports),
+                maps: mapIdArray(maps),
+                dashboards: mapIdArray(dashboards)
+            };
+
+            let dataStoreData;
+            let sendToDataStore;
+
+            if (!dataStoreResult?.results) {
+                sendToDataStore = dataStoreCreate;
+                dataStoreData = {};
+            } else {
+                sendToDataStore = dataStoreUpdate;
+                dataStoreData = dataStoreResult.results;
+            }
+
+            // Saving UIDs of old objects
+            const toDeleteReferences = DeepCopy(dataStoreData);
+            // Setting new UIDs
+            dataStoreData = programRefereces;
+
+            // V. Delete old metadata
+            setProgressSteps(5);
+
+            const fallbackRuleVariables = prvDQ.data.results.programRuleVariables.filter(prv => {
+                return prv.name[0] == "_";
+            });
+
+            const programRulesDel = toDeleteReferences?.programRules || mapIdArray(prDQ.data.results.programRules);
+            const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(fallbackRuleVariables);
+            const programIndicatorsDel = toDeleteReferences?.programIndicators || mapIdArray(pIndDQ.data.results.programIndicators);
+            const visualizationsDel = toDeleteReferences?.visualizations || mapIdArray(visualizationsDQ.data.results.visualizations);
+            const eventReportsDel = toDeleteReferences?.eventReports || mapIdArray(eventReportDQ.data.results.eventReports);
+            const mapsDel = toDeleteReferences?.maps || mapIdArray(mapsDQ.data.results.maps);
+
+            const oldMetadata = {
+                programRules: (programRulesDel.length > 0 ? programRulesDel : undefined),
+                programRuleVariables: (programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined),
+                programIndicators: (programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined),
+                visualizations: (visualizationsDel.length > 0 ? visualizationsDel : undefined),
+                eventReports: (eventReportsDel.length > 0 ? eventReportsDel : undefined),
+                maps: (mapsDel.length > 0 ? mapsDel : undefined)
+            };
+
+            // VI. Import new metadata
+            createMetadata.mutate({
+                data: {
+                    eventReports: eventReportDQ.data.results.eventReports.map(er => {
+                        er.columnDimensions = ["pe", "ou"]
+                        er.dataElementDimensions = [];
+                        er.programIndicatorDimensions = [];
+                        return er;
+                    })
+                }
+            }).then(updateEventReportResp => {
+                if (updateEventReportResp.status != 'OK') { return; }
+                
+                deleteMetadata({ data: oldMetadata }).then((res) => {
+                    if (res.status != 'OK') { return }
+                    
+                    setProgressSteps(6);
+                    executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
+                });
+            });
+        });
+    }
+
     const run = () => {
         if (!savedAndValidated) { return }
         //--------------------- NEW METADATA --------------------//
-        const actionPlanID = programStage.program.programStages.filter(ps => ps.id != programStage.id)[0].id;
-
         setProgressSteps(1);
         const programConfig = programAttributes.results?.programs[0];
         const pcaMetadata = JSON.parse(programConfig?.attributeValues?.find(pa => pa.attribute.id === METADATA)?.value || "{}");
@@ -763,11 +1062,11 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         Object.keys(sharingSettings.users).forEach(key => {
             const access = sharingSettings.users[key]
             access.access = extractMetadataPermissions(access.access)
-        })
+        });
         Object.keys(sharingSettings.userGroups).forEach(key => {
             const access = sharingSettings.userGroups[key]
             access.access = extractMetadataPermissions(access.access)
-        })
+        });
 
         // Set flag to enable/disable actions (buttons)
         setSaveAndBuild('Run');
@@ -779,194 +1078,44 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
             !Object.hasOwn(pcaMetadata, "useUserOrgUnit")) {
             setProgramSettingsError(1);
             setSaveAndBuild("Completed");
-        } else {
-            if (pcaMetadata.useUserOrgUnit == "Yes") { pcaMetadata.useUserOrgUnit = true } else { pcaMetadata.useUserOrgUnit = false }
-
-            //-------------------------------------------------------//
-            setOuLevel({ ouLevel: [pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap] }).then((data) => {
-                if (data?.results?.organisationUnitLevels) {
-                    const valueLevel = data?.results?.organisationUnitLevels
-                    const visualizationLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelTable)
-                    const mapLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelMap)
-
-                    pcaMetadata.ouLevelTable = visualizationLevel?.offlineLevels || visualizationLevel?.level
-                    pcaMetadata.ouLevelMap = mapLevel?.offlineLevels || mapLevel?.level
-
-                    if (visualizationLevel == undefined || mapLevel == undefined) {
-                        setProgramSettingsError(2);
-                        setSaveAndBuild("Completed");
-                    } else {
-
-                        // --------------- PROCESSING ---------------- //
-                        // Globals, States & more...
-
-                        // I. Scores Checking
-                        // Requires: scoresSection
-                        //      Break point: When duplicated scores found
-                        setProgressSteps(2);
-
-                        const { uniqueScores, compositeScores, duplicatedScores } = checkScores(scoresSection.dataElements);
-                        if (!uniqueScores) { throw { msg: "Duplicated scores", duplicatedScores, status: 400 } }
-                        const scoresMapping = scoresSection.dataElements.reduce((acc, cur) => (
-                            {
-                                ...acc,
-                                [cur.attributeValues.find(att => att.attribute.id == FEEDBACK_ORDER)?.value]: cur
-                            }), {});   // { feedbackOrder:deUid, ... }
-
-                        // II. Read questions
-                        // Requires: sections (with or WITHOUT scores&critical)
-                        //      Breakpoint: When a score is missing
-                        setProgressSteps(3);
-
-                        const questionCompositeScores = readQuestionComposites(sections);
-                        const missingComposites = questionCompositeScores.filter(cs => !compositeScores.includes(cs));
-                        if (missingComposites.length > 0) { throw { msg: "Some questions Feedback Order don't match any Score item", missingComposites, status: 400 } }
-
-                        // III. Build new metadata
-                        // Program Rule Variables : Data Elements (questions & labels) , Calculated Values, Critical Steps + Competency Class
-                        // Also, Program Indicators and Visualizations
-                        setProgressSteps(4);
-
-                        const programRuleVariables = buildProgramRuleVariables(
-                            {
-                                sections,
-                                compositeScores,
-                                programId,
-                                useCompetencyClass: programMetadata.useCompetencyClass,
-                                uidPool
-                            }
-                        );
-
-                        const { programRules, programRuleActions, scoreMap } = buildProgramRules(
-                            {
-                                sections,
-                                stageId: programStage.id,
-                                programId,
-                                compositeValues: compositeScores,
-                                scoresMapping,
-                                uidPool,
-                                useCompetencyClass: programMetadata.useCompetencyClass,
-                                healthArea: programMetadata.healthArea
-                            }
-                        );
-
-                        const { programIndicators, indicatorIDs, gsInd } = buildProgramIndicators(
-                            {
-                                programId,
-                                programStage,
-                                scoreMap,
-                                uidPool,
-                                useCompetency: programMetadata.useCompetencyClass,
-                                sharingSettings,
-                                PIAggregationType: programMetadata.programIndicatorsAggType
-                            }
-                        );
-
-                        const { visualizations, androidSettingsVisualizations, maps, dashboards, eventReports } = buildH2BaseVisualizations(
-                            {
-                                programId,
-                                programShortName: programStage.program.shortName,
-                                gsInd,
-                                indicatorIDs,
-                                uidPool,
-                                useCompetency: programMetadata.useCompetencyClass,
-                                currentDashboardId: dashboardsDQ?.data?.results?.dashboards[0]?.id,
-                                userOU: pcaMetadata.useUserOrgUnit,
-                                ouRoot: pcaMetadata.ouRoot,
-                                sharingSettings,
-                                visualizationLevel: pcaMetadata.ouLevelTable,
-                                mapLevel: pcaMetadata.ouLevelMap,
-                                actionPlanID
-                            }
-                        );
-
-                        const metadata = {
-                            programRuleVariables,
-                            programRules,
-                            programRuleActions,
-                            programIndicators,
-                            visualizations,
-                            maps,
-                            dashboards,
-                            eventReports
-                        };
-
-                        // IV. Prepare Datastore references 
-                        getDataStore().then((dataStoreResult) => {
-                            const programRefereces = {
-                                programRules: mapIdArray(programRules),
-                                programRuleVariables: mapIdArray(programRuleVariables),
-                                programIndicators: mapIdArray(programIndicators),
-                                visualizations: mapIdArray(visualizations),
-                                eventReports: mapIdArray(eventReports),
-                                maps: mapIdArray(maps),
-                                dashboards: mapIdArray(dashboards)
-                            };
-
-                            let dataStoreData;
-                            let sendToDataStore;
-
-                            if (!dataStoreResult?.results) {
-                                sendToDataStore = dataStoreCreate;
-                                dataStoreData = {};
-                            } else {
-                                sendToDataStore = dataStoreUpdate;
-                                dataStoreData = dataStoreResult.results;
-                            }
-
-                            // Saving UIDs of old objects
-                            const toDeleteReferences = DeepCopy(dataStoreData);
-                            // Setting new UIDs
-                            dataStoreData = programRefereces;
-
-                            // V. Delete old metadata
-                            setProgressSteps(5);
-
-                            const fallbackRuleVariables = prvDQ.data.results.programRuleVariables.filter(prv => {
-                                return prv.name[0] == "_";
-                            });
-
-                            const programRulesDel = toDeleteReferences?.programRules || mapIdArray(prDQ.data.results.programRules);
-                            const programRuleVariablesDel = toDeleteReferences?.programRuleVariables || mapIdArray(fallbackRuleVariables);
-                            const programIndicatorsDel = toDeleteReferences?.programIndicators || mapIdArray(pIndDQ.data.results.programIndicators);
-                            const visualizationsDel = toDeleteReferences?.visualizations || mapIdArray(visualizationsDQ.data.results.visualizations);
-                            const eventReportsDel = toDeleteReferences?.eventReports || mapIdArray(eventReportDQ.data.results.eventReports);
-                            const mapsDel = toDeleteReferences?.maps || mapIdArray(mapsDQ.data.results.maps);
-
-                            const oldMetadata = {
-                                programRules: (programRulesDel.length > 0 ? programRulesDel : undefined),
-                                programRuleVariables: (programRuleVariablesDel.length > 0 ? programRuleVariablesDel : undefined),
-                                programIndicators: (programIndicatorsDel.length > 0 ? programIndicatorsDel : undefined),
-                                visualizations: (visualizationsDel.length > 0 ? visualizationsDel : undefined),
-                                eventReports: (eventReportsDel.length > 0 ? eventReportsDel : undefined),
-                                maps: (mapsDel.length > 0 ? mapsDel : undefined)
-                            };
-
-                            // VI. Import new metadata
-                            createMetadata.mutate({
-                                data: {
-                                    eventReports: eventReportDQ.data.results.eventReports.map(er => {
-                                        er.columnDimensions = ["pe", "ou"]
-                                        er.dataElementDimensions = [];
-                                        er.programIndicatorDimensions = [];
-                                        return er;
-                                    })
-                                }
-                            }).then(updateEventReportResp => {
-                                if (updateEventReportResp.status == 'OK') {
-                                    deleteMetadata({ data: oldMetadata }).then((res) => {
-                                        if (res.status == 'OK') {
-                                            setProgressSteps(6);
-                                            executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
-                                        }
-                                    });
-                                }
-                            });
-                        })
-                    }
-                }
-            })
+            return;
         }
+        if (pcaMetadata.useUserOrgUnit == "Yes") {
+            pcaMetadata.useUserOrgUnit = true
+        } else {
+            pcaMetadata.useUserOrgUnit = false
+        }
+
+        //-------------------------------------------------------//
+        setOuLevel({ ouLevel: [pcaMetadata.ouLevelTable, pcaMetadata.ouLevelMap] }).then((data) => {
+            if (data?.results?.organisationUnitLevels) {
+                const valueLevel = data?.results?.organisationUnitLevels
+                const visualizationLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelTable)
+                const mapLevel = valueLevel.find(ouLevel => ouLevel.id === pcaMetadata.ouLevelMap)
+
+                pcaMetadata.ouLevelTable = visualizationLevel?.offlineLevels || visualizationLevel?.level
+                pcaMetadata.ouLevelMap = mapLevel?.offlineLevels || mapLevel?.level
+
+                if (visualizationLevel == undefined || mapLevel == undefined) {
+                    setProgramSettingsError(2);
+                    setSaveAndBuild("Completed");
+                    return;
+                }
+
+                switch (hnqisType) {
+                    case TEMPLATE_PROGRAM_TYPES.hnqis2:
+                        executeHNQISProcess({
+                            pcaMetadata,
+                            sharingSettings,
+                            actionPlanID: programStage.program.programStages.filter(ps => ps.id != programStage.id)[0].id
+                        });
+                        break;
+                    case TEMPLATE_PROGRAM_TYPES.hnqismwi:
+                        executeMWIProcess({ pcaMetadata, sharingSettings });
+                        break;
+                }
+            }
+        })
     }
 
     const parseErrors = (e) => {
@@ -1015,7 +1164,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
         setOpen(false);
     };
 
-    if (hnqisMode && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+    if (hnqisType && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
         return (<>
             <NoticeBox title="Check HNQIS2 Metadata" error>
                 <p>The latest PCA Metadata Package is required to access this HNQIS2 Program.</p>
@@ -1048,7 +1197,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                 onClick={() => commit()}
                             > {saveStatus}</Button>
                         }
-                        {hnqisMode && isSectionMode &&
+                        {hnqisType && isSectionMode &&
                             <>
                                 <ButtonGroup disableElevation color='primary' variant="contained" ref={anchorRef} aria-label="split button">
                                     <Button
@@ -1111,7 +1260,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                 </Popper>
                             </>
                         }
-                        {hnqisMode && isSectionMode &&
+                        {hnqisType && isSectionMode &&
                             <ImportDownloadButton
                                 disabled={exportToExcel}
                                 setImporterEnabled={setImporterEnabled}
@@ -1132,12 +1281,12 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     </ButtonStrip>
                 </div>
             </div>
-            {hnqisMode && importerEnabled &&
+            {hnqisType && importerEnabled &&
                 <Importer
                     displayForm={setImporterEnabled}
                     setImportResults={setImportResults}
                     setValidationResults={setValidationResults}
-                    programSpecificType={TEMPLATE_PROGRAM_TYPES.hnqis2}
+                    programSpecificType={hnqisType}
                     previous={{ sections: [...backupData.sections], setSections, scoresSection: DeepCopy(backupData.scoresSection), setScoresSection }}
                     setSaveStatus={setSaveStatus}
                     programMetadata={{ programMetadata, setProgramMetadata }}
@@ -1157,7 +1306,13 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     <MuiChip style={{ marginLeft: '1em' }} label="Read Only" variant="outlined" />
                 }
             </div>
-            {hnqisMode && exportToExcel && <DataProcessor programName={programStage.program.name} ps={programStage} isLoading={setExportToExcel} />}
+            {!!hnqisType && exportToExcel &&
+                <DataProcessor
+                    programName={programStage.program.name}
+                    ps={programStage}
+                    isLoading={setExportToExcel}
+                    hnqisType={hnqisType}
+                />}
             {
                 createMetadata.loading && <ComponentCover translucent></ComponentCover>
 
@@ -1206,7 +1361,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 
                 </CustomMUIDialog>
             }
-            {hnqisMode && saveAndBuild &&
+            {!!hnqisType && saveAndBuild &&
 
                 <CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
                     <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => { if ((saveAndBuild === 'Completed') || (createMetadata?.data?.status === 'ERROR')) { setSaveAndBuild(false); setProgressSteps(0); } }}>
@@ -1383,7 +1538,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                                     index={idx}
                                                     key={pss.id || idx}
                                                     SectionActions={SectionActions}
-                                                    hnqisMode={hnqisMode}
+                                                    hnqisType={hnqisType}
                                                     isSectionMode={isSectionMode}
                                                     readOnly={readOnly}
                                                     setSaveStatus={setSaveStatus}
@@ -1395,7 +1550,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                                 )}
                             </Droppable>
                         }
-                        {hnqisMode && (isSectionMode) &&
+                        {hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2 && (isSectionMode) &&
                             <>
                                 <CriticalCalculations stageSection={criticalSection} ikey={criticalSection?.id || "crit"} />
                                 <Scores stageSection={scoresSection} key={scoresSection?.id || "scores"} program={programId} />
@@ -1418,13 +1573,13 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
             {
                 savingMetadata &&
                 <ValidateMetadata
-                    hnqisMode={hnqisMode}
+                    hnqisType={hnqisType}
                     newDEQty={importResults ? importResults.questions.new + importResults.scores.new + importResults.sections.new : 0}
                     programStage={programStage}
                     importedSections={sections}
                     importedScores={scoresSection}
                     criticalSection={criticalSection}
-                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems) : removedElements}
+                    removedItems={importResults ? importResults.questions.removedItems.concat(importResults.scores.removedItems || []) : removedElements}
                     setSavingMetadata={setSavingMetadata}
                     setSavedAndValidated={setSavedAndValidated}
                     previous={{ sections: [...backupData.sections], setSections, scoresSection: DeepCopy(backupData.scoresSection), setScoresSection }}
@@ -1446,7 +1601,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     refreshSections={setSections}
                     notify={pushNotification}
                     setAddedSection={setAddedSection}
-                    hnqisMode={hnqisMode}
+                    hnqisMode={!!hnqisType}
                     setSaveStatus={setSaveStatus}
                 />
             }
@@ -1457,7 +1612,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
                     setDeManager={setDeManager}
                     programStageDataElements={programStageDataElements}
                     saveAdd={saveAdd}
-                    hnqisMode={hnqisMode}
+                    hnqisMode={!!hnqisType}
                     setSaveStatus={setSaveStatus}
                     dePrefix={programMetadata.dePrefix || 'XXXXXXXXXXX'}
                 />
@@ -1467,7 +1622,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
 }
 
 StageSections.propTypes = {
-    hnqisMode: PropTypes.bool,
+    hnqisType: PropTypes.string,
     programStage: PropTypes.object,
     readOnly: PropTypes.bool
 }

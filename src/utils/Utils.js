@@ -1,5 +1,5 @@
 import React from 'react';
-import { coerce, gte, lte, satisfies } from 'semver';
+import { coerce, satisfies } from 'semver';
 import { METADATA } from '../configs/Constants.js';
 
 export function splitPosition(position) {
@@ -298,7 +298,7 @@ export const getProgramQuery = (deepQuery = true) => {
 
 
     const programSectionsQuery = 'id,name,renderType,sortOrder,program,sharing,translations,attributeValues,trackedEntityAttributes';
-    const programTrackedEntityAttributes = 'id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute[id,name],programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccessesattributeValues,displayInList,id,mandatory,name,program,programTrackedEntityAttributeGroups,renderOptionsAsRadio,searchable,sortOrder,trackedEntityAttribute,translations,userAccesses,userGroupAccesses,valueType';
+    const programTrackedEntityAttributes = 'id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute[id,name],programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccessesattributeValues,displayInList,id,mandatory,allowFutureDate,name,program,programTrackedEntityAttributeGroups,renderOptionsAsRadio,searchable,sortOrder,trackedEntityAttribute,translations,userAccesses,userGroupAccesses,valueType';
 
     return [
         'lastUpdated',
@@ -432,4 +432,20 @@ export const padValue = (value, format) => {
 
 export const mapIdArray = (arr) => {
     return arr.map(elem => ({ id: elem.id }));
+}
+
+export const isHNQIS = (type) => {
+    return (type === "hnqis" || type === "hnqismwi");
+}
+
+export const programIsHNQIS = (type) => {
+    return (type === "HNQIS2" || type === "HNQISMWI");
+}
+
+export const isLabelType = (type) => {
+    return (['label', 'Std Overview'].includes(type));
+}
+
+export const isGeneratedType = (type) => {
+    return (['generated', 'holder'].includes(type));
 }

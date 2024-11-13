@@ -6,15 +6,16 @@ import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react";
 import {  FEEDBACK_ORDER } from "../../configs/Constants.js";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2 } from "../../utils/ImportValidatorUtils.js";
-import { DeepCopy, getPCAMetadataDE } from "../../utils/Utils.js";
+import { DeepCopy, getPCAMetadataDE, programIsHNQIS } from "../../utils/Utils.js";
 import SaveMetadata from "../UIElements/SaveMetadata.js";
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 
 const ValidateMetadata = (
     { 
-        hnqisMode,
+        hnqisType,
         newDEQty,
         programStage,
         importedSections,
@@ -55,11 +56,11 @@ const ValidateMetadata = (
                 validationResults.questions = questions;
                 validationResults.scores = scores;
 
-                let feedbacksErrors
+                let feedbacksErrors;
 
                 // CHECK FEEDBACK DATA
-                if (hnqisMode) {
-                    const validateResults = validateFeedbacks(hnqisMode, importedSectionsV.concat(importedScoresV))
+                if (programIsHNQIS(hnqisType)) {
+                    const validateResults = validateFeedbacks(!!hnqisType, importedSectionsV.concat(importedScoresV))
                     feedbacksErrors = validateResults.feedbacksErrors
                 
                     errorCounts += feedbacksErrors.length
@@ -70,7 +71,7 @@ const ValidateMetadata = (
                 //ADD FEEDBACK ERRORS TO DATA ELEMENTS
                 const dataElementsList = DeepCopy(importedSections.map(section => section.dataElements).flat());
 
-                if (hnqisMode) {
+                if (programIsHNQIS(hnqisType)) {
                     importedSectionsV.forEach((section) => {
                         excelRow += 1;
                         let section_errors = 0;
@@ -126,7 +127,7 @@ const ValidateMetadata = (
 
                 let score_errors = 0;
                 delete importedScoresV.errors
-                if (hnqisMode) {
+                if (hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2) {
                     importedScoresV.dataElements.forEach((dataElement) => {
                         excelRow += 1;
                         const errorDetails = {
@@ -181,16 +182,16 @@ const ValidateMetadata = (
 
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => setSavingMetadata(false)}>
-            {hnqisMode ? 'Assessment Validation' : 'Save changes into the server?'}
+            {hnqisType ? 'Assessment Validation' : 'Save changes into the server?'}
         </CustomMUIDialogTitle >
         <DialogContent dividers style={{ padding: '1em 2em' }}>
-            {hnqisMode &&
+            {hnqisType &&
                 <NoticeBox error={!valid} title={processed ? "Sections and Scores Validated" : "Validating Sections and Scores"}>
                     {!processed && <CircularLoader small />}
                     {validationMessage}
                 </NoticeBox>
             }
-            {!hnqisMode && 'This action cannot be undone'}
+            {!hnqisType && 'This action cannot be undone'}
         </DialogContent>
 
         <DialogActions style={{ padding: '1em' }}>
@@ -199,7 +200,7 @@ const ValidateMetadata = (
             {save &&
                 <SaveMetadata
                     programId={programStage.program.id}
-                    hnqisMode={hnqisMode}
+                    hnqisType={hnqisType}
                     newObjectsQtty={newDEQty}
                     programStage={programStage}
                     importedSections={importedSections}
@@ -224,7 +225,7 @@ const ValidateMetadata = (
 
 ValidateMetadata.propTypes = {
     criticalSection: PropTypes.object,
-    hnqisMode: PropTypes.bool,
+    hnqisType: PropTypes.string,
     importResults: PropTypes.oneOfType([PropTypes.object,PropTypes.bool]),
     importedScores: PropTypes.object,
     importedSections: PropTypes.array,

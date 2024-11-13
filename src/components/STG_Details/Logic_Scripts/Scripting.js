@@ -1,6 +1,6 @@
-import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../configs/AnalyticsTemplates.js";
-import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND, NON_CRITICAL_STEPS, CRITICAL_STEPS } from "../../configs/Constants.js";
-import { DeepCopy, padValue } from "../../utils/Utils.js";
+import { ProgramIndicatorTemplate, compLastSixMonthsByOUTable, compLastSixMonthsPie, compLastSixMonthsTable, ProgramIndicatorTemplateNoA, ProgramIndicatorTemplateGS, AverageScoreByDistrictByPivotTable, NumberOfAssessmentByPivotTable, AverageGlobalScoreByColumn, AssessmentByCompetencyByColumn, GlobalScoreByMap, LineListGlobalScore, dashboardsTemplate, dashVisualization, dashMap, dashEventReport } from "../../../configs/AnalyticsTemplates.js";
+import { FEEDBACK_ORDER, METADATA, COMPETENCY_ATTRIBUTE, ACTION_PLAN_ACTION, VISUALIZATIONS_LEGEND, NON_CRITICAL_STEPS, CRITICAL_STEPS } from "../../../configs/Constants.js";
+import { DeepCopy, padValue } from "../../../utils/Utils.js";
 
 /**
  * 
@@ -657,7 +657,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
 
         if (hsRule.parent == "None") {
             pr.name = "PR - Assign labels text";
-            pr.condition = `'true'`;
+            pr.condition = `true`;
         } else {
             pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
             const conditionValue = ["0", "1"].includes(String(hsRule.condition)) ? hsRule.condition : `"${hsRule.condition.replaceAll("'", "")}"`

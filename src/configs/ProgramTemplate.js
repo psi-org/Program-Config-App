@@ -1,3 +1,14 @@
+const {
+    ASSIGNED_TO_ATTRIBUTE,
+    PERIOD_START_ATTRIBUTE,
+    PERIOD_END_ATTRIBUTE,
+    ASSESSMENT_PERIOD_ATTRIBUTE,
+    HEALTH_AREA_ATTRIBUTE,
+    ORGANISATION_UNIT_ATTRIBUTE,
+    ASSESSMENT_DATE_ATTRIBUTE,
+    METADATA
+} = require("./Constants.js")
+
 const Program = {
     "id": "programId",
     "name": "programName",
@@ -23,13 +34,13 @@ const HnqisProgramConfigs = {
     "trackedEntityType": { "id": "oNwpeWkfoWc" },
     "attributeValues": [
         {
-            "attribute": { "id": "haUflNqP85K" },
+            "attribute": { "id": METADATA },
             "value": "{\"buildVersion\":\"1.1\",\"useCompetencyClass\":\"Yes\",\"dePrefix\":\"programDEPrefix\"}"
         }
     ],
     "programTrackedEntityAttributes": [
         {
-            "trackedEntityAttribute": { "id": "Xe5hUu6KkUT" },
+            "trackedEntityAttribute": { "id": HEALTH_AREA_ATTRIBUTE },
             "mandatory": false,
             "valueType": "TEXT",
             "searchable": false,
@@ -37,7 +48,7 @@ const HnqisProgramConfigs = {
             "sortOrder": 1
         },
         {
-            "trackedEntityAttribute": { "id": "nHg1hGgtJwm" },
+            "trackedEntityAttribute": { "id": ORGANISATION_UNIT_ATTRIBUTE },
             "mandatory": false,
             "valueType": "TEXT",
             "searchable": false,
@@ -45,7 +56,7 @@ const HnqisProgramConfigs = {
             "sortOrder": 2
         },
         {
-            "trackedEntityAttribute": { "id": "UlUYUyZJ6o9" },
+            "trackedEntityAttribute": { "id": ASSESSMENT_DATE_ATTRIBUTE },
             "mandatory": false,
             "valueType": "DATE",
             "searchable": true,
@@ -55,6 +66,43 @@ const HnqisProgramConfigs = {
     ],
     "userGroupAccesses": []
 }
+
+const HNQISMWI_Attributes = [
+    {
+        "trackedEntityAttribute": { "id": ASSIGNED_TO_ATTRIBUTE },
+        "mandatory": true,
+        "valueType": "TEXT",
+        "searchable": true,
+        "displayInList": true,
+        "sortOrder": 4
+    },
+    {
+        "trackedEntityAttribute": { "id": PERIOD_START_ATTRIBUTE },
+        "mandatory": true,
+        "valueType": "DATE",
+        "searchable": true,
+        "allowFutureDate": true,
+        "displayInList": false,
+        "sortOrder": 5
+    },
+    {
+        "trackedEntityAttribute": { "id": PERIOD_END_ATTRIBUTE },
+        "mandatory": true,
+        "valueType": "DATE",
+        "searchable": true,
+        "allowFutureDate": true,
+        "displayInList": false,
+        "sortOrder": 6
+    },
+    {
+        "trackedEntityAttribute": { "id": ASSESSMENT_PERIOD_ATTRIBUTE },
+        "mandatory": true,
+        "valueType": "TEXT",
+        "searchable": true,
+        "displayInList": true,
+        "sortOrder": 7
+    }
+]
 
 const COMPETENCY_TEA = {
     "trackedEntityAttribute": { "id": "ulU9KKgSLYe" },
@@ -99,27 +147,7 @@ const PS_ActionPlanStage = {
     "name": "Action Plan",
     "openAfterEnrollment": false,
     "program": {"id": "programId"},
-    "programStageDataElements": [
-        {
-            "sortOrder": 1,
-            "compulsory": "true",
-            "programStage": {"id": "ajALrNAeyhF"},
-            "dataElement": {"id": "F0Qcr8ANr7t"}
-        },
-        {
-            "sortOrder": 2,
-            "compulsory": "true",
-            "programStage": {"id": "ajALrNAeyhF"},
-            "dataElement": {"id": "nswci5V4j0d"}
-        },
-        {
-            "sortOrder": 3,
-            "compulsory": "true",
-            "allowFutureDate": "true",
-            "programStage": {"id": "ajALrNAeyhF"},
-            "dataElement": {"id": "DIoqtxbSJIL"}
-        }
-    ],
+    "programStageDataElements": [],
     "programStageSections": [],
     "remindCompleted": false,
     "repeatable": true,
@@ -127,6 +155,28 @@ const PS_ActionPlanStage = {
     "style": {"color": "#00b0ff"},
     "userGroupAccesses": []
 }
+
+const PSDE_HNQIS_ActionPlan = [
+    {
+        "sortOrder": 1,
+        "compulsory": "true",
+        "programStage": { "id": "apProgramStageId" },
+        "dataElement": { "id": "F0Qcr8ANr7t" }
+    },
+    {
+        "sortOrder": 2,
+        "compulsory": "true",
+        "programStage": { "id": "apProgramStageId" },
+        "dataElement": { "id": "nswci5V4j0d" }
+    },
+    {
+        "sortOrder": 3,
+        "compulsory": "true",
+        "allowFutureDate": "true",
+        "programStage": { "id": "apProgramStageId" },
+        "dataElement": { "id": "DIoqtxbSJIL" }
+    }
+];
 
 const PSS_Default = {
     "sortOrder": 10,
@@ -170,15 +220,158 @@ const PS_Generic = {
     "programStageSections": []
 }
 
+const OS_HNQISMWI_Criterion = {
+    "name": "optionSet Name",
+    "id": "optionSetId",
+    "valueType": "TEXT",
+    "favorite": false,
+    "favorites": [],
+    "userGroupAccesses": [],
+    "attributeValues": [],
+    "translations": [],
+    "userAccesses": [],
+    "options": []
+}
+
+const HNQISMWI_ActionPlanElements = [
+    {
+        "name": "Criterion Status",
+        "code": "MWI_AP_DE1",
+        "translations": [],
+        "shortName": "Criterion Status",
+        "formName": "Criterion Status",
+        "legendSets": [{ "id": "F9G1wtBjiOY" }],
+        "aggregationType": "NONE",
+        "valueType": "TEXT",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "optionSet": { "id": "eKFCHvlnXxm" },
+        "attributeValues": [{
+            "attribute": { "id": METADATA },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    },
+    {
+        "name": "Criterion Score",
+        "code": "MWI_AP_DE2",
+        "translations": [],
+        "shortName": "Criterion Score",
+        "formName": "Criterion Score",
+        "legendSets": [],
+        "aggregationType": "NONE",
+        "valueType": "NUMBER",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "attributeValues": [{
+            "attribute": { "id": METADATA },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    },
+    {
+        "name": "Comment",
+        "code": "MWI_AP_DE3",
+        "translations": [],
+        "shortName": "Comment",
+        "formName": "Comment",
+        "legendSets": [],
+        "aggregationType": "NONE",
+        "valueType": "TEXT",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "attributeValues": [{
+            "attribute": { "id": METADATA },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    },
+    {
+        "name": "Action Point",
+        "code": "MWI_AP_DE4",
+        "translations": [],
+        "shortName": "Action Point",
+        "formName": "Action Point",
+        "legendSets": [],
+        "aggregationType": "NONE",
+        "valueType": "TEXT",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "attributeValues": [{
+            "attribute": { "id": METADATA },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    },
+    {
+        "name": "Responsible Person",
+        "code": "MWI_AP_DE5",
+        "translations": [],
+        "shortName": "Responsible Person",
+        "formName": "Responsible Person",
+        "legendSets": [],
+        "aggregationType": "NONE",
+        "valueType": "TEXT",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "attributeValues": [{
+            "attribute": { "id": METADATA },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    },
+    {
+        "name": "Due Date",
+        "code": "MWI_AP_DE6",
+        "translations": [],
+        "shortName": "Due Date",
+        "formName": "Due Date",
+        "legendSets": [],
+        "aggregationType": "NONE",
+        "valueType": "DATE",
+        "domainType": "TRACKER",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "attributeValues": [{
+            "attribute": { "id": METADATA },
+            "value": "{\"elemType\":\"generated\",\"isCompulsory\":\"No\"}"
+        }]
+    }
+];
+
+const HNQISMWI_SectionDataElements = [
+    {
+        "name": "Section 1",
+        "code": "Section 1",
+        "translations": [],
+        "shortName": "Section 1",
+        "formName": "Section 1",
+        "aggregationType": "NONE",
+        "valueType": "TEXT",
+        "aggregationLevels": [],
+        "zeroIsSignificant": false,
+        "domainType": "TRACKER",
+        "attributeValues": [{
+            "attribute": { "id": METADATA },
+            "value": "{\"elemType\":\"holder\",\"isCompulsory\":\"No\",\"labelFormName\":\"-\"}"
+        }]
+    }
+];
+
 module.exports = {
     COMPETENCY_TEA,
-    Program,
     EventStage,
+    HNQISMWI_ActionPlanElements,
+    HNQISMWI_Attributes,
+    HNQISMWI_SectionDataElements,
     HnqisProgramConfigs,
-    PS_Generic,
-    PS_AssessmentStage,
+    OS_HNQISMWI_Criterion,
+    Program,
     PS_ActionPlanStage,
-    PSS_Default,
+    PS_AssessmentStage,
+    PS_Generic,
+    PSDE_HNQIS_ActionPlan,
     PSS_CriticalSteps,
+    PSS_Default,
     PSS_Scores
 };
