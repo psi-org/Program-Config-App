@@ -316,7 +316,7 @@
             "translations": []
         },
         {
-            "code": "-1",
+            "code": "0",
             "name": "No",
             "id": "gkLeI6VFJZe",
             "sortOrder": 2,
@@ -326,7 +326,7 @@
             "translations": []
         },
         {
-            "code": "0",
+            "code": "-1",
             "name": "NA",
             "id": "U2dkoDmopiv",
             "sortOrder": 3,

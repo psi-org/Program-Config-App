@@ -319,8 +319,8 @@ const buildScoringRulesMWI = (
         const actionPlanDataElements = criterionRulesGroup[section.id].actionPlanDataElements;
 
         const hasValueSting = parentDataElements.map(de => `d2:hasValue(#{${dataElementVarMapping[de.id]}})`).join(' && ');
-        const questionsSum = parentDataElements.map(de => `#{${dataElementVarMapping[de.id]}}`).join('+');
-        const questionsCountIfValue = parentDataElements.map(de => `(1-d2:countIfValue(#{${dataElementVarMapping[de.id]}}, 0))`).join('+');
+        const questionsSum = parentDataElements.map(de => `d2:countIfValue(#{${dataElementVarMapping[de.id]}},1)`).join('+');
+        const questionsCountIfValue = parentDataElements.map(de => `(1-d2:countIfValue(#{${dataElementVarMapping[de.id]}}, -1))`).join('+');
 
         // [NA, Compliant, Non-Compliant, Partially Compliant]
         const scoringFilter = [
@@ -330,17 +330,17 @@ const buildScoringRulesMWI = (
                 tag: 'NA'
             },
             {
-                condition: `(${hasValueSting}) && ((${questionsSum})/(${questionsCountIfValue})) == 1`,
+                condition: `(${hasValueSting}) && ((${questionsSum})/(${questionsCountIfValue})) >= 0.8`,
                 data: '100',
                 tag: 'C'
             },
             {
-                condition: `(${hasValueSting}) && ((${questionsSum})/(${questionsCountIfValue})) == -1`,
+                condition: `(${hasValueSting}) && ((${questionsSum})/(${questionsCountIfValue})) < 0.4`,
                 data: '5',
                 tag: 'NC'
             },
             {
-                condition: `(${hasValueSting}) && (${questionsCountIfValue}) > 0 && ((${questionsSum})/(${questionsCountIfValue})) > -1 && ((${questionsSum})/(${questionsCountIfValue})) < 1`,
+                condition: `(${hasValueSting}) && (${questionsCountIfValue}) > 0 && ((${questionsSum})/(${questionsCountIfValue})) >= 0.4 && ((${questionsSum})/(${questionsCountIfValue})) < 0.8`,
                 data: '45',
                 tag: 'PC'
             },
