@@ -168,6 +168,13 @@ const processStageData = (
                 dataElement = mergeWithPriority(dataElement, existingPSDE.dataElement);
             }
 
+            let allowFutureDate = existingPSDE?.allowFutureDate;
+
+            // Matches if form name is #.#.# Due Date in HNQIS MWI Programs to define if future date is enabled
+            if (hnqisType === 'HNQISMWI' && dataElement.formName?.match(/\d+.\d+.\d+ Due Date/)) {
+                allowFutureDate = true;
+            }
+
             delete dataElement.importStatus;
             new_programStageDataElements.push({
                 compulsory: (DE_metadata.isCompulsory == 'Yes' && !DE_metadata.parentQuestion), // True: mandatory is Yes and has no parents.
@@ -176,7 +183,7 @@ const processStageData = (
                 dataElement: { id: dataElement.id },
 
                 // Keep original settings if exists
-                allowFutureDate: existingPSDE?.allowFutureDate,
+                allowFutureDate,
                 allowProvidedElsewhere: existingPSDE?.allowProvidedElsewhere,
                 skipSynchronization: existingPSDE?.skipSynchronization,
                 renderType: existingPSDE?.renderType
