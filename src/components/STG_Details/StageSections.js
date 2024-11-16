@@ -150,7 +150,7 @@ const updateAndroidSettingsSynchronization = {
 
 const queryAndroidSettingsSynchronization = {
     results: {
-        resource: `dataStore/ANDROID_SETTINGS_APP/synchronization?encrypt=true`
+        resource: `dataStore/ANDROID_SETTINGS_APP/synchronization`
     }
 };
 

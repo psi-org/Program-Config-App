@@ -22,13 +22,13 @@ const metadataMutation = {
 };
 
 const dataStoreMutation = {
-    resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}?encrypt=true`,
+    resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}`,
     type: 'create',
     data: ({ data }) => data
 };
 
 const updateDataStoreMutation = {
-    resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}?encrypt=true`,
+    resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}`,
     type: 'update',
     data: ({ data }) => data
 };

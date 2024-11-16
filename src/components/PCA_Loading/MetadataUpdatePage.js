@@ -14,12 +14,12 @@ const metadataMutation = {
 };
 
 const dataStoreMutationUpdate = {
-    resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}?encrypt=true`,
+    resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}`,
     type: 'update',
     data: ({ data }) => data
 };
 
-const MetadataErrorPage = () => {
+const MetadataUpdatePage = () => {
 
     const  metadataDM = useDataMutation(metadataMutation, {
         onError: (err) => {
@@ -99,5 +99,5 @@ const MetadataErrorPage = () => {
     );
 }
 
-export default MetadataErrorPage;
+export default MetadataUpdatePage;
 

@@ -2,7 +2,7 @@ window.process = {}
 import './css/main.css';
 import { useDataQuery } from "@dhis2/app-runtime";
 import { CircularLoader } from '@dhis2/ui';
-import React from 'react'
+import React from 'react';
 import { Provider } from 'react-redux';
 import { HashRouter, Route, Switch } from "react-router-dom";
 import classes from './App.module.css'
@@ -34,12 +34,32 @@ const completenessCheck = (queryResult, checkProcess) => {
     return queryResult?.results[checkProcess.objectName]?.filter(obj => checkProcess.resultsList.includes(obj.id)).length >= checkProcess.resultsList.length;
 }
 
+const getErrorPage = (versionValid, pcaReady, pcaMetadataData) => {
+    if (!versionValid) {
+        return VersionErrorPage;
+    }
+
+    if (!pcaReady) {
+        return LoadingPage;
+    }
+
+    if (!pcaMetadataData) {
+        return MetadataErrorPage;
+    }
+
+    if (pcaMetadataData?.results?.version < PCA_METADATA_VERSION) {
+        return MetadataUpdatePage;
+    }
+
+    return undefined;
+}
+
 const App = () => {
 
     let dataChecked = false;
     let pcaReady = false;
     let h2Ready = false;
-    let errorPage;
+    let errorPage = undefined;
     
     //* Checking PCA Metadata Package completeness
     const { data: pcaCheck1 } = useDataQuery(checkProcessPCA[0].queryFunction);
@@ -56,6 +76,9 @@ const App = () => {
     const { data: h2Check5 } = useDataQuery(checkProcessH2[4].queryFunction);
     const { data: h2Check6 } = useDataQuery(checkProcessH2[5].queryFunction);
     const { data: h2Check7 } = useDataQuery(checkProcessH2[6].queryFunction);
+
+    //* Checking PCA Metadata version
+    const { data: pcaMetadataData } = useDataQuery(queryPCAAvailableMetadata);
 
     //* All completeness checked
     if (pcaCheck1 && pcaCheck2 && pcaCheck3 && pcaCheck4 && h2Check1 && h2Check2 && h2Check3 && h2Check4 && h2Check5 && h2Check6 && h2Check7) {
@@ -76,9 +99,6 @@ const App = () => {
         dataChecked = true;
     }
 
-    //* Checking PCA Metadata version
-    const { data: pcaMetadataData } = useDataQuery(queryPCAAvailableMetadata);
-
     //* Checking DHIS2 Server version
     const serverInfoQuery = useDataQuery(queryServerInfo);
     const serverInfo = serverInfoQuery.data?.results;
@@ -91,14 +111,9 @@ const App = () => {
         return (<div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
             <CircularLoader />
         </div>)
-    } else {
-        errorPage = !versionValid
-            ? VersionErrorPage
-            : (pcaReady === undefined
-                ? LoadingPage
-                : (!pcaReady ? MetadataErrorPage : (pcaMetadataData?.results?.version < PCA_METADATA_VERSION ? MetadataUpdatePage : undefined)))
     }
-
+    
+    errorPage = getErrorPage(versionValid, pcaReady, pcaMetadataData);
 
     return (
         <>
@@ -108,15 +123,12 @@ const App = () => {
                         <Switch>
                             <Route exact path={"/"}
                                 component={!errorPage ? ProgramList : errorPage} />
-
                             <Route path={'/program/:id?'}
                                 component={!errorPage ? ProgramDetails : errorPage} />
-
                             <Route path={'/programStage/:id?'}
                                 component={!errorPage ? ProgramStage : errorPage} />
                         </Switch>
                     </div>
-
                 </HashRouter>
             </Provider>
         </>
