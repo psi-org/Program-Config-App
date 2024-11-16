@@ -2,7 +2,7 @@ window.process = {}
 import './css/main.css';
 import { useDataQuery } from "@dhis2/app-runtime";
 import { CircularLoader } from '@dhis2/ui';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { HashRouter, Route, Switch } from "react-router-dom";
 import classes from './App.module.css'
@@ -35,12 +35,12 @@ const completenessCheck = (queryResult, checkProcess) => {
 }
 
 const getErrorPage = (versionValid, pcaReady, pcaMetadataData) => {
-    if (!versionValid) {
-        return VersionErrorPage;
-    }
-
     if (!pcaReady) {
         return LoadingPage;
+    }
+
+    if (!versionValid) {
+        return VersionErrorPage;
     }
 
     if (!pcaMetadataData) {
@@ -56,9 +56,9 @@ const getErrorPage = (versionValid, pcaReady, pcaMetadataData) => {
 
 const App = () => {
 
-    let dataChecked = false;
-    let pcaReady = false;
-    let h2Ready = false;
+    const [dataChecked, setDataChecked] = useState(false);
+    const [pcaReady, setPcaReady] = useState(false);
+    const [h2Ready, setH2Ready] = useState(false);
     let errorPage = undefined;
     
     //* Checking PCA Metadata Package completeness
@@ -81,23 +81,27 @@ const App = () => {
     const { data: pcaMetadataData } = useDataQuery(queryPCAAvailableMetadata);
 
     //* All completeness checked
-    if (pcaCheck1 && pcaCheck2 && pcaCheck3 && pcaCheck4 && h2Check1 && h2Check2 && h2Check3 && h2Check4 && h2Check5 && h2Check6 && h2Check7) {
-        pcaReady = completenessCheck(pcaCheck1, checkProcessPCA[0])
-            && completenessCheck(pcaCheck2, checkProcessPCA[1])
-            && completenessCheck(pcaCheck3, checkProcessPCA[2])
-            && completenessCheck(pcaCheck4, checkProcessPCA[3]);
+    useEffect(() => {
+        if (pcaCheck1 && pcaCheck2 && pcaCheck3 && pcaCheck4 && h2Check1 && h2Check2 && h2Check3 && h2Check4 && h2Check5 && h2Check6 && h2Check7) {
+            const pcaStatus = completenessCheck(pcaCheck1, checkProcessPCA[0])
+                && completenessCheck(pcaCheck2, checkProcessPCA[1])
+                && completenessCheck(pcaCheck3, checkProcessPCA[2])
+                && completenessCheck(pcaCheck4, checkProcessPCA[3]);
+            setPcaReady(pcaStatus);
 
-        h2Ready = completenessCheck(h2Check1, checkProcessH2[0])
-            && completenessCheck(h2Check2, checkProcessH2[1])
-            && completenessCheck(h2Check3, checkProcessH2[2])
-            && completenessCheck(h2Check4, checkProcessH2[3])
-            && completenessCheck(h2Check5, checkProcessH2[4])
-            && completenessCheck(h2Check6, checkProcessH2[5])
-            && completenessCheck(h2Check7, checkProcessH2[6]);
+            const h2Status = completenessCheck(h2Check1, checkProcessH2[0])
+                && completenessCheck(h2Check2, checkProcessH2[1])
+                && completenessCheck(h2Check3, checkProcessH2[2])
+                && completenessCheck(h2Check4, checkProcessH2[3])
+                && completenessCheck(h2Check5, checkProcessH2[4])
+                && completenessCheck(h2Check6, checkProcessH2[5])
+                && completenessCheck(h2Check7, checkProcessH2[6]);
+            setH2Ready(h2Status);
 
-        localStorage.setItem('h2Ready', String(h2Ready));
-        dataChecked = true;
-    }
+            localStorage.setItem('h2Ready', String(h2Ready));
+            setDataChecked(true);
+        }
+    }, [pcaCheck1, pcaCheck2, pcaCheck3, pcaCheck4, h2Check1, h2Check2, h2Check3, h2Check4, h2Check5, h2Check6, h2Check7]);
 
     //* Checking DHIS2 Server version
     const serverInfoQuery = useDataQuery(queryServerInfo);
@@ -107,13 +111,15 @@ const App = () => {
 
     const versionValid = serverInfo && serverInfo.version ? versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION) : false;
 
+    useEffect(() => {
+        errorPage = getErrorPage(versionValid, pcaReady, pcaMetadataData);
+    }, [pcaReady, h2Ready]);
+
     if (!dataChecked || !serverInfo?.version) {
         return (<div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
             <CircularLoader />
         </div>)
     }
-    
-    errorPage = getErrorPage(versionValid, pcaReady, pcaMetadataData);
 
     return (
         <>
