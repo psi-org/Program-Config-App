@@ -97,8 +97,6 @@ const App = () => {
                 && completenessCheck(h2Check6, checkProcessH2[5])
                 && completenessCheck(h2Check7, checkProcessH2[6]);
             setH2Ready(h2Status);
-
-            localStorage.setItem('h2Ready', String(h2Ready));
             setDataChecked(true);
         }
     }, [pcaCheck1, pcaCheck2, pcaCheck3, pcaCheck4, h2Check1, h2Check2, h2Check3, h2Check4, h2Check5, h2Check6, h2Check7]);
@@ -112,6 +110,7 @@ const App = () => {
     const versionValid = serverInfo && serverInfo.version ? versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION) : false;
 
     useEffect(() => {
+        localStorage.setItem('h2Ready', String(h2Ready));
         errorPage = getErrorPage(versionValid, pcaReady, pcaMetadataData);
     }, [pcaReady, h2Ready]);
 
