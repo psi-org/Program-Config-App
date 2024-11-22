@@ -35,7 +35,7 @@ const completenessCheck = (queryResult, checkProcess) => {
 }
 
 const getErrorPage = (versionValid, pcaReady, pcaMetadataData) => {
-    if (!pcaReady) {
+    if (pcaReady===undefined) {
         return LoadingPage;
     }
 
@@ -43,7 +43,7 @@ const getErrorPage = (versionValid, pcaReady, pcaMetadataData) => {
         return VersionErrorPage;
     }
 
-    if (!pcaMetadataData) {
+    if (!pcaMetadataData || !pcaReady) {
         return MetadataErrorPage;
     }
 
@@ -57,9 +57,14 @@ const getErrorPage = (versionValid, pcaReady, pcaMetadataData) => {
 const App = () => {
 
     const [dataChecked, setDataChecked] = useState(false);
-    const [pcaReady, setPcaReady] = useState(false);
-    const [h2Ready, setH2Ready] = useState(false);
-    let errorPage = undefined;
+    const [pcaReady, setPcaReady] = useState(undefined);
+    const [h2Ready, setH2Ready] = useState(undefined);
+    const [renderComponent, setRenderComponent] = useState(()=>LoadingPage);
+
+    //* DHIS2 Server version checks
+    const serverInfoQuery = useDataQuery(queryServerInfo);
+    const [serverInfo, setServerInfo] = useState(undefined);
+    const [versionValid, setVersionValid] = useState(undefined);
     
     //* Checking PCA Metadata Package completeness
     const { data: pcaCheck1 } = useDataQuery(checkProcessPCA[0].queryFunction);
@@ -101,20 +106,26 @@ const App = () => {
         }
     }, [pcaCheck1, pcaCheck2, pcaCheck3, pcaCheck4, h2Check1, h2Check2, h2Check3, h2Check4, h2Check5, h2Check6, h2Check7]);
 
-    //* Checking DHIS2 Server version
-    const serverInfoQuery = useDataQuery(queryServerInfo);
-    const serverInfo = serverInfoQuery.data?.results;
-
-    if (serverInfo) { window.localStorage.SERVER_VERSION = serverInfo.version }
-
-    const versionValid = serverInfo && serverInfo.version ? versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION) : false;
+    useEffect(() => {
+        setServerInfo(serverInfoQuery?.data?.results);
+    }, [serverInfoQuery]);
 
     useEffect(() => {
-        localStorage.setItem('h2Ready', String(h2Ready));
-        errorPage = getErrorPage(versionValid, pcaReady, pcaMetadataData);
-    }, [pcaReady, h2Ready]);
+        if (serverInfo?.version) {
+            window.localStorage.SERVER_VERSION = serverInfo.version
+            setVersionValid(versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION));
+        }
+    }, [serverInfo]);
 
-    if (!dataChecked || !serverInfo?.version) {
+    useEffect(() => {
+        if (versionValid !== undefined && pcaReady !== undefined && h2Ready !== undefined && pcaMetadataData !== undefined) {
+            localStorage.setItem('h2Ready', String(h2Ready));
+            const errorResult = getErrorPage(versionValid, pcaReady, pcaMetadataData);
+            setRenderComponent(errorResult ? () => errorResult : undefined);
+        }
+    }, [pcaReady, h2Ready, pcaMetadataData, versionValid]);
+
+    if (!dataChecked || serverInfo === undefined) {
         return (<div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
             <CircularLoader />
         </div>)
@@ -126,12 +137,9 @@ const App = () => {
                 <HashRouter>
                     <div className={classes.container}>
                         <Switch>
-                            <Route exact path={"/"}
-                                component={!errorPage ? ProgramList : errorPage} />
-                            <Route path={'/program/:id?'}
-                                component={!errorPage ? ProgramDetails : errorPage} />
-                            <Route path={'/programStage/:id?'}
-                                component={!errorPage ? ProgramStage : errorPage} />
+                            <Route exact path={"/"} component={renderComponent || ProgramList} />
+                            <Route path={'/program/:id?'} component={renderComponent || ProgramDetails} />
+                            <Route path={'/programStage/:id?'} component={renderComponent || ProgramStage} />
                         </Switch>
                     </div>
                 </HashRouter>

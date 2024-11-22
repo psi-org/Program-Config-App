@@ -24,11 +24,11 @@ import { useHistory } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import tinycolor from 'tinycolor2';
 import { BUILD_VERSION, DATE_FORMAT_OPTIONS, HNQIS_TYPES, METADATA, REQUIRED_H2_PROGRAM_BUILD_VERSION } from "../../configs/Constants.js";
-import actionCreators from "../../state/action-creators";
+import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
+import actionCreators from "../../state/action-creators/index.js";
 import { versionIsValid, versionGTE, programIsHNQIS } from "../../utils/Utils.js";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import ProgramNew from "./ProgramNew.js";
-import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //

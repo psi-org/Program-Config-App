@@ -49,7 +49,7 @@ const LIGHT_BLUE_COLOR = "#66aee5";
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI", "haUflNqP85K"];
 const PCA_OPTION_SETS = [];
 const PCA_OPTIONS = [];
-const PCA_USER_ROLES = ["QbYqOgwk5fJ", "JDmJ4ADTaDq"];
+const PCA_USER_ROLES = ["QbYqOgwk5fJ", "JDmJ4ADTaDq", "akI7EzBaRaJ"];
 
 //* HNQIS2 Tracked Entity Attributes
 const COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe";

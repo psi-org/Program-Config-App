@@ -95,8 +95,8 @@ const H2Setting = forwardRef((props, ref) => {
 
     useEffect(() => {
         findHealthAreas().then((data) => {
-            if (data?.results?.optionSets[0].options) {
-                setHaOptions(data?.results?.optionSets[0].options);
+            if (data?.results?.optionSets[0]?.options) {
+                setHaOptions(data.results.optionSets[0].options);
             }
         });
     }, []);
