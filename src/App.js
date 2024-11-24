@@ -1,7 +1,6 @@
 window.process = {}
 import './css/main.css';
 import { useDataQuery } from "@dhis2/app-runtime";
-import { CircularLoader } from '@dhis2/ui';
 import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { HashRouter, Route, Switch } from "react-router-dom";
@@ -35,7 +34,7 @@ const completenessCheck = (queryResult, checkProcess) => {
 }
 
 const getErrorPage = (versionValid, pcaReady, pcaMetadataData) => {
-    if (pcaReady===undefined) {
+    if (pcaReady === undefined) {
         return LoadingPage;
     }
 
@@ -83,7 +82,7 @@ const App = () => {
     const { data: h2Check7 } = useDataQuery(checkProcessH2[6].queryFunction);
 
     //* Checking PCA Metadata version
-    const { data: pcaMetadataData } = useDataQuery(queryPCAAvailableMetadata);
+    const { data: pcaMetadataData, loading: loadingPcaMetadata } = useDataQuery(queryPCAAvailableMetadata);
 
     //* All completeness checked
     useEffect(() => {
@@ -118,18 +117,15 @@ const App = () => {
     }, [serverInfo]);
 
     useEffect(() => {
-        if (versionValid !== undefined && pcaReady !== undefined && h2Ready !== undefined && pcaMetadataData !== undefined) {
+        console.log({ loadingPcaMetadata });
+        if (!dataChecked || serverInfo === undefined || loadingPcaMetadata) {
+            setRenderComponent(() => LoadingPage);
+        } else {
             localStorage.setItem('h2Ready', String(h2Ready));
             const errorResult = getErrorPage(versionValid, pcaReady, pcaMetadataData);
             setRenderComponent(errorResult ? () => errorResult : undefined);
         }
-    }, [pcaReady, h2Ready, pcaMetadataData, versionValid]);
-
-    if (!dataChecked || serverInfo === undefined) {
-        return (<div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-            <CircularLoader />
-        </div>)
-    }
+    }, [pcaReady, h2Ready, pcaMetadataData, versionValid, dataChecked, serverInfo, loadingPcaMetadata]);
 
     return (
         <>
