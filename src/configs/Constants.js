@@ -26,7 +26,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
 const BUILD_VERSION = "2.1.1";
-const BUILD_DATE = "Nov 29, 2024";
+const BUILD_DATE = "Nov 26, 2024";
 const MIN_VERSION = "2.36.x";
 const MAX_VERSION = "2.41.x";
 
