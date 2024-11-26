@@ -7,9 +7,10 @@ import DEIcon from '@mui/icons-material/Dns';
 import EditIcon from '@mui/icons-material/Edit';
 import EditOffIcon from '@mui/icons-material/EditOff';
 import LabelIcon from "@mui/icons-material/LabelImportant";
+import LaunchIcon from '@mui/icons-material/Launch';
 import QuizIcon from "@mui/icons-material/Quiz";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import { Tooltip } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import Chip from '@mui/material/Chip';
 import PropTypes from 'prop-types';
 import React, { useState } from "react";
@@ -118,8 +119,35 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                                 {dataElement.errors && dataElement.errors.errors.length > 0 && <BadgeErrors counts={dataElement.errors.errors.length} />}
                             </div>
                             <div className="ml_item-cta">
-                                {deStatus && <Chip label={deStatus.mode.toUpperCase()} color="success" className="blink-opacity-2" style={{ marginLeft: '1em' }} />}
-                                {isSectionMode && !readOnly && !isGeneratedType(metadata.elemType) && <img src={move_vert_svg} alt="menu" id={'menu' + dataElement.id} onClick={() => { setRef(document.getElementById('menu' + dataElement.id)); toggle() }} style={{ cursor: 'pointer' }} />}
+                                {!deStatus &&
+                                    <a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id} style={{ textDecoration: 'none', color: 'black' }}>
+                                        <Tooltip title="Open in Maintenance App" placement="top">
+                                            <IconButton size='small'>
+                                                <LaunchIcon fontSize='inherit' />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </a>
+                                }
+                                {deStatus &&
+                                    <Chip
+                                        label={deStatus.mode.toUpperCase()}
+                                        color="success"
+                                        className="blink-opacity-2"
+                                        style={{ marginLeft: '1em' }}
+                                    />
+                                }
+                                {isSectionMode && !readOnly && !isGeneratedType(metadata.elemType) &&
+                                    <img
+                                        src={move_vert_svg}
+                                        alt="menu"
+                                        id={'menu' + dataElement.id}
+                                        onClick={() => {
+                                            setRef(document.getElementById('menu' + dataElement.id));
+                                            toggle();
+                                        }}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                }
                                 {openMenu &&
                                     <Layer onClick={toggle}>
                                         <Popper reference={ref} placement="bottom-end">
@@ -146,7 +174,9 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                                 setSaveStatus={setSaveStatus}
                             />
                         }
-                        {showValidationMessage && <ValidationMessages objects={[dataElement]} showValidationMessage={setShowValidationMessage} />}
+                        {showValidationMessage &&
+                            <ValidationMessages objects={[dataElement]} showValidationMessage={setShowValidationMessage} />
+                        }
                     </div>
                 )}
             </Draggable>

@@ -4,7 +4,7 @@ import React, { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { bindActionCreators } from "redux";
-import actionCreators from "../../state/action-creators";
+import actionCreators from "../../state/action-creators/index.js";
 import { DeepCopy, programIsHNQIS } from "../../utils/Utils.js"
 import StageSections from "./StageSections.js";
 
@@ -24,21 +24,22 @@ const query = {
 
 const ProgramStage = () => {
 
-    const h2Ready = localStorage.getItem('h2Ready') === 'true'
+    const h2Ready = localStorage.getItem('h2Ready') === 'true';
 
-    const { id } = useParams();
+    let { id } = useParams();
+
+    const dispatch = useDispatch();
 
     if (id && id.length == 11) {
-        const dispatch = useDispatch();
         const { setProgramStage } = bindActionCreators(actionCreators, dispatch);
         setProgramStage(id);
     }
 
     const programStage = useSelector(state => state.programStage);
-    const { error, data, refetch } = useDataQuery(query, { lazy: true, variables: { programStage } });
+    const { error, data, refetch } = useDataQuery(query, { variables: { programStage } });
 
     useEffect(() => {
-        refetch()
+        refetch();
     }, [])
 
     if (!id && !programStage) {
@@ -71,9 +72,14 @@ const ProgramStage = () => {
             )
         }
 
-        const programStageData = DeepCopy({ ...data.results })
+        const programStageData = DeepCopy({ ...data.results });
 
-        return <StageSections programStage={programStageData} stageRefetch={refetch} hnqisType={hnqisType} readOnly={readOnly || (!!hnqisType && programStageData.name.includes('Action Plan'))} />
+        return <StageSections
+            programStage={programStageData}
+            stageRefetch={refetch}
+            hnqisType={hnqisType}
+            readOnly={readOnly || (!!hnqisType && programStageData.name.includes('Action Plan'))}
+        />
     }
 
     return <span><CircularLoader /></span>

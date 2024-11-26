@@ -515,7 +515,7 @@ export const ProgramIndicatorTemplateGS = {
             "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
             "boundaryTarget": "EVENT_DATE",
             "favorite": false,
-            "offsetPeriods": -12,
+            "offsetPeriods": 0,
             "sharing": {
                 "userGroups": {},
                 "external": false,

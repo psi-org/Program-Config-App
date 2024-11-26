@@ -31,7 +31,8 @@ const ValidateMetadata = (
         programMetadata,
         setErrorReports,
         stagesList,
-        setExportToExcel
+        setExportToExcel,
+        stageRefetch
     }
 ) => {
     const validationResults = {};
@@ -216,6 +217,7 @@ const ValidateMetadata = (
                     saveType={'stage'}
                     fromImport={!!importResults}
                     setExportToExcel={setExportToExcel}
+                    stageRefetch={stageRefetch}
                 />
             }
         </DialogActions>
@@ -240,7 +242,8 @@ ValidateMetadata.propTypes = {
     setSavedAndValidated: PropTypes.func,
     setSavingMetadata: PropTypes.func,
     setValidationResults: PropTypes.func,
-    stagesList: PropTypes.array
+    stageRefetch: PropTypes.func,
+    stagesList: PropTypes.array,
 }
 
 export default ValidateMetadata;

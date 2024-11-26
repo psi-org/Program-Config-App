@@ -150,7 +150,7 @@ const updateAndroidSettingsSynchronization = {
 
 const queryAndroidSettingsSynchronization = {
     results: {
-        resource: `dataStore/ANDROID_SETTINGS_APP/synchronization?encrypt=true`
+        resource: `dataStore/ANDROID_SETTINGS_APP/synchronization`
     }
 };
 
@@ -213,23 +213,26 @@ const queryHNQIS2Metadata = {
 
 const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 
-const StageSections = ({ programStage, hnqisType, readOnly }) => {
+const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
 
     const queryDataStore = {
         results: {
             resource: `dataStore/${GENERATED_OBJECTS_NAMESPACE}/${programStage.program.id}`,
+            id: ({ id }) => id
         },
     };
 
     const dsCreateMutation = {
         resource: `dataStore/${GENERATED_OBJECTS_NAMESPACE}/${programStage.program.id}`,
         type: "create",
+        id: ({ id }) => id,
         data: ({ data }) => data,
     };
 
     const dsUpdateMutation = {
         resource: `dataStore/${GENERATED_OBJECTS_NAMESPACE}/${programStage.program.id}`,
         type: "update",
+        id: ({ id }) => id,
         data: ({ data }) => data,
     };
 
@@ -298,8 +301,8 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
 
     useEffect(() => {
         if (importerEnabled) {
-            setErrorReports(undefined)
-            setValidationResults(undefined)
+            setErrorReports(undefined);
+            setValidationResults(undefined);
         }
     }, [importerEnabled])
 
@@ -598,6 +601,7 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
         if (createMetadata.data && createMetadata.data.status) { delete createMetadata.data.status }
         const removed = originalProgramStageDataElements.filter(psde => !programStageDataElements.find(de => de.dataElement.id === psde.dataElement.id)).map(psde => psde.dataElement);
         setRemovedElements(removed);
+        setErrorReports(undefined);
         setSavingMetadata(true);
         return;
     };
@@ -1590,6 +1594,7 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
                     setErrorReports={setErrorReports}
                     stagesList={stagesList}
                     setExportToExcel={setExportToExcel}
+                    stageRefetch={stageRefetch}
                 />
             }
             {showSectionManager &&
@@ -1624,7 +1629,8 @@ const StageSections = ({ programStage, hnqisType, readOnly }) => {
 StageSections.propTypes = {
     hnqisType: PropTypes.string,
     programStage: PropTypes.object,
-    readOnly: PropTypes.bool
+    readOnly: PropTypes.bool,
+    stageRefetch: PropTypes.func
 }
 
 export default StageSections;
