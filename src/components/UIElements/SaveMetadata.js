@@ -553,6 +553,9 @@ const SaveMetadata = (props) => {
 
                     setCompleted(true);
                     setSuccessStatus(true);
+                    if (props.stageRefetch) {
+                        props.stageRefetch();
+                    }
                     props.setSavedAndValidated(true);
                     props.setImportResults(false);
 
@@ -643,7 +646,8 @@ SaveMetadata.propTypes = {
     setImportResults: PropTypes.func,
     setSavedAndValidated: PropTypes.func,
     setSavingMetadata: PropTypes.func,
-    stagesList: PropTypes.array
+    stageRefetch: PropTypes.func,
+    stagesList: PropTypes.array,
 }
 
 export default SaveMetadata;

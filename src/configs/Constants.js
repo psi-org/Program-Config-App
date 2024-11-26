@@ -25,8 +25,8 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.1.0";
-const BUILD_DATE = "Nov 12, 2024";
+const BUILD_VERSION = "2.1.1";
+const BUILD_DATE = "Nov 29, 2024";
 const MIN_VERSION = "2.36.x";
 const MAX_VERSION = "2.41.x";
 
@@ -49,7 +49,7 @@ const LIGHT_BLUE_COLOR = "#66aee5";
 const PCA_ATTRIBUTES = ["yB5tFAAN7bI", "haUflNqP85K"];
 const PCA_OPTION_SETS = [];
 const PCA_OPTIONS = [];
-const PCA_USER_ROLES = ["QbYqOgwk5fJ", "JDmJ4ADTaDq"];
+const PCA_USER_ROLES = ["QbYqOgwk5fJ", "JDmJ4ADTaDq", "akI7EzBaRaJ"];
 
 //* HNQIS2 Tracked Entity Attributes
 const COMPETENCY_ATTRIBUTE = "ulU9KKgSLYe";

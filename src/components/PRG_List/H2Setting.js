@@ -9,9 +9,8 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Switch from "@mui/material/Switch";
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
-import { AGG_TYPES_H2_PI, BUILD_VERSION } from "../../configs/Constants.js";
+import { AGG_TYPES_H2_PI, BUILD_VERSION, HNQIS_TYPES } from "../../configs/Constants.js";
 import SelectOptions from "../UIElements/SelectOptions.js";
-import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 
 const query = {
     results: {
@@ -96,8 +95,8 @@ const H2Setting = forwardRef((props, ref) => {
 
     useEffect(() => {
         findHealthAreas().then((data) => {
-            if (data?.results?.optionSets[0].options) {
-                setHaOptions(data?.results?.optionSets[0].options);
+            if (data?.results?.optionSets[0]?.options) {
+                setHaOptions(data.results.optionSets[0].options);
             }
         });
     }, []);
@@ -462,7 +461,7 @@ const H2Setting = forwardRef((props, ref) => {
                             style={{ ...fieldSetStyle, display: 'flex', justifyContent: 'space-between' }}
                         >
                             <legend style={{ color: 'rgba(0, 0, 0, 0.6)' }}>Core HNQIS Settings</legend>
-                            {props.pgrTypePCA === TEMPLATE_PROGRAM_TYPES.hnqis2 &&
+                            {props.pgrTypePCA === HNQIS_TYPES.HNQIS2 &&
                                 <FormControlLabel
                                     control={
                                         <Switch
@@ -483,7 +482,7 @@ const H2Setting = forwardRef((props, ref) => {
                                 label={"Program Health Area (*)"}
                                 items={healthAreaOptions}
                                 handler={healthAreaChange}
-                                styles={{ width: props.pgrTypePCA === TEMPLATE_PROGRAM_TYPES.hnqis2?"60%":"100%" }}
+                                styles={{ width: props.pgrTypePCA === HNQIS_TYPES.HNQIS2?"60%":"100%" }}
                                 value={healthArea}
                                 defaultOption="Select Health Area"
                             />

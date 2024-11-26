@@ -185,8 +185,7 @@ const ProgramNew = (props) => {
     };
 
     const prgTypeQuery = useDataQuery(queryProgramType);
-    const prgTypeId = prgTypeQuery.data?.results.attributes[0].id;
-
+    const prgTypeId = prgTypeQuery.data?.results?.attributes[0]?.id;
 
     const idsQuery = useDataQuery(queryId);
     const uidPool = idsQuery.data?.results.codes;

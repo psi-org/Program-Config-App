@@ -14,7 +14,7 @@ import { Link, useParams } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { BUILD_VERSION, DATASTORE_H2_METADATA, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import actionCreators from "../../state/action-creators";
+import actionCreators from "../../state/action-creators/index.js";
 import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, mapIdArray, padValue, programIsHNQIS, setPCAMetadata, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessorTracker from "../Excel/DataProcessorTracker.js";
 import Importer from "../Excel/Importer.js";
@@ -111,8 +111,9 @@ const ProgramDetails = () => {
 
     const { id } = useParams();
 
+    const dispatch = useDispatch();
+
     if (id && id.length === 11) {
-        const dispatch = useDispatch();
         const { setProgram } = bindActionCreators(actionCreators, dispatch);
         setProgram(id);
     }
@@ -163,7 +164,7 @@ const ProgramDetails = () => {
     const [importerEnabled, setImporterEnabled] = useState(false);
     const [exportToExcel, setExportToExcel] = useState(false);
     const [saveStatus, setSaveStatus] = useState('Validate');
-    const [importResults, setImportResults] = useState();
+    const [importResults, setImportResults] = useState(undefined);
     const [savedAndValidated, setSavedAndValidated] = useState(false);
     const [savingMetadata, setSavingMetadata] = useState(false);
     const [validationResults, setValidationResults] = useState(undefined);
@@ -252,6 +253,7 @@ const ProgramDetails = () => {
 
     const commit = () => {
         if (createMetadata.data && createMetadata.data.status) { delete createMetadata.data.status }
+        setErrorReports(undefined);
         setSavingMetadata(true);
         return;
     };

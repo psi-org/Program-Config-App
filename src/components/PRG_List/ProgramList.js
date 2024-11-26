@@ -76,7 +76,6 @@ const ProgramList = () => {
 
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
 
-    //console.log(semverCoerce("2.37-SNAPSHOT"))
     // Export Program Metadata //
     const [exportProgramId, setExportProgramId] = useState(undefined)
     const [sharingProgramId, setSharingProgramId] = useState(undefined);
