@@ -721,7 +721,8 @@ export const buildProgramRuleVariables = ({ sections, compositeScores, programId
             name: `_CV_CS${cs}`,
             programRuleVariableSourceType: "CALCULATED_VALUE",
             useCodeForOptionSet: false,
-            program: { id: programId }
+            program: { id: programId },
+            valueType: "NUMBER"
         });
     });
 
