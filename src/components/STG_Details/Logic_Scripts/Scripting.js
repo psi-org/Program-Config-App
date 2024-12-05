@@ -43,7 +43,7 @@ const buildScores = (branch) => {
         branch.questions.forEach((a) => {
             if (a.prgVarName) {
                 const num = `#{${a.prgVarName}}*${a.scoreNum}`;
-                const den = `d2:count('${a.prgVarName}')*${a.scoreDen}`;
+                const den = `d2:count(#{${a.prgVarName}})*${a.scoreDen}`;
                 if (a.isCritical == "Yes") {
                     numC.push(num);
                     denC.push(den);
