@@ -833,14 +833,6 @@ const Exporter = (props) => {
         // For Malawi
         let allowOptionSetToBlank = true;
         if( isHNQISMWI() ) {
-            // Set "read-only" field for "Value Type", column "F"
-            ws.getColumn(6).eachCell((cell) => {
-                cell.protection = { locked: true }; // Lock each cell in the column
-            });
-            ws.protect(password), {
-                selectLockedCells: true, // Allow selection of locked cells
-                selectUnlockedCells: true, // Allow selection of unlocked cells
-            };
             // Not allow Option set as blank
             allowOptionSetToBlank = false;
         }
@@ -881,6 +873,8 @@ const Exporter = (props) => {
 
     const addConditionalFormatting = (ws) => {
         const validationsList = HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS;
+        const hiddenColumns = getHiddenColumns();
+        
 
         //Highlight when Parent Name is not defined for Questions and Labels
         ws.addConditionalFormatting({
@@ -915,17 +909,34 @@ const Exporter = (props) => {
                 }
             ]
         });
-        //Value type not defined
-        ws.addConditionalFormatting({
-            ref: 'F3:F3000',
-            rules: [
-                {
-                    type: 'expression',
-                    formulae: [validationsList.valueTypeNotDefined.formula],
-                    style: conditionalError,
-                }
-            ]
-        });
+        
+        // If the ""Value Type" column is hidden, then the optoon set values columns are set "required" for 'question'
+        if( hiddenColumns.indexOf("value_type") >= 0 ) {
+            ws.addConditionalFormatting({
+                ref: 'G3:G3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.optionSetNotDefined.formula],
+                        style: conditionalError,
+                    }
+                ]
+            });
+        }
+        else {
+            //Value type not defined
+            ws.addConditionalFormatting({
+                ref: 'F3:F3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.valueTypeNotDefined.formula],
+                        style: conditionalError,
+                    }
+                ]
+            });
+        }
+       
         //Disable Value Type when Option Set is selected
         ws.addConditionalFormatting({
             ref: 'F3:F3000',

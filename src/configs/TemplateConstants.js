@@ -382,6 +382,11 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
         dynamicFormula: `AND(NOT(ISBLANK($B_ROWNUM_)),$B_ROWNUM_<>"Std Overview",OR(LEN($C_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C_ROWNUM_)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
         prompt: `Form Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
     },
+    optionSetNotDefined: {
+        formula: 'AND(ISBLANK($G3),NOT(ISBLANK($B3)),$B3="question")',
+        dynamicFormula: 'AND(ISBLANK($G_ROWNUM_),NOT(ISBLANK($B_ROWNUM_)),$B_ROWNUM_="question")',
+        prompt: 'Option set not defined.'
+    },
     valueTypeNotDefined: {
         formula: 'AND($B3 = "question",ISBLANK($G3),ISBLANK($F3))',
         dynamicFormula: 'AND($B_ROWNUM_ = "question",ISBLANK($G_ROWNUM_),ISBLANK($F_ROWNUM_))',
