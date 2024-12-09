@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { ReleaseNotes } from "../../configs/ReleaseNotes.js";
 import {
     HNQIS2_AGG_OPERATORS,
+    conditionalRowError,
     conditionalError,
     disabledHighlighting,
     labelHighlighting,
@@ -874,6 +875,25 @@ const Exporter = (props) => {
     const addConditionalFormatting = (ws) => {
         const validationsList = HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS;
         const hiddenColumns = getHiddenColumns();
+        
+        if( isHNQISMWI() ) {
+            //Highlight when Parent Name is not defined for Questions and Labels
+            ws.addConditionalFormatting({
+                ref: 'B3:B3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.stdOverviewRowRequied.formula],
+                        style: conditionalRowError,
+                    }
+                    // ,{
+                    //     type: 'expression',
+                    //     formulae: [validationsList.criterionRequied.formula],
+                    //     style: conditionalRowError,
+                    // }
+                ]
+            });
+        }
         
 
         //Highlight when Parent Name is not defined for Questions and Labels
