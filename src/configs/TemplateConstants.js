@@ -29,7 +29,7 @@ export const horizontalCenter = {
     horizontal: 'center'
 };
 
-// #2 ==============================================
+// CHANGE #2 ==============================================
 export const conditionalRowError = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'dc3545' } } , font: { bold: true,  italic: true, color: { argb: 'FF0000FF' } }};
 // =================================================
 
@@ -386,7 +386,7 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
         dynamicFormula: `AND(NOT(ISBLANK($B_ROWNUM_)),$B_ROWNUM_<>"Std Overview",OR(LEN($C_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C_ROWNUM_)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
         prompt: `Form Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
     },
-    // #3 ==================================
+    // CHANGE #3 ==================================
 
     sectionFieldRequied: {
         formula: 'AND($B3="Criterion",$B4<>"Std Overview")',
@@ -465,7 +465,7 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
 };
 
 export const getPromptsFormula = (validationsList, rowNumber) => {
-    // #4 ==============================
+    // CHANGE #4 ==============================
     console.log("rowNumber", rowNumber);
     const nextRowNumber = eval(rowNumber) + 1;
     const prevRowNumber = eval(rowNumber) - 1;
