@@ -13,6 +13,32 @@ This repository contains all the source code for the PCA, which is built using t
 
 For in depth instructions on how to use and install the PCA on your DHIS2 instance please refer to the [Program Configuration App Documentation](https://psi.atlassian.net/wiki/spaces/PCA/overview).
 
+### Dev Setup
+
+Use node version 16.20.2 - for working properly with Dhis2 components (@dhis2/cli-app-scripts)
+ --> use of 'nvm' (Node.js Version Manager) is suggested if there already is a later version of node installed.
+
+Add Dhis2 cli with global
+- yarn global add @dhis2/cli-app-scripts
+
+Add react-scripts with global
+- yarn global add react-scripts
+
+Use 'yarn' rather than 'npm'
+- yarn install
+
+Start the project - Might have to try twice.  It might fail on the 1st time.
+- yarn start
+
+Log-In:
+ --> Sign-in in 'http://localhost:3000' does not work.  
+ --> Alternative way of testing is to deploy to existing test Dhis2 server, with name changed.
+ --> Change 'name' in 'package.json' & 'title' in 'd2.config.js' to be a unique name. (Ex: Program Configuration V10.9.1)
+ --> Run below commands:
+ - yarn build
+ - yarn deploy
+
+
 ### License
 
 This project is licensed under the Creative Commons Attribution 4.0 International License - see the [LICENSE.md](LICENSE.md) file for details. Please make sure that you read and understand the terms of the license before using and modifying this software.
