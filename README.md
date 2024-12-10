@@ -38,10 +38,10 @@ Deployment:
  - yarn deploy
 
 Notes:
- -- 'yarn start' would open up the 'Sign-in' in 'http://localhost:3000'.
-  For this to work, Set CORS whitelist with 'http://localhost:3000' in the target DHIS2 server.
+ - 'yarn start' would open up the 'Sign-in' in 'http://localhost:3000'.
+   For this to work, Set CORS whitelist with 'http://localhost:3000' in the target DHIS2 server.
 
- -- Alternative way: Deploy to a target Dhis2 server.
+ - Alternative way: Deploy to a target Dhis2 server.
    Change 'name' in 'package.json' & 'title' in 'd2.config.js' to be a unique name. (Ex: Program Configuration V10.9.1)
    Deploy package by following above 'Deployment:' steps.
 
