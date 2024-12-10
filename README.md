@@ -18,25 +18,32 @@ For in depth instructions on how to use and install the PCA on your DHIS2 instan
 Use node version 16.20.2 - for working properly with Dhis2 components (@dhis2/cli-app-scripts)
  --> use of 'nvm' (Node.js Version Manager) is suggested if there already is a later version of node installed.
 
+Use 'yarn' rather than 'npm'
+
 Add Dhis2 cli with global
 - yarn global add @dhis2/cli-app-scripts
 
 Add react-scripts with global
 - yarn global add react-scripts
 
-Use 'yarn' rather than 'npm'
+Install packages:
 - yarn install
 
-Start the project - Might have to try twice.  It might fail on the 1st time.
+Run in dev:
+--> It might fail on 1st try, but succeed on 2nd time.
 - yarn start
 
-Log-In:
- --> Sign-in in 'http://localhost:3000' does not work.  
- --> Alternative way of testing is to deploy to existing test Dhis2 server, with name changed.
- --> Change 'name' in 'package.json' & 'title' in 'd2.config.js' to be a unique name. (Ex: Program Configuration V10.9.1)
- --> Run below commands:
+Deployment:
  - yarn build
  - yarn deploy
+
+Notes:
+ -- 'yarn start' would open up the 'Sign-in' in 'http://localhost:3000'.
+  For this to work, Set CORS whitelist with 'http://localhost:3000' in the target DHIS2 server.
+
+ -- Alternative way: Deploy to a target Dhis2 server.
+   Change 'name' in 'package.json' & 'title' in 'd2.config.js' to be a unique name. (Ex: Program Configuration V10.9.1)
+   Deploy package by following above 'Deployment:' steps.
 
 
 ### License
