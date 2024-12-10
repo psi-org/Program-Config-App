@@ -29,6 +29,10 @@ export const horizontalCenter = {
     horizontal: 'center'
 };
 
+// #2 ==============================================
+export const conditionalRowError = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'dc3545' } } , font: { bold: true,  italic: true, color: { argb: 'FF0000FF' } }};
+// =================================================
+
 export const conditionalError = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'dc3545' } } };
 export const sectionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'faa557' } } };
 export const standardHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'f8c291' } } };
@@ -382,6 +386,37 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
         dynamicFormula: `AND(NOT(ISBLANK($B_ROWNUM_)),$B_ROWNUM_<>"Std Overview",OR(LEN($C_ROWNUM_)<${MIN_DATA_ELEMENT_NAME_LENGTH},LEN($C_ROWNUM_)>${MAX_DATA_ELEMENT_NAME_LENGTH}))`,
         prompt: `Form Name out of range (Between ${MIN_DATA_ELEMENT_NAME_LENGTH} and ${MAX_DATA_ELEMENT_NAME_LENGTH} characters).`
     },
+    // #3 ==================================
+
+    sectionFieldRequied: {
+        formula: 'AND($B3="Criterion",$B4<>"Std Overview")',
+        dynamicFormula: 'AND($B_ROWNUM_="Standard",$B_NEXTROWNUM_<>"Std Overview")',
+        prompt: 'Std Overview is missing.'
+    }, 
+    // AND(A1="Criterion", OFFSET(A1,1,0)<>"Section")
+    stdOverviewRowRequied: {
+        formula: 'AND($B3="Standard", OFFSET($B3,1,0)<>"Std Overview")',
+        dynamicFormula: 'AND($B_ROWNUM_="Standard", OFFSET(B_ROWNUM_,1,0)<>"Std Overview")',
+        prompt: 'Std Overview is missing.'
+    },
+    criterionRequied: {
+        formula: 'AND($B3="Std Overview", OFFSET($B3,1,0)<>"Criterion")',
+        dynamicFormula: 'AND($B_ROWNUM_="Std Overview", OFFSET(B_ROWNUM_,1,0)<>"Criterion")',
+        prompt: 'Std Overview is missing.'
+    },
+    // stdOverviewRowRequied: {
+    //     formula: 'AND($B3="Standard",$B4<>"Std Overview")',
+    //     dynamicFormula: 'AND($B_ROWNUM_="Standard",$B_NEXTROWNUM_<>"Std Overview")',
+    //     prompt: 'Std Overview is missing.'
+    // },
+    optionSetNotDefined: {
+        formula: 'AND(ISBLANK($G3),NOT(ISBLANK($B3)),$B3="question")',
+        dynamicFormula: 'AND(ISBLANK($G_ROWNUM_),NOT(ISBLANK($B_ROWNUM_)),$B_ROWNUM_="question")',
+        prompt: 'Option set not defined.'
+    },
+
+    // =====================================
+
     valueTypeNotDefined: {
         formula: 'AND($B3 = "question",ISBLANK($G3),ISBLANK($F3))',
         dynamicFormula: 'AND($B_ROWNUM_ = "question",ISBLANK($G_ROWNUM_),ISBLANK($F_ROWNUM_))',
@@ -430,14 +465,25 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
 };
 
 export const getPromptsFormula = (validationsList, rowNumber) => {
+    // #4 ==============================
+    console.log("rowNumber", rowNumber);
+    const nextRowNumber = eval(rowNumber) + 1;
+    const prevRowNumber = eval(rowNumber) - 1;
+    // ===================================
+
     let formula = "CONCATENATE(";
 
     formula = formula + Object.keys(validationsList).map(teaValidation => {
         if (validationsList[teaValidation].dynamicFormula) {
             return `IF(${validationsList[teaValidation].dynamicFormula
-                .replaceAll('_ROWNUM_', rowNumber)}, "${validationsList[teaValidation].prompt} ", "")`
+                .replaceAll('_ROWNUM_', rowNumber).replaceAll('_NEXTROWNUM_', nextRowNumber).replaceAll('_PREVROWNUM_', prevRowNumber) }, "${validationsList[teaValidation].prompt} ", "")`
         }
     }).join(',');
+
+    // ======================
+    // .replaceAll('_ROWNUM_', rowNumber)}, "${validationsList[teaValidation].prompt} ", "")`
+    // ======================
+
 
     formula = formula + ',"")';
     return formula;

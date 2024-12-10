@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { ReleaseNotes } from "../../configs/ReleaseNotes.js";
 import {
     HNQIS2_AGG_OPERATORS,
+    conditionalRowError,
     conditionalError,
     disabledHighlighting,
     labelHighlighting,
@@ -86,11 +87,33 @@ const Exporter = (props) => {
         addInstructions(instructionWS);
         addConfigurations(templateWS);
         addReleaseNotes(releaseNotesWS, ReleaseNotes, password);
-        hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
+
+        // hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
+        // #1 - Pass the type info..
+        hideColumns(templateWS, getHiddenColumns());
+
         addProtection(templateWS,3,3000,password);
         writeWorkbook(workbook, props.programName, props.isLoading);
     };
 
+    // #1 ===========================================
+    const isHNQISMWI = () => {
+        return ( props.hnqisType === "HNQISMWI" );
+    }
+    
+    const getHiddenColumns = () => {
+        const hideColumnNames = ['program_stage_id', 'program_section_id', 'data_element_id'];
+        // Extract keys with value as "X"
+        const templateHeader = isHNQISMWI() ? HNQISMWI_HEADER_INSTRUCTIONS : HNQIS2_HEADER_INSTRUCTIONS;
+            
+        const keysWithX = Object.keys(templateHeader).filter(
+            key => templateHeader[key] === "X"
+        );
+
+        return keysWithX.concat(hideColumnNames);
+    }
+    // ===========================================
+    
     const addInstructions = async (ws) => {
         let editingCell;
 
@@ -734,7 +757,9 @@ const Exporter = (props) => {
         fillBackgroundToRange(ws, "L1:M1", "c9daf8");
         ws.getRow(1).height = 35;
         ws.getRow(1).alignment = middleCenter;
-        ws.getRow(2).values = props.hnqisType === "HNQISMWI"
+
+        // #1 isHNQISMWI() ==================================
+        ws.getRow(2).values = isHNQISMWI()
             ? HNQISMWI_HEADER_INSTRUCTIONS
             : HNQIS2_HEADER_INSTRUCTIONS;
 
@@ -777,6 +802,8 @@ const Exporter = (props) => {
         populateConfiguration(ws);
     };
 
+
+    // #1 isHNQISMWI() ==================================
     const addValidation = (ws) => {
         dataValidation(ws, "B3:B3000", {
             type: 'list',
@@ -784,7 +811,7 @@ const Exporter = (props) => {
             error: 'Please select the valid value from the dropdown',
             errorTitle: 'Invalid Selection',
             showErrorMessage: true,
-            formulae: props.hnqisType === "HNQISMWI" ? structureValidatorMWI : structureValidator
+            formulae: isHNQISMWI() ? structureValidatorMWI : structureValidator
         });
         dataValidation(ws, "D3:D3000", {
             type: 'list',
@@ -802,6 +829,8 @@ const Exporter = (props) => {
             showErrorMessage: true,
             formulae: yesNoValidator
         });
+        
+        // For "Value Type" column
         dataValidation(ws, "F3:F3000", {
             type: 'list',
             allowBlank: true,
@@ -810,9 +839,21 @@ const Exporter = (props) => {
             showErrorMessage: true,
             formulae: ['Value_Type']
         });
+        
+        // #2 ==========================
+        // For Malawi
+        let allowOptionSetToBlank = true;
+        if( isHNQISMWI() ) {
+            // Not allow Option set as blank
+            allowOptionSetToBlank = false;
+        }
+        // ==================================
+
+        // Add validation for "Option Set"
         dataValidation(ws, "G3:G3000", {
             type: 'list',
-            allowBlank: true,
+            // allowBlank: true,
+            allowBlank: allowOptionSetToBlank,
             error: 'Please select the valid value from the dropdown',
             errorTitle: 'Invalid Selection',
             showErrorMessage: true,
@@ -845,6 +886,29 @@ const Exporter = (props) => {
 
     const addConditionalFormatting = (ws) => {
         const validationsList = HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS;
+
+        // #3 =====================================
+        const hiddenColumns = getHiddenColumns();
+        
+        if( isHNQISMWI() ) {
+            //Highlight when Parent Name is not defined for Questions and Labels
+            ws.addConditionalFormatting({
+                ref: 'B3:B3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.stdOverviewRowRequied.formula],
+                        style: conditionalRowError,
+                    }
+                    // ,{
+                    //     type: 'expression',
+                    //     formulae: [validationsList.criterionRequied.formula],
+                    //     style: conditionalRowError,
+                    // }
+                ]
+            });
+        };
+        // ========================================
 
         //Highlight when Parent Name is not defined for Questions and Labels
         ws.addConditionalFormatting({
@@ -879,6 +943,36 @@ const Exporter = (props) => {
                 }
             ]
         });
+        // #4 ====================================
+
+        
+        // If the ""Value Type" column is hidden, then the optoon set values columns are set "required" for 'question'
+        if( hiddenColumns.indexOf("value_type") >= 0 ) {
+            ws.addConditionalFormatting({
+                ref: 'G3:G3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.optionSetNotDefined.formula],
+                        style: conditionalError,
+                    }
+                ]
+            });
+        }
+        else {
+            //Value type not defined
+            ws.addConditionalFormatting({
+                ref: 'F3:F3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.valueTypeNotDefined.formula],
+                        style: conditionalError,
+                    }
+                ]
+            });
+        }
+        /*
         //Value type not defined
         ws.addConditionalFormatting({
             ref: 'F3:F3000',
@@ -890,6 +984,8 @@ const Exporter = (props) => {
                 }
             ]
         });
+        */
+
         //Disable Value Type when Option Set is selected
         ws.addConditionalFormatting({
             ref: 'F3:F3000',
