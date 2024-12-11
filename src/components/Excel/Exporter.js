@@ -43,10 +43,26 @@ import {
 } from "../../utils/ExcelUtils.js";
 
 
+const workbookDef = {
+    instructions: { views: [ { showGridLines: false } ], properties: { tabColor: { argb: '0070C0' }, defaultColWidth: 30, defaultRowHeight: 20, alignment: verticalMiddle } },
+    template: { views: [ { showGridLines: false, state: 'frozen', xSplit: 3, ySplit: 2 } ], properties: { tabColor: { argb: 'D1F1DA' } } },
+    releaseNotes: { views: [ { showGridLines: false } ], properties: { tabColor: { argb: 'D9E7FD' } } },
+    mapping: { views: [ { showGridLines: false } ], properties: { tabColor: { argb: 'FBDAD7' } } }
+}
+
 const Exporter = (props) => {
 
     const password = TEMPLATE_PASSWORD;
     const hnqisType_Mwi = isHnqisTypeMwi( props.hnqisType );
+
+
+    useEffect(() => {
+        if (props.flag) {
+            generate();
+            props.setFlag(!props.flag);
+        }
+    }, []);
+
 
     const generate = () => {
 
@@ -54,45 +70,14 @@ const Exporter = (props) => {
         
         addCreator(workbook);
         
-        const instructionWS = workbook.addWorksheet("Instructions", {
-            views: [{
-                showGridLines: false
-            }],
-            properties: { tabColor: { argb: '0070C0' } }
-        }
-        );
-        
-        instructionWS.properties.defaultColWidth = 30;
-        instructionWS.properties.defaultRowHeight = 20;
-        instructionWS.properties.alignment = verticalMiddle;
+        const instructionWS = workbook.addWorksheet( "Instructions", workbookDef.instructions ); // instructionWS.properties.defaultColWidth = 30; // instructionWS.properties.defaultRowHeight = 20; // instructionWS.properties.alignment = verticalMiddle;
+        const templateWS = workbook.addWorksheet( "Template", workbookDef.template );
+        const releaseNotesWS = workbook.addWorksheet( "Release Notes", workbookDef.releaseNotes );
+        const mappingWS = workbook.addWorksheet( "Mapping", workbookDef.mapping);
 
-        const templateWS = workbook.addWorksheet("Template", {
-            views: [{
-                showGridLines: false,
-                state: 'frozen',
-                xSplit: 3,
-                ySplit: 2
-            }],
-            properties: { tabColor: { argb: 'D1F1DA' } }
-        });
+        workbook.views = [ { activeTab: 1 } ];
 
-        const releaseNotesWS = workbook.addWorksheet("Release Notes", {
-            views: [{
-                showGridLines: false
-            }],
-            properties: { tabColor: { argb: 'D9E7FD' } }
-        });
-
-        const mappingWS = workbook.addWorksheet("Mapping", {
-            views: [{
-                showGridLines: false
-            }],
-            properties: { tabColor: { argb: 'FBDAD7' } }
-        });
-
-        workbook.views = [{
-            activeTab: 1
-        }];
+        // -----------------------
 
         addMapping(mappingWS);
 
@@ -102,22 +87,14 @@ const Exporter = (props) => {
 
         addReleaseNotes(releaseNotesWS, ReleaseNotes, password);
 
-        // QUESTION: Could we move 'hideColumns' inside the 'addConfigurations'?
-        // hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
-        // CHANGE #1 - Pass the type info..
-        hideColumns(templateWS, getHiddenColumns( hnqisType_Mwi ) );
-
+        // QUESTION: Could we move 'hideColumns' & 'addProtection' inside the 'addConfigurations'?        
+        hideColumns(templateWS, getHiddenColumns( hnqisType_Mwi ) ); // hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
         addProtection(templateWS,3,3000,password);
+
 
         writeWorkbook(workbook, props.programName, props.isLoading);
     };
     
-    useEffect(() => {
-        if (props.flag) {
-            generate();
-            props.setFlag(!props.flag);
-        }
-    }, [])
 
     return null;
 };
