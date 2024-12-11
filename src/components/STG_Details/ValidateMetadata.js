@@ -48,61 +48,103 @@ const ValidateMetadata = (
             let errorCounts = 0;
             let excelRow = 2;
 
-            if (verifyProgramDetail(importResults, setValidationMessage)) {
-                const sections = [];
-                const questions = [];
-                const scores = [];
+            const errorMsgList = validateMetadataStructure();
+            if( errorMsgList.length > 0 ) {
+                setValid(false);
+                setValidationMessage(errorMsgList.join("; "));
+                setProcessed(false);
+            }
+            else {
+                if (verifyProgramDetail(importResults, setValidationMessage)) {
+                    const sections = [];
+                    const questions = [];
+                    const scores = [];
 
-                validationResults.sections = sections;
-                validationResults.questions = questions;
-                validationResults.scores = scores;
+                    validationResults.sections = sections;
+                    validationResults.questions = questions;
+                    validationResults.scores = scores;
 
-                let feedbacksErrors;
+                    let feedbacksErrors;
 
-                // CHECK FEEDBACK DATA
-                if (programIsHNQIS(hnqisType)) {
-                    const validateResults = validateFeedbacks(!!hnqisType, importedSectionsV.concat(importedScoresV))
-                    feedbacksErrors = validateResults.feedbacksErrors
+                    // CHECK FEEDBACK DATA
+                    if (programIsHNQIS(hnqisType)) {
+                        const validateResults = validateFeedbacks(!!hnqisType, importedSectionsV.concat(importedScoresV))
+                        feedbacksErrors = validateResults.feedbacksErrors
+                    
+                        errorCounts += feedbacksErrors.length
+                        validationResults.feedbacks = feedbacksErrors;
+                    }
                 
-                    errorCounts += feedbacksErrors.length
-                    validationResults.feedbacks = feedbacksErrors;
-                }
-            
 
-                //ADD FEEDBACK ERRORS TO DATA ELEMENTS
-                const dataElementsList = DeepCopy(importedSections.map(section => section.dataElements).flat());
+                    //ADD FEEDBACK ERRORS TO DATA ELEMENTS
+                    const dataElementsList = DeepCopy(importedSections.map(section => section.dataElements).flat());
 
-                if (programIsHNQIS(hnqisType)) {
-                    importedSectionsV.forEach((section) => {
-                        excelRow += 1;
-                        let section_errors = 0;
-                        const sectionErrorDetails = {
-                            title: section.name || ('Section on Template row ' + excelRow),
-                            tagName: '[ Section ]'
-                        }
-                        delete section.errors
-                        validateSectionsHNQIS2(section, sectionErrorDetails);
-                
-                        if (section.errors) {
-                            sections.push(section);
-                            errorCounts += section.errors.errors.length;
-                            section_errors += section.errors.errors.length;
-                        }
-
-                        section.dataElements.forEach((dataElement) => {
+                    if (programIsHNQIS(hnqisType)) {
+                        importedSectionsV.forEach((section) => {
                             excelRow += 1;
-                            const metadata = getPCAMetadataDE(dataElement);
-                            dataElement.labelFormName = metadata.labelFormName;
-
-                            const errorDetails = {
-                                title: dataElement.labelFormName || dataElement.formName || dataElement.name || ('Element on Template row ' + excelRow),
-                                tagName: dataElement.labelFormName ? '[ Label ]' : '[ Question ]'
+                            let section_errors = 0;
+                            const sectionErrorDetails = {
+                                title: section.name || ('Section on Template row ' + excelRow),
+                                tagName: '[ Section ]'
+                            }
+                            delete section.errors
+                            validateSectionsHNQIS2(section, sectionErrorDetails);
+                    
+                            if (section.errors) {
+                                sections.push(section);
+                                errorCounts += section.errors.errors.length;
+                                section_errors += section.errors.errors.length;
                             }
 
-                            delete dataElement.errors
+                            section.dataElements.forEach((dataElement) => {
+                                excelRow += 1;
+                                const metadata = getPCAMetadataDE(dataElement);
+                                dataElement.labelFormName = metadata.labelFormName;
 
-                            validateQuestions(importedScores, dataElement, metadata, dataElementsList, errorDetails);
-                            if (dataElement.errors) { questions.push(dataElement) }
+                                const errorDetails = {
+                                    title: dataElement.labelFormName || dataElement.formName || dataElement.name || ('Element on Template row ' + excelRow),
+                                    tagName: dataElement.labelFormName ? '[ Label ]' : '[ Question ]'
+                                }
+
+                                delete dataElement.errors
+
+                                validateQuestions(importedScores, dataElement, metadata, dataElementsList, errorDetails);
+                                if (dataElement.errors) { questions.push(dataElement) }
+
+                                if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {
+                                    const deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
+
+                                    const deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
+
+                                    dataElement.errors ? dataElement.errors.errors.push(deErrs) : dataElement.errors = {
+                                        title: errorDetails.title,
+                                        tagName: errorDetails.tagName,
+                                        errors: [deErrs],
+                                        displayBadges: true
+                                    };
+                                }
+
+                                if (dataElement.errors) {
+                                    errorCounts += dataElement.errors.errors.length;
+                                    section_errors += dataElement.errors.errors.length;
+                                }
+                            });
+                            if (section_errors > 0) { section.errorsCount = section_errors }
+                        });
+                    }
+
+                    let score_errors = 0;
+                    delete importedScoresV.errors
+                    if (hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2) {
+                        importedScoresV.dataElements.forEach((dataElement) => {
+                            excelRow += 1;
+                            const errorDetails = {
+                                title: dataElement.formName || dataElement.name || ('Score on Template row ' + excelRow),
+                                tagName: '[ Score ]'
+                            }
+                            delete dataElement.errors
+                            validateScores(dataElement, errorDetails);
+                            if (dataElement.errors) { scores.push(dataElement) }
 
                             if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {
                                 const deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
@@ -115,72 +157,103 @@ const ValidateMetadata = (
                                     errors: [deErrs],
                                     displayBadges: true
                                 };
+
                             }
 
                             if (dataElement.errors) {
                                 errorCounts += dataElement.errors.errors.length;
-                                section_errors += dataElement.errors.errors.length;
+                                score_errors += dataElement.errors.errors.length;
                             }
+
                         });
-                        if (section_errors > 0) { section.errorsCount = section_errors }
-                    });
-                }
+                    }
+                    if (score_errors > 0) { importedScoresV.errors = score_errors }
+                    // SUMMARY - RESULTS
+                    if (errorCounts === 0) {
+                        setValid(true);
+                        setValidationResults(false);
+                    } else {
+                        setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
+                        setSavingMetadata(false);
+                        setValidationResults(validationResults);
+                    }
+                    previous.setSections(importedSectionsV);
+                    previous.setScoresSection(importedScoresV);
 
-                let score_errors = 0;
-                delete importedScoresV.errors
-                if (hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2) {
-                    importedScoresV.dataElements.forEach((dataElement) => {
-                        excelRow += 1;
-                        const errorDetails = {
-                            title: dataElement.formName || dataElement.name || ('Score on Template row ' + excelRow),
-                            tagName: '[ Score ]'
-                        }
-                        delete dataElement.errors
-                        validateScores(dataElement, errorDetails);
-                        if (dataElement.errors) { scores.push(dataElement) }
 
-                        if (feedbacksErrors.find(fe => fe.instance.elements.find(e => e === dataElement.code))) {
-                            const deFeedBackOrder = dataElement.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value
-
-                            const deErrs = feedbacksErrors.find(fe => fe.instance.feedbackOrder === deFeedBackOrder).elementError.errorMsg
-
-                            dataElement.errors ? dataElement.errors.errors.push(deErrs) : dataElement.errors = {
-                                title: errorDetails.title,
-                                tagName: errorDetails.tagName,
-                                errors: [deErrs],
-                                displayBadges: true
-                            };
-
-                        }
-
-                        if (dataElement.errors) {
-                            errorCounts += dataElement.errors.errors.length;
-                            score_errors += dataElement.errors.errors.length;
-                        }
-
-                    });
-                }
-                if (score_errors > 0) { importedScoresV.errors = score_errors }
-                // SUMMARY - RESULTS
-                if (errorCounts === 0) {
-                    setValid(true);
-                    setValidationResults(false);
                 } else {
-                    setValidationMessage("Some Validation Errors occurred. Please check / fix the issues and upload again to continue.");
-                    setSavingMetadata(false);
-                    setValidationResults(validationResults);
+                    setValid(false);
                 }
-                previous.setSections(importedSectionsV);
-                previous.setScoresSection(importedScoresV);
-
-
-            } else {
-                setValid(false);
+                setProcessed(true);
             }
-            setProcessed(true);
         }
     });
 
+    
+    const validateMetadataStructure = () => {
+        const errMsgList = [];
+        
+        const sections = programStage.programStageSections;
+        let curSectionIdx = 0;
+        let curStandardIdx = 0;
+        let curCriterionIdx = 0;
+        for( var i=0; i<sections.length; i++ ) {
+            const section = sections[i];
+            const structure = getStructure(section);
+            if( structure === "Section" ) {
+                if( curSectionIdx > 0 ) { // Check if the section has at least on "Standard"
+                    if( curStandardIdx == 0 ) {
+                        errMsgList.push(`The section '${section.displayName}' must have at least one 'Standard'.`)
+                    }
+                }
+                
+                curSectionIdx ++;
+                curStandardIdx = 0;
+                curCriterionIdx = 0;
+            }
+            else if( structure === "Standard" ) { // Check if there is any "Standard" exists in "Section"
+                if( curSectionIdx === 0 ) {
+                    errMsgList.push(`The standard '${section.displayName}' must belong to a 'Section'.`)
+                }
+                else {
+                    if( section.dataElements.length == 0 ) { // Check if there is any "Std Overview" exists in "Standard"
+                        errMsgList.push(`The standard '${section.displayName}' must have 'Std Overview' data.`);
+                    }
+                    else {
+                        if( curStandardIdx > 0 ) { // Check if the section has at least on "Criterion"
+                            if( curCriterionIdx == 0 ) {
+                                errMsgList.push(`The standard '${section.displayName}' must have at least one 'Criterion'.`)
+                            }
+                        }
+                        curStandardIdx++;
+                        curCriterionIdx = 0;
+                    }
+                }
+            }
+            else if( structure === "Criterion" ) { // Check if there is any "Criterion" exists in "Standard" {
+                const criterionKey = `> > Criterion ${curSectionIdx}.${curStandardIdx}`;
+                if( section.name.indexOf(criterionKey) === 0 ) {
+                    curCriterionIdx++;
+                }
+            }
+        }
+        
+        return errMsgList;
+    }
+    
+    const getStructure = (section) => {
+        if (section.name.match(/Section \d+.*/)) {
+            return "Section";
+        } else if (section.name.match(/> Standard \d+(\.\d+)*.*/)) {
+            return "Standard";
+        } else if (section.name.match(/> > Criterion \d+(\.\d+)*.*/)) {
+            return "Criterion";
+        }
+        
+        return;
+    }
+    
+    
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => setSavingMetadata(false)}>
             {hnqisType ? 'Assessment Validation' : 'Save changes into the server?'}

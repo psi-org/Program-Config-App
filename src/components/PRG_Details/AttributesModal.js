@@ -27,7 +27,7 @@ const queryProgram = {
         resource: 'programs',
         id: ({ programId }) => programId,
         params: {
-            fields: ['*','id', 'displayName',
+            fields: ['*','id', 'displayName','name',
             'programSections[id,name,trackedEntityAttributes,sortOrder,program,renderType]',
             'programTrackedEntityAttributes[id,name,displayInList,sortOrder,mandatory,allowFutureDate,renderOptionAsRadio,searchable,valueType,trackedEntityAttribute[id,name],renderType],trackedEntityType[id,trackedEntityTypeAttributes[trackedEntityAttribute[id]]]'
             ]

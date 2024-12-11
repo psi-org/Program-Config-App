@@ -18,6 +18,7 @@ import {
     verticalMiddle,
     yesNoValidator,
     HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS,
+    HNQISMWI_CONDITIONAL_FORMAT_VALIDATIONS,
     getPromptsFormula,
     structureValidatorMWI,
     standardHighlighting,
@@ -41,6 +42,7 @@ import {
     printObjectArray,
     writeWorkbook
 } from "../../utils/ExcelUtils.js";
+import { deepMerge } from '../../utils/Utils.js';
 
 const Exporter = (props) => {
 
@@ -837,7 +839,6 @@ const Exporter = (props) => {
             // Not allow Option set as blank
             allowOptionSetToBlank = false;
         }
-        
         // Add validation for "Option Set"
         dataValidation(ws, "G3:G3000", {
             type: 'list',
@@ -847,6 +848,7 @@ const Exporter = (props) => {
             showErrorMessage: true,
             formulae: ['Option_Sets_option']
         });
+        
         dataValidation(ws, "H3:H3000", {
             type: 'list',
             allowBlank: true,
@@ -872,8 +874,31 @@ const Exporter = (props) => {
         });
     }
 
+    const getConditionalFormatting = () => {
+        let validationsList = [];
+        if( isHNQISMWI() ) {
+            validationsList = deepMerge(HNQISMWI_CONDITIONAL_FORMAT_VALIDATIONS, HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS);
+            
+            const hiddenColumns = getHiddenColumns();
+            if( hiddenColumns.indexOf("value_type") >= 0 ) {
+                delete validationsList.valueTypeNotDefined;
+            }
+            if( hiddenColumns.indexOf("score_numerator") >= 0 || hiddenColumns.indexOf("score_denominator") >= 0 ) {
+                delete validationsList.incompleteScoring;
+            }
+            
+            console.log(validationsList);
+        }
+        else {
+            validationsList = HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS;
+        }
+        
+        return validationsList;
+    }
+    
     const addConditionalFormatting = (ws) => {
-        const validationsList = HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS;
+        const validationsList = getConditionalFormatting();
+        
         const hiddenColumns = getHiddenColumns();
         
         if( isHNQISMWI() ) {
@@ -883,14 +908,24 @@ const Exporter = (props) => {
                 rules: [
                     {
                         type: 'expression',
-                        formulae: [validationsList.stdOverviewRowRequied.formula],
+                        formulae: [validationsList.stdOverviewRowRequied1.formula],
+                        style: conditionalRowError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.stdOverviewRowRequied2.formula],
+                        style: conditionalRowError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.criterionRequied1.formula],
+                        style: conditionalRowError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.criterionRequied2.formula],
                         style: conditionalRowError,
                     }
-                    // ,{
-                    //     type: 'expression',
-                    //     formulae: [validationsList.criterionRequied.formula],
-                    //     style: conditionalRowError,
-                    // }
                 ]
             });
         }
@@ -1025,17 +1060,20 @@ const Exporter = (props) => {
                 }
             ]
         });
-        //Conditional formatting checking incomplete scoring
-        ws.addConditionalFormatting({
-            ref: 'I3:J3000',
-            rules: [
-                {
-                    type: 'expression',
-                    formulae: [validationsList.incompleteScoring.formula],
-                    style: conditionalError
-                }
-            ]
-        });
+        
+        if( hiddenColumns.indexOf("score_numerator") < 0 &&  hiddenColumns.indexOf("score_denominator") < 0 ) {
+            //Conditional formatting checking incomplete scoring
+            ws.addConditionalFormatting({
+                ref: 'I3:J3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.incompleteScoring.formula],
+                        style: conditionalError
+                    }
+                ]
+            });
+        }
         //Conditional formatting checking incomplete parent and answer
         ws.addConditionalFormatting({
             ref: 'L3:M3000',
@@ -1106,9 +1144,11 @@ const Exporter = (props) => {
     const populateConfiguration = async ws => {
         let dataRow = 3;
         if (props.Configures.length > 0) {
+            const conditionList = getConditionalFormatting();
+            
             props.Configures.forEach((configure) => {
                 configure.prompts = {
-                    formula: `=${getPromptsFormula(HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS, dataRow)}`
+                    formula: `=${getPromptsFormula(conditionList, dataRow)}`
                 }
                 ws.getRow(dataRow).values = configure;
                 ws.getCell("A" + dataRow).value = {

@@ -449,3 +449,29 @@ export const isLabelType = (type) => {
 export const isGeneratedType = (type) => {
     return (['generated', 'holder'].includes(type));
 }
+
+export const deepMerge = (obj1, obj2) => {
+    const result = { ...obj1 };
+  
+    for (const key in obj2) {
+      if (key in result) {
+        // Merge inner objects if both keys exist
+        if (
+          typeof result[key] === "object" &&
+          typeof obj2[key] === "object" &&
+          !Array.isArray(result[key]) &&
+          !Array.isArray(obj2[key])
+        ) {
+          result[key] = deepMerge(result[key], obj2[key]);
+        } else {
+          // Overwrite with the new value otherwise
+          result[key] = obj2[key];
+        }
+      } else {
+        // Add new keys
+        result[key] = obj2[key];
+      }
+    }
+  
+    return result;
+};

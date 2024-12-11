@@ -144,17 +144,17 @@ const DataProcessor = (props) => {
             sectionRow.structure = "Section";
 
             if (props.hnqisType === 'HNQISMWI') {
-                if (programSection.displayName.match(/Section \d+.*/)) {
+                if (programSection.name.match(/Section \d+.*/)) {
                     sectionRow.compositive_indicator = `${++mwiFeedbackOrder.section}`;
                     mwiFeedbackOrder.standard = 0;
                     mwiFeedbackOrder.criterion = 0;
                     mwiFeedbackOrder.element = 1;
-                } else if (programSection.displayName.match(/> Standard \d+(\.\d+)*.*/)) {
+                } else if (programSection.name.match(/> Standard \d+(\.\d+)*.*/)) {
                     sectionRow.structure = "Standard";
                     sectionRow.compositive_indicator = `${mwiFeedbackOrder.section}.${++mwiFeedbackOrder.standard}`;
                     mwiFeedbackOrder.criterion = 0;
                     mwiFeedbackOrder.element = 1;
-                } else if (programSection.displayName.match(/> > Criterion \d+(\.\d+)*.*/)) {
+                } else if (programSection.name.match(/> > Criterion \d+(\.\d+)*.*/)) {
                     sectionRow.structure = "Criterion";
                     sectionRow.compositive_indicator = `${mwiFeedbackOrder.section}.${mwiFeedbackOrder.standard}.${++mwiFeedbackOrder.criterion}`;
                     sectionRow.isCritical = (programSection.description === "*" ? "Yes" : "No");
@@ -162,7 +162,7 @@ const DataProcessor = (props) => {
                 }
             }
 
-            sectionRow.form_name = programSection.displayName.replace(/(> > Criterion \d+(\.\d+)*|> Standard \d+(\.\d+)*|Section \d+) : /g, "");
+            sectionRow.form_name = programSection.name.replace(/(> > Criterion \d+(\.\d+)*|> Standard \d+(\.\d+)*|Section \d+) : /g, "");
             sectionRow.program_stage_id = program_stage_id;
             sectionRow.program_section_id = program_section_id;
 
