@@ -48,8 +48,10 @@ const workbookDef = {
     template: { views: [ { showGridLines: false, state: 'frozen', xSplit: 3, ySplit: 2 } ], properties: { tabColor: { argb: 'D1F1DA' } } },
     releaseNotes: { views: [ { showGridLines: false } ], properties: { tabColor: { argb: 'D9E7FD' } } },
     mapping: { views: [ { showGridLines: false } ], properties: { tabColor: { argb: 'FBDAD7' } } }
-}
+};
 
+
+// Main Export Component Method
 const Exporter = (props) => {
 
     const password = TEMPLATE_PASSWORD;
@@ -64,6 +66,7 @@ const Exporter = (props) => {
     }, []);
 
 
+    // Main Excel Generation Method
     const generate = () => {
 
         const workbook = new ExcelJS.Workbook();
@@ -87,7 +90,7 @@ const Exporter = (props) => {
 
         addReleaseNotes(releaseNotesWS, ReleaseNotes, password);
 
-        // QUESTION: Could we move 'hideColumns' & 'addProtection' inside the 'addConfigurations'?        
+        // #QUESTION: Could we move 'hideColumns' & 'addProtection' inside the 'addConfigurations'?        
         hideColumns(templateWS, getHiddenColumns( hnqisType_Mwi ) ); // hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
         addProtection(templateWS,3,3000,password);
 
