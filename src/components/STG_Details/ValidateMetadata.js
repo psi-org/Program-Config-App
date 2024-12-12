@@ -5,7 +5,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react";
-import {  FEEDBACK_ORDER } from "../../configs/Constants.js";
+import {  FEEDBACK_ORDER, METADATA } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2 } from "../../utils/ImportValidatorUtils.js";
 import { DeepCopy, getPCAMetadataDE, programIsHNQIS } from "../../utils/Utils.js";
@@ -41,6 +41,18 @@ const ValidateMetadata = (
     const [save, setSave] = useState(false);
     const [validationMessage, setValidationMessage] = useState("Metadata validated. Please use the 'SAVE' button to persist your changes.");
 
+    
+    // const getHiddenColumns = () => {
+    //     const isHNQISMWI = ( hnqisType === "HNQISMWI" );
+    //     const templateHeader = ( hnqisType === "HNQISMWI" ) ? HNQISMWI_HEADER_INSTRUCTIONS : HNQIS2_HEADER_INSTRUCTIONS;
+        
+    //     const keysWithX = Object.keys(templateHeader).filter(
+    //         key => templateHeader[key] === "X"
+    //     );
+
+    //     return keysWithX;
+    // }
+    
     useEffect(() => {
         if (!save) {
             const importedSectionsV = importedSections;
@@ -48,13 +60,14 @@ const ValidateMetadata = (
             let errorCounts = 0;
             let excelRow = 2;
 
-            const errorMsgList = validateMetadataStructure();
+            const errorMsgList = validateMetadataStructure(importedSectionsV);
             if( errorMsgList.length > 0 ) {
                 setValid(false);
                 setValidationMessage(errorMsgList.join("; "));
-                setProcessed(false);
+                setProcessed(true);
             }
             else {
+                // const hiddenColumn = getHiddenColumns();
                 if (verifyProgramDetail(importResults, setValidationMessage)) {
                     const sections = [];
                     const questions = [];
@@ -68,6 +81,7 @@ const ValidateMetadata = (
 
                     // CHECK FEEDBACK DATA
                     if (programIsHNQIS(hnqisType)) {
+                        
                         const validateResults = validateFeedbacks(!!hnqisType, importedSectionsV.concat(importedScoresV))
                         feedbacksErrors = validateResults.feedbacksErrors
                     
@@ -188,19 +202,21 @@ const ValidateMetadata = (
             }
         }
     });
-
     
-    const validateMetadataStructure = () => {
+    const validateMetadataStructure = (sections) => {
         const errMsgList = [];
         
-        const sections = programStage.programStageSections;
+        // const sections = programStage.programStageSections;
         let curSectionIdx = 0;
         let curStandardIdx = 0;
         let curCriterionIdx = 0;
+        let sectionData;
+        let standardData;
         for( var i=0; i<sections.length; i++ ) {
             const section = sections[i];
             const structure = getStructure(section);
             if( structure === "Section" ) {
+                sectionData = section;
                 if( curSectionIdx > 0 ) { // Check if the section has at least on "Standard"
                     if( curStandardIdx == 0 ) {
                         errMsgList.push(`The section '${section.displayName}' must have at least one 'Standard'.`)
@@ -212,11 +228,14 @@ const ValidateMetadata = (
                 curCriterionIdx = 0;
             }
             else if( structure === "Standard" ) { // Check if there is any "Standard" exists in "Section"
-                if( curSectionIdx === 0 ) {
-                    errMsgList.push(`The standard '${section.displayName}' must belong to a 'Section'.`)
-                }
-                else {
-                    if( section.dataElements.length == 0 ) { // Check if there is any "Std Overview" exists in "Standard"
+                standardData = section;
+                // if( curSectionIdx === 0 ) {
+                //     errMsgList.push(`The standard '${section.displayName}' must belong to a 'Section'.`)
+                // }
+                // else {
+                    const hasStdOverview = checkStdOverview(section);
+                
+                    if( !hasStdOverview ) { // Check if there is any "Std Overview" exists in "Standard"
                         errMsgList.push(`The standard '${section.displayName}' must have 'Std Overview' data.`);
                     }
                     else {
@@ -225,16 +244,25 @@ const ValidateMetadata = (
                                 errMsgList.push(`The standard '${section.displayName}' must have at least one 'Criterion'.`)
                             }
                         }
-                        curStandardIdx++;
-                        curCriterionIdx = 0;
                     }
-                }
+                    curStandardIdx++;
+                    curCriterionIdx = 0;
+                // }
             }
             else if( structure === "Criterion" ) { // Check if there is any "Criterion" exists in "Standard" {
                 const criterionKey = `> > Criterion ${curSectionIdx}.${curStandardIdx}`;
                 if( section.name.indexOf(criterionKey) === 0 ) {
                     curCriterionIdx++;
                 }
+            }
+        }
+        
+        if( curSectionIdx > 0 ) { // Check if the section has at least on "Standard"
+            if( curStandardIdx == 0 ) {
+                errMsgList.push(`The section '${sectionData.displayName}' must have at least one 'Standard'.`)
+            }
+            else if( curCriterionIdx == 0 ) {
+                errMsgList.push(`The standard '${standardData.displayName}' must have at least one 'Criterion'.`)
             }
         }
         
@@ -251,6 +279,26 @@ const ValidateMetadata = (
         }
         
         return;
+    }
+    
+    const checkStdOverview = (section) => {
+        const dataElements = section.dataElements;
+        if( !dataElements || dataElements.length == 0 ) {
+           return false;
+        }
+        
+        let found = false;
+        for( var i=0; i<dataElements.length; i++ ) {
+            const dataElement = dataElements[i];
+            const metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
+            const metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
+            const structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
+            if( structure === "Std Overview" ) {
+                found = true;
+            }
+        }
+        
+        return found;
     }
     
     
