@@ -60,7 +60,7 @@ const ValidateMetadata = (
             let errorCounts = 0;
             let excelRow = 2;
 
-            const errorMsgList = validateMetadataStructure(importedSectionsV);
+            const errorMsgList = (hnqisType === "HNQISMWI") ? validateMetadataStructure(importedSectionsV) : [];
             if( errorMsgList.length > 0 ) {
                 setValid(false);
                 setValidationMessage(errorMsgList.join("; "));
