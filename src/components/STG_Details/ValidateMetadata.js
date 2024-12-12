@@ -221,6 +221,9 @@ const ValidateMetadata = (
                     if( curStandardIdx == 0 ) {
                         errMsgList.push(`The section '${section.displayName}' must have at least one 'Standard'.`)
                     }
+                    else if( curCriterionIdx == 0 ) {
+                        errMsgList.push(`The standard '${section.displayName}' must have at least one 'Criterion'.`)
+                    }
                 }
                 
                 curSectionIdx ++;
