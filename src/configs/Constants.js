@@ -25,15 +25,15 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.1.1";
-const BUILD_DATE = "Nov 26, 2024";
+const BUILD_VERSION = "2.1.2";
+const BUILD_DATE = "Dec 13, 2024";
 const MIN_VERSION = "2.36.x";
 const MAX_VERSION = "2.41.x";
 
 const PCA_METADATA_VERSION = "1.2.1";
 const H2_METADATA_VERSION = "1.2.0";
 
-const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.6";
+const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.1.2";
 
 const HNQIS_TYPES = {
     hnqis: "HNQIS2",
