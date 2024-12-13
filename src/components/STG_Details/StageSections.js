@@ -1498,7 +1498,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
                         {
                             importResults && (importResults.questions.removed > 0 || importResults.scores.removed > 0) &&
                             <Removed
-                                removedItems={importResults.questions.removedItems.concat(importResults.scores.removedItems)}
+                                removedItems={importResults.questions.removedItems.concat(importResults.scores.removedItems || [] )}
                                 key={"removedSec"}
                             />
                         }
