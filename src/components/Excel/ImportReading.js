@@ -150,12 +150,14 @@ export const importReadingTracker = (
 
         countChanges({
             sections: importedProgramSections,
+            // sections: checkedSections,
             sectionsSummary: importSummaryValues.teaSummary.programSections,
             countObject: 'trackedEntityAttributes',
             summaryObject: importSummaryValues.teaSummary.teas,
             currentData: currentTEAData.sections,
             impObjId: 'programTrackedEntityAttribute',
         })
+        
     }
 
     importSummaryValues.program = programDetails;

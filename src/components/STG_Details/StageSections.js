@@ -1151,6 +1151,8 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
         }
     };
 
+    
+    console.log(" ==== sections: ", sections);
     const handleMenuItemClick = (index) => {
         setSelectedIndex(index);
         setOpen(false);

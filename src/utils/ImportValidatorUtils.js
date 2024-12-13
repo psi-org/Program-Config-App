@@ -613,7 +613,7 @@ export const validateQuestions = (importedScores, dataElement, metadata, dataEle
 export const validateSectionsHNQIS2 = (section, errorDetails) => {
     const validations = HNQIS2_VALIDATION_SETTINGS.sections;
     if (validations.enabled) {
-        const errors = [];
+        const errors = section.errors || [];
 
         validate(validations.checkHasName, checkSectionHasFormName, { section }, errors);
 
