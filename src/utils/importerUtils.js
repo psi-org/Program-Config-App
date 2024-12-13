@@ -622,7 +622,7 @@ export const validateMetadataStructure = ( prgStgSections ) => {
                 }
                 if ( stdItem.criterions.length === 0 ) {
                     if( !stdItem.ref_source.errors ) {
-                        stdItem.ref_source.errors = generateErrorMessage( "Criterion", "NOT FOUND", `The standard '${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
+                        stdItem.ref_source.errors = generateErrorMessage( "Criterion Error", "NOT FOUND", `The standard '${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
                     }
                     else {
                         stdItem.ref_source.errors.title += " and Criterion Error";
