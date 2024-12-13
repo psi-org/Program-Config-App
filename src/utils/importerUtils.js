@@ -618,10 +618,16 @@ export const validateMetadataStructure = ( prgStgSections ) => {
         {
             secItem.standards.forEach( ( stdItem ) => {
                 if ( !stdItem.bStandardOverview ) {
-                    stdItem.ref_source.errors = generateErrorMessage( "Std Overview", "NOT FOUND", `The standard '${stdItem.ref_source.displayName}' must have 'Std Overview' data.`);
+                    stdItem.ref_source.errors = generateErrorMessage( "Std Overview Error", "NOT FOUND", `The standard '${stdItem.ref_source.displayName}' must have 'Std Overview' data.`);
                 }
                 if ( stdItem.criterions.length === 0 ) {
-                    stdItem.ref_source.errors = generateErrorMessage( "Criterion", "NOT FOUND", `The standard '${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
+                    if( !stdItem.ref_source.errors ) {
+                        stdItem.ref_source.errors = generateErrorMessage( "Criterion", "NOT FOUND", `The standard '${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
+                    }
+                    else {
+                        stdItem.ref_source.errors.title += " and Criterion Error";
+                        stdItem.ref_source.errors.errors.push({message: {code: "NOT FOUND", text: `The standard '${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`} });
+                    }
                 }
             });
         }
