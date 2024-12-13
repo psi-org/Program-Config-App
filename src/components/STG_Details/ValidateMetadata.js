@@ -344,7 +344,7 @@ const validateMetadataStructure2 = ( prgStgSections ) =>
 
         if ( typeName === 'Section' ) {
             currSecJson = {
-                ref_pgStgSec: pgStgSec,
+                ref_source: pgStgSec,
                 standards: []
             };
 
@@ -352,7 +352,7 @@ const validateMetadataStructure2 = ( prgStgSections ) =>
         }
         else if ( typeName === 'Standard' ) {
             currStdJson = {
-                ref_pgStgSec: pgStgSec,
+                ref_source: pgStgSec,
                 bStandardOverview: checkStdOverview( pgStgSec ),
                 criterions: []
             };
@@ -360,7 +360,7 @@ const validateMetadataStructure2 = ( prgStgSections ) =>
             currSecJson.standards.push( currStdJson );
         }
         else if ( typeName === 'Criterion' ) {
-            currCritJson = { ref_pgStgSec: pgStgSec };
+            currCritJson = { ref_source: pgStgSec };
 
             currStdJson.criterions.push( currCritJson );
         }
@@ -372,12 +372,12 @@ const validateMetadataStructure2 = ( prgStgSections ) =>
 
     summarySections.forEach( ( secItem ) => 
     {
-        if ( secItem.standards.length === 0 ) errMsgList.push(`The section '${secItem.ref_pgStgSec.displayName}' must have at least one 'Standard'.`);
+        if ( secItem.standards.length === 0 ) errMsgList.push(`The section '${secItem.ref_source.displayName}' must have at least one 'Standard'.`);
         else
         {
             secItem.standards.forEach( ( stdItem ) => {
-                if ( !stdItem.bStandardOverview ) errMsgList.push(`The standard '${stdItem.ref_pgStgSec.displayName}' must have 'Std Overview' data.`);
-                if ( stdItem.criterions.length === 0 ) errMsgList.push(`The standard '${stdItem.ref_pgStgSec.displayName}' must have at least one 'Criterion'.`);
+                if ( !stdItem.bStandardOverview ) errMsgList.push(`The standard '${stdItem.ref_source.displayName}' must have 'Std Overview' data.`);
+                if ( stdItem.criterions.length === 0 ) errMsgList.push(`The standard '${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
             });
         }
     });
