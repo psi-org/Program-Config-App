@@ -877,7 +877,7 @@ const Exporter = (props) => {
     const getConditionalFormatting = () => {
         let validationsList = [];
         if( isHNQISMWI() ) {
-            validationsList = deepMerge(HNQISMWI_CONDITIONAL_FORMAT_VALIDATIONS, HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS);
+            validationsList = deepMerge(HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS, HNQISMWI_CONDITIONAL_FORMAT_VALIDATIONS);
             
             const hiddenColumns = getHiddenColumns();
             if( hiddenColumns.indexOf("value_type") >= 0 ) {
@@ -901,6 +901,7 @@ const Exporter = (props) => {
         
         const hiddenColumns = getHiddenColumns();
         
+        
         if( isHNQISMWI() ) {
             //Highlight when Parent Name is not defined for Questions and Labels
             ws.addConditionalFormatting({
@@ -909,22 +910,22 @@ const Exporter = (props) => {
                     {
                         type: 'expression',
                         formulae: [validationsList.stdOverviewRowRequied1.formula],
-                        style: conditionalRowError,
+                        style: conditionalError,
                     },
                     {
                         type: 'expression',
                         formulae: [validationsList.stdOverviewRowRequied2.formula],
-                        style: conditionalRowError,
+                        style: conditionalError,
                     },
                     {
                         type: 'expression',
                         formulae: [validationsList.criterionRequied1.formula],
-                        style: conditionalRowError,
+                        style: conditionalError,
                     },
                     {
                         type: 'expression',
                         formulae: [validationsList.criterionRequied2.formula],
-                        style: conditionalRowError,
+                        style: conditionalError,
                     }
                 ]
             });
@@ -1139,6 +1140,7 @@ const Exporter = (props) => {
                 }
             ]
         });
+        
     }
 
     const populateConfiguration = async ws => {

@@ -203,107 +203,6 @@ const ValidateMetadata = (
         }
     });
     
-    const validateMetadataStructure = (sections) => {
-        const errMsgList = [];
-        
-        // const sections = programStage.programStageSections;
-        let curSectionIdx = 0;
-        let curStandardIdx = 0;
-        let curCriterionIdx = 0;
-        let sectionData;
-        let standardData;
-        for( var i=0; i<sections.length; i++ ) {
-            const section = sections[i];
-            const structure = getStructure(section);
-            if( structure === "Section" ) {
-                sectionData = section;
-                if( curSectionIdx > 0 ) { // Check if the section has at least on "Standard"
-                    if( curStandardIdx == 0 ) {
-                        errMsgList.push(`The section '${section.displayName}' must have at least one 'Standard'.`)
-                    }
-                    else if( curCriterionIdx == 0 ) {
-                        errMsgList.push(`The standard '${section.displayName}' must have at least one 'Criterion'.`)
-                    }
-                }
-                
-                curSectionIdx ++;
-                curStandardIdx = 0;
-                curCriterionIdx = 0;
-            }
-            else if( structure === "Standard" ) { // Check if there is any "Standard" exists in "Section"
-                standardData = section;
-                // if( curSectionIdx === 0 ) {
-                //     errMsgList.push(`The standard '${section.displayName}' must belong to a 'Section'.`)
-                // }
-                // else {
-                    const hasStdOverview = checkStdOverview(section);
-                
-                    if( !hasStdOverview ) { // Check if there is any "Std Overview" exists in "Standard"
-                        errMsgList.push(`The standard '${section.displayName}' must have 'Std Overview' data.`);
-                    }
-                    else {
-                        if( curStandardIdx > 0 ) { // Check if the section has at least on "Criterion"
-                            if( curCriterionIdx == 0 ) {
-                                errMsgList.push(`The standard '${section.displayName}' must have at least one 'Criterion'.`)
-                            }
-                        }
-                    }
-                    curStandardIdx++;
-                    curCriterionIdx = 0;
-                // }
-            }
-            else if( structure === "Criterion" ) { // Check if there is any "Criterion" exists in "Standard" {
-                const criterionKey = `> > Criterion ${curSectionIdx}.${curStandardIdx}`;
-                if( section.name.indexOf(criterionKey) === 0 ) {
-                    curCriterionIdx++;
-                }
-            }
-        }
-        
-        if( curSectionIdx > 0 ) { // Check if the section has at least on "Standard"
-            if( curStandardIdx == 0 ) {
-                errMsgList.push(`The section '${sectionData.displayName}' must have at least one 'Standard'.`)
-            }
-            else if( curCriterionIdx == 0 ) {
-                errMsgList.push(`The standard '${standardData.displayName}' must have at least one 'Criterion'.`)
-            }
-        }
-        
-        return errMsgList;
-    }
-    
-    const getStructure = (section) => {
-        if (section.name.match(/Section \d+.*/)) {
-            return "Section";
-        } else if (section.name.match(/> Standard \d+(\.\d+)*.*/)) {
-            return "Standard";
-        } else if (section.name.match(/> > Criterion \d+(\.\d+)*.*/)) {
-            return "Criterion";
-        }
-        
-        return;
-    }
-    
-    const checkStdOverview = (section) => {
-        const dataElements = section.dataElements;
-        if( !dataElements || dataElements.length == 0 ) {
-           return false;
-        }
-        
-        let found = false;
-        for( var i=0; i<dataElements.length; i++ ) {
-            const dataElement = dataElements[i];
-            const metaDataString = dataElement.attributeValues.filter(av => av.attribute.id === METADATA);
-            const metaData = (metaDataString.length > 0) ? JSON.parse(metaDataString[0].value) : '';
-            const structure = (typeof metaData.elemType !== 'undefined') ? metaData.elemType : '';
-            if( structure === "Std Overview" ) {
-                found = true;
-            }
-        }
-        
-        return found;
-    }
-    
     
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => setSavingMetadata(false)}>
@@ -370,4 +269,104 @@ ValidateMetadata.propTypes = {
     stagesList: PropTypes.array,
 }
 
+
+const validateMetadataStructure = ( prgStgSections ) => 
+{
+    // 2 Step Process.  Step 1: Collect structrues, Step2: Check the structure issues.
+    const errMsgList = [];    
+
+    const summarySections = [];  // sections: [ { standards: [ { standardOverview: true, criterions: [] } ]  } ];
+    let currSecJson;
+    let currStdJson;
+    let currCritJson;
+
+
+    // STEP 1. Go Through programStageSections, and group the types together..
+    prgStgSections.forEach( ( pgStgSec ) => {
+
+        const typeName = getStructure( pgStgSec );
+
+        if ( typeName === 'Section' ) {
+            currSecJson = {
+                ref_source: pgStgSec,
+                standards: []
+            };
+
+            summarySections.push( currSecJson );
+        }
+        else if ( typeName === 'Standard' ) {
+            currStdJson = {
+                ref_source: pgStgSec,
+                bStandardOverview: checkStdOverview( pgStgSec ),
+                criterions: []
+            };
+
+            currSecJson.standards.push( currStdJson );
+        }
+        else if ( typeName === 'Criterion' ) {
+            currCritJson = { ref_source: pgStgSec };
+
+            currStdJson.criterions.push( currCritJson );
+        }
+    });
+
+
+    // STEP 2. Collect errMsgList from structures issues
+    if ( summarySections.length === 0 ) errMsgList.push(`No section found.  At least one section should exist.`)
+
+    summarySections.forEach( ( secItem ) => 
+    {
+        if ( secItem.standards.length === 0 ) errMsgList.push(`The section '${secItem.ref_source.displayName}' must have at least one 'Standard'.`);
+        else
+        {
+            secItem.standards.forEach( ( stdItem ) => {
+                if ( !stdItem.bStandardOverview ) errMsgList.push(`The standard '${stdItem.ref_source.displayName}' must have 'Std Overview' data.`);
+                if ( stdItem.criterions.length === 0 ) errMsgList.push(`The standard '${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
+            });
+        }
+    });
+
+    
+    return errMsgList;
+}
+
+const getStructure = (prgStgSection) => {
+    if (prgStgSection.name.match(/Section \d+.*/)) {
+        return "Section";
+    } else if (prgStgSection.name.match(/> Standard \d+(\.\d+)*.*/)) {
+        return "Standard";
+    } else if (prgStgSection.name.match(/> > Criterion \d+(\.\d+)*.*/)) {
+        return "Criterion";
+    }
+
+    return;
+}
+
+
+const checkStdOverview = (prgStgSection) => {
+
+    let overviewFound = false;
+
+    try
+    {
+        prgStgSection?.dataElements.forEach( (dataElement) => {
+
+            const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
+
+            if ( metaDataStringArr.length > 0 ) 
+            {
+                const metaData = JSON.parse( metaDataStringArr[0].value );
+
+                if ( metaData?.elemType === "Std Overview" ) overviewFound = true;   
+            }
+        });       
+    }
+    catch( errMsg ) {
+        console.log( 'ERROR in ValidationMedadata > checkStdOverview, ' + errMsg );
+    }
+
+    return overviewFound;
+}
+
+    
 export default ValidateMetadata;
