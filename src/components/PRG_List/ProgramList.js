@@ -55,15 +55,12 @@ const query = {
                 fields: ["code", "id", "name", "shortName", "created", "lastUpdated", "href", "completeEventsExpiryDays", "description", "ignoreOverdueEvents", "skipOffline", "featureType", "minAttributesRequiredToSearch", "displayFrontPageList", "enrollmentDateLabel", "onlyEnrollOnce", "programType", "accessLevel", "sharing", "version", "maxTeiCountToReturn", "selectIncidentDatesInFuture", "incidentDateLabel", "expiryPeriodType", "displayIncidentDate", "selectEnrollmentDatesInFuture", "expiryDays", "useFirstStageDuringRegistration", "categoryCombo[id,name]", "trackedEntityType[id,name,trackedEntityTypeAttributes[trackedEntityAttribute[id]]]", "style", "programTrackedEntityAttributes[id,name,displayInList,sortOrder,mandatory,allowFutureDate,renderOptionAsRadio,searchable,valueType,trackedEntityAttribute[id,name],renderType]", "notificationTemplates", "translations", "organisationUnits", "attributeValues", "programSections[id,name,trackedEntityAttributes,sortOrder,program,renderType]","programStages[id, name, allowGenerateNextVisit, formType, generatedByEnrollmentDate, sortOrder, hideDueDate, enableUserAssignment, minDaysFromStart, openAfterEnrollment, repeatable, remindCompleted, displayGenerateEventBox, validationStrategy, autoGenerateEvent, blockEntryForm, program, sharing, programStageDataElements, translations, attributeValues, programStageSections[*]]", "access", "withoutRegistration"],
                 filter: []
             }
-
             if (token !== "") {
-                paramsObject.filter.push(`name:$ilike:${token}`)
-                paramsObject.filter.push(`identifiable:token:${token}`)
-                paramsObject.rootJunction = 'OR'
+                paramsObject.filter.push(`name:$ilike:${token}`);
+                paramsObject.filter.push(`identifiable:token:${token}`);
+                paramsObject.rootJunction = 'OR';
             }
-            //Original: if (token !== "") paramsObject.filter.push(`identifiable:token:${token}`)
-
-            return paramsObject
+            return paramsObject;
         }
     }
 };

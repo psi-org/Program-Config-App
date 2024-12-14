@@ -203,7 +203,7 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
             const result3 = buildProgramRuleAndAction({
                 programRuleUid: uidPool.shift(),
                 name: `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (No Value)`,
-                condition: `!d2:hasValue(#{_CV${composite.prgVarName}}) || #{_CV${composite.prgVarName}}==''`,
+                condition: `!d2:hasValue(#{_CV${composite.prgVarName}})`,
                 actionId: uidPool.shift(),
                 data: `''`,
                 dataElement: composite.uid,
@@ -306,7 +306,7 @@ const buildScoreRules = (branch, stageId, programId, uidPool) => {
         const result3 = buildProgramRuleAndAction({
             programRuleUid: uidPool.shift(),
             name: `PR - Score - ${v.title} (No Value)`,
-            condition: `!d2:hasValue(#{${v.calculatedValue}}) || #{${v.calculatedValue}}==''`,
+            condition: `!d2:hasValue(#{${v.calculatedValue}})`,
             actionId: uidPool.shift(),
             data: `''`,
             dataElement: v.dataElement,
@@ -461,7 +461,7 @@ const buildAttributesRules = (programId, uidPool, useCompetencyClass = "Yes", he
             name: `PR - Attributes - CompClass `,
             displayName: `PR - Attributes - CompClass `,
             description: "_Scripted",
-            condition: "!d2:hasValue(#{_criticalNewest}) || !d2:hasValue(#{_NoncriticalNewest}) || #{_criticalNewest}=='' || #{_NoncriticalNewest}==''",
+            condition: "!d2:hasValue(#{_criticalNewest}) || !d2:hasValue(#{_NoncriticalNewest})",
             program: { id: "" },
             programRuleActions: [
                 {
