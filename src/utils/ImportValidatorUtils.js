@@ -903,8 +903,11 @@ export const validateMetadataStructure = ( prgStgSections ) => {
         else if ( typeName === 'Standard' ) {
             // Create a emty 'Section' in case no Section exist
             if( !currSecJson ) { 
-                currSecJson = createSectionValidateData({});
+                currSecJson = createSectionValidateData();
                 summarySections.push( currSecJson );
+            }
+            else {
+                currSecJson.hasStandard = true;
             }
             
             currStdJson = createStandardValidateData(pgStgSec);
@@ -914,12 +917,15 @@ export const validateMetadataStructure = ( prgStgSections ) => {
             currCritJson = { ref_source: pgStgSec, hasQuestions: checkQuestionsExist(pgStgSec) };
             // Create a emty 'Section' in case no Section exist
             if( !currSecJson ) { 
-                currSecJson = createSectionValidateData({});
+                currSecJson = createSectionValidateData();
                 summarySections.push( currSecJson );
             }
             // Create a emty 'Standard' in case no Standard exist
             if( !currStdJson ) {
-                currStdJson = createStandardValidateData({});
+                currStdJson = createStandardValidateData();
+            }
+            else {
+                currSecJson.hasStandard = true;
             }
             currStdJson.criterions.push( currCritJson );
         }
@@ -940,27 +946,28 @@ export const validateMetadataStructure = ( prgStgSections ) => {
     summarySections.forEach( ( secItem ) => 
     {
         // Check if any Standard which doesn't belong to any Section
-        if( !secItem.ref_source.name && secItem.standards.length > 0 ) {
+        // if( !secItem.ref_source && secItem.standards.length > 0 ) {
+        if( !secItem.hasStandard ) {
             generateErrorMessage( secItem.standards[0].ref_source, "Standard Error", "NOT FOUND", `'${secItem.standards[0].ref_source.displayName}' must belongs to a 'Section'.`);
         }
         // Check if the Section doesn't have any Standard
-        if( secItem.ref_source.name && secItem.standards.length === 0 ){
+        if( secItem.ref_source && secItem.standards.length === 0 ) {
             generateErrorMessage( secItem.ref_source, "Standard Error", "NOT FOUND", `'${secItem.ref_source.displayName}' must have at least one 'Standard'.`);
         }
         else
         {
             secItem.standards.forEach( ( stdItem ) => {
                 // Check if a Standard doesn't have "Std Overview"
-                if ( !stdItem.bStandardOverview.hasStdOverview ) {
-                    generateErrorMessage( secItem.ref_source, "Std Overview Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have 'Std Overview'.`);
+                if ( stdItem && !stdItem.bStandardOverview.hasStdOverview ) {
+                    generateErrorMessage( stdItem.ref_source, "Std Overview Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have 'Std Overview'.`);
                 }
                 // Check if a Standard has something ( BUT NOT "Std Overview" ), such as 'lable', 'question', ...
-                if ( stdItem.bStandardOverview.hasOthers ) {
-                    generateErrorMessage( secItem.ref_source, "Standard Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have only 'Std Overview'. Anything else is not accepted.`);
+                if ( stdItem && stdItem.bStandardOverview.hasOthers ) {
+                    generateErrorMessage( stdItem.ref_source, "Standard Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have only 'Std Overview'. Anything else is not accepted.`);
                 }
                 // Check if a Standard doesn't have any 'Criterion'
-                if ( stdItem.criterions.length === 0 ) {
-                    generateErrorMessage( secItem.ref_source, "Criterion Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
+                if ( stdItem && stdItem.criterions.length === 0 ) {
+                    generateErrorMessage( stdItem.ref_source, "Criterion Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
                 }
                 // Check if a Criterion doesn't have any 'Question'
                 else {
@@ -981,6 +988,7 @@ export const validateMetadataStructure = ( prgStgSections ) => {
 const createSectionValidateData = (pgStgSec) => {
     return {
         ref_source: pgStgSec,
+        hasStandard: false,
         standards: []
     };
 }
@@ -988,6 +996,7 @@ const createSectionValidateData = (pgStgSec) => {
 const createStandardValidateData = (pgStgSec) => {
     const currStdJson = {
         ref_source: pgStgSec,
+        bStandardOverview: false,
         criterions: []
     };
     
@@ -1001,13 +1010,13 @@ const createStandardValidateData = (pgStgSec) => {
 const generateErrorMessage = (source, title, code, text) => {
     if( source.errors ) {
         source.errors.title += `; ${title}`;
-        source.errors.errors.push({code: code, text: text});
+        source.errors.errors.push({message:{code: code, text: text}});
         
     }
     else {
         source.errors = {
             title: title,
-            errors: [{message: {code: code, text: text} }]
+            errors: [{message:{code: code, text: text}}]
         }
     }
 }
