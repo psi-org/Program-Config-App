@@ -1,4 +1,4 @@
-import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, MIN_DATA_ELEMENT_NAME_LENGTH } from "../configs/Constants.js";
+import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMENT_NAME_LENGTH } from "../configs/Constants.js";
 import { getVarNameFromParentUid } from "./ExcelUtils.js";
 import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isGeneratedType, isNum, isValidCorrelative, isValidParentName, padValue, setPCAMetadata } from "./Utils.js";
 
@@ -176,6 +176,39 @@ export const HNQIS2_VALIDATION_SETTINGS = {
         }
     }
 }
+
+// export const HNQISMWI_VALIDATION_SETTINGS = {
+//     standard: {
+//         enabled: true,
+//         checkHasStdOverview: {
+//             enabled: true, 
+//             title: "Std Overview is missing",
+//             errorMsg: {
+//                 code: "EXW100",
+//                 text: `A standard must have one 'Std Overview'.`
+//             }
+//         },
+//         checkHasCriterion: {
+//             enabled: true, 
+//             title: "Criterion is missing",
+//             errorMsg: {
+//                 code: "EXW112",
+//                 text: `A standard must have at least one 'Criterion'.`
+//             }
+//         }
+//     },
+//     criterion: {
+//         enabled: true,
+//         checkQuestion: {
+//             enabled: true,
+//             title: "Question is missing",
+//             errorMsg: {
+//                 code: "EXW113",
+//                 text: `A criterion must have at least one question.`
+//             }
+//         }
+//     }
+// }
 
 export const TRACKER_VALIDATION_SETTINGS = {
     sections: {
@@ -628,6 +661,26 @@ export const validateSectionsHNQIS2 = (section, errorDetails) => {
     }
 }
 
+
+export const validateSectionsHNQISMWI = (section, errorDetails) => {
+    const validations = HNQIS2_VALIDATION_SETTINGS.sections;
+    if (validations.enabled) {
+        const errors = section.errors || [];
+
+        validate(validations.checkHasName, checkSectionHasFormName, { section }, errors);
+
+        if (errors.length > 0) {
+            section.errors = {
+                title: errorDetails.title,
+                tagName: errorDetails.tagName,
+                errors,
+                displayBadges: true
+            };
+        }
+    }
+}
+
+
 export const validateSections = (section, errorDetails) => {
     const validations = TRACKER_VALIDATION_SETTINGS.sections;
     if (validations.enabled) {
@@ -826,4 +879,202 @@ export const buildProgramConfigurations = (input) => {
     const teas = extractTEAs(input)
     const importedStages = extractStages(input)
     return { configurations: { teas, importedStages } }
+}
+
+
+
+export const validateMetadataStructure = ( prgStgSections ) => {
+    // 2 Step Process.  Step 1: Collect structrues, Step2: Check the structure issues.
+    const summarySections = [];  // sections: [ { standards: [ { standardOverview: true, criterions: [] } ]  } ];
+    let currSecJson;
+    let currStdJson;
+    let currCritJson;
+
+
+    // STEP 1. Go Through programStageSections, and group the types together..
+    prgStgSections.forEach( ( pgStgSec ) => {
+
+        const typeName = getStructure( pgStgSec );
+
+        if ( typeName === 'Section' ) {
+            currSecJson = createSectionValidateData(pgStgSec);
+            summarySections.push( currSecJson );
+        }
+        else if ( typeName === 'Standard' ) {
+            // Create a emty 'Section' in case no Section exist
+            if( !currSecJson ) { 
+                currSecJson = createSectionValidateData({});
+                summarySections.push( currSecJson );
+            }
+            
+            currStdJson = createStandardValidateData(pgStgSec);
+            currSecJson.standards.push( currStdJson );
+        }
+        else if ( typeName === 'Criterion' ) {
+            currCritJson = { ref_source: pgStgSec, hasQuestions: checkQuestionsExist(pgStgSec) };
+            // Create a emty 'Section' in case no Section exist
+            if( !currSecJson ) { 
+                currSecJson = createSectionValidateData({});
+                summarySections.push( currSecJson );
+            }
+            // Create a emty 'Standard' in case no Standard exist
+            if( !currStdJson ) {
+                currStdJson = createStandardValidateData({});
+            }
+            currStdJson.criterions.push( currCritJson );
+        }
+    });
+
+
+    // // STEP 2. Collect errMsgList from structures issues
+    // if ( summarySections.length === 0 ) {
+    //     errMsgList.push(`No section found. At least one section should exist.`);
+    //     const section = {name: "ERROR", displayName: "ERROR"};
+    //     generateErrorMessage( section, "Section", "NOT FOUND", `No any section found.`);
+    //     if( !prgStgSections ) {
+    //         prgStgSections = [];
+    //     } 
+    //     prgStgSections.push(section);
+    // }
+    
+    summarySections.forEach( ( secItem ) => 
+    {
+        // Check if any Standard which doesn't belong to any Section
+        if( !secItem.ref_source.name && secItem.standards.length > 0 ) {
+            generateErrorMessage( secItem.standards[0].ref_source, "Standard Error", "NOT FOUND", `'${secItem.standards[0].ref_source.displayName}' must belongs to a 'Section'.`);
+        }
+        // Check if the Section doesn't have any Standard
+        if( secItem.ref_source.name && secItem.standards.length === 0 ){
+            generateErrorMessage( secItem.ref_source, "Standard Error", "NOT FOUND", `'${secItem.ref_source.displayName}' must have at least one 'Standard'.`);
+        }
+        else
+        {
+            secItem.standards.forEach( ( stdItem ) => {
+                // Check if a Standard doesn't have "Std Overview"
+                if ( !stdItem.bStandardOverview.hasStdOverview ) {
+                    generateErrorMessage( secItem.ref_source, "Std Overview Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have 'Std Overview'.`);
+                }
+                // Check if a Standard has something ( BUT NOT "Std Overview" ), such as 'lable', 'question', ...
+                if ( stdItem.bStandardOverview.hasOthers ) {
+                    generateErrorMessage( secItem.ref_source, "Standard Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have only 'Std Overview'. Anything else is not accepted.`);
+                }
+                // Check if a Standard doesn't have any 'Criterion'
+                if ( stdItem.criterions.length === 0 ) {
+                    generateErrorMessage( secItem.ref_source, "Criterion Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
+                }
+                // Check if a Criterion doesn't have any 'Question'
+                else {
+                    stdItem.criterions.forEach( ( crtItem ) => {
+                        if( !crtItem.hasQuestions ) {
+                            // stdItem.ref_source.errors = 
+                            generateErrorMessage( crtItem.ref_source, "Question Missing Error", "NOT FOUND", `'${crtItem.ref_source.displayName}' must have at least one question.`);
+                        }
+                    })
+                }
+            });
+        }
+    });
+    
+    // return prgStgSections;
+}
+
+const createSectionValidateData = (pgStgSec) => {
+    return {
+        ref_source: pgStgSec,
+        standards: []
+    };
+}
+
+const createStandardValidateData = (pgStgSec) => {
+    const currStdJson = {
+        ref_source: pgStgSec,
+        criterions: []
+    };
+    
+    if( pgStgSec.name ) { // If Standard data is empty ( not exist in metadata )
+        currStdJson.bStandardOverview = checkStdOverview( pgStgSec );
+    }
+    
+    return currStdJson;
+}
+    
+const generateErrorMessage = (source, title, code, text) => {
+    if( source.errors ) {
+        source.errors.title += `; ${title}`;
+        source.errors.errors.push({code: code, text: text});
+        
+    }
+    else {
+        source.errors = {
+            title: title,
+            errors: [{message: {code: code, text: text} }]
+        }
+    }
+}
+
+const getStructure = (prgStgSection) => {
+    if (prgStgSection.name.match(/Section \d+.*/)) {
+        return "Section";
+    } else if (prgStgSection.name.match(/> Standard \d+(\.\d+)*.*/)) {
+        return "Standard";
+    } else if (prgStgSection.name.match(/> > Criterion \d+(\.\d+)*.*/)) {
+        return "Criterion";
+    }
+
+    return;
+}
+
+
+const checkStdOverview = (prgStgSection) => {
+
+    const valid = { hasStdOverview: false, hasOthers: false };
+
+    try
+    {
+        prgStgSection?.dataElements.forEach( (dataElement) => {
+
+            const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
+
+            if ( metaDataStringArr.length > 0 ) 
+            {
+                const metaData = JSON.parse( metaDataStringArr[0].value );
+
+                if ( metaData?.elemType === "Std Overview" ) valid.hasStdOverview = true;
+                else valid.hasOthers = true;
+            }
+            else {
+                valid.hasOthers = true;
+            }
+        });
+    }
+    catch( errMsg ) {
+        console.log( 'ERROR in ValidationMedadata > checkStdOverview, ' + errMsg );
+    }
+
+    return valid;
+}
+
+// Check if the Criterion section, there is any data element with attribute value with elemType as 'question'.
+const checkQuestionsExist = (prgStgSection) => {
+    let questionFound = false;
+
+    try
+    {
+        prgStgSection?.dataElements.forEach( (dataElement) => {
+
+            const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
+
+            if ( metaDataStringArr.length > 0 ) 
+            {
+                const metaData = JSON.parse( metaDataStringArr[0].value );
+
+                if ( metaData?.elemType === "question" ) questionFound = true;
+            }
+        });
+    }
+    catch( errMsg ) {
+        console.log( 'ERROR in ValidationMedadata > checkQuestion, ' + errMsg );
+    }
+
+    return questionFound;
 }

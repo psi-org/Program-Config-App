@@ -442,6 +442,11 @@ export const programIsHNQIS = (type) => {
     return (type === "HNQIS2" || type === "HNQISMWI");
 }
 
+
+export const programIsHNQISMWI = (type) => {
+    return (type === "HNQISMWI");
+}
+
 export const isLabelType = (type) => {
     return (['label', 'Std Overview'].includes(type));
 }

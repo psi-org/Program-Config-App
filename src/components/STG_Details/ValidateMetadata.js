@@ -7,9 +7,8 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react";
 import {  FEEDBACK_ORDER } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { validateMetadataStructure } from "../../utils/importerUtils.js";
-import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2 } from "../../utils/ImportValidatorUtils.js";
-import { DeepCopy, getPCAMetadataDE, programIsHNQIS } from "../../utils/Utils.js";
+import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2, validateMetadataStructure } from "../../utils/ImportValidatorUtils.js";
+import { DeepCopy, getPCAMetadataDE, programIsHNQIS, programIsHNQISMWI } from "../../utils/Utils.js";
 import SaveMetadata from "../UIElements/SaveMetadata.js";
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
@@ -42,6 +41,12 @@ const ValidateMetadata = (
     const [save, setSave] = useState(false);
     const [validationMessage, setValidationMessage] = useState("Metadata validated. Please use the 'SAVE' button to persist your changes.");
     
+    const resetErrorsINSections = () => {
+        importedSections.forEach((section) => {
+            delete section.errors;
+        })
+    }
+    
     useEffect(() => {
         if (!save) {
             const importedSectionsV = importedSections;
@@ -53,6 +58,7 @@ const ValidateMetadata = (
                 const sections = [];
                 const questions = [];
                 const scores = [];
+                resetErrorsINSections();
 
                 validationResults.sections = sections;
                 validationResults.questions = questions;
@@ -69,23 +75,27 @@ const ValidateMetadata = (
                     errorCounts += feedbacksErrors.length
                     validationResults.feedbacks = feedbacksErrors;
                 }
+                
             
 
                 //ADD FEEDBACK ERRORS TO DATA ELEMENTS
                 const dataElementsList = DeepCopy(importedSections.map(section => section.dataElements).flat());
 
                 if (programIsHNQIS(hnqisType)) {
-                    const checkedSections = validateMetadataStructure(importedSectionsV);
-                    checkedSections.forEach((section) => {
+                    if( programIsHNQISMWI(hnqisType) ) {
+                        validateMetadataStructure(importedSectionsV);
+                    }
+                    
+                    importedSectionsV.forEach((section) => {
                         excelRow += 1;
                         let section_errors = 0;
                         const sectionErrorDetails = {
                             title: section.name || ('Section on Template row ' + excelRow),
                             tagName: '[ Section ]'
                         }
-                        // delete section.errors
+                        // delete section.errors;
                         validateSectionsHNQIS2(section, sectionErrorDetails);
-                
+                       
                         if (section.errors) {
                             sections.push(section);
                             errorCounts += section.errors.errors.length;
