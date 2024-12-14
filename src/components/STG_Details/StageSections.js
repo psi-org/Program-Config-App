@@ -523,9 +523,9 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
         const androidSettingsAmount = 1;
 
         let n = (
-            (sections.reduce((prev, acu) => prev + acu.dataElements.length, 10) * 10) //Tripled to create Program Rule Variables
+            (sections.reduce((prev, acu) => prev + acu.dataElements.length, 10) * 10) //x10 to avoid missing IDs
             + ((scoresSection?.dataElements?.length || 10) * 2) //Doubled to create Program Rule Variables
-            + ((criticalSection?.dataElements?.length || 10) * 5)
+            + ((criticalSection?.dataElements?.length || 10) * 10)
         ) + programIndicatorsAmount + visualizationsAmount + androidSettingsAmount;
 
         //No Sections , get minimum ids for core Program Rules
@@ -620,7 +620,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
                 }
             })
             createMetadata.mutate({ data: { programs: [res.results] } }).then(response => {
-                if (response.status == 'OK') {
+                if (response.status === 'OK') {
                     setProgressSteps(8)
                     setSaveAndBuild('Completed');
                     setSavedAndValidated(false);
@@ -717,7 +717,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
 
     const executeStep6 = ({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData }) => {
         createMetadata.mutate({ data: metadata }).then(response => {
-            if (response.status == 'OK') {
+            if (response.status === 'OK') {
                 sendToDataStore({ data: dataStoreData }).then(dataStoreResp => {
                     if (dataStoreResp.status != 'OK') {
                         console.error(dataStoreResp);
@@ -887,12 +887,21 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
                     })
                 }
             }).then(updateEventReportResp => {
-                if (updateEventReportResp.status == 'OK') {
+                if (updateEventReportResp.status === 'OK') {
                     deleteMetadata({ data: oldMetadata }).then((res) => {
-                        if (res.status == 'OK') {
-                            setProgressSteps(6);
-                            executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
-                        }
+                        if (res.status != 'OK') { return; }
+                        sendToDataStore({
+                            data: {
+                                dashboards: dataStoreData.dashboards,
+                            }
+                        }).then(dataStoreResp => {
+                            if (dataStoreResp.status != 'OK') {
+                                console.error(dataStoreResp);
+                            } else {
+                                setProgressSteps(6);
+                                executeStep6({ metadata, androidSettingsVisualizations, sendToDataStore, dataStoreData });
+                            }
+                        });
                     });
                 }
             });

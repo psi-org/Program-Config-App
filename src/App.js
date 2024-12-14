@@ -117,7 +117,6 @@ const App = () => {
     }, [serverInfo]);
 
     useEffect(() => {
-        console.log({ loadingPcaMetadata });
         if (!dataChecked || serverInfo === undefined || loadingPcaMetadata) {
             setRenderComponent(() => LoadingPage);
         } else {

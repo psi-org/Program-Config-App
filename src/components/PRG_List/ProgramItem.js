@@ -23,7 +23,7 @@ import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import tinycolor from 'tinycolor2';
-import { BUILD_VERSION, DATE_FORMAT_OPTIONS, HNQIS_TYPES, METADATA, REQUIRED_H2_PROGRAM_BUILD_VERSION } from "../../configs/Constants.js";
+import { BUILD_VERSION, DATE_FORMAT_OPTIONS, GLOBAL_SCORE_ATTRIBUTE, HNQIS_TYPES, METADATA, REQUIRED_H2_PROGRAM_BUILD_VERSION } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import actionCreators from "../../state/action-creators/index.js";
 import { versionIsValid, versionGTE, programIsHNQIS } from "../../utils/Utils.js";
@@ -112,7 +112,7 @@ const ProgramItem = ({
         ? <Tooltip title={`IMPORTANT UPGRADE REQUIRED. This program was built using an older version of the PCA with deprecated logic and will not work properly. Please 'Set Up Program' again to fix this issue.`}>
             <SyncProblemIcon sx={{ fontSize: 35, color: '#FE3636' }} style={{ marginRight: "0.3em", cursor: 'pointer' }} />
         </Tooltip>
-        :null;
+        :undefined;
 
     return (
         <>
@@ -160,6 +160,11 @@ const ProgramItem = ({
                     {programType !== 'HNQIS' && !(pcaMetadata.dePrefix && pcaMetadata.dePrefix !== '') &&
                         <Tooltip title={`A Data Element Prefix is not defined for this Program. Please edit the Program Settings to add a Prefix.`}>
                             <WarningIcon sx={{ fontSize: 30, color: '#FEBB36' }} style={{ marginRight: "0.3em",cursor: 'pointer' }} />
+                        </Tooltip>
+                    }
+                    {programType !== 'HNQIS' && program.programTrackedEntityAttributes?.find(ptea => ptea.trackedEntityAttribute.id === GLOBAL_SCORE_ATTRIBUTE) &&
+                        <Tooltip title={`This Program contains a Global Score Tracked Entity Attribute, which is now deprecated. To remove it, select "Edit Program" and save without making any changes.`}>
+                            <WarningIcon sx={{ fontSize: 30, color: '#FEBB36' }} style={{ marginRight: "0.3em", cursor: 'pointer' }} />
                         </Tooltip>
                     }
                     <IconButton
