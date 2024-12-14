@@ -959,7 +959,7 @@ export const validateMetadataStructure = ( prgStgSections ) => {
             secItem.standards.forEach( ( stdItem ) => {
                 // Check if a Standard doesn't have "Std Overview"
                 if ( stdItem && !stdItem.bStandardOverview.hasStdOverview ) {
-                    generateErrorMessage( stdItem.ref_source, "Std Overview Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have 'Std Overview'.`);
+                    generateErrorMessage( stdItem.ref_source, "Standard Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have 'Std Overview'.`);
                 }
                 // Check if a Standard has something ( BUT NOT "Std Overview" ), such as 'lable', 'question', ...
                 if ( stdItem && stdItem.bStandardOverview.hasOthers ) {
@@ -967,14 +967,14 @@ export const validateMetadataStructure = ( prgStgSections ) => {
                 }
                 // Check if a Standard doesn't have any 'Criterion'
                 if ( stdItem && stdItem.criterions.length === 0 ) {
-                    generateErrorMessage( stdItem.ref_source, "Criterion Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
+                    generateErrorMessage( stdItem.ref_source, "Standard Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
                 }
                 // Check if a Criterion doesn't have any 'Question'
                 else {
                     stdItem.criterions.forEach( ( crtItem ) => {
                         if( !crtItem.hasQuestions ) {
                             // stdItem.ref_source.errors = 
-                            generateErrorMessage( crtItem.ref_source, "Question Missing Error", "NOT FOUND", `'${crtItem.ref_source.displayName}' must have at least one question.`);
+                            generateErrorMessage( crtItem.ref_source, "Criterion Error", "NOT FOUND", `'${crtItem.ref_source.displayName}' must have at least one question.`);
                         }
                     })
                 }
@@ -1009,7 +1009,7 @@ const createStandardValidateData = (pgStgSec) => {
     
 const generateErrorMessage = (source, title, code, text) => {
     if( source.errors ) {
-        source.errors.title += `; ${title}`;
+        source.errors.title = title;
         source.errors.errors.push({message:{code: code, text: text}});
         
     }
