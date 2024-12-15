@@ -897,16 +897,18 @@ export const validateMetadataStructure = ( prgStgSections ) => {
         const typeName = getStructure( pgStgSec );
 
         if ( typeName === 'Section' ) {
+            // Create 'section' validation data for checking structure later
             currSecJson = createSectionValidateData(pgStgSec);
             summarySections.push( currSecJson );
         }
         else if ( typeName === 'Standard' ) {
-            // Create a emty 'Section' in case no Section exist
+            // In case no Section exist, Create an emty 'Section' so that we have a place to put Standard data inside
             if( !currSecJson ) { 
                 currSecJson = createSectionValidateData();
                 summarySections.push( currSecJson );
             }
             else {
+                // Set the "hasStandard" of the section is true
                 currSecJson.hasStandard = true;
             }
             
@@ -914,7 +916,7 @@ export const validateMetadataStructure = ( prgStgSections ) => {
             currSecJson.standards.push( currStdJson );
         }
         else if ( typeName === 'Criterion' ) {
-            currCritJson = { ref_source: pgStgSec, hasQuestions: checkQuestionsExist(pgStgSec) };
+            currCritJson = { ref_source: pgStgSec, hasQuestions: checkQuestionsExist(pgStgSec), hasStandard: false };
             // Create a emty 'Section' in case no Section exist
             if( !currSecJson ) { 
                 currSecJson = createSectionValidateData();
@@ -925,28 +927,16 @@ export const validateMetadataStructure = ( prgStgSections ) => {
                 currStdJson = createStandardValidateData();
             }
             else {
-                currSecJson.hasStandard = true;
+                currCritJson.hasStandard = true;
             }
+            
             currStdJson.criterions.push( currCritJson );
         }
     });
-
-
-    // // STEP 2. Collect errMsgList from structures issues
-    // if ( summarySections.length === 0 ) {
-    //     errMsgList.push(`No section found. At least one section should exist.`);
-    //     const section = {name: "ERROR", displayName: "ERROR"};
-    //     generateErrorMessage( section, "Section", "NOT FOUND", `No any section found.`);
-    //     if( !prgStgSections ) {
-    //         prgStgSections = [];
-    //     } 
-    //     prgStgSections.push(section);
-    // }
     
     summarySections.forEach( ( secItem ) => 
     {
         // Check if any Standard which doesn't belong to any Section
-        // if( !secItem.ref_source && secItem.standards.length > 0 ) {
         if( !secItem.hasStandard ) {
             generateErrorMessage( secItem.standards[0].ref_source, "Standard Error", "NOT FOUND", `'${secItem.standards[0].ref_source.displayName}' must belongs to a 'Section'.`);
         }
@@ -969,9 +959,12 @@ export const validateMetadataStructure = ( prgStgSections ) => {
                 if ( stdItem && stdItem.criterions.length === 0 ) {
                     generateErrorMessage( stdItem.ref_source, "Standard Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have at least one 'Criterion'.`);
                 }
-                // Check if a Criterion doesn't have any 'Question'
+                // Check if a Criterion doesn't have any 'Question' or belong to any "Standard"
                 else {
                     stdItem.criterions.forEach( ( crtItem ) => {
+                        if( !crtItem.hasStandard) {
+                            generateErrorMessage( crtItem.ref_source, "Criterion Error", "NOT FOUND", `'${crtItem.ref_source.displayName}' must belong to one 'Standard'.`);
+                        }
                         if( !crtItem.hasQuestions ) {
                             // stdItem.ref_source.errors = 
                             generateErrorMessage( crtItem.ref_source, "Criterion Error", "NOT FOUND", `'${crtItem.ref_source.displayName}' must have at least one question.`);

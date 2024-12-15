@@ -909,22 +909,48 @@ const Exporter = (props) => {
                 rules: [
                     {
                         type: 'expression',
-                        formulae: [validationsList.stdOverviewRowRequied1.formula],
+                        formulae: [validationsList.sectionStandardRequired.formula],
                         style: conditionalError,
                     },
                     {
                         type: 'expression',
-                        formulae: [validationsList.stdOverviewRowRequied2.formula],
+                        formulae: [validationsList.standardStdOverviewRequired.formula],
                         style: conditionalError,
                     },
                     {
                         type: 'expression',
-                        formulae: [validationsList.criterionRequied1.formula],
+                        formulae: [validationsList.stdOverviewStandardRequired.formula],
                         style: conditionalError,
                     },
                     {
                         type: 'expression',
-                        formulae: [validationsList.criterionRequied2.formula],
+                        formulae: [validationsList.stdOverviewCriterionRequired.formula],
+                        style: conditionalError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.criterionStdOverviewRequired.formula],
+                        style: conditionalError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.criterionQuestionRequired.formula],
+                        style: conditionalError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.questionCriterionRequired.formula],
+                        style: conditionalError,
+                    }
+                ]
+            });
+            
+            ws.addConditionalFormatting({
+                ref: 'B3:B3',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: ['COUNTIF(B:B, "Section") = 0'],
                         style: conditionalError,
                     }
                 ]
