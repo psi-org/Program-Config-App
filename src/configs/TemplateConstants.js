@@ -431,55 +431,51 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
 };
 
 
-// Section
-// Standard
-// Std Overview
-// Criterion
-// question
 export const HNQISMWI_CONDITIONAL_FORMAT_VALIDATIONS = {
     sectionStandardRequired: {
-        formula: 'AND($B3="Section", INDIRECT("B" & (ROW() + 1))<>"Standard")',
+        formula: 'AND($B3="Section", $B4<>"Standard")',
         dynamicFormula: 'AND($B_ROWNUM_="Section", INDIRECT("B" & (ROW() + 1))<>"Standard")',
         prompt: 'The next row must be Standard row.'
     },
+    
     // ********* For checking "Standard" and "Std Overview" relationship *********
-    // If the current row is "Standard", check if the next row is not "Std Overview"
+    // If the current row is "Standard", check if the NEXT row is not "Std Overview"
     standardStdOverviewRequired: {
-        formula: 'AND($B3="Standard", INDIRECT("B" & (ROW() + 1))<>"Std Overview")',
+        formula: 'AND($B3="Standard", $B4<>"Std Overview")',
         dynamicFormula: 'AND($B_ROWNUM_="Standard", INDIRECT("B" & (ROW() + 1))<>"Std Overview")',
         prompt: 'The next row must be Std Overview row.'
     },
-    // If the current row is "Std Overview", check if the previous row is not "Standard"
+    // If the current row is "Std Overview", check if the PREVIOUS row is not "Standard"
     stdOverviewStandardRequired: {
-        formula: 'AND($B3="Std Overview", INDIRECT("B" & (ROW() - 1))<>"Standard")',
+        formula: 'AND($B3="Std Overview",$B2<>"Standard")',
         dynamicFormula: 'AND($B_ROWNUM_="Std Overview", INDIRECT("B" & (ROW() - 1))<>"Standard")',
         prompt: 'The previous row must be Standard row.'
     },
     
     // ********* For checking "Std Overview" and "Criterion" relationship *********
-    // IF the current row is "Std Overview", check if the next row is not "Criterion"
+    // IF the current row is "Std Overview", check if the NEXT row is not "Criterion"
     stdOverviewCriterionRequired: {
-        formula: 'AND($B3="Std Overview", INDIRECT("B" & (ROW() + 1))<>"Criterion")',
+        formula: 'AND($B3="Std Overview", $B4<>"Criterion")',
         dynamicFormula: 'AND($B_ROWNUM_="Std Overview", INDIRECT("B" & (ROW() + 1))<>"Criterion")',
         prompt: 'The next row must be Criterion row.'
     },
-    // IF the current row is "Criterion", check if the previous row is not "Std Overview"
+    // IF the current row is "Criterion", check if the PREVIOUS row is not "Std Overview"
     criterionStdOverviewRequired: {
-        formula: 'AND($B3="Criterion", INDIRECT("B" & (ROW() - 1))<>"Std Overview", INDIRECT("B" & (ROW() - 1))<>"question", INDIRECT("B" & (ROW() - 1))<>"label")',
+        formula: 'AND($B3="Criterion", $B2<>"Std Overview", $B2<>"question", $B2<>"label")',
         dynamicFormula: 'AND($B_ROWNUM_="Criterion", INDIRECT("B" & (ROW() - 1))<>"Std Overview", INDIRECT("B" & (ROW() - 1))<>"question", INDIRECT("B" & (ROW() - 1))<>"label")',
         prompt: 'The previous row must be Std Overview row.'
     },
     
     // ********* For checking "Std Overview" and "Criterion" relationship *********
-    // IF the current row is "Criterion", check if the next row is not "question"
+    // IF the current row is "Criterion", check if the NEXT row is not "question"
     criterionQuestionRequired: {
-        formula: 'AND($B3="Criterion", INDIRECT("B" & (ROW() + 1))<>"question")',
+        formula: 'AND($B3="Criterion", $B4<>"question")',
         dynamicFormula: 'AND($B_ROWNUM_="Criterion", INDIRECT("B" & (ROW() + 1))<>"question")',
         prompt: 'The next row must be a question row.'
     },
-    // IF the current row is "question", check if the previous row is not "Criterion"
+    // IF the current row is "question", check if the PREVIOUS row is not "Criterion"
     questionCriterionRequired: {
-        formula: 'AND($B3="question", OR(INDIRECT("B" & (ROW() - 1))="Section", INDIRECT("B" & (ROW() - 1))="Standard", INDIRECT("B" & (ROW() - 1))="Std Overview"))',
+        formula: 'AND($B3="question", OR($B2="Section", $B2="Standard", $B2="Std Overview"))',
         dynamicFormula: 'AND($B_ROWNUM_="question", OR(INDIRECT("B" & (ROW() - 1))="Section", INDIRECT("B" & (ROW() - 1))="Standard", INDIRECT("B" & (ROW() - 1))="Std Overview"))',
         prompt: 'The previous row must be a Criterion row.'
     },
