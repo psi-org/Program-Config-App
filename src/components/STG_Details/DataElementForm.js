@@ -13,6 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react"
 import { FEEDBACK_TEXT, FEEDBACK_ORDER, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES_H2, AGG_TYPES, MAX_SHORT_NAME_LENGTH, VALUE_TYPES_TRACKER, MAX_FORM_NAME_LENGTH } from '../../configs/Constants.js';
+import { isLabelType, programIsHNQIS, programIsHNQISMWI } from '../../utils/Utils.js';
 import AlertDialogSlide from '../UIElements/AlertDialogSlide.js';
 import SelectOptions from '../UIElements/SelectOptions.js';
 import StyleManager from '../UIElements/StyleManager.js';
@@ -20,7 +21,6 @@ import InfoBox from './../UIElements/InfoBox.js';
 import ProgramRulesList from './../UIElements/ProgramRulesList.js'
 import MarkDownEditor from './MarkDownEditor.js';
 import RowRadioButtonsGroup from './RowRadioButtonsGroup.js';
-import { isLabelType, programIsHNQIS } from '../../utils/Utils.js';
 
 const optionSetQuery = {
     results: {
@@ -59,8 +59,8 @@ const queryId = {
     }
 };
 
-const DataElementForm = ({ program, dePrefix, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisType, setSaveStatus }) => {
-
+const DataElementForm = ({ program, dePrefix, programStageDataElement, section, sectionType, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisType, setSaveStatus }) => {
+console.log("=== hnqisType: " + hnqisType);
     const de = programStageDataElement.dataElement;
 
     const idQuery = useDataQuery(queryId);
@@ -576,6 +576,19 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
             />
         </div>
     ]
+    
+    const getElemType = () => {
+        if( programIsHNQISMWI(hnqisType) ) {
+            if( sectionType === "Criterion" ) {
+                return ELEM_TYPES.filter(item => item.label !== 'Std Overview');
+            }
+            else if( sectionType === "Standard" ) {
+                return ELEM_TYPES.filter(item => item.label == 'Std Overview');
+            }
+        }
+        
+        return ELEM_TYPES;
+    }
     return (
         <div className={de ? "dataElement_cont" : ''}>
 
@@ -601,7 +614,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                         <Grid style={{ display: 'flex' }} item>
                             <RowRadioButtonsGroup
                                 label={"HNQIS Element Type"}
-                                items={ELEM_TYPES}
+                                items={getElemType()}
                                 handler={elemTypeChange}
                                 value={structure}
                             />
@@ -649,25 +662,26 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     </Grid>
                 </Grid>
                 <Grid item xs={6} style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    <div style={{ display: 'flex' }}>
-                        <FormLabel component="legend" style={{ marginRight: '0.5em' }}>Data Element Value Type</FormLabel>
-                        <InfoBox
-                            title='About Value Type and Option Sets'
-                            message={
-                                <p>
-                                    The Value Type will define the type of data that the data element will record.
-                                    <br />If an Option Set is selected,
-                                    the Value Type will be assigned automatically to match the Option Set.
-                                    <br /><br />
-                                    If the current program is a HNQIS2 program, only Option Sets that include &lsquo;HNQIS&lsquo; in the name will be displayed.
-                                </p>
-                            }
-                        />
-                    </div>
+                    {!programIsHNQISMWI(hnqisType) && <div style={{ display: 'flex' }}>
+                            <FormLabel component="legend" style={{ marginRight: '0.5em' }}>Data Element Value Type</FormLabel>
+                                <InfoBox
+                                    title='About Value Type and Option Sets'
+                                    message={
+                                        <p>
+                                            The Value Type will define the type of data that the data element will record.
+                                            <br />If an Option Set is selected,
+                                            the Value Type will be assigned automatically to match the Option Set.
+                                            <br /><br />
+                                            If the current program is a HNQIS2 program, only Option Sets that include &lsquo;HNQIS&lsquo; in the name will be displayed.
+                                        </p>
+                                    }
+                                />
+                    </div>}
+                    
                     <div style={{ display: 'flex', width: '100%', marginTop: '0.5em', justifyContent: 'end', alignItems: 'center' }}>
                         <SelectOptions
                             label="Value Type (*)"
-                            styles={{ width: '40%' }}
+                            styles={{ width: '40%', display: programIsHNQISMWI(hnqisType) ? "none": "" }}
                             useError={validationErrors.valueType !== undefined}
                             helperText={validationErrors.valueType}
                             items={programIsHNQIS(hnqisType)?VALUE_TYPES_H2:VALUE_TYPES_TRACKER}
@@ -675,34 +689,38 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             disabled={structure === 'label' || optionSet != null}
                             handler={valueTypeChange} />
 
-                        <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '10%' }}>or</p>
-
-                        <Autocomplete
-                            id="optionSetsSelect"
-                            disabled={structure === 'label'}
-                            options={
-                                serverOptionSets?.results.optionSets.filter(os => !programIsHNQIS(hnqisType) || os.name?.toLowerCase().includes("hnqis")).map(os =>
-                                    ({ label: os.name, id: os.id, valueType: os.valueType })
-                                ) || []
-                            }
-                            sx={{ width: '45%', marginRight: '0.5em' }}
-                            renderInput={(params) => <TextField {...params} label="Option Set" />}
-                            value={optionSet}
-                            onChange={optionSetChange}
-                            getOptionLabel={(option) => (option.label || '')}
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                        />
-                        <Tooltip title="Create New Option Set" placement="top">
-                            <IconButton onClick={()=>{}} target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/otherSection/optionSet/add"}>
-                                <AddCircleOutlineIcon />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Reload Option Sets" placement="top">
-                            <IconButton onClick={()=> reloadOptionSets()} >
-                                <RefreshIcon />
-                            </IconButton>
-                        </Tooltip>
+                            <p style={{ display: programIsHNQISMWI(hnqisType) ? "none": 'flex', alignItems: 'center', justifyContent: 'center', width: '10%' }}>or</p>
+                        
+                        {/* For HNQISMWI, don't need to show option option set for sectionType === "Standard" */}
+                        {sectionType !== "Standard" && <>
+                            <Autocomplete
+                                id="optionSetsSelect"
+                                disabled={structure === 'label'}
+                                options={
+                                    serverOptionSets?.results.optionSets.filter(os => !programIsHNQIS(hnqisType) || os.name?.toLowerCase().includes("hnqis")).map(os =>
+                                        ({ label: os.name, id: os.id, valueType: os.valueType })
+                                    ) || []
+                                }
+                                sx={{ width: '45%', marginRight: '0.5em' }}
+                                renderInput={(params) => <TextField {...params} label="Option Set" />}
+                                value={optionSet}
+                                onChange={optionSetChange}
+                                getOptionLabel={(option) => (option.label || '')}
+                                isOptionEqualToValue={(option, value) => option.id === value.id}
+                            />
+                            <Tooltip title="Create New Option Set" placement="top">
+                                <IconButton onClick={()=>{}} target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/otherSection/optionSet/add"}>
+                                    <AddCircleOutlineIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Reload Option Sets" placement="top">
+                                <IconButton onClick={()=> reloadOptionSets()} >
+                                    <RefreshIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </>}
                     </div>
+                   
                     {programIsHNQIS(hnqisType) && aggTypeContent}
                 </Grid>
             </Grid>
@@ -734,7 +752,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     }
                     margin='0 1em 0 0.5em'
                 />
-                <FormControlLabel
+                {!programIsHNQISMWI(hnqisType) && <FormControlLabel
                     disabled={programIsHNQIS(hnqisType)}
                     control={
                         <Switch
@@ -742,7 +760,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             onChange={autoNamingChange}
                         />}
                     label="Automatic Name, Short Name and Code"
-                />
+                /> }
             </div>
             {!autoNaming && <>
                 <TextField
@@ -877,78 +895,82 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                                 </p>
                             }
                         />
-                        <FormControl sx={{ minWidth: '2.5rem', width: '15%', marginRight: '1em' }}>
-                            <TextField
-                                error={validationErrors.numerator !== undefined}
-                                helperText={validationErrors.numerator}
-                                disabled={structure === 'label'}
-                                autoComplete='off'
-                                id="numerator"
-                                sx={{ width: '100%' }}
-                                margin="dense"
-                                label="Numerator"
-                                variant='standard'
-                                value={structure !== 'label' ? numerator : ''}
-                                onChange={numeratorChange}
-                                inputProps={{ type: 'number', min: '0' }}
+                        
+                        {/* For HNQISMWI, don't need to show Numerator, Denominator and Feedback Order*/}
+                        {!programIsHNQISMWI(hnqisType) &&  <>
+                            <FormControl sx={{ minWidth: '2.5rem', width: '15%', marginRight: '1em' }}>
+                                <TextField
+                                    error={validationErrors.numerator !== undefined}
+                                    helperText={validationErrors.numerator}
+                                    disabled={structure === 'label'}
+                                    autoComplete='off'
+                                    id="numerator"
+                                    sx={{ width: '100%' }}
+                                    margin="dense"
+                                    label="Numerator"
+                                    variant='standard'
+                                    value={structure !== 'label' ? numerator : ''}
+                                    onChange={numeratorChange}
+                                    inputProps={{ type: 'number', min: '0' }}
+                                />
+                            </FormControl>
+                            <FormControl sx={{ minWidth: '2.5rem', width: '15%' }}>
+                                <TextField
+                                    error={validationErrors.denominator !== undefined}
+                                    helperText={validationErrors.denominator}
+                                    disabled={structure === 'label'}
+                                    autoComplete='off'
+                                    id="denominator"
+                                    sx={{ width: '100%' }}
+                                    margin="dense"
+                                    label="Denominator"
+                                    variant='standard'
+                                    value={structure !== 'label' ? denominator : ''}
+                                    onChange={denominatorChange}
+                                    inputProps={{ type: 'number', min: '0' }}
+                                />
+                            </FormControl>
+                            <InfoBox
+                                title="About the Numerator and Denominator"
+                                message={
+                                    <p>
+                                        This values will be used in the formulas that calculate scores.<br /><br />
+                                        Each Numerator and Denominator will contribute to the scores calculation formulas for each section.
+                                    </p>
+                                }
+                                margin='0 1.5em 0 0.5em'
                             />
-                        </FormControl>
-                        <FormControl sx={{ minWidth: '2.5rem', width: '15%' }}>
-                            <TextField
-                                error={validationErrors.denominator !== undefined}
-                                helperText={validationErrors.denominator}
-                                disabled={structure === 'label'}
-                                autoComplete='off'
-                                id="denominator"
-                                sx={{ width: '100%' }}
-                                margin="dense"
-                                label="Denominator"
-                                variant='standard'
-                                value={structure !== 'label' ? denominator : ''}
-                                onChange={denominatorChange}
-                                inputProps={{ type: 'number', min: '0' }}
+                            <FormControl sx={{ minWidth: '10rem', width: '20%' }}>
+                                <TextField
+                                    error={validationErrors.feedbackOrder !== undefined}
+                                    helperText={validationErrors.feedbackOrder}
+                                    autoComplete='off'
+                                    id="feedbackOrder"
+                                    sx={{ width: '100%' }}
+                                    margin="dense"
+                                    label="Feedback Order (Compositive Indicator)"
+                                    variant="standard"
+                                    value={feedbackOrder}
+                                    onChange={feedbackOrderChange}
+                                />
+                            </FormControl>
+                            <InfoBox
+                                title="About the Feedback Order"
+                                message={
+                                    <p>
+                                        Formerly known as Compositive Indicator.<br /><br />
+                                        This number will generate the feedback hierarchy in the app, while also grouping the scores to calculate the composite scores.<br /><br />
+                                        <strong>There cannot exist gaps in the Compositive indicators!</strong> The existence of gaps will be validated through the Config App before Setting up the program.<br /><br />
+                                        <strong>Keep in mind the following:</strong><br /><br />
+                                        - Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc.<br />
+                                        - Feedback Order gaps will result in logic errors. Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.<br /><br />
+                                        - Questions are not required to be grouped together to belong to the same level of the compositive indicator, for example: <br />
+                                        Having [ 1, 1.1, 1.2, 1.3, 2, 2.1, 2.2, 1.4 ] is a valid configuration as there are no gaps in the same level of the compositive indicator.
+                                    </p>
+                                }
+                                margin='0 0.5em'
                             />
-                        </FormControl>
-                        <InfoBox
-                            title="About the Numerator and Denominator"
-                            message={
-                                <p>
-                                    This values will be used in the formulas that calculate scores.<br /><br />
-                                    Each Numerator and Denominator will contribute to the scores calculation formulas for each section.
-                                </p>
-                            }
-                            margin='0 1.5em 0 0.5em'
-                        />
-                        <FormControl sx={{ minWidth: '10rem', width: '20%' }}>
-                            <TextField
-                                error={validationErrors.feedbackOrder !== undefined}
-                                helperText={validationErrors.feedbackOrder}
-                                autoComplete='off'
-                                id="feedbackOrder"
-                                sx={{ width: '100%' }}
-                                margin="dense"
-                                label="Feedback Order (Compositive Indicator)"
-                                variant="standard"
-                                value={feedbackOrder}
-                                onChange={feedbackOrderChange}
-                            />
-                        </FormControl>
-                        <InfoBox
-                            title="About the Feedback Order"
-                            message={
-                                <p>
-                                    Formerly known as Compositive Indicator.<br /><br />
-                                    This number will generate the feedback hierarchy in the app, while also grouping the scores to calculate the composite scores.<br /><br />
-                                    <strong>There cannot exist gaps in the Compositive indicators!</strong> The existence of gaps will be validated through the Config App before Setting up the program.<br /><br />
-                                    <strong>Keep in mind the following:</strong><br /><br />
-                                    - Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc.<br />
-                                    - Feedback Order gaps will result in logic errors. Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.<br /><br />
-                                    - Questions are not required to be grouped together to belong to the same level of the compositive indicator, for example: <br />
-                                    Having [ 1, 1.1, 1.2, 1.3, 2, 2.1, 2.2, 1.4 ] is a valid configuration as there are no gaps in the same level of the compositive indicator.
-                                </p>
-                            }
-                            margin='0 0.5em'
-                        />
+                        </>}
                     </div>
 
                     <div style={{ display: 'flex', margin: '0.5em 0' }}>

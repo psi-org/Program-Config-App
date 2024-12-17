@@ -41,7 +41,7 @@ const getDEIcon = (elemType, hnqisType) => {
     return <QuizIcon />;
 }
 
-const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActions, section, index, hnqisType, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
+const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActions, section, sectionType, index, hnqisType, deStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false)
@@ -168,6 +168,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                                 dePrefix={dePrefix}
                                 programStageDataElement={stageDE}
                                 section={section}
+                                sectionType={sectionType}
                                 setDeToEdit={DEActions.setEdit}
                                 save={DEActions.update}
                                 hnqisType={hnqisType}

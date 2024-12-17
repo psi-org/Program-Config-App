@@ -455,6 +455,19 @@ export const isGeneratedType = (type) => {
     return (['generated', 'holder'].includes(type));
 }
 
+
+export const getSectionType = (prgStgSection) => {
+    if (prgStgSection.name.match(/Section \d+.*/)) {
+        return "Section";
+    } else if (prgStgSection.name.match(/> Standard \d+(\.\d+)*.*/)) {
+        return "Standard";
+    } else if (prgStgSection.name.match(/> > Criterion \d+(\.\d+)*.*/)) {
+        return "Criterion";
+    }
+
+    return;
+}
+
 export const deepMerge = (obj1, obj2) => {
     const result = { ...obj1 };
   

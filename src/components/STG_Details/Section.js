@@ -22,6 +22,7 @@ import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg'
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import DraggableDataElement from "./DataElement.js";
+import { getSectionType } from '../../utils/Utils.js';
 
 const getSectionIcon = (hnqisType, sectionName) => { 
     if (hnqisType === 'HNQISMWI') {
@@ -154,6 +155,7 @@ const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, 
                                             stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)}
                                             DEActions={DEActions}
                                             section={stageSection.id}
+                                            sectionType={getSectionType(stageSection)}
                                             index={i}
                                             key={de.id || i}
                                             hnqisType={hnqisType}

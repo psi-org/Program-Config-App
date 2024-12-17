@@ -280,6 +280,7 @@ const DataElementManager = (props) => {
                                 dePrefix={props.dePrefix}
                                 programStageDataElement={{}}
                                 section={{}}
+                                sectionType={props.sectionType}
                                 setDeToEdit={undefined}
                                 save={handleNewDE}
                                 saveFlag={saveDeFlag}

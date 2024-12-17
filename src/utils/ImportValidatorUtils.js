@@ -1,6 +1,6 @@
 import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMENT_NAME_LENGTH } from "../configs/Constants.js";
 import { getVarNameFromParentUid } from "./ExcelUtils.js";
-import { extractAttributeValues, getPCAMetadataDE, hasAttributeValue, isBlank, isGeneratedType, isNum, isValidCorrelative, isValidParentName, padValue, setPCAMetadata } from "./Utils.js";
+import { extractAttributeValues, getPCAMetadataDE, getSectionType, hasAttributeValue, isBlank, isGeneratedType, isNum, isValidCorrelative, isValidParentName, padValue, setPCAMetadata } from "./Utils.js";
 
 export const HNQIS2_VALIDATION_SETTINGS = {
     sections: {
@@ -894,7 +894,7 @@ export const validateMetadataStructure = ( prgStgSections ) => {
     // STEP 1. Go Through programStageSections, and group the types together..
     prgStgSections.forEach( ( pgStgSec ) => {
 
-        const typeName = getStructure( pgStgSec );
+        const typeName = getSectionType( pgStgSec );
 
         if ( typeName === 'Section' ) {
             // Create 'section' validation data for checking structure later
@@ -1013,19 +1013,6 @@ const generateErrorMessage = (source, title, code, text) => {
         }
     }
 }
-
-const getStructure = (prgStgSection) => {
-    if (prgStgSection.name.match(/Section \d+.*/)) {
-        return "Section";
-    } else if (prgStgSection.name.match(/> Standard \d+(\.\d+)*.*/)) {
-        return "Standard";
-    } else if (prgStgSection.name.match(/> > Criterion \d+(\.\d+)*.*/)) {
-        return "Criterion";
-    }
-
-    return;
-}
-
 
 const checkStdOverview = (prgStgSection) => {
 

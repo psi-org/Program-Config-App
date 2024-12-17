@@ -89,7 +89,6 @@ const Exporter = (props) => {
         addInstructions(instructionWS);
         addConfigurations(templateWS);
         addReleaseNotes(releaseNotesWS, ReleaseNotes, password);
-        // hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
         hideColumns(templateWS, getHiddenColumns());
         addProtection(templateWS,3,3000,password);
         writeWorkbook(workbook, props.programName, props.isLoading);
