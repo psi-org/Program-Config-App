@@ -28,7 +28,7 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Link } from "react-router-dom";
 import { BUILD_VERSION, DATASTORE_H2_METADATA, FEEDBACK_ORDER, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, getProgramQuery, mapIdArray, truncateString, versionGTE } from "../../utils/Utils.js";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, getProgramQuery, getSectionType, mapIdArray, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessor from "../Excel/DataProcessor.js";
 import Importer from "../Excel/Importer.js";
 import ErrorReports from "../UIElements/ErrorReports.js";
@@ -1617,8 +1617,10 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
                     program={programStage.program.id}
                     deRef={deManager}
                     setDeManager={setDeManager}
+                    sectionType={getSectionType({name: deManager.sectionName})}
                     programStageDataElements={programStageDataElements}
                     saveAdd={saveAdd}
+                    hnqisType={hnqisType}
                     hnqisMode={!!hnqisType}
                     setSaveStatus={setSaveStatus}
                     dePrefix={programMetadata.dePrefix || 'XXXXXXXXXXX'}

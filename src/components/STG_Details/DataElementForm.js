@@ -60,7 +60,8 @@ const queryId = {
 };
 
 const DataElementForm = ({ program, dePrefix, programStageDataElement, section, sectionType, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisType, setSaveStatus }) => {
-console.log("=== hnqisType: " + hnqisType);
+    
+    console.log("hnqisType: " + hnqisType + " --- programIsHNQISMWI(hnqisType): " + programIsHNQISMWI(hnqisType));
     const de = programStageDataElement.dataElement;
 
     const idQuery = useDataQuery(queryId);
@@ -1041,6 +1042,7 @@ DataElementForm.propTypes = {
     save: PropTypes.func,
     saveFlag: PropTypes.bool,
     section: PropTypes.object,
+    sectionType: PropTypes.string,
     setDeToEdit: PropTypes.func,
     setSaveFlag: PropTypes.func,
     setSaveStatus: PropTypes.func
