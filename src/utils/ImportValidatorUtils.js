@@ -177,39 +177,6 @@ export const HNQIS2_VALIDATION_SETTINGS = {
     }
 }
 
-// export const HNQISMWI_VALIDATION_SETTINGS = {
-//     standard: {
-//         enabled: true,
-//         checkHasStdOverview: {
-//             enabled: true, 
-//             title: "Std Overview is missing",
-//             errorMsg: {
-//                 code: "EXW100",
-//                 text: `A standard must have one 'Std Overview'.`
-//             }
-//         },
-//         checkHasCriterion: {
-//             enabled: true, 
-//             title: "Criterion is missing",
-//             errorMsg: {
-//                 code: "EXW112",
-//                 text: `A standard must have at least one 'Criterion'.`
-//             }
-//         }
-//     },
-//     criterion: {
-//         enabled: true,
-//         checkQuestion: {
-//             enabled: true,
-//             title: "Question is missing",
-//             errorMsg: {
-//                 code: "EXW113",
-//                 text: `A criterion must have at least one question.`
-//             }
-//         }
-//     }
-// }
-
 export const TRACKER_VALIDATION_SETTINGS = {
     sections: {
         enabled: true,

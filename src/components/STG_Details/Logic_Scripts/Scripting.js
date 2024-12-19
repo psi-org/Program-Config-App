@@ -43,7 +43,7 @@ const buildScores = (branch) => {
         branch.questions.forEach((a) => {
             if (a.prgVarName) {
                 const num = `#{${a.prgVarName}}*${a.scoreNum}`;
-                const den = `d2:count('${a.prgVarName}')*${a.scoreDen}`;
+                const den = `d2:count(#{${a.prgVarName}})*${a.scoreDen}`;
                 if (a.isCritical == "Yes") {
                     numC.push(num);
                     denC.push(den);
@@ -84,6 +84,50 @@ const buildScores = (branch) => {
     }
 }
 
+const buildProgramRuleAndAction = ({
+    programRuleUid,
+    name,
+    condition,
+    actionId,
+    data,
+    content,
+    dataElement,
+    programId,
+    stageId,
+    priority
+}) => {
+    const rule = {
+        id: programRuleUid,
+        name,
+        description: "_Scripted",
+        program: { id: programId },
+        condition,
+        programRuleActions: [{ id: actionId }]
+    };
+
+    if (stageId) {
+        rule.programStage = { id: stageId };
+    }
+
+    if (priority) {
+        rule.priority = priority;
+    }
+
+    const action = {
+        id: actionId,
+        programRuleActionType: "ASSIGN",
+        data,
+        content,
+        programRule: { id: programRuleUid }
+    };
+
+    if (dataElement) {
+        action.dataElement = { id: dataElement };
+    }
+
+    return { rule, action }
+}
+
 /**
  * 
  * @param {Object} composite : subLevels, feedbackOrder, formName, prgVarName, uid
@@ -103,6 +147,8 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
         branch = branch.childs.find(s => s.order == currentOrder);
         return getScorePR(composite, branch, programId, stageId, uidPool);                // Output {scorePRs , scorePRAs}
     } else {
+        const scorePRs = [], scorePRAs = [];
+        
         if (branch) {     // Composite Score HAS scoring questions
             /**
              * Creating PR for Scores - Two steps:
@@ -110,91 +156,78 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
              * 2- ASSIGN CALCULATED VALUE to DATA ELEMENT
              */
 
-            let programRuleUid, actionId, name, data;
-            const programRuleActionType = "ASSIGN";
-
-            // STEP 1 -
+            // STEP 1 - Assign Calculcated Value
             const num = [branch.numC, branch.numN].filter(n => n != "").join("+");
-            const den = [branch.denC, branch.denN].filter(n => n != "").join("+");
-            data = `(((${num}) * 100) / (${den}))*100`;
-            name = `PR - Calculated - ${composite.feedbackOrder} ${composite.formName}`;
-            programRuleUid = uidPool.shift();
-            actionId = uidPool.shift();
+            const den = [branch.denC, branch.denN].filter(n => n != "").join("+");;
 
-            const pr_s1 = {
-                id: programRuleUid,
-                name: name,
-                description: "_Scripted",
-                program: { id: programId },
-                //programStage : {id : stageId},
-                condition: "true",
-                priority: 1,
-                programRuleActions: [{ id: actionId }]
-            };
-
-            const pra_s1 = {
-                id: actionId,
-                programRuleActionType: programRuleActionType,
-                data,
+            const result1a = buildProgramRuleAndAction({
+                programRuleUid: uidPool.shift(),
+                name: `PR - Calculated - ${composite.feedbackOrder} ${composite.formName}`,
+                condition: `(${den}) > 0`,
+                actionId: uidPool.shift(),
+                data: `(((${num}) * 100) / (${den}))*100`,
                 content: `#{_CV${composite.prgVarName}}`,
-                programRule: { id: programRuleUid }
-            };
+                programId,
+                priority: 1
+            });
+            scorePRs.push(result1a.rule);
+            scorePRAs.push(result1a.action);
 
-            // STEP 2 -
+            const result1b = buildProgramRuleAndAction({
+                programRuleUid: uidPool.shift(),
+                name: `PR - Calculated - ${composite.feedbackOrder} ${composite.formName} (Den == 0)`,
+                condition: `(${den}) == 0`,
+                actionId: uidPool.shift(),
+                data: `''`,
+                content: `#{_CV${composite.prgVarName}}`,
+                programId,
+                priority: 1
+            });
+            scorePRs.push(result1b.rule);
+            scorePRAs.push(result1b.action);
 
-            name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
-            programRuleUid = uidPool.shift();
-            actionId = uidPool.shift();
-            data = `d2:round(#{_CV${composite.prgVarName}})/100`;
-
-            const pr_s2 = {
-                id: programRuleUid,
-                name: name,
-                description: "_Scripted",
-                program: { id: programId },
-                programStage: { id: stageId },
-                condition: `d2:hasValue('_CV${composite.prgVarName}')`,
-                programRuleActions: [{ id: actionId }]
-            };
-
-            const pra_s2 = {
-                id: actionId,
-                programRuleActionType: programRuleActionType,
-                data,
+            // STEP 2 - Assign Data Element
+            const result2 = buildProgramRuleAndAction({
+                programRuleUid: uidPool.shift(),
+                name: `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`,
+                condition: `d2:hasValue(#{_CV${composite.prgVarName}})`,
+                actionId: uidPool.shift(),
+                data: `d2:round(#{_CV${composite.prgVarName}})/100`,
                 dataElement: { id: composite.uid },
-                programRule: { id: programRuleUid }
-            };
+                programId,
+                stageId
+            });
+            scorePRs.push(result2.rule);
+            scorePRAs.push(result2.action);
 
-            return { scorePRs: [pr_s1, pr_s2], scorePRAs: [pra_s1, pra_s2] }
-
+            const result3 = buildProgramRuleAndAction({
+                programRuleUid: uidPool.shift(),
+                name: `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (No Value)`,
+                condition: `!d2:hasValue(#{_CV${composite.prgVarName}})`,
+                actionId: uidPool.shift(),
+                data: `''`,
+                dataElement: composite.uid,
+                programId,
+                stageId
+            });
+            scorePRs.push(result3.rule);
+            scorePRAs.push(result3.action);
         } else { // Composite Score DOESN'T HAVE scoring questions
-            const data = `''`;
-            const name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
-            const programRuleActionType = "ASSIGN";
-
-            const programRuleUid = uidPool.shift();
-            const actionId = uidPool.shift();
-
-            const pr = {
-                id: programRuleUid,
-                name: name,
-                description: "_Scripted",
-                program: { id: programId },
-                programStage: { id: stageId },
+            const result = buildProgramRuleAndAction({
+                programRuleUid: uidPool.shift(),
+                name: `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`,
                 condition: "true",
-                programRuleActions: [{ id: actionId }]
-            };
-
-            const pra = {
-                id: actionId,
-                programRuleActionType: programRuleActionType,
-                data,
-                dataElement: { id: composite.uid },
-                programRule: { id: programRuleUid }
-            };
-
-            return { scorePRs: [pr], scorePRAs: [pra] }
+                actionId: uidPool.shift(),
+                data: `''`,
+                dataElement: composite.uid,
+                programId,
+                stageId
+            });
+            scorePRs.push(result.rule);
+            scorePRAs.push(result.action);
         }
+
+        return { scorePRs, scorePRAs }
     }
 }
 
@@ -205,141 +238,86 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
  * @param {*} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
  * @returns {Object} : { rules : <Array> , actions : <Array> }
  */
-const buildCriticalScore = (branch, stageId, programId, uidPool) => {
-    const num = (branch.numC != "" ? branch.numC : undefined);
-    const den = (branch.denC != "" ? branch.denC : undefined);
+const buildScoreRules = (branch, stageId, programId, uidPool) => {
+    const rules = [], actions = [];
 
-    /**
-     * Two Steps Assign
-     * 1- From data to Calculated Value
-     * 2- From Calculated Value to Data Element
-     */
+    const values = [
+        {
+            num: (branch.numC != "" ? branch.numC : undefined),
+            den: (branch.denC != "" ? branch.denC : undefined),
+            title: 'Critical Questions',
+            calculatedValue: '_CV_CriticalQuestions',
+            dataElement: CRITICAL_STEPS
+        },
+        {
+            num: (branch.numN != "" ? branch.numN : undefined),
+            den: (branch.denN != "" ? branch.denN : undefined),
+            title: 'Non-Critical Questions',
+            calculatedValue: '_CV_NonCriticalQuestions',
+            dataElement: NON_CRITICAL_STEPS
+        }
+    ];
 
-    const programRuleActionType = "ASSIGN";
-    let programRuleUid, actionId, name, data;
+    values.forEach(v => {
+        const num = v.num;
+        const den = v.den;
 
-    // STEP 1- 
-    programRuleUid = uidPool.shift();
-    actionId = uidPool.shift();
-    name = `PR - Calculated - Critical Questions`;
-    data = (num && den) ? `((${num}) * 100) / (${den})` : `100`;
+        const result1a = buildProgramRuleAndAction({
+            programRuleUid: uidPool.shift(),
+            name: `PR - Calculated - ${v.title}`,
+            condition: (num && den) ? `(${den}) > 0` : "true",
+            actionId: uidPool.shift(),
+            data: (num && den) ? `((${num}) * 100) / (${den})` : `100`,
+            content: `#{${v.calculatedValue}}`,
+            programId,
+            priority: 1
+        });
+        rules.push(result1a.rule);
+        actions.push(result1a.action);
 
-    const pr_s1 = {
-        id: programRuleUid,
-        name,
-        description: "_Scripted",
-        program: { id: programId },
-        //programStage : {id : stageId},
-        condition: "true",
-        priority: 1,
-        programRuleActions: [{ id: actionId }]
-    };
+        if (num && den) {
+            const result1b = buildProgramRuleAndAction({
+                programRuleUid: uidPool.shift(),
+                name: `PR - Calculated - ${v.title} (Den == 0)`,
+                condition: `(${den}) == 0`,
+                actionId: uidPool.shift(),
+                data: `''`,
+                content: `#{${v.calculatedValue}}`,
+                programId,
+                priority: 1
+            });
+            rules.push(result1b.rule);
+            actions.push(result1b.action);
+        }
 
-    const pra_s1 = {
-        id: actionId,
-        programRuleActionType,
-        data,
-        content: `#{_CV_CriticalQuestions}`,
-        programRule: { id: programRuleUid }
-    };
+        const result2 = buildProgramRuleAndAction({
+            programRuleUid: uidPool.shift(),
+            name: `PR - Score - ${v.title} (%)`,
+            condition: `d2:hasValue(#{${v.calculatedValue}})`,
+            actionId: uidPool.shift(),
+            data: `#{${v.calculatedValue}}`,
+            dataElement: v.dataElement,
+            programId,
+            stageId
+        });
+        rules.push(result2.rule);
+        actions.push(result2.action);
 
-    // STEP 2-
-    programRuleUid = uidPool.shift();
-    actionId = uidPool.shift();
-    name = `PR - Score - Critical Questions (%)`;
+        const result3 = buildProgramRuleAndAction({
+            programRuleUid: uidPool.shift(),
+            name: `PR - Score - ${v.title} (No Value)`,
+            condition: `!d2:hasValue(#{${v.calculatedValue}})`,
+            actionId: uidPool.shift(),
+            data: `''`,
+            dataElement: v.dataElement,
+            programId,
+            stageId
+        });
+        rules.push(result3.rule);
+        actions.push(result3.action);
+    });
 
-    const pr_s2 = {
-        id: programRuleUid,
-        name,
-        description: "_Scripted",
-        program: { id: programId },
-        programStage: { id: stageId },
-        condition: `d2:hasValue('_CV_CriticalQuestions')`,
-        programRuleActions: [{ id: actionId }]
-    };
-
-    data = `#{_CV_CriticalQuestions}`;
-    const pra_s2 = {
-        id: actionId,
-        programRuleActionType,
-        data,
-        dataElement: { id: 'VqBfZjZhKkU' },
-        programRule: { id: programRuleUid }
-    };
-
-    return { rules: [pr_s1, pr_s2], actions: [pra_s1, pra_s2] }
-}
-
-/**
- * 
- * @param {*} branch : scoring map - root level will be used
- * @param {*} programId 
- * @param {*} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
- * @returns {Object}: { rules : <Array> , actions : <Array> }
- */
-const buildNonCriticalScore = (branch, stageId, programId, uidPool) => {
-    const num = (branch.numN != "" ? branch.numN : undefined);
-    const den = (branch.denN != "" ? branch.denN : undefined);
-
-    /**
-     * Two Steps Assign
-     * 1- From data to Calculated Value
-     * 2- From Calculated Value to Data Element
-     */
-
-    const programRuleActionType = "ASSIGN";
-    let programRuleUid, actionId, name, data;
-
-    // STEP 1- 
-    programRuleUid = uidPool.shift();
-    actionId = uidPool.shift();
-    name = `PR - Calculated - Non-Critical Questions`;
-    data = (num && den) ? `((${num}) * 100) / (${den})` : `100`;
-
-    const pr_s1 = {
-        id: programRuleUid,
-        name,
-        description: "_Scripted",
-        program: { id: programId },
-        //programStage : {id : stageId},
-        condition: "true",
-        priority: 1,
-        programRuleActions: [{ id: actionId }]
-    };
-
-    const pra_s1 = {
-        id: actionId,
-        programRuleActionType,
-        data,
-        content: `#{_CV_NonCriticalQuestions}`,
-        programRule: { id: programRuleUid }
-    };
-
-    // STEP 2-
-    programRuleUid = uidPool.shift();
-    actionId = uidPool.shift();
-    name = `PR - Score - Non-Critical Questions (%)`;
-    data = `#{_CV_NonCriticalQuestions}`;
-
-    const pr_s2 = {
-        id: programRuleUid,
-        name,
-        description: "_Scripted",
-        program: { id: programId },
-        programStage: { id: stageId },
-        condition: `d2:hasValue('_CV_NonCriticalQuestions')`,
-        programRuleActions: [{ id: actionId }]
-    };
-
-    const pra_s2 = {
-        id: actionId,
-        programRuleActionType,
-        data,
-        dataElement: { id: 'pzWDtDUorBt' },
-        programRule: { id: programRuleUid }
-    };
-
-    return { rules: [pr_s1, pr_s2], actions: [pra_s1, pra_s2] }
+    return { rules, actions }
 }
 
 /**
@@ -497,7 +475,7 @@ const buildAttributesRules = (programId, uidPool, useCompetencyClass = "Yes", he
             {
                 name: "PR - Attributes - Assign Competency",
                 displayName: "PR - Attributes - Assign Competency",
-                condition: "d2:hasValue('_competencyNewest')",
+                condition: "d2:hasValue(#{_competencyNewest})",
                 program: { id: "" },
                 description: "_Scripted",
                 programRuleActions: [
@@ -721,7 +699,8 @@ export const buildProgramRuleVariables = ({ sections, compositeScores, programId
             name: `_CV_CS${cs}`,
             programRuleVariableSourceType: "CALCULATED_VALUE",
             useCodeForOptionSet: false,
-            program: { id: programId }
+            program: { id: programId },
+            valueType: "NUMBER"
         });
     });
 
@@ -850,8 +829,7 @@ export const buildProgramRules = ({ sections, stageId, programId, compositeValue
     });
 
     // Critical Calculations
-    const criticalScore = buildCriticalScore(scoreMap, stageId, programId, uidPool);
-    const nonCriticalScore = buildNonCriticalScore(scoreMap, stageId, programId, uidPool);
+    const scoreRules = buildScoreRules(scoreMap, stageId, programId, uidPool);
 
     // Competency Class
 
@@ -870,8 +848,7 @@ export const buildProgramRules = ({ sections, stageId, programId, compositeValue
     const { labelsRules, labelsActions } = labelsRulesLogic(hideShowLabels, programId, uidPool);
 
     programRules = programRules.concat(
-        criticalScore.rules,
-        nonCriticalScore.rules,
+        scoreRules.rules,
         competencyRules,
         attributeRules,
         hideShowRules,
@@ -879,8 +856,7 @@ export const buildProgramRules = ({ sections, stageId, programId, compositeValue
     );
 
     programRuleActions = programRuleActions.concat(
-        criticalScore.actions,
-        nonCriticalScore.actions,
+        scoreRules.actions,
         competencyActions,
         attributeActions,
         hideShowActions,

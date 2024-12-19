@@ -40,7 +40,6 @@ const getSectionIcon = (hnqisType, sectionName) => {
 
 const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisType, editStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
-    console.log("=== DraggableSection:", stageSection);
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false);
@@ -49,7 +48,7 @@ const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, 
     const [showValidationMessage, setShowValidationMessage] = useState(false);
 
     const toggle = () => setOpenMenu(!openMenu)
-    
+
     // Import Values //
     var sectionImportStatus = undefined;
     var sectionImportSummary = undefined;

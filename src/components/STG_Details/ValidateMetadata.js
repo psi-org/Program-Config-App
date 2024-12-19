@@ -41,7 +41,7 @@ const ValidateMetadata = (
     const [save, setSave] = useState(false);
     const [validationMessage, setValidationMessage] = useState("Metadata validated. Please use the 'SAVE' button to persist your changes.");
     
-    const resetErrorsINSections = () => {
+    const resetErrorsInSections = () => {
         importedSections.forEach((section) => {
             delete section.errors;
         })
@@ -58,7 +58,7 @@ const ValidateMetadata = (
                 const sections = [];
                 const questions = [];
                 const scores = [];
-                resetErrorsINSections();
+                resetErrorsInSections();
 
                 validationResults.sections = sections;
                 validationResults.questions = questions;
@@ -68,14 +68,12 @@ const ValidateMetadata = (
 
                 // CHECK FEEDBACK DATA
                 if (programIsHNQIS(hnqisType)) {
-                    
                     const validateResults = validateFeedbacks(!!hnqisType, importedSectionsV.concat(importedScoresV))
                     feedbacksErrors = validateResults.feedbacksErrors
                 
                     errorCounts += feedbacksErrors.length
                     validationResults.feedbacks = feedbacksErrors;
                 }
-                
             
 
                 //ADD FEEDBACK ERRORS TO DATA ELEMENTS
@@ -93,9 +91,8 @@ const ValidateMetadata = (
                             title: section.name || ('Section on Template row ' + excelRow),
                             tagName: '[ Section ]'
                         }
-                        // delete section.errors;
                         validateSectionsHNQIS2(section, sectionErrorDetails);
-                       
+                
                         if (section.errors) {
                             sections.push(section);
                             errorCounts += section.errors.errors.length;
@@ -191,11 +188,9 @@ const ValidateMetadata = (
                 setValid(false);
             }
             setProcessed(true);
-            
         }
     });
-    
-    
+
     return (<CustomMUIDialog open={true} maxWidth='sm' fullWidth={true} >
         <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => setSavingMetadata(false)}>
             {hnqisType ? 'Assessment Validation' : 'Save changes into the server?'}

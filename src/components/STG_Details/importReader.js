@@ -118,6 +118,8 @@ const readTemplateData = (
         return { importedSections, importedScores };
     }
 
+    
+
     return { importedSections, ignoredSections };
 
 };

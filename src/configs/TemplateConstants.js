@@ -499,6 +499,5 @@ export const getPromptsFormula = (validationsList, rowNumber) => {
     }).join(',');
 
     formula = formula + ',"")';
-    
     return formula;
 }
