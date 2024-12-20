@@ -693,7 +693,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             <p style={{ display: programIsHNQISMWI(hnqisType) ? "none": 'flex', alignItems: 'center', justifyContent: 'center', width: '10%' }}>or</p>
                         
                         {/* For HNQISMWI, don't need to show option option set for sectionType === "Standard" */}
-                        {sectionType !== "Standard" && <>
+                        {/* {sectionType !== "Standard" && <> */}
                             <Autocomplete
                                 id="optionSetsSelect"
                                 disabled={structure === 'label'}
@@ -719,7 +719,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                                     <RefreshIcon />
                                 </IconButton>
                             </Tooltip>
-                        </>}
+                        {/* </>} */}
                     </div>
                    
                     {programIsHNQIS(hnqisType) && aggTypeContent}
