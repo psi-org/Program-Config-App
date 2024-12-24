@@ -904,8 +904,13 @@ export const validateMetadataStructure = ( prgStgSections ) => {
     summarySections.forEach( ( secItem ) => 
     {
         // Check if any Standard which doesn't belong to any Section
-        if( !secItem.hasStandard ) {
-            generateErrorMessage( secItem.standards[0].ref_source, "Standard Error", "NOT FOUND", `'${secItem.standards[0].ref_source.displayName}' must belongs to a 'Section'.`);
+        if( !secItem.ref_source && !secItem.hasStandard ) {
+            // if( secItem.standards.length == 0 ) {
+            //     generateErrorMessage( secItem.ref_source, "Section Error", "NOT FOUND", `'${secItem.ref_source.displayName}' must have at least one 'Standard'.`);
+            // }
+            // else {
+                generateErrorMessage( secItem.standards[0].ref_source, "Standard Error", "NOT FOUND", `'${secItem.standards[0].ref_source.displayName}' must belongs to a 'Section'.`);
+            // }
         }
         // Check if the Section doesn't have any Standard
         if( secItem.ref_source && secItem.standards.length === 0 ) {

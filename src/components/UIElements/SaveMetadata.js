@@ -11,6 +11,7 @@ import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue, programIsHNQIS, isLabelType } from "../../utils/Utils.js";
 import CustomMUIDialog from './CustomMUIDialog.js';
 import CustomMUIDialogTitle from './CustomMUIDialogTitle.js';
+import { reorderMWISectionNumbering } from "../../utils/importerUtils.js";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -90,6 +91,9 @@ const processStageData = (
         });
     }
 
+    // For HNQISMWI, we need to re-order the numbers for programStageSections
+    reorderMWISectionNumbering(importedSections);
+    
     /**
      * Delete importStatus: section & Data Elements
      * Prepare new data elements (payloads)

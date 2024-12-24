@@ -61,7 +61,6 @@ const queryId = {
 
 const DataElementForm = ({ program, dePrefix, programStageDataElement, section, sectionType, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisType, setSaveStatus }) => {
     
-    console.log("hnqisType: " + hnqisType + " --- programIsHNQISMWI(hnqisType): " + programIsHNQISMWI(hnqisType));
     const de = programStageDataElement.dataElement;
 
     const idQuery = useDataQuery(queryId);
@@ -85,7 +84,15 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     }, [initLegendSets])
     
 
-    const metadata = JSON.parse(de?.attributeValues.find(att => att.attribute.id === METADATA)?.value || '{}')
+    const metadata = JSON.parse(de?.attributeValues.find(att => att.attribute.id === METADATA)?.value || '{}');
+    
+    const initCritical = () => {
+        if( programIsHNQISMWI(hnqisType) ) {
+            return section.description === "*" ? "Yes" : "No";
+        } 
+         
+         return metadata.isCritical === 'Yes';
+    } 
 
     // States
     const [structure, setStructure] = useState(metadata.elemType || 'question')
@@ -104,7 +111,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     const [deIcon,setDeIcon] = useState(de?.style?.icon ?? "")
     const [deColor,setDeColor] = useState(de?.style?.color)
 
-    const [critical, setCritical] = useState(metadata.isCritical === 'Yes') // metadata.isCritical : ['Yes','No']
+    const [critical, setCritical] = useState(initCritical()) // metadata.isCritical : ['Yes','No']
     const [numerator, setNumerator] = useState(metadata.scoreNum || '')
     const [denominator, setDenominator] = useState(metadata.scoreDen || '')
     const [feedbackOrder, setFeedbackOrder] = useState(de?.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value || '')
@@ -692,8 +699,6 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
 
                             <p style={{ display: programIsHNQISMWI(hnqisType) ? "none": 'flex', alignItems: 'center', justifyContent: 'center', width: '10%' }}>or</p>
                         
-                        {/* For HNQISMWI, don't need to show option option set for sectionType === "Standard" */}
-                        {/* {sectionType !== "Standard" && <> */}
                             <Autocomplete
                                 id="optionSetsSelect"
                                 disabled={structure === 'label'}
@@ -719,7 +724,6 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                                     <RefreshIcon />
                                 </IconButton>
                             </Tooltip>
-                        {/* </>} */}
                     </div>
                    
                     {programIsHNQIS(hnqisType) && aggTypeContent}
@@ -878,7 +882,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
 
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <FormControlLabel
-                            disabled={structure === 'label'}
+                            disabled={programIsHNQISMWI(hnqisType) ? true :  structure === 'label'}
                             control={
                                 <Switch
                                     checked={critical && structure !== 'label'}

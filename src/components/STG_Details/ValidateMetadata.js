@@ -35,11 +35,21 @@ const ValidateMetadata = (
         stageRefetch
     }
 ) => {
+    
+    const initValidationMsg = () => {
+        let msg = "Metadata validated. Please use the 'SAVE' button to persist your changes.";
+        if( programIsHNQISMWI(hnqisType) ) {
+            msg += " The number of sections may be re-orderred.";
+        }
+        
+        return msg;
+    }
+    
     const validationResults = {};
     const [processed, setProcessed] = useState(false);
     const [valid, setValid] = useState(false);
     const [save, setSave] = useState(false);
-    const [validationMessage, setValidationMessage] = useState("Metadata validated. Please use the 'SAVE' button to persist your changes.");
+    const [validationMessage, setValidationMessage] = useState(initValidationMsg());
     
     const resetErrorsInSections = () => {
         importedSections.forEach((section) => {

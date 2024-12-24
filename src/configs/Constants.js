@@ -543,6 +543,12 @@ const tagStyle = { minWidth: '11em', maxWidth: '10em', display: 'flex', justifyC
 const newTagStyle = { minWidth: '6em', maxWidth: '6em', display: 'flex', justifyContent: 'center' };
 const updatedTagStyle = { minWidth: '8em', maxWidth: '8em', display: 'flex', justifyContent: 'center' };
 
+export const HNQISMWI_PROGRAM_STAGE_SECTION_TYPES = [
+    { label: 'Section', value: 'Section'},
+    { label: 'Standard', value: 'Standard'},
+    { label: 'Criterion', value: 'Criterion'},
+];
+
 export {
     ABOUT_DATE_FORMAT_OPTIONS,
     ACTION_PLAN_ACTION,
