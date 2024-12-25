@@ -859,6 +859,11 @@ export const validateMetadataStructure = ( prgStgSections ) => {
         const typeName = getSectionType( pgStgSec );
 
         if ( typeName === 'Section' ) {
+              // Check if any Standard which doesn't belong to any Section
+            if( currSecJson && !currStdJson ) {
+                generateErrorMessage( currSecJson, "Standard Error", "NOT FOUND", `'${currSecJson.displayName}' must have at least one 'Standard'.`);
+            }
+            
             // Create 'section' validation data for checking structure later
             currSecJson = pgStgSec;
             currStdJson = undefined;
@@ -870,28 +875,27 @@ export const validateMetadataStructure = ( prgStgSections ) => {
             if( !currSecJson ) {
                 generateErrorMessage( pgStgSec, "Standard Error", "NOT FOUND", `'${pgStgSec.displayName}' must belongs to a 'Section'.`);
             }
-            // Check "Standard" and "Std Overview" Section
-            else {
-                const checkStdSection = checkStdOverview(currStdJson);
-                // Check if a Standard doesn't have "Std Overview"
-                if( checkStdSection.stdOverview == 0 ) {
-                    generateErrorMessage( currStdJson, "Standard Error", "NOT FOUND", `'${currStdJson.displayName}' must have 'Std Overview'.`);
-                }
-                // Check if a Standard has many "Std Overview"
-                else if( checkStdSection.stdOverview > 1 ) {
-                    generateErrorMessage( currStdJson, "Standard Error", "NOT FOUND", `'${currStdJson.displayName}' must have ONLY ONE 'Std Overview'.`);
-                }
-                
-                // Check if a Standard has another data, NOT "Std Overview"
-                if( checkStdSection.others > 0 ) {
-                    generateErrorMessage( currStdJson, "Standard Error", "NOT FOUND", `'${currStdJson.displayName}' must have ONLY ONE 'Std Overview'. Anything else is not accepted.`);
-                }
+            
+            // ----  Check "Standard" and "Std Overview" Section
+            const checkStdSection = checkStdOverview(currStdJson);
+            // Check if a Standard doesn't have "Std Overview"
+            if( checkStdSection.stdOverview == 0 ) {
+                generateErrorMessage( currStdJson, "Standard Error", "NOT FOUND", `'${currStdJson.displayName}' must have 'Std Overview'.`);
+            }
+            // Check if a Standard has many "Std Overview"
+            else if( checkStdSection.stdOverview > 1 ) {
+                generateErrorMessage( currStdJson, "Standard Error", "NOT FOUND", `'${currStdJson.displayName}' must have ONLY ONE 'Std Overview'.`);
+            }
+            
+            // Check if a Standard has another data, NOT "Std Overview"
+            if( checkStdSection.others > 0 ) {
+                generateErrorMessage( currStdJson, "Standard Error", "NOT FOUND", `'${currStdJson.displayName}' must have ONLY ONE 'Std Overview'. Anything else is not accepted.`);
             }
         }
         else if ( typeName === 'Criterion' ) {
             // Check if "Criterion" does not belong to a "Standard"
             if( !currStdJson ) {
-                generateErrorMessage( pgStgSec, "Criterion Error", "NOT FOUND", `'${pgStgSec.displayName}' must belong to one 'Standard'.`);
+                generateErrorMessage( pgStgSec, "Criterion Error", "NOT FOUND", `'${pgStgSec.displayName}' must belong to a 'Standard'.`);
             }
             // Check if "Criterion" does not have any 'question'
             if( !checkQuestionsExist(pgStgSec) ) {
@@ -899,6 +903,8 @@ export const validateMetadataStructure = ( prgStgSections ) => {
             }
         }
     });
+    
+  
 }
 
 // export const validateMetadataStructure_BK = ( prgStgSections ) => {

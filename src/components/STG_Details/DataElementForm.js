@@ -138,6 +138,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
         if( elemTypes.length === 1 ) {
             setStructure( elemTypes[0].value );
             setValueType('NUMBER');
+            setOptionSet(null);
         }
         else {
             setStructure( metadata.elemType || 'question');
