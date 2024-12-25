@@ -54,6 +54,7 @@ const ValidateMetadata = (
     const resetErrorsInSections = () => {
         importedSections.forEach((section) => {
             delete section.errors;
+            delete section.errorsCount;
         })
     }
     
