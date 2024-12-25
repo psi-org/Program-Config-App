@@ -74,9 +74,29 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     const { data: programRuleVariables } = useDataQuery(programRuleVariableQuery, {variables: { program, dataElement: de?.id ?? "X" } });
     const programRuleVariable = programRuleVariables?.results?.programRuleVariables?.at(0) 
     
-
+    const getElemType = () => {
+        if( programIsHNQISMWI(hnqisType) ) {
+            if( sectionType === "Criterion" ) {
+                return ELEM_TYPES.filter(item => item.label !== 'Std Overview');
+            }
+            else if( sectionType === "Standard" ) {
+                return ELEM_TYPES.filter(item => item.label == 'Std Overview');
+            }
+        }
+        
+        return ELEM_TYPES;
+    }
+    
+    
     useEffect(() => {
-        if (initOptionSets) { setServerOptionSets(initOptionSets) }
+        if (initOptionSets) { 
+            setServerOptionSets(initOptionSets);
+            if( programIsHNQISMWI(hnqisType) && structure === "question") {
+                const optionSet = initOptionSets.results.optionSets.find((item) => item.id=="Ri5XuSekdRg" ); // Option set "HNQIS MWI - YesNoNA"
+                setOptionSet(optionSet);
+                if( optionSet ) setValueType(optionSet.valueType);
+            }
+        }
     }, [initOptionSets])
 
     useEffect(() => {
@@ -85,17 +105,9 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     
 
     const metadata = JSON.parse(de?.attributeValues.find(att => att.attribute.id === METADATA)?.value || '{}');
-    
-    const initCritical = () => {
-        if( programIsHNQISMWI(hnqisType) ) {
-            return section.description === "*" ? "Yes" : "No";
-        } 
-         
-         return metadata.isCritical === 'Yes';
-    } 
-
+   
     // States
-    const [structure, setStructure] = useState(metadata.elemType || 'question')
+    const [structure, setStructure] = useState(metadata.elemType || 'question');
     const [valueType, setValueType] = useState(de?.valueType || '')
     const [aggType, setAggType] = useState(de?.aggregationType || 'NONE')
     const [formName, setFormName] = useState((metadata.elemType === 'label' ? metadata.labelFormName : de?.formName)?.replace(' [C]', '') || '')
@@ -111,7 +123,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     const [deIcon,setDeIcon] = useState(de?.style?.icon ?? "")
     const [deColor,setDeColor] = useState(de?.style?.color)
 
-    const [critical, setCritical] = useState(initCritical()) // metadata.isCritical : ['Yes','No']
+    const [critical, setCritical] = useState(metadata.isCritical === 'Yes') // metadata.isCritical : ['Yes','No']
     const [numerator, setNumerator] = useState(metadata.scoreNum || '')
     const [denominator, setDenominator] = useState(metadata.scoreDen || '')
     const [feedbackOrder, setFeedbackOrder] = useState(de?.attributeValues.find(att => att.attribute.id === FEEDBACK_ORDER)?.value || '')
@@ -120,12 +132,33 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     const [dialogStatus, setDialogStatus] = useState(false)
     const [autoNaming, setAutoNaming] = useState(metadata.autoNaming === 'No'?false:true)
 
+    useEffect(() => {
+        const elemTypes = getElemType();
+        if( elemTypes.length === 1 ) {
+            setStructure( elemTypes[0].value );
+            setValueType('NUMBER');
+        }
+        else {
+            setStructure( metadata.elemType || 'question');
+        }
+    }, [])
+    
+    
     // Handlers
     const elemTypeChange = (e) => {
         setStructure(e.target.value)
         if (e.target.value === 'label') {
-            setValueType('LONG_TEXT')
-            setOptionSet(null)
+            setValueType('LONG_TEXT');
+            setOptionSet(null);
+        } 
+        else if (e.target.value === 'Std Overview') {
+            setValueType('NUMBER');
+            setOptionSet(null);
+        }
+        else if( e.target.value === 'question' ) {
+            const optionSet = serverOptionSets.results.optionSets.find((item) => item.id=="Ri5XuSekdRg" ); // Option set "HNQIS MWI - YesNoNA"
+            setOptionSet(optionSet);
+            if( optionSet ) setValueType(optionSet.valueType);
         }
     }
 
@@ -585,18 +618,8 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
         </div>
     ]
     
-    const getElemType = () => {
-        if( programIsHNQISMWI(hnqisType) ) {
-            if( sectionType === "Criterion" ) {
-                return ELEM_TYPES.filter(item => item.label !== 'Std Overview');
-            }
-            else if( sectionType === "Standard" ) {
-                return ELEM_TYPES.filter(item => item.label == 'Std Overview');
-            }
-        }
-        
-        return ELEM_TYPES;
-    }
+    console.log(" --- optionSet ", optionSet);
+   
     return (
         <div className={de ? "dataElement_cont" : ''}>
 
@@ -642,10 +665,10 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     <FormLabel component="legend">Behavior in Current Stage</FormLabel>
                     <Grid item style={{ display: 'flex' }}>
                         <FormControlLabel
-                            disabled={structure === 'label'}
+                            disabled={structure === 'label' || structure === 'Std Overview'}
                             control={
                                 <Switch
-                                    checked={compulsory && structure !== 'label'}
+                                    checked={compulsory && (structure !== 'label' || structure !== 'Std Overview')}
                                     onChange={compulsoryChange}
                                 />}
                             label="Compulsory"
@@ -670,7 +693,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     </Grid>
                 </Grid>
                 <Grid item xs={6} style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    {!programIsHNQISMWI(hnqisType) && <div style={{ display: 'flex' }}>
+                    <div style={{ display: !programIsHNQISMWI(hnqisType) ? 'flex' : "none"}}>
                             <FormLabel component="legend" style={{ marginRight: '0.5em' }}>Data Element Value Type</FormLabel>
                                 <InfoBox
                                     title='About Value Type and Option Sets'
@@ -684,7 +707,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                                         </p>
                                     }
                                 />
-                    </div>}
+                    </div>
                     
                     <div style={{ display: 'flex', width: '100%', marginTop: '0.5em', justifyContent: 'end', alignItems: 'center' }}>
                         <SelectOptions
@@ -694,14 +717,14 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             helperText={validationErrors.valueType}
                             items={programIsHNQIS(hnqisType)?VALUE_TYPES_H2:VALUE_TYPES_TRACKER}
                             value={valueType}
-                            disabled={structure === 'label' || optionSet != null}
+                            disabled={structure === 'label' || optionSet != null || programIsHNQISMWI(hnqisType)}
                             handler={valueTypeChange} />
 
                             <p style={{ display: programIsHNQISMWI(hnqisType) ? "none": 'flex', alignItems: 'center', justifyContent: 'center', width: '10%' }}>or</p>
                         
                             <Autocomplete
                                 id="optionSetsSelect"
-                                disabled={structure === 'label'}
+                                disabled={structure === 'label' || structure === 'Std Overview' || programIsHNQISMWI(hnqisType)}
                                 options={
                                     serverOptionSets?.results.optionSets.filter(os => !programIsHNQIS(hnqisType) || os.name?.toLowerCase().includes("hnqis")).map(os =>
                                         ({ label: os.name, id: os.id, valueType: os.valueType })
@@ -834,7 +857,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                 <div style={{ display: 'flex', width: '30%' }}>
                     <Autocomplete
                         id="legendSetSelect"
-                        disabled={structure === 'label'}
+                        disabled={structure === 'label' || structure === 'Std Overview'}
                         sx={{ minWidth: '100%', marginRight: '0.5em' }}
                         options={serverLegendSets?.results.legendSets.filter(ls => !programIsHNQIS(hnqisType) || ls.name?.toLowerCase().includes("hnqis")).map(ls => ({ label: ls.name, id: ls.id }))/* .concat({label: 'None', id: ''}) */ || [/* {label: 'None', id: ''} */]}
                         renderInput={(params) => <TextField {...params} label="Legend Set" />}
@@ -882,10 +905,10 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
 
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <FormControlLabel
-                            disabled={programIsHNQISMWI(hnqisType) ? true :  structure === 'label'}
+                            disabled={structure === 'label' || structure === 'Std Overview'}
                             control={
                                 <Switch
-                                    checked={critical && structure !== 'label'}
+                                    checked={critical && structure !== 'label' && structure !== 'Std Overview'}
                                     onChange={criticalChange}
                                 />
                             }
@@ -991,8 +1014,8 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             margin='0 0.5em'
                         />
                     </div>
-                    <div data-color-mode="light" style={structure === 'label' ? { opacity: '0.5' } : undefined}>
-                        <MarkDownEditor value={feedbackText} setValue={setFeedbackText} disabled={structure === 'label'} />
+                    <div data-color-mode="light" style={(structure === 'label' || structure === 'Std Overview') ? { opacity: '0.5' } : undefined}>
+                        <MarkDownEditor value={feedbackText} setValue={setFeedbackText} disabled={structure === 'label' || structure === 'Std Overview'} />
                     </div>
                 </>}
                 {/* PROGRAM RULE ACTIONS */}

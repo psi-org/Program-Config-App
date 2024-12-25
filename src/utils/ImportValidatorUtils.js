@@ -923,6 +923,10 @@ export const validateMetadataStructure = ( prgStgSections ) => {
                 if ( stdItem && !stdItem.bStandardOverview.hasStdOverview ) {
                     generateErrorMessage( stdItem.ref_source, "Standard Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have 'Std Overview'.`);
                 }
+                // Check if a Standard have many "Std Overview" DEs
+                if ( stdItem && stdItem.bStandardOverview.hasStdOverview && !stdItem.bStandardOverview.hasOthers && stdItem.ref_source.dataElements.length > 1 ) {
+                    generateErrorMessage( stdItem.ref_source, "Standard Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must not have many 'Std Overview'.`);
+                }
                 // Check if a Standard has something ( BUT NOT "Std Overview" ), such as 'lable', 'question', ...
                 if ( stdItem && stdItem.bStandardOverview.hasOthers ) {
                     generateErrorMessage( stdItem.ref_source, "Standard Error", "NOT FOUND", `'${stdItem.ref_source.displayName}' must have only 'Std Overview'. Anything else is not accepted.`);

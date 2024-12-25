@@ -74,6 +74,9 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
                 if(critical) {
                     section.description = "*";
                 }
+                else {
+                    delete section.description;
+                }
                 
                 if( type === "Section" ) {
                     const sectionDE = createSectionDataElement();
@@ -154,7 +157,7 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
                                 onChange={(e) => {setCritical(e.target.checked);}}
                             />
                         }
-                        label="Critical Question"
+                        label="Critical Criterion"
                     />}
                 </>}
 
