@@ -93,6 +93,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
             setServerOptionSets(initOptionSets);
             if( programIsHNQISMWI(hnqisType) && structure === "question") {
                 const optionSet = initOptionSets.results.optionSets.find((item) => item.id=="Ri5XuSekdRg" ); // Option set "HNQIS MWI - YesNoNA"
+                optionSet.label = optionSet.name;
                 setOptionSet(optionSet);
                 if( optionSet ) setValueType(optionSet.valueType);
             }
@@ -157,6 +158,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
         }
         else if( e.target.value === 'question' ) {
             const optionSet = serverOptionSets.results.optionSets.find((item) => item.id=="Ri5XuSekdRg" ); // Option set "HNQIS MWI - YesNoNA"
+            optionSet.label = optionSet.name;
             setOptionSet(optionSet);
             if( optionSet ) setValueType(optionSet.valueType);
         }
@@ -903,7 +905,8 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     <h3 style={{ marginBottom: '0.5em', marginTop: '2em' }}>HNQIS Settings</h3>
 
 
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                     {/* For HNQISMWI, don't need to show Critical Question, Numerator, Denominator and Feedback Order*/}
+                     {!programIsHNQISMWI(hnqisType) && <div style={{ display: 'flex', alignItems: 'center' }}>
                         <FormControlLabel
                             disabled={structure === 'label' || structure === 'Std Overview'}
                             control={
@@ -924,82 +927,80 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             }
                         />
                         
-                        {/* For HNQISMWI, don't need to show Numerator, Denominator and Feedback Order*/}
-                        {!programIsHNQISMWI(hnqisType) &&  <>
-                            <FormControl sx={{ minWidth: '2.5rem', width: '15%', marginRight: '1em' }}>
-                                <TextField
-                                    error={validationErrors.numerator !== undefined}
-                                    helperText={validationErrors.numerator}
-                                    disabled={structure === 'label'}
-                                    autoComplete='off'
-                                    id="numerator"
-                                    sx={{ width: '100%' }}
-                                    margin="dense"
-                                    label="Numerator"
-                                    variant='standard'
-                                    value={structure !== 'label' ? numerator : ''}
-                                    onChange={numeratorChange}
-                                    inputProps={{ type: 'number', min: '0' }}
-                                />
-                            </FormControl>
-                            <FormControl sx={{ minWidth: '2.5rem', width: '15%' }}>
-                                <TextField
-                                    error={validationErrors.denominator !== undefined}
-                                    helperText={validationErrors.denominator}
-                                    disabled={structure === 'label'}
-                                    autoComplete='off'
-                                    id="denominator"
-                                    sx={{ width: '100%' }}
-                                    margin="dense"
-                                    label="Denominator"
-                                    variant='standard'
-                                    value={structure !== 'label' ? denominator : ''}
-                                    onChange={denominatorChange}
-                                    inputProps={{ type: 'number', min: '0' }}
-                                />
-                            </FormControl>
-                            <InfoBox
-                                title="About the Numerator and Denominator"
-                                message={
-                                    <p>
-                                        This values will be used in the formulas that calculate scores.<br /><br />
-                                        Each Numerator and Denominator will contribute to the scores calculation formulas for each section.
-                                    </p>
-                                }
-                                margin='0 1.5em 0 0.5em'
+                       
+                        <FormControl sx={{ minWidth: '2.5rem', width: '15%', marginRight: '1em' }}>
+                            <TextField
+                                error={validationErrors.numerator !== undefined}
+                                helperText={validationErrors.numerator}
+                                disabled={structure === 'label'}
+                                autoComplete='off'
+                                id="numerator"
+                                sx={{ width: '100%' }}
+                                margin="dense"
+                                label="Numerator"
+                                variant='standard'
+                                value={structure !== 'label' ? numerator : ''}
+                                onChange={numeratorChange}
+                                inputProps={{ type: 'number', min: '0' }}
                             />
-                            <FormControl sx={{ minWidth: '10rem', width: '20%' }}>
-                                <TextField
-                                    error={validationErrors.feedbackOrder !== undefined}
-                                    helperText={validationErrors.feedbackOrder}
-                                    autoComplete='off'
-                                    id="feedbackOrder"
-                                    sx={{ width: '100%' }}
-                                    margin="dense"
-                                    label="Feedback Order (Compositive Indicator)"
-                                    variant="standard"
-                                    value={feedbackOrder}
-                                    onChange={feedbackOrderChange}
-                                />
-                            </FormControl>
-                            <InfoBox
-                                title="About the Feedback Order"
-                                message={
-                                    <p>
-                                        Formerly known as Compositive Indicator.<br /><br />
-                                        This number will generate the feedback hierarchy in the app, while also grouping the scores to calculate the composite scores.<br /><br />
-                                        <strong>There cannot exist gaps in the Compositive indicators!</strong> The existence of gaps will be validated through the Config App before Setting up the program.<br /><br />
-                                        <strong>Keep in mind the following:</strong><br /><br />
-                                        - Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc.<br />
-                                        - Feedback Order gaps will result in logic errors. Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.<br /><br />
-                                        - Questions are not required to be grouped together to belong to the same level of the compositive indicator, for example: <br />
-                                        Having [ 1, 1.1, 1.2, 1.3, 2, 2.1, 2.2, 1.4 ] is a valid configuration as there are no gaps in the same level of the compositive indicator.
-                                    </p>
-                                }
-                                margin='0 0.5em'
+                        </FormControl>
+                        <FormControl sx={{ minWidth: '2.5rem', width: '15%' }}>
+                            <TextField
+                                error={validationErrors.denominator !== undefined}
+                                helperText={validationErrors.denominator}
+                                disabled={structure === 'label'}
+                                autoComplete='off'
+                                id="denominator"
+                                sx={{ width: '100%' }}
+                                margin="dense"
+                                label="Denominator"
+                                variant='standard'
+                                value={structure !== 'label' ? denominator : ''}
+                                onChange={denominatorChange}
+                                inputProps={{ type: 'number', min: '0' }}
                             />
-                        </>}
-                    </div>
+                        </FormControl>
+                        <InfoBox
+                            title="About the Numerator and Denominator"
+                            message={
+                                <p>
+                                    This values will be used in the formulas that calculate scores.<br /><br />
+                                    Each Numerator and Denominator will contribute to the scores calculation formulas for each section.
+                                </p>
+                            }
+                            margin='0 1.5em 0 0.5em'
+                        />
+                        <FormControl sx={{ minWidth: '10rem', width: '20%' }}>
+                            <TextField
+                                error={validationErrors.feedbackOrder !== undefined}
+                                helperText={validationErrors.feedbackOrder}
+                                autoComplete='off'
+                                id="feedbackOrder"
+                                sx={{ width: '100%' }}
+                                margin="dense"
+                                label="Feedback Order (Compositive Indicator)"
+                                variant="standard"
+                                value={feedbackOrder}
+                                onChange={feedbackOrderChange}
+                            />
+                        </FormControl>
+                        <InfoBox
+                            title="About the Feedback Order"
+                            message={
+                                <p>
+                                    Formerly known as Compositive Indicator.<br /><br />
+                                    This number will generate the feedback hierarchy in the app, while also grouping the scores to calculate the composite scores.<br /><br />
+                                    <strong>There cannot exist gaps in the Compositive indicators!</strong> The existence of gaps will be validated through the Config App before Setting up the program.<br /><br />
+                                    <strong>Keep in mind the following:</strong><br /><br />
+                                    - Accepted values are: 1, 1.1, 1.1.1, 1.1.2, 1.1.(...), 1.2, etc.<br />
+                                    - Feedback Order gaps will result in logic errors. Having [ 1, 1.1, 1.2, 1.4, 2, ... ] will result in an error as the indicator for 1.3 does not exist.<br /><br />
+                                    - Questions are not required to be grouped together to belong to the same level of the compositive indicator, for example: <br />
+                                    Having [ 1, 1.1, 1.2, 1.3, 2, 2.1, 2.2, 1.4 ] is a valid configuration as there are no gaps in the same level of the compositive indicator.
+                                </p>
+                            }
+                            margin='0 0.5em'
+                        />
+                    </div> }
 
                     <div style={{ display: 'flex', margin: '0.5em 0' }}>
                         <FormLabel component="legend">Feedback Text</FormLabel>
