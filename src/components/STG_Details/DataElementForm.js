@@ -13,6 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react"
 import { FEEDBACK_TEXT, FEEDBACK_ORDER, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES_H2, AGG_TYPES, MAX_SHORT_NAME_LENGTH, VALUE_TYPES_TRACKER, MAX_FORM_NAME_LENGTH } from '../../configs/Constants.js';
+import { HNQISMWI_QUESTION_OPTION_SET, HNQISMWI_STD_OVERVIEW_VALUE_TYPE } from '../../configs/TemplateConstants.js';
 import { isLabelType, programIsHNQIS, programIsHNQISMWI } from '../../utils/Utils.js';
 import AlertDialogSlide from '../UIElements/AlertDialogSlide.js';
 import SelectOptions from '../UIElements/SelectOptions.js';
@@ -92,7 +93,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
         if (initOptionSets) { 
             setServerOptionSets(initOptionSets);
             if( programIsHNQISMWI(hnqisType) && structure === "question") {
-                const optionSet = initOptionSets.results.optionSets.find((item) => item.id=="Ri5XuSekdRg" ); // Option set "HNQIS MWI - YesNoNA"
+                const optionSet = initOptionSets.results.optionSets.find((item) => item.id == HNQISMWI_QUESTION_OPTION_SET ); // Option set "HNQIS MWI - YesNoNA"
                 optionSet.label = optionSet.name;
                 setOptionSet(optionSet);
                 if( optionSet ) setValueType(optionSet.valueType);
@@ -105,17 +106,18 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     }, [initLegendSets])
     
 
-    const metadata = JSON.parse(de?.attributeValues.find(att => att.attribute.id === METADATA)?.value || '{}');
-   
+    const metadata = JSON.parse(de?.attributeValues.find(att => att.attribute.id === METADATA)?.value || '{}')
+    const initStructure = metadata.elemType || 'question';
+    
     // States
-    const [structure, setStructure] = useState(metadata.elemType || 'question');
+    const [structure, setStructure] = useState(initStructure);
     const [valueType, setValueType] = useState(de?.valueType || '')
     const [aggType, setAggType] = useState(de?.aggregationType || 'NONE')
     const [formName, setFormName] = useState((metadata.elemType === 'label' ? metadata.labelFormName : de?.formName)?.replace(' [C]', '') || '')
     const [elementName, setElementName] = useState(de?.name || '')
     const [shortName, setShortName] = useState(de?.shortName || '')
     const [elementCode, setElementCode] = useState(de?.code || '')
-    const [compulsory, setCompulsory] = useState((metadata.isCompulsory? metadata.isCompulsory === 'Yes' : programStageDataElement.compulsory) ?? false)  // metadata.isCompulsory : ['Yes','No']
+    const [compulsory, setCompulsory] = useState(false)  // metadata.isCompulsory : ['Yes','No']
     const [displayInReports, setDisplayInReports] = useState(programStageDataElement.displayInReports ?? false)
     const [optionSet, setOptionSet] = useState(de?.optionSet ? { label: de.optionSet.name, id: de.optionSet.id } : null)
     const [legendSet, setLegendSet] = useState(de?.legendSet ? { label: de.legendSet.name, id: de.legendSet.id } : null)
@@ -133,35 +135,67 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     const [dialogStatus, setDialogStatus] = useState(false)
     const [autoNaming, setAutoNaming] = useState(metadata.autoNaming === 'No'?false:true)
 
+    // Initilize the values of the structure, valueType, optionSet and compulsory
     useEffect(() => {
+        let _compulsory = (metadata.isCompulsory? metadata.isCompulsory === 'Yes' : programStageDataElement.compulsory) ?? false
+        let _structure = structure;
+        let _valueType;
+        let _optionSet;
+        
         const elemTypes = getElemType();
-        if( elemTypes.length === 1 ) {
-            setStructure( elemTypes[0].value );
-            setValueType('NUMBER');
-            setOptionSet(null);
+        if( programIsHNQISMWI(hnqisType) ) {
+            if(  elemTypes.length === 1 ) { // For "Std Overview" case
+                _structure = elemTypes[0].value
+                _valueType = HNQISMWI_STD_OVERVIEW_VALUE_TYPE
+                _optionSet = null;
+            }
+            
+            // For HNQISMWI, for 'question' DEs, the compulsory is set as TRUE
+            if( _structure === 'question' ) {
+                _compulsory = true
+            }
+            // For HNQISMWI, for 'Std Overview' DEs, the compulsory is set as FALSE
+            else if( _structure === 'Std Overview' ) {
+                _compulsory = false
+            }
         }
         else {
             setStructure( metadata.elemType || 'question');
         }
+        
+        if( _structure != structure ) setStructure( _structure )
+        if( _valueType ) setValueType( _valueType )
+        if( _optionSet ) setOptionSet( _optionSet )
+        setCompulsory(_compulsory)
+        
     }, [])
     
     
     // Handlers
     const elemTypeChange = (e) => {
         setStructure(e.target.value)
+        
         if (e.target.value === 'label') {
-            setValueType('LONG_TEXT');
-            setOptionSet(null);
-        } 
-        else if (e.target.value === 'Std Overview') {
-            setValueType('NUMBER');
-            setOptionSet(null);
+            setValueType('LONG_TEXT')
+            setOptionSet(null)
+            setCompulsory(false)
         }
-        else if( e.target.value === 'question' ) {
-            const optionSet = serverOptionSets.results.optionSets.find((item) => item.id=="Ri5XuSekdRg" ); // Option set "HNQIS MWI - YesNoNA"
-            optionSet.label = optionSet.name;
-            setOptionSet(optionSet);
-            if( optionSet ) setValueType(optionSet.valueType);
+        else if( programIsHNQISMWI(hnqisType) ) {
+            if ( e.target.value === 'Std Overview') {
+                setValueType(HNQISMWI_STD_OVERVIEW_VALUE_TYPE)
+                setOptionSet(null)
+                setCompulsory(false)
+            }
+            else if( e.target.value === 'question' ) {
+                const optionSet = serverOptionSets.results.optionSets.find((item) => item.id == HNQISMWI_QUESTION_OPTION_SET ); // Option set "HNQIS MWI - YesNoNA"
+                optionSet.label = optionSet.name
+                setOptionSet(optionSet)
+                if( optionSet ) setValueType(optionSet.valueType)
+                setCompulsory(true)
+            }
+            else {
+                setCompulsory(false)
+            }
         }
     }
 
@@ -227,7 +261,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     }
 
     const compulsoryChange = (data) => setCompulsory(data.target.checked)
-
+    
     const removeNamingValidationErrors = () => {
         validationErrors.formName = undefined
         validationErrors.elementName = undefined
@@ -668,10 +702,10 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     <FormLabel component="legend">Behavior in Current Stage</FormLabel>
                     <Grid item style={{ display: 'flex' }}>
                         <FormControlLabel
-                            disabled={structure === 'label' || structure === 'Std Overview'}
+                            disabled={structure === 'label' || programIsHNQISMWI(hnqisType)}
                             control={
                                 <Switch
-                                    checked={compulsory && (structure !== 'label' || structure !== 'Std Overview')}
+                                    checked={compulsory}
                                     onChange={compulsoryChange}
                                 />}
                             label="Compulsory"
@@ -727,7 +761,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                         
                             <Autocomplete
                                 id="optionSetsSelect"
-                                disabled={structure === 'label' || structure === 'Std Overview' || programIsHNQISMWI(hnqisType)}
+                                disabled={structure === 'label' || ( programIsHNQISMWI(hnqisType) )}
                                 options={
                                     serverOptionSets?.results.optionSets.filter(os => !programIsHNQIS(hnqisType) || os.name?.toLowerCase().includes("hnqis")).map(os =>
                                         ({ label: os.name, id: os.id, valueType: os.valueType })

@@ -501,3 +501,6 @@ export const getPromptsFormula = (validationsList, rowNumber) => {
     formula = formula + ',"")';
     return formula;
 }
+
+export const HNQISMWI_STD_OVERVIEW_VALUE_TYPE = "LONG_TEXT"
+export const HNQISMWI_QUESTION_OPTION_SET = "Ri5XuSekdRg"
