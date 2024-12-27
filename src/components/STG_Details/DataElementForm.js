@@ -92,11 +92,16 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     useEffect(() => {
         if (initOptionSets) { 
             setServerOptionSets(initOptionSets);
-            if( programIsHNQISMWI(hnqisType) && structure === "question") {
-                const optionSet = initOptionSets.results.optionSets.find((item) => item.id == HNQISMWI_QUESTION_OPTION_SET ); // Option set "HNQIS MWI - YesNoNA"
-                optionSet.label = optionSet.name;
-                setOptionSet(optionSet);
-                if( optionSet ) setValueType(optionSet.valueType);
+            if( programIsHNQISMWI(hnqisType) ) {
+                if( structure === "question" ) {
+                    const optionSet = initOptionSets.results.optionSets.find((item) => item.id == HNQISMWI_QUESTION_OPTION_SET ); // Option set "HNQIS MWI - YesNoNA"
+                    optionSet.label = optionSet.name;
+                    setOptionSet(optionSet);
+                    if( optionSet ) setValueType(optionSet.valueType);
+                }
+                else {
+                    setOptionSet(null);
+                }
             }
         }
     }, [initOptionSets])
@@ -147,7 +152,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
             if(  elemTypes.length === 1 ) { // For "Std Overview" case
                 _structure = elemTypes[0].value
                 _valueType = HNQISMWI_STD_OVERVIEW_VALUE_TYPE
-                _optionSet = null;
+                _optionSet = null
             }
             
             // For HNQISMWI, for 'question' DEs, the compulsory is set as TRUE
