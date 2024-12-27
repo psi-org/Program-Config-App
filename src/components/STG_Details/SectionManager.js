@@ -11,8 +11,8 @@ import { HNQISMWI_PROGRAM_STAGE_SECTION_TYPES, MAX_SECTION_NAME_LENGTH, METADATA
 import SelectOptions from '../UIElements/SelectOptions.js';
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
-import { DeepCopy, getSectionType, programIsHNQISMWI } from '../../utils/Utils.js';
-import { HNQISMWI_SectionDataElements } from '../../configs/ProgramTemplate.js';
+import { DeepCopy, getSectionType, programIsHNQIS, programIsHNQISMWI } from '../../utils/Utils.js';
+import { HNQISMWI_ActionPlanElements, HNQISMWI_SectionDataElements } from '../../configs/ProgramTemplate.js';
 
 const queryId = {
     results: {
@@ -91,7 +91,9 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
             
             if (hnqisMode) { setSaveStatus('Validate & Save') }
             refreshSections(sections);
-            notify(<span>Section {newSectionIndex !== undefined ? 'created' : 'edited'}! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong></span>);
+            
+            const numbersWarmingMsg = programIsHNQIS(hnqisType) ? "The numbers of section will be changed to proper number after saved." : ""
+            notify(<span>Section {newSectionIndex !== undefined ? 'created' : 'edited'}! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong> <span>{numbersWarmingMsg}</span></span>);
             setAddedSection({ index: sectionIndex ?? newSectionIndex, mode: newSectionIndex !== undefined ? 'created' : 'edited', dataElements: [] });
             hideForm()
         }
@@ -113,8 +115,19 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
             
             return de;
         });
+        
         return de[0];
     }
+    
+    // const createCriterionDataElements = () => {
+    //     return DeepCopy(HNQISMWI_ActionPlanElements).map(de => {
+    //         de.code = `${programPrefix} - x.x.x ${de.code}`;
+    //         de.name = `${programPrefix} - ${sectionNumber}.${standardNumber}.${criterionNumber} ${de.name}`;
+    //         de.shortName = `${programPrefix} - ${sectionNumber}.${standardNumber}.${criterionNumber} ${de.shortName}`;
+    //         de.formName = `${sectionNumber}.${standardNumber}.${criterionNumber} ${de.formName}`;
+    //         return de;
+    //     })
+    // }
     
     const getMWISectionName = () => {
         if( sections[sectionIndex] ) {
@@ -123,17 +136,19 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
         }
         else {
             let sectionPrefix = type;
-            if( type === "Standard" ) {
-                sectionPrefix = `> ${type}`;
+            if( type === "Section" ) {
+                sectionPrefix = `${type} x`; // "x" here will be replaced to a proper number after saving
+            }
+            else if( type === "Standard" ) {
+                sectionPrefix = `> ${type} x.x`;
             }
             else if( type === "Criterion" ) {
-                sectionPrefix = `> > ${type}`;
+                sectionPrefix = `> > ${type} x.x.x`;
             }
             
-            return `${sectionPrefix} ${newSectionIndex} : ${sectionName}`;
+            return `${sectionPrefix} : ${sectionName}`;
         }
     }
-    
 
     return (
         <CustomMUIDialog open={true} maxWidth='md' fullWidth={true} >
