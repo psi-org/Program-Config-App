@@ -39,7 +39,7 @@ const ValidateMetadata = (
     const initValidationMsg = () => {
         let msg = "Metadata validated. Please use the 'SAVE' button to persist your changes.";
         if( programIsHNQISMWI(hnqisType) ) {
-            msg += " The number of sections may be re-orderred.";
+            msg += " The number of sections may be reset.";
         }
         
         return msg;

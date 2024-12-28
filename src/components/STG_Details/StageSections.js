@@ -1618,7 +1618,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
                     hnqisType={hnqisType}
                     hnqisMode={!!hnqisType}
                     setSaveStatus={setSaveStatus}
-                    dePrefix={programMetadata.dePrefix || 'XXXXXXXXXXX'}
                 />
             }
             {deManager &&

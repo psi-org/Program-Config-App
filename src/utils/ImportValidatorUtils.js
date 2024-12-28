@@ -1,4 +1,5 @@
 import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMENT_NAME_LENGTH } from "../configs/Constants.js";
+import { HNQISMWI_ActionPlanElements } from "../configs/ProgramTemplate.js";
 import { getVarNameFromParentUid } from "./ExcelUtils.js";
 import { extractAttributeValues, getPCAMetadataDE, getSectionType, hasAttributeValue, isBlank, isGeneratedType, isNum, isValidCorrelative, isValidParentName, padValue, setPCAMetadata } from "./Utils.js";
 
@@ -1096,4 +1097,38 @@ const checkQuestionsExist = (prgStgSection) => {
     }
 
     return questionFound;
+}
+
+// Check if "Criterion" have required data elements
+const checkCriterionRequiredDEs = (prgStgSection) => {
+    const dataElements = prgStgSection.dataElements;
+    if(!dataElements || dataElements.length == 0 || dataElements.length < HNQISMWI_ActionPlanElements.length )
+    {
+        return false
+    }
+    
+    const valid = true
+    try
+    {
+        prgStgSection?.dataElements.forEach( (dataElement) => {
+
+            const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
+
+            if ( metaDataStringArr.length > 0 ) 
+            {
+                const metaData = JSON.parse( metaDataStringArr[0].value );
+
+                if ( metaData?.elemType === "Std Overview" ) valid.stdOverview ++;
+            }
+            else {
+                valid.others = true;
+            }
+        });
+        
+        return valid
+    }
+    catch( errMsg ) {
+        console.log( 'ERROR in ValidationMedadata > checkStdOverview, ' + errMsg );
+    }
+    
 }

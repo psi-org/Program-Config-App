@@ -22,6 +22,7 @@ import InfoBox from './../UIElements/InfoBox.js';
 import ProgramRulesList from './../UIElements/ProgramRulesList.js'
 import MarkDownEditor from './MarkDownEditor.js';
 import RowRadioButtonsGroup from './RowRadioButtonsGroup.js';
+import { resolveDEPrefix } from '../../utils/importerUtils.js';
 
 const optionSetQuery = {
     results: {
@@ -489,7 +490,6 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
             data.code = elementCode;
         }
 
-
         // METADATA
         // Elem type
         metadata.isCompulsory = compulsory ? "Yes" : "No";
@@ -519,7 +519,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
         if (programIsHNQIS(hnqisType)) { setSaveStatus('Validate & Save') }
 
     }
-
+    
     //Handling create New Data Element
     useEffect(() => {
         if (saveFlag && setSaveFlag) {
@@ -660,7 +660,6 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
         </div>
     ]
     
-    console.log(" --- optionSet ", optionSet);
    
     return (
         <div className={de ? "dataElement_cont" : ''}>

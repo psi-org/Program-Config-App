@@ -14,14 +14,15 @@ import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 import { DeepCopy, getSectionType, programIsHNQIS, programIsHNQISMWI } from '../../utils/Utils.js';
 import { HNQISMWI_ActionPlanElements, HNQISMWI_SectionDataElements } from '../../configs/ProgramTemplate.js';
 
+const DEID_NO = HNQISMWI_SectionDataElements.length + HNQISMWI_ActionPlanElements.length + 1;
 const queryId = {
     results: {
         resource: 'system/id.json',
-        params: { limit: 1 }
+        params: { limit: DEID_NO }
     }
 };
 
-const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notify, refreshSections, sectionIndex, sections, setAddedSection, setSaveStatus, setShowSectionForm }) => {
+const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refreshSections, sectionIndex, sections, setAddedSection, setSaveStatus, setShowSectionForm }) => {
     
     const [type, setType] = useState("Section");
     const [critical, setCritical] = useState(false);
@@ -30,7 +31,7 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
 
     const idsQuery = useDataQuery(queryId);
     const sectionId = idsQuery.data?.results.codes[0];
-
+console.log("==== 1 ", idsQuery.data?.results.codes);
     
     useEffect(() => {
         if( programIsHNQISMWI(hnqisType) && sections[sectionIndex] ) {
@@ -59,30 +60,12 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
     function submission() {
         setSentForm(true)
         const section = sections[sectionIndex] || {};
+        let numbersWarmingMsg = ""
+        
         if (formDataIsValid()) {
             if( programIsHNQISMWI(hnqisType) ) {
-                section.name = getMWISectionName();
-                section.displayName = section.name;
-                if (sectionIndex !== undefined) {
-                    sections[sectionIndex] = section;
-                } else if (newSectionIndex !== undefined) {
-                    section.dataElements = [];
-                    section.id = sectionId;
-                    sections.splice(newSectionIndex, 0, section);
-                }
-                
-                if(critical) {
-                    section.description = "*";
-                }
-                else {
-                    delete section.description;
-                }
-                
-                if( type === "Section" ) {
-                    const sectionDE = createSectionDataElement();
-                    section.dataElements = [];
-                    section.dataElements.push(sectionDE);
-                }
+                setHNQISMWISection(section)
+                numbersWarmingMsg = "The numbers of section will be set/reset to proper number after saved."
             }
             else {
                 section.name = sectionName;
@@ -92,25 +75,60 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
             if (hnqisMode) { setSaveStatus('Validate & Save') }
             refreshSections(sections);
             
-            const numbersWarmingMsg = programIsHNQIS(hnqisType) ? "The numbers of section will be changed to proper number after saved." : ""
-            notify(<span>Section {newSectionIndex !== undefined ? 'created' : 'edited'}! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong> <span>{numbersWarmingMsg}</span></span>);
-            setAddedSection({ index: sectionIndex ?? newSectionIndex, mode: newSectionIndex !== undefined ? 'created' : 'edited', dataElements: [] });
+            notify(<span>Section {newSectionIndex !== undefined ? 'created' : 'edited'}! <strong>Remember to {hnqisMode ? " Validate and Save!" : " save your changes!"}</strong> <br/><strong>{numbersWarmingMsg}</strong></span>);
+            setAddedSection({ index: sectionIndex ?? newSectionIndex, mode: newSectionIndex !== undefined ? 'created' : 'edited', dataElements: [] })
             hideForm()
         }
     }
     
-    const createSectionDataElement = () => {
-        const de = DeepCopy(HNQISMWI_SectionDataElements).map(de => {
+    // Set id( if needed), name, description, dataElements( if needed ) for section (Section, Standard, Criterion)
+    const setHNQISMWISection = (section) => {
+        section.name = getMWISectionName();
+        section.displayName = section.name;
+        
+        if (sectionIndex !== undefined) { // Edit section
+            sections[sectionIndex] = section
+        } else if (newSectionIndex !== undefined) { // New section
+            section.dataElements = []
+            section.id = sectionId
+            sections.splice(newSectionIndex, 0, section)
             
-            const deId = idsQuery.data?.results.codes[0];
+            
+            if( type === "Section" ) {
+                const sectionDE = createHNQISMWISectionDataElement()
+                section.dataElements = []
+                section.dataElements.push(sectionDE)
+            }
+            else if( type === "Criterion" ) {
+                const sectionDEs = createHNQISMWICriterionDataElements()
+                section.dataElements = []
+                section.dataElements = (sectionDEs)
+            }
+        }
+        
+        if(critical) {
+            section.description = "*";
+        }
+        else {
+            delete section.description;
+        }
+    }
+
+    // Create Data Element for section "Section"
+    const createHNQISMWISectionDataElement = () => {
+        const de = DeepCopy(HNQISMWI_SectionDataElements).map((de, idx) => {
+            
+            const deIdIdx = idx + 1; // +1 because the first one is "sectionId"
+            const deId = idsQuery.data?.results.codes[deIdIdx];
+console.log("==== 2 ", idsQuery.data?.results.codes);
             de.id = deId;
-            de.code = `${dePrefix} - Section ${newSectionIndex}`;
-            de.name = `${dePrefix} - Section ${newSectionIndex}`;
-            de.shortName = `${dePrefix} - Section ${newSectionIndex}`;
-            de.formName = `Section ${newSectionIndex}`;
+            de.code = `${deId}`;
+            de.name = `${deId} - Section #`;
+            de.shortName = `${deId} - Section #`;
+            de.formName = `Section #`;
             
             const attributeValue = JSON.parse(de.attributeValues[0].value);
-            attributeValue.varName = `Section ${newSectionIndex}`;
+            attributeValue.varName = `Section #`;
             de.attributeValues[0].value = JSON.stringify(attributeValue);
             
             return de;
@@ -119,15 +137,26 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
         return de[0];
     }
     
-    // const createCriterionDataElements = () => {
-    //     return DeepCopy(HNQISMWI_ActionPlanElements).map(de => {
-    //         de.code = `${programPrefix} - x.x.x ${de.code}`;
-    //         de.name = `${programPrefix} - ${sectionNumber}.${standardNumber}.${criterionNumber} ${de.name}`;
-    //         de.shortName = `${programPrefix} - ${sectionNumber}.${standardNumber}.${criterionNumber} ${de.shortName}`;
-    //         de.formName = `${sectionNumber}.${standardNumber}.${criterionNumber} ${de.formName}`;
-    //         return de;
-    //     })
-    // }
+    /** Create Data Elements needed for section "Criterion"
+     * 1. Check if there are DEs we needed existed in "Criterion"
+     * 2. If not, create them
+     * */ 
+    const createHNQISMWICriterionDataElements = () => {
+        return DeepCopy(HNQISMWI_ActionPlanElements).map((de, idx) => {
+            
+            const deIdIdx = idx + HNQISMWI_SectionDataElements.length + 1; // +1 because the first one is "sectionId"
+            const deId = idsQuery.data?.results.codes[deIdIdx];
+
+            de.id = deId
+            de.code = `${deId}`
+            de.name = `${deId} - #.#.# ${de.name}`
+            de.displayName = de.name
+            de.shortName = `${deId} - #.#.# ${de.shortName}`
+            de.formName = `#.#.# ${de.formName}`
+            
+            return de
+        })
+    }
     
     const getMWISectionName = () => {
         if( sections[sectionIndex] ) {
@@ -137,13 +166,13 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
         else {
             let sectionPrefix = type;
             if( type === "Section" ) {
-                sectionPrefix = `${type} x`; // "x" here will be replaced to a proper number after saving
+                sectionPrefix = `${type} #`; // "#" here will be replaced to a proper number after saving
             }
             else if( type === "Standard" ) {
-                sectionPrefix = `> ${type} x.x`;
+                sectionPrefix = `> ${type} #.#`;
             }
             else if( type === "Criterion" ) {
-                sectionPrefix = `> > ${type} x.x.x`;
+                sectionPrefix = `> > ${type} #.#.#`;
             }
             
             return `${sectionPrefix} : ${sectionName}`;
@@ -200,7 +229,6 @@ const SectionManager = ({ hnqisMode, hnqisType, dePrefix, newSectionIndex, notif
 }
 
 SectionManager.propTypes = {
-    dePrefix: PropTypes.string,
     hnqisMode: PropTypes.bool,
     hnqisType: PropTypes.string,
     newSectionIndex: PropTypes.number,

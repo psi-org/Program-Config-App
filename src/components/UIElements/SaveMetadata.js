@@ -8,10 +8,10 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect } from "react";
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue, programIsHNQIS, isLabelType } from "../../utils/Utils.js";
+import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue, programIsHNQIS, isLabelType, getSectionType } from "../../utils/Utils.js";
 import CustomMUIDialog from './CustomMUIDialog.js';
 import CustomMUIDialogTitle from './CustomMUIDialogTitle.js';
-import { reorderMWISectionNumbering } from "../../utils/importerUtils.js";
+import { resetMWISectionNumbering, resolveDEPrefix } from "../../utils/importerUtils.js";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -56,6 +56,7 @@ const buildRemovedDE = (de) => {
     de.name = de.name.replaceAll(/\d{7}\[X\]/g,'').slice(0, MAX_FORM_NAME_LENGTH - suffix.length) + suffix;
     de.shortName = de.id + ' ' + suffix;
     delete de.code;
+    
     return de
 }
 
@@ -92,7 +93,7 @@ const processStageData = (
     }
 
     // For HNQISMWI, we need to re-order the numbers for programStageSections
-    reorderMWISectionNumbering(importedSections);
+    const processingSections = JSON.parse(JSON.stringify(importedSections))
     
     /**
      * Delete importStatus: section & Data Elements
@@ -106,10 +107,11 @@ const processStageData = (
     let secIdx = 0;
     let deIdx = 1;
 
-    importedSections.forEach(section => {
+    processingSections.forEach(section => {
 
         if (hnqisType === 'HNQISMWI') {
-            if (section.name.match(/Section \d+ : /)) {
+            const sectionType = getSectionType(section)
+            if (sectionType === "Section") {
                 secIdx += 1;
                 deIdx = 1;
             }
@@ -175,7 +177,7 @@ const processStageData = (
             let allowFutureDate = existingPSDE?.allowFutureDate;
 
             // Matches if form name is #.#.# Due Date in HNQIS MWI Programs to define if future date is enabled
-            if (hnqisType === 'HNQISMWI' && dataElement.formName?.match(/\d+.\d+.\d+ Due Date/)) {
+            if (hnqisType === 'HNQISMWI' && dataElement.formName?.match(/\w+.\w+.\w+ Due Date/)) {
                 allowFutureDate = true;
             }
 
@@ -203,15 +205,17 @@ const processStageData = (
                 deIdx += 1;
             }
         });
+        
 
         delete section.importStatus;
         section.sortOrder = sectionOrder;
         sectionOrder += 1;
     });
-
+    resetMWISectionNumbering(processingSections);
+    
     // Map parent name with data element uid
-    const importedDataElements = importedSections.map(sec => sec.dataElements).flat();
-    importedSections.map(section => {
+    const importedDataElements = processingSections.map(sec => sec.dataElements).flat();
+    processingSections.map(section => {
         section.dataElements.map(de => {
             const attributeValues = de.attributeValues;
             if (de.parentQuestion) {
@@ -229,7 +233,7 @@ const processStageData = (
     });
 
     new_dataElements = new_dataElements.concat(
-        importedSections.map(is => is.dataElements.map(de => {
+        processingSections.map(is => is.dataElements.map(de => {
             delete de.parentQuestion
             delete de.parentName
             return de
@@ -259,8 +263,8 @@ const processStageData = (
         });
 
         //*Set new critical steps and scores section order
-        criticalSection.sortOrder = importedSections.length + 1;
-        importedScores.sortOrder = importedSections.length + 2;
+        criticalSection.sortOrder = processingSections.length + 1;
+        importedScores.sortOrder = processingSections.length + 2;
 
     }
 
@@ -278,7 +282,7 @@ const processStageData = (
 
     //*Replace sections and Data Elements on program stage
     const specialSections = hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2 ? [importedScores].concat(criticalSection) : [];
-    programStage.programStageSections = !isBasicForm ? [...importedSections, ...specialSections]: [];
+    programStage.programStageSections = !isBasicForm ? [...processingSections, ...specialSections]: [];
     programStage.programStageDataElements = new_programStageDataElements;
 
     //*PROGRAM UPDATE ==> trackedEntityAttributes, attributeValues[metadata]
@@ -377,7 +381,7 @@ const processProgramData = (
                 uidPool,
                 hnqisType,
                 programStage,
-                importedSections: programStage.importedSections,
+                importedSections: programStage.processingSections,
                 removedItems: importResults.stages.find(stage => stage.id === programStage.id)?.dataElements?.removedItems || [],
                 programMetadata,
                 stagesList: stagesList,

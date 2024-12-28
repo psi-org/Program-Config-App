@@ -458,11 +458,11 @@ export const isGeneratedType = (type) => {
 
 export const getSectionType = (prgStgSection) => {
     // For NEW Section, "x" will be added instead of numbers. When metadata is saved, the "x" will be changed to proper number
-    if (prgStgSection.name.match(/Section \w+.*/)) { //    /Section \d+.*/
+    if (prgStgSection.name.match(/Section (\d+|#)/)) { //    /Section \d+.*/
         return "Section";
-    } else if (prgStgSection.name.match(/> Standard \w+(\.\w+)*.*/)) { //    /> Standard \d+(\.\d+)*.*/)
+    } else if (prgStgSection.name.match(/> Standard ((\d+|#)(\.(\d+|#))+)/)) { //    /> Standard \d+(\.\d+)*.*/)
         return "Standard";
-    } else if (prgStgSection.name.match(/> > Criterion \w+(\.\w+)*.*/)) { //     /> > Criterion \d+(\.\d+)*.*/
+    } else if (prgStgSection.name.match(/> > Criterion ((\d+|#)(\.(\d+|#))+)/)) { //     /> > Criterion \d+(\.\d+)*.*/
         return "Criterion";
     }
 
