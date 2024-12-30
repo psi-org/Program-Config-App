@@ -469,6 +469,26 @@ export const getSectionType = (prgStgSection) => {
     return;
 }
 
+export const getDEMetadata = (dataElement) => {
+    const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
+    return ( metaDataStringArr.length > 0 )  ? JSON.parse( metaDataStringArr[0].value ) : undefined
+}
+
+export const isDEQuestion = (dataElement) => {
+    const metaData = getDEMetadata(dataElement)
+    return (metaData ) ? metaData?.elemType === "question" : false
+}
+
+export const isDEStdOverview = (dataElement) => {
+    const metaData = getDEMetadata(dataElement)
+    return (metaData ) ? metaData?.elemType === "Std Overview" : false
+}
+
+export const isCriterionDEGenerated = (dataElement) => {
+    const metaData = getDEMetadata(dataElement)
+    return (metaData ) ? metaData?.elemType === "generated" : false
+}
+
 export const deepMerge = (obj1, obj2) => {
     const result = { ...obj1 };
   

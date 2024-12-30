@@ -1,7 +1,7 @@
 import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMENT_NAME_LENGTH } from "../configs/Constants.js";
 import { HNQISMWI_ActionPlanElements } from "../configs/ProgramTemplate.js";
 import { getVarNameFromParentUid } from "./ExcelUtils.js";
-import { extractAttributeValues, getPCAMetadataDE, getSectionType, hasAttributeValue, isBlank, isGeneratedType, isNum, isValidCorrelative, isValidParentName, padValue, setPCAMetadata } from "./Utils.js";
+import { extractAttributeValues, getPCAMetadataDE, getSectionType, hasAttributeValue, isBlank, isCriterionDEGenerated, isDEQuestion, isDEStdOverview, isGeneratedType, isNum, isValidCorrelative, isValidParentName, padValue, setPCAMetadata } from "./Utils.js";
 
 export const HNQIS2_VALIDATION_SETTINGS = {
     sections: {
@@ -853,8 +853,9 @@ export const buildProgramConfigurations = (input) => {
 export const validateMetadataStructure = ( prgStgSections ) => {
     let currSecJson;
     let currStdJson;
+    let currCrtJson;
     
-    // STEP 1. Go Through programStageSections
+    // Go Through programStageSections
     prgStgSections.forEach( ( pgStgSec ) => {
 
         const typeName = getSectionType( pgStgSec );
@@ -865,6 +866,11 @@ export const validateMetadataStructure = ( prgStgSections ) => {
                 generateErrorMessage( currSecJson, "Standard Error", "NOT FOUND", `'${currSecJson.displayName}' must have at least one 'Standard'.`);
             }
             
+            // Check "Standard" and "Criterion"
+            if( currStdJson && !currCrtJson ) {
+                generateErrorMessage( currStdJson, "Standard Error", "NOT FOUND", `'${currStdJson.displayName}' must have at least one 'Criterion'.`);
+            }
+                
             // Create 'section' validation data for checking structure later
             currSecJson = pgStgSec;
             currStdJson = undefined;
@@ -894,6 +900,8 @@ export const validateMetadataStructure = ( prgStgSections ) => {
             }
         }
         else if ( typeName === 'Criterion' ) {
+            currCrtJson = pgStgSec
+            
             // Check if "Criterion" does not belong to a "Standard"
             if( !currStdJson ) {
                 generateErrorMessage( pgStgSec, "Criterion Error", "NOT FOUND", `'${pgStgSec.displayName}' must belong to a 'Standard'.`);
@@ -902,10 +910,28 @@ export const validateMetadataStructure = ( prgStgSections ) => {
             if( !checkQuestionsExist(pgStgSec) ) {
                 generateErrorMessage( pgStgSec, "Criterion Error", "NOT FOUND", `'${pgStgSec.displayName}' must have at least one question.`);
             }
+            // Check if "Criterion" have required data elements ""
+            if( !checkCriterionRequiredDEs(pgStgSec) ) {
+                const requiredDENames = HNQISMWI_ActionPlanElements.map(item => item.name )
+                generateErrorMessage( pgStgSec, "Criterion Error", "NOT FOUND", `'${pgStgSec.displayName}' must have required data elements, includes ${requiredDENames.join(", ")}`);
+            }
+            
         }
-    });
+    })
     
-  
+    // // Tf there is one one stage section, try to check which one is missing
+    // if( prgStgSections.length === 1 ) {
+    
+    // If 'section' exists, then show messge this section is missig "Standard"
+    if( currSecJson && !currStdJson ) {
+        generateErrorMessage( currSecJson, "Section Error", "NOT FOUND", `'${currSecJson.displayName}' must have at least one 'Standard'.`);
+    }
+    
+    // Standard doesn't have any Criterion
+    if( currStdJson && !currCrtJson  ) {
+        generateErrorMessage( currStdJson, "Standard Error", "NOT FOUND", `'${currStdJson.displayName}' must have at least one 'Criterion'.`);
+    }
+    // }
 }
 
 // export const validateMetadataStructure_BK = ( prgStgSections ) => {
@@ -1052,19 +1078,24 @@ const checkStdOverview = (prgStgSection) => {
     try
     {
         prgStgSection?.dataElements.forEach( (dataElement) => {
-
-            const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
-
-            if ( metaDataStringArr.length > 0 ) 
-            {
-                const metaData = JSON.parse( metaDataStringArr[0].value );
-
-                if ( metaData?.elemType === "Std Overview" ) valid.stdOverview ++;
-                else valid.others++;
+            if( isDEStdOverview(dataElement) ) {
+                valid.stdOverview ++;
             }
             else {
                 valid.others = true;
             }
+            // const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
+
+            // if ( metaDataStringArr.length > 0 ) 
+            // {
+            //     const metaData = JSON.parse( metaDataStringArr[0].value );
+
+            //     if ( metaData?.elemType === "Std Overview" ) valid.stdOverview ++;
+            //     else valid.others++;
+            // }
+            // else {
+            //     valid.others = true;
+            // }
         });
     }
     catch( errMsg ) {
@@ -1081,15 +1112,17 @@ const checkQuestionsExist = (prgStgSection) => {
     try
     {
         prgStgSection?.dataElements.forEach( (dataElement) => {
-
-            const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
-
-            if ( metaDataStringArr.length > 0 ) 
-            {
-                const metaData = JSON.parse( metaDataStringArr[0].value );
-
-                if ( metaData?.elemType === "question" ) questionFound = true;
+            if( isDEQuestion(dataElement) ) {
+                questionFound = true
             }
+            // const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
+
+            // if ( metaDataStringArr.length > 0 ) 
+            // {
+            //     const metaData = JSON.parse( metaDataStringArr[0].value );
+
+            //     if ( metaData?.elemType === "question" ) questionFound = true;
+            // }
         });
     }
     catch( errMsg ) {
@@ -1102,33 +1135,44 @@ const checkQuestionsExist = (prgStgSection) => {
 // Check if "Criterion" have required data elements
 const checkCriterionRequiredDEs = (prgStgSection) => {
     const dataElements = prgStgSection.dataElements;
-    if(!dataElements || dataElements.length == 0 || dataElements.length < HNQISMWI_ActionPlanElements.length )
-    {
+    if(!dataElements || dataElements.length == 0 || dataElements.length < HNQISMWI_ActionPlanElements.length ) {
         return false
     }
     
-    const valid = true
     try
     {
+        const nameList = [];
         prgStgSection?.dataElements.forEach( (dataElement) => {
-
-            const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
-
-            if ( metaDataStringArr.length > 0 ) 
-            {
-                const metaData = JSON.parse( metaDataStringArr[0].value );
-
-                if ( metaData?.elemType === "Std Overview" ) valid.stdOverview ++;
+            
+            if( isCriterionDEGenerated(dataElement) ) {
+                // Search the name of DE is proper name which is defined in template
+                // In template, the name is "Criterion Status". The real name of DE should be "<somethinghere>_1.1.1 Criterion Status"
+                const found = HNQISMWI_ActionPlanElements.filter(item => dataElement.name.indexOf( item.name ) > 0 )
+                if( found.length > 0 && nameList.indexOf(found[0].name) < 0 ) {
+                    nameList.push( found[0].name )
+                }
             }
-            else {
-                valid.others = true;
-            }
+
+            // const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
+
+            // if ( metaDataStringArr.length > 0 ) 
+            // {
+            //     const metaData = JSON.parse( metaDataStringArr[0].value );
+            //     if ( metaData?.elemType === "generated" ) {
+            //         // Search the name of DE is proper name which is defined in template
+            //         // In templete, the name is "Criterion Status". The real name of DE should be "<somethinghere>_1.1.1 Criterion Status"
+            //         const found = HNQISMWI_ActionPlanElements.filter(item => dataElement.name.indexOf( item.name ) > 0 )
+            //         if( found.length > 0 && nameList.indexOf(found[0].name) < 0 ) {
+            //             nameList.push( found[0].name )
+            //         }
+            //     }
+            // }
         });
         
-        return valid
+        return nameList.length === HNQISMWI_ActionPlanElements.length;
     }
     catch( errMsg ) {
-        console.log( 'ERROR in ValidationMedadata > checkStdOverview, ' + errMsg );
+        console.log( 'ERROR in ValidationMedadata > checkCriterionRequiredDEs, ' + errMsg );
     }
     
 }
