@@ -16,13 +16,14 @@ import PropTypes from 'prop-types';
 import React, { useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { METADATA } from "../../configs/Constants.js";
-import { isGeneratedType, isLabelType } from '../../utils/Utils.js';
+import { isCriterionDEGenerated, isGeneratedType, isLabelType, programIsHNQISMWI } from '../../utils/Utils.js';
 import AlertDialogSlide from "../UIElements/AlertDialogSlide.js";
 import BadgeErrors from "../UIElements/BadgeErrors.js";
 import BadgeWarnings from "../UIElements/BadgeWarnings.js";
 import ValidationMessages from "../UIElements/ValidationMessages.js";
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import DataElementForm from "./DataElementForm.js";
+import DataElementItem from './DataElementItem.js';
 
 const getDEIcon = (elemType, hnqisType) => {
     if (!hnqisType) {
@@ -75,6 +76,14 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                 break;
         }
     }
+    
+    const isDisabled = () => {
+        if( (programIsHNQISMWI(hnqisType) && isCriterionDEGenerated(dataElement) )  ) {
+            return true
+        }
+        
+        return dataElement.importStatus != undefined || DEActions.deToEdit !== '' || !isSectionMode || readOnly
+    }
 
     return (
         <>
@@ -82,106 +91,29 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                 key={dataElement.id || index}
                 draggableId={dataElement.id || dataElement.formName?.slice(-15) || index}
                 index={index}
-                isDragDisabled={dataElement.importStatus != undefined || DEActions.deToEdit !== '' || !isSectionMode || readOnly}
+                isDragDisabled={isDisabled()}
             >
                 {(provided) => (
                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} >
-                        <div id={"de_" + dataElement.id} className={'data-element-header ' + (openMenu ? 'data-element-selected ' : '') + classNames}>
-                            <div className="ml_item-icon" style={{ display: 'flex', alignItems: 'center' }}>
-                                {getDEIcon(metadata.elemType, hnqisType)}
-                            </div>
-                            <div className="ml_item-title" style={{ maxWidth: '80vw' }}>
-                                {deImportStatus}
-                                {
-                                    renderFormName ? renderFormName :
-                                        (
-                                            (dataElement.formName && dataElement.formName?.replaceAll(' ', '') !== '')
-                                                ?
-                                                <div style={{
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    whiteSpace: 'nowrap'
-                                                }}>
-                                                    {dataElement.formName}
-                                                </div>
-                                                :
-                                                <span style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <em style={{ marginRight: '0.5em' }}>{dataElement.name}</em>
-                                                    <Tooltip title="No Form Name provided" placement="right" color="warning">
-                                                        <WarningAmberIcon fontSize="small" />
-                                                    </Tooltip>
-                                                </span>
-                                        )
-                                }
-                            </div>
-                            <div className="ml_item-warning_error" onClick={() => setShowValidationMessage(!showValidationMessage)}>
-                                {dataElement.warnings && dataElement.warnings.length > 0 && <BadgeWarnings counts={dataElement.warnings.length} />}
-                                {dataElement.errors && dataElement.errors.errors.length > 0 && <BadgeErrors counts={dataElement.errors.errors.length} />}
-                            </div>
-                            <div className="ml_item-cta">
-                                {!deStatus &&
-                                    <a target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/dataElementSection/dataElement/" + dataElement.id} style={{ textDecoration: 'none', color: 'black' }}>
-                                        <Tooltip title="Open in Maintenance App" placement="top">
-                                            <IconButton size='small'>
-                                                <LaunchIcon fontSize='inherit' />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </a>
-                                }
-                                {deStatus &&
-                                    <Chip
-                                        label={deStatus.mode.toUpperCase()}
-                                        color="success"
-                                        className="blink-opacity-2"
-                                        style={{ marginLeft: '1em' }}
-                                    />
-                                }
-                                {isSectionMode && !readOnly && !isGeneratedType(metadata.elemType) &&
-                                    <img
-                                        src={move_vert_svg}
-                                        alt="menu"
-                                        id={'menu' + dataElement.id}
-                                        onClick={() => {
-                                            setRef(document.getElementById('menu' + dataElement.id));
-                                            toggle();
-                                        }}
-                                        style={{ cursor: 'pointer' }}
-                                    />
-                                }
-                                {openMenu &&
-                                    <Layer onClick={toggle}>
-                                        <Popper reference={ref} placement="bottom-end">
-                                            <FlyoutMenu>
-                                                <MenuItem disabled={!stageDE} label={stageDE ? "Edit This Data Element" : "(Reload to Enable Edit)"} dataTest={"EDIT"} icon={stageDE ? <EditIcon /> : <EditOffIcon />} onClick={() => { toggle(); DEActions.setEdit(dataElement.id) }} />
-                                                <MenuItem disabled={false} label="Add Data Element(s) Above" icon={<UpIcon />} onClick={() => { toggle(); DEActions.add(index, section) }} />
-                                                <MenuItem disabled={false} label="Add Data Element(s) Below" icon={<DownIcon />} onClick={() => { toggle(); DEActions.add(index + 1, section) }} />
-                                                <MenuItem disabled={false} destructive label="Remove This Data Element" icon={<DeleteIcon />} onClick={() => { toggle(); setDeToRemove(dataElement); }} />
-                                            </FlyoutMenu>
-                                        </Popper>
-                                    </Layer>
-                                }
-                            </div>
-                        </div>
-                        {DEActions.deToEdit === dataElement.id &&
-                            <DataElementForm
-                                program={program}
-                                dePrefix={dePrefix}
-                                programStageDataElement={stageDE}
-                                section={section}
-                                sectionType={sectionType}
-                                setDeToEdit={DEActions.setEdit}
-                                save={DEActions.update}
-                                hnqisType={hnqisType}
-                                setSaveStatus={setSaveStatus}
-                            />
-                        }
-                        {showValidationMessage &&
-                            <ValidationMessages objects={[dataElement]} showValidationMessage={setShowValidationMessage} />
-                        }
+                        <DataElementItem 
+                            program={program}
+                            dePrefix={dePrefix}
+                            dataElement={dataElement}
+                            stageDE={stageDE}
+                            DEActions={DEActions}
+                            section={section}
+                            sectionType={sectionType}
+                            index={index}
+                            hnqisType={hnqisType}
+                            deStatus={deStatus}
+                            isSectionMode={isSectionMode}
+                            readOnly={readOnly}
+                            setSaveStatus={setSaveStatus}
+                        />
                     </div>
                 )}
             </Draggable>
-            {!!deToRemove && <AlertDialogSlide
+            {/* {!!deToRemove && <AlertDialogSlide
                 open={!!deToRemove}
                 title={"Remove this Data Element from the Stage?"}
                 icon={<WarningAmberIcon fontSize="large" color="warning" />}
@@ -195,7 +127,7 @@ const DraggableDataElement = ({ program, dePrefix, dataElement, stageDE, DEActio
                     primary: function () { setDeToRemove(false); removeDataElement() },
                     secondary: function () { setDeToRemove(false); }
                 }}
-            />}
+            />} */}
         </>
     );
 };
