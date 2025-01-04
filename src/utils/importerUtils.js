@@ -598,6 +598,7 @@ const setNumbersToCriterionDEs = (prgStgSection, criterionNo, dePrefix) => {
     try
     {
         const dataElements = prgStgSection?.dataElements
+        const criterionNoRex = /(\d+|#)(\.(\d+|#))(\.(\d+|#))/g
         
         dataElements.forEach( (dataElement) => {
 
@@ -608,14 +609,14 @@ const setNumbersToCriterionDEs = (prgStgSection, criterionNo, dePrefix) => {
                 const metaData = JSON.parse( metaDataStringArr[0].value );
 
                 if ( metaData?.elemType === "generated" ) {
-                    dataElement.code = dataElement.code.replace("#.#.#", criterionNo)
-                    dataElement.name = dataElement.name.replace("#.#.#", criterionNo)
-                    dataElement.shortName = dataElement.shortName.replace("#.#.#", criterionNo)
-                    dataElement.formName = dataElement.formName.replace("#.#.#", criterionNo)
+                    dataElement.code = dataElement.code.replace(criterionNoRex, criterionNo)
+                    dataElement.name = dataElement.name.replace(criterionNoRex, criterionNo)
+                    dataElement.shortName = dataElement.shortName.replace(criterionNoRex, criterionNo)
+                    dataElement.formName = dataElement.formName.replace(criterionNoRex, criterionNo)
                     
                     dataElement.attributeValues?.map(av => {
                         if (av.attribute.id === METADATA) {
-                            metaData.varName = metaData.varName.replace("#.#.#", criterionNo)
+                            metaData.varName = metaData.varName.replace(criterionNoRex, criterionNo)
                             av.attribute.value = JSON.stringify(metaData)
                         }
                         return av;
