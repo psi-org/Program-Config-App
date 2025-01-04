@@ -93,7 +93,8 @@ const processStageData = (
     }
 
     // For HNQISMWI, we need to re-order the numbers for programStageSections
-    const processingSections = JSON.parse(JSON.stringify(importedSections))
+    // const processingSections = JSON.parse(JSON.stringify(importedSections))
+    const processingSections = importedSections
     
     /**
      * Delete importStatus: section & Data Elements
@@ -330,6 +331,7 @@ const processStageData = (
         programStageDataElements: programStage.programStageDataElements
     };
 
+    importedSections = processingSections 
     return {
         tempMetadata,
         metadata,

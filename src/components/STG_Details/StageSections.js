@@ -28,7 +28,7 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Link } from "react-router-dom";
 import { BUILD_VERSION, DATASTORE_H2_METADATA, FEEDBACK_ORDER, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, getProgramQuery, getSectionType, mapIdArray, truncateString, versionGTE } from "../../utils/Utils.js";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, getProgramQuery, getSectionType, isCriterionDEGenerated, isDEQuestion, mapIdArray, programIsHNQISMWI, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessor from "../Excel/DataProcessor.js";
 import Importer from "../Excel/Importer.js";
 import ErrorReports from "../UIElements/ErrorReports.js";
@@ -575,26 +575,115 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
                 );
                 setSaveStatus(hnqisType ? 'Validate & Save' : 'Save Changes');
                 break;
-            case 'DATA_ELEMENT':
-                if (result.source.droppableId == result.destination.droppableId) {
-                    //Same section
-                    const sectionIndex = newSections.findIndex(s => s.id == result.source.droppableId);
-                    newSections[sectionIndex].dataElements = reorder(
-                        newSections[sectionIndex].dataElements,
-                        result.source.index,
-                        result.destination.index
-                    );
-                } else {
-                    //Different section
-                    const element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
-                    newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
-                }
+            case 'DATA_ELEMENT': {
+                // let canDrop = false
+                // let sourceDE
+                // let destinationDE
+                
+                
+                // if( programIsHNQISMWI(hnqisType) ) {
+                //     const sourceDE = findDataElement(result.source.draggableId)
+                //     const destinationDE = findDataElement(result.destination.droppableId)
+                //     if( isDEQuestion(sourceDE) && isDEQuestion(destinationDE)) {
+                //         canDrop = true
+                //     }
+                // }
+                // else {
+                //     canDrop = true
+                // }
+                
+                // if(canDrop) {
+                //     if (result.source.droppableId == result.destination.droppableId) {
+                //         //Same section
+                //         const sectionIndex = newSections.findIndex(s => s.id == result.source.droppableId);
+                //         newSections[sectionIndex].dataElements = reorder(
+                //             newSections[sectionIndex].dataElements,
+                //             result.source.index,
+                //             result.destination.index
+                //         );
+                //     } else {
+                //         //Different section
+                //         const element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
+                //         newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
+                //     }
+                //     setSaveStatus(hnqisType ? 'Validate & Save' : 'Save Changes');
+                // }
+                dragDataElement(newSections, result)
                 setSaveStatus(hnqisType ? 'Validate & Save' : 'Save Changes');
                 break;
+            }
             default:
         }
-        setSections(newSections);
+        console.log(newSections)
+        setSections(JSON.parse(JSON.stringify(newSections)));
     };
+    
+    const dragDataElement = (newSections, result) => {
+        if (result.source.droppableId === result.destination.droppableId) {
+            // Same section
+            const sectionIndex = newSections.findIndex(s => s.id === result.source.droppableId);
+            const section = newSections[sectionIndex];
+            const { dataElements } = section;
+
+            // Ensure "generated" DEs stay at the end of the list
+            const questions = dataElements.filter(de => isDEQuestion(de));
+            const generated = dataElements.filter(de => isCriterionDEGenerated(de));
+
+            if (result.destination.index < questions.length) {
+                // Allow reordering only within "question" DEs
+                section.dataElements = [
+                    ...reorder(questions, result.source.index, result.destination.index),
+                    ...generated,
+                ];
+            }
+        } else {
+            // Different section
+            const sourceSection = newSections.find(s => s.id === result.source.droppableId);
+            const destSection = newSections.find(s => s.id === result.destination.droppableId);
+
+            const element = sourceSection.dataElements[result.source.index];
+
+            // if (element.type === 'question') {
+            if( isDEQuestion(element) ) {
+                // Remove the element from the source section
+                sourceSection.dataElements.splice(result.source.index, 1);
+
+                // Ensure "generated" DEs remain at the end in the destination section
+                const questions = destSection.dataElements.filter(de => isDEQuestion(de));
+                const generated = destSection.dataElements.filter(de => isCriterionDEGenerated(de));
+
+                // Insert the element into the destination section
+                questions.splice(result.destination.index, 0, element);
+                destSection.dataElements = [...questions, ...generated];
+            }
+        }
+    }
+    
+    // const canDragDataElement = (newSections, dragData) => {
+    //     let sourceDE
+    //     let destinationDE
+        
+    //     if (dragData.source.droppableId == dragData.destination.droppableId) {
+    //         //Same section
+    //         const sectionIndex = newSections.findIndex(s => s.id == dragData.source.droppableId)
+    //         sourceDE = newSections[sectionIndex].dataElements.find((item => item.id === dragData.draggableId))
+    //         destinationDE = newSections[sectionIndex].dataElements[dragData.destination.index]
+    //     } else {
+    //         //Different section
+    //         sourceDE = newSections.find(s => s.id == dragData.source.droppableId).dataElements.find((item => item.id === dragData.draggableId))
+    //         destinationDE = newSections.find(s => s.id == dragData.destination.droppableId).dataElements[dragData.destination.index]
+    //     }
+        
+    //     return( isDEQuestion(sourceDE) && isDEQuestion(destinationDE) )
+        
+    //     // for( const section of newSections ) {
+    //     //     const foundDE = section.dataElements.find((psDataElement => psDataElement.dataElement.id === id
+    //     //     ))
+    //     //     if( foundDE ) return foundDE
+    //     // }
+        
+    //     // return
+    // }
 
     const commit = () => {
         setAddedSection(undefined)
