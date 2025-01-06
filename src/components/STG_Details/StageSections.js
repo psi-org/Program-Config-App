@@ -576,45 +576,32 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
                 setSaveStatus(hnqisType ? 'Validate & Save' : 'Save Changes');
                 break;
             case 'DATA_ELEMENT': {
-                // let canDrop = false
-                // let sourceDE
-                // let destinationDE
                 
+                if(programIsHNQISMWI(hnqisType) ) {
+                    dragDataElement(newSections, result)
+                }
                 
-                // if( programIsHNQISMWI(hnqisType) ) {
-                //     const sourceDE = findDataElement(result.source.draggableId)
-                //     const destinationDE = findDataElement(result.destination.droppableId)
-                //     if( isDEQuestion(sourceDE) && isDEQuestion(destinationDE)) {
-                //         canDrop = true
-                //     }
-                // }
-                // else {
-                //     canDrop = true
-                // }
-                
-                // if(canDrop) {
-                //     if (result.source.droppableId == result.destination.droppableId) {
-                //         //Same section
-                //         const sectionIndex = newSections.findIndex(s => s.id == result.source.droppableId);
-                //         newSections[sectionIndex].dataElements = reorder(
-                //             newSections[sectionIndex].dataElements,
-                //             result.source.index,
-                //             result.destination.index
-                //         );
-                //     } else {
-                //         //Different section
-                //         const element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
-                //         newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
-                //     }
-                //     setSaveStatus(hnqisType ? 'Validate & Save' : 'Save Changes');
-                // }
-                dragDataElement(newSections, result)
+                else {
+                    if (result.source.droppableId == result.destination.droppableId) {
+                        //Same section
+                        const sectionIndex = newSections.findIndex(s => s.id == result.source.droppableId);
+                        newSections[sectionIndex].dataElements = reorder(
+                            newSections[sectionIndex].dataElements,
+                            result.source.index,
+                            result.destination.index
+                        );
+                    } else {
+                        //Different section
+                        const element = newSections.find(s => s.id == result.source.droppableId).dataElements.splice(result.source.index, 1)[0];
+                        newSections.find(s => s.id == result.destination.droppableId).dataElements.splice(result.destination.index, 0, element);
+                    }
+                }
                 setSaveStatus(hnqisType ? 'Validate & Save' : 'Save Changes');
                 break;
             }
             default:
         }
-        console.log(newSections)
+        
         setSections(JSON.parse(JSON.stringify(newSections)));
     };
     

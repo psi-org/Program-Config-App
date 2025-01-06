@@ -594,7 +594,7 @@ export const resetMWISectionNumbering = (prgStgSections) => { // 2 Step Process.
  * 
  * Set the numbers for data elements of Criterion
  */
-const setNumbersToCriterionDEs = (prgStgSection, criterionNo, dePrefix) => {
+const setNumbersToCriterionDEs = (prgStgSection, criterionNo) => {
     try
     {
         const dataElements = prgStgSection?.dataElements
@@ -630,111 +630,6 @@ const setNumbersToCriterionDEs = (prgStgSection, criterionNo, dePrefix) => {
         console.log( 'ERROR in importUtils > setNumbersToCriterionDEs, ' + errMsg );
     }
 }
-
-
-// const setNumbersToCriterionDEs = (prgStgSection, criterionNo) => {
-//     try
-//     {
-//         // Get the first DE created by users
-//         const questionData = getLastQuestionInCriterion(prgStgSection)
-//         const dePrefix = questionData.dePrefix
-//         const questionPrefix = questionData.prefix
-//         let questionNo = questionData.questionNo
-        
-//         const dataElements = prgStgSection?.dataElements
-        
-//         // let newVarName = `_${preDECode}Q${padValue(deIdx, "000")}`
-        
-//         dataElements.forEach( (dataElement) => {
-
-//             const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
-
-//             if ( metaDataStringArr.length > 0 ) 
-//             {
-//                 const metaData = JSON.parse( metaDataStringArr[0].value );
-
-//                 if ( metaData?.elemType === "generated" ) {
-//                     const code = dataElement.code; // "DEPRE - #.#.# MWI_AP_DE1"
-//                     const keyword = code.substring(code.lastIndexOf(" ") + 1, code.length) // MWI_AP_DE1
-//                     questionNo ++;
-//                     const newCode = `${questionPrefix}Q${padValue(questionNo, "000")}`
-//                     dataElement.code = dataElement.code.replace("#.#.#", criterionNo).replace(keyword, newCode).replace("DEPRE", dePrefix)
-//                     dataElement.name = dataElement.name.replace("#.#.#", criterionNo).replace(keyword, newCode).replace("DEPRE", dePrefix)
-//                     dataElement.shortName = dataElement.shortName.replace("#.#.#", criterionNo).replace(keyword, newCode).replace("DEPRE", dePrefix)
-//                     dataElement.formName = dataElement.formName.replace("#.#.#", criterionNo).replace(keyword, newCode).replace("DEPRE", dePrefix)
-                    
-//                     metaData.varName = `_${newCode}`
-//                     dataElement.attributeValues?.map(av => {
-//                         if (av.attribute.id === METADATA) {
-//                             // Modify av.attribute.value
-//                             av.attribute.value = JSON.stringify(metaData);
-//                         }
-//                         return av;
-//                     });
-//                 }
-//             }
-//         });
-//     }
-//     catch( errMsg ) {
-//         console.log( 'ERROR in importUtils > setNumbersToCriterionDEs, ' + errMsg );
-//     }
-// }
-
-// /**
-//  * Get the question with the largest number from DE CODE
-//  * 
-//  * Example: prgStgSection.dataElements => [{ code: "DETC_S02Q004", code: "DETC_S02Q003", code: "DETC_S02Q005" }]
-//  * Output: 
-//  * 
-//  *  */
-// const getLastQuestionInCriterion = (prgStgSection) => {
-//     const dataElements = prgStgSection?.dataElements
-    
-//     var lastQuestion;
-//     for( var i=0; i<dataElements.length; i++ ) {
-//         const de = dataElements[i]
-//         const metaDataStringArr = de.attributeValues?.filter(av => av.attribute.id === METADATA)
-//         if ( metaDataStringArr.length > 0 ) {
-//             const metaData = JSON.parse( metaDataStringArr[0].value )
-//             if( metaData.elemType === "question") {
-//                 if( lastQuestion === undefined ) {
-//                     lastQuestion = de
-//                 }
-//                 else {
-//                     const currentNumber = parseInt(de.code.match(/Q(\d+)$/)[1], 10)
-//                     const maxNumber = parseInt(lastQuestion.code.match(/Q(\d+)$/)[1], 10);
-//                     if( currentNumber > maxNumber ) {
-//                         lastQuestion = de
-//                     }
-//                 }
-//             }
-//         }
-//     }
-    
-//     // const lastQuestion = dataElements.reduce((max, de) => {
-//     //     const metaDataStringArr = de.attributeValues?.filter(av => av.attribute.id === METADATA);
-//     //     if ( metaDataStringArr.length > 0 ) {
-//     //         const metaData = JSON.parse( metaDataStringArr[0].value )
-//     //         if( metaData.elemType === "question") {
-//     //             const currentNumber = parseInt(de.code.match(/Q(\d+)$/)[1], 10)
-//     //             const maxNumber = parseInt(max.code.match(/Q(\d+)$/)[1], 10);
-//     //             return currentNumber > maxNumber ? de : max
-//     //         }
-            
-//     //         // return max;
-//     //     }
-//     // });
-    
-//     const dePrefix = lastQuestion.code.split("_")[0]
-//     const questionPrefix = lastQuestion.code.split("_")[1].split("Q")[0] // S01, S02, ...
-//     const questionNo = parseInt(lastQuestion.code.match(/Q(\d+)$/)[1], 10) // 001, 002, ...
-    
-//     return {
-//         dePrefix,
-//         questionPrefix,
-//         questionNo,
-//     }
-// }
 
 
 const setStageSectionName = (type, idx, prgStgSection) => {

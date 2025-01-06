@@ -31,7 +31,7 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
 
     const idsQuery = useDataQuery(queryId);
     const sectionId = idsQuery.data?.results.codes[0];
-console.log("==== 1 ", idsQuery.data?.results.codes);
+    
     
     useEffect(() => {
         if( programIsHNQISMWI(hnqisType) && sections[sectionIndex] ) {
