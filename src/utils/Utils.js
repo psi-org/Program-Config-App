@@ -485,8 +485,42 @@ export const isDEStdOverview = (dataElement) => {
 }
 
 export const isCriterionDEGenerated = (dataElement) => {
+    if( dataElement.code?.match(/MWI_AP_DE[1-6]/)) return true
+    
     const metaData = getDEMetadata(dataElement)
     return (metaData ) ? metaData?.elemType === "generated" : false
+}
+
+export const isCriterionDE1 = (dataElement) => {
+    if( isCriterionDEGenerated(dataElement) && ( dataElement.code?.match(/MWI_AP_DE1/) || dataElement.name.indexOf("Criterion Status") > 0 )) {
+        return true
+    }
+    
+    return false
+}
+
+export const isCriterionDE2 = (dataElement) => {
+    if( isCriterionDEGenerated(dataElement) && ( dataElement.code?.match(/MWI_AP_DE2/) || dataElement.name.indexOf("Criterion Score") > 0 )) {
+        return true
+    }
+    
+    return false
+}
+
+export const isCriterionDE3 = (dataElement) => {
+    if( isCriterionDEGenerated(dataElement) && ( dataElement.code?.match(/MWI_AP_DE3/) || dataElement.name.indexOf("Comment") > 0 )) {
+        return true
+    }
+    
+    return false
+}
+
+export const isCriterionDE3To6 = (dataElement) => {
+    if( isCriterionDEGenerated(dataElement) && !isCriterionDE1(dataElement) && !isCriterionDE2(dataElement)) {
+        return true
+    }
+    
+    return false
 }
 
 export const deepMerge = (obj1, obj2) => {
