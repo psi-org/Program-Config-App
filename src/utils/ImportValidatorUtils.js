@@ -877,6 +877,7 @@ export const validateMetadataStructure = ( prgStgSections ) => {
         }
         else if ( typeName === 'Standard' ) {
             currStdJson = pgStgSec;
+            currCrtJson = undefined;
             
             // Check if any Standard which doesn't belong to any Section
             if( !currSecJson ) {

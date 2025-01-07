@@ -8,10 +8,10 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect } from "react";
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue, programIsHNQIS, isLabelType, getSectionType } from "../../utils/Utils.js";
+import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue, programIsHNQIS, isLabelType, getSectionType, isCriterionDEGenerated } from "../../utils/Utils.js";
 import CustomMUIDialog from './CustomMUIDialog.js';
 import CustomMUIDialogTitle from './CustomMUIDialogTitle.js';
-import { resetMWISectionNumbering, resolveDEPrefix } from "../../utils/importerUtils.js";
+import { resetMWISectionNumbering } from "../../utils/importerUtils.js";
 
 const competencyClassAttribute = {
     "mandatory": false,
@@ -145,6 +145,7 @@ const processStageData = (
                 formName = dataElement.formName;
             }
 
+            // This code is applied for data which import from Excel file
             if (dataElement.code?.match(/MWI_AP_DE/)) {
                 isLogicDE = true;
                 newCode = dataElement.code;

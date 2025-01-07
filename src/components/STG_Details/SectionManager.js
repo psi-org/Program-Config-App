@@ -101,8 +101,7 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
             }
             else if( type === "Criterion" ) {
                 const sectionDEs = createHNQISMWICriterionDataElements()
-                section.dataElements = []
-                section.dataElements = (sectionDEs)
+                section.dataElements = sectionDEs
             }
         }
         
@@ -120,7 +119,7 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
             
             const deIdIdx = idx + 1; // +1 because the first one is "sectionId"
             const deId = idsQuery.data?.results.codes[deIdIdx];
-console.log("==== 2 ", idsQuery.data?.results.codes);
+            
             de.id = deId;
             de.code = `${deId}`;
             de.name = `${deId} - Section #`;
