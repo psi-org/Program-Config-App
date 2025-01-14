@@ -61,6 +61,19 @@ const queryId = {
     }
 };
 
+const getElemType = (hnqisType, sectionType) => {
+    if( programIsHNQISMWI(hnqisType) ) {
+        if( sectionType === "Criterion" ) {
+            return ELEM_TYPES.filter(item => item.label !== 'Std Overview');
+        }
+        else if( sectionType === "Standard" ) {
+            return ELEM_TYPES.filter(item => item.label == 'Std Overview');
+        }
+    }
+    
+    return ELEM_TYPES;
+}
+
 const DataElementForm = ({ program, dePrefix, programStageDataElement, section, sectionType, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisType, setSaveStatus }) => {
     
     const de = programStageDataElement.dataElement;
@@ -76,18 +89,18 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     const { data: programRuleVariables } = useDataQuery(programRuleVariableQuery, {variables: { program, dataElement: de?.id ?? "X" } });
     const programRuleVariable = programRuleVariables?.results?.programRuleVariables?.at(0) 
     
-    const getElemType = () => {
-        if( programIsHNQISMWI(hnqisType) ) {
-            if( sectionType === "Criterion" ) {
-                return ELEM_TYPES.filter(item => item.label !== 'Std Overview');
-            }
-            else if( sectionType === "Standard" ) {
-                return ELEM_TYPES.filter(item => item.label == 'Std Overview');
-            }
-        }
+    // const getElemType = () => {
+    //     if( programIsHNQISMWI(hnqisType) ) {
+    //         if( sectionType === "Criterion" ) {
+    //             return ELEM_TYPES.filter(item => item.label !== 'Std Overview');
+    //         }
+    //         else if( sectionType === "Standard" ) {
+    //             return ELEM_TYPES.filter(item => item.label == 'Std Overview');
+    //         }
+    //     }
         
-        return ELEM_TYPES;
-    }
+    //     return ELEM_TYPES;
+    // }
     
     
     useEffect(() => {
@@ -148,7 +161,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
         let _valueType;
         let _optionSet;
         
-        const elemTypes = getElemType();
+        const elemTypes = getElemType(hnqisType, sectionType);
         if( programIsHNQISMWI(hnqisType) ) {
             if(  elemTypes.length === 1 ) { // For "Std Overview" case
                 _structure = elemTypes[0].value
@@ -686,7 +699,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                         <Grid style={{ display: 'flex' }} item>
                             <RowRadioButtonsGroup
                                 label={"HNQIS Element Type"}
-                                items={getElemType()}
+                                items={getElemType(hnqisType, sectionType)}
                                 handler={elemTypeChange}
                                 value={structure}
                             />
