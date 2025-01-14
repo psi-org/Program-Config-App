@@ -64,14 +64,14 @@ const queryId = {
 const getElemType = (hnqisType, sectionType) => {
     if( programIsHNQISMWI(hnqisType) ) {
         if( sectionType === "Criterion" ) {
-            return ELEM_TYPES.filter(item => item.label !== 'Std Overview');
+            return ELEM_TYPES.filter(item => item.label !== 'Std Overview')
         }
         else if( sectionType === "Standard" ) {
-            return ELEM_TYPES.filter(item => item.label == 'Std Overview');
+            return ELEM_TYPES.filter(item => item.label == 'Std Overview')
         }
     }
-    
-    return ELEM_TYPES;
+   
+    return ELEM_TYPES.filter(item => item.label !== 'Std Overview')
 }
 
 const DataElementForm = ({ program, dePrefix, programStageDataElement, section, sectionType, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisType, setSaveStatus }) => {
