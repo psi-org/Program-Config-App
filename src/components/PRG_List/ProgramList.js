@@ -3,8 +3,8 @@ import { Chip, CircularLoader, NoticeBox, Pagination, FlyoutMenu, MenuItem, Popp
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import BuildIcon from '@mui/icons-material/Build';
 import ClearIcon from '@mui/icons-material/Clear';
+import ExtensionIcon from '@mui/icons-material/Extension';
 import InfoIcon from '@mui/icons-material/Info';
-import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { Tooltip } from "@mui/material";
@@ -23,8 +23,8 @@ import RestoreScreen from "../PRG_List/RestoreScreen.js";
 import SharingScreen from "../Sharing/SharingScreen.js";
 import About from "./About.js";
 import DependencyExport from "./DependencyExport.js";
+import ExtensionManager from "./ExtensionManager/ExtensionManager.js";
 import H2Convert from "./H2Convert.js";
-import H2Metadata from "./H2Metadata.js";
 import H2Transfer from "./H2Transfer.js";
 import ProgramItem from "./ProgramItem.js";
 import ProgramNew from './ProgramNew.js'
@@ -98,7 +98,7 @@ const ProgramList = () => {
     const [ref, setRef] = useState();
 
     const [aboutModal, setAboutModal] = useState(false);
-    const [H2Modal, setH2Modal] = useState(false);
+    const [packageModal, setPackageModal] = useState(false);
 
     useEffect(() => {
         if (notification) { setSnackSeverity(notification.severity) }
@@ -231,11 +231,11 @@ const ProgramList = () => {
                                         }}
                                     />
                                     <MenuItem
-                                        label="HNQIS 2.0 Status"
-                                        icon={<InstallDesktopIcon />}
+                                        label="PCA Extensions"
+                                        icon={<ExtensionIcon />}
                                         onClick={() => {
                                             setSettingsMenu(false);
-                                            setH2Modal(true);
+                                            setPackageModal(true);
                                         }}
                                     />
                                 </FlyoutMenu>
@@ -358,7 +358,16 @@ const ProgramList = () => {
             <div className="wrapper" style={{ padding: '1em  1.2em 0' }}>
                 <div className="layout_prgms_stages">
                     {data.results?.programs?.length === 0 &&
-                        <div className="title" style={{ padding: '1.5em', display: 'flex', justifyContent: 'center' }}>No Programs Found</div>
+                        <div
+                            className="title"
+                            style={{
+                                padding: '1.5em',
+                                display: 'flex',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            No Programs Found
+                        </div>
                     }
                     <div className="list-ml_item">
                         {data.results?.programs?.map((program) => {
@@ -430,12 +439,15 @@ const ProgramList = () => {
                 </Alert>
             </Snackbar>
 
-            {aboutModal && (
+            {aboutModal && 
                 <About aboutModal={aboutModal} setAboutModal={setAboutModal} />
-            )}
-            {H2Modal && (
-                <H2Metadata H2Modal={H2Modal} setH2Modal={setH2Modal} />
-            )}
+            }
+            {packageModal && 
+                <ExtensionManager
+                    packageModal={packageModal}
+                    setPackageModal={setPackageModal} 
+                />
+            }
         </div>
     );
 };

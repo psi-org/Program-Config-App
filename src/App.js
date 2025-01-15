@@ -12,9 +12,9 @@ import VersionErrorPage from './components/PCA_Loading/VersionErrorPage.js';
 import ProgramDetails from "./components/PRG_Details/ProgramDetails.js";
 import ProgramList from "./components/PRG_List/ProgramList.js";
 import ProgramStage from './components/STG_Details/ProgramStage.js';
-import { MIN_VERSION, MAX_VERSION, PCA_METADATA_VERSION, NAMESPACE, DATASTORE_PCA_METADATA } from './configs/Constants.js';
+import { MIN_VERSION, MAX_VERSION, PCA_METADATA_VERSION, NAMESPACE, DATASTORE_PCA_METADATA, H2_REQUIRED, HMWI_REQUIRED } from './configs/Constants.js';
 import store from './state/store.js';
-import { checkProcessH2, checkProcessPCA } from './utils/PCALoadingUtils.js';
+import { checkProcessH2, checkProcessHMWI, checkProcessPCA, completenessCheck } from './utils/PCALoadingUtils.js';
 import { versionIsValid } from './utils/Utils.js';
 
 const queryServerInfo = {
@@ -28,10 +28,6 @@ export const queryPCAAvailableMetadata = {
         resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}`
     }
 };
-
-const completenessCheck = (queryResult, checkProcess) => {
-    return queryResult?.results[checkProcess.objectName]?.filter(obj => checkProcess.resultsList.includes(obj.id)).length >= checkProcess.resultsList.length;
-}
 
 const getErrorPage = (versionValid, pcaReady, pcaMetadataData) => {
     if (pcaReady === undefined) {
@@ -58,6 +54,7 @@ const App = () => {
     const [dataChecked, setDataChecked] = useState(false);
     const [pcaReady, setPcaReady] = useState(undefined);
     const [h2Ready, setH2Ready] = useState(undefined);
+    const [hMWIReady, setHMWIReady] = useState(undefined);
     const [renderComponent, setRenderComponent] = useState(()=>LoadingPage);
 
     //* DHIS2 Server version checks
@@ -73,37 +70,69 @@ const App = () => {
 
 
     //* Checking HNQIS2 Metadata Package completeness
-    const { data: h2Check1 } = useDataQuery(checkProcessH2[0].queryFunction);
-    const { data: h2Check2 } = useDataQuery(checkProcessH2[1].queryFunction);
-    const { data: h2Check3 } = useDataQuery(checkProcessH2[2].queryFunction);
-    const { data: h2Check4 } = useDataQuery(checkProcessH2[3].queryFunction);
-    const { data: h2Check5 } = useDataQuery(checkProcessH2[4].queryFunction);
-    const { data: h2Check6 } = useDataQuery(checkProcessH2[5].queryFunction);
-    const { data: h2Check7 } = useDataQuery(checkProcessH2[6].queryFunction);
+    const { data: h2Check1 } = useDataQuery(checkProcessH2[0].queryFunction, { variables: { packageRequired: H2_REQUIRED } });
+    const { data: h2Check2 } = useDataQuery(checkProcessH2[1].queryFunction, { variables: { packageRequired: H2_REQUIRED } });
+    const { data: h2Check3 } = useDataQuery(checkProcessH2[2].queryFunction, { variables: { packageRequired: H2_REQUIRED } });
+    const { data: h2Check4 } = useDataQuery(checkProcessH2[3].queryFunction, { variables: { packageRequired: H2_REQUIRED } });
+    const { data: h2Check5 } = useDataQuery(checkProcessH2[4].queryFunction, { variables: { packageRequired: H2_REQUIRED } });
+    const { data: h2Check6 } = useDataQuery(checkProcessH2[5].queryFunction, { variables: { packageRequired: H2_REQUIRED } });
+    const { data: h2Check7 } = useDataQuery(checkProcessH2[6].queryFunction, { variables: { packageRequired: H2_REQUIRED } });
+
+    //* Checking HNQISMWI Metadata Package completeness
+    const { data: hMWICheck1 } = useDataQuery(checkProcessHMWI[0].queryFunction, { variables: { packageRequired: HMWI_REQUIRED } });
+    const { data: hMWICheck2 } = useDataQuery(checkProcessHMWI[1].queryFunction, { variables: { packageRequired: HMWI_REQUIRED } });
+    const { data: hMWICheck3 } = useDataQuery(checkProcessHMWI[2].queryFunction, { variables: { packageRequired: HMWI_REQUIRED } });
+    const { data: hMWICheck4 } = useDataQuery(checkProcessHMWI[3].queryFunction, { variables: { packageRequired: HMWI_REQUIRED } });
+    const { data: hMWICheck5 } = useDataQuery(checkProcessHMWI[4].queryFunction, { variables: { packageRequired: HMWI_REQUIRED } });
+    const { data: hMWICheck6 } = useDataQuery(checkProcessHMWI[5].queryFunction, { variables: { packageRequired: HMWI_REQUIRED } });
 
     //* Checking PCA Metadata version
     const { data: pcaMetadataData, loading: loadingPcaMetadata } = useDataQuery(queryPCAAvailableMetadata);
 
     //* All completeness checked
     useEffect(() => {
-        if (pcaCheck1 && pcaCheck2 && pcaCheck3 && pcaCheck4 && h2Check1 && h2Check2 && h2Check3 && h2Check4 && h2Check5 && h2Check6 && h2Check7) {
-            const pcaStatus = completenessCheck(pcaCheck1, checkProcessPCA[0])
-                && completenessCheck(pcaCheck2, checkProcessPCA[1])
-                && completenessCheck(pcaCheck3, checkProcessPCA[2])
-                && completenessCheck(pcaCheck4, checkProcessPCA[3]);
-            setPcaReady(pcaStatus);
+        if (pcaCheck1 && pcaCheck2 && pcaCheck3 && pcaCheck4) {
+            const pcaChecks = [pcaCheck1, pcaCheck2, pcaCheck3, pcaCheck4];
 
-            const h2Status = completenessCheck(h2Check1, checkProcessH2[0])
-                && completenessCheck(h2Check2, checkProcessH2[1])
-                && completenessCheck(h2Check3, checkProcessH2[2])
-                && completenessCheck(h2Check4, checkProcessH2[3])
-                && completenessCheck(h2Check5, checkProcessH2[4])
-                && completenessCheck(h2Check6, checkProcessH2[5])
-                && completenessCheck(h2Check7, checkProcessH2[6]);
+            let pcaStatus = true;
+            for (let i = 0; i < pcaChecks.length; i++) {
+                pcaStatus = pcaStatus && completenessCheck(pcaChecks[i], checkProcessPCA[i]);
+            }
+            setPcaReady(pcaStatus);
+        }
+    }, [pcaCheck1, pcaCheck2, pcaCheck3, pcaCheck4]);
+
+    useEffect(() => {
+        if ( h2Check1 && h2Check2 && h2Check3 && h2Check4 && h2Check5 && h2Check6 && h2Check7) {
+            const h2Checks = [h2Check1, h2Check2, h2Check3, h2Check4, h2Check5, h2Check6, h2Check7];
+
+            let h2Status = true;
+            for (let i = 0; i < h2Checks.length; i++) {
+                h2Status = h2Status && completenessCheck(h2Checks[i], checkProcessH2[i]);
+            }
             setH2Ready(h2Status);
+        }
+    }, [h2Check1, h2Check2, h2Check3, h2Check4, h2Check5, h2Check6, h2Check7]);
+
+    useEffect(() => {
+        if (hMWICheck1 && hMWICheck2 && hMWICheck3 && hMWICheck4 && hMWICheck5 && hMWICheck6) {
+            const hMWIChecks = [hMWICheck1, hMWICheck2, hMWICheck3, hMWICheck4, hMWICheck5, hMWICheck6];
+
+            let hMWIStatus = true;
+            for (let i = 0; i < hMWIChecks.length; i++) {
+                hMWIStatus = hMWIStatus && completenessCheck(hMWIChecks[i], checkProcessHMWI[i]);
+            }
+            setHMWIReady(hMWIStatus);
+        }
+    }, [hMWICheck1, hMWICheck2, hMWICheck3, hMWICheck4, hMWICheck5, hMWICheck6]);
+
+    useEffect(() => {
+        if (pcaReady !== undefined && h2Ready !== undefined && hMWIReady !== undefined) {
+            localStorage.setItem('h2Ready', String(h2Ready));
+            localStorage.setItem('hMWIReady', String(hMWIReady))
             setDataChecked(true);
         }
-    }, [pcaCheck1, pcaCheck2, pcaCheck3, pcaCheck4, h2Check1, h2Check2, h2Check3, h2Check4, h2Check5, h2Check6, h2Check7]);
+    }, [pcaReady, h2Ready, hMWIReady]);
 
     useEffect(() => {
         setServerInfo(serverInfoQuery?.data?.results);
@@ -120,11 +149,10 @@ const App = () => {
         if (!dataChecked || serverInfo === undefined || loadingPcaMetadata) {
             setRenderComponent(() => LoadingPage);
         } else {
-            localStorage.setItem('h2Ready', String(h2Ready));
             const errorResult = getErrorPage(versionValid, pcaReady, pcaMetadataData);
             setRenderComponent(errorResult ? () => errorResult : undefined);
         }
-    }, [pcaReady, h2Ready, pcaMetadataData, versionValid, dataChecked, serverInfo, loadingPcaMetadata]);
+    }, [pcaReady, pcaMetadataData, versionValid, dataChecked, serverInfo, loadingPcaMetadata]);
 
     return (
         <>

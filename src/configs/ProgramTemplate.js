@@ -277,7 +277,7 @@ const HNQISMWI_ActionPlanElements = [
         "formName": "Comment",
         "legendSets": [],
         "aggregationType": "NONE",
-        "valueType": "TEXT",
+        "valueType": "LONG_TEXT",
         "domainType": "TRACKER",
         "aggregationLevels": [],
         "zeroIsSignificant": false,
