@@ -1,6 +1,5 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { NoticeBox } from '@dhis2/ui'
-import PropTypes from "prop-types";
+import { CircularLoader, NoticeBox } from '@dhis2/ui'
 import React, { useState } from 'react';
 import { NAMESPACE, DATASTORE_H2_METADATA, H2_METADATA_VERSION } from "../../../configs/Constants.js";
 import metadataPkg from '../../../configs/HNQIS2_Metadata_Package.json'
@@ -32,13 +31,15 @@ const queryHNQIS2Metadata = {
     }
 };
 
-const H2MetadataHandler = ({ isInstalled }) => {
+const H2MetadataHandler = () => {
+
+    const [isInstalled, setIsInstalled] = useState(localStorage.getItem('h2Ready') === 'true');
 
     const [sending, setSending] = useState(false);
     const [error, setError] = useState(undefined);
     const [success, setSuccess] = useState(undefined);
 
-    const { data: hnqis2Metadata, refetch: hnqis2MetadataRefetch } = useDataQuery(queryHNQIS2Metadata);
+    const { data: hnqis2Metadata, loading, refetch: hnqis2MetadataRefetch } = useDataQuery(queryHNQIS2Metadata);
 
     const [metadataMutate] = useDataMutation(metadataMutation, {
         onError: (err) => {
@@ -81,6 +82,7 @@ const H2MetadataHandler = ({ isInstalled }) => {
                     } else {
                         setSuccess(true);
                         localStorage.setItem('h2Ready', String(true));
+                        setIsInstalled(true);
                         hnqis2MetadataRefetch();
                     }
                 });
@@ -93,13 +95,14 @@ const H2MetadataHandler = ({ isInstalled }) => {
         <>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5em' }}>
                 <h3>HNQIS 2.0 Metadata Details</h3>
-                <div><strong>Latest Metadata Package Version: </strong>{H2_METADATA_VERSION}</div>
+                <div>
+                    <strong>Latest Metadata Package Version: </strong>{H2_METADATA_VERSION}</div>
                 <div>
                     <div>
                         <strong>Current Installed Version: </strong>
                         {hnqis2Metadata?.results?.version ?? "Not Found"}
                     </div>
-                    {!hnqis2Metadata?.results &&
+                    {!loading && !hnqis2Metadata?.results &&
                         <div style={{ marginTop: '1em' }}>
                             <NoticeBox
                                 title="Installation Required"
@@ -107,6 +110,11 @@ const H2MetadataHandler = ({ isInstalled }) => {
                             >
                                 <p>The HNQIS 2.0 metadata package is required in order to enable HNQIS features</p>
                             </NoticeBox>
+                        </div>
+                    }
+                    {loading &&
+                        <div style={{ marginTop: '1em', display: 'flex', justifyContent: 'center' }}>
+                            <CircularLoader small />
                         </div>
                     }
                 </div>
@@ -136,9 +144,5 @@ const H2MetadataHandler = ({ isInstalled }) => {
         </>
     )
 }
-
-H2MetadataHandler.propTypes = {
-    isInstalled: PropTypes.bool
-};
 
 export default H2MetadataHandler;

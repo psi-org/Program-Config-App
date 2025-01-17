@@ -19,9 +19,9 @@ const ExtensionManager = (props) => {
     const getPageContent = () => {
         switch (currentContent) {
             case 'h2Ready':
-                return (<H2MetadataHandler isInstalled={h2Ready} />);
+                return (<H2MetadataHandler />);
             case 'hMWIReady':
-                return (<HMWIMetadataHandler isInstalled={hMWIReady} />);
+                return (<HMWIMetadataHandler />);
             default:
                 return (<ExtensionSelector
                     onSelect={setCurrentContent}

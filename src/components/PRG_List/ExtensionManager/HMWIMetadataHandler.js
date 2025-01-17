@@ -1,6 +1,5 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { NoticeBox } from '@dhis2/ui'
-import PropTypes from "prop-types";
+import { CircularLoader, NoticeBox } from '@dhis2/ui'
 import React, { useState } from 'react';
 import { NAMESPACE, DATASTORE_HMWI_METADATA, HMWI_METADATA_VERSION } from "../../../configs/Constants.js";
 import metadataPkg from '../../../configs/HNQISMWI_Metadata_Package.json'
@@ -32,13 +31,15 @@ const queryHNQISMWIMetadata = {
     }
 };
 
-const HMWIMetadataHandler = ({ isInstalled }) => {
+const HMWIMetadataHandler = () => {
+
+    const [isInstalled, setIsInstalled] = useState(localStorage.getItem('hMWIReady') === 'true');
 
     const [sending, setSending] = useState(false);
     const [error, setError] = useState(undefined);
     const [success, setSuccess] = useState(undefined);
 
-    const { data: hnqisMWIMetadata, refetch: hnqisMWIMetadataRefetch } = useDataQuery(queryHNQISMWIMetadata);
+    const { data: hnqisMWIMetadata, loading, refetch: hnqisMWIMetadataRefetch } = useDataQuery(queryHNQISMWIMetadata);
 
     const [metadataMutate] = useDataMutation(metadataMutation, {
         onError: (err) => {
@@ -81,6 +82,7 @@ const HMWIMetadataHandler = ({ isInstalled }) => {
                     } else {
                         setSuccess(true);
                         localStorage.setItem('hMWIReady', String(true));
+                        setIsInstalled(true);
                         hnqisMWIMetadataRefetch();
                     }
                 });
@@ -93,13 +95,14 @@ const HMWIMetadataHandler = ({ isInstalled }) => {
         <>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5em' }}>
                 <h3>HNQIS MWI Metadata Details</h3>
-                <div><strong>Latest Metadata Package Version: </strong>{HMWI_METADATA_VERSION}</div>
+                <div>
+                    <strong>Latest Metadata Package Version: </strong>{HMWI_METADATA_VERSION}</div>
                 <div>
                     <div>
                         <strong>Current Installed Version: </strong>
                         {hnqisMWIMetadata?.results?.version ?? "Not Found"}
                     </div>
-                    {!hnqisMWIMetadata?.results &&
+                    {!loading && !hnqisMWIMetadata?.results &&
                         <div style={{ marginTop: '1em' }}>
                             <NoticeBox
                                 title="Installation Required"
@@ -107,6 +110,11 @@ const HMWIMetadataHandler = ({ isInstalled }) => {
                             >
                                 <p>The HNQIS MWI metadata package is required in order to enable HNQIS MWI features</p>
                             </NoticeBox>
+                        </div>
+                    }
+                    {loading &&
+                        <div style={{ marginTop: '1em', display: 'flex', justifyContent: 'center' }}>
+                            <CircularLoader small />
                         </div>
                     }
                 </div>
@@ -135,9 +143,5 @@ const HMWIMetadataHandler = ({ isInstalled }) => {
         </>
     )
 }
-
-HMWIMetadataHandler.propTypes = {
-    isInstalled: PropTypes.bool
-};
 
 export default HMWIMetadataHandler;

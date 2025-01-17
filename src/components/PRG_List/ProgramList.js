@@ -15,7 +15,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import React, { useState, useEffect } from "react";
-import { DATASTORE_H2_METADATA, H2_METADATA_VERSION, NAMESPACE } from "../../configs/Constants.js";
+import { DATASTORE_H2_METADATA, DATASTORE_HMWI_METADATA, H2_METADATA_VERSION, HMWI_METADATA_VERSION, NAMESPACE } from "../../configs/Constants.js";
 import { formatAlert, versionGTE } from "../../utils/Utils.js";
 import OunitScreen from "../Org_Units/OunitScreen.js";
 import BackupScreen from "../PRG_List/BackupScreen.js";
@@ -42,6 +42,12 @@ const queryProgramType = {
 const queryHNQIS2Metadata = {
     results: {
         resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}`,
+    },
+};
+
+const queryHNQISMWIMetadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_HMWI_METADATA}`,
     },
 };
 
@@ -72,6 +78,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const ProgramList = () => {
 
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
+    const { data: hnqisMWIMetadata } = useDataQuery(queryHNQISMWIMetadata);
+
+    const h2Ready = localStorage.getItem('h2Ready') === 'true';
+    const hMWIReady = localStorage.getItem('hMWIReady') === 'true';
 
     // Export Program Metadata //
     const [exportProgramId, setExportProgramId] = useState(undefined)
@@ -388,7 +398,10 @@ const ProgramList = () => {
                                     convertToH2={convertToH2}
                                     transferDataH2={transferDataH2}
                                     setSearchLocalStorage={setSearchLocalStorageWithCurrentValues}
-                                    h2Valid={versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)}
+                                    h2Valid={{
+                                        vanilla: (versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION) && h2Ready),
+                                        mwi: (versionGTE(hnqisMWIMetadata?.results?.version, HMWI_METADATA_VERSION) && hMWIReady)
+                                    }}
                                 />
                             );
                         })}
