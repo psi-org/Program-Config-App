@@ -1,8 +1,8 @@
 {
-    "name": "program_configuration_tran_dev",
-    "title": "Program Configuration TRAN DEV",
-    "author": "KnowTechTure SL",
-    "version": "2.1.1",
+    "name": "program_configuration",
+    "title": "Program Configuration",
+    "author": "BAO Systems",
+    "version": "2.2.0",
     "description": "Tracker Programs management tool",
     "license": "CC-BY-4.0",
     "private": true,
