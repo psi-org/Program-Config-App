@@ -482,7 +482,7 @@ export const HNQISMWI_CONDITIONAL_FORMAT_VALIDATIONS = {
     questionCriterionRequired: {
         formula: 'AND($B3="question", OR($B2="Section", $B2="Standard", $B2="Std Overview"))',
         dynamicFormula: 'AND($B_ROWNUM_="question", OR(INDIRECT("B" & (ROW() - 1))="Section", INDIRECT("B" & (ROW() - 1))="Standard", INDIRECT("B" & (ROW() - 1))="Std Overview"))',
-        prompt: 'The previous row must be a Criterion row.'
+        prompt: 'The previous row must be a Criterion or question or lable row.'
     },
     
     // Check OptionSet field required
