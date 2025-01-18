@@ -911,6 +911,11 @@ const Exporter = (props) => {
                         formulae: [validationsList.sectionStandardRequired.formula],
                         style: conditionalError,
                     },
+                    // {
+                    //     type: 'expression',
+                    //     formulae: [validationsList.standardSectionRequired.formula],
+                    //     style: conditionalError,
+                    // },
                     {
                         type: 'expression',
                         formulae: [validationsList.standardStdOverviewRequired.formula],
