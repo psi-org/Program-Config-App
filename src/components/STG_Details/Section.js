@@ -48,7 +48,6 @@ const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, 
     const [sectionToRemove, setSectionToRemove] = useState(undefined);
     const [expanded, setExpanded] = useState(false);
     const [showValidationMessage, setShowValidationMessage] = useState(false);
-
     const initMovableItems = stageSection.dataElements.filter((de => !isCriterionDEGenerated(de)))
     
     const [movableItems, setMovableItems] = useState(initMovableItems)

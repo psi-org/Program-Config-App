@@ -12,9 +12,9 @@ import SelectOptions from '../UIElements/SelectOptions.js';
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 import { DeepCopy, getSectionType, programIsHNQIS, programIsHNQISMWI } from '../../utils/Utils.js';
-import { HNQISMWI_ActionPlanElements, HNQISMWI_SectionDataElements } from '../../configs/ProgramTemplate.js';
+import { HNQISMWI_ActionPlanElements, HNQISMWI_Criterion_RequiredDEs_Section_Name, HNQISMWI_SectionDataElements } from '../../configs/ProgramTemplate.js';
 
-const DEID_NO = HNQISMWI_SectionDataElements.length + HNQISMWI_ActionPlanElements.length + 1;
+const DEID_NO = HNQISMWI_SectionDataElements.length + HNQISMWI_ActionPlanElements.length + 2;
 const queryId = {
     results: {
         resource: 'system/id.json',
@@ -64,7 +64,10 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
         
         if (formDataIsValid()) {
             if( programIsHNQISMWI(hnqisType) ) {
-                setHNQISMWISection(section)
+                const criterionRequiredSection = setHNQISMWISection(section)
+                if( criterionRequiredSection ) {
+                    sections.splice(newSectionIndex + 1, 0, criterionRequiredSection)
+                }
                 numbersWarmingMsg = "The numbers of section will be set/reset to proper number after saved."
             }
             else {
@@ -83,8 +86,10 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
     
     // Set id( if needed), name, description, dataElements( if needed ) for section (Section, Standard, Criterion)
     const setHNQISMWISection = (section) => {
-        section.name = getMWISectionName();
-        section.displayName = section.name;
+        section.name = getMWISectionName()
+        section.displayName = section.name
+        
+        let criterionRequiredSection
         
         if (sectionIndex !== undefined) { // Edit section
             sections[sectionIndex] = section
@@ -96,12 +101,13 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
             
             if( type === "Section" ) {
                 const sectionDE = createHNQISMWISectionDataElement()
-                section.dataElements = []
                 section.dataElements.push(sectionDE)
             }
             else if( type === "Criterion" ) {
+                criterionRequiredSection = buildCriterionRequiredSection(section)
+                
                 const sectionDEs = createHNQISMWICriterionDataElements()
-                section.dataElements = sectionDEs
+                criterionRequiredSection.dataElements = sectionDEs
             }
         }
         
@@ -111,6 +117,8 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
         else {
             delete section.description;
         }
+        
+        return criterionRequiredSection
     }
 
     // Create Data Element for section "Section"
@@ -134,6 +142,19 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
         });
         
         return de[0];
+    }
+    
+    /**
+     * Create a new Section for "Criterion"
+     */
+    const buildCriterionRequiredSection = (section) => {
+        const name = `x.x.x ${HNQISMWI_Criterion_RequiredDEs_Section_Name} - ${section.name}`
+        const sectionDEs = createHNQISMWICriterionDataElements()
+        
+        const _section = {name: name, displayName: name}
+        _section.dataElements = sectionDEs
+        
+        return _section
     }
     
     /** Create Data Elements needed for section "Criterion"
