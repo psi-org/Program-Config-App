@@ -26,7 +26,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
 const BUILD_VERSION = "2.2.0";
-const BUILD_DATE = "Jan 25, 2025";
+const BUILD_DATE = "Feb 28, 2025";
 const MIN_VERSION = "2.36.x";
 const MAX_VERSION = "2.41.x";
 
@@ -35,7 +35,7 @@ const H2_METADATA_VERSION = "1.2.0";
 const HMWI_METADATA_VERSION = "1.0.0";
 
 const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.1.2";
-const REQUIRED_HMWI_PROGRAM_BUILD_VERSION = "2.1.2";
+const REQUIRED_HMWI_PROGRAM_BUILD_VERSION = "2.2.0";
 
 const HNQIS_TYPES = {
     hnqis: "HNQIS2",
