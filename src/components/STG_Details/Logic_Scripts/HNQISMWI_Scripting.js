@@ -390,7 +390,6 @@ const buildScoringRulesMWI = (
                 programRule: { id: programRuleUid }
             };
 
-            //TODO: Add hide/show logic for the action plan data elements when no value is selected
             const additionalActions = [];
             actionPlanDataElements.forEach(de => {
                 if (['0', '100'].includes(f.data)) {
@@ -407,14 +406,14 @@ const buildScoringRulesMWI = (
                     additionalActions.push(hideAction);
                     return;
                 }
-                const mandatoryAction = {
-                    id: uidPool.shift(),
-                    programRuleActionType: "SETMANDATORYFIELD",
-                    dataElement: { id: de.id },
-                    programRule: { id: programRuleUid }
-                };
-                scoringRuleActions.push(mandatoryAction);
-                additionalActions.push(mandatoryAction);
+                //const mandatoryAction = {
+                //    id: uidPool.shift(),
+                //    programRuleActionType: "SETMANDATORYFIELD",
+                //    dataElement: { id: de.id },
+                //    programRule: { id: programRuleUid }
+                //};
+                //scoringRuleActions.push(mandatoryAction);
+                //additionalActions.push(mandatoryAction);
             });
 
             const pr = {
@@ -627,10 +626,9 @@ export const buildProgramIndicatorsMWI = (
     return { programIndicators, indicatorIDs }
 }
 
-export const buildH2BaseVisualizationsMWI = ({ a/*programId, programShortName, gsInd, indicatorIDs, uidPool, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel*/ }) => {
+export const buildH2BaseVisualizationsMWI = (/*{programId, programShortName, gsInd, indicatorIDs, uidPool, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel}*/) => {
     //const series = []
     //const dataDimensionItems = []
-    console.log(a);
     const visualizations = []
     const eventReports = []
     const androidSettingsVisualizations = []

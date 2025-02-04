@@ -11,8 +11,8 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Tooltip } from "@mui/material";
 import Chip from '@mui/material/Chip';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
-import { Droppable, Draggable, DragDropContext } from "react-beautiful-dnd";
+import React, { useState, useEffect } from 'react';
+import { Droppable, Draggable } from "react-beautiful-dnd";
 import { newTagStyle, tagStyle, updatedTagStyle } from '../../configs/Constants.js';
 import { getSectionType, isCriterionDEGenerated } from '../../utils/Utils.js';
 import AlertDialogSlide from "../UIElements/AlertDialogSlide.js";
@@ -23,7 +23,6 @@ import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg'
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
 import move_vert_svg from './../../images/i-more_vert_black.svg';
 import DraggableDataElement from "./DataElement.js";
-import { useEffect } from 'react';
 
 const getSectionIcon = (hnqisType, sectionName) => { 
     if (hnqisType === 'HNQISMWI') {

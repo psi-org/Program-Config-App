@@ -26,7 +26,7 @@ const ProgramStage = () => {
 
     const h2Ready = localStorage.getItem('h2Ready') === 'true';
 
-    let { id } = useParams();
+    const { id } = useParams();
 
     const dispatch = useDispatch();
 
@@ -83,7 +83,6 @@ const ProgramStage = () => {
     }
 
     return <span><CircularLoader /></span>
-
 
 }
 

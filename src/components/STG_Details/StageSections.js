@@ -645,32 +645,6 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
             }
         }
     }
-    
-    // const canDragDataElement = (newSections, dragData) => {
-    //     let sourceDE
-    //     let destinationDE
-        
-    //     if (dragData.source.droppableId == dragData.destination.droppableId) {
-    //         //Same section
-    //         const sectionIndex = newSections.findIndex(s => s.id == dragData.source.droppableId)
-    //         sourceDE = newSections[sectionIndex].dataElements.find((item => item.id === dragData.draggableId))
-    //         destinationDE = newSections[sectionIndex].dataElements[dragData.destination.index]
-    //     } else {
-    //         //Different section
-    //         sourceDE = newSections.find(s => s.id == dragData.source.droppableId).dataElements.find((item => item.id === dragData.draggableId))
-    //         destinationDE = newSections.find(s => s.id == dragData.destination.droppableId).dataElements[dragData.destination.index]
-    //     }
-        
-    //     return( isDEQuestion(sourceDE) && isDEQuestion(destinationDE) )
-        
-    //     // for( const section of newSections ) {
-    //     //     const foundDE = section.dataElements.find((psDataElement => psDataElement.dataElement.id === id
-    //     //     ))
-    //     //     if( foundDE ) return foundDE
-    //     // }
-        
-    //     // return
-    // }
 
     const commit = () => {
         setAddedSection(undefined)
@@ -683,7 +657,9 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
     };
 
     useEffect(() => {
-        if (androidSettingsError || androidSettingsSyncUpdateError) { updateProgramBuildVersion(programId) }
+        if (androidSettingsError || androidSettingsSyncUpdateError) {
+            updateProgramBuildVersion(programId);
+        }
     }, [androidSettingsUpdateError, androidSettingsSyncUpdateError])
 
     const updateProgramBuildVersion = (programId) => {
@@ -1104,6 +1080,17 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
                 eventReports: (eventReportsDel.length > 0 ? eventReportsDel : undefined),
                 maps: (mapsDel.length > 0 ? mapsDel : undefined)
             };
+
+            if (programIndicatorsDel && programIndicatorsDel.length > 0) {
+                for (let index = 0; index < metadata.programIndicators.length; index++) {
+                    if (programIndicatorsDel[index]?.id) {
+                        metadata.programIndicators[index].id = programIndicatorsDel[index].id;
+                        dataStoreData.programIndicators[index].id = programIndicatorsDel[index].id;
+                    } else {
+                        break;
+                    }
+                }
+            }
 
             // VI. Import new metadata
             createMetadata.mutate({

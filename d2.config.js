@@ -1,7 +1,7 @@
 const config = {
     id: 'cf9b8ff8-58f2-488a-b3e6-8274288ca22c',
     type: 'app',
-    title: 'Program Configuration TRAN DEV',
+    title: 'Program Configuration',
     description:"Tracker and Event Programs management tool",
     entryPoints: {
         app: './src/App.js',

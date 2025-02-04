@@ -96,7 +96,8 @@ const ProgramItem = ({
     const id = openPop ? "simple-popover" : undefined;
 
     const isEnabled = () => {
-        if (programType === TEMPLATE_PROGRAM_TYPES.hnqis2 && !h2Valid) { return false };
+        if (programType === TEMPLATE_PROGRAM_TYPES.hnqis2 && !h2Valid.vanilla) { return false };
+        if (programType === TEMPLATE_PROGRAM_TYPES.hnqismwi && !h2Valid.mwi) { return false };
         return true;
     }
 
@@ -122,7 +123,7 @@ const ProgramItem = ({
                         <div style={{ backgroundColor: (program.style?.color || '#e0e0e0'), width: '3em', height: '3em', minWidth: '3em', minHeight: '3em', border: '1px solid #DDD', borderRadius: '10%', padding: '0' }}>
                             <img
                                 src={`${(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL)}/api/icons/${program.style?.icon || 'clinical_fe_outline'}/icon.svg`}
-                                style={{ width: '100%', height: 'auto', borderRadius: '10%', zIndex: '999', filter: `brightness(0) invert(${tinycolor(program.style?.color || '#e0e0e0').isDark() ? 1 : 0})`, objectFit: 'cover' }}
+                                style={{ width: '100%', height: 'auto', borderRadius: '5%', zIndex: '999', filter: `brightness(0) invert(${tinycolor(program.style?.color || '#e0e0e0').isDark() ? 1 : 0})`, objectFit: 'cover' }}
                             />
                         </div>
                     </div>
@@ -141,9 +142,15 @@ const ProgramItem = ({
 
 
                 <div className="ml_item-desc">
+                    
                     {programType === TEMPLATE_PROGRAM_TYPES.hnqis2 && !isEnabled() &&
-                        <Tooltip title={`This HNQIS2 Program cannot be accessed as it requires the latest HNQIS2 Metadata Package. Go to Settings > HNQIS 2.0 Status for more information.`}>
-                            <LockIcon style={{ marginRight: "0.3em", cursor: 'pointer' }} />
+                        <Tooltip title={`This HNQIS2 Program cannot be accessed as it requires the latest HNQIS2 Metadata Package. Go to Settings > PCA Extensions > HNQIS 2.0 for more information.`}>
+                            <LockIcon style={{ marginRight: "0.5em", cursor: 'pointer' }} />
+                        </Tooltip>
+                    }
+                    {programType === TEMPLATE_PROGRAM_TYPES.hnqismwi && !isEnabled() &&
+                        <Tooltip title={`This HNQIS MWI Program cannot be accessed as it requires the latest HNQIS MWI Metadata Package. Go to Settings > PCA Extensions > HNQIS MWI for more information.`}>
+                            <LockIcon style={{ marginRight: "0.5em", cursor: 'pointer' }} />
                         </Tooltip>
                     }
                     {requiredUpgradeBadge}
@@ -488,7 +495,7 @@ ProgramItem.propTypes = {
     deleteProgram: PropTypes.func,
     doSearch: PropTypes.func,
     downloadMetadata: PropTypes.func,
-    h2Valid: PropTypes.bool,
+    h2Valid: PropTypes.object,
     prgTypeId: PropTypes.string,
     program: PropTypes.object,
     refetch: PropTypes.func,
