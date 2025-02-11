@@ -437,11 +437,11 @@ export const HNQISMWI_CONDITIONAL_FORMAT_VALIDATIONS = {
         dynamicFormula: 'AND($B_ROWNUM_="Section", INDIRECT("B" & (ROW() + 1))<>"Standard")',
         prompt: 'The row below must be set to Standard.'
     },
-    // standardSectionRequired: {
-    //     formula: 'AND($B3="Standard", $B2<>"Section")',
-    //     dynamicFormula: 'AND($B_ROWNUM_="Standard", INDIRECT("B" & (ROW() - 1))<>"Section")',
-    //     prompt: 'The previous row must be Section row.'
-    // },
+    standardSectionRequired: {
+        formula: 'AND($B3="Standard", $B2<>"Section")',
+        dynamicFormula: 'AND($B_ROWNUM_="Standard", INDIRECT("B" & (ROW() - 1))<>"Section")',
+        prompt: 'The previous row must be Section row.'
+    },
     
     // ********* For checking "Standard" and "Std Overview" relationship *********
     // If the current row is "Standard", check if the NEXT row is not "Std Overview"

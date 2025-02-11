@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { ReleaseNotes } from "../../configs/ReleaseNotes.js";
 import {
     HNQIS2_AGG_OPERATORS,
-    conditionalRowError,
     conditionalError,
     disabledHighlighting,
     labelHighlighting,
@@ -911,11 +910,11 @@ const Exporter = (props) => {
                         formulae: [validationsList.sectionStandardRequired.formula],
                         style: conditionalError,
                     },
-                    // {
-                    //     type: 'expression',
-                    //     formulae: [validationsList.standardSectionRequired.formula],
-                    //     style: conditionalError,
-                    // },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.standardSectionRequired.formula],
+                        style: conditionalError,
+                    },
                     {
                         type: 'expression',
                         formulae: [validationsList.standardStdOverviewRequired.formula],
