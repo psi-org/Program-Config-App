@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import TextField from '@mui/material/TextField';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react";
-import { HNQISMWI_PROGRAM_STAGE_SECTION_TYPES, MAX_SECTION_NAME_LENGTH, METADATA } from '../../configs/Constants.js';
+import { HNQISMWI_PROGRAM_STAGE_SECTION_TYPES, MAX_SECTION_NAME_LENGTH, METADATA, MIN_NAME_LENGTH } from '../../configs/Constants.js';
 import SelectOptions from '../UIElements/SelectOptions.js';
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
@@ -54,7 +54,7 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
     }
 
     const formDataIsValid = () => {
-        return sectionName.trim() !== '' && sectionName.length <= MAX_SECTION_NAME_LENGTH;
+        return sectionName.trim() !== '' && sectionName.length <= MAX_SECTION_NAME_LENGTH && sectionName.length >= MIN_NAME_LENGTH;
     }
 
     function submission() {
@@ -224,10 +224,10 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
                         label="Critical Criterion"
                     />}
                 </>}
-
+                
                 <TextField
                     error={sentForm && !formDataIsValid()}
-                    helperText={sentForm ? (sectionName.trim() === '' ? 'This field is required' : (sectionName.length > MAX_SECTION_NAME_LENGTH ? `The Section Name cannot exceed ${MAX_SECTION_NAME_LENGTH} characters long` : '')) : ''}
+                    helperText={sentForm ? (sectionName.trim() === '' ? 'This field is required' : ((sectionName.length > MAX_SECTION_NAME_LENGTH || sectionName.length < MIN_NAME_LENGTH)? `The length is out of the accepted range (Between ${MIN_NAME_LENGTH} and ${MAX_SECTION_NAME_LENGTH} characters).` : '')) : ''}
                     margin="normal"
                     id="name"
                     label="Section Name"

@@ -1,4 +1,4 @@
-import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SECTION_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMENT_NAME_LENGTH } from "../configs/Constants.js";
+import { FEEDBACK_ORDER, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SECTION_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH, METADATA, MIN_DATA_ELEMENT_NAME_LENGTH, MIN_NAME_LENGTH } from "../configs/Constants.js";
 import { HNQISMWI_ActionPlanElements } from "../configs/ProgramTemplate.js";
 import { getVarNameFromParentUid } from "./ExcelUtils.js";
 import { extractAttributeValues, getPCAMetadataDE, getSectionType, hasAttributeValue, isBlank, isCriterionDEGenerated, isDEQuestion, isDEStdOverview, isGeneratedType, isNum, isValidCorrelative, isValidParentName, padValue, setPCAMetadata } from "./Utils.js";
@@ -15,7 +15,7 @@ export const HNQIS2_VALIDATION_SETTINGS = {
         checkSectionLength: {
             enabled: true, title: "Section length not valid", errorMsg: {
                 code: "EXW112",
-                text: `Given Section length is out of the accepted length ${MAX_SECTION_NAME_LENGTH} characters.`
+                text: `Given Section length is out of the accepted range (Between ${MIN_NAME_LENGTH} and ${MAX_SECTION_NAME_LENGTH} characters).`
             }
         }
     },
@@ -440,8 +440,13 @@ export const checkHasFormName = ({ metadata, dataElement }) => {
 export const checkSectionHasFormName = ({ section }) => !isBlank(section.name);
 
 export const checkSectionLength = ({ section }) => {
-    const name = section.name || '';
-    return name.length <= MAX_SECTION_NAME_LENGTH;
+    const nameWithPrefix = section.name || "";
+
+    // Use this regex to make sure if this section is MWI section
+    const regex = /^(Section|Criterion|Standard) (\d+|#) :/;
+    const name = nameWithPrefix.replace(regex, '').trim();
+   
+    return (name.length <= MAX_SECTION_NAME_LENGTH && name.length >= MIN_NAME_LENGTH);
 }
 
 export const checkFormNameLength = ({ metadata, dataElement }) => {
