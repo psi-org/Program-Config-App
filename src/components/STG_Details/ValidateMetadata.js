@@ -5,16 +5,16 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react";
-import {  FEEDBACK_ORDER } from "../../configs/Constants.js";
+import { FEEDBACK_ORDER } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2 } from "../../utils/ImportValidatorUtils.js";
-import { DeepCopy, getPCAMetadataDE, programIsHNQIS } from "../../utils/Utils.js";
+import { validateFeedbacks, validateScores, validateQuestions, verifyProgramDetail, validateSectionsHNQIS2, validateMetadataStructure } from "../../utils/ImportValidatorUtils.js";
+import { DeepCopy, getPCAMetadataDE, programIsHNQIS, programIsHNQISMWI } from "../../utils/Utils.js";
 import SaveMetadata from "../UIElements/SaveMetadata.js";
 import CustomMUIDialog from './../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from './../UIElements/CustomMUIDialogTitle.js'
 
 const ValidateMetadata = (
-    { 
+    {
         hnqisType,
         newDEQty,
         programStage,
@@ -35,11 +35,28 @@ const ValidateMetadata = (
         stageRefetch
     }
 ) => {
+
+    const initValidationMsg = () => {
+        let msg = "Metadata validated. Please use the 'SAVE' button to persist your changes.";
+        if (programIsHNQISMWI(hnqisType)) {
+            msg += " The number of sections may be reset.";
+        }
+
+        return msg;
+    }
+
     const validationResults = {};
     const [processed, setProcessed] = useState(false);
     const [valid, setValid] = useState(false);
     const [save, setSave] = useState(false);
-    const [validationMessage, setValidationMessage] = useState("Metadata validated. Please use the 'SAVE' button to persist your changes.");
+    const [validationMessage, setValidationMessage] = useState(initValidationMsg());
+
+    const resetErrorsInSections = () => {
+        importedSections.forEach((section) => {
+            delete section.errors;
+            delete section.errorsCount;
+        })
+    }
 
     useEffect(() => {
         if (!save) {
@@ -52,6 +69,7 @@ const ValidateMetadata = (
                 const sections = [];
                 const questions = [];
                 const scores = [];
+                resetErrorsInSections();
 
                 validationResults.sections = sections;
                 validationResults.questions = questions;
@@ -63,16 +81,20 @@ const ValidateMetadata = (
                 if (programIsHNQIS(hnqisType)) {
                     const validateResults = validateFeedbacks(!!hnqisType, importedSectionsV.concat(importedScoresV))
                     feedbacksErrors = validateResults.feedbacksErrors
-                
+
                     errorCounts += feedbacksErrors.length
                     validationResults.feedbacks = feedbacksErrors;
                 }
-            
+
 
                 //ADD FEEDBACK ERRORS TO DATA ELEMENTS
                 const dataElementsList = DeepCopy(importedSections.map(section => section.dataElements).flat());
 
                 if (programIsHNQIS(hnqisType)) {
+                    if (programIsHNQISMWI(hnqisType)) {
+                        validateMetadataStructure(importedSectionsV);
+                    }
+
                     importedSectionsV.forEach((section) => {
                         excelRow += 1;
                         let section_errors = 0;
@@ -80,9 +102,8 @@ const ValidateMetadata = (
                             title: section.name || ('Section on Template row ' + excelRow),
                             tagName: '[ Section ]'
                         }
-                        delete section.errors
                         validateSectionsHNQIS2(section, sectionErrorDetails);
-                
+
                         if (section.errors) {
                             sections.push(section);
                             errorCounts += section.errors.errors.length;
@@ -228,14 +249,14 @@ const ValidateMetadata = (
 ValidateMetadata.propTypes = {
     criticalSection: PropTypes.object,
     hnqisType: PropTypes.string,
-    importResults: PropTypes.oneOfType([PropTypes.object,PropTypes.bool]),
+    importResults: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
     importedScores: PropTypes.object,
     importedSections: PropTypes.array,
     newDEQty: PropTypes.number,
     previous: PropTypes.object,
     programMetadata: PropTypes.object,
     programStage: PropTypes.object,
-    removedItems: PropTypes.oneOfType([PropTypes.object,PropTypes.array]),
+    removedItems: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
     setErrorReports: PropTypes.func,
     setExportToExcel: PropTypes.func,
     setImportResults: PropTypes.func,

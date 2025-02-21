@@ -13,6 +13,8 @@ import Tooltip from '@mui/material/Tooltip';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react"
 import { FEEDBACK_TEXT, FEEDBACK_ORDER, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES_H2, AGG_TYPES, MAX_SHORT_NAME_LENGTH, VALUE_TYPES_TRACKER, MAX_FORM_NAME_LENGTH } from '../../configs/Constants.js';
+import { HNQISMWI_QUESTION_OPTION_SET, HNQISMWI_STD_OVERVIEW_VALUE_TYPE } from '../../configs/TemplateConstants.js';
+import { isLabelType, programIsHNQIS, programIsHNQISMWI } from '../../utils/Utils.js';
 import AlertDialogSlide from '../UIElements/AlertDialogSlide.js';
 import SelectOptions from '../UIElements/SelectOptions.js';
 import StyleManager from '../UIElements/StyleManager.js';
@@ -20,7 +22,7 @@ import InfoBox from './../UIElements/InfoBox.js';
 import ProgramRulesList from './../UIElements/ProgramRulesList.js'
 import MarkDownEditor from './MarkDownEditor.js';
 import RowRadioButtonsGroup from './RowRadioButtonsGroup.js';
-import { isLabelType, programIsHNQIS } from '../../utils/Utils.js';
+import { resolveDEPrefix } from '../../utils/importerUtils.js';
 
 const optionSetQuery = {
     results: {
@@ -59,8 +61,21 @@ const queryId = {
     }
 };
 
-const DataElementForm = ({ program, dePrefix, programStageDataElement, section, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisType, setSaveStatus }) => {
+const getElemType = (hnqisType, sectionType) => {
+    if( programIsHNQISMWI(hnqisType) ) {
+        if( sectionType === "Criterion" ) {
+            return ELEM_TYPES.filter(item => item.label !== 'Std Overview')
+        }
+        else if( sectionType === "Standard" ) {
+            return ELEM_TYPES.filter(item => item.label == 'Std Overview')
+        }
+    }
+   
+    return ELEM_TYPES.filter(item => item.label !== 'Std Overview')
+}
 
+const DataElementForm = ({ program, dePrefix, programStageDataElement, section, sectionType, setDeToEdit, save, saveFlag = false, setSaveFlag = undefined, hnqisType, setSaveStatus }) => {
+    
     const de = programStageDataElement.dataElement;
 
     const idQuery = useDataQuery(queryId);
@@ -74,9 +89,35 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     const { data: programRuleVariables } = useDataQuery(programRuleVariableQuery, {variables: { program, dataElement: de?.id ?? "X" } });
     const programRuleVariable = programRuleVariables?.results?.programRuleVariables?.at(0) 
     
-
+    // const getElemType = () => {
+    //     if( programIsHNQISMWI(hnqisType) ) {
+    //         if( sectionType === "Criterion" ) {
+    //             return ELEM_TYPES.filter(item => item.label !== 'Std Overview');
+    //         }
+    //         else if( sectionType === "Standard" ) {
+    //             return ELEM_TYPES.filter(item => item.label == 'Std Overview');
+    //         }
+    //     }
+        
+    //     return ELEM_TYPES;
+    // }
+    
+    
     useEffect(() => {
-        if (initOptionSets) { setServerOptionSets(initOptionSets) }
+        if (initOptionSets) { 
+            setServerOptionSets(initOptionSets);
+            if( programIsHNQISMWI(hnqisType) ) {
+                if( structure === "question" ) {
+                    const optionSet = initOptionSets.results.optionSets.find((item) => item.id == HNQISMWI_QUESTION_OPTION_SET ); // Option set "HNQIS MWI - YesNoNA"
+                    optionSet.label = optionSet.name;
+                    setOptionSet(optionSet);
+                    if( optionSet ) setValueType(optionSet.valueType);
+                }
+                else {
+                    setOptionSet(null);
+                }
+            }
+        }
     }, [initOptionSets])
 
     useEffect(() => {
@@ -85,16 +126,17 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     
 
     const metadata = JSON.parse(de?.attributeValues.find(att => att.attribute.id === METADATA)?.value || '{}')
-
+    const initStructure = metadata.elemType || 'question';
+    
     // States
-    const [structure, setStructure] = useState(metadata.elemType || 'question')
+    const [structure, setStructure] = useState(initStructure);
     const [valueType, setValueType] = useState(de?.valueType || '')
     const [aggType, setAggType] = useState(de?.aggregationType || 'NONE')
     const [formName, setFormName] = useState((metadata.elemType === 'label' ? metadata.labelFormName : de?.formName)?.replace(' [C]', '') || '')
     const [elementName, setElementName] = useState(de?.name || '')
     const [shortName, setShortName] = useState(de?.shortName || '')
     const [elementCode, setElementCode] = useState(de?.code || '')
-    const [compulsory, setCompulsory] = useState((metadata.isCompulsory? metadata.isCompulsory === 'Yes' : programStageDataElement.compulsory) ?? false)  // metadata.isCompulsory : ['Yes','No']
+    const [compulsory, setCompulsory] = useState(false)  // metadata.isCompulsory : ['Yes','No']
     const [displayInReports, setDisplayInReports] = useState(programStageDataElement.displayInReports ?? false)
     const [optionSet, setOptionSet] = useState(de?.optionSet ? { label: de.optionSet.name, id: de.optionSet.id } : null)
     const [legendSet, setLegendSet] = useState(de?.legendSet ? { label: de.legendSet.name, id: de.legendSet.id } : null)
@@ -112,12 +154,67 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     const [dialogStatus, setDialogStatus] = useState(false)
     const [autoNaming, setAutoNaming] = useState(metadata.autoNaming === 'No'?false:true)
 
+    // Initilize the values of the structure, valueType, optionSet and compulsory
+    useEffect(() => {
+        let _compulsory = (metadata.isCompulsory? metadata.isCompulsory === 'Yes' : programStageDataElement.compulsory) ?? false
+        let _structure = structure;
+        let _valueType;
+        let _optionSet;
+        
+        const elemTypes = getElemType(hnqisType, sectionType);
+        if( programIsHNQISMWI(hnqisType) ) {
+            if(  elemTypes.length === 1 ) { // For "Std Overview" case
+                _structure = elemTypes[0].value
+                _valueType = HNQISMWI_STD_OVERVIEW_VALUE_TYPE
+                _optionSet = null
+            }
+            
+            // For HNQISMWI, for 'question' DEs, the compulsory is set as TRUE
+            if( _structure === 'question' ) {
+                _compulsory = true
+            }
+            // For HNQISMWI, for 'Std Overview' DEs, the compulsory is set as FALSE
+            else if( _structure === 'Std Overview' ) {
+                _compulsory = false
+            }
+        }
+        else {
+            setStructure( metadata.elemType || 'question');
+        }
+        
+        if( _structure != structure ) setStructure( _structure )
+        if( _valueType ) setValueType( _valueType )
+        if( _optionSet ) setOptionSet( _optionSet )
+        setCompulsory(_compulsory)
+        
+    }, [])
+    
+    
     // Handlers
     const elemTypeChange = (e) => {
         setStructure(e.target.value)
+        
         if (e.target.value === 'label') {
             setValueType('LONG_TEXT')
             setOptionSet(null)
+            setCompulsory(false)
+        }
+        else if( programIsHNQISMWI(hnqisType) ) {
+            if ( e.target.value === 'Std Overview') {
+                setValueType(HNQISMWI_STD_OVERVIEW_VALUE_TYPE)
+                setOptionSet(null)
+                setCompulsory(false)
+            }
+            else if( e.target.value === 'question' ) {
+                const optionSet = serverOptionSets.results.optionSets.find((item) => item.id == HNQISMWI_QUESTION_OPTION_SET ); // Option set "HNQIS MWI - YesNoNA"
+                optionSet.label = optionSet.name
+                setOptionSet(optionSet)
+                if( optionSet ) setValueType(optionSet.valueType)
+                setCompulsory(true)
+            }
+            else {
+                setCompulsory(false)
+            }
         }
     }
 
@@ -183,7 +280,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     }
 
     const compulsoryChange = (data) => setCompulsory(data.target.checked)
-
+    
     const removeNamingValidationErrors = () => {
         validationErrors.formName = undefined
         validationErrors.elementName = undefined
@@ -406,7 +503,6 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
             data.code = elementCode;
         }
 
-
         // METADATA
         // Elem type
         metadata.isCompulsory = compulsory ? "Yes" : "No";
@@ -436,7 +532,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
         if (programIsHNQIS(hnqisType)) { setSaveStatus('Validate & Save') }
 
     }
-
+    
     //Handling create New Data Element
     useEffect(() => {
         if (saveFlag && setSaveFlag) {
@@ -576,6 +672,8 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
             />
         </div>
     ]
+    
+   
     return (
         <div className={de ? "dataElement_cont" : ''}>
 
@@ -601,7 +699,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                         <Grid style={{ display: 'flex' }} item>
                             <RowRadioButtonsGroup
                                 label={"HNQIS Element Type"}
-                                items={ELEM_TYPES}
+                                items={getElemType(hnqisType, sectionType)}
                                 handler={elemTypeChange}
                                 value={structure}
                             />
@@ -621,10 +719,10 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     <FormLabel component="legend">Behavior in Current Stage</FormLabel>
                     <Grid item style={{ display: 'flex' }}>
                         <FormControlLabel
-                            disabled={structure === 'label'}
+                            disabled={structure === 'label' || programIsHNQISMWI(hnqisType)}
                             control={
                                 <Switch
-                                    checked={compulsory && structure !== 'label'}
+                                    checked={compulsory}
                                     onChange={compulsoryChange}
                                 />}
                             label="Compulsory"
@@ -649,60 +747,62 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     </Grid>
                 </Grid>
                 <Grid item xs={6} style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    <div style={{ display: 'flex' }}>
-                        <FormLabel component="legend" style={{ marginRight: '0.5em' }}>Data Element Value Type</FormLabel>
-                        <InfoBox
-                            title='About Value Type and Option Sets'
-                            message={
-                                <p>
-                                    The Value Type will define the type of data that the data element will record.
-                                    <br />If an Option Set is selected,
-                                    the Value Type will be assigned automatically to match the Option Set.
-                                    <br /><br />
-                                    If the current program is a HNQIS2 program, only Option Sets that include &lsquo;HNQIS&lsquo; in the name will be displayed.
-                                </p>
-                            }
-                        />
+                    <div style={{ display: !programIsHNQISMWI(hnqisType) ? 'flex' : "none"}}>
+                            <FormLabel component="legend" style={{ marginRight: '0.5em' }}>Data Element Value Type</FormLabel>
+                                <InfoBox
+                                    title='About Value Type and Option Sets'
+                                    message={
+                                        <p>
+                                            The Value Type will define the type of data that the data element will record.
+                                            <br />If an Option Set is selected,
+                                            the Value Type will be assigned automatically to match the Option Set.
+                                            <br /><br />
+                                            If the current program is a HNQIS2 program, only Option Sets that include &lsquo;HNQIS&lsquo; in the name will be displayed.
+                                        </p>
+                                    }
+                                />
                     </div>
+                    
                     <div style={{ display: 'flex', width: '100%', marginTop: '0.5em', justifyContent: 'end', alignItems: 'center' }}>
                         <SelectOptions
                             label="Value Type (*)"
-                            styles={{ width: '40%' }}
+                            styles={{ width: '40%', display: programIsHNQISMWI(hnqisType) ? "none": "" }}
                             useError={validationErrors.valueType !== undefined}
                             helperText={validationErrors.valueType}
                             items={programIsHNQIS(hnqisType)?VALUE_TYPES_H2:VALUE_TYPES_TRACKER}
                             value={valueType}
-                            disabled={structure === 'label' || optionSet != null}
+                            disabled={structure === 'label' || optionSet != null || programIsHNQISMWI(hnqisType)}
                             handler={valueTypeChange} />
 
-                        <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '10%' }}>or</p>
-
-                        <Autocomplete
-                            id="optionSetsSelect"
-                            disabled={structure === 'label'}
-                            options={
-                                serverOptionSets?.results.optionSets.filter(os => !programIsHNQIS(hnqisType) || os.name?.toLowerCase().includes("hnqis")).map(os =>
-                                    ({ label: os.name, id: os.id, valueType: os.valueType })
-                                ) || []
-                            }
-                            sx={{ width: '45%', marginRight: '0.5em' }}
-                            renderInput={(params) => <TextField {...params} label="Option Set" />}
-                            value={optionSet}
-                            onChange={optionSetChange}
-                            getOptionLabel={(option) => (option.label || '')}
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                        />
-                        <Tooltip title="Create New Option Set" placement="top">
-                            <IconButton onClick={()=>{}} target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/otherSection/optionSet/add"}>
-                                <AddCircleOutlineIcon />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Reload Option Sets" placement="top">
-                            <IconButton onClick={()=> reloadOptionSets()} >
-                                <RefreshIcon />
-                            </IconButton>
-                        </Tooltip>
+                            <p style={{ display: programIsHNQISMWI(hnqisType) ? "none": 'flex', alignItems: 'center', justifyContent: 'center', width: '10%' }}>or</p>
+                        
+                            <Autocomplete
+                                id="optionSetsSelect"
+                                disabled={structure === 'label' || ( programIsHNQISMWI(hnqisType) )}
+                                options={
+                                    serverOptionSets?.results.optionSets.filter(os => !programIsHNQIS(hnqisType) || os.name?.toLowerCase().includes("hnqis")).map(os =>
+                                        ({ label: os.name, id: os.id, valueType: os.valueType })
+                                    ) || []
+                                }
+                                sx={{ width: '45%', marginRight: '0.5em' }}
+                                renderInput={(params) => <TextField {...params} label="Option Set" />}
+                                value={optionSet}
+                                onChange={optionSetChange}
+                                getOptionLabel={(option) => (option.label || '')}
+                                isOptionEqualToValue={(option, value) => option.id === value.id}
+                            />
+                            <Tooltip title="Create New Option Set" placement="top">
+                                <IconButton onClick={()=>{}} target="_blank" rel="noreferrer" href={(window.localStorage.DHIS2_BASE_URL || process.env.REACT_APP_DHIS2_BASE_URL) + "/dhis-web-maintenance/index.html#/edit/otherSection/optionSet/add"}>
+                                    <AddCircleOutlineIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Reload Option Sets" placement="top">
+                                <IconButton onClick={()=> reloadOptionSets()} >
+                                    <RefreshIcon />
+                                </IconButton>
+                            </Tooltip>
                     </div>
+                   
                     {programIsHNQIS(hnqisType) && aggTypeContent}
                 </Grid>
             </Grid>
@@ -734,7 +834,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     }
                     margin='0 1em 0 0.5em'
                 />
-                <FormControlLabel
+                {!programIsHNQISMWI(hnqisType) && <FormControlLabel
                     disabled={programIsHNQIS(hnqisType)}
                     control={
                         <Switch
@@ -742,7 +842,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             onChange={autoNamingChange}
                         />}
                     label="Automatic Name, Short Name and Code"
-                />
+                /> }
             </div>
             {!autoNaming && <>
                 <TextField
@@ -811,7 +911,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                 <div style={{ display: 'flex', width: '30%' }}>
                     <Autocomplete
                         id="legendSetSelect"
-                        disabled={structure === 'label'}
+                        disabled={structure === 'label' || structure === 'Std Overview'}
                         sx={{ minWidth: '100%', marginRight: '0.5em' }}
                         options={serverLegendSets?.results.legendSets.filter(ls => !programIsHNQIS(hnqisType) || ls.name?.toLowerCase().includes("hnqis")).map(ls => ({ label: ls.name, id: ls.id }))/* .concat({label: 'None', id: ''}) */ || [/* {label: 'None', id: ''} */]}
                         renderInput={(params) => <TextField {...params} label="Legend Set" />}
@@ -857,12 +957,13 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                     <h3 style={{ marginBottom: '0.5em', marginTop: '2em' }}>HNQIS Settings</h3>
 
 
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                     {/* For HNQISMWI, don't need to show Critical Question, Numerator, Denominator and Feedback Order*/}
+                     {!programIsHNQISMWI(hnqisType) && <div style={{ display: 'flex', alignItems: 'center' }}>
                         <FormControlLabel
-                            disabled={structure === 'label'}
+                            disabled={structure === 'label' || structure === 'Std Overview'}
                             control={
                                 <Switch
-                                    checked={critical && structure !== 'label'}
+                                    checked={critical && structure !== 'label' && structure !== 'Std Overview'}
                                     onChange={criticalChange}
                                 />
                             }
@@ -877,6 +978,8 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                                 </p>
                             }
                         />
+                        
+                       
                         <FormControl sx={{ minWidth: '2.5rem', width: '15%', marginRight: '1em' }}>
                             <TextField
                                 error={validationErrors.numerator !== undefined}
@@ -949,7 +1052,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             }
                             margin='0 0.5em'
                         />
-                    </div>
+                    </div> }
 
                     <div style={{ display: 'flex', margin: '0.5em 0' }}>
                         <FormLabel component="legend">Feedback Text</FormLabel>
@@ -964,8 +1067,8 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                             margin='0 0.5em'
                         />
                     </div>
-                    <div data-color-mode="light" style={structure === 'label' ? { opacity: '0.5' } : undefined}>
-                        <MarkDownEditor value={feedbackText} setValue={setFeedbackText} disabled={structure === 'label'} />
+                    <div data-color-mode="light" style={(structure === 'label' || structure === 'Std Overview') ? { opacity: '0.5' } : undefined}>
+                        <MarkDownEditor value={feedbackText} setValue={setFeedbackText} disabled={structure === 'label' || structure === 'Std Overview'} />
                     </div>
                 </>}
                 {/* PROGRAM RULE ACTIONS */}
@@ -1019,6 +1122,7 @@ DataElementForm.propTypes = {
     save: PropTypes.func,
     saveFlag: PropTypes.bool,
     section: PropTypes.object,
+    sectionType: PropTypes.string,
     setDeToEdit: PropTypes.func,
     setSaveFlag: PropTypes.func,
     setSaveStatus: PropTypes.func

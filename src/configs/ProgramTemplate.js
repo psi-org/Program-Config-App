@@ -277,7 +277,7 @@ const HNQISMWI_ActionPlanElements = [
         "formName": "Comment",
         "legendSets": [],
         "aggregationType": "NONE",
-        "valueType": "TEXT",
+        "valueType": "LONG_TEXT",
         "domainType": "TRACKER",
         "aggregationLevels": [],
         "zeroIsSignificant": false,
@@ -339,6 +339,8 @@ const HNQISMWI_ActionPlanElements = [
     }
 ];
 
+const HNQISMWI_Criterion_RequiredDEs_Section_Name = "Criterion Required";
+
 const HNQISMWI_SectionDataElements = [
     {
         "name": "Section 1",
@@ -362,6 +364,7 @@ module.exports = {
     COMPETENCY_TEA,
     EventStage,
     HNQISMWI_ActionPlanElements,
+    HNQISMWI_Criterion_RequiredDEs_Section_Name,
     HNQISMWI_Attributes,
     HNQISMWI_SectionDataElements,
     HnqisProgramConfigs,

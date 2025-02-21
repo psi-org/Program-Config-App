@@ -1,6 +1,6 @@
 import { MWIProgramIndicatorTemplate, } from "../../../configs/AnalyticsTemplates.js";
 import { ASSESSMENT_DATE_ATTRIBUTE, ASSESSMENT_PERIOD_ATTRIBUTE, FEEDBACK_ORDER, HEALTH_AREA_ATTRIBUTE, METADATA, ORGANISATION_UNIT_ATTRIBUTE, PERIOD_END_ATTRIBUTE, PERIOD_START_ATTRIBUTE } from "../../../configs/Constants.js";
-import { DeepCopy, padValue } from "../../../utils/Utils.js";
+import { DeepCopy, getSectionType, isCriterionDE1, isCriterionDE2, isCriterionDE3, isCriterionDE3To6, isCriterionDEGenerated, padValue } from "../../../utils/Utils.js";
 
 const buildAttributesRulesMWI = (programId, uidPool, healthArea) => {
 
@@ -276,14 +276,16 @@ export const buildProgramRuleVariablesMWI = ({ sections, programId, uidPool }) =
 
     // Data Elements Variables
     sections.forEach(section => {
-        if (section.name.match(/Section \d+ : /)) {
+        if( getSectionType(section) === "Section" ) {
+        // if (section.name.match(/Section \d+ : /)) {
             secIdx += 1;
             deIdx = 1;
         }
         section.dataElements.forEach(dataElement => {
             let name;
 
-            if (!dataElement.code?.match(/MWI_AP_DE/)) {
+            // if (!dataElement.code?.match(/MWI_AP_DE/)) {
+            if( !isCriterionDEGenerated(dataElement) ) {
                 name = `_S${padValue(secIdx, "00")}E${padValue(deIdx, "000")}`;
                 deIdx += 1;
             } else {
@@ -388,7 +390,6 @@ const buildScoringRulesMWI = (
                 programRule: { id: programRuleUid }
             };
 
-            //TODO: Add hide/show logic for the action plan data elements when no value is selected
             const additionalActions = [];
             actionPlanDataElements.forEach(de => {
                 if (['0', '100'].includes(f.data)) {
@@ -405,14 +406,14 @@ const buildScoringRulesMWI = (
                     additionalActions.push(hideAction);
                     return;
                 }
-                const mandatoryAction = {
-                    id: uidPool.shift(),
-                    programRuleActionType: "SETMANDATORYFIELD",
-                    dataElement: { id: de.id },
-                    programRule: { id: programRuleUid }
-                };
-                scoringRuleActions.push(mandatoryAction);
-                additionalActions.push(mandatoryAction);
+                //const mandatoryAction = {
+                //    id: uidPool.shift(),
+                //    programRuleActionType: "SETMANDATORYFIELD",
+                //    dataElement: { id: de.id },
+                //    programRule: { id: programRuleUid }
+                //};
+                //scoringRuleActions.push(mandatoryAction);
+                //additionalActions.push(mandatoryAction);
             });
 
             const pr = {
@@ -471,15 +472,15 @@ export const buildProgramRulesMWI = (
             const metadata = JSON.parse(dataElement.attributeValues.find(att => att.attribute.id == METADATA)?.value || "{}");
 
             // Get parents hide/show logic
-            if (dataElement.code?.match(/MWI_AP_DE1/)) {
+            if (isCriterionDE1(dataElement)) {
                 criterionRulesGroup[section.id].criterionStatus = { id: dataElement.id, code: dataElement.code };
-            } else if (dataElement.code?.match(/MWI_AP_DE2/)) {
+            } else if (isCriterionDE2(dataElement)) {
                 criterionRulesGroup[section.id].criterionScore = { id: dataElement.id, code: dataElement.code };
-            } else if (dataElement.code?.match(/MWI_AP_DE[3-6]/)) {
+            } else if (isCriterionDE3To6(dataElement)) {
                 criterionRulesGroup[section.id].actionPlanDataElements.push({
                     id: dataElement.id,
                     mandatory: true,
-                    alwaysDisplay: dataElement.code?.match(/MWI_AP_DE3/) ? true : false
+                    alwaysDisplay: isCriterionDE3(dataElement) ? true : false
                 });
             }
 
@@ -625,10 +626,9 @@ export const buildProgramIndicatorsMWI = (
     return { programIndicators, indicatorIDs }
 }
 
-export const buildH2BaseVisualizationsMWI = ({ a/*programId, programShortName, gsInd, indicatorIDs, uidPool, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel*/ }) => {
+export const buildH2BaseVisualizationsMWI = (/*{programId, programShortName, gsInd, indicatorIDs, uidPool, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel}*/) => {
     //const series = []
     //const dataDimensionItems = []
-    console.log(a);
     const visualizations = []
     const eventReports = []
     const androidSettingsVisualizations = []

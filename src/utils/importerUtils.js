@@ -1,7 +1,7 @@
 import { DHIS2_AGG_OPERATORS_MAP, DHIS2_VALUE_TYPES_MAP, FEEDBACK_ORDER, FEEDBACK_TEXT, MAX_DATA_ELEMENT_NAME_LENGTH, MAX_SHORT_NAME_LENGTH, METADATA, OPTION_SET_YESNONA } from "../configs/Constants.js";
 import { ReleaseNotes, ReleaseNotesTracker } from "../configs/ReleaseNotes.js";
 import { HNQIS2_TEMPLATE_MAP, HNQISMWI_TEMPLATE_MAP, HQNIS2_PROGRAM_TYPE_CELL, TEMPLATE_PROGRAM_TYPES, TRACKER_PROGRAM_TYPE_CELL, TRACKER_TEMPLATE_MAP } from "../configs/TemplateConstants.js";
-import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty, isLabelType, programIsHNQIS } from "./Utils.js";
+import { buildAttributeValue, getKeyByValue, getObjectByProperty, getObjectIdByProperty, getSectionType, isLabelType, padValue, programIsHNQIS } from "./Utils.js";
 
 export const isTrackerType = (importType) => [TEMPLATE_PROGRAM_TYPES.tracker, TEMPLATE_PROGRAM_TYPES.event].includes(importType);
 
@@ -550,4 +550,106 @@ export const getBasicForm = (type) => {
     if (type === 'TEA') { result.trackedEntityAttributes = [] }
     if (type === 'DE') { result.dataElements = [] }
     return result;
+}
+
+export const resetMWISectionNumbering = (prgStgSections) => { // 2 Step Process.  Step 1: Collect structrues, Step2: Check the structure issues.
+    let sectionIdx = 0
+    let standardIdx = 0
+    let criterionIdx = 0
+
+    // STEP 1. Go Through programStageSections, and reset the numbers for each programStageSection
+    for( let i=0; i<prgStgSections.length; i++ ) {
+        const pgStgSec = prgStgSections[i]
+
+        const typeName = getSectionType( pgStgSec )
+
+        if ( typeName === 'Section' ) {
+            // Increate section idx
+            sectionIdx++
+            // Reset standard idx and criterion idx
+            standardIdx = 0
+            criterionIdx = 0
+            
+            // Reset the number for the name of "Section"
+            // The name of a section looks like "Section 1 : xxx yyy zzz ..."
+            // I want to get the name "xxx yyy zzz ..."
+            setStageSectionName(typeName, sectionIdx, pgStgSec);
+        }
+        else if ( typeName === 'Standard' ) {
+            standardIdx++
+            criterionIdx = 0
+            const standardNo = `${sectionIdx}.${standardIdx}`
+            setStageSectionName(typeName, standardNo, pgStgSec)
+        }
+        else if ( typeName === 'Criterion' ) {
+            criterionIdx++;
+            const criterionNo = `${sectionIdx}.${standardIdx}.${criterionIdx}`
+            setStageSectionName(typeName, criterionNo, pgStgSec)
+            setNumbersToCriterionDEs(pgStgSec, criterionNo)
+        }
+    }
+}
+
+/**
+ * 
+ * Set the numbers for data elements of Criterion
+ */
+const setNumbersToCriterionDEs = (prgStgSection, criterionNo) => {
+    try
+    {
+        const dataElements = prgStgSection?.dataElements
+        const criterionNoRex = /(\d+|#)(\.(\d+|#))(\.(\d+|#))/g
+        
+        dataElements.forEach( (dataElement) => {
+
+            const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
+
+            if ( metaDataStringArr.length > 0 ) 
+            {
+                const metaData = JSON.parse( metaDataStringArr[0].value );
+
+                if ( metaData?.elemType === "generated" ) {
+                    dataElement.code = dataElement.code.replace(criterionNoRex, criterionNo)
+                    dataElement.name = dataElement.name.replace(criterionNoRex, criterionNo)
+                    dataElement.shortName = dataElement.shortName.replace(criterionNoRex, criterionNo)
+                    dataElement.formName = dataElement.formName.replace(criterionNoRex, criterionNo)
+                    
+                    dataElement.attributeValues?.map(av => {
+                        if (av.attribute.id === METADATA) {
+                            metaData.varName = metaData.varName.replace(criterionNoRex, criterionNo)
+                            av.attribute.value = JSON.stringify(metaData)
+                        }
+                        return av;
+                    });
+
+                }
+            }
+        });
+    }
+    catch( errMsg ) {
+        console.log( 'ERROR in importUtils > setNumbersToCriterionDEs, ' + errMsg );
+    }
+}
+
+
+const setStageSectionName = (type, idx, prgStgSection) => {
+    const prefix = `${type} ${idx}`;
+    let name =  `${prefix} : ${prgStgSection.name.split(" : ")[1]}`;
+    if( type === "Section" ) {
+        const dataElement = prgStgSection.dataElements[0];
+        // DE name like this "EM2_S01Q001_Section 0", and I need to change the last part "Section 0" to proper number
+        dataElement.name = dataElement.name.replace( dataElement.name.split("_")[2], prefix );
+        dataElement.formName = prefix;
+    }
+    
+    if( type === "Standard" ) {
+        name = `> ${name}`;
+    }
+    
+    if( type === "Criterion" ) {
+        name = `> > ${name}`;
+    }
+    
+    prgStgSection.name = name;
+    prgStgSection.displayName = name;
 }

@@ -280,10 +280,12 @@ const DataElementManager = (props) => {
                                 dePrefix={props.dePrefix}
                                 programStageDataElement={{}}
                                 section={{}}
+                                sectionType={props.sectionType}
                                 setDeToEdit={undefined}
                                 save={handleNewDE}
                                 saveFlag={saveDeFlag}
                                 setSaveFlag={setSaveDeFlag}
+                                hnqisType={props.hnqisType}
                                 hnqisMode={props.hnqisMode}
                                 setSaveStatus={props.setSaveStatus}
                             />
@@ -316,9 +318,11 @@ DataElementManager.propTypes = {
     dePrefix: PropTypes.string,
     deRef: PropTypes.object,
     hnqisMode: PropTypes.bool,
+    hnqisType: PropTypes.string,
     program: PropTypes.string,
     programStageDataElements: PropTypes.array,
     saveAdd: PropTypes.func,
+    sectionType: PropTypes.string,
     setDeManager: PropTypes.func,
     setSaveStatus: PropTypes.func,
 }

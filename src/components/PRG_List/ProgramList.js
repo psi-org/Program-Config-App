@@ -3,8 +3,8 @@ import { Chip, CircularLoader, NoticeBox, Pagination, FlyoutMenu, MenuItem, Popp
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import BuildIcon from '@mui/icons-material/Build';
 import ClearIcon from '@mui/icons-material/Clear';
+import ExtensionIcon from '@mui/icons-material/Extension';
 import InfoIcon from '@mui/icons-material/Info';
-import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { Tooltip } from "@mui/material";
@@ -15,7 +15,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import React, { useState, useEffect } from "react";
-import { DATASTORE_H2_METADATA, H2_METADATA_VERSION, NAMESPACE } from "../../configs/Constants.js";
+import { DATASTORE_H2_METADATA, DATASTORE_HMWI_METADATA, H2_METADATA_VERSION, HMWI_METADATA_VERSION, NAMESPACE } from "../../configs/Constants.js";
 import { formatAlert, versionGTE } from "../../utils/Utils.js";
 import OunitScreen from "../Org_Units/OunitScreen.js";
 import BackupScreen from "../PRG_List/BackupScreen.js";
@@ -23,8 +23,8 @@ import RestoreScreen from "../PRG_List/RestoreScreen.js";
 import SharingScreen from "../Sharing/SharingScreen.js";
 import About from "./About.js";
 import DependencyExport from "./DependencyExport.js";
+import ExtensionManager from "./ExtensionManager/ExtensionManager.js";
 import H2Convert from "./H2Convert.js";
-import H2Metadata from "./H2Metadata.js";
 import H2Transfer from "./H2Transfer.js";
 import ProgramItem from "./ProgramItem.js";
 import ProgramNew from './ProgramNew.js'
@@ -42,6 +42,12 @@ const queryProgramType = {
 const queryHNQIS2Metadata = {
     results: {
         resource: `dataStore/${NAMESPACE}/${DATASTORE_H2_METADATA}`,
+    },
+};
+
+const queryHNQISMWIMetadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_HMWI_METADATA}`,
     },
 };
 
@@ -72,6 +78,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const ProgramList = () => {
 
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
+    const { data: hnqisMWIMetadata } = useDataQuery(queryHNQISMWIMetadata);
+
+    const h2Ready = localStorage.getItem('h2Ready') === 'true';
+    const hMWIReady = localStorage.getItem('hMWIReady') === 'true';
 
     // Export Program Metadata //
     const [exportProgramId, setExportProgramId] = useState(undefined)
@@ -98,7 +108,7 @@ const ProgramList = () => {
     const [ref, setRef] = useState();
 
     const [aboutModal, setAboutModal] = useState(false);
-    const [H2Modal, setH2Modal] = useState(false);
+    const [packageModal, setPackageModal] = useState(false);
 
     useEffect(() => {
         if (notification) { setSnackSeverity(notification.severity) }
@@ -231,11 +241,11 @@ const ProgramList = () => {
                                         }}
                                     />
                                     <MenuItem
-                                        label="HNQIS 2.0 Status"
-                                        icon={<InstallDesktopIcon />}
+                                        label="PCA Extensions"
+                                        icon={<ExtensionIcon />}
                                         onClick={() => {
                                             setSettingsMenu(false);
-                                            setH2Modal(true);
+                                            setPackageModal(true);
                                         }}
                                     />
                                 </FlyoutMenu>
@@ -358,7 +368,16 @@ const ProgramList = () => {
             <div className="wrapper" style={{ padding: '1em  1.2em 0' }}>
                 <div className="layout_prgms_stages">
                     {data.results?.programs?.length === 0 &&
-                        <div className="title" style={{ padding: '1.5em', display: 'flex', justifyContent: 'center' }}>No Programs Found</div>
+                        <div
+                            className="title"
+                            style={{
+                                padding: '1.5em',
+                                display: 'flex',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            No Programs Found
+                        </div>
                     }
                     <div className="list-ml_item">
                         {data.results?.programs?.map((program) => {
@@ -379,7 +398,10 @@ const ProgramList = () => {
                                     convertToH2={convertToH2}
                                     transferDataH2={transferDataH2}
                                     setSearchLocalStorage={setSearchLocalStorageWithCurrentValues}
-                                    h2Valid={versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)}
+                                    h2Valid={{
+                                        vanilla: (versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION) && h2Ready),
+                                        mwi: (versionGTE(hnqisMWIMetadata?.results?.version, HMWI_METADATA_VERSION) && hMWIReady)
+                                    }}
                                 />
                             );
                         })}
@@ -430,12 +452,15 @@ const ProgramList = () => {
                 </Alert>
             </Snackbar>
 
-            {aboutModal && (
+            {aboutModal && 
                 <About aboutModal={aboutModal} setAboutModal={setAboutModal} />
-            )}
-            {H2Modal && (
-                <H2Metadata H2Modal={H2Modal} setH2Modal={setH2Modal} />
-            )}
+            }
+            {packageModal && 
+                <ExtensionManager
+                    packageModal={packageModal}
+                    setPackageModal={setPackageModal} 
+                />
+            }
         </div>
     );
 };

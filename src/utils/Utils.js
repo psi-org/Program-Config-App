@@ -291,11 +291,6 @@ export const getProgramQuery = (deepQuery = true) => {
     const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style,allowFutureDate,allowProvidedElsewhere,skipSynchronization,renderType`;
     const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder`;
     const stagesQuery = `name,created,lastUpdated,translations,externalAccess,publicAccess,createdBy,userGroupAccesses,userAccesses,access,favorites,lastUpdatedBy,sharing,description,displayDescription,minDaysFromStart,program[id,name],programStageDataElements[${stageDataElementsQuery}],standardInterval,executionDateLabel,dueDateLabel,autoGenerateEvent,validationStrategy,displayGenerateEventBox,featureType,blockEntryForm,preGenerateUID,style[color,icon],remindCompleted,generatedByEnrollmentDate,allowGenerateNextVisit,openAfterEnrollment,reportDateToUse,sortOrder,periodType,hideDueDate,enableUserAssignment,referral,formType,displayExecutionDateLabel,displayDueDateLabel,displayFormName,displayName,user,favorite,id,attributeValues,repeatable,programStageSections[${stageSectionsQuery}],notificationTemplates`;
-        
-    `name,created,lastUpdated,translations,externalAccess,publicAccess,createdBy,userGroupAccesses,userAccesses,access,favorites,lastUpdatedBy,sharing,minDaysFromStart,program[id,name],programStageDataElements[${stageDataElementsQuery}],autoGenerateEvent,validationStrategy,displayGenerateEventBox,blockEntryForm,preGenerateUID,remindCompleted,generatedByEnrollmentDate,allowGenerateNextVisit,openAfterEnrollment,sortOrder,hideDueDate,enableUserAssignment,referral,formType,displayFormName,displayName,user,favorite,id,attributeValues,repeatable,programStageSections[${stageSectionsQuery}],notificationTemplates`;
-
-
-
 
     const programSectionsQuery = 'id,name,renderType,sortOrder,program,sharing,translations,attributeValues,trackedEntityAttributes';
     const programTrackedEntityAttributes = 'id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute[id,name],programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccessesattributeValues,displayInList,id,mandatory,allowFutureDate,name,program,programTrackedEntityAttributeGroups,renderOptionsAsRadio,searchable,sortOrder,trackedEntityAttribute,translations,userAccesses,userGroupAccesses,valueType';
@@ -442,6 +437,11 @@ export const programIsHNQIS = (type) => {
     return (type === "HNQIS2" || type === "HNQISMWI");
 }
 
+
+export const programIsHNQISMWI = (type) => {
+    return (type === "HNQISMWI");
+}
+
 export const isLabelType = (type) => {
     return (['label', 'Std Overview'].includes(type));
 }
@@ -449,3 +449,97 @@ export const isLabelType = (type) => {
 export const isGeneratedType = (type) => {
     return (['generated', 'holder'].includes(type));
 }
+
+
+export const getSectionType = (prgStgSection) => {
+    // For NEW Section, "x" will be added instead of numbers. When metadata is saved, the "x" will be changed to proper number
+    if (prgStgSection.name.match(/Section (\d+|#)/)) { //    /Section \d+.*/
+        return "Section";
+    } else if (prgStgSection.name.match(/> Standard ((\d+|#)(\.(\d+|#))+)/)) { //    /> Standard \d+(\.\d+)*.*/)
+        return "Standard";
+    } else if (prgStgSection.name.match(/> > Criterion ((\d+|#)(\.(\d+|#))+)/)) { //     /> > Criterion \d+(\.\d+)*.*/
+        return "Criterion";
+    }
+
+    return;
+}
+
+export const getDEMetadata = (dataElement) => {
+    const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
+    return ( metaDataStringArr.length > 0 )  ? JSON.parse( metaDataStringArr[0].value ) : undefined
+}
+
+export const isDEQuestion = (dataElement) => {
+    const metaData = getDEMetadata(dataElement)
+    return (metaData ) ? metaData?.elemType === "question" : false
+}
+
+export const isDEStdOverview = (dataElement) => {
+    const metaData = getDEMetadata(dataElement)
+    return (metaData ) ? metaData?.elemType === "Std Overview" : false
+}
+
+export const isCriterionDEGenerated = (dataElement) => {
+    if( dataElement.code?.match(/MWI_AP_DE[1-6]/)) return true
+    
+    const metaData = getDEMetadata(dataElement)
+    return (metaData ) ? metaData?.elemType === "generated" : false
+}
+
+export const isCriterionDE1 = (dataElement) => {
+    if( isCriterionDEGenerated(dataElement) && ( dataElement.code?.match(/MWI_AP_DE1/) || dataElement.name.indexOf("Criterion Status") > 0 )) {
+        return true
+    }
+    
+    return false
+}
+
+export const isCriterionDE2 = (dataElement) => {
+    if( isCriterionDEGenerated(dataElement) && ( dataElement.code?.match(/MWI_AP_DE2/) || dataElement.name.indexOf("Criterion Score") > 0 )) {
+        return true
+    }
+    
+    return false
+}
+
+export const isCriterionDE3 = (dataElement) => {
+    if( isCriterionDEGenerated(dataElement) && ( dataElement.code?.match(/MWI_AP_DE3/) || dataElement.name.indexOf("Comment") > 0 )) {
+        return true
+    }
+    
+    return false
+}
+
+export const isCriterionDE3To6 = (dataElement) => {
+    if( isCriterionDEGenerated(dataElement) && !isCriterionDE1(dataElement) && !isCriterionDE2(dataElement)) {
+        return true
+    }
+    
+    return false
+}
+
+export const deepMerge = (obj1, obj2) => {
+    const result = { ...obj1 };
+  
+    for (const key in obj2) {
+      if (key in result) {
+        // Merge inner objects if both keys exist
+        if (
+          typeof result[key] === "object" &&
+          typeof obj2[key] === "object" &&
+          !Array.isArray(result[key]) &&
+          !Array.isArray(obj2[key])
+        ) {
+          result[key] = deepMerge(result[key], obj2[key]);
+        } else {
+          // Overwrite with the new value otherwise
+          result[key] = obj2[key];
+        }
+      } else {
+        // Add new keys
+        result[key] = obj2[key];
+      }
+    }
+  
+    return result;
+};
