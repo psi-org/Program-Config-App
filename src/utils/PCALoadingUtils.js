@@ -1,4 +1,11 @@
-import { H2_REQUIRED, PCA_ATTRIBUTES, PCA_OPTIONS, PCA_OPTION_SETS, PCA_USER_ROLES } from "../configs/Constants.js";
+import {
+    H2_REQUIRED,
+    HMWI_REQUIRED,
+    PCA_ATTRIBUTES,
+    PCA_OPTIONS,
+    PCA_OPTION_SETS,
+    PCA_USER_ROLES
+} from "../configs/Constants.js";
 
 const queryPCAAttributes = {
     results: {
@@ -40,75 +47,79 @@ const queryPCAUserRoles = {
     }
 };
 
-const queryH2DataElements = {
+const queryRequiredDataElements = {
     results: {
         resource: 'dataElements',
-        params: {
+        params: ({packageRequired}) => ({
             fields: ['id'],
-            filter: [`id:in:[${H2_REQUIRED.dataElements.join(',')}]`]
-        }
+            filter: [`id:in:[${packageRequired.dataElements.join(',')}]`]
+        })
     }
 };
 
-const queryH2OptionSets = {
+const queryRequiredOptionSets = {
     results: {
         resource: 'optionSets',
-        params: {
+        params: ({packageRequired}) => ({
             fields: ['id'],
-            filter: [`id:in:[${H2_REQUIRED.optionSets.join(',')}]`]
-        }
+            filter: [`id:in:[${packageRequired.optionSets.join(',')}]`]
+        })
     }
 };
 
-const queryH2Options = {
+const queryRequiredOptions = {
     results: {
         resource: 'options',
-        params: {
+        params: ({packageRequired}) => ({
             fields: ['id'],
-            filter: [`id:in:[${H2_REQUIRED.options.join(',')}]`]
-        }
+            filter: [`id:in:[${packageRequired.options.join(',')}]`]
+        })
     }
 };
 
-const queryH2TrackedEntityTypes = {
+const queryRequiredTrackedEntityTypes = {
     results: {
         resource: 'trackedEntityTypes',
-        params: {
+        params: ({packageRequired}) => ({
             fields: ['id'],
-            filter: [`id:in:[${H2_REQUIRED.trackedEntityTypes.join(',')}]`]
-        }
+            filter: [`id:in:[${packageRequired.trackedEntityTypes.join(',')}]`]
+        })
     }
 };
 
-const queryH2TrackedEntityAttributes = {
+const queryRequiredTrackedEntityAttributes = {
     results: {
         resource: 'trackedEntityAttributes',
-        params: {
+        params: ({packageRequired}) => ({
             fields: ['id'],
-            filter: [`id:in:[${H2_REQUIRED.trackedEntityAttributes.join(',')}]`]
-        }
+            filter: [`id:in:[${packageRequired.trackedEntityAttributes.join(',')}]`]
+        })
     }
 };
 
-const queryH2Attributes = {
+const queryRequiredAttributes = {
     results: {
         resource: 'attributes',
-        params: {
+        params: ({packageRequired}) => ({
             fields: ['id'],
-            filter: [`id:in:[${H2_REQUIRED.attributes.join(',')}]`]
-        }
+            filter: [`id:in:[${packageRequired.attributes.join(',')}]`]
+        })
     }
 };
 
-const queryH2LegendSets = {
+const queryRequiredLegendSets = {
     results: {
         resource: 'legendSets',
-        params: {
+        params: ({packageRequired}) => ({
             fields: ['id'],
-            filter: [`id:in:[${H2_REQUIRED.legendSets.join(',')}]`]
-        }
+            filter: [`id:in:[${packageRequired.legendSets.join(',')}]`]
+        })
     }
 };
+
+export const completenessCheck = (queryResult, checkProcess) => {
+    return queryResult?.results[checkProcess.objectName]?.filter(obj => checkProcess.resultsList.includes(obj.id)).length >= checkProcess.resultsList.length;
+}
 
 export const checkProcessPCA = [
     { queryFunction: queryPCAAttributes, resultsList: PCA_ATTRIBUTES, objectName: 'attributes' },
@@ -118,11 +129,20 @@ export const checkProcessPCA = [
 ];
 
 export const checkProcessH2 = [
-    { queryFunction: queryH2DataElements, resultsList: H2_REQUIRED.dataElements, objectName: 'dataElements' },
-    { queryFunction: queryH2OptionSets, resultsList: H2_REQUIRED.optionSets, objectName: 'optionSets' },
-    { queryFunction: queryH2Options, resultsList: H2_REQUIRED.options, objectName: 'options' },
-    { queryFunction: queryH2TrackedEntityTypes, resultsList: H2_REQUIRED.trackedEntityTypes, objectName: 'trackedEntityTypes' },
-    { queryFunction: queryH2TrackedEntityAttributes, resultsList: H2_REQUIRED.trackedEntityAttributes, objectName: 'trackedEntityAttributes' },
-    { queryFunction: queryH2Attributes, resultsList: H2_REQUIRED.attributes, objectName: 'attributes' },
-    { queryFunction: queryH2LegendSets, resultsList: H2_REQUIRED.legendSets, objectName: 'legendSets' }
-]
+    { queryFunction: queryRequiredDataElements, resultsList: H2_REQUIRED.dataElements, objectName: 'dataElements' },
+    { queryFunction: queryRequiredOptionSets, resultsList: H2_REQUIRED.optionSets, objectName: 'optionSets' },
+    { queryFunction: queryRequiredOptions, resultsList: H2_REQUIRED.options, objectName: 'options' },
+    { queryFunction: queryRequiredTrackedEntityTypes, resultsList: H2_REQUIRED.trackedEntityTypes, objectName: 'trackedEntityTypes' },
+    { queryFunction: queryRequiredTrackedEntityAttributes, resultsList: H2_REQUIRED.trackedEntityAttributes, objectName: 'trackedEntityAttributes' },
+    { queryFunction: queryRequiredAttributes, resultsList: H2_REQUIRED.attributes, objectName: 'attributes' },
+    { queryFunction: queryRequiredLegendSets, resultsList: H2_REQUIRED.legendSets, objectName: 'legendSets' }
+];
+
+export const checkProcessHMWI = [
+    { queryFunction: queryRequiredOptionSets, resultsList: HMWI_REQUIRED.optionSets, objectName: 'optionSets' },
+    { queryFunction: queryRequiredOptions, resultsList: HMWI_REQUIRED.options, objectName: 'options' },
+    { queryFunction: queryRequiredTrackedEntityTypes, resultsList: HMWI_REQUIRED.trackedEntityTypes, objectName: 'trackedEntityTypes' },
+    { queryFunction: queryRequiredTrackedEntityAttributes, resultsList: HMWI_REQUIRED.trackedEntityAttributes, objectName: 'trackedEntityAttributes' },
+    { queryFunction: queryRequiredAttributes, resultsList: HMWI_REQUIRED.attributes, objectName: 'attributes' },
+    { queryFunction: queryRequiredLegendSets, resultsList: HMWI_REQUIRED.legendSets, objectName: 'legendSets' }
+];

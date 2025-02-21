@@ -17,6 +17,7 @@ import {
     verticalMiddle,
     yesNoValidator,
     HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS,
+    HNQISMWI_CONDITIONAL_FORMAT_VALIDATIONS,
     getPromptsFormula,
     structureValidatorMWI,
     standardHighlighting,
@@ -40,6 +41,7 @@ import {
     printObjectArray,
     writeWorkbook
 } from "../../utils/ExcelUtils.js";
+import { deepMerge } from '../../utils/Utils.js';
 
 const Exporter = (props) => {
 
@@ -86,11 +88,27 @@ const Exporter = (props) => {
         addInstructions(instructionWS);
         addConfigurations(templateWS);
         addReleaseNotes(releaseNotesWS, ReleaseNotes, password);
-        hideColumns(templateWS, ['program_stage_id', 'program_section_id', 'data_element_id']);
+        hideColumns(templateWS, getHiddenColumns());
         addProtection(templateWS,3,3000,password);
         writeWorkbook(workbook, props.programName, props.isLoading);
     };
 
+    const isHNQISMWI = () => {
+        return ( props.hnqisType === "HNQISMWI" );
+    }
+    
+    const getHiddenColumns = () => {
+        const hideColumnNames = ['program_stage_id', 'program_section_id', 'data_element_id'];
+        // Extract keys with value as "X"
+        const templateHeader = isHNQISMWI() ? HNQISMWI_HEADER_INSTRUCTIONS : HNQIS2_HEADER_INSTRUCTIONS;
+            
+        const keysWithX = Object.keys(templateHeader).filter(
+            key => templateHeader[key] === "X"
+        );
+
+        return keysWithX.concat(hideColumnNames);
+    }
+    
     const addInstructions = async (ws) => {
         let editingCell;
 
@@ -734,7 +752,7 @@ const Exporter = (props) => {
         fillBackgroundToRange(ws, "L1:M1", "c9daf8");
         ws.getRow(1).height = 35;
         ws.getRow(1).alignment = middleCenter;
-        ws.getRow(2).values = props.hnqisType === "HNQISMWI"
+        ws.getRow(2).values = isHNQISMWI()
             ? HNQISMWI_HEADER_INSTRUCTIONS
             : HNQIS2_HEADER_INSTRUCTIONS;
 
@@ -776,7 +794,7 @@ const Exporter = (props) => {
         addConditionalFormatting(ws);
         populateConfiguration(ws);
     };
-
+    
     const addValidation = (ws) => {
         dataValidation(ws, "B3:B3000", {
             type: 'list',
@@ -784,7 +802,7 @@ const Exporter = (props) => {
             error: 'Please select the valid value from the dropdown',
             errorTitle: 'Invalid Selection',
             showErrorMessage: true,
-            formulae: props.hnqisType === "HNQISMWI" ? structureValidatorMWI : structureValidator
+            formulae: isHNQISMWI() ? structureValidatorMWI : structureValidator
         });
         dataValidation(ws, "D3:D3000", {
             type: 'list',
@@ -802,6 +820,8 @@ const Exporter = (props) => {
             showErrorMessage: true,
             formulae: yesNoValidator
         });
+        
+        // For "Value Type" column
         dataValidation(ws, "F3:F3000", {
             type: 'list',
             allowBlank: true,
@@ -810,14 +830,23 @@ const Exporter = (props) => {
             showErrorMessage: true,
             formulae: ['Value_Type']
         });
+        
+        // For Malawi
+        let allowOptionSetToBlank = true;
+        if( isHNQISMWI() ) {
+            // Not allow Option set as blank
+            allowOptionSetToBlank = false;
+        }
+        // Add validation for "Option Set"
         dataValidation(ws, "G3:G3000", {
             type: 'list',
-            allowBlank: true,
+            allowBlank: allowOptionSetToBlank,
             error: 'Please select the valid value from the dropdown',
             errorTitle: 'Invalid Selection',
             showErrorMessage: true,
             formulae: ['Option_Sets_option']
         });
+        
         dataValidation(ws, "H3:H3000", {
             type: 'list',
             allowBlank: true,
@@ -843,8 +872,94 @@ const Exporter = (props) => {
         });
     }
 
+    const getConditionalFormatting = () => {
+        let validationsList = [];
+        if( isHNQISMWI() ) {
+            validationsList = deepMerge(HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS, HNQISMWI_CONDITIONAL_FORMAT_VALIDATIONS);
+            
+            const hiddenColumns = getHiddenColumns();
+            if( hiddenColumns.indexOf("value_type") >= 0 ) {
+                delete validationsList.valueTypeNotDefined;
+            }
+            if( hiddenColumns.indexOf("score_numerator") >= 0 || hiddenColumns.indexOf("score_denominator") >= 0 ) {
+                delete validationsList.incompleteScoring;
+            }
+            
+            console.log(validationsList);
+        }
+        else {
+            validationsList = HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS;
+        }
+        
+        return validationsList;
+    }
+    
     const addConditionalFormatting = (ws) => {
-        const validationsList = HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS;
+        const validationsList = getConditionalFormatting();
+        
+        const hiddenColumns = getHiddenColumns();
+        
+        
+        if( isHNQISMWI() ) {
+            //Highlight when Parent Name is not defined for Questions and Labels
+            ws.addConditionalFormatting({
+                ref: 'B3:B3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.sectionStandardRequired.formula],
+                        style: conditionalError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.standardSectionRequired.formula],
+                        style: conditionalError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.standardStdOverviewRequired.formula],
+                        style: conditionalError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.stdOverviewStandardRequired.formula],
+                        style: conditionalError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.stdOverviewCriterionRequired.formula],
+                        style: conditionalError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.criterionStdOverviewRequired.formula],
+                        style: conditionalError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.criterionQuestionRequired.formula],
+                        style: conditionalError,
+                    },
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.questionCriterionRequired.formula],
+                        style: conditionalError,
+                    }
+                ]
+            });
+            
+            ws.addConditionalFormatting({
+                ref: 'B3:B3',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: ['COUNTIF(B:B, "Section") = 0'],
+                        style: conditionalError,
+                    }
+                ]
+            });
+        }
+        
 
         //Highlight when Parent Name is not defined for Questions and Labels
         ws.addConditionalFormatting({
@@ -879,17 +994,34 @@ const Exporter = (props) => {
                 }
             ]
         });
-        //Value type not defined
-        ws.addConditionalFormatting({
-            ref: 'F3:F3000',
-            rules: [
-                {
-                    type: 'expression',
-                    formulae: [validationsList.valueTypeNotDefined.formula],
-                    style: conditionalError,
-                }
-            ]
-        });
+        
+        // If the ""Value Type" column is hidden, then the optoon set values columns are set "required" for 'question'
+        if( hiddenColumns.indexOf("value_type") >= 0 ) {
+            ws.addConditionalFormatting({
+                ref: 'G3:G3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.optionSetNotDefined.formula],
+                        style: conditionalError,
+                    }
+                ]
+            });
+        }
+        else {
+            //Value type not defined
+            ws.addConditionalFormatting({
+                ref: 'F3:F3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.valueTypeNotDefined.formula],
+                        style: conditionalError,
+                    }
+                ]
+            });
+        }
+       
         //Disable Value Type when Option Set is selected
         ws.addConditionalFormatting({
             ref: 'F3:F3000',
@@ -958,17 +1090,20 @@ const Exporter = (props) => {
                 }
             ]
         });
-        //Conditional formatting checking incomplete scoring
-        ws.addConditionalFormatting({
-            ref: 'I3:J3000',
-            rules: [
-                {
-                    type: 'expression',
-                    formulae: [validationsList.incompleteScoring.formula],
-                    style: conditionalError
-                }
-            ]
-        });
+        
+        if( hiddenColumns.indexOf("score_numerator") < 0 &&  hiddenColumns.indexOf("score_denominator") < 0 ) {
+            //Conditional formatting checking incomplete scoring
+            ws.addConditionalFormatting({
+                ref: 'I3:J3000',
+                rules: [
+                    {
+                        type: 'expression',
+                        formulae: [validationsList.incompleteScoring.formula],
+                        style: conditionalError
+                    }
+                ]
+            });
+        }
         //Conditional formatting checking incomplete parent and answer
         ws.addConditionalFormatting({
             ref: 'L3:M3000',
@@ -1034,14 +1169,17 @@ const Exporter = (props) => {
                 }
             ]
         });
+        
     }
 
     const populateConfiguration = async ws => {
         let dataRow = 3;
         if (props.Configures.length > 0) {
+            const conditionList = getConditionalFormatting();
+            
             props.Configures.forEach((configure) => {
                 configure.prompts = {
-                    formula: `=${getPromptsFormula(HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS, dataRow)}`
+                    formula: `=${getPromptsFormula(conditionList, dataRow)}`
                 }
                 ws.getRow(dataRow).values = configure;
                 ws.getCell("A" + dataRow).value = {

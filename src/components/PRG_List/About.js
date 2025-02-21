@@ -119,7 +119,7 @@ const About = (props) => {
                                 <img src={PSILogo} alt="PSI Logo" style={{ width: '10em', maxWidth: '10em' }} />
                                 <p style={{ marginTop: '1em', width: '100%', fontWeight: 'bold' }}>
                                     The Program Configuration App is developed
-                                    by <a href="https://www.psi.org/" target="_blank" rel="noreferrer">Population Services International (PSI)</a> in collaboration with <a href="https://www.knowtechture.com/" target="_blank" rel="noreferrer" >KnowTechTure SL</a>.
+                                    by <a href="https://www.psi.org/" target="_blank" rel="noreferrer">Population Services International (PSI)</a> in collaboration with <a href="https://baosystems.com/" target="_blank" rel="noreferrer" >BAO Systems (formerly KnowTechTure SL)</a>.
                                 </p>
                                 <Alert severity="info" sx={{ marginTop: '1em', textAlign: 'justify' }}>
                                     This version of the PCA is compatible with DHIS2 versions between {MIN_VERSION.replace(".x", "")} and {MAX_VERSION.replace(".x", "")}.

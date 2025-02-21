@@ -204,7 +204,7 @@ const DataProcessorTracker = ({ programId, isLoading }) => {
 
                 const row = {};
                 row.structure = "Section";
-                row.form_name = programSection.displayName;
+                row.form_name = programSection.name;
                 row.program_section_id = program_section_id;
                 currentConfigurations.push(row);
 

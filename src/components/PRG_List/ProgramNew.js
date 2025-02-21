@@ -30,7 +30,9 @@ import {
     COMPETENCY_CLASS,
     CRITICAL_STEPS,
     DATASTORE_H2_METADATA,
+    DATASTORE_HMWI_METADATA,
     H2_METADATA_VERSION,
+    HMWI_METADATA_VERSION,
     HNQIS_TYPES,
     MAX_PREFIX_LENGTH,
     MAX_PROGRAM_NAME_LENGTH,
@@ -142,6 +144,12 @@ const queryHNQIS2Metadata = {
     },
 };
 
+const queryHNQISMWIMetadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_HMWI_METADATA}`,
+    },
+};
+
 const queryCurrentUser = {
     results: {
         resource: 'me',
@@ -161,7 +169,9 @@ const stepsLimit = {
 const ProgramNew = (props) => {
 
     const h2Ready = localStorage.getItem("h2Ready") === "true";
+    const hMWIReady = localStorage.getItem("hMWIReady") === "true";
     const { data: hnqis2Metadata } = useDataQuery(queryHNQIS2Metadata);
+    const { data: hnqisMWIMetadata } = useDataQuery(queryHNQISMWIMetadata);
     const { data: currentUser } = useDataQuery(queryCurrentUser);
     const [createPublicObjects, setCreatePublicObjects] = useState(false);
     const [programBackup, setProgramBackup] = useState();
@@ -1084,20 +1094,20 @@ const ProgramNew = (props) => {
                                                 {hnqis2Metadata?.results?.version < H2_METADATA_VERSION && (
                                                     <LockIcon />
                                                 )}
-                                                HNQIS 2.0{" "}
+                                                HNQIS 2.0
                                             </MenuItem>
                                             <MenuItem
                                                 disabled={
-                                                    !h2Ready ||
-                                                    hnqis2Metadata?.results?.version <
-                                                    H2_METADATA_VERSION
+                                                    !hMWIReady ||
+                                                    hnqisMWIMetadata?.results?.version <
+                                                    HMWI_METADATA_VERSION
                                                 }
                                                 value={"hnqismwi"}
                                             >
-                                                {hnqis2Metadata?.results?.version < H2_METADATA_VERSION && (
+                                                {hnqisMWIMetadata?.results?.version < HMWI_METADATA_VERSION && (
                                                     <LockIcon />
                                                 )}
-                                                HNQIS MWI{" "}
+                                                HNQIS MWI
                                             </MenuItem>
                                         </Select>
                                         <FormHelperText>

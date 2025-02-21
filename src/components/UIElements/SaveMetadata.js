@@ -8,7 +8,8 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect } from "react";
 import { BUILD_VERSION, METADATA, COMPETENCY_CLASS, COMPETENCY_ATTRIBUTE, MAX_FORM_NAME_LENGTH, MAX_SHORT_NAME_LENGTH } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue, programIsHNQIS, isLabelType } from "../../utils/Utils.js";
+import { resetMWISectionNumbering } from "../../utils/importerUtils.js";
+import { DeepCopy, getProgramQuery, mergeWithPriority, parseErrorsSaveMetadata, extractMetadataPermissionsAllLevels, setPCAMetadata, padValue, programIsHNQIS, isLabelType, getSectionType, programIsHNQISMWI } from "../../utils/Utils.js";
 import CustomMUIDialog from './CustomMUIDialog.js';
 import CustomMUIDialogTitle from './CustomMUIDialogTitle.js';
 
@@ -52,9 +53,10 @@ const metadataMutation = {
 
 const buildRemovedDE = (de) => {
     const suffix = `${String(+ new Date()).slice(-7)}[X]`;
-    de.name = de.name.replaceAll(/\d{7}\[X\]/g,'').slice(0, MAX_FORM_NAME_LENGTH - suffix.length) + suffix;
+    de.name = de.name.replaceAll(/\d{7}\[X\]/g, '').slice(0, MAX_FORM_NAME_LENGTH - suffix.length) + suffix;
     de.shortName = de.id + ' ' + suffix;
     delete de.code;
+
     return de
 }
 
@@ -78,7 +80,7 @@ const processStageData = (
     const new_programStageDataElements = [];
     let isBasicForm = false;
 
-    if (hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2) {
+    if (hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2) {
         criticalSection.dataElements.forEach((de, i) => {
             new_programStageDataElements.push(
                 {
@@ -89,6 +91,10 @@ const processStageData = (
             )
         });
     }
+
+    // For HNQISMWI, we need to re-order the numbers for programStageSections
+    // const processingSections = JSON.parse(JSON.stringify(importedSections))
+    const processingSections = importedSections;
 
     /**
      * Delete importStatus: section & Data Elements
@@ -102,10 +108,11 @@ const processStageData = (
     let secIdx = 0;
     let deIdx = 1;
 
-    importedSections.forEach(section => {
+    processingSections.forEach(section => {
 
         if (hnqisType === 'HNQISMWI') {
-            if (section.name.match(/Section \d+ : /)) {
+            const sectionType = getSectionType(section)
+            if (sectionType === "Section") {
                 secIdx += 1;
                 deIdx = 1;
             }
@@ -138,6 +145,7 @@ const processStageData = (
                 formName = dataElement.formName;
             }
 
+            // This code is applied for data which import from Excel file
             if (dataElement.code?.match(/MWI_AP_DE/)) {
                 isLogicDE = true;
                 newCode = dataElement.code;
@@ -171,7 +179,7 @@ const processStageData = (
             let allowFutureDate = existingPSDE?.allowFutureDate;
 
             // Matches if form name is #.#.# Due Date in HNQIS MWI Programs to define if future date is enabled
-            if (hnqisType === 'HNQISMWI' && dataElement.formName?.match(/\d+.\d+.\d+ Due Date/)) {
+            if (hnqisType === 'HNQISMWI' && dataElement.formName?.match(/\w+.\w+.\w+ Due Date/)) {
                 allowFutureDate = true;
             }
 
@@ -195,19 +203,23 @@ const processStageData = (
 
             setPCAMetadata(dataElement, DE_metadata);
 
-            if(!isLogicDE) {
+            if (!isLogicDE) {
                 deIdx += 1;
             }
         });
+
 
         delete section.importStatus;
         section.sortOrder = sectionOrder;
         sectionOrder += 1;
     });
+    resetMWISectionNumbering(processingSections);
+
+    console.log(processingSections);
 
     // Map parent name with data element uid
-    const importedDataElements = importedSections.map(sec => sec.dataElements).flat();
-    importedSections.map(section => {
+    const importedDataElements = processingSections.map(sec => sec.dataElements).flat();
+    processingSections.forEach(section => {
         section.dataElements.map(de => {
             const attributeValues = de.attributeValues;
             if (de.parentQuestion) {
@@ -225,7 +237,7 @@ const processStageData = (
     });
 
     new_dataElements = new_dataElements.concat(
-        importedSections.map(is => is.dataElements.map(de => {
+        processingSections.map(is => is.dataElements.map(de => {
             delete de.parentQuestion
             delete de.parentName
             return de
@@ -236,7 +248,7 @@ const processStageData = (
      * Edit imported scores
      * Prepare new scores data elements payload
      */
-    if (hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2) {
+    if (hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2) {
         importedScores.dataElements.forEach((score, scoreIdx) => {
 
             // Check if new DE
@@ -255,8 +267,8 @@ const processStageData = (
         });
 
         //*Set new critical steps and scores section order
-        criticalSection.sortOrder = importedSections.length + 1;
-        importedScores.sortOrder = importedSections.length + 2;
+        criticalSection.sortOrder = processingSections.length + 1;
+        importedScores.sortOrder = processingSections.length + 2;
 
     }
 
@@ -273,8 +285,8 @@ const processStageData = (
     };
 
     //*Replace sections and Data Elements on program stage
-    const specialSections = hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2 ? [importedScores].concat(criticalSection) : [];
-    programStage.programStageSections = !isBasicForm ? [...importedSections, ...specialSections]: [];
+    const specialSections = hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2 ? [importedScores].concat(criticalSection) : [];
+    programStage.programStageSections = !isBasicForm ? [...processingSections, ...specialSections] : [];
     programStage.programStageDataElements = new_programStageDataElements;
 
     //*PROGRAM UPDATE ==> trackedEntityAttributes, attributeValues[metadata]
@@ -305,7 +317,7 @@ const processStageData = (
 
     //* PROGRAM TRACKED ENTITY ATTRIBUTES
     const currentCompetencyAttribute = programPayload.programTrackedEntityAttributes.find(att => att.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE);
-    if (hnqisType===TEMPLATE_PROGRAM_TYPES.hnqis2 && new_programMetadata.useCompetencyClass == "Yes" && !currentCompetencyAttribute) {
+    if (hnqisType === TEMPLATE_PROGRAM_TYPES.hnqis2 && new_programMetadata.useCompetencyClass == "Yes" && !currentCompetencyAttribute) {
         competencyClassAttribute.program.id = programPayload.id;
         programPayload.programTrackedEntityAttributes.push(competencyClassAttribute);
         criticalSection.dataElements.push({ id: COMPETENCY_CLASS })
@@ -322,6 +334,7 @@ const processStageData = (
         programStageDataElements: programStage.programStageDataElements
     };
 
+    importedSections = processingSections;
     return {
         tempMetadata,
         metadata,
@@ -373,7 +386,7 @@ const processProgramData = (
                 uidPool,
                 hnqisType,
                 programStage,
-                importedSections: programStage.importedSections,
+                importedSections: programStage.processingSections,
                 removedItems: importResults.stages.find(stage => stage.id === programStage.id)?.dataElements?.removedItems || [],
                 programMetadata,
                 stagesList: stagesList,
@@ -394,7 +407,7 @@ const processProgramData = (
     if (programPayload.withoutRegistration === false) {
         //*TEAs must be constructed
         importedTEAs.forEach((teaSection, index) => {
-            
+
             const programTrackedEntityAttributes = teaSection.trackedEntityAttributes.map(ptea => {
                 ptea.id = ptea.programTrackedEntityAttribute || uidPool.shift();
                 return ptea;
@@ -428,7 +441,7 @@ const processProgramData = (
             programPayload.programTrackedEntityAttributes = teaConfigurations.programTrackedEntityAttributes;
         });
     }
-    
+
 
     //* Result Object
     return {
@@ -500,7 +513,18 @@ const SaveMetadata = (props) => {
                         uidPool,
                         hnqisType: props.hnqisType,
                         programStage: props.programStage,
-                        importedSections: props.importedSections,
+                        importedSections: props.importedSections.map(section => {
+                            if (programIsHNQISMWI(props.hnqisType)) {
+                                section.name = section.name.replaceAll("‼️", "");
+                                section.displayName = section.displayName.replaceAll("‼️", "");
+
+                                if (section.description === "*") {
+                                    section.name = section.name + " ‼️";
+                                    section.displayName = section.displayName + " ‼️";
+                                }
+                            }
+                            return section;
+                        }),
                         importedScores: props.importedScores,
                         criticalSection: props.criticalSection,
                         removedItems,
@@ -528,7 +552,7 @@ const SaveMetadata = (props) => {
                 ...metadata,
                 ...teaConfigurations,
                 programs: [programConfigurations],
-                
+
             }
 
             //? CALL METADATA REQUESTS - POST DHIS2
@@ -579,7 +603,7 @@ const SaveMetadata = (props) => {
                         <div>
                             <p><strong>Process completed! {props.hnqisType && '"Set up program" button is now enabled'}</strong></p>
                             {importFlag &&
-                                <p style={{marginTop: '1em'}}>
+                                <p style={{ marginTop: '1em' }}>
                                     <strong>Please Note:</strong>
                                     As you imported Metadata from an Excel Template, make sure you download an updated Template before making more changes.
                                 </p>

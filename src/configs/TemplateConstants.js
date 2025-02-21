@@ -29,6 +29,7 @@ export const horizontalCenter = {
     horizontal: 'center'
 };
 
+export const conditionalRowError = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'dc3545' } } , font: { bold: true,  italic: true, color: { argb: 'FFFFFF' } }};
 export const conditionalError = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'dc3545' } } };
 export const sectionHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'faa557' } } };
 export const standardHighlighting = { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'f8c291' } } };
@@ -429,6 +430,69 @@ export const HNQIS2_CONDITIONAL_FORMAT_VALIDATIONS = {
     }
 };
 
+
+export const HNQISMWI_CONDITIONAL_FORMAT_VALIDATIONS = {
+    sectionStandardRequired: {
+        formula: 'AND($B3="Section", $B4<>"Standard")',
+        dynamicFormula: 'AND($B_ROWNUM_="Section", INDIRECT("B" & (ROW() + 1))<>"Standard")',
+        prompt: 'The row below must be set to Standard.'
+    },
+    standardSectionRequired: {
+        formula: 'AND($B3="Standard", $B2<>"Section")',
+        dynamicFormula: 'AND($B_ROWNUM_="Standard", INDIRECT("B" & (ROW() - 1))<>"Section")',
+        prompt: 'The previous row must be Section row.'
+    },
+    
+    // ********* For checking "Standard" and "Std Overview" relationship *********
+    // If the current row is "Standard", check if the NEXT row is not "Std Overview"
+    standardStdOverviewRequired: {
+        formula: 'AND($B3="Standard", $B4<>"Std Overview")',
+        dynamicFormula: 'AND($B_ROWNUM_="Standard", INDIRECT("B" & (ROW() + 1))<>"Std Overview")',
+        prompt: 'The row below must be set to Std Overview.'
+    },
+    // If the current row is "Std Overview", check if the PREVIOUS row is not "Standard"
+    stdOverviewStandardRequired: {
+        formula: 'AND($B3="Std Overview",$B2<>"Standard")',
+        dynamicFormula: 'AND($B_ROWNUM_="Std Overview", INDIRECT("B" & (ROW() - 1))<>"Standard")',
+        prompt: 'The row above must be set to Standard.'
+    },
+    
+    // ********* For checking "Std Overview" and "Criterion" relationship *********
+    // IF the current row is "Std Overview", check if the NEXT row is not "Criterion"
+    stdOverviewCriterionRequired: {
+        formula: 'AND($B3="Std Overview", $B4<>"Criterion")',
+        dynamicFormula: 'AND($B_ROWNUM_="Std Overview", INDIRECT("B" & (ROW() + 1))<>"Criterion")',
+        prompt: 'The row below must be set to Criterion.'
+    },
+    // IF the current row is "Criterion", check if the PREVIOUS row is not "Std Overview"
+    criterionStdOverviewRequired: {
+        formula: 'AND($B3="Criterion", $B2<>"Std Overview", $B2<>"question", $B2<>"label")',
+        dynamicFormula: 'AND($B_ROWNUM_="Criterion", INDIRECT("B" & (ROW() - 1))<>"Std Overview", INDIRECT("B" & (ROW() - 1))<>"question", INDIRECT("B" & (ROW() - 1))<>"label")',
+        prompt: 'The row above must be set to Std Overview.'
+    },
+    
+    // ********* For checking "Std Overview" and "Criterion" relationship *********
+    // IF the current row is "Criterion", check if the NEXT row is not "question"
+    criterionQuestionRequired: {
+        formula: 'AND($B3="Criterion", $B4<>"question", $B4<>"label")',
+        dynamicFormula: 'AND($B_ROWNUM_="Criterion", INDIRECT("B" & (ROW() + 1))<>"question", INDIRECT("B" & (ROW() + 1))<>"label")',
+        prompt: 'The row below must be set to either question or label'
+    },
+    // IF the current row is "question", check if the PREVIOUS row is not "Criterion"
+    questionCriterionRequired: {
+        formula: 'AND($B3="question", OR($B2="Section", $B2="Standard", $B2="Std Overview"))',
+        dynamicFormula: 'AND($B_ROWNUM_="question", OR(INDIRECT("B" & (ROW() - 1))="Section", INDIRECT("B" & (ROW() - 1))="Standard", INDIRECT("B" & (ROW() - 1))="Std Overview"))',
+        prompt: 'The row above must be set to Criterion, question, or label.'
+    },
+    
+    // Check OptionSet field required
+    optionSetNotDefined: {
+        formula: 'AND(ISBLANK($G3),NOT(ISBLANK($B3)),$B3="question")',
+        dynamicFormula: 'AND(ISBLANK($G_ROWNUM_),NOT(ISBLANK($B_ROWNUM_)),$B_ROWNUM_="question")',
+        prompt: 'Option set is not defined.'
+    }
+}
+
 export const getPromptsFormula = (validationsList, rowNumber) => {
     let formula = "CONCATENATE(";
 
@@ -442,3 +506,6 @@ export const getPromptsFormula = (validationsList, rowNumber) => {
     formula = formula + ',"")';
     return formula;
 }
+
+export const HNQISMWI_STD_OVERVIEW_VALUE_TYPE = "LONG_TEXT"
+export const HNQISMWI_QUESTION_OPTION_SET = "Ri5XuSekdRg"

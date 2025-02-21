@@ -25,15 +25,17 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.1.2";
-const BUILD_DATE = "Dec 13, 2024";
+const BUILD_VERSION = "2.2.0";
+const BUILD_DATE = "Feb 21, 2025";
 const MIN_VERSION = "2.36.x";
 const MAX_VERSION = "2.41.x";
 
 const PCA_METADATA_VERSION = "1.2.1";
 const H2_METADATA_VERSION = "1.2.0";
+const HMWI_METADATA_VERSION = "1.0.0";
 
 const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.1.2";
+const REQUIRED_HMWI_PROGRAM_BUILD_VERSION = "2.2.0";
 
 const HNQIS_TYPES = {
     hnqis: "HNQIS2",
@@ -87,6 +89,8 @@ const ASSESSMENT_TET = "oNwpeWkfoWc";
 //* H2 Option Sets
 const OPTION_SET_COMPETENCY = "NDfZ129owtz";
 const OPTION_SET_HEALTH_AREAS = "y752HEwvCGi";
+
+//? MWI Option Sets
 const OPTION_SET_YESNONA = "Ri5XuSekdRg";
 const OPTION_SET_COMPLIANCE_TYPES = "eKFCHvlnXxm";
 
@@ -94,6 +98,8 @@ const OPTION_SET_COMPLIANCE_TYPES = "eKFCHvlnXxm";
 const LEGEND_YES_NO = "RXxPYFwtgf4";
 const LEGEND_YES_PARTIAL_NO = "kqQjtHIc7II";
 const VISUALIZATIONS_LEGEND = "nvVrBnbud3L";
+
+//? MWI Legend Sets
 const LEGEND_COMPLIANT = "F9G1wtBjiOY";
 const LEGEND_YES_NO_NA = "OvTfZMpgeAm";
 
@@ -135,9 +141,7 @@ const H2_REQUIRED = {
     ],
     optionSets: [
         OPTION_SET_COMPETENCY,
-        OPTION_SET_HEALTH_AREAS,
-        OPTION_SET_YESNONA,
-        OPTION_SET_COMPLIANCE_TYPES
+        OPTION_SET_HEALTH_AREAS
     ],
     options: [
         "BNjofUBvlJ8",
@@ -161,28 +165,61 @@ const H2_REQUIRED = {
         "OqRNLt5Nbub",
         "MstdLcCaYZW",
         "Jhn703YNPa1",
-        "jHAilN60gsN",
-        "IVVfVluYFli",
-        "gkLeI6VFJZe",
-        "U2dkoDmopiv",
-        "taUjIWC98Y2",
-        "jPv8u9xUbs3",
-        "OlAkP1EGLTV",
-        "Nfxy7d5ajSJ"
+        "jHAilN60gsN"
     ],
     trackedEntityTypes: [ASSESSMENT_TET],
     trackedEntityAttributes: [
         HEALTH_AREA_ATTRIBUTE,
         ORGANISATION_UNIT_ATTRIBUTE,
         ASSESSMENT_DATE_ATTRIBUTE,
-        COMPETENCY_ATTRIBUTE,
+        COMPETENCY_ATTRIBUTE
+    ],
+    attributes: [FEEDBACK_ORDER, FEEDBACK_TEXT],
+    legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND],
+};
+
+const HMWI_REQUIRED = {
+    options: [
+        "IVVfVluYFli",
+        "gkLeI6VFJZe",
+        "U2dkoDmopiv",
+        "taUjIWC98Y2",
+        "jPv8u9xUbs3",
+        "OlAkP1EGLTV",
+        "Nfxy7d5ajSJ",
+        "McXRLIwjDh7",
+        "lztu61LKSII",
+        "xTJOcijWyaD",
+        "UgcqvJVJ9f0",
+        "aYWZXNhvXQw",
+        "C9L7MCPeHr5",
+        "c8qOHzSbhWM",
+        "imVa2DiLgrJ",
+        "r8UqKmXwXqa",
+        "RHreLvo1UWn",
+        "hX7DJdCN9Ou",
+        "xaBeYsM2hFH",
+        "NPw1hV4degm",
+        "jdVVvtwuJ7Y",
+        "e10afvAkkPR",
+        "OqRNLt5Nbub",
+        "Jhn703YNPa1",
+        "jHAilN60gsN",
+        "MstdLcCaYZW"
+    ],
+    optionSets: [OPTION_SET_YESNONA, OPTION_SET_COMPLIANCE_TYPES, OPTION_SET_HEALTH_AREAS],
+    trackedEntityAttributes: [
+        HEALTH_AREA_ATTRIBUTE,
+        ORGANISATION_UNIT_ATTRIBUTE,
+        ASSESSMENT_DATE_ATTRIBUTE,
         ASSIGNED_TO_ATTRIBUTE,
         PERIOD_END_ATTRIBUTE,
         PERIOD_START_ATTRIBUTE,
         ASSESSMENT_PERIOD_ATTRIBUTE
     ],
+    trackedEntityTypes: [ASSESSMENT_TET],
     attributes: [FEEDBACK_ORDER, FEEDBACK_TEXT],
-    legendSets: [LEGEND_YES_NO, LEGEND_YES_PARTIAL_NO, VISUALIZATIONS_LEGEND, LEGEND_COMPLIANT, LEGEND_YES_NO_NA],
+    legendSets: [LEGEND_COMPLIANT, LEGEND_YES_NO_NA]
 };
 
 const DATE_FORMAT_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false, localeMatcher: 'best fit', };
@@ -195,6 +232,7 @@ const TRANSFERRED_EVENTS_NAMESPACE = `${NAMESPACE}_transferred`;
 const GENERATED_OBJECTS_NAMESPACE = `${NAMESPACE}_generatedObjects`;
 const DATASTORE_PCA_METADATA = "PCAMetadata";
 const DATASTORE_H2_METADATA = "H2Metadata";
+const DATASTORE_HMWI_METADATA = "HMWIMetadata";
 
 const PERIOD_TYPES = [
     { label: "Daily", value: "Daily" },
@@ -246,7 +284,7 @@ const QUESTION_ORDER_ATTRIBUTE = "xf9iDHNFLgx";
 const MAX_PREFIX_LENGTH = 25;
 const MAX_PROGRAM_NAME_LENGTH = 230;
 const MAX_STAGE_NAME_LENGTH = 230;
-const MAX_SECTION_NAME_LENGTH = 230;
+const MAX_SECTION_NAME_LENGTH = 200;
 const MAX_DATA_ELEMENT_NAME_LENGTH = 200;
 const MAX_FORM_NAME_LENGTH = 230;
 const MAX_TRACKER_DATA_ELEMENT_NAME_LENGTH = 230;
@@ -289,30 +327,30 @@ const VALUE_TYPES_TRACKER = [
     { label: 'Text', value: 'TEXT', icon: <TextIcon /> },
     { label: 'Long Text', value: 'LONG_TEXT', icon: <TextIcon /> },
     { label: 'Letter', value: 'LETTER', icon: <TextIcon /> },
-    { label: 'Phone Number', value: 'PHONE_NUMBER', icon: <PhoneIcon />},
-    { label: 'Email', value: 'EMAIL', icon: <EmailIcon />},
+    { label: 'Phone Number', value: 'PHONE_NUMBER', icon: <PhoneIcon /> },
+    { label: 'Email', value: 'EMAIL', icon: <EmailIcon /> },
     { label: 'Yes/No', value: 'BOOLEAN', icon: <ArrowDropDownIcon /> },
     { label: 'Yes only', value: 'TRUE_ONLY', icon: <CheckBoxIcon /> },
     { label: 'Date', value: 'DATE', icon: <DateIcon /> },
     { label: 'Date & Time', value: 'DATETIME', icon: <DateIcon /> },
     { label: 'Time', value: 'TIME', icon: <TimeIcon /> },
     { label: 'Number', value: 'NUMBER', icon: <NumberIcon /> },
-    { label: 'Unit Interval', value: 'UNIT_INTERVAL', icon: <DataArrayIcon />},
+    { label: 'Unit Interval', value: 'UNIT_INTERVAL', icon: <DataArrayIcon /> },
     { label: 'Percentage', value: 'PERCENTAGE', icon: <PercentIcon /> },
     { label: 'Integer', value: 'INTEGER', icon: <NumberIcon /> },
     { label: 'Positive Integer', value: 'INTEGER_POSITIVE', icon: <NumberIcon /> },
     { label: 'Negative Integer', value: 'INTEGER_NEGATIVE', icon: <NumberIcon /> },
     { label: 'Positive or Zero Integer', value: 'INTEGER_ZERO_OR_POSITIVE', icon: <NumberIcon /> },
-    { label: 'Coordinate', value: 'COORDINATE', icon: <PlaceIcon />},
-    { label: 'Organisation Unit', value: 'ORGANISATION_UNIT', icon: <ApartmentIcon />},
-    { label: 'Reference', value: 'REFERENCE', icon: <ArrowRightAltIcon />},
+    { label: 'Coordinate', value: 'COORDINATE', icon: <PlaceIcon /> },
+    { label: 'Organisation Unit', value: 'ORGANISATION_UNIT', icon: <ApartmentIcon /> },
+    { label: 'Reference', value: 'REFERENCE', icon: <ArrowRightAltIcon /> },
     { label: 'Age', value: 'AGE', icon: <NumberIcon /> },
-    { label: 'URL', value: 'URL', icon: <HttpIcon />},
-    { label: 'File', value: 'FILE_RESOURCE', icon: <InsertDriveFileIcon />},
-    { label: 'Image', value: 'IMAGE', icon: <ImageIcon />},
-    { label: 'GeoJSON', value: 'GEOJSON', icon: <DataObjectIcon />},
+    { label: 'URL', value: 'URL', icon: <HttpIcon /> },
+    { label: 'File', value: 'FILE_RESOURCE', icon: <InsertDriveFileIcon /> },
+    { label: 'Image', value: 'IMAGE', icon: <ImageIcon /> },
+    { label: 'GeoJSON', value: 'GEOJSON', icon: <DataObjectIcon /> },
     { label: 'Username', value: 'USERNAME', icon: <TextIcon /> },
-    { label: 'Tracker Associate', value: 'TRACKER_ASSOCIATE', icon: <QuestionMarkIcon />}
+    { label: 'Tracker Associate', value: 'TRACKER_ASSOCIATE', icon: <QuestionMarkIcon /> }
 ];
 
 const AGG_TYPES = [
@@ -463,15 +501,15 @@ const DHIS2_KEY_MAP = {
 //* JSON Metadata Export related
 
 const EXPORT_PRESETS = [
-    { value: 'local', label: 'Current Server'},
+    { value: 'local', label: 'Current Server' },
     { value: 'external', label: 'Another Server' }
 ]
 
 const EXPORT_HNQIS_PRESETS = [
-    { value: 'h2External', label: 'HNQIS2-Enabled Server'}
+    { value: 'h2External', label: 'HNQIS2-Enabled Server' }
 ]
 
-const H2_ENABLED_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions','trackedEntityTypes','trackedEntityAttributes','system'];
+const H2_ENABLED_IMPORT_REMOVE_KEYS = ['date', 'categories', 'categoryCombos', 'categoryOptionCombos', 'categoryOptions', 'trackedEntityTypes', 'trackedEntityAttributes', 'system'];
 
 const H2_ATTRIBUTES_TO_KEEP = ['haUflNqP85K', 'LP171jpctBm', 'yB5tFAAN7bI', 'DVzuBdj9kli', 'yhKEe6BLEer'];
 
@@ -517,24 +555,24 @@ const DHIS2_VALUE_TYPES_MAP = {
 
 //* DHIS2 Aggregation Types
 const DHIS2_AGG_OPERATORS_MAP = {
-    "SUM": "Sum", 
-    "AVERAGE": "Average", 
-    "AVERAGE_SUM_ORG_UNIT": "Average (Sum in Org Unit hierarchy)", 
-    "LAST": "Last value (Sum in Org Unit hierarchy)", 
-    "LAST_AVERAGE_ORG_UNIT": "Last value (Average in Org Unit hierarchy)", 
-    "LAST_LAST_ORG_UNIT": "** last_last_org_unit **", 
-    "LAST_IN_PERIOD": "Last value in period (Sum in Org Unit hierarchy)", 
-    "LAST_IN_PERIOD_AVERAGE_ORG_UNIT": "Last value in period (Average in Org Unit hierarchy)", 
-    "FIRST": "First value (Sum in Org Unit hierarchy)", 
-    "FIRST_AVERAGE_ORG_UNIT": "First value (Average in Org Unit hierarchy)", 
-    "FIRST_FIRST_ORG_UNIT": "** first_first_org_unit ", 
-    "COUNT": "Count", 
-    "STDDEV": "Standard Deviation", 
-    "VARIANCE": "Variance", 
-    "MIN": "Min", 
-    "MAX": "Max", 
-    "NONE": "None", 
-    "CUSTOM": "Custom", 
+    "SUM": "Sum",
+    "AVERAGE": "Average",
+    "AVERAGE_SUM_ORG_UNIT": "Average (Sum in Org Unit hierarchy)",
+    "LAST": "Last value (Sum in Org Unit hierarchy)",
+    "LAST_AVERAGE_ORG_UNIT": "Last value (Average in Org Unit hierarchy)",
+    "LAST_LAST_ORG_UNIT": "** last_last_org_unit **",
+    "LAST_IN_PERIOD": "Last value in period (Sum in Org Unit hierarchy)",
+    "LAST_IN_PERIOD_AVERAGE_ORG_UNIT": "Last value in period (Average in Org Unit hierarchy)",
+    "FIRST": "First value (Sum in Org Unit hierarchy)",
+    "FIRST_AVERAGE_ORG_UNIT": "First value (Average in Org Unit hierarchy)",
+    "FIRST_FIRST_ORG_UNIT": "** first_first_org_unit ",
+    "COUNT": "Count",
+    "STDDEV": "Standard Deviation",
+    "VARIANCE": "Variance",
+    "MIN": "Min",
+    "MAX": "Max",
+    "NONE": "None",
+    "CUSTOM": "Custom",
     "DEFAULT": "Default"
 }
 
@@ -542,6 +580,12 @@ const DHIS2_AGG_OPERATORS_MAP = {
 const tagStyle = { minWidth: '11em', maxWidth: '10em', display: 'flex', justifyContent: 'center' };
 const newTagStyle = { minWidth: '6em', maxWidth: '6em', display: 'flex', justifyContent: 'center' };
 const updatedTagStyle = { minWidth: '8em', maxWidth: '8em', display: 'flex', justifyContent: 'center' };
+
+export const HNQISMWI_PROGRAM_STAGE_SECTION_TYPES = [
+    { label: 'Section', value: 'Section' },
+    { label: 'Standard', value: 'Standard' },
+    { label: 'Criterion', value: 'Criterion' },
+];
 
 export {
     ABOUT_DATE_FORMAT_OPTIONS,
@@ -562,6 +606,7 @@ export {
     COMPOSITIVE_SCORE_ATTRIBUTE,
     CRITICAL_STEPS,
     DATASTORE_H2_METADATA,
+    DATASTORE_HMWI_METADATA,
     DATASTORE_PCA_METADATA,
     DATE_FORMAT_OPTIONS,
     DE_TYPE_ATTRIBUTE,
@@ -602,8 +647,12 @@ export {
     H2_REQUIRED,
     HEADER_ATTRIBUTE,
     HEALTH_AREA_ATTRIBUTE,
+    HMWI_METADATA_VERSION,
+    HMWI_REQUIRED,
     HNQIS_TYPES,
     JSON_ATTRIBUTE_SETTINGS,
+    LEGEND_COMPLIANT,
+    LEGEND_YES_NO_NA,
     LEGEND_YES_NO,
     LEGEND_YES_PARTIAL_NO,
     LIGHT_BLUE_COLOR,
@@ -648,6 +697,7 @@ export {
     RENDER_TYPES,
     REPORT_DATE_TO_USE,
     REQUIRED_H2_PROGRAM_BUILD_VERSION,
+    REQUIRED_HMWI_PROGRAM_BUILD_VERSION,
     SCORE_DEN_ATTRIBUTE,
     SCORE_NUM_ATTRIBUTE,
     SHORT_DATE_FORMAT_OPTIONS,
