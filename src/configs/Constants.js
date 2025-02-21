@@ -26,7 +26,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
 const BUILD_VERSION = "2.2.0";
-const BUILD_DATE = "Feb 28, 2025";
+const BUILD_DATE = "Feb 21, 2025";
 const MIN_VERSION = "2.36.x";
 const MAX_VERSION = "2.41.x";
 
@@ -186,9 +186,28 @@ const HMWI_REQUIRED = {
         "taUjIWC98Y2",
         "jPv8u9xUbs3",
         "OlAkP1EGLTV",
-        "Nfxy7d5ajSJ"
+        "Nfxy7d5ajSJ",
+        "McXRLIwjDh7",
+        "lztu61LKSII",
+        "xTJOcijWyaD",
+        "UgcqvJVJ9f0",
+        "aYWZXNhvXQw",
+        "C9L7MCPeHr5",
+        "c8qOHzSbhWM",
+        "imVa2DiLgrJ",
+        "r8UqKmXwXqa",
+        "RHreLvo1UWn",
+        "hX7DJdCN9Ou",
+        "xaBeYsM2hFH",
+        "NPw1hV4degm",
+        "jdVVvtwuJ7Y",
+        "e10afvAkkPR",
+        "OqRNLt5Nbub",
+        "Jhn703YNPa1",
+        "jHAilN60gsN",
+        "MstdLcCaYZW"
     ],
-    optionSets: [OPTION_SET_YESNONA, OPTION_SET_COMPLIANCE_TYPES],
+    optionSets: [OPTION_SET_YESNONA, OPTION_SET_COMPLIANCE_TYPES, OPTION_SET_HEALTH_AREAS],
     trackedEntityAttributes: [
         HEALTH_AREA_ATTRIBUTE,
         ORGANISATION_UNIT_ATTRIBUTE,

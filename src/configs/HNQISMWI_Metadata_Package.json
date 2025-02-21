@@ -69,6 +69,196 @@
                 "id": "eKFCHvlnXxm"
             },
             "translations": []
+        },
+        {
+            "code": "CC",
+            "name": "Cervical Cancer",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 2,
+            "id": "McXRLIwjDh7"
+        },
+        {
+            "code": "CBRM",
+            "name": "Client Based Record Management",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 1,
+            "id": "lztu61LKSII"
+        },
+        {
+            "code": "FP",
+            "name": "Family Planning",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 3,
+            "id": "xTJOcijWyaD"
+        },
+        {
+            "code": "FP CFC",
+            "name": "Family Planning Counseling",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 4,
+            "id": "UgcqvJVJ9f0"
+        },
+        {
+            "code": "FP LPM",
+            "name": "Family Planning Long Acting Methods",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 5,
+            "id": "aYWZXNhvXQw"
+        },
+        {
+            "code": "FP SAM",
+            "name": "Family Planning Short Acting Method",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 6,
+            "id": "C9L7MCPeHr5"
+        },
+        {
+            "code": "HIV",
+            "name": "Human Immunodeficiency Virus",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 7,
+            "id": "c8qOHzSbhWM"
+        },
+        {
+            "code": "HT",
+            "name": "Hypertension",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 8,
+            "id": "imVa2DiLgrJ"
+        },
+        {
+            "code": "IMCI",
+            "name": "Integrated Management of Childhood Illness",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 9,
+            "id": "r8UqKmXwXqa"
+        },
+        {
+            "code": "MAL",
+            "name": "Malaria",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 10,
+            "id": "RHreLvo1UWn"
+        },
+        {
+            "code": "MNH",
+            "name": "Maternal and Newborn Health",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 11,
+            "id": "hX7DJdCN9Ou"
+        },
+        {
+            "code": "NBRes",
+            "name": "Newborn Resuscitation",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 12,
+            "id": "xaBeYsM2hFH"
+        },
+        {
+            "code": "PAC",
+            "name": "Post Abortion Care",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 0,
+            "id": "NPw1hV4degm"
+        },
+        {
+            "code": "SafAb",
+            "name": "Safe Abortion",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 13,
+            "id": "jdVVvtwuJ7Y"
+        },
+        {
+            "code": "STI",
+            "name": "Sexually Transmitted Infections",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 14,
+            "id": "e10afvAkkPR"
+        },
+        {
+            "code": "TB",
+            "name": "Tuberculosis",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 15,
+            "id": "OqRNLt5Nbub"
+        },
+        {
+            "code": "VMMC",
+            "name": "VMMC",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 18,
+            "id": "Jhn703YNPa1"
+        },
+        {
+            "code": "WASH",
+            "name": "WASH",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 17,
+            "id": "jHAilN60gsN"
+        },
+        {
+            "code": "WEA",
+            "name": "Work Environment Assessment",
+            "translations": [],
+            "optionSet": {
+                "id": "y752HEwvCGi"
+            },
+            "sortOrder": 16,
+            "id": "MstdLcCaYZW"
         }
     ],
     "optionSets": [
@@ -96,6 +286,35 @@
                 {"id": "Nfxy7d5ajSJ"},
                 {"id": "jPv8u9xUbs3"},
                 {"id": "taUjIWC98Y2"}
+            ]
+        },
+        {
+            "name": "HNQIS Health Areas",
+            "id": "y752HEwvCGi",
+            "version": 18,
+            "valueType": "TEXT",
+            "attributeValues": [],
+            "translations": [],
+            "options": [
+                {"id": "NPw1hV4degm"},
+                {"id": "lztu61LKSII"},
+                {"id": "McXRLIwjDh7"},
+                {"id": "xTJOcijWyaD"},
+                {"id": "UgcqvJVJ9f0"},
+                {"id": "aYWZXNhvXQw"},
+                {"id": "C9L7MCPeHr5"},
+                {"id": "c8qOHzSbhWM"},
+                {"id": "imVa2DiLgrJ"},
+                {"id": "r8UqKmXwXqa"},
+                {"id": "RHreLvo1UWn"},
+                {"id": "hX7DJdCN9Ou"},
+                {"id": "xaBeYsM2hFH"},
+                {"id": "jdVVvtwuJ7Y"},
+                {"id": "e10afvAkkPR"},
+                {"id": "OqRNLt5Nbub"},
+                {"id": "MstdLcCaYZW"},
+                {"id": "jHAilN60gsN"},
+                {"id": "Jhn703YNPa1"}
             ]
         }
     ],
