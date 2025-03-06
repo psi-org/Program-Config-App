@@ -610,7 +610,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
             // Same section
             const sectionIndex = newSections.findIndex(s => s.id === result.source.droppableId);
             const section = newSections[sectionIndex];
-            const { dataElements } = section;
+            const dataElements = section.dataElements.filter(de => de !== null);;
 
             // Ensure "generated" DEs stay at the end of the list
             const questions = dataElements.filter(de => isDEQuestion(de));

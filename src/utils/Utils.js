@@ -466,7 +466,7 @@ export const getSectionType = (prgStgSection) => {
 
 export const getDEMetadata = (dataElement) => {
     const metaDataStringArr = dataElement.attributeValues?.filter(av => av.attribute.id === METADATA);
-    return ( metaDataStringArr.length > 0 )  ? JSON.parse( metaDataStringArr[0].value ) : undefined
+    return ( metaDataStringArr && metaDataStringArr.length > 0 )  ? JSON.parse( metaDataStringArr[0].value ) : undefined
 }
 
 export const isDEQuestion = (dataElement) => {

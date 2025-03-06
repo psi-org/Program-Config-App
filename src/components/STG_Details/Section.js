@@ -11,7 +11,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Tooltip } from "@mui/material";
 import Chip from '@mui/material/Chip';
 import PropTypes from 'prop-types';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import { newTagStyle, tagStyle, updatedTagStyle } from '../../configs/Constants.js';
 import { getSectionType, isCriterionDEGenerated } from '../../utils/Utils.js';
@@ -41,21 +41,20 @@ const getSectionIcon = (hnqisType, sectionName) => {
 
 const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, DEActions, index, SectionActions, hnqisType, editStatus, isSectionMode, readOnly, setSaveStatus }) => {
 
+    stageSection.dataElements = stageSection.dataElements.filter((de) => de); // Remove 'null' dataElements if any
+    
+    /** for "Criterion" section, we need to set data element list again by moving fixed DEs in the bottom of the list  */
+    const fixedItems = stageSection.dataElements.filter((de => de && isCriterionDEGenerated(de)))
+    const initMovableItem = stageSection.dataElements.filter((de => de && !isCriterionDEGenerated(de)));
+    stageSection.dataElements = [...initMovableItem, ...fixedItems]; 
+      
     //FLoating Menu
     const [ref, setRef] = useState(undefined);
     const [openMenu, setOpenMenu] = useState(false);
     const [sectionToRemove, setSectionToRemove] = useState(undefined);
     const [expanded, setExpanded] = useState(false);
     const [showValidationMessage, setShowValidationMessage] = useState(false);
-    const initMovableItems = stageSection.dataElements.filter((de => !isCriterionDEGenerated(de)))
     
-    const [movableItems, setMovableItems] = useState(initMovableItems)
-    const fixedItems = stageSection.dataElements.filter((de => isCriterionDEGenerated(de)))
-    
-     useEffect(() => {
-        const list = stageSection.dataElements.filter((de => !isCriterionDEGenerated(de)))
-        setMovableItems( list )
-  }, [DEActions])
   
     const toggle = () => setOpenMenu(!openMenu)
 
@@ -155,10 +154,7 @@ const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, 
                                     display: expanded ? 'block' : 'none'
                                 }}
                             >
-                                {
-                                    // Movable Items
-                                    // stageSection.dataElements.map((de, i) => {
-                                    movableItems.map((de, i) => {
+                                {stageSection.dataElements.map((de, i) => {
                                         return <DraggableDataElement
                                             program={program}
                                             dePrefix={dePrefix}
@@ -175,28 +171,7 @@ const DraggableSection = ({ program, dePrefix, stageSection, stageDataElements, 
                                             readOnly={readOnly}
                                             setSaveStatus={setSaveStatus}
                                         />;
-                                    })
-                                }
-                        
-                                {/* Fixed Items */}
-                                {fixedItems.map((de, i) => (
-                                    <DraggableDataElement
-                                        program={program}
-                                        dePrefix={dePrefix}
-                                        dataElement={de}
-                                        stageDE={stageDataElements.find(stageDE => stageDE.dataElement.id === de.id)}
-                                        DEActions={DEActions}
-                                        section={stageSection.id}
-                                        sectionType={getSectionType(stageSection)}
-                                        index={i}
-                                        key={de.id || i}
-                                        hnqisType={hnqisType}
-                                        deStatus={editStatus?.dataElements?.find(dataElement => dataElement.id === de.id)}
-                                        isSectionMode={isSectionMode}
-                                        readOnly={readOnly}
-                                        setSaveStatus={setSaveStatus}
-                                    />
-                                ))}
+                                    })}
                                 
                                 {provided.placeholder}
                             </div>
