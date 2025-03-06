@@ -339,7 +339,7 @@ const HNQISMWI_ActionPlanElements = [
     }
 ];
 
-const HNQISMWI_Criterion_RequiredDEs_Section_Name = "Criterion Required";
+// const HNQISMWI_Criterion_RequiredDEs_Section_Name = "Criterion Required";
 
 const HNQISMWI_SectionDataElements = [
     {
@@ -364,7 +364,6 @@ module.exports = {
     COMPETENCY_TEA,
     EventStage,
     HNQISMWI_ActionPlanElements,
-    HNQISMWI_Criterion_RequiredDEs_Section_Name,
     HNQISMWI_Attributes,
     HNQISMWI_SectionDataElements,
     HnqisProgramConfigs,

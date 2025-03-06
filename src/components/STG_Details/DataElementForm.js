@@ -88,20 +88,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
     const [serverLegendSets, setServerLegendSets] = useState(undefined)
     const { data: programRuleVariables } = useDataQuery(programRuleVariableQuery, {variables: { program, dataElement: de?.id ?? "X" } });
     const programRuleVariable = programRuleVariables?.results?.programRuleVariables?.at(0) 
-    
-    // const getElemType = () => {
-    //     if( programIsHNQISMWI(hnqisType) ) {
-    //         if( sectionType === "Criterion" ) {
-    //             return ELEM_TYPES.filter(item => item.label !== 'Std Overview');
-    //         }
-    //         else if( sectionType === "Standard" ) {
-    //             return ELEM_TYPES.filter(item => item.label == 'Std Overview');
-    //         }
-    //     }
-        
-    //     return ELEM_TYPES;
-    // }
-    
+
     
     useEffect(() => {
         if (initOptionSets) { 
