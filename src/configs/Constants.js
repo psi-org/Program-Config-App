@@ -25,8 +25,8 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.2.0";
-const BUILD_DATE = "Feb 21, 2025";
+const BUILD_VERSION = "2.2.1";
+const BUILD_DATE = "Mar 6, 2025";
 const MIN_VERSION = "2.36.x";
 const MAX_VERSION = "2.41.x";
 

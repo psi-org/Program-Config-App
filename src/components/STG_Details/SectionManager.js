@@ -37,7 +37,9 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
         if( programIsHNQISMWI(hnqisType) && sections[sectionIndex] ) {
             const selectedSection = sections[sectionIndex];
             const initType = getSectionType(selectedSection);
-            const name = selectedSection.name.split(":")[1].trim();
+
+            const nameParts = selectedSection.name.split(":");
+            const name = nameParts.length > 1? nameParts[1].trim() : nameParts[0].trim();
             
             setType (initType );
             setCritical ( selectedSection.description === "*" );
@@ -91,6 +93,10 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
         section.displayName = section.name;
         
         if (sectionIndex !== undefined) { // Edit section
+            if (type === "Section" && section.dataElements.length === 0) {
+                const sectionDE = createHNQISMWISectionDataElement()
+                section.dataElements = [sectionDE];
+            }
             sections[sectionIndex] = section
         } else if (newSectionIndex !== undefined) { // New section
             section.dataElements = []
@@ -100,8 +106,7 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
             
             if( type === "Section" ) {
                 const sectionDE = createHNQISMWISectionDataElement()
-                section.dataElements = [];
-                section.dataElements.push(sectionDE)
+                section.dataElements = [sectionDE];
             }
             else if( type === "Criterion" ) {    
                 const sectionDEs = createHNQISMWICriterionDataElements();
@@ -162,11 +167,11 @@ const SectionManager = ({ hnqisMode, hnqisType, newSectionIndex, notify, refresh
     }
     
     const getMWISectionName = () => {
-        if( sections[sectionIndex] ) {
-            const sectionPrefix = sections[sectionIndex].name.split(":")[0].trim();
+        const sectionNameSplit = sections[sectionIndex]?.name?.split(":");
+        if ( sectionNameSplit && sectionNameSplit > 1 ) {
+            const sectionPrefix = sectionNameSplit[0].trim();
             return `${sectionPrefix} : ${sectionName}`;
-        }
-        else {
+        } else {
             let sectionPrefix = type;
             if( type === "Section" ) {
                 sectionPrefix = `${type} #`; // "#" here will be replaced to a proper number after saving
