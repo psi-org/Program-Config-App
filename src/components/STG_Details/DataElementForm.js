@@ -552,7 +552,7 @@ const DataElementForm = ({ program, dePrefix, programStageDataElement, section, 
                         varName: '_S0Q0'
                     }
 
-                    if (structure==='label'){
+                    if (isLabelType(structure)){
                         pcaMetadata.labelFormName = formName
                     }
 

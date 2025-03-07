@@ -26,9 +26,9 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Link } from "react-router-dom";
-import { BUILD_VERSION, DATASTORE_H2_METADATA, FEEDBACK_ORDER, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
+import { BUILD_VERSION, DATASTORE_H2_METADATA, DATASTORE_HMWI_METADATA, FEEDBACK_ORDER, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, HMWI_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
-import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, getProgramQuery, getSectionType, isCriterionDEGenerated, isDEQuestion, mapIdArray, programIsHNQISMWI, truncateString, versionGTE } from "../../utils/Utils.js";
+import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, getProgramQuery, getSectionType, isCriterionDEGenerated, isDEQuestion, mapIdArray, programIsHNQIS2, programIsHNQISMWI, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessor from "../Excel/DataProcessor.js";
 import Importer from "../Excel/Importer.js";
 import ErrorReports from "../UIElements/ErrorReports.js";
@@ -211,6 +211,12 @@ const queryHNQIS2Metadata = {
     }
 };
 
+const queryHNQISMWIMetadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_HMWI_METADATA}`
+    }
+};
+
 const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 
 const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
@@ -239,6 +245,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
     //const { loading: dsLoading, data: dsData } = useDataQuery(queryDataStore);
 
     const { data: hnqis2Metadata, loading: metadataLoading } = useDataQuery(queryHNQIS2Metadata);
+        const { data: hnqisMWIMetadata, loading: mwiMetadataLoading } = useDataQuery(queryHNQISMWIMetadata);
 
     // Globals
     const programId = programStage.program.id;
@@ -1240,10 +1247,18 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
         setOpen(false);
     };
 
-    if (hnqisType && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+    if (programIsHNQIS2(hnqisType) && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
         return (<>
             <NoticeBox title="Check HNQIS2 Metadata" error>
-                <p>The latest PCA Metadata Package is required to access this HNQIS2 Program.</p>
+                <p>The latest HNQIS2 Metadata Package is required to access this HNQIS2 Program.</p>
+            </NoticeBox>
+        </>);
+    }
+
+    if (programIsHNQISMWI(hnqisType) && !mwiMetadataLoading && !versionGTE(hnqisMWIMetadata?.results?.version, HMWI_METADATA_VERSION)) {
+        return (<>
+            <NoticeBox title="Check HNQIS MWI Metadata" error>
+                <p>The latest HNQIS MWI Metadata Package is required to access this HNQIS MWI Program.</p>
             </NoticeBox>
         </>);
     }
