@@ -25,6 +25,7 @@ const query = {
 const ProgramStage = () => {
 
     const h2Ready = localStorage.getItem('h2Ready') === 'true';
+    const hmwiReady = localStorage.getItem('hMWIReady') === 'true';
 
     const { id } = useParams();
 
@@ -62,11 +63,21 @@ const ProgramStage = () => {
         const hnqisType = data.results.program.attributeValues.find(av => programIsHNQIS(av.value))?.value || "";
         const readOnly = !!data.results.program.attributeValues.find(av => av.value === "HNQIS")
 
-        if (!!hnqisType && !h2Ready) {
+        if (hnqisType === "HNQIS2" && !h2Ready) {
             return (
                 <div style={{ margin: '2em' }}>
                     <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
                         <span>First go to the <Link to="/">Home Screen</Link> and Install the latest HNQIS 2.0 Metadata to continue.</span>
+                    </NoticeBox>
+                </div>
+            )
+        }
+
+        if (hnqisType === "HNQISMWI" && !hmwiReady) {
+            return (
+                <div style={{ margin: '2em' }}>
+                    <NoticeBox title="HNQIS MWI Metadata is missing or out of date" error>
+                        <span>First go to the <Link to="/">Home Screen</Link> and Install the latest HNQIS MWI Metadata to continue.</span>
                     </NoticeBox>
                 </div>
             )
