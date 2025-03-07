@@ -434,9 +434,12 @@ export const isHNQIS = (type) => {
 }
 
 export const programIsHNQIS = (type) => {
-    return (type === "HNQIS2" || type === "HNQISMWI");
+    return (programIsHNQIS2(type) || programIsHNQISMWI(type));
 }
 
+export const programIsHNQIS2 = (type) => {
+    return (type === "HNQIS2");
+}
 
 export const programIsHNQISMWI = (type) => {
     return (type === "HNQISMWI");

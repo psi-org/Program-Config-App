@@ -12,10 +12,10 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { bindActionCreators } from "redux";
-import { BUILD_VERSION, DATASTORE_H2_METADATA, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
+import { BUILD_VERSION, DATASTORE_H2_METADATA, DATASTORE_HMWI_METADATA, GENERATED_OBJECTS_NAMESPACE, H2_METADATA_VERSION, HMWI_METADATA_VERSION, METADATA, NAMESPACE } from "../../configs/Constants.js";
 import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import actionCreators from "../../state/action-creators/index.js";
-import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, mapIdArray, padValue, programIsHNQIS, setPCAMetadata, truncateString, versionGTE } from "../../utils/Utils.js";
+import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, mapIdArray, padValue, programIsHNQIS, programIsHNQIS2, programIsHNQISMWI, setPCAMetadata, truncateString, versionGTE } from "../../utils/Utils.js";
 import DataProcessorTracker from "../Excel/DataProcessorTracker.js";
 import Importer from "../Excel/Importer.js";
 import ValidateTracker from "../PRG_Details/ValidateTracker.js";
@@ -103,9 +103,16 @@ const queryHNQIS2Metadata = {
     }
 };
 
+const queryHNQISMWIMetadata = {
+    results: {
+        resource: `dataStore/${NAMESPACE}/${DATASTORE_HMWI_METADATA}`
+    }
+};
+
 const ProgramDetails = () => {
 
-    const { data: hnqis2Metadata, loading: metadataLoading  } = useDataQuery(queryHNQIS2Metadata);
+    const { data: hnqis2Metadata, loading: metadataLoading } = useDataQuery(queryHNQIS2Metadata);
+    const { data: hnqisMWIMetadata, loading: mwiMetadataLoading } = useDataQuery(queryHNQISMWIMetadata);
 
     const h2Ready = localStorage.getItem('h2Ready') === 'true';
     const hmwiReady = localStorage.getItem('hMWIReady') === 'true';
@@ -242,7 +249,7 @@ const ProgramDetails = () => {
     const hnqisType = data.results.attributeValues.find(av => programIsHNQIS(av.value))?.value || "";
     const readOnly = !!data.results.attributeValues.find(av => av.value === "HNQIS");
 
-    if (hnqisType ==="HNQIS2" && !h2Ready) {
+    if (programIsHNQIS2(hnqisType) && !h2Ready) {
         return (
             <div style={{ margin: '2em' }}>
                 <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
@@ -252,7 +259,7 @@ const ProgramDetails = () => {
         )
     }
 
-    if (hnqisType === "HNQISMWI" && !hmwiReady) {
+    if (programIsHNQISMWI(hnqisType) && !hmwiReady) {
         return (
             <div style={{ margin: '2em' }}>
                 <NoticeBox title="HNQIS MWI Metadata is missing or out of date" error>
@@ -414,10 +421,18 @@ const ProgramDetails = () => {
         })
     }
 
-    if (!!hnqisType && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
+    if (programIsHNQIS2(hnqisType) && !metadataLoading && !versionGTE(hnqis2Metadata?.results?.version, H2_METADATA_VERSION)) {
         return (<>
             <NoticeBox title="Check HNQIS2 Metadata" error>
-                <p>The latest PCA Metadata Package is required to access this HNQIS2 Program.</p>
+                <p>The latest HNQIS2 Metadata Package is required to access this HNQIS2 Program.</p>
+            </NoticeBox>
+        </>);
+    }
+
+    if (programIsHNQISMWI(hnqisType) && !mwiMetadataLoading && !versionGTE(hnqisMWIMetadata?.results?.version, HMWI_METADATA_VERSION)) {
+        return (<>
+            <NoticeBox title="Check HNQIS MWI Metadata" error>
+                <p>The latest HNQIS MWI Metadata Package is required to access this HNQIS MWI Program.</p>
             </NoticeBox>
         </>);
     }
