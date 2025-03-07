@@ -19,4 +19,4 @@ This project is licensed under the Creative Commons Attribution 4.0 Internationa
 
 ### Credits
 
-The PCA was developed by [KnowTechTure](https://www.knowtechture.com/) in collaboration with [Population Services International](https://www.psi.org/).
+The PCA was developed by [BAO Systems (formerly KnowTechTure)](https://baosystems.com/) in collaboration with [Population Services International](https://www.psi.org/).

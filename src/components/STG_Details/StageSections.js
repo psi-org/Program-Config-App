@@ -939,7 +939,7 @@ const StageSections = ({ programStage, stageRefetch, hnqisType, readOnly }) => {
                     })
                 }
             }).then(updateEventReportResp => {
-                if (updateEventReportResp.status == 'OK') {
+                if (updateEventReportResp.status === 'OK') {
                     deleteMetadata({ data: oldMetadata }).then((res) => {
                         if (res.status != 'OK') { return; }
                         sendToDataStore({
