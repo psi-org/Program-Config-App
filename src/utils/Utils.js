@@ -287,12 +287,12 @@ export const getPCAMetadataDE = (dataElement) => {
 }
 
 export const getProgramQuery = (deepQuery = true) => {
-    const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,description,displayName,domainType,formName,id,legendSet,legendSets[id,name],name,optionSet[id,name],optionSetValue,sharing,shortName,style,valueType,categoryCombo';
+    const dataElementQuery = 'aggregationType,attributeValues[value,attribute],code,description,displayName,domainType,formName,id,legendSet,legendSets[id,name],name,optionSet[id,name],optionSetValue,sharing,shortName,style,valueType,categoryCombo,translations';
     const stageDataElementsQuery = `categoryCombo,compulsory,dataElement[${dataElementQuery}],displayInReports,id,name,programStage,sortOrder,style,allowFutureDate,allowProvidedElsewhere,skipSynchronization,renderType`;
-    const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder`;
+    const stageSectionsQuery = `dataElements[${dataElementQuery}],displayName,id,name,sortOrder,translations`;
     const stagesQuery = `name,created,lastUpdated,translations,externalAccess,publicAccess,createdBy,userGroupAccesses,userAccesses,access,favorites,lastUpdatedBy,sharing,description,displayDescription,minDaysFromStart,program[id,name],programStageDataElements[${stageDataElementsQuery}],standardInterval,executionDateLabel,dueDateLabel,autoGenerateEvent,validationStrategy,displayGenerateEventBox,featureType,blockEntryForm,preGenerateUID,style[color,icon],remindCompleted,generatedByEnrollmentDate,allowGenerateNextVisit,openAfterEnrollment,reportDateToUse,sortOrder,periodType,hideDueDate,enableUserAssignment,referral,formType,displayExecutionDateLabel,displayDueDateLabel,displayFormName,displayName,user,favorite,id,attributeValues,repeatable,programStageSections[${stageSectionsQuery}],notificationTemplates`;
 
-    const programSectionsQuery = 'id,name,renderType,sortOrder,program,sharing,translations,attributeValues,trackedEntityAttributes';
+    const programSectionsQuery = 'id,name,renderType,sortOrder,program,sharing,translations,attributeValues,trackedEntityAttributes,translations';
     const programTrackedEntityAttributes = 'id,name,mandatory,renderOptionsAsRadio,valueType,searchable,displayInList,sortOrder,program,trackedEntityAttribute[id,name],programTrackedEntityAttributeGroups,translations,userGroupAccesses,attributeValues,userAccessesattributeValues,displayInList,id,mandatory,allowFutureDate,name,program,programTrackedEntityAttributeGroups,renderOptionsAsRadio,searchable,sortOrder,trackedEntityAttribute,translations,userAccesses,userGroupAccesses,valueType';
 
     return [

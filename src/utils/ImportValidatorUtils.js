@@ -792,17 +792,14 @@ const mapStage = (stage, stageNumber) => {
 
     return stage.programStageSections && stage.programStageSections.length > 0 ?
         // Stage with sections
-        stage.programStageSections.map((section, sectionIdx) => ({
-            id: section.id,
-            name: section.name,
-            displayName: section.displayName,
-            sortOrder: section.sortOrder,
-            importStatus: 'update',
-            isBasicForm: false,
-            newValues: 0,
-            updatedValues: section.dataElements.length,
-            dataElements: mapDataElements(section.dataElements, stage, { stageNumber, sectionIdx })
-        })) :
+        stage.programStageSections.map((section, sectionIdx) => {
+            section.importStatus = 'update';
+            section.isBasicForm = false;
+            section.newValues = 0;
+            section.updatedValues = section.dataElements.length;
+            section.dataElements = mapDataElements(section.dataElements, stage, { stageNumber, sectionIdx });
+            return section;
+        }) :
         // Stage without sections
         [{
             id: "basic-form",
@@ -850,13 +847,11 @@ const extractTEAs = (input) => {
 }
 
 const extractStages = (input) => {
-    return input.programStages.map((stage, idx) => ({
-        id: stage.id,
-        name: stage.name,
-        stageNumber: idx + 1,
-        formType: stage.formType,
-        importedSections: mapStage(stage, idx + 1)
-    }))
+    return input.programStages.map((stage, idx) => {
+        stage.stageNumber = idx + 1;
+        stage.importedSections = mapStage(stage, idx + 1);
+        return stage;
+    })
 }
 
 export const buildProgramConfigurations = (input) => {

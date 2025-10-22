@@ -23,9 +23,15 @@ const readTemplateData = (
     const ignoredSections = [];
     const importedSections = [];
     const importedScores = [];
+
     const dataElementsPool = currentSectionsData?.map(section => section.dataElements)
         .flat().reduce((acu, cur) => {
-        acu[cur.id] = { sharing: cur.sharing, attributeValues: cur.attributeValues, style: cur.style, categoryCombo: cur.categoryCombo };
+            acu[cur.id] = cur;
+        return acu;
+        }, {}) || [];
+    
+    const sectionsPool = currentSectionsData?.reduce((acu, cur) => {
+        acu[cur.id] = cur;
         return acu;
     }, {}) || [];
 
@@ -36,22 +42,33 @@ const readTemplateData = (
     templateData.forEach((row, rowNum) => {
         switch (row[templateMap.structure]) {
             case 'Section':
-                if (row[templateMap.programSection] === 'basic-form' && sectionIndex === -1) { isBasicForm = true }
+                if (row[templateMap.programSection] === 'basic-form' && sectionIndex === -1) {
+                    isBasicForm = true;
+                }
+
                 if ((isBasicForm && importedSections.length > 0)) {
-                    ignoredSections.push({ name: row[templateMap.formName], rowNum: rowNum + 3 })
+                    ignoredSections.push({ name: row[templateMap.formName], rowNum: rowNum + 3 });
                     break;
                 }
                 sectionIndex += 1;
-                if (isHNQIS && (row[HNQIS2_TEMPLATE_MAP.formName] == "Critical Steps Calculations" || row[HNQIS2_TEMPLATE_MAP.formName] == "Scores")) { break }
-                importedSections[sectionIndex] = {
-                    id: row[templateMap.programSection] || undefined,
-                    name: row[templateMap.formName],
-                    displayName: row[templateMap.formName],
-                    sortOrder: sectionIndex,
-                    dataElements: [],
-                    importStatus: row[templateMap.programSection] ? 'update' : 'new',
-                    isBasicForm
+                if (isHNQIS && (
+                    row[HNQIS2_TEMPLATE_MAP.formName] == "Critical Steps Calculations"
+                    || row[HNQIS2_TEMPLATE_MAP.formName] == "Scores"
+                )) {
+                    break;
                 }
+
+                importedSections[sectionIndex] = sectionsPool[row[templateMap.programSection]] || {}
+                
+                importedSections[sectionIndex].id = row[templateMap.programSection];
+                importedSections[sectionIndex].name = row[templateMap.formName];
+                importedSections[sectionIndex].displayName = row[templateMap.formName];
+                importedSections[sectionIndex].sortOrder = sectionIndex;
+                importedSections[sectionIndex].dataElements = [];
+                importedSections[sectionIndex].importStatus = row[templateMap.programSection] ? 'update' : 'new';
+                importedSections[sectionIndex].isBasicForm = isBasicForm;
+                
+
                 row[templateMap.programSection] ? importSummaryValues.sections.updated++ : importSummaryValues.sections.new++;
                 break;
             case 'Data Element':
@@ -141,7 +158,7 @@ const readTemplateDataMWI = (
     const importedSections = [];
     const dataElementsPool = currentSectionsData?.map(section => section.dataElements)
         .flat().reduce((acu, cur) => {
-            acu[cur.id] = { sharing: cur.sharing, attributeValues: cur.attributeValues, style: cur.style, categoryCombo: cur.categoryCombo };
+            acu[cur.id] = cur;
             return acu;
         }, {}) || [];
 

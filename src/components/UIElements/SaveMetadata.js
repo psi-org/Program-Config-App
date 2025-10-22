@@ -215,8 +215,6 @@ const processStageData = (
     });
     resetMWISectionNumbering(processingSections);
 
-    console.log(processingSections);
-
     // Map parent name with data element uid
     const importedDataElements = processingSections.map(sec => sec.dataElements).flat();
     processingSections.forEach(section => {
@@ -386,7 +384,7 @@ const processProgramData = (
                 uidPool,
                 hnqisType,
                 programStage,
-                importedSections: programStage.processingSections,
+                importedSections: programStage.importedSections,
                 removedItems: importResults.stages.find(stage => stage.id === programStage.id)?.dataElements?.removedItems || [],
                 programMetadata,
                 stagesList: stagesList,

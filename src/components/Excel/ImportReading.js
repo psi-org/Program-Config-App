@@ -62,7 +62,7 @@ export const importReadingTracker = (
                 programPrefix: (programDetails.dePrefix) || programDetails.id,
                 optionSets: mappingDetails.optionSets,
                 legendSets: mappingDetails.legendSets,
-                currentSectionsData: setUpProgramStageSections(currentStage.programStageSections),
+                currentSectionsData: setUpProgramStageSections(currentStage),
                 mode: programSpecificType,
                 importSummaryValues: importSummaryValues.stages[index]
             });
