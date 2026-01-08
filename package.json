@@ -17,7 +17,7 @@
         "format:staged": "yarn format --staged"
     },
     "devDependencies": {
-        "@dhis2/cli-app-scripts": "^8.3.2",
+        "@dhis2/cli-app-scripts": "^12.10.1",
         "@dhis2/cli-style": "^10.5.1",
         "react-error-overlay": "6.0.9"
     },
@@ -34,6 +34,7 @@
         "@mui/material": "^5.5.2",
         "@mui/x-data-grid": "^5.9.0",
         "@uiw/react-md-editor": "^3.11.2",
+        "core-js": "^3.47.0",
         "exceljs": "^4.3.0",
         "file-saver": "^2.0.5",
         "jquery": "^3.6.0",
@@ -46,8 +47,10 @@
         "react-sweet-progress": "^1.1.2",
         "redux": "^4.1.1",
         "redux-thunk": "^2.3.0",
+        "regenerator-runtime": "^0.14.1",
         "rehype-sanitize": "^5.0.1",
         "semver": "^7.3.7",
         "tinycolor2": "^1.4.2"
-    }
+    },
+    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

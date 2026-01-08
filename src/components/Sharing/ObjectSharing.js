@@ -1,6 +1,6 @@
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import {useEffect} from "react";
-import { DeepCopy } from '../../utils/Utils.js';
+import { DeepCopy } from '../../utils/Utils.jsx';
 
 const sharingQuery = {
     results: {

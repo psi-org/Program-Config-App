@@ -1,4 +1,4 @@
-import { H2_REQUIRED, PCA_ATTRIBUTES, PCA_OPTIONS, PCA_OPTION_SETS, PCA_USER_ROLES } from "../configs/Constants.js";
+import { H2_REQUIRED, PCA_ATTRIBUTES, PCA_OPTIONS, PCA_OPTION_SETS, PCA_USER_ROLES } from "../configs/Constants.jsx";
 
 const queryPCAAttributes = {
     results: {

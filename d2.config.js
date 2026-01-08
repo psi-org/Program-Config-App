@@ -4,7 +4,7 @@ const config = {
     title: 'Program Configuration',
     description:"Tracker and Event Programs management tool",
     entryPoints: {
-        app: './src/App.js',
+        app: './src/App.jsx',
     },
     minDHIS2Version:'2.36',
     maxDHIS2Version:'2.40'

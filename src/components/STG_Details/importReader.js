@@ -1,7 +1,7 @@
-const { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP } = require("../../configs/TemplateConstants.js");
-const { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm } = require("../../utils/importerUtils.js");
+import { HNQIS2_TEMPLATE_MAP, TEMPLATE_PROGRAM_TYPES, TRACKER_TEMPLATE_MAP } from "../../configs/TemplateConstants.js";
+import { mapImportedDEHNQIS2, mapImportedDE, countChanges, getBasicForm } from "../../utils/importerUtils.js";
 
-const readTemplateData = (
+export const readTemplateData = (
     {
         templateData,
         currentData,
@@ -119,8 +119,4 @@ const readTemplateData = (
 
     return { importedSections, ignoredSections };
 
-};
-
-module.exports = {
-    readTemplateData
 };

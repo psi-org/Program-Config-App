@@ -1,4 +1,4 @@
-const Program = {
+export const Program = {
     "id": "programId",
     "name": "programName",
     "shortName": "programShortName",
@@ -10,7 +10,7 @@ const Program = {
     "programStages": []
 }
 
-const EventStage = {
+export const EventStage = {
     "id": "Stage Id",
     "name": "Program Name",
     "validationStrategy": "ValidationStrat",
@@ -19,7 +19,7 @@ const EventStage = {
     "programStageSections": []
 }
 
-const HnqisProgramConfigs = {
+export const HnqisProgramConfigs = {
     "trackedEntityType": { "id": "oNwpeWkfoWc" },
     "attributeValues": [
         {
@@ -56,7 +56,7 @@ const HnqisProgramConfigs = {
     "userGroupAccesses": []
 }
 
-const COMPETENCY_TEA = {
+export const COMPETENCY_TEA = {
     "trackedEntityAttribute": { "id": "ulU9KKgSLYe" },
     "mandatory": false,
     "valueType": "TEXT",
@@ -65,7 +65,7 @@ const COMPETENCY_TEA = {
     "sortOrder": 5
 }
 
-const PS_AssessmentStage = {
+export const PS_AssessmentStage = {
     "autoGenerateEvent": true,
     "executionDateLabel": "Assessment date",
     "generatedByEnrollmentDate": true,
@@ -90,7 +90,7 @@ const PS_AssessmentStage = {
     "userGroupAccesses": []
 }
 
-const PS_ActionPlanStage = {
+export const PS_ActionPlanStage = {
     "autoGenerateEvent": false,
     "generatedByEnrollmentDate": false,
     "hideDueDate": false,
@@ -128,7 +128,7 @@ const PS_ActionPlanStage = {
     "userGroupAccesses": []
 }
 
-const PSS_Default = {
+export const PSS_Default = {
     "sortOrder": 10,
     "name": "Default",
     "programStage": {"id": "assessmentId"},
@@ -136,7 +136,7 @@ const PSS_Default = {
     "id": "defaultSectionId"
 }
 
-const PSS_CriticalSteps = {
+export const PSS_CriticalSteps = {
     "sortOrder": 20,
     "name": "Critical Steps Calculations",
     "programStage": {"id": "assessmentId"},
@@ -148,7 +148,7 @@ const PSS_CriticalSteps = {
     "id": "stepsSectionId"
 }
 
-const PSS_Scores = {
+export const PSS_Scores = {
     "sortOrder": 30,
     "name": "Scores",
     "programStage": {"id": "assessmentId"},
@@ -156,7 +156,7 @@ const PSS_Scores = {
     "id": "scoresSectionId"
 }
 
-const PS_Generic = {
+export const PS_Generic = {
     "id": "stageID",
     "name": "Stage",
     "displayGenerateEventBox": true,
@@ -169,16 +169,3 @@ const PS_Generic = {
     "attributeValues": [],
     "programStageSections": []
 }
-
-module.exports = {
-    COMPETENCY_TEA,
-    Program,
-    EventStage,
-    HnqisProgramConfigs,
-    PS_Generic,
-    PS_AssessmentStage,
-    PS_ActionPlanStage,
-    PSS_Default,
-    PSS_CriticalSteps,
-    PSS_Scores
-};

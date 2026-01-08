@@ -1,7 +1,7 @@
 import { saveAs } from 'file-saver';
-import { METADATA, SHORT_DATE_FORMAT_OPTIONS } from "../configs/Constants.js";
+import { METADATA, SHORT_DATE_FORMAT_OPTIONS } from "../configs/Constants.jsx";
 import { thinBorder } from "../configs/TemplateConstants.js";
-import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy, padValue } from "./Utils.js";
+import { splitPosition, character2Number, number2Character, columnCharacters, DeepCopy, padValue } from "./Utils.jsx";
 
 export function printArray2Column(sheet, array, header, startPosition, headerBgColor) {
     const coordinates = splitPosition(startPosition);
