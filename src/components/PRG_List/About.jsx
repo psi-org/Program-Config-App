@@ -13,9 +13,9 @@ import Tab from '@mui/material/Tab';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { NAMESPACE, DATASTORE_PCA_METADATA, DATASTORE_H2_METADATA, BUILD_VERSION, BUILD_DATE, PCA_METADATA_VERSION, H2_METADATA_VERSION, DHIS2_PRIMARY_COLOR, ABOUT_DATE_FORMAT_OPTIONS, MIN_VERSION, MAX_VERSION } from "../../configs/Constants.jsx";
-import PSILogo from "./../../images/PSI-logo.png";
 import CustomMUIDialog from '../UIElements/CustomMUIDialog.js';
 import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.jsx';
+import PSILogo from "./../../images/PSI-logo.png";
 
 const queryPCAMetadata = {
     results: {
@@ -119,7 +119,7 @@ const About = (props) => {
                                 <img src={PSILogo} alt="PSI Logo" style={{ width: '10em', maxWidth: '10em' }} />
                                 <p style={{ marginTop: '1em', width: '100%', fontWeight: 'bold' }}>
                                     The Program Configuration App is developed
-                                    by <a href="https://www.psi.org/" target="_blank" rel="noreferrer">Population Services International (PSI)</a> in collaboration with <a href="https://www.knowtechture.com/" target="_blank" rel="noreferrer" >KnowTechTure SL</a>.
+                                    by <a href="https://www.psi.org/" target="_blank" rel="noreferrer">Population Services International (PSI)</a> in collaboration with <a href="https://www.baosystems.com/" target="_blank" rel="noreferrer" >BAO Systems</a>.
                                 </p>
                                 <Alert severity="info" sx={{ marginTop: '1em', textAlign: 'justify' }}>
                                     This version of the PCA is compatible with DHIS2 versions between {MIN_VERSION.replace(".x", "")} and {MAX_VERSION.replace(".x", "")}.

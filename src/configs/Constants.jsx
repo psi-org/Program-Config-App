@@ -25,13 +25,13 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_VERSION = "2.0.7";
-const BUILD_DATE = "Sep 30, 2024";
-const MIN_VERSION = "2.36.x";
-const MAX_VERSION = "2.40.x";
+const BUILD_VERSION = "2.3.0";
+const BUILD_DATE = "Feb 01, 2026";
+const MIN_VERSION = "2.40.x";
+const MAX_VERSION = "2.43.x";
 
 const PCA_METADATA_VERSION = "1.2.1";
-const H2_METADATA_VERSION = "1.1.4";
+const H2_METADATA_VERSION = "2.0.0";
 
 const REQUIRED_H2_PROGRAM_BUILD_VERSION = "2.0.6";
 

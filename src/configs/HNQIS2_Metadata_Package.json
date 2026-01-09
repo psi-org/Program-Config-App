@@ -583,6 +583,7 @@
         {
             "id": "oNwpeWkfoWc",
             "name": "Assessment HNQIS",
+            "shortName": "Assessment HNQIS",
             "publicAccess": "rwrw----",
             "externalAccess": false,
             "allowAuditLog": false,

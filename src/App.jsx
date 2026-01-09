@@ -39,7 +39,6 @@ const App = () => {
     let dataChecked = false;
     let pcaReady = false;
     let h2Ready = false;
-    let errorPage;
     
     //* Checking PCA Metadata Package completeness
     const { data: pcaCheck1 } = useDataQuery(checkProcessPCA[0].queryFunction);
@@ -77,7 +76,11 @@ const App = () => {
     }
 
     //* Checking PCA Metadata version
-    const { data: pcaMetadataData } = useDataQuery(queryPCAAvailableMetadata);
+    const {
+        data: pcaMetadataData,
+        error: pcaMetadataError,
+        loading: pcaMetadataLoading
+    } = useDataQuery(queryPCAAvailableMetadata);
 
     //* Checking DHIS2 Server version
     const serverInfoQuery = useDataQuery(queryServerInfo);
@@ -85,20 +88,33 @@ const App = () => {
 
     if (serverInfo) { window.localStorage.SERVER_VERSION = serverInfo.version }
 
-    const versionValid = serverInfo && serverInfo.version ? versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION) : false;
+    const getPageContent = () => {
+        if (pcaMetadataLoading) {
+            return LoadingPage;
+        }
+        const versionValid = serverInfo && serverInfo.version
+            ? versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION)
+            : false;
+        if (!versionValid) {
+            return VersionErrorPage;
+        }
+        if (pcaReady === undefined) {
+            return LoadingPage;
+        }
+        if (!pcaReady) {
+            return MetadataErrorPage;
+        }
+        if (pcaMetadataData?.results?.version < PCA_METADATA_VERSION || pcaMetadataError) {
+            return MetadataUpdatePage;
+        }
+        return undefined;
+    };
 
     if (!dataChecked || !serverInfo?.version) {
         return (<div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
             <CircularLoader />
         </div>)
-    } else {
-        errorPage = !versionValid
-            ? VersionErrorPage
-            : (pcaReady === undefined
-                ? LoadingPage
-                : (!pcaReady ? MetadataErrorPage : (pcaMetadataData?.results?.version < PCA_METADATA_VERSION ? MetadataUpdatePage : undefined)))
     }
-
 
     return (
         <>
@@ -107,13 +123,13 @@ const App = () => {
                     <div className={classes.container}>
                         <Switch>
                             <Route exact path={"/"}
-                                component={!errorPage ? ProgramList : errorPage} />
+                                component={getPageContent() || ProgramList} />
 
                             <Route path={'/program/:id?'}
-                                component={!errorPage ? ProgramDetails : errorPage} />
+                                component={getPageContent() || ProgramDetails} />
 
                             <Route path={'/programStage/:id?'}
-                                component={!errorPage ? ProgramStage : errorPage} />
+                                component={getPageContent() || ProgramStage} />
                         </Switch>
                     </div>
 
