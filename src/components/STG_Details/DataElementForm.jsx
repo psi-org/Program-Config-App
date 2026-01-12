@@ -14,10 +14,10 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from "react"
 import { FEEDBACK_TEXT, FEEDBACK_ORDER, METADATA, MIN_NAME_LENGTH, ELEM_TYPES, VALUE_TYPES_H2, AGG_TYPES, MAX_SHORT_NAME_LENGTH, VALUE_TYPES_TRACKER, MAX_FORM_NAME_LENGTH } from '../../configs/Constants.jsx';
 import AlertDialogSlide from '../UIElements/AlertDialogSlide.jsx';
-import SelectOptions from '../UIElements/SelectOptions.jsx';
-import StyleManager from '../UIElements/StyleManager.jsx';
 import InfoBox from '../UIElements/InfoBox.jsx';
 import ProgramRulesList from '../UIElements/ProgramRulesList.jsx'
+import SelectOptions from '../UIElements/SelectOptions.jsx';
+import StyleManager from '../UIElements/StyleManager.jsx';
 import MarkDownEditor from './MarkDownEditor.jsx';
 import RowRadioButtonsGroup from './RowRadioButtonsGroup.jsx';
 

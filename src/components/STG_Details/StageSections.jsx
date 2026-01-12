@@ -31,12 +31,12 @@ import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import { DeepCopy, buildBasicFormStage, extractMetadataPermissions, getProgramQuery, mapIdArray, truncateString, versionGTE } from "../../utils/Utils.jsx";
 import DataProcessor from "../Excel/DataProcessor.jsx";
 import Importer from "../Excel/Importer.jsx";
+import CustomMUIDialog from '../UIElements/CustomMUIDialog.js'
+import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.jsx'
 import ErrorReports from "../UIElements/ErrorReports.jsx";
 import Errors from "../UIElements/Errors.jsx";
 import ImportDownloadButton from "../UIElements/ImportDownloadButton.jsx";
 import Removed from "../UIElements/Removed.jsx";
-import CustomMUIDialog from '../UIElements/CustomMUIDialog.js'
-import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.jsx'
 import CriticalCalculations from "./CriticalCalculations.jsx";
 import DataElementManager from './DataElementManager.jsx'
 import Scores from "./Scores.jsx";

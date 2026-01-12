@@ -10,11 +10,11 @@ import TextField from '@mui/material/TextField';
 import PropTypes from 'prop-types';
 import React, { useState } from "react";
 import { PERIOD_TYPES, FEATURE_TYPES, METADATA, MAX_STAGE_NAME_LENGTH, BUILD_VERSION, MIN_DESCRIPTION_LENGTH, REPORT_DATE_TO_USE } from '../../configs/Constants.jsx';
-import { parseErrorsJoin } from '../../utils/Utils.jsx';
-import SelectOptions from '../UIElements/SelectOptions.jsx';
 import { PS_Generic } from '../../configs/ProgramTemplate.js';
+import { parseErrorsJoin } from '../../utils/Utils.jsx';
 import CustomMUIDialog from '../UIElements/CustomMUIDialog.js'
 import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.jsx'
+import SelectOptions from '../UIElements/SelectOptions.jsx';
 
 //const { Form, Field } = ReactFinalForm
 

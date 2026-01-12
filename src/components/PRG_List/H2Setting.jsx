@@ -202,13 +202,16 @@ const H2Setting = forwardRef((props, ref) => {
     }, [ouMetadata]);
 
     useEffect(() => {
+        if (!ouMetadata) {
+            return;
+        }
         if ((!ouLevelLoading && orgUnitPathSelected.length > 0) || noOULevelFound) {
             ouTreeNLevelInit(ouMetadata)
         }
-    }, [orgUnitPathSelected, noOULevelFound])
+    }, [orgUnitPathSelected, noOULevelFound, ouMetadata])
 
     const ouTreeNLevelInit = () => {
-        setOrgUnitTreeRoot([...ouMetadata.userOrgUnits?.organisationUnits.map(ou => ou.id)]);
+        setOrgUnitTreeRoot([...ouMetadata.userOrgUnits.organisationUnits.map(ou => ou.id)]);
         setOULevels(ouMetadata.orgUnitLevels?.organisationUnitLevels);
 
         setorgUnitTreeRootLoaded(true)

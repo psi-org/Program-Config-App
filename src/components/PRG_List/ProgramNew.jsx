@@ -52,9 +52,9 @@ import {
 import { DeepCopy, parseErrorsJoin, truncateString } from "../../utils/Utils.jsx";
 import InputModal from "../PRG_Details/InputModal.jsx";
 import AttributesEditor from "../TEAEditor/AttributesEditor.jsx";
-import StyleManager from "../UIElements/StyleManager.jsx";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog.js";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle.jsx";
+import StyleManager from "../UIElements/StyleManager.jsx";
 import H2Setting from "./H2Setting.jsx"
 
 const queryId = {
@@ -117,13 +117,18 @@ const queryCatCombos = {
 const queryAvailablePrefix = {
     results: {
         resource: "programs",
-        params: ({ dePrefix, program }) => ({
-            fields: ["id"],
-            filter: [
-                `attributeValues.value:like:"dePrefix":"${dePrefix}"`,
-                `name:!eq:${program}`,
-            ],
-        }),
+        params: ({ dePrefix, program }) => {
+            const queryParams = {
+                fields: ["id"],
+                filters: [
+                    `${METADATA}:like:"dePrefix":"${dePrefix}"`
+                ]
+            }
+            if (program) {
+                queryParams.filters.push(`name:!eq:${program}`);
+            }
+            return queryParams;
+        },
     },
 };
 
@@ -649,15 +654,15 @@ const ProgramNew = (props) => {
         }
 
         const useCompetency = pgrTypePCA === "hnqis" ? h2SettingsRef.current.saveMetaData()?.useCompetencyClass === 'Yes' : undefined;
-
         //Validating available prefix
         checkForExistingPrefix({
             dePrefix,
-            program: props.data?.name || " ",
+            program: props.data?.name,
         }).then((data) => {
             if (data.results?.programs.length > 0) {
                 validationErrors.prefix = `The specified Data Element Prefix is already in use`;
                 setValidationErrors({ ...validationErrors });
+                setBasicValidated(false);
                 setSentForm(false);
                 return;
             }
