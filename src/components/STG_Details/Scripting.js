@@ -27,6 +27,89 @@ const locateInTree = (question, branch) => {
     }
 }
 
+export const buildFeedbackTree = (dataElements, programRuleVariables) => {
+    const prvsMap = programRuleVariables.reduce((acc, prv) => {
+        if (prv.dataElement) {
+            acc[prv.dataElement.id] = prv;
+        }
+        return acc;
+    }, {});
+
+    const scoreDEs =
+        dataElements.filter(de =>
+            JSON.parse(de.attributeValues.find(av =>
+                av.attribute.id === METADATA)?.value || "{}").elemType === "score"
+        ).sort((a, b) => {
+            const foA = a.attributeValues.find(av => av.attribute.id === FEEDBACK_ORDER)?.value?.split(".");
+            a.scoreLayout = foA;
+            const foB = b.attributeValues.find(av => av.attribute.id === FEEDBACK_ORDER)?.value?.split(".");
+            b.scoreLayout = foB;
+            return (foA.length >= foB.length ? 1 : -1);
+        });
+
+    const feedbackTree = {};
+
+    scoreDEs.forEach(score => {
+        let nav = feedbackTree;
+        score.scoreLayout.forEach((lvl, index) => {
+            if (!nav[lvl]) {
+                nav[lvl] = { content: [] };
+                if (index === score.scoreLayout.length - 1 && !nav[lvl].score) {
+                    nav[lvl].score = score;
+                }
+            } else {
+                if (!nav[lvl]?.content && !nav[lvl].score && index === score.scoreLayout.length - 1) {
+                    nav[lvl].score = score;
+                }
+                nav = nav[lvl];
+            }
+        });
+    });
+
+    const questionDEs = dataElements.filter(de =>
+        JSON.parse(de.attributeValues.find(av => av.attribute.id === METADATA)?.value || "{}").elemType === "question"
+    ).sort((a, b) => {
+        const foA = a.attributeValues.find(av => av.attribute.id === FEEDBACK_ORDER)?.value?.split(".");
+        const foB = b.attributeValues.find(av => av.attribute.id === FEEDBACK_ORDER)?.value?.split(".");
+
+        if (!foA) {
+            return 1;
+        }
+        if (!foB) {
+            return -1;
+        }
+
+        // Creating a semantic order for the question based on the score layout and add leading zeros
+        const semanticOrderA = foA.map(lvl => new Array(3 - lvl.length + 1).join('0') + lvl).join("");
+        const semanticOrderB = foB.map(lvl => new Array(3 - lvl.length + 1).join('0') + lvl).join("");
+
+        return (semanticOrderA >= semanticOrderB) ? 1 : -1;
+    });
+
+    questionDEs.forEach(question => {
+        const scoreLayout = question.attributeValues.find(av => av.attribute.id === FEEDBACK_ORDER)?.value?.split(".");
+        if (!scoreLayout) {
+            return;
+        }
+
+        let nav = feedbackTree;
+        let pos = 0;
+
+        while (pos >= 0) {
+            const lvl = scoreLayout[pos];
+            if (pos === scoreLayout.length - 2) {
+                nav[lvl].content.push(question);
+                pos = -1;
+            } else {
+                nav = nav[lvl];
+                pos++;
+            }
+        }
+    });
+
+    return { feedbackTree, prvsMap };
+}
+
 /**
  * 
  * @param {Object} branch : Init as: scoreMap __ Object (Tree) that contains allocated questions
@@ -92,7 +175,7 @@ const buildScores = (branch) => {
  * @param {Array} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
  * @returns {Object}: scorePRs , scorePRAs for the current composite score
  */
-const getScorePR = (composite, branch, programId, stageId, uidPool) => {
+const getScorePR = ({ composite, branch, programId, stageId, uidPool }) => {
 
     //      Breakpoint: No more IDs available
     if (uidPool.length == 0) { return { scorePRs: [], scorePRAs: [] } }
@@ -101,7 +184,7 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
     if (currentOrder && composite.subLevels.length >= 0) {
 
         branch = branch.childs.find(s => s.order == currentOrder);
-        return getScorePR(composite, branch, programId, stageId, uidPool);                // Output {scorePRs , scorePRAs}
+        return getScorePR({ composite, branch, programId, stageId, uidPool }); // Output {scorePRs , scorePRAs}
     } else {
         if (branch) {     // Composite Score HAS scoring questions
             /**
@@ -205,7 +288,7 @@ const getScorePR = (composite, branch, programId, stageId, uidPool) => {
  * @param {*} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
  * @returns {Object} : { rules : <Array> , actions : <Array> }
  */
-const buildCriticalScore = (branch, stageId, programId, uidPool) => {
+const buildCriticalScore = ({ branch, stageId, programId, uidPool }) => {
     const num = (branch.numC != "" ? branch.numC : undefined);
     const den = (branch.denC != "" ? branch.denC : undefined);
 
@@ -277,7 +360,7 @@ const buildCriticalScore = (branch, stageId, programId, uidPool) => {
  * @param {*} uidPool : available uids , will be used on relationship ProgramRule <- ProgramRuleAction
  * @returns {Object}: { rules : <Array> , actions : <Array> }
  */
-const buildNonCriticalScore = (branch, stageId, programId, uidPool) => {
+const buildNonCriticalScore = ({ branch, stageId, programId, uidPool }) => {
     const num = (branch.numN != "" ? branch.numN : undefined);
     const den = (branch.denN != "" ? branch.denN : undefined);
 
@@ -415,7 +498,7 @@ const buildCompetencyRules = (programId, stageId, uidPool) => {
     return { competencyRules, competencyActions }
 }
 
-const buildAttributesRules = (programId, uidPool, useCompetencyClass = "Yes", healthArea) => {
+const buildAttributesRules = ({ programId, uidPool, useCompetencyClass = "Yes", healthArea }) => {
 
     const attributeActions = [];
 
@@ -688,12 +771,22 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
 /**
  * 
  * @param {Array} sections : Sections that contains questions ONLY
+ * @param {Object} scoresSection : Section that contains Scores Data Elements
  * @param {Array} compositeScores : List of composite scores [1,2,2.1,...]
  * @param {String} programId 
  * @param {String} useCompetencyClass: Flag to include or not the competency class realated items
  * @returns {Array} programRuleVariables: <Array>{name,programRuleVariableSourceType,useCodeForOptionSet,program,|dataElement|}
  */
-export const buildProgramRuleVariables = ({ sections, compositeScores, programId, useCompetencyClass = "Yes", uidPool }) => {
+export const buildProgramRuleVariables = (
+    {
+        sections,
+        scoresSection,
+        compositeScores,
+        programId,
+        useCompetencyClass = "Yes",
+        uidPool
+    }
+) => {
     // const criticalStepCalculations = sections.find(s => s.name == "Critical Step Calculations");
     // const scores = sections.find(s => s.name == "Scores");
     // sections = sections.filter(s => s.name != "Scores" && s.name != "Critical Steps Calculations");
@@ -713,6 +806,19 @@ export const buildProgramRuleVariables = ({ sections, compositeScores, programId
             });
         });
     });
+
+    // Score Data Elements Variables
+    scoresSection.dataElements.forEach((dataElement, deIdx) => {
+        programRuleVariables.push({
+            id: uidPool.shift(),
+            name: `_CS_${padValue(deIdx + 1, "00")}`,
+            programRuleVariableSourceType: "DATAELEMENT_CURRENT_EVENT",
+            useCodeForOptionSet: false,
+            program: { id: programId },
+            dataElement: { id: dataElement.id }
+        });
+    });
+
 
     // Calculated Values
     compositeScores.forEach(cs => {
@@ -773,7 +879,150 @@ export const buildProgramRuleVariables = ({ sections, compositeScores, programId
     return programRuleVariables.concat(criticalVariables)
 }
 
-export const buildProgramRules = ({ sections, stageId, programId, compositeValues, scoresMapping, uidPool, useCompetencyClass = "Yes", healthArea = "FP", scoreMap = { childs: [] } }) => {
+const FEEDBACK_RULE_TEMPLATE = {
+    "id": "<RULE_ID>",
+    "name": "PR - Feedback - <CORRELATIVE> - <NAME>",
+    "description": "_Scripted",
+    "program": {
+        "id": "<PROGRAM_ID>"
+    },
+    "programRuleActions": [
+        {
+            "id": "<ACTION_ID>",
+        }
+    ],
+    "condition": "d2:hasValue(#{_CS1_Result})",
+    "priority": 10,
+    "attributeValues": []
+};
+
+const FEEDBACK_ACTION_TEMPLATE = {
+    "id": "<ACTION_ID>",
+    "programRule": {
+        "id": "<RULE_ID>"
+    },
+    "programRuleActionType": "DISPLAYTEXT",
+    "location": "feedback",
+    "priority": 1,
+    "legendSet": undefined,
+    "attributeValues": []
+}
+
+export const buildFeedbackRules = ({ tree, prvsMap, programId, uidPool }) => {
+    const programRules = [];
+    const programRuleActions = [];
+    let feedbackIndex = 1;
+
+    const recursiveBuild = ({ tree, prvsMap, programId, uidPool }) => {
+        if (!tree) {
+            return;
+        }
+
+        Object.keys(tree).forEach(key => {
+            const subTree = tree[key];
+            if (!subTree.score) {
+                return;
+            }
+            const scorePRV = prvsMap[subTree.score.id];
+            const scoreRule = DeepCopy(FEEDBACK_RULE_TEMPLATE);
+            const scoreAction = DeepCopy(FEEDBACK_ACTION_TEMPLATE);
+
+            scoreRule.id = uidPool.shift();
+            scoreAction.id = uidPool.shift();
+
+            const scoreFO = subTree.score.attributeValues.find(av => av.attribute.id === FEEDBACK_ORDER).value;
+
+            scoreRule.name = `PR - Feedback - ${new Array(4 - feedbackIndex.toString().length + 1).join('0') + feedbackIndex} - CS${scoreFO}`;
+            scoreRule.program.id = programId;
+            scoreRule.programRuleActions[0].id = scoreAction.id;
+            scoreRule.condition = `d2:hasValue(#{${scorePRV.name}})`;
+            scoreRule.priority = 10 + feedbackIndex - 1;
+            feedbackIndex++;
+
+            scoreAction.programRule.id = scoreRule.id;
+            const padding = new Array(scoreFO.split(".").length).join('‎ ‎ ');
+            scoreAction.programRuleActionType = "DISPLAYKEYVALUEPAIR";
+            //console.log(`${padding} ${scoreFO}. ${subTree.score.formName}`);
+            scoreAction.content = `${padding} ${scoreFO}. ${subTree.score.formName.replaceAll(/'/g, "’")}`;
+            scoreAction.data = `d2:concatenate(#{${scorePRV.name}},'%')`;
+
+            programRules.push(scoreRule);
+            programRuleActions.push(scoreAction);
+
+            recursiveBuild({ tree: subTree, prvsMap, programId, uidPool });
+
+            if (subTree?.content?.length > 0) {
+                subTree.content.forEach(question => {
+                    const prv = prvsMap[question.id];
+                    const rule = DeepCopy(FEEDBACK_RULE_TEMPLATE);
+                    const action = DeepCopy(FEEDBACK_ACTION_TEMPLATE);
+
+                    rule.id = uidPool.shift();
+                    action.id = uidPool.shift();
+
+                    rule.name = `PR - Feedback - ${new Array(4 - feedbackIndex.toString().length + 1).join('0') + feedbackIndex} - ${question.code}`;
+                    rule.program.id = programId;
+                    rule.programRuleActions[0].id = action.id;
+                    rule.condition = `d2:hasValue(#{${prv.name}})`;
+                    rule.priority = 10 + feedbackIndex - 1;
+                    feedbackIndex++;
+
+                    action.programRule.id = rule.id;
+                    const paddingQuestions = new Array(scoreFO.split(".").length + 1).join('‎ ‎ ');
+                    //console.log(`${paddingQuestions} Q: ${question.formName}`);
+                    action.content = `${paddingQuestions} Q: ${question.formName.replaceAll(/'/g, "’")}`;
+
+                    const questionFeedbackText = question.attributeValues.find(av => av.attribute.id === "yhKEe6BLEer")?.value;
+                    if (questionFeedbackText) {
+                        const ruleF = DeepCopy(FEEDBACK_RULE_TEMPLATE);
+                        const actionF = DeepCopy(FEEDBACK_ACTION_TEMPLATE);
+
+                        ruleF.id = uidPool.shift();
+                        actionF.id = uidPool.shift();
+
+                        ruleF.name = `PR - Feedback - ${new Array(4 - feedbackIndex.toString().length + 1).join('0') + feedbackIndex} - ${question.code}F`;
+                        ruleF.program.id = programId;
+                        ruleF.programRuleActions[0].id = actionF.id;
+                        ruleF.condition = `d2:hasValue(#{${prv.name}}) && #{${prv.name}}==0`;
+                        ruleF.priority = 10 + feedbackIndex - 1;
+                        feedbackIndex++;
+
+                        actionF.programRule.id = ruleF.id;
+                        const paddingFeedback = new Array(scoreFO.split(".").length + 2).join('‎ ‎ ');
+                        //console.log(`${paddingFeedback} F: ${questionFeedbackText}`);
+                        actionF.content = `${paddingFeedback} F: ${questionFeedbackText}`;
+
+                        programRules.push(ruleF);
+                        programRuleActions.push(actionF);
+                    }
+
+                    programRules.push(rule);
+                    programRuleActions.push(action);
+                });
+            }
+        });
+    }
+
+    recursiveBuild({ tree, prvsMap, programId, uidPool });
+
+    console.log("DEBUG", { programRules, programRuleActions });
+
+    return { programRules, programRuleActions };
+}
+
+export const buildProgramRules = (
+    {
+        sections,
+        stageId,
+        programId,
+        compositeValues,
+        scoresMapping,
+        uidPool,
+        useCompetencyClass = "Yes",
+        healthArea = "FP",
+        scoreMap = { childs: [] }
+    }
+) => {
 
     var programRules = [];
     var programRuleActions = [];
@@ -781,7 +1030,7 @@ export const buildProgramRules = ({ sections, stageId, programId, compositeValue
     var hideShowLabels = [{ parent: 'None', condition: 'true', actions: [] }];
 
     const varNameRef = sections.map(sec => sec.dataElements.map(de => {
-        const metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === 'haUflNqP85K')?.value || "{}")
+        const metadata = JSON.parse(de.attributeValues.find(att => att.attribute.id === METADATA)?.value || "{}")
         return { id: de.id, varName: metadata.varName }
     })).flat();
 
@@ -844,14 +1093,20 @@ export const buildProgramRules = ({ sections, stageId, programId, compositeValue
             prgVarName: '_CS' + score,
             uid: scoresMapping[score].id
         }
-        const { scorePRs, scorePRAs } = getScorePR(compositeData, scoreMap, programId, stageId, uidPool);
+        const { scorePRs, scorePRAs } = getScorePR({
+            composite: compositeData,
+            branch: scoreMap,
+            programId,
+            stageId,
+            uidPool
+        });
         programRules = programRules.concat(scorePRs);
         programRuleActions = programRuleActions.concat(scorePRAs);
     });
 
     // Critical Calculations
-    const criticalScore = buildCriticalScore(scoreMap, stageId, programId, uidPool);
-    const nonCriticalScore = buildNonCriticalScore(scoreMap, stageId, programId, uidPool);
+    const criticalScore = buildCriticalScore({ branch: scoreMap, stageId, programId, uidPool });
+    const nonCriticalScore = buildNonCriticalScore({ branch: scoreMap, stageId, programId, uidPool });
 
     // Competency Class
 
@@ -859,7 +1114,7 @@ export const buildProgramRules = ({ sections, stageId, programId, compositeValue
 
     // Attributes
 
-    const { attributeRules, attributeActions } = buildAttributesRules(programId, uidPool, useCompetencyClass, healthArea); //Define: useCompetencyClass & healthArea
+    const { attributeRules, attributeActions } = buildAttributesRules({ programId, uidPool, useCompetencyClass, healthArea });
 
     // Hide/Show Logic
 
@@ -953,7 +1208,23 @@ export const buildProgramIndicators = ({ programId, programStage, scoreMap, uidP
     return { programIndicators, indicatorIDs, gsInd: AnalyticGS.id }
 }
 
-export const buildH2BaseVisualizations = ({ programId, programShortName, gsInd, indicatorIDs, uidPool, useCompetency, currentDashboardId, userOU, ouRoot, sharingSettings, visualizationLevel, mapLevel, actionPlanID}) => {
+export const buildH2BaseVisualizations = (
+    {
+        programId,
+        programShortName,
+        gsInd,
+        indicatorIDs,
+        uidPool,
+        useCompetency,
+        currentDashboardId,
+        userOU,
+        ouRoot,
+        sharingSettings,
+        visualizationLevel,
+        mapLevel,
+        actionPlanID
+    }
+) => {
     const series = []
     const dataDimensionItems = []
     const visualizations = []
@@ -1041,7 +1312,7 @@ export const buildH2BaseVisualizations = ({ programId, programShortName, gsInd, 
     avergeScorebyTable.series = [series.at(4)]
     avergeScorebyTable.dataDimensionItems = [dataDimensionItems.at(4)]
     avergeScorebyTable.organisationUnits[0].id = ouRoot
-    avergeScorebyTable.organisationUnitLevels = [visualizationLevel]
+    avergeScorebyTable.organisationUnitLevels = [1]
     avergeScorebyTable.legendSet.id = VISUALIZATIONS_LEGEND
     visualizations.push(avergeScorebyTable)
     // Dashboard - Tables
@@ -1119,12 +1390,12 @@ export const buildH2BaseVisualizations = ({ programId, programShortName, gsInd, 
     GlobalScorebyMap.publicAccess = sharingSettings.public
     GlobalScorebyMap.sharing = sharingSettings
     GlobalScorebyMap.mapViews[0].sharing = sharingSettings
-    GlobalScorebyMap.mapViews[0].organisationUnitLevels = [mapLevel]
+    GlobalScorebyMap.mapViews[0].organisationUnitLevels = [1]
     GlobalScorebyMap.mapViews[0].organisationUnits[0].id = ouRoot
     GlobalScorebyMap.mapViews[1].sharing = sharingSettings
     GlobalScorebyMap.mapViews[1].program.id = programId
     GlobalScorebyMap.mapViews[1].dataDimensionItems = [dataDimensionItems.at(4)]
-    GlobalScorebyMap.mapViews[1].organisationUnitLevels = [mapLevel]
+    GlobalScorebyMap.mapViews[1].organisationUnitLevels = [1]
     GlobalScorebyMap.mapViews[1].organisationUnits[0].id = ouRoot
     GlobalScorebyMap.mapViews[1].legendSet.id = VISUALIZATIONS_LEGEND
     maps.push(GlobalScorebyMap)
@@ -1150,7 +1421,7 @@ export const buildH2BaseVisualizations = ({ programId, programShortName, gsInd, 
     LineListScore.dataElementDimensions[0].dataElement.id = ACTION_PLAN_ACTION
     LineListScore.programIndicatorDimensions[0].programIndicator.id = gsInd
     LineListScore.organisationUnits[0].id = ouRoot
-    LineListScore.organisationUnitLevels = [visualizationLevel]
+    LineListScore.organisationUnitLevels = [1]
 
     eventReports.push(LineListScore)
     //Dashboard - Event Report

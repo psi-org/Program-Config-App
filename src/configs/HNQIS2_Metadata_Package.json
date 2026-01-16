@@ -584,6 +584,11 @@
             "id": "oNwpeWkfoWc",
             "name": "Assessment HNQIS",
             "shortName": "Assessment HNQIS",
+            "sharing": {
+                "users": {},
+                "userGroups": {},
+                "public": "rwrw----"
+            },
             "publicAccess": "rwrw----",
             "externalAccess": false,
             "allowAuditLog": false,
