@@ -1,17 +1,18 @@
-window.process = {}
+window.process = {};
+
 import './css/main.css';
-import { useDataQuery } from "@dhis2/app-runtime";
+import { useDataEngine, useDataQuery } from '@dhis2/app-runtime';
 import { CircularLoader } from '@dhis2/ui';
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
-import { HashRouter, Route, Switch } from "react-router-dom";
-import classes from './App.module.css'
+import { HashRouter, Route, Switch } from 'react-router-dom';
+import classes from './App.module.css';
 import LoadingPage from './components/PCA_Loading/LoadingPage.jsx';
 import MetadataErrorPage from './components/PCA_Loading/MetadataErrorPage.jsx';
 import MetadataUpdatePage from './components/PCA_Loading/MetadataUpdatePage.jsx';
 import VersionErrorPage from './components/PCA_Loading/VersionErrorPage.jsx';
-import ProgramDetails from "./components/PRG_Details/ProgramDetails.jsx";
-import ProgramList from "./components/PRG_List/ProgramList.jsx";
+import ProgramDetails from './components/PRG_Details/ProgramDetails.jsx';
+import ProgramList from './components/PRG_List/ProgramList.jsx';
 import ProgramStage from './components/STG_Details/ProgramStage.jsx';
 import { MIN_VERSION, MAX_VERSION, PCA_METADATA_VERSION, NAMESPACE, DATASTORE_PCA_METADATA } from './configs/Constants.jsx';
 import store from './state/store.js';
@@ -19,125 +20,187 @@ import { checkProcessH2, checkProcessPCA } from './utils/PCALoadingUtils.js';
 import { versionIsValid } from './utils/Utils.jsx';
 
 const queryServerInfo = {
-    results: {
-        resource: 'system/info',
-    }
+    results: { resource: 'system/info' },
 };
 
-export const queryPCAAvailableMetadata = {
-    results: {
-        resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}`
-    }
+const queryPCAAvailableMetadata = {
+    results: { resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}` },
 };
 
-const completenessCheck = (queryResult, checkProcess) => {
-    return queryResult?.results[checkProcess.objectName]?.filter(obj => checkProcess.resultsList.includes(obj.id)).length >= checkProcess.resultsList.length;
-}
+const toInnerQuery = (q) => (q?.results && typeof q.results === 'object' ? q.results : q);
+
+const buildMultiQuery = (processList, prefix) => {
+    const query = {};
+    processList.forEach((proc, i) => {
+        const raw = typeof proc.queryFunction === 'function' ? proc.queryFunction() : proc.queryFunction;
+        const inner = toInnerQuery(raw);
+        if (inner) {
+            query[`${prefix}${i}`] = inner;
+        }
+    })
+    return query;
+};
+
+const isComplete = (dataForStep, proc) => {
+    const list = dataForStep?.[proc.objectName];
+    if (!Array.isArray(list)) { return false; }
+    const presentIds = new Set(list.map((o) => o.id));
+    return proc.resultsList.every((id) => presentIds.has(id));
+};
+
+const CenteredLoader = () => (
+    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+        <CircularLoader />
+    </div>
+);
 
 const App = () => {
+    const engine = useDataEngine();
 
-    let dataChecked = false;
-    let pcaReady = false;
-    let h2Ready = false;
-    
-    //* Checking PCA Metadata Package completeness
-    const { data: pcaCheck1 } = useDataQuery(checkProcessPCA[0].queryFunction);
-    const { data: pcaCheck2 } = useDataQuery(checkProcessPCA[1].queryFunction);
-    const { data: pcaCheck3 } = useDataQuery(checkProcessPCA[2].queryFunction);
-    const { data: pcaCheck4 } = useDataQuery(checkProcessPCA[3].queryFunction);
+    const pcaChecksQuery = useMemo(() => buildMultiQuery(checkProcessPCA, 'pca'), []);
+    const h2ChecksQuery = useMemo(() => buildMultiQuery(checkProcessH2, 'h2'), []);
 
+    const { data: pcaChecksData, loading: pcaChecksLoading, error: pcaChecksError } =
+        useDataQuery(pcaChecksQuery);
 
-    //* Checking HNQIS2 Metadata Package completeness
-    const { data: h2Check1 } = useDataQuery(checkProcessH2[0].queryFunction);
-    const { data: h2Check2 } = useDataQuery(checkProcessH2[1].queryFunction);
-    const { data: h2Check3 } = useDataQuery(checkProcessH2[2].queryFunction);
-    const { data: h2Check4 } = useDataQuery(checkProcessH2[3].queryFunction);
-    const { data: h2Check5 } = useDataQuery(checkProcessH2[4].queryFunction);
-    const { data: h2Check6 } = useDataQuery(checkProcessH2[5].queryFunction);
-    const { data: h2Check7 } = useDataQuery(checkProcessH2[6].queryFunction);
+    const { data: h2ChecksData, loading: h2ChecksLoading, error: h2ChecksError } =
+        useDataQuery(h2ChecksQuery);
 
-    //* All completeness checked
-    if (pcaCheck1 && pcaCheck2 && pcaCheck3 && pcaCheck4 && h2Check1 && h2Check2 && h2Check3 && h2Check4 && h2Check5 && h2Check6 && h2Check7) {
-        pcaReady = completenessCheck(pcaCheck1, checkProcessPCA[0])
-            && completenessCheck(pcaCheck2, checkProcessPCA[1])
-            && completenessCheck(pcaCheck3, checkProcessPCA[2])
-            && completenessCheck(pcaCheck4, checkProcessPCA[3]);
-
-        h2Ready = completenessCheck(h2Check1, checkProcessH2[0])
-            && completenessCheck(h2Check2, checkProcessH2[1])
-            && completenessCheck(h2Check3, checkProcessH2[2])
-            && completenessCheck(h2Check4, checkProcessH2[3])
-            && completenessCheck(h2Check5, checkProcessH2[4])
-            && completenessCheck(h2Check6, checkProcessH2[5])
-            && completenessCheck(h2Check7, checkProcessH2[6]);
-
-        localStorage.setItem('h2Ready', String(h2Ready));
-        dataChecked = true;
-    }
-
-    //* Checking PCA Metadata version
-    const {
-        data: pcaMetadataData,
-        error: pcaMetadataError,
-        loading: pcaMetadataLoading
-    } = useDataQuery(queryPCAAvailableMetadata);
-
-    //* Checking DHIS2 Server version
     const serverInfoQuery = useDataQuery(queryServerInfo);
     const serverInfo = serverInfoQuery.data?.results;
 
-    if (serverInfo) { window.localStorage.SERVER_VERSION = serverInfo.version }
+    const [pcaMetaState, setPcaMetaState] = useState({
+        loading: true,
+        data: null,
+        error: null,
+        missing: false,
+    });
 
-    const getPageContent = () => {
-        if (pcaMetadataLoading) {
+    useEffect(() => {
+        let cancelled = false;
+
+        const run = async () => {
+            setPcaMetaState({ loading: true, data: null, error: null, missing: false });
+
+            try {
+                const res = await engine.query(queryPCAAvailableMetadata);
+                if (cancelled) { return; };
+                setPcaMetaState({ loading: false, data: res?.results ?? null, error: null, missing: false });
+            } catch (e) {
+                if (cancelled) { return; }
+
+                const status =
+                    e?.details?.httpStatusCode ??
+                    e?.details?.response?.status ??
+                    e?.response?.status ??
+                    e?.httpStatusCode;
+
+                const missing = status === 404;
+                setPcaMetaState({ loading: false, data: null, error: e, missing });
+            }
+        }
+
+        run();
+        return () => {
+            cancelled = true;
+        }
+    }, [engine]);
+
+    useEffect(() => {
+        if (serverInfo?.version) {
+            window.localStorage.SERVER_VERSION = serverInfo.version;
+        }
+    }, [serverInfo?.version]);
+
+    const pcaReady = useMemo(() => {
+        if (pcaChecksLoading) {
+            return undefined;
+        }
+        if (pcaChecksError || !pcaChecksData) {
+            return false;
+        }
+
+        return checkProcessPCA.every((proc, i) => isComplete(pcaChecksData[`pca${i}`], proc));
+    }, [pcaChecksLoading, pcaChecksError, pcaChecksData]);
+
+    const h2Ready = useMemo(() => {
+        if (h2ChecksLoading) {
+            return undefined;
+        }
+        if (h2ChecksError || !h2ChecksData) {
+            return false;
+        }
+
+        return checkProcessH2.every((proc, i) => isComplete(h2ChecksData[`h2${i}`], proc));
+    }, [h2ChecksLoading, h2ChecksError, h2ChecksData]);
+
+    useEffect(() => {
+        if (typeof h2Ready === 'boolean') {
+            localStorage.setItem('h2Ready', String(h2Ready));
+        }
+    }, [h2Ready]);
+
+    const GateComponent = useMemo(() => {
+        if (serverInfoQuery.loading || pcaMetaState.loading || pcaReady === undefined) {
             return LoadingPage;
         }
-        const versionValid = serverInfo && serverInfo.version
-            ? versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION)
-            : false;
+
+        const versionValid =
+            serverInfo?.version && versionIsValid(serverInfo.version, MIN_VERSION, MAX_VERSION);
+
         if (!versionValid) {
             return VersionErrorPage;
         }
-        if (pcaReady === undefined) {
-            return LoadingPage;
-        }
-        if (!pcaReady) {
+        if (pcaReady === false) {
             return MetadataErrorPage;
         }
-        if (pcaMetadataData?.results?.version < PCA_METADATA_VERSION || pcaMetadataError) {
+
+
+        if (pcaMetaState.missing) {
             return MetadataUpdatePage;
         }
-        return undefined;
-    };
 
-    if (!dataChecked || !serverInfo?.version) {
-        return (<div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-            <CircularLoader />
-        </div>)
+        const availableVersion = pcaMetaState.data?.version;
+        const needsUpdate =
+            pcaMetaState.error ||
+            availableVersion < PCA_METADATA_VERSION;
+
+        if (needsUpdate) {
+            return MetadataUpdatePage;
+        }
+
+        return null;
+    }, [
+        serverInfoQuery.loading,
+        serverInfo?.version,
+        pcaMetaState.loading,
+        pcaMetaState.data,
+        pcaMetaState.error,
+        pcaMetaState.missing,
+        pcaReady,
+    ]);
+
+    if (pcaChecksLoading || h2ChecksLoading || serverInfoQuery.loading) {
+        return (<CenteredLoader />);
     }
 
+    const RootComponent = GateComponent ?? ProgramList;
+    const ProgramComponent = GateComponent ?? ProgramDetails;
+    const StageComponent = GateComponent ?? ProgramStage;
+
     return (
-        <>
-            <Provider store={store}>
-                <HashRouter>
-                    <div className={classes.container}>
-                        <Switch>
-                            <Route exact path={"/"}
-                                component={getPageContent() || ProgramList} />
-
-                            <Route path={'/program/:id?'}
-                                component={getPageContent() || ProgramDetails} />
-
-                            <Route path={'/programStage/:id?'}
-                                component={getPageContent() || ProgramStage} />
-                        </Switch>
-                    </div>
-
-                </HashRouter>
-            </Provider>
-        </>
+        <Provider store={store}>
+            <HashRouter>
+                <div className={classes.container}>
+                    <Switch>
+                        <Route exact path="/" component={RootComponent} />
+                        <Route path="/program/:id?" component={ProgramComponent} />
+                        <Route path="/programStage/:id?" component={StageComponent} />
+                    </Switch>
+                </div>
+            </HashRouter>
+        </Provider>
     )
+};
 
-}
-
-export default App
+export default App;
