@@ -17,7 +17,7 @@ import { TEMPLATE_PROGRAM_TYPES } from "../../configs/TemplateConstants.js";
 import actionCreators from "../../state/action-creators/index.js";
 import { DeepCopy, formatAlert, getPCAMetadataDE, getProgramQuery, mapIdArray, padValue, setPCAMetadata, truncateString, versionGTE } from "../../utils/Utils.jsx";
 import DataProcessorTracker from "../Excel/DataProcessorTracker.jsx";
-import Importer from "../Excel/Importer.jsx";
+import Importer from "../Excel/Importer";
 import { hideShowLogic } from "../STG_Details/Scripting.js";
 import CustomMUIDialog from "../UIElements/CustomMUIDialog.js";
 import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle.jsx";

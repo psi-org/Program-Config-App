@@ -6,7 +6,7 @@ const FileSelector = ({ fileName, setFile, acceptedFiles }) => {
     return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Button variant="contained" component="label" style={{ width: '30%', maxWidth: '30%', minWidth: '30%' }}>
-                Select File
+                Select File {' '}
                 <input
                     type="file"
                     accept={ acceptedFiles }

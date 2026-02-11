@@ -74,10 +74,13 @@ export const workbookValidation = (status, task, { setNotificationError, workboo
     let mappingWS;
     let isEvent = false;
     workbook.eachSheet((worksheet) => {
+        //TODO: Question for Mario: What is this checking for?
         if (worksheet.getCell("L1").value === 'Program TEA Id') {
             teasWS = worksheet;
+        //TODO: Question for Mario: What is this checking for?
         } else if (worksheet.getCell("R1").value === 'Stage ID' || worksheet.getCell("A1").value === 'Parent Name') {
             templateWS.push(worksheet);
+        //TODO: Question for Mario: What is this checking for?
         } else {
             const id = worksheet.getCell("A1").value;
             switch (id) {
