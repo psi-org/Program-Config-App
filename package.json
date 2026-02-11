@@ -1,56 +1,63 @@
 {
-    "name": "program_configuration",
-    "title": "Program Configuration",
-    "author": "KnowTechTure SL",
-    "version": "2.3.0",
-    "description": "Tracker Programs management tool",
-    "license": "CC-BY-4.0",
-    "private": true,
-    "scripts": {
-        "build": "d2-app-scripts build",
-        "start": "d2-app-scripts start",
-        "test": "d2-app-scripts test",
-        "deploy": "d2-app-scripts deploy",
-        "lint": "yarn d2-style check",
-        "lint:staged": "yarn lint --staged",
-        "format": "yarn d2-style apply",
-        "format:staged": "yarn format --staged"
-    },
-    "devDependencies": {
-        "@dhis2/cli-app-scripts": "^12.10.1",
-        "@dhis2/cli-style": "^10.5.1",
-        "react-error-overlay": "6.0.9"
-    },
-    "resolutions": {
-        "react-scripts/**/react-error-overlay": "6.0.9"
-    },
-    "dependencies": {
-        "@dhis2/app-runtime": "^3.2.9",
-        "@dhis2/ui": "^7.2.0",
-        "@emotion/react": "^11.8.2",
-        "@emotion/styled": "^11.8.1",
-        "@mui/icons-material": "^5.5.1",
-        "@mui/lab": "^5.0.0-alpha.79",
-        "@mui/material": "^5.5.2",
-        "@mui/x-data-grid": "^5.9.0",
-        "@uiw/react-md-editor": "^3.11.2",
-        "core-js": "^3.47.0",
-        "exceljs": "^4.3.0",
-        "file-saver": "^2.0.5",
-        "jquery": "^3.6.0",
-        "prop-types": "^15.8.1",
-        "react-beautiful-dnd": "^13.1.0",
-        "react-color": "2.17.3",
-        "react-hook-form": "^7.34.0",
-        "react-redux": "^7.2.5",
-        "react-router-dom": "^5.3.0",
-        "react-sweet-progress": "^1.1.2",
-        "redux": "^4.1.1",
-        "redux-thunk": "^2.3.0",
-        "regenerator-runtime": "^0.14.1",
-        "rehype-sanitize": "^5.0.1",
-        "semver": "^7.3.7",
-        "tinycolor2": "^1.4.2"
-    },
-    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "name": "program_configuration",
+  "title": "Program Configuration",
+  "author": "KnowTechTure SL",
+  "version": "2.3.0",
+  "description": "Tracker Programs management tool",
+  "license": "CC-BY-4.0",
+  "private": true,
+  "scripts": {
+    "build": "d2-app-scripts build",
+    "start": "d2-app-scripts start",
+    "test": "d2-app-scripts test",
+    "deploy": "d2-app-scripts deploy",
+    "lint": "yarn d2-style check",
+    "lint:staged": "yarn lint --staged",
+    "format": "yarn d2-style apply",
+    "format:staged": "yarn format --staged",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@dhis2/cli-app-scripts": "^12.10.1",
+    "@dhis2/cli-style": "^10.5.1",
+    "husky": "^9.1.7",
+    "react-error-overlay": "6.0.9"
+  },
+  "resolutions": {
+    "react-scripts/**/react-error-overlay": "6.0.9"
+  },
+  "dependencies": {
+    "@dhis2/app-runtime": "^3.2.9",
+    "@dhis2/ui": "^7.2.0",
+    "@emotion/react": "^11.8.2",
+    "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.5.1",
+    "@mui/lab": "^5.0.0-alpha.79",
+    "@mui/material": "^5.5.2",
+    "@mui/x-data-grid": "^5.9.0",
+    "@uiw/react-md-editor": "^3.11.2",
+    "core-js": "^3.47.0",
+    "exceljs": "^4.3.0",
+    "file-saver": "^2.0.5",
+    "jquery": "^3.6.0",
+    "prop-types": "^15.8.1",
+    "react-beautiful-dnd": "^13.1.0",
+    "react-color": "2.17.3",
+    "react-hook-form": "^7.34.0",
+    "react-redux": "^7.2.5",
+    "react-router-dom": "^5.3.0",
+    "react-sweet-progress": "^1.1.2",
+    "redux": "^4.1.1",
+    "redux-thunk": "^2.3.0",
+    "regenerator-runtime": "^0.14.1",
+    "rehype-sanitize": "^5.0.1",
+    "semver": "^7.3.7",
+    "tinycolor2": "^1.4.2"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,md,json}": [
+      "yarn format"
+    ]
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
