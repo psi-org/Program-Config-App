@@ -13,7 +13,8 @@
     "deploy": "d2-app-scripts deploy",
     "lint": "yarn d2-style check",
     "lint:staged": "yarn lint --staged",
-    "format": "yarn d2-style apply",
+    "format-d2": "yarn d2-style apply",
+    "format": "npx -y prettier --write .",
     "format:staged": "yarn format --staged",
     "prepare": "husky"
   },

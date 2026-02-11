@@ -1,19 +1,19 @@
-import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
-import { NoticeBox } from "@dhis2/ui";
-import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
-import LoadingButton from "@mui/lab/LoadingButton";
-import React, { useState } from "react";
+import { useDataMutation, useDataQuery } from '@dhis2/app-runtime';
+import { NoticeBox } from '@dhis2/ui';
+import InstallDesktopIcon from '@mui/icons-material/InstallDesktop';
+import LoadingButton from '@mui/lab/LoadingButton';
+import React, { useState } from 'react';
 import {
   NAMESPACE,
   PCA_METADATA_VERSION,
   DATASTORE_PCA_METADATA,
-} from "../../configs/Constants.jsx";
-import metadataPackage from "../../configs/pcaMetadataPackage.json";
-import { parseErrorsUL } from "../../utils/Utils.jsx";
+} from '../../configs/Constants.jsx';
+import metadataPackage from '../../configs/pcaMetadataPackage.json';
+import { parseErrorsUL } from '../../utils/Utils.jsx';
 
 const metadataMutation = {
-  resource: "metadata",
-  type: "create",
+  resource: 'metadata',
+  type: 'create',
   data: ({ data }) => data,
 };
 
@@ -25,13 +25,13 @@ const queryDataStore = {
 
 const dataStoreMutation = {
   resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}`,
-  type: "create",
+  type: 'create',
   data: ({ data }) => data,
 };
 
 const dataStoreMutationUpdate = {
   resource: `dataStore/${NAMESPACE}/${DATASTORE_PCA_METADATA}`,
-  type: "update",
+  type: 'update',
   data: ({ data }) => data,
 };
 
@@ -71,7 +71,7 @@ const MetadataErrorPage = () => {
   function installMetadata() {
     setSentData(true);
     metadataRequest.mutate({ data: metadataPackage }).then((response) => {
-      if (response.status != "OK") {
+      if (response.status != 'OK') {
         setError(response);
       } else {
         //Success
@@ -83,7 +83,7 @@ const MetadataErrorPage = () => {
           ? dataStoreCreate
           : dataStoreUpdate;
         sendToDataStore({ data: dsData }).then((res) => {
-          if (res.status != "OK") {
+          if (res.status != 'OK') {
             setError(res);
           } else {
             window.location.reload();
@@ -103,11 +103,11 @@ const MetadataErrorPage = () => {
       <div className="wrapper">
         <div
           style={{
-            width: "500px",
-            margin: "auto",
-            display: "flex",
-            flexDirection: "column",
-            paddingTop: "1em",
+            width: '500px',
+            margin: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            paddingTop: '1em',
           }}
         >
           {!error && (
@@ -123,7 +123,7 @@ const MetadataErrorPage = () => {
             <LoadingButton
               variant="contained"
               loading={sentData}
-              style={{ width: "100%", marginTop: "1em" }}
+              style={{ width: '100%', marginTop: '1em' }}
               startIcon={<InstallDesktopIcon />}
               Ç
               onClick={() => installMetadata()}

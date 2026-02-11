@@ -1,11 +1,11 @@
-import { NoticeBox } from "@dhis2-ui/notice-box";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import Button from "@mui/material/Button";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import ExcelJS from "exceljs/dist/exceljs.min.js";
-import PropTypes from "prop-types";
-import React, { useState } from "react";
+import { NoticeBox } from '@dhis2-ui/notice-box';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import ExcelJS from 'exceljs/dist/exceljs.min.js';
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import {
   HNQIS2_ORIGIN_SERVER_CELL,
   HNQIS2_TEMPLATE_HEADERS,
@@ -16,11 +16,11 @@ import {
   TRACKER_TEA_MAP,
   TRACKER_TEMPLATE_HEADERS,
   TRACKER_TEMPLATE_VERSION_CELL,
-} from "../../configs/TemplateConstants.js";
+} from '../../configs/TemplateConstants.js';
 import {
   getHNQIS2MappingList,
   getTrackerMappingList,
-} from "../../utils/ExcelUtils.js";
+} from '../../utils/ExcelUtils.js';
 import {
   getProgramDetailsHNQIS2,
   fileValidation,
@@ -33,14 +33,14 @@ import {
   isTracker,
   countChanges,
   getBasicForm,
-} from "../../utils/importerUtils.js";
-import { setUpProgramStageSections } from "../../utils/Utils.jsx";
-import { readTemplateData } from "../STG_Details/importReader.js";
-import FileSelector from "../UIElements/FileSelector.jsx";
-import ImportStatusBox from "../UIElements/ImportStatusBox.jsx";
-import ImportSummary from "../UIElements/ImportSummary.jsx";
-import CustomMUIDialog from "../UIElements/CustomMUIDialog.js";
-import CustomMUIDialogTitle from "../UIElements/CustomMUIDialogTitle.jsx";
+} from '../../utils/importerUtils.js';
+import { setUpProgramStageSections } from '../../utils/Utils.jsx';
+import { readTemplateData } from '../STG_Details/importReader.js';
+import FileSelector from '../UIElements/FileSelector.jsx';
+import ImportStatusBox from '../UIElements/ImportStatusBox.jsx';
+import ImportSummary from '../UIElements/ImportSummary.jsx';
+import CustomMUIDialog from '../UIElements/CustomMUIDialog.js';
+import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.jsx';
 
 interface SummaryObject {
   new: number;
@@ -90,46 +90,46 @@ interface PreviousData {
   }[];
 }
 type CurrentStagesData = {
-    name: string;
+  name: string;
+  id: string;
+  programStageSections: {
     id: string;
-    programStageSections: {
-        id: string;
-        name: string;
-        displayName: string;
-        sortOrder: number;
-        dataElements: {
-            id: string;
-        }[];
+    name: string;
+    displayName: string;
+    sortOrder: number;
+    dataElements: {
+      id: string;
     }[];
-}[]
+  }[];
+}[];
 
 enum ProgramTypesEnum {
-    TRACKER = 'Tracker Program',
-    HNQIS2 = 'HNQIS2',
-    EVENT = 'Event Program',
+  TRACKER = 'Tracker Program',
+  HNQIS2 = 'HNQIS2',
+  EVENT = 'Event Program',
 }
 
 export interface ProgramMetadataHandlers {
-    setProgramMetadata: (programMetadata: ProgramMetadata) => void;
-    programMetadata: ProgramMetadata;
+  setProgramMetadata: (programMetadata: ProgramMetadata) => void;
+  programMetadata: ProgramMetadata;
 }
 
 export interface ProgramMetadata {
-    dePrefix: string;
-    useCompetencyClass: boolean;
-    healthArea: {
-        name: string;
-    }[]
+  dePrefix: string;
+  useCompetencyClass: boolean;
+  healthArea: {
+    name: string;
+  }[];
 }
 
 export type CurrentSectionsData = {
-   dataElements: {
+  dataElements: {
     sharing: string;
-    attributeValues: unknown[]
+    attributeValues: unknown[];
     style: unknown;
     categoryCombo: unknown;
     id: string;
-   }[]
+  }[];
 }[];
 
 interface Task {
@@ -139,43 +139,43 @@ interface Task {
 }
 
 interface ImportSummary {
-    configurations?: {
-        skippedSections?: {
-            stage: string
-        }[]
-    }
-    questions?: unknown[]
-    sections?: unknown[]
-    scores?: unknown[]
-    teaSummary: {
-        programSections: unknown[]
-        teas: unknown[]
-    }
-    stages: {
-        stageName: string;
-        sections: unknown[]
-        dataElements: unknown[]
-    }[]
+  configurations?: {
+    skippedSections?: {
+      stage: string;
+    }[];
+  };
+  questions?: unknown[];
+  sections?: unknown[];
+  scores?: unknown[];
+  teaSummary: {
+    programSections: unknown[];
+    teas: unknown[];
+  };
+  stages: {
+    stageName: string;
+    sections: unknown[];
+    dataElements: unknown[];
+  }[];
 }
 interface Stage {
-    stageName: string;
-    id: string;
+  stageName: string;
+  id: string;
 }
 interface ImportSummaryValues {
-    stages: Stage[]
-    teaSummary: {
-        programSections: {
-            updated: number;
-            new: number
-        };
+  stages: Stage[];
+  teaSummary: {
+    programSections: {
+      updated: number;
+      new: number;
     };
-    program: unknown;
-    mapping: unknown;
-    configurations: {
-        teas: unknown[]
-        importedStages: unknown[]
-        skippedSections: unknown[]
-    }
+  };
+  program: unknown;
+  mapping: unknown;
+  configurations: {
+    teas: unknown[];
+    importedStages: unknown[];
+    skippedSections: unknown[];
+  };
 }
 
 //* Tracker Only: currentStagesData
@@ -206,18 +206,22 @@ const Importer = ({
   setSavedAndValidated: (savedAndValidated: boolean) => void;
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
-  const [currentTask, setCurrentTask] = useState<Task | undefined | null> (undefined);
+  const [currentTask, setCurrentTask] = useState<Task | undefined | null>(
+    undefined
+  );
   const [executedTasks, setExecutedTasks] = useState<Task[]>([]);
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [isNotificationError, setNotificationError] = useState(false);
-  const [fileName, setFileName] = useState("No file selected...");
+  const [fileName, setFileName] = useState('No file selected...');
 
-  const [importSummary, setImportSummary] = useState<ImportSummary | undefined>(undefined); //TODO: Find out why we're using boolean here
+  const [importSummary, setImportSummary] = useState<ImportSummary | undefined>(
+    undefined
+  ); //TODO: Find out why we're using boolean here
 
   const setFile = (files: File[]) => {
     setNotificationError(false);
     setExecutedTasks([]);
-    setFileName(files[0]?.name || "No file selected...");
+    setFileName(files[0]?.name || 'No file selected...');
     setSelectedFile(files[0]);
   };
 
@@ -237,7 +241,7 @@ const Importer = ({
     const task = {
       step,
       name: message,
-      status: initialStatus ? "success" : "error",
+      status: initialStatus ? 'success' : 'error',
     };
     setCurrentTask(task.name);
 
@@ -263,7 +267,7 @@ const Importer = ({
         !tasksHandler(
           {
             step: 1,
-            message: "Validating Template format (XLSX)",
+            message: 'Validating Template format (XLSX)',
             initialStatus: false,
           },
           fileValidation,
@@ -283,7 +287,7 @@ const Importer = ({
         const worksheets = tasksHandler(
           {
             step: 2,
-            message: "Validating worksheets in the workbook",
+            message: 'Validating worksheets in the workbook',
             initialStatus: true,
           },
           workbookValidation,
@@ -314,7 +318,7 @@ const Importer = ({
           !tasksHandler(
             {
               step: 3,
-              message: "Validating Template version and origin server",
+              message: 'Validating Template version and origin server',
               initialStatus: false,
             },
             serverAndVersionValidation,
@@ -396,13 +400,13 @@ const Importer = ({
           addExecutedTask({
             step: 10000,
             name: importSummaryValues.error,
-            status: "error",
+            status: 'error',
           });
           setNotificationError(true);
         } else {
           setImportSummary(importSummaryValues);
           setImportResults(importSummaryValues);
-          setSaveStatus("Validate & Save");
+          setSaveStatus('Validate & Save');
           setSavedAndValidated(false);
         }
       };
@@ -508,9 +512,9 @@ const Importer = ({
       let isBasicForm = false;
       teaData.forEach((row, rowNum) => {
         switch (row[TRACKER_TEA_MAP.structure]) {
-          case "Section":
+          case 'Section':
             if (
-              row[TRACKER_TEA_MAP.programSection] === "basic-form" &&
+              row[TRACKER_TEA_MAP.programSection] === 'basic-form' &&
               programSectionIndex === -1
             ) {
               isBasicForm = true;
@@ -529,8 +533,8 @@ const Importer = ({
               sortOrder: programSectionIndex,
               trackedEntityAttributes: [],
               importStatus: row[TRACKER_TEA_MAP.programSection]
-                ? "update"
-                : "new",
+                ? 'update'
+                : 'new',
               isBasicForm,
             };
             if (row[TRACKER_TEA_MAP.programSection]) {
@@ -539,12 +543,12 @@ const Importer = ({
               importSummaryValues.teaSummary.programSections.new += 1;
             }
             break;
-          case "TEA":
+          case 'TEA':
             if (programSectionIndex === -1) {
               programSectionIndex += 1;
               isBasicForm = true;
               importedProgramSections[programSectionIndex] =
-                getBasicForm("TEA");
+                getBasicForm('TEA');
             }
             importedProgramSections[
               programSectionIndex
@@ -554,10 +558,10 @@ const Importer = ({
                 name: row[TRACKER_TEA_MAP.name],
               },
               valueType: row[TRACKER_TEA_MAP.valueType]?.result,
-              allowFutureDate: row[TRACKER_TEA_MAP.allowFutureDate] === "Yes",
-              displayInList: row[TRACKER_TEA_MAP.displayInList] === "Yes",
-              mandatory: row[TRACKER_TEA_MAP.mandatory] === "Yes",
-              searchable: row[TRACKER_TEA_MAP.searchable] === "Yes",
+              allowFutureDate: row[TRACKER_TEA_MAP.allowFutureDate] === 'Yes',
+              displayInList: row[TRACKER_TEA_MAP.displayInList] === 'Yes',
+              mandatory: row[TRACKER_TEA_MAP.mandatory] === 'Yes',
+              searchable: row[TRACKER_TEA_MAP.searchable] === 'Yes',
               programTrackedEntityAttribute: row[TRACKER_TEA_MAP.programTea],
             });
             break;
@@ -566,7 +570,7 @@ const Importer = ({
 
       if (ignoredProgramSections.length > 0) {
         skippedSections.push({
-          stage: "Tracked Entity Attributes",
+          stage: 'Tracked Entity Attributes',
           ignoredSections: ignoredProgramSections,
         });
       }
@@ -574,14 +578,14 @@ const Importer = ({
       const currentTEAData: {
         sections: {
           id: string;
-          trackedEntityAttributes: PreviousData["teas"];
+          trackedEntityAttributes: PreviousData['teas'];
         }[];
       } = {
         sections: [],
       };
       if (previous.programSections.length === 0) {
         currentTEAData.sections.push({
-          id: "basic-form",
+          id: 'basic-form',
           trackedEntityAttributes: previous.teas,
         });
       } else {
@@ -602,10 +606,10 @@ const Importer = ({
       countChanges({
         sections: importedProgramSections,
         sectionsSummary: importSummaryValues.teaSummary.programSections,
-        countObject: "trackedEntityAttributes",
+        countObject: 'trackedEntityAttributes',
         summaryObject: importSummaryValues.teaSummary.teas,
         currentData: currentTEAData.sections,
-        impObjId: "programTrackedEntityAttribute",
+        impObjId: 'programTrackedEntityAttribute',
       });
     }
 
@@ -623,7 +627,7 @@ const Importer = ({
   return (
     <CustomMUIDialog
       open={true}
-      maxWidth={isTracker(programSpecificType) ? "lg" : "sm"}
+      maxWidth={isTracker(programSpecificType) ? 'lg' : 'sm'}
       fullWidth={true}
     >
       <CustomMUIDialogTitle
@@ -635,33 +639,34 @@ const Importer = ({
       <DialogContent
         dividers
         style={{
-          display: "flex",
-          flexDirection: isTracker(programSpecificType) ? "row" : "column",
-          justifyContent: "space-between",
-          padding: "1em 2em",
+          display: 'flex',
+          flexDirection: isTracker(programSpecificType) ? 'row' : 'column',
+          justifyContent: 'space-between',
+          padding: '1em 2em',
         }}
       >
         <div
           style={{
-            width: isTracker(programSpecificType) ? "49%" : "100%",
-            maxHeight: "30rem",
-            overflow: "scroll",
-            overflowX: "hidden",
+            width: isTracker(programSpecificType) ? '49%' : '100%',
+            maxHeight: '30rem',
+            overflow: 'scroll',
+            overflowX: 'hidden',
           }}
         >
           {(currentTask || executedTasks.length > 0) && (
-            <div style={{ width: "100%", marginBottom: "1em" }}>
+            <div style={{ width: '100%', marginBottom: '1em' }}>
               <ImportStatusBox
                 title="Configurations File - Import Status"
                 currentTask={currentTask}
                 executedTasks={executedTasks}
                 isError={isNotificationError}
               />
-              {(importSummary?.configurations?.skippedSections?.length ?? 0) > 0 && (
-                <div style={{ width: "100%", marginTop: "0.5em" }}>
+              {(importSummary?.configurations?.skippedSections?.length ?? 0) >
+                0 && (
+                <div style={{ width: '100%', marginTop: '0.5em' }}>
                   <NoticeBox
                     title={
-                      "One or more Program Stages were imported as Basic Form. To keep the Stage Sections, delete the light blue row and make sure that the first available row is a Section in the following Stage Template(s):"
+                      'One or more Program Stages were imported as Basic Form. To keep the Stage Sections, delete the light blue row and make sure that the first available row is a Section in the following Stage Template(s):'
                     }
                     warning={true}
                   >
@@ -686,9 +691,9 @@ const Importer = ({
               <ImportSummary
                 title="Import Summary"
                 importCategories={[
-                  { name: "Questions", content: importSummary.questions },
-                  { name: "Sections", content: importSummary.sections },
-                  { name: "Scores", content: importSummary.scores },
+                  { name: 'Questions', content: importSummary.questions },
+                  { name: 'Sections', content: importSummary.sections },
+                  { name: 'Scores', content: importSummary.scores },
                 ]}
               />
             )}
@@ -697,7 +702,7 @@ const Importer = ({
             <FileSelector
               fileName={fileName}
               setFile={setFile}
-              acceptedFiles={".xlsx"}
+              acceptedFiles={'.xlsx'}
             />
           )}
         </div>
@@ -705,10 +710,10 @@ const Importer = ({
         {importSummary && isTracker(programSpecificType) && (
           <div
             style={{
-              width: "49%",
-              maxHeight: "30rem",
-              overflow: "scroll",
-              overflowX: "hidden",
+              width: '49%',
+              maxHeight: '30rem',
+              overflow: 'scroll',
+              overflowX: 'hidden',
             }}
           >
             {importSummary.teaSummary && (
@@ -716,11 +721,11 @@ const Importer = ({
                 title={`Import Summary - Tracked Entity Attributes`}
                 importCategories={[
                   {
-                    name: "Sections",
+                    name: 'Sections',
                     content: importSummary.teaSummary.programSections,
                   },
                   {
-                    name: "Tracked Entity Attributes",
+                    name: 'Tracked Entity Attributes',
                     content: importSummary.teaSummary.teas,
                   },
                 ]}
@@ -732,9 +737,9 @@ const Importer = ({
                   key={stage.stageName + index}
                   title={`Import Summary - ${stage.stageName}`}
                   importCategories={[
-                    { name: "Sections", content: stage.sections },
+                    { name: 'Sections', content: stage.sections },
                     {
-                      name: "Stage Data Elements",
+                      name: 'Stage Data Elements',
                       content: stage.dataElements,
                     },
                   ]}
@@ -745,10 +750,10 @@ const Importer = ({
         )}
       </DialogContent>
 
-      <DialogActions style={{ padding: "1em" }}>
+      <DialogActions style={{ padding: '1em' }}>
         <Button
-          color={!importSummary ? "error" : "primary"}
-          variant={!importSummary ? "text" : "outlined"}
+          color={!importSummary ? 'error' : 'primary'}
+          variant={!importSummary ? 'text' : 'outlined'}
           disabled={buttonDisabled}
           onClick={() => hideForm()}
         >
@@ -761,8 +766,8 @@ const Importer = ({
             disabled={buttonDisabled}
             onClick={() => startImportProcess(isTracker(programSpecificType))}
           >
-            {" "}
-            Import{" "}
+            {' '}
+            Import{' '}
           </Button>
         )}
       </DialogActions>
