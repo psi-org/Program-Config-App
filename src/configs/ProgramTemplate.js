@@ -1,3 +1,5 @@
+import { METADATA } from "./Constants"
+
 export const Program = {
     "id": "programId",
     "name": "programName",
@@ -23,7 +25,7 @@ export const HnqisProgramConfigs = {
     "trackedEntityType": { "id": "oNwpeWkfoWc" },
     "attributeValues": [
         {
-            "attribute": { "id": "haUflNqP85K" },
+            "attribute": { "id": METADATA },
             "value": "{\"buildVersion\":\"1.1\",\"useCompetencyClass\":\"Yes\",\"dePrefix\":\"programDEPrefix\"}"
         }
     ],

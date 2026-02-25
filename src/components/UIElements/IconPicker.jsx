@@ -15,85 +15,86 @@ const queryIcons = {
     results: {
         resource: 'icons',
         params: {
-            fields: ['key', 'keywords', 'href']
+            fields: ['key', 'keywords', 'href'],
+            paging: 'false'
         }
     }
 };
 
-const IconPicker = ({parentIcon, setParentIcon}) => {
+const IconPicker = ({ parentIcon, setParentIcon }) => {
 
-    const [showModal, setShowModal] = useState(false)
-    const [iconsList, setIconsList] = useState(undefined)
-    const [displayIconsList, setDisplayIconsList] = useState(undefined)
-    const [selectedIcon, setSelectedIcon] = useState('')
+    const [showModal, setShowModal] = useState(false);
+    const [iconsList, setIconsList] = useState(undefined);
+    const [displayIconsList, setDisplayIconsList] = useState(undefined);
+    const [selectedIcon, setSelectedIcon] = useState('');
 
-    const [iconFilterText, setIconFilterText] = useState('')
-    const [iconFilter, setIconFilter] = useState('')
+    const [iconFilterText, setIconFilterText] = useState('');
+    const [iconFilter, setIconFilter] = useState('');
     const { refetch: fetchIcons } = useDataQuery(queryIcons, { lazy: true });
 
     const filterTextChange = data => {
-        setIconFilterText(data.target.value)
+        setIconFilterText(data.target.value);
     }
 
-    const displayIcons = () =>{
-        setSelectedIcon(parentIcon || '')
-        if(!iconsList){
+    const displayIcons = () => {
+        setSelectedIcon(parentIcon || '');
+        if (!iconsList) {
             fetchIcons().then(data => {
-                if (data?.results) {
-                    setIconsList(data.results.sort(( a, b ) => {
-                        return (a.key<b.key)?-1:((a.key>b.key)?1:0)
+                if (data?.results?.icons) {
+                    setIconsList(data.results.icons.sort((a, b) => {
+                        return (a.key < b.key) ? -1 : ((a.key > b.key) ? 1 : 0);
                     }))
-                    setShowModal(true)
+                    setShowModal(true);
                 }
             })
         } else {
-            setShowModal(true)
+            setShowModal(true);
         }
     }
 
     useEffect(() => {
-        setDisplayIconsList(iconsList)
+        setDisplayIconsList(iconsList);
     }, [iconsList])
     
     useEffect(() => {
-        if (iconsList) { filterIcons() }
+        if (iconsList) { filterIcons(); }
     }, [iconFilter, iconFilterText])
 
-    const filterIcons = () =>{
-        let newList =  iconsList.filter(icon => iconFilter===''?true:icon.key.includes(iconFilter))
-        newList =  newList.filter(icon => iconFilterText===''?true:icon.key.includes(iconFilterText))
-        setDisplayIconsList(newList)
+    const filterIcons = () => {
+        let newList = iconsList.filter(icon => iconFilter === '' ? true : icon.key.includes(iconFilter));
+        newList = newList.filter(icon => iconFilterText === '' ? true : icon.key.includes(iconFilterText));
+        setDisplayIconsList(newList);
     }
 
-    const hideForm = () =>{
-        setSelectedIcon('')
-        setShowModal(false)
+    const hideForm = () => {
+        setSelectedIcon('');
+        setShowModal(false);
     }
 
-    return <>
+    return (<>
         <Button
             variant="outlined"
             size="large"
-            style={{marginLeft:'1em'}}
+            style={{ marginLeft: '1em' }}
             startIcon={<InsertEmoticonIcon />}
             onClick={() => displayIcons()}>
             ADD ICON
         </Button>
         {parentIcon &&
-            <IconButton onClick={()=>setParentIcon(undefined)} color="error">
+            <IconButton onClick={() => setParentIcon(undefined)} color="error">
                 <LayersClearIcon />
             </IconButton>
         }
-        {showModal && displayIconsList && 
+        {showModal && displayIconsList &&
             <CustomMUIDialog open={true} maxWidth='lg' fullWidth={true} >
                 <CustomMUIDialogTitle id="customized-dialog-title" onClose={() => hideForm()}>
                     Select an Icon
-                    <div style={{ display: 'flex',justifyContent:'space-between', alignItems: 'center', marginTop: '1em'}}>
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%'}}>
-                            <Button variant={iconFilter===''?'outlined':'text'} onClick={() => setIconFilter('')}> All </Button>
-                            <Button variant={iconFilter==='positive'?'outlined':'text'} onClick={() => setIconFilter('positive')}> Positive </Button>
-                            <Button variant={iconFilter==='negative'?'outlined':'text'} onClick={() => setIconFilter('negative')}> Negative </Button>
-                            <Button variant={iconFilter==='outline'?'outlined':'text'} onClick={() => setIconFilter('outline')}> Outline </Button>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1em' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+                            <Button variant={iconFilter === '' ? 'outlined' : 'text'} onClick={() => setIconFilter('')}> All </Button>
+                            <Button variant={iconFilter === 'positive' ? 'outlined' : 'text'} onClick={() => setIconFilter('positive')}> Positive </Button>
+                            <Button variant={iconFilter === 'negative' ? 'outlined' : 'text'} onClick={() => setIconFilter('negative')}> Negative </Button>
+                            <Button variant={iconFilter === 'outline' ? 'outlined' : 'text'} onClick={() => setIconFilter('outline')}> Outline </Button>
                         </div>
                         <TextField
                             autoComplete='off'
@@ -106,19 +107,19 @@ const IconPicker = ({parentIcon, setParentIcon}) => {
                         />
                     </div>
                 </CustomMUIDialogTitle >
-                <DialogContent dividers style={{ padding: '1em 2em', display: 'flex', flexDirection:'column' }}>
-                    <div style={{width: '100%'}}>
-                        {displayIconsList.map((icon, index)=>
-                            <img 
+                <DialogContent dividers style={{ padding: '1em 2em', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ width: '100%' }}>
+                        {displayIconsList.map((icon, index) =>
+                            <img
                                 src={icon.href}
                                 key={index}
-                                onClick={() => {setSelectedIcon(icon.key)}}
+                                onClick={() => { setSelectedIcon(icon.key) }}
                                 title={icon.key.replaceAll("_", " ")}
                                 width='60px'
                                 height='60px'
                                 style={{
                                     margin: '4px',
-                                    border: selectedIcon===icon.key?'2px solid #1976d2':'2px solid transparent',
+                                    border: selectedIcon === icon.key ? '2px solid #1976d2' : '2px solid transparent',
                                     cursor: 'pointer'
                                 }}
                             />
@@ -128,20 +129,20 @@ const IconPicker = ({parentIcon, setParentIcon}) => {
                 <DialogActions style={{ padding: '1em' }}>
                     <Button onClick={() => hideForm()} color="error" > Cancel </Button>
                     <Button
-                        onClick={() => {setParentIcon(selectedIcon); hideForm()}}
+                        onClick={() => { setParentIcon(selectedIcon); hideForm() }}
                         variant='outlined'
-                        disabled={selectedIcon===''}>
+                        disabled={selectedIcon === ''}>
                         Select Icon
                     </Button>
                 </DialogActions>
             </CustomMUIDialog>
         }
-    </>
-}
+    </>);
+};
 
 IconPicker.propTypes = {
     parentIcon: PropTypes.string,
     setParentIcon: PropTypes.func
-}
+};
 
 export default IconPicker;
