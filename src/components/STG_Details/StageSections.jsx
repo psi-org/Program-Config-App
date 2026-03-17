@@ -1123,6 +1123,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
           prvsMap,
           programId,
           uidPool: localUidPool,
+          legacy: !versionGTE(window.localStorage.SERVER_VERSION, '2.43.0'),
         });
 
         const metadata = {
