@@ -24,6 +24,8 @@ import {
   VISUALIZATIONS_LEGEND,
   NON_CRITICAL_STEPS,
   CRITICAL_STEPS,
+  LEGEND_YES_NO,
+  FEEDBACK_TEXT,
 } from '../../configs/Constants.jsx';
 import { DeepCopy, padValue } from '../../utils/Utils.jsx';
 
@@ -179,7 +181,7 @@ const buildScores = (branch) => {
     branch.questions.forEach((a) => {
       if (a.prgVarName) {
         const num = `#{${a.prgVarName}}*${a.scoreNum}`;
-        const den = `d2:count('${a.prgVarName}')*${a.scoreDen}`;
+        const den = `d2:count(#{${a.prgVarName}})*${a.scoreDen}`;
         if (a.isCritical == 'Yes') {
           numC.push(num);
           denC.push(den);
@@ -264,7 +266,7 @@ const getScorePR = ({ composite, branch, programId, stageId, uidPool }) => {
         description: '_Scripted',
         program: { id: programId },
         //programStage : {id : stageId},
-        condition: 'true',
+        condition: `(${den}) != 0`,
         priority: 1,
         programRuleActions: [{ id: actionId }],
       };
@@ -289,9 +291,10 @@ const getScorePR = ({ composite, branch, programId, stageId, uidPool }) => {
         name: name,
         description: '_Scripted',
         program: { id: programId },
-        programStage: { id: stageId },
-        condition: `d2:hasValue('_CV${composite.prgVarName}')`,
+        //programStage: { id: stageId },
+        condition: `d2:hasValue(#{_CV${composite.prgVarName}})`,
         programRuleActions: [{ id: actionId }],
+        priority: 3,
       };
 
       const pra_s2 = {
@@ -302,10 +305,37 @@ const getScorePR = ({ composite, branch, programId, stageId, uidPool }) => {
         programRule: { id: programRuleUid },
       };
 
-      return { scorePRs: [pr_s1, pr_s2], scorePRAs: [pra_s1, pra_s2] };
+      // Fallback assignment to handle zero denominator case and avoid blank scores
+      name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (Fallback)`;
+      programRuleUid = uidPool.shift();
+      actionId = uidPool.shift();
+      data = `Setting score to empty when denominator is 0`;
+
+      const pr_s3 = {
+        id: programRuleUid,
+        name: name,
+        description: '_Scripted',
+        program: { id: programId },
+        //programStage: { id: stageId },
+        condition: `!d2:hasValue(#{_CV${composite.prgVarName}})`,
+        programRuleActions: [{ id: actionId }],
+        priority: 2,
+      };
+
+      const pra_s3 = {
+        id: actionId,
+        programRuleActionType: programRuleActionType,
+        data: '100',
+        dataElement: { id: composite.uid },
+        programRule: { id: programRuleUid },
+      };
+
+      return {
+        scorePRs: [pr_s1, pr_s2, pr_s3],
+        scorePRAs: [pra_s1, pra_s2, pra_s3],
+      };
     } else {
       // Composite Score DOESN'T HAVE scoring questions
-      const data = `''`;
       const name = `PR - Score - [${composite.feedbackOrder}] ${composite.formName} (%)`;
       const programRuleActionType = 'ASSIGN';
 
@@ -325,7 +355,7 @@ const getScorePR = ({ composite, branch, programId, stageId, uidPool }) => {
       const pra = {
         id: actionId,
         programRuleActionType: programRuleActionType,
-        data,
+        data: "''",
         dataElement: { id: composite.uid },
         programRule: { id: programRuleUid },
       };
@@ -391,7 +421,7 @@ const buildCriticalScore = ({ branch, stageId, programId, uidPool }) => {
     description: '_Scripted',
     program: { id: programId },
     programStage: { id: stageId },
-    condition: `d2:hasValue('_CV_CriticalQuestions')`,
+    condition: `d2:hasValue(#{_CV_CriticalQuestions})`,
     programRuleActions: [{ id: actionId }],
   };
 
@@ -464,7 +494,7 @@ const buildNonCriticalScore = ({ branch, stageId, programId, uidPool }) => {
     description: '_Scripted',
     program: { id: programId },
     programStage: { id: stageId },
-    condition: `d2:hasValue('_CV_NonCriticalQuestions')`,
+    condition: `d2:hasValue(#{_CV_NonCriticalQuestions})`,
     programRuleActions: [{ id: actionId }],
   };
 
@@ -640,7 +670,7 @@ const buildAttributesRules = ({
     attributeRules.push({
       name: 'PR - Attributes - Assign Competency',
       displayName: 'PR - Attributes - Assign Competency',
-      condition: "d2:hasValue('_competencyNewest')",
+      condition: 'd2:hasValue(#{_competencyNewest})',
       program: { id: '' },
       description: '_Scripted',
       programRuleActions: [
@@ -873,7 +903,7 @@ export const buildProgramRuleVariables = ({
       programRuleVariables.push({
         id: uidPool.shift(),
         name: `_S${padValue(secIdx + 1, '00')}Q${padValue(deIdx + 1, '000')}`,
-        programRuleVariableSourceType: 'DATAELEMENT_CURRENT_EVENT',
+        programRuleVariableSourceType: 'DATAELEMENT_NEWEST_EVENT_PROGRAM',
         useCodeForOptionSet: dataElement.optionSet?.id ? true : false,
         program: { id: programId },
         dataElement: { id: dataElement.id },
@@ -886,7 +916,7 @@ export const buildProgramRuleVariables = ({
     programRuleVariables.push({
       id: uidPool.shift(),
       name: `_CS_${padValue(deIdx + 1, '00')}`,
-      programRuleVariableSourceType: 'DATAELEMENT_CURRENT_EVENT',
+      programRuleVariableSourceType: 'DATAELEMENT_NEWEST_EVENT_PROGRAM',
       useCodeForOptionSet: false,
       program: { id: programId },
       dataElement: { id: dataElement.id },
@@ -979,127 +1009,191 @@ const FEEDBACK_ACTION_TEMPLATE = {
   attributeValues: [],
 };
 
-export const buildFeedbackRules = ({ tree, prvsMap, programId, uidPool }) => {
+const makeKVP = ({ content, data, legend = LEGEND_YES_NO }) => {
+  const action = DeepCopy(FEEDBACK_ACTION_TEMPLATE);
+  action.programRuleActionType = 'DISPLAYKEYVALUEPAIR';
+  action.content = content;
+  action.data = data;
+  action.legendSet = {
+    id: legend,
+  };
+  return action;
+};
+
+const makeText = ({ data }) => {
+  const action = DeepCopy(FEEDBACK_ACTION_TEMPLATE);
+  action.programRuleActionType = 'DISPLAYTEXT';
+  action.content = '';
+  action.data = data;
+  return action;
+};
+
+const getTitleSize = (text = '') => {
+  let numSubLevels = text.split('.').length;
+  let res = '';
+  while (numSubLevels) {
+    res += '#';
+    numSubLevels -= 1;
+  }
+  return res;
+};
+
+export const buildFeedbackRules = ({
+  tree,
+  prvsMap,
+  programId,
+  uidPool,
+  legacy = false,
+}) => {
   const programRules = [];
   const programRuleActions = [];
-  let feedbackIndex = 1;
 
-  const recursiveBuild = ({ tree, prvsMap, programId, uidPool }) => {
+  let renderPriority = 1;
+
+  const safeText = (s) =>
+    (s ?? '').replaceAll(/'/g, '’').replaceAll(/\n/g, '\\n\\n');
+
+  const hasValueCondition = (prvName) =>
+    prvName ? `d2:hasValue(#{${prvName}})` : 'true';
+
+  const createBaseRule = ({ name, condition, priority }) => {
+    const rule = DeepCopy(FEEDBACK_RULE_TEMPLATE);
+    rule.id = uidPool.shift();
+    rule.name = name;
+    rule.program.id = programId;
+    rule.programRuleActions = [];
+    rule.condition = condition || 'true';
+    rule.priority = priority;
+    return rule;
+  };
+
+  const pushRuleWithSingleAction = ({ action, condition, name }) => {
+    const rule = createBaseRule({
+      name,
+      condition,
+      priority: renderPriority++,
+    });
+
+    action.id = uidPool.shift();
+    action.programRule.id = rule.id;
+
+    delete action.priority;
+    delete action.legend;
+    delete action.legendSet;
+
+    programRuleActions.push(action);
+    rule.programRuleActions.push({ id: action.id });
+    programRules.push(rule);
+  };
+
+  const sharedRule = !legacy
+    ? createBaseRule({
+        name: `PR - Feedback - ALL`,
+        condition: 'true',
+        priority: 10,
+      })
+    : null;
+
+  const ruleConditionParts = new Set();
+
+  const pushActionToSharedRule = (action) => {
+    action.id = uidPool.shift();
+    action.programRule.id = sharedRule.id;
+    action.priority = renderPriority++;
+
+    programRuleActions.push(action);
+    sharedRule.programRuleActions.push({ id: action.id });
+  };
+
+  const addRenderable = ({ action, condition, name }) => {
+    if (legacy) {
+      pushRuleWithSingleAction({ action, condition, name });
+    } else {
+      if (condition && condition !== 'true') {
+        ruleConditionParts.add(condition);
+      }
+      pushActionToSharedRule(action);
+    }
+  };
+
+  const recursiveBuild = ({ tree }) => {
     if (!tree) {
       return;
     }
 
     Object.keys(tree).forEach((key) => {
       const subTree = tree[key];
-      if (!subTree.score) {
+      if (!subTree?.score) {
         return;
       }
+
       const scorePRV = prvsMap[subTree.score.id];
-      const scoreRule = DeepCopy(FEEDBACK_RULE_TEMPLATE);
-      const scoreAction = DeepCopy(FEEDBACK_ACTION_TEMPLATE);
-
-      scoreRule.id = uidPool.shift();
-      scoreAction.id = uidPool.shift();
-
       const scoreFO = subTree.score.attributeValues.find(
         (av) => av.attribute.id === FEEDBACK_ORDER
-      ).value;
+      )?.value;
 
-      scoreRule.name = `PR - Feedback - ${
-        new Array(4 - feedbackIndex.toString().length + 1).join('0') +
-        feedbackIndex
-      } - CS${scoreFO}`;
-      scoreRule.program.id = programId;
-      scoreRule.programRuleActions[0].id = scoreAction.id;
-      scoreRule.condition = `d2:hasValue(#{${scorePRV.name}})`;
-      scoreRule.priority = 10 + feedbackIndex - 1;
-      feedbackIndex++;
+      const scoreCondition = hasValueCondition(scorePRV?.name);
 
-      scoreAction.programRule.id = scoreRule.id;
-      const padding = new Array(scoreFO.split('.').length).join('‎ ‎ ');
-      scoreAction.programRuleActionType = 'DISPLAYKEYVALUEPAIR';
-      //console.log(`${padding} ${scoreFO}. ${subTree.score.formName}`);
-      scoreAction.content = `${padding} ${scoreFO}. ${subTree.score.formName.replaceAll(
-        /'/g,
-        '’'
-      )}`;
-      scoreAction.data = `d2:concatenate(#{${scorePRV.name}},'%')`;
+      addRenderable({
+        name: `PR - Feedback - Score - ${scoreFO ?? key}`,
+        condition: scoreCondition,
+        action: makeKVP({
+          content: `${getTitleSize(scoreFO)} ${scoreFO}. ${safeText(
+            subTree.score.formName
+          )}`,
+          data: `d2:concatenate(#{${scorePRV?.name}},'%')`,
+          ...(legacy ? {} : { legend: VISUALIZATIONS_LEGEND }),
+        }),
+      });
 
-      programRules.push(scoreRule);
-      programRuleActions.push(scoreAction);
-
-      recursiveBuild({ tree: subTree, prvsMap, programId, uidPool });
+      recursiveBuild({ tree: subTree });
 
       if (subTree?.content?.length > 0) {
-        subTree.content.forEach((question) => {
+        subTree.content.forEach((question, index) => {
           const prv = prvsMap[question.id];
-          const rule = DeepCopy(FEEDBACK_RULE_TEMPLATE);
-          const action = DeepCopy(FEEDBACK_ACTION_TEMPLATE);
+          const questionCondition = hasValueCondition(prv?.name);
 
-          rule.id = uidPool.shift();
-          action.id = uidPool.shift();
-
-          rule.name = `PR - Feedback - ${
-            new Array(4 - feedbackIndex.toString().length + 1).join('0') +
-            feedbackIndex
-          } - ${question.code}`;
-          rule.program.id = programId;
-          rule.programRuleActions[0].id = action.id;
-          rule.condition = `d2:hasValue(#{${prv.name}})`;
-          rule.priority = 10 + feedbackIndex - 1;
-          feedbackIndex++;
-
-          action.programRule.id = rule.id;
-          const paddingQuestions = new Array(
-            scoreFO.split('.').length + 1
-          ).join('‎ ‎ ');
-          //console.log(`${paddingQuestions} Q: ${question.formName}`);
-          action.content = `${paddingQuestions} Q: ${question.formName.replaceAll(
-            /'/g,
-            '’'
-          )}`;
+          addRenderable({
+            name: `PR - Feedback - Question - ${question.id || index}`,
+            condition: questionCondition,
+            action: makeKVP({
+              content: `${safeText(`${question.formName}`)}`,
+              data: `#{${prv?.name}}`,
+            }),
+          });
 
           const questionFeedbackText = question.attributeValues.find(
-            (av) => av.attribute.id === 'yhKEe6BLEer'
+            (av) => av.attribute.id === FEEDBACK_TEXT
           )?.value;
+
           if (questionFeedbackText) {
-            const ruleF = DeepCopy(FEEDBACK_RULE_TEMPLATE);
-            const actionF = DeepCopy(FEEDBACK_ACTION_TEMPLATE);
+            const preparedFeedback = safeText(
+              `*Feedback*\\n${questionFeedbackText}`
+            );
 
-            ruleF.id = uidPool.shift();
-            actionF.id = uidPool.shift();
-
-            ruleF.name = `PR - Feedback - ${
-              new Array(4 - feedbackIndex.toString().length + 1).join('0') +
-              feedbackIndex
-            } - ${question.code}F`;
-            ruleF.program.id = programId;
-            ruleF.programRuleActions[0].id = actionF.id;
-            ruleF.condition = `d2:hasValue(#{${prv.name}}) && #{${prv.name}}==0`;
-            ruleF.priority = 10 + feedbackIndex - 1;
-            feedbackIndex++;
-
-            actionF.programRule.id = ruleF.id;
-            const paddingFeedback = new Array(
-              scoreFO.split('.').length + 2
-            ).join('‎ ‎ ');
-            //console.log(`${paddingFeedback} F: ${questionFeedbackText}`);
-            actionF.content = `${paddingFeedback} F: ${questionFeedbackText}`;
-
-            programRules.push(ruleF);
-            programRuleActions.push(actionF);
+            addRenderable({
+              name: `PR - Feedback - Text - ${question.id || index}`,
+              condition: questionCondition,
+              action: makeText({
+                data: `d2:condition('#{${prv?.name}} == 0', '${preparedFeedback}', '')`,
+              }),
+            });
           }
-
-          programRules.push(rule);
-          programRuleActions.push(action);
         });
       }
     });
   };
 
-  recursiveBuild({ tree, prvsMap, programId, uidPool });
+  recursiveBuild({ tree });
 
-  console.log('DEBUG', { programRules, programRuleActions });
+  if (!legacy) {
+    sharedRule.condition =
+      ruleConditionParts.size > 0
+        ? [...ruleConditionParts].join(' || ')
+        : 'true';
+
+    programRules.push(sharedRule);
+  }
 
   return { programRules, programRuleActions };
 };

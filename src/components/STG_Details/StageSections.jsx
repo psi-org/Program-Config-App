@@ -698,7 +698,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     if (isNaN(n) || n < 50) {
       n = 10;
     }
-    n = n * 2; // Doubled to handle new HNQIS Feedback Rules
+    n = n * 4; // Quadrupled to handle new HNQIS Feedback Rules and zero scores (x2)
 
     idsQuery.refetch({ n }).then((data) => {
       if (data) {
