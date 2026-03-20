@@ -4,6 +4,7 @@ import DownIcon from '@mui/icons-material/ArrowDownward';
 import UpIcon from '@mui/icons-material/ArrowUpward';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SegmentIcon from '@mui/icons-material/Segment';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Tooltip } from '@mui/material';
@@ -22,7 +23,6 @@ import BadgeWarnings from '../UIElements/BadgeWarnings.jsx';
 import ValidationMessages from '../UIElements/ValidationMessages.jsx';
 import contracted_bottom_svg from './../../images/i-contracted-bottom_black.svg';
 import expanded_bottom_svg from './../../images/i-expanded-bottom_black.svg';
-import move_vert_svg from './../../images/i-more_vert_black.svg';
 import DraggableDataElement from './DataElement.jsx';
 
 const DraggableSection = ({
@@ -172,9 +172,7 @@ const DraggableSection = ({
             </div>
             <div className="ml_item-cta">
               {isSectionMode && !readOnly && (
-                <img
-                  src={move_vert_svg}
-                  alt="menu"
+                <MoreVertIcon
                   id={'menu' + stageSection.id}
                   onClick={() => {
                     setRef(document.getElementById('menu' + stageSection.id));

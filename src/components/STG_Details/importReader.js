@@ -26,19 +26,21 @@ export const readTemplateData = ({
   const ignoredSections = [];
   const importedSections = [];
   const importedScores = [];
+
   const dataElementsPool =
     currentSectionsData
       ?.map((section) => section.dataElements)
       .flat()
-      .reduce((acu, cur) => {
-        acu[cur.id] = {
-          sharing: cur.sharing,
-          attributeValues: cur.attributeValues,
-          style: cur.style,
-          categoryCombo: cur.categoryCombo,
-        };
+      .reduce((acu, curr) => {
+        acu[curr.id] = curr;
         return acu;
       }, {}) || [];
+
+  const sectionsPool =
+    currentSectionsData?.reduce((acu, curr) => {
+      acu[curr.id] = curr;
+      return acu;
+    }, {}) || [];
 
   const dataElementsName = isHNQIS ? 'questions' : 'dataElements';
 
@@ -47,12 +49,9 @@ export const readTemplateData = ({
   templateData.forEach((row, rowNum) => {
     switch (row[templateMap.structure]) {
       case 'Section':
-        if (
+        isBasicForm =
           row[templateMap.programSection] === 'basic-form' &&
-          sectionIndex === -1
-        ) {
-          isBasicForm = true;
-        }
+          sectionIndex === -1;
         if (isBasicForm && importedSections.length > 0) {
           ignoredSections.push({
             name: row[templateMap.formName],
@@ -68,18 +67,24 @@ export const readTemplateData = ({
         ) {
           break;
         }
-        importedSections[sectionIndex] = {
-          id: row[templateMap.programSection] || undefined,
-          name: row[templateMap.formName],
-          displayName: row[templateMap.formName],
-          sortOrder: sectionIndex,
-          dataElements: [],
-          importStatus: row[templateMap.programSection] ? 'update' : 'new',
-          isBasicForm,
-        };
+
+        importedSections[sectionIndex] =
+          sectionsPool[row[templateMap.programSection]] || {};
+        importedSections[sectionIndex].id = row[templateMap.programSection];
+        importedSections[sectionIndex].name = row[templateMap.formName];
+        importedSections[sectionIndex].displayName = row[templateMap.formName];
+        importedSections[sectionIndex].sortOrder = sectionIndex;
+        importedSections[sectionIndex].dataElements = [];
+        importedSections[sectionIndex].importStatus = row[
+          templateMap.programSection
+        ]
+          ? 'update'
+          : 'new';
+        importedSections[sectionIndex].isBasicForm = isBasicForm;
         row[templateMap.programSection]
           ? importSummaryValues.sections.updated++
           : importSummaryValues.sections.new++;
+
         break;
       case 'Data Element':
         if (sectionIndex === -1) {

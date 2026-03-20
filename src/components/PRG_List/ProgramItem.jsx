@@ -12,6 +12,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
 import LockIcon from '@mui/icons-material/Lock';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 import NewReleasesIcon from '@mui/icons-material/NewReleases';
 import PublicIcon from '@mui/icons-material/Public';
@@ -36,7 +37,6 @@ import {
 } from '../../configs/Constants.jsx';
 import actionCreators from '../../state/action-creators/index.js';
 import { versionIsValid, versionGTE } from '../../utils/Utils.jsx';
-import move_vert_svg from './../../images/i-more_vert_black.svg';
 import ProgramNew from './ProgramNew.jsx';
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
@@ -285,10 +285,8 @@ const ProgramItem = ({
           </div>
         </div>
         <div className="ml_item-cta">
-          <img
-            src={move_vert_svg}
+          <MoreVertIcon
             id={'menu' + program.id}
-            alt="menu"
             onClick={() => {
               setRef(document.getElementById('menu' + program.id));
               toggle();

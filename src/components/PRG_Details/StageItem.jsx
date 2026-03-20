@@ -2,6 +2,7 @@ import { FlyoutMenu, MenuItem, Popper, Layer } from '@dhis2/ui';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Tooltip } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import PropTypes from 'prop-types';
@@ -13,7 +14,6 @@ import { tagStyle } from '../../configs/Constants.jsx';
 import actionCreators from '../../state/action-creators/index.js';
 import BadgeErrors from '../UIElements/BadgeErrors.jsx';
 import ValidationMessages from '../UIElements/ValidationMessages.jsx';
-import move_vert_svg from './../../images/i-more_vert_black.svg';
 import StageNew from './StageNew.jsx';
 
 const StageItem = ({
@@ -136,10 +136,8 @@ const StageItem = ({
       </div>
       <div className="ml_item-cta">
         {!hnqisMode && !eventMode && (
-          <img
-            src={move_vert_svg}
+          <MoreVertIcon
             id={'menu' + stage.id}
-            alt="menu"
             onClick={() => {
               setRef(document.getElementById('menu' + stage.id));
               toggle();

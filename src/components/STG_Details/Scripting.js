@@ -1094,8 +1094,6 @@ export const buildFeedbackRules = ({
       })
     : null;
 
-  const ruleConditionParts = new Set();
-
   const pushActionToSharedRule = (action) => {
     action.id = uidPool.shift();
     action.programRule.id = sharedRule.id;
@@ -1109,9 +1107,6 @@ export const buildFeedbackRules = ({
     if (legacy) {
       pushRuleWithSingleAction({ action, condition, name });
     } else {
-      if (condition && condition !== 'true') {
-        ruleConditionParts.add(condition);
-      }
       pushActionToSharedRule(action);
     }
   };
@@ -1187,11 +1182,7 @@ export const buildFeedbackRules = ({
   recursiveBuild({ tree });
 
   if (!legacy) {
-    sharedRule.condition =
-      ruleConditionParts.size > 0
-        ? [...ruleConditionParts].join(' || ')
-        : 'true';
-
+    sharedRule.condition = 'true';
     programRules.push(sharedRule);
   }
 

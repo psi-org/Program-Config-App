@@ -540,7 +540,8 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     });
   };
 
-  const [deManager, setDeManager] = useState(false);
+  // <{ index: number; section: string; stage: string; sectionName: string } | null>
+  const [deManager, setDeManager] = useState(null);
 
   const DEActions = {
     deToEdit,
