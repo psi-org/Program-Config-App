@@ -31,16 +31,16 @@ import {
 } from '../../configs/Constants.jsx';
 import { formatAlert, versionGTE } from '../../utils/Utils.jsx';
 import OunitScreen from '../Org_Units/OunitScreen.jsx';
-import BackupScreen from './BackupScreen.jsx';
-import RestoreScreen from './RestoreScreen.jsx';
 import SharingScreen from '../Sharing/SharingScreen.jsx';
-import About from './About.jsx';
+import About from './About';
+import BackupScreen from './BackupScreen.jsx';
 import DependencyExport from './DependencyExport.jsx';
 import H2Convert from './H2Convert.jsx';
 import H2Metadata from './H2Metadata.jsx';
 import H2Transfer from './H2Transfer.jsx';
 import ProgramItem from './ProgramItem.jsx';
 import ProgramNew from './ProgramNew.jsx';
+import RestoreScreen from './RestoreScreen.jsx';
 
 const queryProgramType = {
   results: {
