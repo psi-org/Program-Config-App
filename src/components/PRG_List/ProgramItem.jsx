@@ -37,7 +37,7 @@ import {
 } from '../../configs/Constants.jsx';
 import actionCreators from '../../state/action-creators/index.js';
 import { versionIsValid, versionGTE } from '../../utils/Utils.jsx';
-import ProgramNew from './ProgramNew.jsx';
+import ProgramNew from './ProgramNew/ProgramNew';
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
 

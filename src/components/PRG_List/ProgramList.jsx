@@ -39,7 +39,7 @@ import H2Convert from './H2Convert.jsx';
 import H2Metadata from './H2Metadata.jsx';
 import H2Transfer from './H2Transfer.jsx';
 import ProgramItem from './ProgramItem.jsx';
-import ProgramNew from './ProgramNew.jsx';
+import ProgramNew from './ProgramNew';
 import RestoreScreen from './RestoreScreen.jsx';
 
 const queryProgramType = {

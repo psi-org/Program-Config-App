@@ -1,5 +1,5 @@
 import React from 'react';
-import { coerce, gte, lte, satisfies } from 'semver';
+import { coerce, satisfies } from 'semver';
 import { METADATA } from '../configs/Constants.jsx';
 
 export function splitPosition(position) {

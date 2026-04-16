@@ -5,7 +5,7 @@ import type { DataDimensionType } from './DataDimensionType';
 import type { Sharing } from './Sharing';
 
 export interface CategoryCombo extends BaseMetadataObject {
-  id?: number;
+  id?: string;
   code?: string;
   name?: string;
   categories?: Category[];
