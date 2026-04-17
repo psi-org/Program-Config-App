@@ -7,6 +7,7 @@ import {
   METADATA,
   MIN_NAME_LENGTH,
 } from '../../../configs/Constants';
+import { isHnqisProgramType } from '../../../utils/Utils';
 import type {
   H2SettingRef,
   ProgramAttributeValue,
@@ -23,6 +24,8 @@ import type {
 export const stepsLimit: Record<ProgramType, number> = {
   '': 0,
   hnqis: 1,
+  hnqis2: 1,
+  hnqis3: 1,
   tracker: 2,
   event: 1,
 };
@@ -162,8 +165,9 @@ export const validateProgramForm = ({
     errors.programTET = 'This field is required';
   }
 
-  const hnqisValidated =
-    pgrTypePCA === 'hnqis' ? Boolean(h2Ref?.handleFormValidation()) : true;
+  const hnqisValidated = isHnqisProgramType(pgrTypePCA)
+    ? Boolean(h2Ref?.handleFormValidation())
+    : true;
 
   return {
     basicValidated,
@@ -193,7 +197,7 @@ export const createOrUpdateMetaData = ({
       unknown
     >;
 
-    if (programType === 'hnqis') {
+    if (isHnqisProgramType(programType)) {
       const h1Program = value.h1Program;
       value = getH2Metadata(h2Ref);
       value.h1Program = h1Program;
@@ -205,7 +209,7 @@ export const createOrUpdateMetaData = ({
     return;
   }
 
-  const value = programType === 'hnqis' ? getH2Metadata(h2Ref) : {};
+  const value = isHnqisProgramType(programType) ? getH2Metadata(h2Ref) : {};
   const payload = {
     ...value,
     saveVersion: import.meta.env.DHIS2_APP_VERSION,

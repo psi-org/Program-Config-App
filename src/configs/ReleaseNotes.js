@@ -34,6 +34,11 @@ export const ReleaseNotes = [
     description:
       '- Updated some Conditional Formatting Rules related to Label Data Elements.',
   },
+  {
+    version: 'v1.6',
+    date: '2026-05-01',
+    description: '- Template now references HNQIS Framework.',
+  },
 ];
 
 // EXCEL TEMPLATE RELEASE NOTES

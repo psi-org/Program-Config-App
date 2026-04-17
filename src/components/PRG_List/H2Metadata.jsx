@@ -110,7 +110,7 @@ const H2Metadata = (props) => {
         onClose={() => props.setH2Modal(false)}
       >
         <strong>
-          <em>HNQIS 2.0 Status</em>
+          <em>HNQIS Framework Status</em>
         </strong>
       </CustomMUIDialogTitle>
       <DialogContent
@@ -123,7 +123,7 @@ const H2Metadata = (props) => {
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5em' }}>
-          <h3>HNQIS 2.0 Metadata Details</h3>
+          <h3>HNQIS Framework Metadata Details</h3>
           <div>
             <strong>Latest Metadata Package Version: </strong>
             {H2_METADATA_VERSION}
@@ -145,8 +145,8 @@ const H2Metadata = (props) => {
               >
                 <WarningIcon />
                 <em>
-                  The HNQIS 2.0 metadata package is required in order to enable
-                  HNQIS features
+                  The HNQIS Framework metadata package is required in order to
+                  enable HNQIS features
                 </em>
               </div>
             )}
@@ -186,14 +186,16 @@ const H2Metadata = (props) => {
         </div>
         {success && (
           <NoticeBox title="Installation Completed">
-            <p>The HNQIS 2.0 Metadata Package was installed successfully.</p>
+            <p>
+              The HNQIS Framework Metadata Package was installed successfully.
+            </p>
           </NoticeBox>
         )}
         {error && (
           <NoticeBox error={true} title="Install Error">
             <p>
-              The HNQIS 2.0 Metadata Package could not be installed due to the
-              following errors:
+              The HNQIS Framework Metadata Package could not be installed due to
+              the following errors:
             </p>
             <div style={{ marginTop: '1em' }}>{parseErrorsUL(error)}</div>
           </NoticeBox>
@@ -214,7 +216,7 @@ const H2Metadata = (props) => {
               href="https://psi.atlassian.net/wiki/spaces/HNQIS/overview?homepageId=36536495"
               startIcon={<DescriptionIcon />}
             >
-              Check the HNQIS 2.0 documentation
+              Check the HNQIS Framework documentation
             </Button>
           </span>
         </div>

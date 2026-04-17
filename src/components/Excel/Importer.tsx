@@ -106,6 +106,7 @@ type CurrentStagesData = {
 enum ProgramTypesEnum {
   TRACKER = 'Tracker Program',
   HNQIS2 = 'HNQIS2',
+  HNQIS3 = 'HNQIS3',
   EVENT = 'Event Program',
 }
 

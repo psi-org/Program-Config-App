@@ -497,3 +497,22 @@ export const padValue = (value, format) => {
 export const mapIdArray = (arr) => {
   return arr.map((elem) => ({ id: elem.id }));
 };
+
+export const isHnqisProgramType = (type) =>
+  ['hnqis', 'hnqis2', 'hnqis3'].includes(type);
+
+export const hnqisTypes = {
+  HNQIS2: 'hnqis2',
+  HNQIS3: 'hnqis3',
+};
+
+export const getHnqisType = (type) => hnqisTypes[type];
+
+export const isHnqisPCAType = (type) => Object.keys(hnqisTypes).includes(type);
+
+export const getHnqisPCAType = (type) => {
+  const invertedHnqisTypes = Object.fromEntries(
+    Object.entries(hnqisTypes).map(([key, value]) => [value, key])
+  );
+  return invertedHnqisTypes[type];
+};

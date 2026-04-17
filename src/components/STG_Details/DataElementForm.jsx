@@ -688,8 +688,9 @@ const DataElementForm = ({
             The Aggregation Type will define the way the information is grouped
             in analytics.
             <br />
-            If the current program is a HNQIS2 program, this value will be
-            inferred depending on the Value Type selected and cannot be changed.
+            If the current program is a HNQIS Framework program, this value will
+            be inferred depending on the Value Type selected and cannot be
+            changed.
           </p>
         }
         margin="0 0 0 0.5em"
@@ -822,9 +823,9 @@ const DataElementForm = ({
                   automatically to match the Option Set.
                   <br />
                   <br />
-                  If the current program is a HNQIS2 program, only Option Sets
-                  that include &lsquo;HNQIS&lsquo; in the name will be
-                  displayed.
+                  If the current program is a HNQIS Framework program, only
+                  Option Sets that include &lsquo;HNQIS&lsquo; in the name will
+                  be displayed.
                 </p>
               }
             />
@@ -1096,8 +1097,9 @@ const DataElementForm = ({
                 data entry and information display of any kind.
                 <br />
                 <br />
-                If the current program is a HNQIS2 program, only Legend Sets
-                that include &lsquo;HNQIS&lsquo; in the name will be displayed.
+                If the current program is a HNQIS Framework program, only Legend
+                Sets that include &lsquo;HNQIS&lsquo; in the name will be
+                displayed.
               </p>
             }
             margin="0 0 0 0.5em"

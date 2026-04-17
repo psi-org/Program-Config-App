@@ -1,7 +1,13 @@
 import { CategoryCombo } from '../../../types';
 import { TrackedEntityAttribute } from '../../../../.d2/shell/src/D2App/components/Excel/Importer';
 
-export type ProgramType = '' | 'hnqis' | 'tracker' | 'event';
+export type ProgramType =
+  | ''
+  | 'hnqis'
+  | 'hnqis2'
+  | 'hnqis3'
+  | 'tracker'
+  | 'event';
 
 export interface SelectOption {
   label: string;

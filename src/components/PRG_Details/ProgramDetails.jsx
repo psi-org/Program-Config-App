@@ -32,6 +32,7 @@ import {
   formatAlert,
   getPCAMetadataDE,
   getProgramQuery,
+  isHnqisPCAType,
   mapIdArray,
   padValue,
   setPCAMetadata,
@@ -276,8 +277,8 @@ const ProgramDetails = () => {
     );
   }
 
-  const hnqisMode = !!data.results.attributeValues.find(
-    (av) => av.value === 'HNQIS2'
+  const hnqisMode = !!data.results.attributeValues.find((av) =>
+    isHnqisPCAType(av.value)
   );
   const readOnly = !!data.results.attributeValues.find(
     (av) => av.value === 'HNQIS'
@@ -286,10 +287,13 @@ const ProgramDetails = () => {
   if (hnqisMode && !h2Ready) {
     return (
       <div style={{ margin: '2em' }}>
-        <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
+        <NoticeBox
+          title="HNQIS Framework Metadata is missing or out of date"
+          error
+        >
           <span>
             First go to the <Link to="/">Home Screen</Link> and Install the
-            latest HNQIS 2.0 Metadata to continue.
+            latest HNQIS Framework Metadata to continue.
           </span>
         </NoticeBox>
       </div>
@@ -507,10 +511,10 @@ const ProgramDetails = () => {
   ) {
     return (
       <>
-        <NoticeBox title="Check HNQIS2 Metadata" error>
+        <NoticeBox title="Check HNQIS Framework Metadata" error>
           <p>
-            The latest PCA Metadata Package is required to access this HNQIS2
-            Program.
+            The latest PCA Metadata Package is required to access this HNQIS
+            Framework Program.
           </p>
         </NoticeBox>
       </>

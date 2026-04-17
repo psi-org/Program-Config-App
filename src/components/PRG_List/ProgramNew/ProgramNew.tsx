@@ -29,7 +29,12 @@ import {
   PSS_Scores,
 } from '../../../configs/ProgramTemplate';
 import { CategoryCombo } from '../../../types';
-import { parseErrorsJoin, truncateString } from '../../../utils/Utils';
+import {
+  parseErrorsJoin,
+  truncateString,
+  isHnqisProgramType,
+  getHnqisPCAType,
+} from '../../../utils/Utils';
 import InputModal from '../../PRG_Details/InputModal';
 import CustomMUIDialog from '../../UIElements/CustomMUIDialog';
 import CustomMUIDialogTitle from '../../UIElements/CustomMUIDialogTitle';
@@ -352,7 +357,7 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
 
     setPgrTypePCA(value);
 
-    if (value === 'hnqis') {
+    if (isHnqisProgramType(value)) {
       setButtonDisabled(false);
       const hnqisTET = trackedEntityTypes.find(
         (tet) => tet.id === ASSESSMENT_TET
@@ -490,10 +495,9 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
       return;
     }
 
-    const useCompetency =
-      pgrTypePCA === 'hnqis'
-        ? getH2Metadata(h2SettingsRef.current).useCompetencyClass === 'Yes'
-        : undefined;
+    const useCompetency = isHnqisProgramType(pgrTypePCA)
+      ? getH2Metadata(h2SettingsRef.current).useCompetencyClass === 'Yes'
+      : undefined;
 
     const prefixResult = (await checkForExistingPrefix({
       dePrefix,
@@ -534,7 +538,7 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
     }
     prgrm.style = Object.keys(style).length ? style : undefined;
 
-    if (pgrTypePCA === 'hnqis') {
+    if (isHnqisProgramType(pgrTypePCA)) {
       let assessmentStage: any;
       let actionPlanStage: any;
       let criticalSteps: any;
@@ -545,7 +549,7 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
       if (!props.data) {
         Object.assign(prgrm, HnqisProgramConfigs);
         prgrm.attributeValues.push({
-          value: 'HNQIS2',
+          value: getHnqisPCAType(pgrTypePCA),
           attribute: { id: prgTypeId ?? '' },
         });
         prgrm.programStages.push({ id: assessmentId });
@@ -870,13 +874,13 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
             </Slide>
 
             <Slide
-              in={pgrTypePCA === 'hnqis' && activeStep === 1}
+              in={isHnqisProgramType(pgrTypePCA) && activeStep === 1}
               direction={activeStep > previousStep ? 'left' : 'right'}
             >
               <div
                 style={{
                   display:
-                    pgrTypePCA === 'hnqis' && activeStep === 1
+                    isHnqisProgramType(pgrTypePCA) && activeStep === 1
                       ? 'inherit'
                       : 'none',
                 }}

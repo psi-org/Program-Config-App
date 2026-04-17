@@ -227,6 +227,7 @@ export const RENDER_TYPES = [
 
 export const TEMPLATE_PROGRAM_TYPES = {
   hnqis2: 'HNQIS2',
+  hnqis3: 'HNQIS3',
   tracker: 'Tracker Program',
   event: 'Event Program',
 };

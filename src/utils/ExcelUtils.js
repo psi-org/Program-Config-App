@@ -257,7 +257,7 @@ export const addReleaseNotes = async (ws, releaseNotes, password) => {
 };
 
 export const addCreator = (wb) => {
-  wb.creator = 'KnowTechTure Ltd';
+  wb.creator = 'BAO Systems';
   wb.created = new Date();
 };
 

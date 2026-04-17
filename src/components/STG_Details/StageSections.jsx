@@ -1388,10 +1388,10 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
   ) {
     return (
       <>
-        <NoticeBox title="Check HNQIS2 Metadata" error>
+        <NoticeBox title="Check HNQIS Framework Metadata" error>
           <p>
-            The latest PCA Metadata Package is required to access this HNQIS2
-            Program.
+            The latest PCA Metadata Package is required to access this HNQIS
+            Framework Program.
           </p>
         </NoticeBox>
       </>
@@ -1623,7 +1623,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
           <DialogContent dividers style={{ padding: '1em 2em' }}>
             <p>
               Your User does not have the authorities required by the Android
-              Settings App to enable In-app Analytics for HNQIS 2.0.
+              Settings App to enable In-app Analytics for HNQIS Framework.
             </p>
             <p style={{ margin: '1em 0' }}>
               You are still able to Set Up the program, however, the Android App

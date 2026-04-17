@@ -35,7 +35,7 @@ const MIN_VERSION = '2.41.x';
 const MAX_VERSION = '2.43.x';
 
 const PCA_METADATA_VERSION = '1.2.1';
-const H2_METADATA_VERSION = '2.0.0';
+const H2_METADATA_VERSION = '2.0.1';
 
 const REQUIRED_H2_PROGRAM_BUILD_VERSION = '2.0.6';
 
@@ -518,7 +518,7 @@ const EXPORT_PRESETS = [
 ];
 
 const EXPORT_HNQIS_PRESETS = [
-  { value: 'h2External', label: 'HNQIS2-Enabled Server' },
+  { value: 'h2External', label: 'HNQIS-Enabled Server' },
 ];
 
 const H2_ENABLED_IMPORT_REMOVE_KEYS = [

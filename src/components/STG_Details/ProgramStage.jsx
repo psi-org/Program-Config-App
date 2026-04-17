@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import actionCreators from '../../state/action-creators/index.js';
-import { DeepCopy } from '../../utils/Utils.jsx';
+import { DeepCopy, isHnqisPCAType } from '../../utils/Utils.jsx';
 import StageSections from './StageSections.jsx';
 
 const query = {
@@ -95,8 +95,8 @@ const ProgramStage = () => {
   }
 
   if (data) {
-    const hnqisMode = !!data.results.program.attributeValues.find(
-      (av) => av.value === 'HNQIS2'
+    const hnqisMode = !!data.results.program.attributeValues.find((av) =>
+      isHnqisPCAType(av.value)
     );
     const readOnly = !!data.results.program.attributeValues.find(
       (av) => av.value === 'HNQIS'
@@ -105,10 +105,13 @@ const ProgramStage = () => {
     if (hnqisMode && !h2Ready) {
       return (
         <div style={{ margin: '2em' }}>
-          <NoticeBox title="HNQIS 2.0 Metadata is missing or out of date" error>
+          <NoticeBox
+            title="HNQIS Framework Metadata is missing or out of date"
+            error
+          >
             <span>
               First go to the <Link to="/">Home Screen</Link> and Install the
-              latest HNQIS 2.0 Metadata to continue.
+              latest HNQIS Framework Metadata to continue.
             </span>
           </NoticeBox>
         </div>

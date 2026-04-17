@@ -1,5 +1,6 @@
 import { Step, StepLabel, Stepper } from '@mui/material';
 import React from 'react';
+import { isHnqisProgramType } from '../../../../utils/Utils';
 import type { ProgramNewStepperProps } from '../programNew.types';
 
 const clickableStepSx = { cursor: 'pointer' } as const;
@@ -18,10 +19,10 @@ const ProgramNewStepper: React.FC<ProgramNewStepperProps> = ({
       </StepLabel>
     </Step>
 
-    {pgrTypePCA === 'hnqis' && (
+    {isHnqisProgramType(pgrTypePCA) && (
       <Step sx={clickableStepSx}>
         <StepLabel error={!hnqisValidated} onClick={() => onStepChange(1)}>
-          HNQIS2 Settings
+          HNQIS Framework Settings
         </StepLabel>
       </Step>
     )}

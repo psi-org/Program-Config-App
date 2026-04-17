@@ -311,7 +311,7 @@ const ProgramList = () => {
                     }}
                   />
                   <MenuItem
-                    label="HNQIS 2.0 Status"
+                    label="HNQIS Framework Status"
                     icon={<InstallDesktopIcon />}
                     onClick={() => {
                       setSettingsMenu(false);

@@ -107,10 +107,10 @@ const Exporter = (props) => {
     editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
 
     editingCell = buildCellObject(ws, 'B2');
-    editingCell.cell.value = 'HNQIS 2.0 CONFIGURATION TEMPLATE';
+    editingCell.cell.value = 'HNQIS FRAMEWORK CONFIGURATION TEMPLATE';
     editingCell.cell.style = { font: { size: 12, bold: true } };
     ws.getCell('B4').value =
-      'By using this Template, you will be able to configure the structure of the HNQIS2 checklist. Before you continue working, make sure you understand how to work with the tools integrated into this spreadsheet.';
+      'By using this Template, you will be able to configure the structure of the HNQIS Framework checklist. Before you continue working, make sure you understand how to work with the tools integrated into this spreadsheet.';
     ws.getCell('B5').value = `You're currently working with version ${
       ReleaseNotes.at(-1).version
     } of this Template, please refer to the 'Release Notes' tab to check the latest features.`;
@@ -121,7 +121,7 @@ const Exporter = (props) => {
     editingCell.cell.style = { font: { size: 12, bold: true } };
     fillBackgroundToRange(ws, editingCell.ref, '6fa8dc');
     ws.getCell('B8').value =
-      'The following settings will be used to configure the checklist as HNQIS 2.0 compatible Tracker Program';
+      'The following settings will be used to configure the checklist as HNQIS Framework compatible Tracker Program';
     ws.getCell('B9').value =
       'Please Note: Some fields are filled automatically when the template is downloaded from the server.';
 

@@ -34,6 +34,7 @@ import {
   DeepCopy,
   changeAttributeValue,
   getJSONKeyTree,
+  isHnqisPCAType,
   removeKey,
 } from '../../utils/Utils.jsx';
 import SelectOptions from '../UIElements/SelectOptions.jsx';
@@ -446,7 +447,9 @@ const DependencyExport = ({ program, programType, setExportProgramId }) => {
                         useError={false}
                         defaultOption={false}
                         items={EXPORT_PRESETS.concat(
-                          programType === 'HNQIS2' ? EXPORT_HNQIS_PRESETS : []
+                          isHnqisPCAType(programType)
+                            ? EXPORT_HNQIS_PRESETS
+                            : []
                         )}
                         handler={selectPreset}
                         value={selectedPreset}

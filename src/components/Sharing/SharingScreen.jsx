@@ -46,6 +46,8 @@ import {
   parseErrorsJoin,
   parseErrorsUL,
   truncateString,
+  isHnqisProgramType,
+  isHnqisPCAType,
 } from '../../utils/Utils.jsx';
 import ObjectSharing from './ObjectSharing.js';
 import SharingItem from './SharingItem.jsx';
@@ -174,7 +176,9 @@ const SharingScreen = ({
   const [entity, setEntity] = useState({});
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
-  const [selectedIndex, setSelectedIndex] = useState(type === 'hnqis' ? 2 : 0);
+  const [selectedIndex, setSelectedIndex] = useState(
+    isHnqisProgramType(type) ? 2 : 0
+  );
   const [content, setContent] = useState('form');
   const [overwrite, setOverwrite] = useState(false);
   const [deleted, setDeleted] = useState([]);
@@ -489,7 +493,7 @@ const SharingScreen = ({
         })[0]?.value || 'Tracker'
       : 'Tracker';
 
-    if (programType === 'HNQIS2') {
+    if (isHnqisPCAType(programType)) {
       addHNQISElement4Sharing();
       if (hnqisElements.length > 0) {
         setAdditionalElements([...hnqisElements]);

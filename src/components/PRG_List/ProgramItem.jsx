@@ -36,7 +36,12 @@ import {
   REQUIRED_H2_PROGRAM_BUILD_VERSION,
 } from '../../configs/Constants.jsx';
 import actionCreators from '../../state/action-creators/index.js';
-import { versionIsValid, versionGTE } from '../../utils/Utils.jsx';
+import {
+  versionIsValid,
+  versionGTE,
+  getHnqisType,
+  isHnqisPCAType,
+} from '../../utils/Utils.jsx';
 import ProgramNew from './ProgramNew/ProgramNew';
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
@@ -82,6 +87,7 @@ const ProgramItem = ({
       '{}'
   );
   const typeTag = {
+    HNQIS3: { color: '#2300c0', text: 'HNQIS 3.0' },
     HNQIS2: { color: '#03a9f4', text: 'HNQIS 2.0' },
     HNQIS: { color: '#00deff', text: 'HNQIS 1.X' },
     RDQA: { color: '#00acc1', text: 'RDQA' },
@@ -102,7 +108,7 @@ const ProgramItem = ({
   const id = openPop ? 'simple-popover' : undefined;
 
   const isEnabled = () => {
-    if (programType === 'HNQIS2' && !h2Valid) {
+    if (isHnqisPCAType(programType) && !h2Valid) {
       return false;
     }
     return true;
@@ -119,7 +125,7 @@ const ProgramItem = ({
   };
 
   const requiredUpgradeBadge =
-    programType === 'HNQIS2' &&
+    isHnqisPCAType(programType) &&
     pcaMetadata.buildVersion &&
     !versionGTE(pcaMetadata.buildVersion, REQUIRED_H2_PROGRAM_BUILD_VERSION) ? (
       <Tooltip
@@ -212,9 +218,9 @@ const ProgramItem = ({
         </div>
 
         <div className="ml_item-desc">
-          {programType === 'HNQIS2' && !isEnabled() && (
+          {isHnqisPCAType(programType) && !isEnabled() && (
             <Tooltip
-              title={`This HNQIS2 Program cannot be accessed as it requires the latest HNQIS2 Metadata Package. Go to Settings > HNQIS 2.0 Status for more information.`}
+              title={`This HNQIS Framework Program cannot be accessed as it requires the latest HNQIS Framework Metadata Package. Go to Settings > HNQIS Framework Status for more information.`}
             >
               <LockIcon style={{ marginRight: '0.3em', cursor: 'pointer' }} />
             </Tooltip>
@@ -231,7 +237,7 @@ const ProgramItem = ({
                 title={`This Program's logic was built in version ${
                   pcaMetadata.buildVersion
                 }, please ${
-                  programType === 'HNQIS2'
+                  isHnqisPCAType(programType)
                     ? "'Set Up Program'"
                     : "'Build Program Rules'"
                 } again to update it.`}
@@ -313,7 +319,7 @@ const ProgramItem = ({
                         toggle();
                         shareProgram(
                           program.id,
-                          programType === 'HNQIS2' ? 'hnqis' : 'tracker'
+                          getHnqisType(programType) || 'tracker'
                         );
                       }}
                     />
@@ -375,8 +381,8 @@ const ProgramItem = ({
                       <MenuItem
                         label={
                           pcaMetadata.h2Reworked !== 'Yes'
-                            ? 'Convert to HNQIS 2.0 Program'
-                            : 'Already Converted to HNQIS 2.0'
+                            ? 'Convert to Modern HNQIS Program'
+                            : 'Already Converted to Modern HNQIS'
                         }
                         disabled={pcaMetadata.h2Reworked === 'Yes'}
                         icon={<UpgradeIcon />}
@@ -388,7 +394,7 @@ const ProgramItem = ({
                     )}
                     {pcaMetadata.dataConverted !== 'Yes' && h2Ready && (
                       <MenuItem
-                        label={'Transfer Assessment Data to HNQIS 2.0'}
+                        label={'Transfer Assessment Data to Modern HNQIS'}
                         disabled={pcaMetadata.h2Reworked !== 'Yes'}
                         icon={<MoveDownIcon />}
                         onClick={() => {
@@ -420,8 +426,8 @@ const ProgramItem = ({
               doSearch={doSearch}
               data={program}
               programType={
-                programType === 'HNQIS2'
-                  ? 'hnqis'
+                isHnqisPCAType(programType)
+                  ? getHnqisType(programType)
                   : program.withoutRegistration
                   ? 'event'
                   : 'tracker'
