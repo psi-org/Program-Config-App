@@ -591,7 +591,7 @@ const H2Transfer = ({
           } else {
             failedEvents.push({
               id: eventReq.event,
-              msg: 'Failed to convert Assessment to HNQIS 2.0.',
+              msg: 'Failed to convert Assessment to Modern HNQIS.',
             });
             setProgressValue(index + 1);
           }
@@ -610,7 +610,7 @@ const H2Transfer = ({
         doSearch(programConfig.name);
         if (!cancelTransfer.current) {
           setNotification({
-            message: 'HNQIS 1.X Program Data transferred to HNQIS 2.0',
+            message: 'HNQIS 1.X Program Data transferred to Modern HNQIS',
             severity: 'success',
           });
         } else {
@@ -631,7 +631,7 @@ const H2Transfer = ({
           id="customized-dialog-title"
           onClose={() => hideForm()}
         >
-          Transfer all HNQIS 1.X Data to HNQIS 2.0
+          Transfer all HNQIS 1.X Data to Modern HNQIS
         </CustomMUIDialogTitle>
         <DialogContent
           dividers
@@ -746,7 +746,7 @@ const H2Transfer = ({
         open={dialogStatus}
         title={'Are you sure you want to begin the Data Transfer process?'}
         content={
-          'All the original Assessment Data will be copied and modified to fit the new HNQIS 2.0 structure.'
+          'All the original Assessment Data will be copied and modified to fit the new Modern HNQIS structure.'
         }
         primaryText={'Yes, continue'}
         secondaryText={'Cancel'}

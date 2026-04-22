@@ -2,7 +2,7 @@
   "name": "program_configuration",
   "title": "Program Configuration",
   "author": "KnowTechTure SL",
-  "version": "3.0.0",
+  "version": "3.0.0-alpha",
   "description": "Tracker Programs management tool",
   "license": "CC-BY-4.0",
   "private": true,
@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@dhis2/app-runtime": "^3.2.9",
+    "@dhis2/data-engine": "^3.17.0",
     "@dhis2/ui": "^10.11.0",
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",

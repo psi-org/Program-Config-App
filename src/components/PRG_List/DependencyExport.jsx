@@ -37,9 +37,9 @@ import {
   isHnqisPCAType,
   removeKey,
 } from '../../utils/Utils.jsx';
-import SelectOptions from '../UIElements/SelectOptions.jsx';
 import CustomMUIDialog from '../UIElements/CustomMUIDialog.js';
 import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.jsx';
+import SelectOptions from '../UIElements/SelectOptions.jsx';
 
 const queryLegends = {
   results: {

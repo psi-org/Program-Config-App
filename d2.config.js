@@ -6,7 +6,7 @@ const config = {
   entryPoints: {
     app: './src/App.jsx',
   },
-  minDHIS2Version: '2.40',
+  minDHIS2Version: '2.41',
   maxDHIS2Version: '2.43',
 };
 

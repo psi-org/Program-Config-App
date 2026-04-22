@@ -688,7 +688,7 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
     const androidSettingsAmount = 1;
 
     let n =
-      sections.reduce((prev, acu) => prev + acu.dataElements.length, 10) * 3 + //Tripled to create Program Rule Variables
+      sections.reduce((prev, acu) => prev + acu.dataElements.length, 10) * 10 + // x10 to create Program Rule objects
       (scoresSection?.dataElements?.length || 10) * 2 + //Doubled to create Program Rule Variables
       (criticalSection?.dataElements?.length || 10) * 5 +
       programIndicatorsAmount +
