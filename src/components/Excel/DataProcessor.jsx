@@ -1,6 +1,6 @@
 import { useDataQuery } from '@dhis2/app-runtime';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import {
   COMPETENCY_CLASS,
   CRITICAL_STEPS,
@@ -79,12 +79,12 @@ const DataProcessor = (props) => {
 
   const [isDownloaded, setIsDownloaded] = useState(false);
   const [exportFlag, setExportFlag] = useState(true);
+  const [configures, setConfigures] = useState(undefined);
   const { data: data } = useDataQuery(optionSetQuery);
   const { data: haData } = useDataQuery(healthAreasQuery);
   const { data: lsData } = useDataQuery(legendSetsQuery);
   const { data: progData } = useDataQuery(programsQuery);
 
-  const Configures = [];
   let optionData = [];
   let healthAreaData = [];
   let legendSetData = [];
@@ -118,19 +118,20 @@ const DataProcessor = (props) => {
     });
   }
 
-  const initialize = () => {
+  const initialize = async () => {
     if (typeof programStage.program !== 'undefined') {
-      compile_report();
+      await compile_report();
     }
-    setTimeout(function () {
-      setIsDownloaded(true);
-    }, 2000);
   };
 
-  const compile_report = () => {
+  const compile_report = async () => {
+    const Configures = [];
     const program_stage_id = programStage.id;
 
-    programStage.programStageSections.forEach((programSection) => {
+    const refetchProgramStage = await props.stageRefetch();
+    const updatedStage = refetchProgramStage?.results;
+
+    updatedStage.programStageSections.forEach((programSection) => {
       const criticalStepsDataElements = [
         COMPETENCY_CLASS,
         CRITICAL_STEPS,
@@ -158,26 +159,16 @@ const DataProcessor = (props) => {
       programSection.dataElements.forEach((dataElement) => {
         const row = {};
 
-        row.form_name = dataElement.formName?.replaceAll(' [C]', '') || '';
-        row.value_type =
-          typeof dataElement.valueType !== 'undefined'
-            ? dataElement.valueType
-            : undefined;
-        row.optionSet =
-          typeof dataElement.optionSet !== 'undefined'
-            ? dataElement.optionSet.name
-            : undefined;
-        row.legend =
-          typeof dataElement.legendSet !== 'undefined'
-            ? dataElement.legendSet.name
-            : undefined;
-        row.description = dataElement.description;
-
+        row.form_name = dataElement?.formName?.replaceAll(' [C]', '') || '';
+        row.value_type = dataElement?.valueType;
+        row.optionSet = dataElement?.optionSet?.name;
+        row.legend = dataElement?.legendSet?.name;
+        row.description = dataElement?.description;
         row.program_stage_id = program_stage_id;
         row.program_section_id = program_section_id;
-        row.data_element_id = dataElement.id;
+        row.data_element_id = dataElement?.id;
 
-        const metaDataString = dataElement.attributeValues.filter(
+        const metaDataString = dataElement?.attributeValues.filter(
           (av) => av.attribute.id === METADATA
         );
         const metaData =
@@ -188,24 +179,14 @@ const DataProcessor = (props) => {
         if (row.structure == 'label') {
           row.form_name = metaData.labelFormName || '';
         }
-        row.score_numerator =
-          typeof metaData.scoreNum !== 'undefined'
-            ? metaData.scoreNum
-            : undefined;
-        row.score_denominator =
-          typeof metaData.scoreDen !== 'undefined'
-            ? metaData.scoreDen
-            : undefined;
-        row.parent_question =
-          typeof metaData.parentQuestion !== 'undefined'
-            ? getVarNameFromParentUid(metaData.parentQuestion, programStage)
-            : undefined;
-        row.answer_value =
-          typeof metaData.parentValue !== 'undefined'
-            ? getPureValue(metaData.parentValue)
-            : undefined;
+        row.score_numerator = metaData?.scoreNum;
+        row.score_denominator = metaData?.scoreDen;
+        row.parent_question = metaData?.parentQuestion
+          ? getVarNameFromParentUid(metaData.parentQuestion, updatedStage)
+          : undefined;
+        row.answer_value = getPureValue(metaData?.parentValue);
         row.isCompulsory =
-          typeof metaData.isCompulsory !== 'undefined' &&
+          typeof metaData?.isCompulsory !== 'undefined' &&
           row.structure != 'score'
             ? metaData.isCompulsory
             : undefined;
@@ -231,18 +212,26 @@ const DataProcessor = (props) => {
         Configures.push(row);
       });
     });
+
+    setConfigures(Configures);
+    setTimeout(function () {
+      setIsDownloaded(true);
+    }, 2000);
   };
 
-  initialize();
+  useEffect(() => {
+    initialize();
+  }, []);
 
   return (
     <>
-      {isDownloaded && exportFlag && (
+      {isDownloaded && exportFlag && configures && (
         <Exporter
+          programType={props.programType}
           programName={props.programName}
           flag={exportFlag}
           setFlag={setExportFlag}
-          Configures={Configures}
+          Configures={configures}
           optionData={optionData}
           healthAreaData={healthAreaData}
           legendSetData={legendSetData}
@@ -262,7 +251,9 @@ DataProcessor.propTypes = {
   isLoading: PropTypes.func,
   programName: PropTypes.string,
   programStageSections: PropTypes.array,
+  programType: PropTypes.string,
   ps: PropTypes.object,
+  stageRefetch: PropTypes.func,
 };
 
 export default DataProcessor;

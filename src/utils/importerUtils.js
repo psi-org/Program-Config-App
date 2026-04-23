@@ -20,6 +20,7 @@ import {
   getKeyByValue,
   getObjectByProperty,
   getObjectIdByProperty,
+  hnqisTypes,
 } from './Utils.jsx';
 
 export const isTracker = (importType) =>
@@ -150,21 +151,20 @@ export const workbookValidation = (
     }
   });
 
-  const templateIsHNQIS =
-    instructionsWS.getCell(HQNIS2_PROGRAM_TYPE_CELL).value ===
-    TEMPLATE_PROGRAM_TYPES.hnqis2;
+  const templateIsHNQIS = Object.keys(hnqisTypes).includes(
+    instructionsWS.getCell(HQNIS2_PROGRAM_TYPE_CELL).value
+  );
   const templateTracker = getKeyByValue(
     TEMPLATE_PROGRAM_TYPES,
     instructionsWS.getCell(TRACKER_PROGRAM_TYPE_CELL).value
   );
   const templateType =
     templateIsHNQIS || !templateTracker
-      ? TEMPLATE_PROGRAM_TYPES.hnqis2
+      ? instructionsWS.getCell(HQNIS2_PROGRAM_TYPE_CELL).value
       : instructionsWS.getCell(TRACKER_PROGRAM_TYPE_CELL).value;
 
   if (
-    (templateIsHNQIS &&
-      programSpecificType !== TEMPLATE_PROGRAM_TYPES.hnqis2) ||
+    (templateIsHNQIS && templateType !== programSpecificType) ||
     (!templateIsHNQIS &&
       programSpecificType !== TEMPLATE_PROGRAM_TYPES[templateTracker])
   ) {

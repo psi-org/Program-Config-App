@@ -322,63 +322,71 @@ const ProgramList = () => {
               </Popper>
             </Layer>
           )}
-          {exportProgramId && (
-            <DependencyExport
-              program={exportProgramId.id}
-              programType={exportProgramId.type}
-              setExportProgramId={setExportProgramId}
-            />
-          )}
-          {sharingProgramId && (
-            <SharingScreen
-              element="program"
-              id={sharingProgramId}
-              setSharingProgramId={setSharingProgramId}
-              type={sharingProgramType}
-              setType={setSharingProgramType}
-              readOnly={readOnlyPermission}
-              setNotification={setNotification}
-            />
-          )}
-          {orgUnitProgram && (
-            <OunitScreen
-              id={orgUnitProgram.program}
-              readOnly={orgUnitProgram.readOnly}
-              setOrgUnitProgram={setOrgUnitProgram}
-              setNotification={setNotification}
-            />
-          )}
-          {backupProgramId && (
-            <BackupScreen
-              program={backupProgramId}
-              setBackupProgramId={setBackupProgramId}
-              setNotification={setNotification}
-            />
-          )}
-          {conversionH2ProgramId && (
-            <H2Convert
-              program={conversionH2ProgramId}
-              setConversionH2ProgramId={setConversionH2ProgramId}
-              setNotification={setNotification}
-              doSearch={doSearch}
-            />
-          )}
-          {transferH2Program && (
-            <H2Transfer
-              programConfig={transferH2Program}
-              setTransferH2Program={setTransferH2Program}
-              setNotification={setNotification}
-              doSearch={doSearch}
-            />
-          )}
-          {restoreProgramId && (
-            <RestoreScreen
-              program={restoreProgramId}
-              setRestoreProgramId={setRestoreProgramId}
-              setNotification={setNotification}
-            />
-          )}
         </div>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
+        }}
+      >
+        {exportProgramId && (
+          <DependencyExport
+            program={exportProgramId.id}
+            programType={exportProgramId.type}
+            setExportProgramId={setExportProgramId}
+          />
+        )}
+        {sharingProgramId && (
+          <SharingScreen
+            element="program"
+            id={sharingProgramId}
+            setSharingProgramId={setSharingProgramId}
+            type={sharingProgramType}
+            setType={setSharingProgramType}
+            readOnly={readOnlyPermission}
+            setNotification={setNotification}
+          />
+        )}
+        {orgUnitProgram && (
+          <OunitScreen
+            id={orgUnitProgram.program}
+            readOnly={orgUnitProgram.readOnly}
+            setOrgUnitProgram={setOrgUnitProgram}
+            setNotification={setNotification}
+          />
+        )}
+        {backupProgramId && (
+          <BackupScreen
+            program={backupProgramId}
+            setBackupProgramId={setBackupProgramId}
+            setNotification={setNotification}
+          />
+        )}
+        {conversionH2ProgramId && (
+          <H2Convert
+            program={conversionH2ProgramId}
+            setConversionH2ProgramId={setConversionH2ProgramId}
+            setNotification={setNotification}
+            doSearch={doSearch}
+          />
+        )}
+        {transferH2Program && (
+          <H2Transfer
+            programConfig={transferH2Program}
+            setTransferH2Program={setTransferH2Program}
+            setNotification={setNotification}
+            doSearch={doSearch}
+          />
+        )}
+        {restoreProgramId && (
+          <RestoreScreen
+            program={restoreProgramId}
+            setRestoreProgramId={setRestoreProgramId}
+            setNotification={setNotification}
+          />
+        )}
       </div>
       <div>
         <div className="title" style={{ padding: '1.5em 1em 0' }}>
@@ -432,7 +440,6 @@ const ProgramList = () => {
           />
         </div>
       </div>
-
       <div className="wrapper" style={{ padding: '1em  1.2em 0' }}>
         <div className="layout_prgms_stages">
           {data.results?.programs?.length === 0 && (

@@ -44,12 +44,13 @@ import {
   H2_METADATA_VERSION,
   METADATA,
   NAMESPACE,
+  PCA_PROGRAM_TYPE_ATTRIBUTE,
 } from '../../configs/Constants.jsx';
-import { TEMPLATE_PROGRAM_TYPES } from '../../configs/TemplateConstants.js';
 import {
   DeepCopy,
   buildBasicFormStage,
   extractMetadataPermissions,
+  getAttributeValue,
   getProgramQuery,
   mapIdArray,
   truncateString,
@@ -249,7 +250,7 @@ const queryHNQIS2Metadata = {
 
 const optionsSetUp = ['SET UP PROGRAM', 'ENABLE IN-APP ANALYTICS'];
 
-const StageSections = ({ programStage, hnqisMode, readOnly }) => {
+const StageSections = ({ programStage, stageRefetch, hnqisMode, readOnly }) => {
   const programId = programStage.program.id;
 
   const queryDataStore = {
@@ -1536,7 +1537,10 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
           displayForm={setImporterEnabled}
           setImportResults={setImportResults}
           setValidationResults={setValidationResults}
-          programSpecificType={TEMPLATE_PROGRAM_TYPES.hnqis2}
+          programSpecificType={getAttributeValue(
+            programStage.program.attributeValues,
+            PCA_PROGRAM_TYPE_ATTRIBUTE
+          )}
           previous={{
             sections: [...backupData.sections],
             setSections,
@@ -1580,8 +1584,13 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
       </div>
       {hnqisMode && exportToExcel && (
         <DataProcessor
+          programType={getAttributeValue(
+            programStage.program.attributeValues,
+            PCA_PROGRAM_TYPE_ATTRIBUTE
+          )}
           programName={programStage.program.name}
           ps={programStage}
+          stageRefetch={stageRefetch}
           isLoading={setExportToExcel}
         />
       )}
@@ -1795,12 +1804,6 @@ const StageSections = ({ programStage, hnqisMode, readOnly }) => {
               <NoticeBox error title="Error deleting old metadata">
                 {deleteError.message} (Error Type: {deleteError.type})
               </NoticeBox>
-            )}
-            {console.log(
-              'DEBUG',
-              progressSteps,
-              createMetadata.loading,
-              createMetadata.error
             )}
             {progressSteps > 5 && !programSettingsError && (
               <div className="progressItem">
@@ -2083,6 +2086,7 @@ StageSections.propTypes = {
   hnqisMode: PropTypes.bool,
   programStage: PropTypes.object,
   readOnly: PropTypes.bool,
+  stageRefetch: PropTypes.func,
 };
 
 export default StageSections;

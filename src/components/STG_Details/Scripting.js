@@ -1163,7 +1163,7 @@ export const buildFeedbackRules = ({
 
           if (questionFeedbackText) {
             const preparedFeedback = safeText(
-              `*Feedback*\\n${questionFeedbackText}`
+              `###### *Feedback*\\n${questionFeedbackText}`
             );
 
             addRenderable({

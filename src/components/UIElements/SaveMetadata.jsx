@@ -543,7 +543,6 @@ const SaveMetadata = (props) => {
   useEffect(() => {
     setImportFlag(props.fromImport);
     getProgramPayload({ id: props.programId }).then((payload) => {
-      console.log('Program Payload for Save', payload);
       setProgramPayload(payload?.results);
       setProgramPayloadBackup(payload?.results);
     });

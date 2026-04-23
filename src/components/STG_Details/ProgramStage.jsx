@@ -5,8 +5,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import actionCreators from '../../state/action-creators/index.js';
-import { DeepCopy, isHnqisPCAType } from '../../utils/Utils.jsx';
+import {
+  DeepCopy,
+  getAttributeValue,
+  isHnqisPCAType,
+} from '../../utils/Utils.jsx';
 import StageSections from './StageSections.jsx';
+import { PCA_PROGRAM_TYPE_ATTRIBUTE } from '../../configs/Constants.jsx';
 
 const query = {
   results: {
@@ -50,7 +55,7 @@ const query = {
         'notificationTemplates',
         'sharing',
         'programStageDataElements[:all,dataElement[:all,optionSet[id,name],legendSet[id,name],legendSets],sortOrder,style,categoryCombo,allowFutureDate,allowProvidedElsewhere,skipSynchronization,renderType]',
-        'programStageSections[:all,dataElements[:all]]',
+        'programStageSections[:all,dataElements[:all,optionSet[id,name],legendSet[id,name]]]',
       ],
     },
   },
@@ -95,9 +100,13 @@ const ProgramStage = () => {
   }
 
   if (data) {
-    const hnqisMode = !!data.results.program.attributeValues.find((av) =>
-      isHnqisPCAType(av.value)
+    const hnqisMode = !!isHnqisPCAType(
+      getAttributeValue(
+        data.results.program.attributeValues,
+        PCA_PROGRAM_TYPE_ATTRIBUTE
+      )
     );
+
     const readOnly = !!data.results.program.attributeValues.find(
       (av) => av.value === 'HNQIS'
     );

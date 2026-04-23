@@ -70,7 +70,7 @@ const queryProgramMetadata = {
 
 const queryProgramEvent = {
   results: {
-    resource: 'events',
+    resource: 'tracker/events',
     params: ({ program, eventId }) => ({
       event: eventId,
       program,
@@ -91,7 +91,7 @@ const queryProgramEvent = {
 
 const queryEventList = {
   results: {
-    resource: 'events',
+    resource: 'tracker/events',
     params: ({ program }) => ({
       program,
       fields: ['event', 'orgUnit'],
@@ -102,7 +102,7 @@ const queryEventList = {
 };
 
 const metadataMutation = {
-  resource: 'trackedEntityInstances',
+  resource: 'tracker/trackedEntityInstances',
   type: 'create',
   data: ({ data }) => data,
 };

@@ -12,7 +12,7 @@ const DraggableDataElement = ({
   section,
   sectionType,
   index,
-  hnqisType,
+  hnqisMode,
   deStatus,
   isSectionMode,
   readOnly,
@@ -52,7 +52,7 @@ const DraggableDataElement = ({
               section={section}
               sectionType={sectionType}
               index={index}
-              hnqisType={hnqisType}
+              hnqisMode={hnqisMode}
               deStatus={deStatus}
               isSectionMode={isSectionMode}
               readOnly={readOnly}
@@ -70,7 +70,7 @@ DraggableDataElement.propTypes = {
   dataElement: PropTypes.object,
   dePrefix: PropTypes.string,
   deStatus: PropTypes.object,
-  hnqisType: PropTypes.string,
+  hnqisMode: PropTypes.string,
   index: PropTypes.number,
   isSectionMode: PropTypes.bool,
   program: PropTypes.string,

@@ -164,7 +164,7 @@ const Exporter = (props) => {
     editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
     editingCell = buildCellObject(ws, 'D14:D16');
     editingCell.merge();
-    editingCell.cell.value = 'HNQIS2';
+    editingCell.cell.value = props.programType;
     editingCell.cell.style = { font: { color: { argb: 'FFFFFFFF' } } };
     fillBackgroundToRange(ws, 'C12:C16', 'cfe2f3');
 

@@ -21,8 +21,8 @@ import BadgeWarnings from '../UIElements/BadgeWarnings.jsx';
 import ValidationMessages from '../UIElements/ValidationMessages.jsx';
 import DataElementForm from './DataElementForm.jsx';
 
-const getDEIcon = (elemType: string, hnqisType: boolean) => {
-  if (!hnqisType) {
+const getDEIcon = (elemType: string, hnqisMode: boolean) => {
+  if (!hnqisMode) {
     return <DEIcon />;
   }
 
@@ -66,7 +66,7 @@ interface DataElementItemProps {
   DEActions: DEActionsProps;
   section: string;
   index: number;
-  hnqisType: boolean;
+  hnqisMode: boolean;
   deStatus?: DEStatus;
   isSectionMode: boolean;
   readOnly: boolean;
@@ -81,7 +81,7 @@ const DataElementItem = ({
   DEActions,
   section,
   index,
-  hnqisType,
+  hnqisMode,
   deStatus,
   isSectionMode,
   readOnly,
@@ -145,7 +145,7 @@ const DataElementItem = ({
           className="ml_item-icon"
           style={{ display: 'flex', alignItems: 'center' }}
         >
-          {getDEIcon(metadata.elemType, hnqisType)}
+          {getDEIcon(metadata.elemType, hnqisMode)}
         </div>
         <div className="ml_item-title" style={{ maxWidth: '80vw' }}>
           {deImportStatus}
@@ -286,7 +286,7 @@ const DataElementItem = ({
           section={section}
           setDeToEdit={DEActions.setEdit}
           save={DEActions.update}
-          hnqisMode={hnqisType}
+          hnqisMode={hnqisMode}
           setSaveStatus={setSaveStatus}
         />
       )}
