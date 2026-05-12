@@ -207,7 +207,9 @@ const DataProcessor = (props) => {
           (av) => av.attribute.id === FEEDBACK_TEXT
         );
         row.feedback_text =
-          feedbackText.length > 0 ? feedbackText[0].value : undefined;
+          feedbackText.length > 0
+            ? feedbackText[0].value.replaceAll('\\n', '\n')
+            : undefined;
 
         Configures.push(row);
       });

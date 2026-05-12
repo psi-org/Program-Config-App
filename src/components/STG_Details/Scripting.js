@@ -63,24 +63,20 @@ export const buildFeedbackTree = (dataElements, programRuleVariables) => {
   }, {});
 
   const scoreDEs = dataElements
-    .filter(
-      (de) =>
-        JSON.parse(
-          de.attributeValues.find((av) => av.attribute.id === METADATA)
-            ?.value || '{}'
-        ).elemType === 'score'
-    )
-    .sort((a, b) => {
-      const foA = a.attributeValues
-        .find((av) => av.attribute.id === FEEDBACK_ORDER)
-        ?.value?.split('.');
-      a.scoreLayout = foA;
-      const foB = b.attributeValues
-        .find((av) => av.attribute.id === FEEDBACK_ORDER)
-        ?.value?.split('.');
-      b.scoreLayout = foB;
-      return foA.length >= foB.length ? 1 : -1;
-    });
+    .filter((de) => {
+      const meta = de.attributeValues.find(
+        (av) => av.attribute.id === METADATA
+      );
+      return JSON.parse(meta?.value || '{}').elemType === 'score';
+    })
+    .map((de) => {
+      const fo =
+        de.attributeValues
+          .find((av) => av.attribute.id === FEEDBACK_ORDER)
+          ?.value?.split('.') ?? [];
+      return { ...de, scoreLayout: fo };
+    })
+    .sort((a, b) => a.scoreLayout.length - b.scoreLayout.length);
 
   const feedbackTree = {};
 
@@ -398,7 +394,7 @@ const buildCriticalScore = ({ branch, stageId, programId, uidPool }) => {
     program: { id: programId },
     //programStage : {id : stageId},
     condition: 'true',
-    priority: 1,
+    priority: 100001,
     programRuleActions: [{ id: actionId }],
   };
 
@@ -423,6 +419,7 @@ const buildCriticalScore = ({ branch, stageId, programId, uidPool }) => {
     programStage: { id: stageId },
     condition: `d2:hasValue(#{_CV_CriticalQuestions})`,
     programRuleActions: [{ id: actionId }],
+    priority: 100002,
   };
 
   data = `#{_CV_CriticalQuestions}`;
@@ -470,7 +467,7 @@ const buildNonCriticalScore = ({ branch, stageId, programId, uidPool }) => {
     program: { id: programId },
     //programStage : {id : stageId},
     condition: 'true',
-    priority: 1,
+    priority: 100001,
     programRuleActions: [{ id: actionId }],
   };
 
@@ -496,6 +493,7 @@ const buildNonCriticalScore = ({ branch, stageId, programId, uidPool }) => {
     programStage: { id: stageId },
     condition: `d2:hasValue(#{_CV_NonCriticalQuestions})`,
     programRuleActions: [{ id: actionId }],
+    priority: 100002,
   };
 
   const pra_s2 = {
@@ -530,6 +528,7 @@ const buildCompetencyRules = (programId, stageId, uidPool) => {
           dataElement: { id: 'NAaHST5ZDTE' },
         },
       ],
+      priority: 100003,
     },
     {
       name: "PR - Assign Competency - 'Competent'",
@@ -543,6 +542,7 @@ const buildCompetencyRules = (programId, stageId, uidPool) => {
           dataElement: { id: 'NAaHST5ZDTE' },
         },
       ],
+      priority: 100003,
     },
     {
       name: "PR - Assign Competency - 'Not Competent'",
@@ -557,6 +557,7 @@ const buildCompetencyRules = (programId, stageId, uidPool) => {
           dataElement: { id: 'NAaHST5ZDTE' },
         },
       ],
+      priority: 100003,
     },
   ];
 
@@ -1051,7 +1052,7 @@ export const buildFeedbackRules = ({
   let renderPriority = 1;
 
   const safeText = (s) =>
-    (s ?? '').replaceAll(/'/g, '’').replaceAll(/\n/g, '\\n\\n');
+    (s ?? '').replaceAll(/'/g, '’').replaceAll(/\n/g, '\\n');
 
   const hasValueCondition = (prvName) =>
     prvName ? `d2:hasValue(#{${prvName}})` : 'true';
@@ -1157,13 +1158,17 @@ export const buildFeedbackRules = ({
             }),
           });
 
-          const questionFeedbackText = question.attributeValues.find(
-            (av) => av.attribute.id === FEEDBACK_TEXT
-          )?.value;
+          const questionFeedbackText =
+            question.attributeValues.find(
+              (av) => av.attribute.id === FEEDBACK_TEXT
+            )?.value || '';
 
           if (questionFeedbackText) {
             const preparedFeedback = safeText(
-              `###### *Feedback*\\n${questionFeedbackText}`
+              `###### *Feedback*\\n${questionFeedbackText.replaceAll(
+                '\\n',
+                '\n'
+              )}`
             );
 
             addRenderable({

@@ -346,7 +346,7 @@ export const getPCAMetadataDE = (dataElement) => {
 };
 
 export const getAttributeValue = (attributeValues, targetAttribute) => {
-  return attributeValues.find(
+  return attributeValues?.find(
     (attributeValue) => attributeValue.attribute.id === targetAttribute
   )?.value;
 };
@@ -357,15 +357,17 @@ export const getDataElementQuery = () =>
 export const getStageDataElementsQuery = () =>
   `categoryCombo,compulsory,dataElement[${getDataElementQuery()}],displayInReports,id,name,programStage,sortOrder,style,allowFutureDate,allowProvidedElsewhere,skipSynchronization,renderType`;
 
-export const getProgramStagesQuery = () => {
+export const getProgramStagesQuery = (includeProgram = false) => {
   const stageDataElementsQuery = getStageDataElementsQuery();
   const stageSectionsQuery = `dataElements[${getDataElementQuery()}],displayName,id,name,sortOrder,translations`;
-  return `name,created,lastUpdated,translations,externalAccess,publicAccess,createdBy,userGroupAccesses,userAccesses,access,favorites,lastUpdatedBy,sharing,description,displayDescription,minDaysFromStart,program[id,name],programStageDataElements[${stageDataElementsQuery}],standardInterval,executionDateLabel,dueDateLabel,autoGenerateEvent,validationStrategy,displayGenerateEventBox,featureType,blockEntryForm,preGenerateUID,style[color,icon],remindCompleted,generatedByEnrollmentDate,allowGenerateNextVisit,openAfterEnrollment,reportDateToUse,sortOrder,periodType,hideDueDate,enableUserAssignment,referral,formType,displayExecutionDateLabel,displayDueDateLabel,displayFormName,displayName,user,favorite,id,attributeValues,repeatable,programStageSections[${stageSectionsQuery}],notificationTemplates`;
+  return `name,created,lastUpdated,translations,externalAccess,publicAccess,createdBy,userGroupAccesses,userAccesses,access,favorites,lastUpdatedBy,sharing,description,displayDescription,minDaysFromStart,program[${
+    includeProgram ? ':all' : 'id,name'
+  }],programStageDataElements[${stageDataElementsQuery}],standardInterval,executionDateLabel,dueDateLabel,autoGenerateEvent,validationStrategy,displayGenerateEventBox,featureType,blockEntryForm,preGenerateUID,style[color,icon],remindCompleted,generatedByEnrollmentDate,allowGenerateNextVisit,openAfterEnrollment,reportDateToUse,sortOrder,periodType,hideDueDate,enableUserAssignment,referral,formType,displayExecutionDateLabel,displayDueDateLabel,displayFormName,displayName,user,favorite,id,attributeValues,repeatable,programStageSections[${stageSectionsQuery}],notificationTemplates`;
 };
 
 export const getProgramQuery = (deepQuery = true) => {
   const stagesQuery = deepQuery
-    ? `programStages[${getProgramStagesQuery()}]`
+    ? `programStages[${getProgramStagesQuery(false)}]`
     : 'programStages';
 
   const programTrackedEntityAttributes =
@@ -515,6 +517,8 @@ export const mapIdArray = (arr) => {
 
 export const isHnqisProgramType = (type) =>
   ['hnqis', 'hnqis2', 'hnqis3'].includes(type);
+
+export const isModernHnqisProgramType = (type) => ['hnqis3'].includes(type);
 
 export const hnqisTypes = {
   HNQIS2: 'hnqis2',

@@ -8,9 +8,11 @@ import actionCreators from '../../state/action-creators/index.js';
 import {
   DeepCopy,
   getAttributeValue,
+  getProgramStagesQuery,
   isHnqisPCAType,
 } from '../../utils/Utils.jsx';
-import StageSections from './StageSections.jsx';
+// eslint-disable-next-line import/extensions
+import StageSections from './StageSections';
 import { PCA_PROGRAM_TYPE_ATTRIBUTE } from '../../configs/Constants.jsx';
 
 const query = {
@@ -18,45 +20,7 @@ const query = {
     resource: 'programStages',
     id: ({ programStage }) => programStage,
     params: {
-      fields: [
-        'id',
-        'name',
-        'allowGenerateNextVisit',
-        'publicAccess',
-        'reportDateToUse',
-        'formType',
-        'generatedByEnrollmentDate',
-        'displayFormName',
-        'sortOrder',
-        'hideDueDate',
-        'enableUserAssignment',
-        'minDaysFromStart',
-        'favorite',
-        'executionDateLabel',
-        'preGenerateUID',
-        'displayName',
-        'externalAccess',
-        'openAfterEnrollment',
-        'repeatable',
-        'remindCompleted',
-        'displayGenerateEventBox',
-        'validationStrategy',
-        'autoGenerateEvent',
-        'blockEntryForm',
-        'program[id,name,shortName,attributeValues,withoutRegistration,programStages[id]]',
-        'style',
-        'access',
-        'user',
-        'translations',
-        'userGroupAccesses',
-        'attributeValues',
-        'userAccesses',
-        'favorites',
-        'notificationTemplates',
-        'sharing',
-        'programStageDataElements[:all,dataElement[:all,optionSet[id,name],legendSet[id,name],legendSets],sortOrder,style,categoryCombo,allowFutureDate,allowProvidedElsewhere,skipSynchronization,renderType]',
-        'programStageSections[:all,dataElements[:all,optionSet[id,name],legendSet[id,name]]]',
-      ],
+      fields: getProgramStagesQuery(true),
     },
   },
 };
@@ -102,12 +66,12 @@ const ProgramStage = () => {
   if (data) {
     const hnqisMode = !!isHnqisPCAType(
       getAttributeValue(
-        data.results.program.attributeValues,
+        data.results?.program?.attributeValues,
         PCA_PROGRAM_TYPE_ATTRIBUTE
       )
     );
 
-    const readOnly = !!data.results.program.attributeValues.find(
+    const readOnly = !!data.results?.program?.attributeValues?.find(
       (av) => av.value === 'HNQIS'
     );
 

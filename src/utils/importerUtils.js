@@ -458,9 +458,11 @@ export const mapImportedDEHNQIS2 = ({
     data[HNQIS2_TEMPLATE_MAP.feedbackText] &&
     data[HNQIS2_TEMPLATE_MAP.feedbackText] !== ''
   ) {
-    parsedDE.attributeValues.push(
-      buildAttributeValue(FEEDBACK_TEXT, data[HNQIS2_TEMPLATE_MAP.feedbackText])
+    const feedbackTextAttribute = buildAttributeValue(
+      FEEDBACK_TEXT,
+      data[HNQIS2_TEMPLATE_MAP.feedbackText].replaceAll('\n', '\\n')
     );
+    parsedDE.attributeValues.push(feedbackTextAttribute);
   }
 
   if (data[HNQIS2_TEMPLATE_MAP.parentQuestion] !== '') {
