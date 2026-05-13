@@ -70,7 +70,7 @@ import {
   getProgramFromResponse,
 } from './h2Convert.utils';
 
-const hnqisVersions: Record<
+const HNQIS_VERSIONS: Record<
   string,
   { name: string; shortName: string; tag: string }
 > = {
@@ -346,14 +346,14 @@ const H2Convert = ({
             pcaMetadata.elemType = 'label';
             pcaMetadata.labelFormName = `${dataElement.formName ?? ''}`;
             dataElement.name = `${(dataElement.name ?? '').slice(0, 225)} [${
-              hnqisVersions[hnqisVersion].shortName
+              HNQIS_VERSIONS[hnqisVersion].shortName
             }]`;
             dataElement.shortName = `${(dataElement.shortName ?? '').slice(
               0,
               45
-            )} [${hnqisVersions[hnqisVersion].shortName}]`;
+            )} [${HNQIS_VERSIONS[hnqisVersion].shortName}]`;
             dataElement.code = `${(dataElement.code ?? '').slice(0, 45)} [${
-              hnqisVersions[hnqisVersion].shortName
+              HNQIS_VERSIONS[hnqisVersion].shortName
             }]`;
             dataElement.formName = '   ';
             originalLabelIds.push(dataElement.id);
@@ -465,7 +465,7 @@ const H2Convert = ({
     Object.assign(convertedProgram, HnqisProgramConfigs);
     convertedProgram.attributeValues = [];
     convertedProgram.attributeValues.push({
-      value: hnqisVersions[hnqisVersion].name,
+      value: HNQIS_VERSIONS[hnqisVersion].name,
       attribute: { id: programTypeId },
     });
 
@@ -473,7 +473,7 @@ const H2Convert = ({
     const useCompetency = pcaMetadata?.useCompetencyClass === 'Yes';
     pcaMetadata.h1Program = programDetails.id;
     pcaMetadata.dePrefix = `${(programDetails.shortName ?? '').slice(0, 22)} ${
-      hnqisVersions[hnqisVersion].shortName
+      HNQIS_VERSIONS[hnqisVersion].shortName
     }`;
     convertedProgram.attributeValues.push({
       value: JSON.stringify(pcaMetadata),
@@ -481,17 +481,16 @@ const H2Convert = ({
     });
 
     convertedProgram.id = programId;
-    convertedProgram.name = `${hnqisVersions[hnqisVersion].tag} ${(
+    convertedProgram.name = `${HNQIS_VERSIONS[hnqisVersion].tag} ${(
       programDetails.name ?? ''
     ).slice(0, 221)}`;
-    convertedProgram.shortName = `${hnqisVersions[hnqisVersion].tag} ${(
+    convertedProgram.shortName = `${HNQIS_VERSIONS[hnqisVersion].tag} ${(
       programDetails.shortName ?? ''
     ).slice(0, 41)}`;
     convertedProgram.code = programDetails.code
-      ? `${hnqisVersions[hnqisVersion].tag} ${String(programDetails.code).slice(
-          0,
-          41
-        )}`
+      ? `${HNQIS_VERSIONS[hnqisVersion].tag} ${String(
+          programDetails.code
+        ).slice(0, 41)}`
       : undefined;
     convertedProgram.style = programDetails.style;
     convertedProgram.programStages.push({ id: assessmentId });
@@ -645,7 +644,7 @@ const H2Convert = ({
     if (response.status === 'OK') {
       doSearch(programDetails.name);
       setNotification({
-        message: `The HNQIS 1.X Program has been converted to ${hnqisVersions[hnqisVersion].name} successfully, access it to apply changes and finish the setup.`,
+        message: `The HNQIS 1.X Program has been converted to ${HNQIS_VERSIONS[hnqisVersion].name} successfully, access it to apply changes and finish the setup.`,
         severity: 'success',
       });
       setConversionH2ProgramId(undefined);
@@ -660,7 +659,7 @@ const H2Convert = ({
     <>
       <CustomMUIDialog open maxWidth="md" fullWidth>
         <CustomMUIDialogTitle id="h2-convert-dialog-title" onClose={hideForm}>
-          Convert HNQIS 1.X Program to {hnqisVersions[hnqisVersion].name}
+          Convert HNQIS 1.X Program to {HNQIS_VERSIONS[hnqisVersion].name}
         </CustomMUIDialogTitle>
 
         <DialogContent
@@ -713,7 +712,7 @@ const H2Convert = ({
                     label="HNQIS Version"
                     onChange={(event) => setHnqisVersion(event.target.value)}
                   >
-                    {Object.entries(hnqisVersions).map(([key, version]) => (
+                    {Object.entries(HNQIS_VERSIONS).map(([key, version]) => (
                       <MenuItem key={key} value={key}>
                         {version.name}
                       </MenuItem>
@@ -747,7 +746,7 @@ const H2Convert = ({
               disabled={!programData?.results}
               startIcon={<UpgradeIcon />}
             >
-              Convert to {hnqisVersions[hnqisVersion].name}
+              Convert to {HNQIS_VERSIONS[hnqisVersion].name}
             </Button>
           )}
         </DialogActions>
@@ -755,7 +754,7 @@ const H2Convert = ({
 
       <AlertDialogSlide
         open={confirmationOpen}
-        title={`Are you sure you want to convert this program to ${hnqisVersions[hnqisVersion].name}?`}
+        title={`Are you sure you want to convert this program to ${HNQIS_VERSIONS[hnqisVersion].name}?`}
         content="A new program will be created re-using as many Data Elements as possible and assigning the same Organisation Units and Sharing Settings as the original. The program will not be available for conversion again after the process ends."
         primaryText="Yes, continue"
         secondaryText="Cancel"

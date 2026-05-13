@@ -3,6 +3,7 @@ import {
   DHIS2_VALUE_TYPES_MAP,
   FEEDBACK_ORDER,
   FEEDBACK_TEXT,
+  HNQIS_TYPES,
   MAX_FORM_NAME_LENGTH,
   MAX_SHORT_NAME_LENGTH,
   METADATA,
@@ -20,7 +21,6 @@ import {
   getKeyByValue,
   getObjectByProperty,
   getObjectIdByProperty,
-  hnqisTypes,
 } from './Utils.jsx';
 
 export const isTracker = (importType) =>
@@ -151,7 +151,7 @@ export const workbookValidation = (
     }
   });
 
-  const templateIsHNQIS = Object.keys(hnqisTypes).includes(
+  const templateIsHNQIS = Object.keys(HNQIS_TYPES).includes(
     instructionsWS.getCell(HQNIS2_PROGRAM_TYPE_CELL).value
   );
   const templateTracker = getKeyByValue(

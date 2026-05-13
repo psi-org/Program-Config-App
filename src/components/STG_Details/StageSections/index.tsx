@@ -34,6 +34,7 @@ import {
   FEEDBACK_ORDER,
   GENERATED_OBJECTS_NAMESPACE,
   H2_METADATA_VERSION,
+  HNQIS_TYPES,
   METADATA,
   PCA_PROGRAM_TYPE_ATTRIBUTE,
 } from '../../../configs/Constants';
@@ -43,7 +44,6 @@ import {
   buildBasicFormStage,
   extractMetadataPermissions,
   getAttributeValue,
-  hnqisTypes,
   isModernHnqisProgramType,
   mapIdArray,
   truncateString,
@@ -1012,11 +1012,11 @@ const StageSections = ({
         );
 
         const hnqisProgramType =
-          hnqisTypes[
+          HNQIS_TYPES[
             getAttributeValue(
               programStage.program.attributeValues,
               PCA_PROGRAM_TYPE_ATTRIBUTE
-            ) as keyof typeof hnqisTypes
+            ) as keyof typeof HNQIS_TYPES
           ];
 
         const {

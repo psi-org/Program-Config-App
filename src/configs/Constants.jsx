@@ -664,6 +664,14 @@ const updatedTagStyle = {
   justifyContent: 'center',
 };
 
+const HNQIS_TYPES = {
+  HNQIS2: 'hnqis2',
+  HNQIS3: 'hnqis3',
+};
+
+const HNQIS_VERSIONS = ['hnqis', 'hnqis2', 'hnqis3'];
+const MODERN_HNQIS_INDEX = 2;
+
 export {
   ABOUT_DATE_FORMAT_OPTIONS,
   ACTION_PLAN_ACTION,
@@ -717,6 +725,9 @@ export {
   H2_ATTRIBUTES_TO_KEEP,
   H2_ENABLED_IMPORT_REMOVE_KEYS,
   H2_METADATA_VERSION,
+  HNQIS_TYPES,
+  HNQIS_VERSIONS,
+  MODERN_HNQIS_INDEX,
   H2_REQUIRED,
   HEADER_ATTRIBUTE,
   HEALTH_AREA_ATTRIBUTE,

@@ -9,10 +9,12 @@ import TextField from '@mui/material/TextField';
 import React from 'react';
 import {
   H2_METADATA_VERSION,
+  HNQIS_VERSIONS,
   MAX_PREFIX_LENGTH,
   MAX_PROGRAM_NAME_LENGTH,
   MAX_SHORT_NAME_LENGTH,
 } from '../../../../configs/Constants';
+import { isHnqisProgramType } from '../../../../utils/Utils';
 import StyleManager from '../../../UIElements/StyleManager';
 import type { BasicSettingsStepProps, ProgramType } from '../programNew.types';
 
@@ -57,6 +59,11 @@ const BasicSettingsStep: React.FC<BasicSettingsStepProps> = ({
     !h2Enabled ||
     Number(hnqisMetadataVersion ?? 0) < Number(H2_METADATA_VERSION);
 
+  const lockedHnqisIndex = lockedProgramType
+    ? HNQIS_VERSIONS.indexOf(lockedProgramType)
+    : -1;
+  const isHnqisUpgradeMode = lockedHnqisIndex >= 0;
+
   return (
     <div>
       <div
@@ -76,23 +83,41 @@ const BasicSettingsStep: React.FC<BasicSettingsStepProps> = ({
             labelId="label-prgType"
             id="prgTypePCA"
             value={pgrTypePCA}
-            disabled={lockedProgramType !== undefined}
+            disabled={lockedProgramType !== undefined && !isHnqisUpgradeMode}
             onChange={(event: SelectChangeEvent) =>
               onChangeProgramType(event.target.value as ProgramType)
             }
             label="Program Type (*)"
           >
-            <MenuItem value="">
+            <MenuItem value="" disabled={isHnqisUpgradeMode}>
               <em>None</em>
             </MenuItem>
-            <MenuItem value="tracker">Tracker Program</MenuItem>
-            <MenuItem value="event">Event Program</MenuItem>
-            <MenuItem disabled={hnqisUnavailable} value="hnqis2">
+            <MenuItem value="tracker" disabled={isHnqisUpgradeMode}>
+              Tracker Program
+            </MenuItem>
+            <MenuItem value="event" disabled={isHnqisUpgradeMode}>
+              Event Program
+            </MenuItem>
+            <MenuItem
+              disabled={
+                hnqisUnavailable ||
+                (isHnqisUpgradeMode &&
+                  HNQIS_VERSIONS.indexOf('hnqis2') < lockedHnqisIndex)
+              }
+              value="hnqis2"
+            >
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 HNQIS 2.0 {hnqisUnavailable && <UnavailableIndicator />}
               </span>
             </MenuItem>
-            <MenuItem disabled={hnqisUnavailable} value="hnqis3">
+            <MenuItem
+              disabled={
+                hnqisUnavailable ||
+                (isHnqisUpgradeMode &&
+                  HNQIS_VERSIONS.indexOf('hnqis3') < lockedHnqisIndex)
+              }
+              value="hnqis3"
+            >
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 HNQIS 3.0 {hnqisUnavailable && <UnavailableIndicator />}
               </span>

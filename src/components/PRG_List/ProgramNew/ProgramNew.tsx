@@ -548,10 +548,6 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
 
       if (!props.data) {
         Object.assign(prgrm, HnqisProgramConfigs);
-        prgrm.attributeValues.push({
-          value: getHnqisPCAType(pgrTypePCA),
-          attribute: { id: prgTypeId ?? '' },
-        });
         prgrm.programStages.push({ id: assessmentId });
         prgrm.programStages.push({ id: actionPlanId });
 
@@ -600,6 +596,19 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
           assessmentStage?.programStageDataElements?.filter(
             (elem: any) => !exclusionsDEs.includes(elem.dataElement.id)
           ) ?? [];
+      }
+
+      const existingAttrIdx = prgrm.attributeValues.findIndex(
+        (av: ProgramAttributeValue) => av.attribute?.id === (prgTypeId ?? '')
+      );
+      const newAttrValue = {
+        value: getHnqisPCAType(pgrTypePCA),
+        attribute: { id: prgTypeId ?? '' },
+      };
+      if (existingAttrIdx >= 0) {
+        prgrm.attributeValues[existingAttrIdx] = newAttrValue;
+      } else {
+        prgrm.attributeValues.push(newAttrValue);
       }
 
       prgrm.programTrackedEntityAttributes = cloneDeep(
