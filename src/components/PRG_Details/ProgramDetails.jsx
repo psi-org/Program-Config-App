@@ -1,4 +1,8 @@
-import { useDataMutation, useDataQuery } from '@dhis2/app-runtime';
+import {
+  useDataMutation,
+  useDataEngine,
+  useDataQuery,
+} from '@dhis2/app-runtime';
 import {
   Chip,
   CircularLoader,
@@ -172,11 +176,7 @@ const ProgramDetails = () => {
     data: metadataDM[1].data,
   };
 
-  const deleteMetadata = useDataMutation(deleteMetadataMutation, {
-    onError: (err) => {
-      console.error(err);
-    },
-  })[0];
+  const engine = useDataEngine();
 
   const [showStageForm, setShowStageForm] = useState(false);
   const [notification, setNotification] = useState(undefined);
@@ -203,17 +203,6 @@ const ProgramDetails = () => {
   // ***** DATASTORE ***** //
 
   const { refetch: getDataStore } = useDataQuery(queryDataStore);
-
-  const [dataStoreCreate] = useDataMutation(dsCreateMutation, {
-    onError: (err) => {
-      console.log(err);
-    },
-  });
-  const [dataStoreUpdate] = useDataMutation(dsUpdateMutation, {
-    onError: (err) => {
-      console.log(err);
-    },
-  });
 
   // Get Ids
   const idsQuery = useDataQuery(queryIds, { lazy: true, variables: { n: 0 } });
@@ -443,13 +432,10 @@ const ProgramDetails = () => {
             };
 
             let dataStoreData;
-            let sendToDataStore;
 
             if (!dataStoreResult?.results) {
-              sendToDataStore = dataStoreCreate;
               dataStoreData = {};
             } else {
-              sendToDataStore = dataStoreUpdate;
               dataStoreData = dataStoreResult.results;
             }
 
@@ -479,25 +465,57 @@ const ProgramDetails = () => {
 
             // Setting new UIDs
             dataStoreData = programRefereces;
-            deleteMetadata({ data: oldMetadata }).then((res) => {
-              if (res.status == 'OK') {
+            const sendToDataStoreMutation = !dataStoreResult?.results
+              ? dsCreateMutation
+              : dsUpdateMutation;
+
+            (async () => {
+              // Non-fatal deletion — objects may have been removed externally
+              try {
+                const deleteResp = await engine.mutate(deleteMetadataMutation, {
+                  variables: { data: oldMetadata },
+                });
+                if (deleteResp?.status !== 'OK') {
+                  console.warn(
+                    'Delete metadata returned non-OK (objects may have been already deleted):',
+                    deleteResp
+                  );
+                }
+              } catch (deleteErr) {
+                console.warn(
+                  'Delete metadata failed (objects may have been already deleted):',
+                  deleteErr
+                );
+              }
+
+              try {
                 setProgressSteps(4);
-                createMetadata.mutate({ data: metadata }).then((response) => {
-                  if (response.status == 'OK') {
-                    sendToDataStore({ data: dataStoreData }).then(
-                      (dataStoreResp) => {
-                        if (dataStoreResp.status != 'OK') {
-                          console.error(dataStoreResp);
-                        } else {
-                          setProgressSteps(5);
-                          updateProgramBuildVersion(program, pcaMetadata);
-                        }
-                      }
-                    );
-                  }
+                const response = await engine.mutate(createMutation, {
+                  variables: { data: metadata },
+                });
+                if (response?.status !== 'OK') {
+                  throw response ?? new Error('Metadata import failed');
+                }
+
+                const dataStoreResp = await engine.mutate(
+                  sendToDataStoreMutation,
+                  { variables: { data: dataStoreData } }
+                );
+                if (dataStoreResp?.status !== 'OK') {
+                  console.error('DataStore update failed:', dataStoreResp);
+                } else {
+                  setProgressSteps(5);
+                  updateProgramBuildVersion(program, pcaMetadata);
+                }
+              } catch (e) {
+                setSaveAndBuild('Completed');
+                setProgressSteps(0);
+                setNotification({
+                  message: e?.message || 'Setup failed. Please try again.',
+                  severity: 'error',
                 });
               }
-            });
+            })();
           });
         }
       });

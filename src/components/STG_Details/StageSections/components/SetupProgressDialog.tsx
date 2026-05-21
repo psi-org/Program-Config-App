@@ -3,10 +3,15 @@ import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import React from 'react';
+import type {
+  DhisApiError,
+  MetadataImportResponse,
+} from '../../../../types/pca';
 import CustomMUIDialog from '../../../UIElements/CustomMUIDialog';
 import CustomMUIDialogTitle from '../../../UIElements/CustomMUIDialogTitle';
 import type {
   NormalizedError,
+  ResolvedPcaMetadata,
   SaveAndBuildState,
 } from '../stageSections.types';
 import ProgressStep from './ProgressStep';
@@ -23,13 +28,18 @@ interface SetupProgressDialogProps {
   createMetadataStatus: string | undefined;
   androidSettings: unknown;
   androidSettingsError: unknown;
-  programMetadata: Record<string, any> | undefined;
+  programMetadata: Partial<ResolvedPcaMetadata> | undefined;
   runError: NormalizedError | null;
 }
 
-const step1Status = (p: number, err: 1 | 2 | undefined): StepStatus => {
+const step1Status = (
+  p: number,
+  err: 1 | 2 | undefined,
+  runFailed: boolean
+): StepStatus => {
   if (p !== 1) return 'success';
-  return err ? 'error' : 'loading';
+  if (err) return 'error';
+  return runFailed ? 'error' : 'loading';
 };
 
 const step1Text = (err: 1 | 2 | undefined) => {
@@ -41,9 +51,10 @@ const step1Text = (err: 1 | 2 | undefined) => {
 const androidStatus = (
   p: number,
   settings: unknown,
-  error: unknown
+  error: unknown,
+  runFailed: boolean
 ): StepStatus => {
-  if (p === 7) return 'loading';
+  if (p === 7) return runFailed ? 'error' : 'loading';
   if (!settings) return 'warning';
   return error ? 'error' : 'success';
 };
@@ -59,13 +70,41 @@ const androidText = (
       : 'Applying Android Settings';
   if (!settings) return `${label} (Android Settings app not enabled)`;
   if (error) {
+    const err = error as Partial<DhisApiError>;
     const msg =
-      (error as any).httpStatus === 'Forbidden'
+      err.httpStatus === 'Forbidden'
         ? "You don't have permissions to update the Android Settings in this server"
-        : (error as any).message;
+        : err.message;
     return `${label} (Error: ${msg})`;
   }
   return label;
+};
+
+/**
+ * Extracts a human-readable message from a delete error, which may be either
+ * a body-level MetadataImportResponse (HTTP 200 with status ERROR/WARNING) or
+ * a DhisApiError thrown for non-200 responses.
+ */
+const formatDeleteError = (err: unknown): string => {
+  const resp = err as Partial<MetadataImportResponse>;
+  if (resp?.typeReports?.length) {
+    const messages = resp.typeReports
+      .flatMap((tr) =>
+        (tr.objectReports ?? []).flatMap((or) =>
+          (or.errorReports ?? []).map((er) => er.message)
+        )
+      )
+      .filter(Boolean)
+      .slice(0, 5);
+    return messages.length
+      ? `${resp.status}: ${messages.join('; ')}`
+      : `Import returned status: ${resp.status}`;
+  }
+  const apiErr = err as Partial<DhisApiError>;
+  if (apiErr?.message) {
+    return [apiErr.httpStatus, apiErr.message].filter(Boolean).join(': ');
+  }
+  return 'Unknown deletion error';
 };
 
 const SetupProgressDialog = ({
@@ -84,13 +123,22 @@ const SetupProgressDialog = ({
 }: SetupProgressDialogProps) => {
   const canClose =
     saveAndBuild === 'Completed' || createMetadataStatus === 'ERROR';
+  const runFailed = saveAndBuild === 'Completed' && !!runError;
   const handleClose = () => {
     if (canClose) onClose();
   };
 
+  // Returns 'error' instead of 'loading' when the run has finished with a failure,
+  // so the step that was active at the time of failure shows an X rather than a spinner.
+  const activeStepStatus = (stepNo: number): StepStatus => {
+    if (progressSteps !== stepNo) return 'success';
+    return runFailed ? 'error' : 'loading';
+  };
+
   const deleteStatus = (): StepStatus => {
     if (progressSteps === 5 && deleteLoading) return 'loading';
-    if (progressSteps > 5 && deleteError) return 'error';
+    if (progressSteps > 5 && deleteError) return 'warning';
+    if (progressSteps === 5 && runFailed) return 'error';
     return 'success';
   };
 
@@ -105,7 +153,11 @@ const SetupProgressDialog = ({
         {progressSteps > 0 && (
           <>
             <ProgressStep
-              status={step1Status(progressSteps, programSettingsError)}
+              status={step1Status(
+                progressSteps,
+                programSettingsError,
+                runFailed
+              )}
             >
               {step1Text(programSettingsError)}
             </ProgressStep>
@@ -138,17 +190,17 @@ const SetupProgressDialog = ({
           </>
         )}
         {progressSteps > 1 && ok && (
-          <ProgressStep status={progressSteps === 2 ? 'loading' : 'success'}>
+          <ProgressStep status={activeStepStatus(2)}>
             Checking scores
           </ProgressStep>
         )}
         {progressSteps > 2 && ok && (
-          <ProgressStep status={progressSteps === 3 ? 'loading' : 'success'}>
+          <ProgressStep status={activeStepStatus(3)}>
             Reading assessment&apos;s questions
           </ProgressStep>
         )}
         {progressSteps > 3 && ok && (
-          <ProgressStep status={progressSteps === 4 ? 'loading' : 'success'}>
+          <ProgressStep status={activeStepStatus(4)}>
             Building new metadata and analytics
           </ProgressStep>
         )}
@@ -158,23 +210,17 @@ const SetupProgressDialog = ({
               Deleting old metadata
             </ProgressStep>
             {deleteError && (
-              <NoticeBox error title="Error deleting old metadata">
-                {(deleteError as any).message} (Error Type:{' '}
-                {(deleteError as any).type})
+              <NoticeBox
+                warning
+                title="Warning: could not delete old metadata (import will still proceed)"
+              >
+                {formatDeleteError(deleteError)}
               </NoticeBox>
             )}
           </>
         )}
         {progressSteps > 5 && ok && (
-          <ProgressStep
-            status={
-              progressSteps === 6
-                ? 'loading'
-                : createMetadataStatus === 'ERROR'
-                ? 'error'
-                : 'success'
-            }
-          >
+          <ProgressStep status={activeStepStatus(6)}>
             Importing new metadata
           </ProgressStep>
         )}
@@ -183,7 +229,8 @@ const SetupProgressDialog = ({
             status={androidStatus(
               progressSteps,
               androidSettings,
-              androidSettingsError
+              androidSettingsError,
+              runFailed
             )}
           >
             {androidText(
@@ -196,7 +243,11 @@ const SetupProgressDialog = ({
         {progressSteps > 7 && ok && (
           <ProgressStep
             status={
-              androidSettings && !androidSettingsError ? 'success' : 'warning'
+              runFailed
+                ? 'error'
+                : androidSettings && !androidSettingsError
+                ? 'success'
+                : 'warning'
             }
           >
             Done!

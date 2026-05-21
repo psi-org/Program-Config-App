@@ -1,6 +1,85 @@
 type QueryVariables = Record<string, unknown>;
 import { DATASTORE_H2_METADATA, NAMESPACE } from '../../../configs/Constants';
 import { getProgramQuery } from '../../../utils/Utils';
+import type { PcaDataElement } from '../../../types/pca';
+import type { ProgramRule, ProgramRuleVariable } from '../../../types';
+
+// ── Typed query result shapes ─────────────────────────────────────────────────
+// These mirror the DHIS2 API responses for each query defined below.
+// Cast `useDataQuery(...).data` to the appropriate type to avoid `as any`.
+
+export interface QueryDataPCA {
+  results: {
+    programs: Array<{
+      attributeValues: PcaDataElement['attributeValues'];
+      sharing: Record<string, unknown>;
+      programStages: Array<{ id: string }>;
+    }>;
+  };
+}
+
+export interface QueryDataOULevels {
+  results: {
+    organisationUnitLevels: Array<{
+      id: string;
+      level: number;
+      offlineLevels?: number;
+    }>;
+  };
+}
+
+export interface QueryDataIds {
+  results: { codes: string[] };
+}
+
+export interface QueryDataProgramRules {
+  results: {
+    programRules: Pick<
+      ProgramRule,
+      'id' | 'name' | 'condition' | 'programRuleActions'
+    >[];
+  };
+}
+
+export interface QueryDataProgramRuleVariables {
+  results: {
+    programRuleVariables: Pick<ProgramRuleVariable, 'id' | 'name'>[];
+  };
+}
+
+export interface QueryDataProgramIndicators {
+  results: { programIndicators: Array<{ id: string; name: string }> };
+}
+
+export interface QueryDataVisualizations {
+  results: { visualizations: Array<{ id: string; name: string }> };
+}
+
+export interface QueryDataMaps {
+  results: { maps: Array<{ id: string; name: string }> };
+}
+
+export interface QueryDataEventReports {
+  results: {
+    eventReports: Array<Record<string, unknown>>;
+  };
+}
+
+export interface QueryDataDashboards {
+  results: { dashboards: Array<{ id: string; name: string }> };
+}
+
+export interface QueryDataAndroidSettings {
+  results: Record<string, unknown> | null;
+}
+
+export interface QueryDataDataStore {
+  results: Record<string, Array<{ id: string }>> | null;
+}
+
+export interface QueryDataHNQIS2Metadata {
+  results: { version?: string } | null;
+}
 
 export const createMutation = {
   resource: 'metadata',

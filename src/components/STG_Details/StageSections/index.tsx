@@ -1,4 +1,8 @@
-import { useDataMutation, useDataQuery } from '@dhis2/app-service-data';
+import {
+  useDataMutation,
+  useDataEngine,
+  useDataQuery,
+} from '@dhis2/app-service-data';
 import type { Mutation } from '@dhis2/app-service-data';
 import {
   ButtonStrip,
@@ -28,6 +32,7 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
+// @ts-expect-error react-beautiful-dnd has no type declarations; install @types/react-beautiful-dnd to resolve
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { Link } from 'react-router-dom';
 import {
@@ -39,6 +44,13 @@ import {
   PCA_PROGRAM_TYPE_ATTRIBUTE,
 } from '../../../configs/Constants';
 import type { ProgramStageDataElement } from '../../../types';
+import type {
+  DhisApiError,
+  MetadataImportResponse,
+  PcaAttributeValue,
+  PcaDataElement,
+  ScoresMapping,
+} from '../../../types/pca';
 import {
   DeepCopy,
   buildBasicFormStage,
@@ -94,6 +106,18 @@ import {
   queryProgramSettings,
   queryCurrentUser,
   queryHNQIS2Metadata,
+  type QueryDataPCA,
+  type QueryDataOULevels,
+  type QueryDataProgramRules,
+  type QueryDataProgramRuleVariables,
+  type QueryDataProgramIndicators,
+  type QueryDataVisualizations,
+  type QueryDataMaps,
+  type QueryDataEventReports,
+  type QueryDataDashboards,
+  type QueryDataAndroidSettings,
+  type QueryDataDataStore,
+  type QueryDataHNQIS2Metadata,
 } from './stageSections.queries';
 import type {
   StageSectionsProps,
@@ -170,7 +194,7 @@ const StageSections = ({
     ProgramStageDataElement[]
   >(programStage.programStageDataElements.flat());
   const [programMetadata, setProgramMetadata] = useState<
-    Record<string, any> | undefined
+    Partial<ResolvedPcaMetadata> | undefined
   >();
   const [programSettingsError, setProgramSettingsError] = useState<
     1 | 2 | undefined
@@ -220,6 +244,7 @@ const StageSections = ({
 
   const anchorRef = useRef<HTMLDivElement>(null);
   const runInFlightRef = useRef(false);
+  const engine = useDataEngine();
 
   // ── DHIS2 queries ─────────────────────────────────────────────────────────
 
@@ -246,10 +271,8 @@ const StageSections = ({
     data: metadataDM[1].data,
   };
 
-  const [deleteMetadata, { error: deleteError, loading: deleteLoading }] =
-    useDataMutation(deleteMetadataMutation as unknown as Mutation, {
-      onError: () => setProgressSteps(6),
-    });
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<unknown>(undefined);
 
   const { data: androidSettings, refetch: refreshAndroidSettings } =
     useDataQuery(queryAndroidSettingsAnalytics);
@@ -296,7 +319,9 @@ const StageSections = ({
   });
 
   const stagesList = useMemo(
-    () => (programAttributes as any)?.results?.programs?.[0]?.programStages,
+    () =>
+      (programAttributes as unknown as QueryDataPCA)?.results?.programs?.[0]
+        ?.programStages,
     [programAttributes]
   );
 
@@ -650,7 +675,7 @@ const StageSections = ({
 
   const commit = useCallback(() => {
     setAddedSection(undefined);
-    if ((createMetadata.data as any)?.status) {
+    if ((createMetadata.data as unknown as MetadataImportResponse)?.status) {
       delete (createMetadata.data as Record<string, unknown>).status;
     }
     const removed = originalProgramStageDataElements
@@ -685,7 +710,9 @@ const StageSections = ({
       viz.home = [];
     }
     settings.results.dhisVisualizations = viz;
-    viz.home = viz.home.filter((s: any) => s.program !== programId);
+    viz.home = viz.home.filter(
+      (s: Record<string, unknown>) => s.program !== programId
+    );
 
     if (programMetadata?.createAndroidAnalytics === 'Yes') {
       viz.home.push({
@@ -706,23 +733,26 @@ const StageSections = ({
   ) => {
     try {
       const analytics = await refreshAndroidSettings();
-      if ((analytics as any)?.results) {
+      if ((analytics as unknown as QueryDataAndroidSettings)?.results) {
         const settings = buildAndroidSettings(
-          analytics as Record<string, any>,
+          analytics as Record<string, unknown>,
           localUidPool.shift()!,
           androidSettingsVisualizations
         );
         const r = await androidSettingsUpdate({ data: settings.results });
-        if ((r as any)?.status !== 'OK') {
+        if ((r as unknown as MetadataImportResponse)?.status !== 'OK') {
           setAndroidSettingsError(r);
         }
       }
 
       const sync = await refreshAndroidSettingsSync();
-      if ((sync as any)?.results) {
-        const settings = (sync as any).results;
+      if ((sync as unknown as QueryDataAndroidSettings)?.results) {
+        const settings = (sync as unknown as QueryDataAndroidSettings)
+          .results as Record<string, unknown>;
         const teiAmount = programMetadata?.teiDownloadAmount ?? 5;
-        settings.programSettings.specificSettings[programId] = {
+        (
+          settings.programSettings as Record<string, Record<string, unknown>>
+        ).specificSettings[programId] = {
           enrollmentDateDownload: 'ANY',
           enrollmentDownload: 'ONLY_ACTIVE',
           id: programId,
@@ -733,14 +763,14 @@ const StageSections = ({
           updateDownload: 'ANY',
         };
         const r2 = await androidSettingsSyncUpdate({ data: settings });
-        if ((r2 as any)?.status !== 'OK') {
+        if ((r2 as unknown as MetadataImportResponse)?.status !== 'OK') {
           setAndroidSettingsError(r2);
         } else {
           setAndroidSettingsError(undefined);
         }
       }
     } catch (e) {
-      setAndroidSettingsError((e as any)?.details ?? e);
+      setAndroidSettingsError((e as { details?: unknown })?.details ?? e);
     }
   };
 
@@ -749,18 +779,31 @@ const StageSections = ({
   const updateProgramBuildVersion = useCallback(
     async (pid: string) => {
       const res = await getProgramSettings({ programId: pid });
-      (res as any).results?.attributeValues?.forEach((av: any) => {
+      const prog = (
+        res as {
+          results?: { attributeValues?: PcaAttributeValue[] } & Record<
+            string,
+            unknown
+          >;
+        }
+      )?.results;
+      prog?.attributeValues?.forEach((av) => {
         if (av.attribute.id === METADATA) {
-          const pcaMetadata = JSON.parse(av.value || '{}');
-          pcaMetadata.buildVersion = (import.meta as any).env.DHIS2_APP_VERSION;
+          const pcaMetadata = JSON.parse(av.value || '{}') as Record<
+            string,
+            unknown
+          >;
+          pcaMetadata.buildVersion = (
+            import.meta as unknown as { env: { DHIS2_APP_VERSION?: string } }
+          ).env.DHIS2_APP_VERSION;
           av.value = JSON.stringify(pcaMetadata);
         }
       });
 
-      const response = await createMetadata.mutate({
-        data: { programs: [(res as any).results] },
+      const response = await engine.mutate(createMutation, {
+        variables: { data: { programs: [prog] } },
       });
-      if ((response as any)?.status === 'OK') {
+      if ((response as unknown as MetadataImportResponse)?.status === 'OK') {
         setProgressSteps(8);
         setSaveAndBuild('Completed');
         setSavedAndValidated(false);
@@ -776,8 +819,8 @@ const StageSections = ({
       throw new Error('Failed to update Program build version');
     },
     [
+      engine,
       getProgramSettings,
-      createMetadata.mutate,
       prDQ,
       prvDQ,
       pIndDQ,
@@ -799,6 +842,7 @@ const StageSections = ({
     setRunError(null);
     setProgramSettingsError(undefined);
     setAndroidSettingsError(undefined);
+    setDeleteError(undefined);
     setSaveAndBuild('Run');
 
     const localUidPool = [...uidPool];
@@ -806,14 +850,14 @@ const StageSections = ({
     try {
       // STEP 1: validate program config and resolve OU levels to numeric values
       const { pcaMetadata, programConfig } = await safeStep(1, async () => {
-        const programConfig = (programAttributes as any)?.results
-          ?.programs?.[0];
+        const programConfig = (programAttributes as unknown as QueryDataPCA)
+          ?.results?.programs?.[0];
         if (!programConfig) {
           throw new Error('Program attributes not loaded yet');
         }
 
         const rawMetadata = programConfig.attributeValues?.find(
-          (pa: any) => pa.attribute.id === METADATA
+          (pa) => pa.attribute.id === METADATA
         )?.value;
         const pcaMetadata: ResolvedPcaMetadata = JSON.parse(
           rawMetadata || '{}'
@@ -839,9 +883,8 @@ const StageSections = ({
             pcaMetadata.ouLevelMap as unknown as string,
           ],
         });
-        const levels = (ouData as any)?.results?.organisationUnitLevels as
-          | any[]
-          | undefined;
+        const levels = (ouData as unknown as QueryDataOULevels)?.results
+          ?.organisationUnitLevels;
         if (!levels?.length) {
           setProgramSettingsError(2);
           throw new Error('Configured Organisation Unit Levels not found');
@@ -867,7 +910,9 @@ const StageSections = ({
         return { pcaMetadata, programConfig };
       });
 
-      const sharingSettings: SharingSettings = { ...programConfig.sharing };
+      const sharingSettings: SharingSettings = {
+        ...(programConfig.sharing as unknown as SharingSettings),
+      };
       sharingSettings.public = extractMetadataPermissions(
         sharingSettings.public
       );
@@ -891,10 +936,10 @@ const StageSections = ({
       )[0]?.id;
 
       // STEP 2: validate scores
+      const scoresElements = (scoresSection as ProgramStageSection)
+        .dataElements as unknown as PcaDataElement[];
       await safeStep(2, async () => {
-        const result = checkScores(
-          (scoresSection as ProgramStageSection).dataElements
-        ) as any;
+        const result = checkScores(scoresElements);
         if (!result.uniqueScores) {
           throw {
             msg: 'Duplicated scores',
@@ -903,17 +948,18 @@ const StageSections = ({
           };
         }
       });
-      const { compositeScores } = checkScores(
-        (scoresSection as ProgramStageSection).dataElements
-      ) as any;
+      const { compositeScores } = checkScores(scoresElements);
+      const definedCompositeScores = compositeScores.filter(
+        (cs): cs is string => cs !== undefined
+      );
 
       // STEP 3: validate question composite scores
       await safeStep(3, async () => {
-        const questionCompositeScores = (readQuestionComposites as any)(
-          sections
+        const questionCompositeScores = readQuestionComposites(
+          sections as unknown as Array<{ dataElements: PcaDataElement[] }>
         );
         const missing = questionCompositeScores.filter(
-          (cs: string) => !compositeScores.includes(cs)
+          (cs) => !compositeScores.includes(cs)
         );
         if (missing.length) {
           throw {
@@ -932,25 +978,29 @@ const StageSections = ({
         sendToDataStore,
         dataStoreData,
       } = await safeStep(4, async () => {
-        type AttributeValueEntry = { attribute: { id: string }; value: string };
         const scoresMapping = (
           scoresSection as ProgramStageSection
-        ).dataElements.reduce<Record<string, unknown>>(
+        ).dataElements.reduce<ScoresMapping>(
           (acc, cur) => ({
             ...acc,
-            [(
-              cur as unknown as { attributeValues: AttributeValueEntry[] }
-            ).attributeValues?.find(
+            [(cur as unknown as PcaDataElement).attributeValues?.find(
               (att) => att.attribute.id === FEEDBACK_ORDER
-            )?.value as string]: cur,
+            )?.value as string]: cur as unknown as PcaDataElement,
           }),
           {}
         );
 
-        const programRuleVariables = (buildProgramRuleVariables as any)({
-          sections,
-          scoresSection,
-          compositeScores,
+        const pcaSections = sections as unknown as Array<{
+          dataElements: PcaDataElement[];
+        }>;
+        const pcaScoresSection = scoresSection as unknown as {
+          dataElements: PcaDataElement[];
+        };
+
+        const programRuleVariables = buildProgramRuleVariables({
+          sections: pcaSections,
+          scoresSection: pcaScoresSection,
+          compositeScores: definedCompositeScores,
           programId,
           useCompetencyClass: programMetadata?.useCompetencyClass,
           uidPool: localUidPool,
@@ -958,10 +1008,10 @@ const StageSections = ({
 
         const { programRules, programRuleActions, scoreMap } =
           buildProgramRules({
-            sections,
+            sections: pcaSections,
             stageId: programStage.id,
             programId,
-            compositeValues: compositeScores,
+            compositeValues: definedCompositeScores,
             scoresMapping,
             uidPool: localUidPool,
             useCompetencyClass: programMetadata?.useCompetencyClass,
@@ -992,8 +1042,9 @@ const StageSections = ({
           indicatorIDs,
           uidPool: localUidPool,
           useCompetency: programMetadata?.useCompetencyClass,
-          currentDashboardId: (dashboardsDQ as any)?.data?.results
-            ?.dashboards?.[0]?.id,
+          currentDashboardId: (
+            dashboardsDQ.data as unknown as QueryDataDashboards
+          )?.results?.dashboards?.[0]?.id,
           userOU: pcaMetadata.useUserOrgUnit,
           ouRoot: pcaMetadata.ouRoot,
           sharingSettings,
@@ -1002,8 +1053,11 @@ const StageSections = ({
           actionPlanID,
         });
 
-        const dataElements = programStage.programStageSections.reduce(
-          (acc: any[], cur) => acc.concat(cur.dataElements),
+        const dataElements = programStage.programStageSections.reduce<
+          PcaDataElement[]
+        >(
+          (acc, cur) =>
+            acc.concat(cur.dataElements as unknown as PcaDataElement[]),
           []
         );
         const { feedbackTree, prvsMap } = buildFeedbackTree(
@@ -1048,9 +1102,11 @@ const StageSections = ({
 
         const dataStoreResult = await getDataStore();
         const toDeleteReferences = DeepCopy(
-          (dataStoreResult as any)?.results ?? {}
+          (dataStoreResult as unknown as QueryDataDataStore)?.results ?? {}
         );
-        const sendToDataStore = (dataStoreResult as any)?.results
+        const sendToDataStore = (
+          dataStoreResult as unknown as QueryDataDataStore
+        )?.results
           ? dataStoreUpdate
           : dataStoreCreate;
 
@@ -1066,10 +1122,8 @@ const StageSections = ({
         };
 
         const fallbackRuleVariables = (
-          prvDQ.data as any
-        ).results.programRuleVariables.filter(
-          (prv: any) => prv.name?.[0] === '_'
-        );
+          prvDQ.data as unknown as QueryDataProgramRuleVariables
+        ).results.programRuleVariables.filter((prv) => prv.name?.[0] === '_');
 
         const oldIds = (key: string, fallback: unknown[]) => {
           const ids: unknown[] =
@@ -1080,7 +1134,7 @@ const StageSections = ({
         const oldMetadata = {
           programRules: oldIds(
             'programRules',
-            (prDQ.data as any).results.programRules
+            (prDQ.data as unknown as QueryDataProgramRules).results.programRules
           ),
           programRuleVariables: oldIds(
             'programRuleVariables',
@@ -1088,17 +1142,23 @@ const StageSections = ({
           ),
           programIndicators: oldIds(
             'programIndicators',
-            (pIndDQ.data as any).results.programIndicators
+            (pIndDQ.data as unknown as QueryDataProgramIndicators).results
+              .programIndicators
           ),
           visualizations: oldIds(
             'visualizations',
-            (visualizationsDQ.data as any).results.visualizations
+            (visualizationsDQ.data as unknown as QueryDataVisualizations)
+              .results.visualizations
           ),
           eventReports: oldIds(
             'eventReports',
-            (eventReportDQ.data as any).results.eventReports
+            (eventReportDQ.data as unknown as QueryDataEventReports).results
+              .eventReports
           ),
-          maps: oldIds('maps', (mapsDQ.data as any).results.maps),
+          maps: oldIds(
+            'maps',
+            (mapsDQ.data as unknown as QueryDataMaps).results.maps
+          ),
         };
 
         return {
@@ -1112,32 +1172,52 @@ const StageSections = ({
 
       // STEP 5: clear event report dimensions then delete old metadata
       await safeStep(5, async () => {
-        const updateResp = await createMetadata.mutate({
-          data: {
-            eventReports: (eventReportDQ.data as any).results.eventReports.map(
-              (er: any) => ({
+        const updateResp = await engine.mutate(createMutation, {
+          variables: {
+            data: {
+              eventReports: (
+                eventReportDQ.data as unknown as QueryDataEventReports
+              ).results.eventReports.map((er) => ({
                 ...er,
                 columnDimensions: ['pe', 'ou'],
                 dataElementDimensions: [],
                 programIndicatorDimensions: [],
-              })
-            ),
+              })),
+            },
           },
         });
-        if ((updateResp as any)?.status !== 'OK') {
+        if (
+          (updateResp as unknown as MetadataImportResponse)?.status !== 'OK'
+        ) {
           throw updateResp ?? new Error('Failed to update eventReports');
         }
-        await deleteMetadata({ data: oldMetadata });
+        setDeleteLoading(true);
+        try {
+          const deleteResp = await engine.mutate(deleteMetadataMutation, {
+            variables: { data: oldMetadata },
+          });
+          if (
+            (deleteResp as unknown as MetadataImportResponse)?.status !== 'OK'
+          ) {
+            setDeleteError(deleteResp);
+          }
+        } catch (deleteErr) {
+          setDeleteError(deleteErr);
+        } finally {
+          setDeleteLoading(false);
+        }
       });
 
       // STEP 6: import new metadata + persist datastore references
       await safeStep(6, async () => {
-        const resp = await createMetadata.mutate({ data: metadata });
-        if ((resp as any)?.status !== 'OK') {
+        const resp = await engine.mutate(createMutation, {
+          variables: { data: metadata },
+        });
+        if ((resp as unknown as MetadataImportResponse)?.status !== 'OK') {
           throw resp ?? new Error('Metadata import failed');
         }
         const dsResp = await sendToDataStore({ data: dataStoreData });
-        if ((dsResp as any)?.status !== 'OK') {
+        if ((dsResp as unknown as MetadataImportResponse)?.status !== 'OK') {
           throw dsResp ?? new Error('Datastore update failed');
         }
       });
@@ -1220,13 +1300,12 @@ const StageSections = ({
   }, [savedAndValidated, storeBackupData]);
 
   useEffect(() => {
-    const prog = (programAttributes as any)?.results?.programs?.[0];
+    const prog = (programAttributes as unknown as QueryDataPCA)?.results
+      ?.programs?.[0];
     if (!prog) {
       return;
     }
-    const av = prog.attributeValues?.find(
-      (av: any) => av.attribute.id === METADATA
-    );
+    const av = prog.attributeValues?.find((av) => av.attribute.id === METADATA);
     setProgramMetadata(av ? JSON.parse(av.value) : {});
   }, [programAttributes]);
 
@@ -1249,7 +1328,10 @@ const StageSections = ({
   if (
     hnqisMode &&
     !metadataLoading &&
-    !versionGTE((hnqis2Metadata as any)?.results?.version, H2_METADATA_VERSION)
+    !versionGTE(
+      (hnqis2Metadata as unknown as QueryDataHNQIS2Metadata)?.results?.version,
+      H2_METADATA_VERSION
+    )
   ) {
     return (
       <NoticeBox title="Check HNQIS Framework Metadata" error>
@@ -1263,9 +1345,9 @@ const StageSections = ({
 
   // ── Render ────────────────────────────────────────────────────────────────
 
-  const createMetadataStatus = (createMetadata.data as any)?.status as
-    | string
-    | undefined;
+  const createMetadataStatus = (
+    createMetadata.data as unknown as MetadataImportResponse
+  )?.status;
   const hasValidationResults =
     validationResults &&
     (validationResults.sections.length > 0 ||
@@ -1416,7 +1498,10 @@ const StageSections = ({
       {createMetadata.error && (
         <AlertStack>
           <AlertBar critical>
-            {'Error: ' + JSON.stringify((createMetadata.error as any).message)}
+            {'Error: ' +
+              JSON.stringify(
+                (createMetadata.error as Partial<DhisApiError>).message
+              )}
           </AlertBar>
         </AlertStack>
       )}
