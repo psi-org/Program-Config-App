@@ -70,7 +70,7 @@ DraggableDataElement.propTypes = {
   dataElement: PropTypes.object,
   dePrefix: PropTypes.string,
   deStatus: PropTypes.object,
-  hnqisMode: PropTypes.string,
+  hnqisMode: PropTypes.bool,
   index: PropTypes.number,
   isSectionMode: PropTypes.bool,
   program: PropTypes.string,

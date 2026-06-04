@@ -10,13 +10,13 @@ import {
   HNQIS2_ORIGIN_SERVER_CELL,
   HNQIS2_TEMPLATE_HEADERS,
   HNQIS2_TEMPLATE_VERSION_CELL,
-  TEMPLATE_PROGRAM_TYPES,
   TRACKER_ORIGIN_SERVER_CELL,
   TRACKER_TEA_HEADERS,
   TRACKER_TEA_MAP,
   TRACKER_TEMPLATE_HEADERS,
   TRACKER_TEMPLATE_VERSION_CELL,
 } from '../../configs/TemplateConstants.js';
+import type { PcaSection } from '../../types';
 import {
   getHNQIS2MappingList,
   getTrackerMappingList,
@@ -36,11 +36,11 @@ import {
 } from '../../utils/importerUtils.js';
 import { setUpProgramStageSections } from '../../utils/Utils.jsx';
 import { readTemplateData } from '../STG_Details/importReader.js';
+import CustomMUIDialog from '../UIElements/CustomMUIDialog.js';
+import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.jsx';
 import FileSelector from '../UIElements/FileSelector.jsx';
 import ImportStatusBox from '../UIElements/ImportStatusBox.jsx';
 import ImportSummary from '../UIElements/ImportSummary.jsx';
-import CustomMUIDialog from '../UIElements/CustomMUIDialog.js';
-import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.jsx';
 
 interface SummaryObject {
   new: number;
@@ -48,7 +48,10 @@ interface SummaryObject {
   removed: number;
 }
 
+// StageSummary extended to include tracker stage identity fields
 interface StageSummary {
+  stageName?: string;
+  id?: string;
   sections: SummaryObject;
   dataElements: SummaryObject;
 }
@@ -77,18 +80,17 @@ interface PreviousData {
     displayInList: boolean;
     mandatory: boolean;
     searchable: boolean;
-  }[]; //TODO: Possible extract into its own type
-  scoresSection: {
-    dataElements: {};
-  };
+  }[];
+  scoresSection: PcaSection;
   stages: { id: string }[];
-  setSections: (sections: never) => void;
-  setScoresSection: (scoresSection: never) => void;
+  setSections: (sections: PcaSection[]) => void;
+  setScoresSection: (scoresSection: PcaSection) => void;
   programSections: {
     id: string;
-    trackedEntityAttributes: TrackedEntityAttribute[]; //TODO: Possible extract into its own type
+    trackedEntityAttributes: TrackedEntityAttribute[];
   }[];
 }
+
 type CurrentStagesData = {
   name: string;
   id: string;
@@ -97,9 +99,7 @@ type CurrentStagesData = {
     name: string;
     displayName: string;
     sortOrder: number;
-    dataElements: {
-      id: string;
-    }[];
+    dataElements: { id: string }[];
   }[];
 }[];
 
@@ -118,9 +118,7 @@ export interface ProgramMetadataHandlers {
 export interface ProgramMetadata {
   dePrefix: string;
   useCompetencyClass: boolean;
-  healthArea: {
-    name: string;
-  }[];
+  healthArea: { name: string }[];
 }
 
 export type CurrentSectionsData = {
@@ -139,45 +137,47 @@ interface Task {
   status: string;
 }
 
-interface ImportSummary {
+interface TaskHandlerConfig {
+  step: number;
+  message: string;
+  initialStatus: boolean;
+}
+
+interface TemplateWorksheetData {
+  data: unknown[];
+  stageId?: string;
+  status: boolean;
+}
+
+// HNQIS2/HNQIS3 import result
+interface HNQISSummary {
+  questions: SummaryObject;
+  sections: SummaryObject;
+  scores: SummaryObject;
+  program?: unknown;
+  mapping?: unknown;
   configurations?: {
-    skippedSections?: {
-      stage: string;
-    }[];
+    skippedSections?: { stage: string }[];
   };
-  questions?: unknown[];
-  sections?: unknown[];
-  scores?: unknown[];
-  teaSummary: {
-    programSections: unknown[];
-    teas: unknown[];
-  };
-  stages: {
-    stageName: string;
-    sections: unknown[];
-    dataElements: unknown[];
-  }[];
 }
-interface Stage {
-  stageName: string;
-  id: string;
-}
-interface ImportSummaryValues {
-  stages: Stage[];
-  teaSummary: {
-    programSections: {
-      updated: number;
-      new: number;
-    };
+
+// Tracker / Event import result
+interface TrackerSummary {
+  stages: StageSummary[];
+  teaSummary?: {
+    programSections: SummaryObject;
+    teas: SummaryObject;
   };
-  program: unknown;
-  mapping: unknown;
-  configurations: {
+  program?: unknown;
+  mapping?: unknown;
+  configurations?: {
     teas: unknown[];
     importedStages: unknown[];
-    skippedSections: unknown[];
+    skippedSections: { stage: string }[];
   };
 }
+
+type ImportSummaryState = HNQISSummary | TrackerSummary;
 
 //* Tracker Only: currentStagesData
 //* HNQIS Only: setSaveStatus, programMetadata, currentSectionsData, setSavedAndValidated
@@ -207,7 +207,7 @@ const Importer = ({
   setSavedAndValidated: (savedAndValidated: boolean) => void;
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
-  const [currentTask, setCurrentTask] = useState<Task | undefined | null>(
+  const [currentTask, setCurrentTask] = useState<string | null | undefined>(
     undefined
   );
   const [executedTasks, setExecutedTasks] = useState<Task[]>([]);
@@ -215,9 +215,9 @@ const Importer = ({
   const [isNotificationError, setNotificationError] = useState(false);
   const [fileName, setFileName] = useState('No file selected...');
 
-  const [importSummary, setImportSummary] = useState<ImportSummary | undefined>(
-    undefined
-  ); //TODO: Find out why we're using boolean here
+  const [importSummary, setImportSummary] = useState<
+    ImportSummaryState | undefined
+  >(undefined); //TODO: Find out why we're using boolean here
 
   const setFile = (files: File[]) => {
     setNotificationError(false);
@@ -234,12 +234,16 @@ const Importer = ({
     displayForm(false);
   }
 
-  const tasksHandler = (
-    { step, message, initialStatus },
-    actionFunction,
-    params = {}
-  ) => {
-    const task = {
+  const tasksHandler = <T,>(
+    { step, message, initialStatus }: TaskHandlerConfig,
+    actionFunction: (
+      status: boolean,
+      task: Task,
+      params: Record<string, unknown>
+    ) => T,
+    params: Record<string, unknown> = {}
+  ): T => {
+    const task: Task = {
       step,
       name: message,
       status: initialStatus ? 'success' : 'error',
@@ -271,7 +275,11 @@ const Importer = ({
             message: 'Validating Template format (XLSX)',
             initialStatus: false,
           },
-          fileValidation,
+          fileValidation as unknown as (
+            status: boolean,
+            task: Task,
+            params: Record<string, unknown>
+          ) => boolean,
           { setNotificationError, selectedFile }
         )
       ) {
@@ -291,7 +299,21 @@ const Importer = ({
             message: 'Validating worksheets in the workbook',
             initialStatus: true,
           },
-          workbookValidation,
+          workbookValidation as unknown as (
+            status: boolean,
+            task: Task,
+            params: Record<string, unknown>
+          ) =>
+            | {
+                status: boolean;
+                templateWS: { getRow: (n: number) => { values: unknown[] } }[];
+                instructionsWS: unknown;
+                mappingWS: unknown;
+                teasWS:
+                  | { getRow: (n: number) => { values: unknown[] } }
+                  | undefined;
+              }
+            | undefined,
           {
             setNotificationError,
             workbook: loadedWorkbook,
@@ -322,7 +344,11 @@ const Importer = ({
               message: 'Validating Template version and origin server',
               initialStatus: false,
             },
-            serverAndVersionValidation,
+            serverAndVersionValidation as unknown as (
+              status: boolean,
+              task: Task,
+              params: Record<string, unknown>
+            ) => boolean,
             {
               setNotificationError,
               instructionsWS,
@@ -357,33 +383,38 @@ const Importer = ({
           }).data;
         }
 
-        const templateData = [];
+        const templateData: TemplateWorksheetData[] = [];
         let stopFlag = false;
 
-        templateWS.forEach((currentTemplate, index) => {
-          const headers = currentTemplate.getRow(1).values;
-          headers.shift();
+        templateWS.forEach(
+          (
+            currentTemplate: { getRow: (n: number) => { values: unknown[] } },
+            index: number
+          ) => {
+            const headers = currentTemplate.getRow(1).values as unknown[];
+            headers.shift();
 
-          const currentTemplateData = handleWorksheetReading({
-            tasksHandler,
-            currentWorksheet: currentTemplate,
-            setNotificationError,
-            headers,
-            templateHeadersList: isTracker
-              ? TRACKER_TEMPLATE_HEADERS
-              : HNQIS2_TEMPLATE_HEADERS,
-            startingIndex: 4 + 2 * index + indexModifier,
-            structureColumn: isTracker ? 1 : 2,
-            isTrackerTemplate: true,
-          });
+            const currentTemplateData = handleWorksheetReading({
+              tasksHandler,
+              currentWorksheet: currentTemplate,
+              setNotificationError,
+              headers,
+              templateHeadersList: isTracker
+                ? TRACKER_TEMPLATE_HEADERS
+                : HNQIS2_TEMPLATE_HEADERS,
+              startingIndex: 4 + 2 * index + indexModifier,
+              structureColumn: isTracker ? 1 : 2,
+              isTrackerTemplate: true,
+            });
 
-          if (!currentTemplateData?.status) {
-            stopFlag = true;
-            return;
+            if (!currentTemplateData?.status) {
+              stopFlag = true;
+              return;
+            }
+
+            templateData.push(currentTemplateData);
           }
-
-          templateData.push(currentTemplateData);
-        });
+        );
 
         if (stopFlag) {
           return;
@@ -397,10 +428,10 @@ const Importer = ({
             )
           : importReadingHNQIS(templateData, programDetails, mappingDetails);
 
-        if (importSummaryValues.error) {
+        if ('error' in importSummaryValues) {
           addExecutedTask({
             step: 10000,
-            name: importSummaryValues.error,
+            name: (importSummaryValues as { error: string }).error,
             status: 'error',
           });
           setNotificationError(true);
@@ -415,52 +446,73 @@ const Importer = ({
     setButtonDisabled(false);
   };
 
-  const importReadingHNQIS = (templateData, programDetails, mappingDetails) => {
-    const importSummaryValues = buildHNQIS2Summary();
+  const importReadingHNQIS = (
+    templateData: TemplateWorksheetData[],
+    programDetails: unknown,
+    mappingDetails: unknown
+  ): HNQISSummary => {
+    const pd = programDetails as Record<string, unknown>;
+    const md = mappingDetails as Record<string, unknown>;
+    const importSummaryValues = buildHNQIS2Summary() as HNQISSummary;
     const { importedSections, importedScores } = readTemplateData({
       templateData: templateData[0].data,
       currentData: previous,
-      programPrefix: programDetails.dePrefix || programDetails.id,
-      optionSets: mappingDetails.optionSets,
-      legendSets: mappingDetails.legendSets,
+      programPrefix: (pd.dePrefix || pd.id) as string | undefined,
+      optionSets: md.optionSets,
+      legendSets: md.legendSets,
       currentSectionsData,
-      mode: TEMPLATE_PROGRAM_TYPES.hnqis2,
+      mode: programSpecificType,
       importSummaryValues,
     });
 
-    importSummaryValues.program = programDetails;
-    importSummaryValues.mapping = mappingDetails;
+    importSummaryValues.program = pd;
+    importSummaryValues.mapping = md;
 
     const newScoresSection = previous.scoresSection;
-    newScoresSection.dataElements = importedScores;
+    newScoresSection.dataElements =
+      importedScores as import('../../types').PcaDataElement[];
     delete newScoresSection.errors;
 
-    previous.setSections(importedSections);
+    previous.setSections(
+      importedSections as import('../../types').PcaSection[]
+    );
     previous.setScoresSection(newScoresSection);
 
     const programMetadata_new = programMetadata.programMetadata;
-    programMetadata_new.dePrefix = programDetails.dePrefix;
-    programMetadata_new.useCompetencyClass = programDetails.useCompetencyClass;
-    programMetadata_new.healthArea = mappingDetails.healthAreas.find(
-      (ha) => ha.name == programDetails.healthArea
-    )?.code;
+    programMetadata_new.dePrefix = pd.dePrefix as string;
+    programMetadata_new.useCompetencyClass = pd.useCompetencyClass as boolean;
+    programMetadata_new.healthArea = (
+      md.healthAreas as { name: string; code?: string }[]
+    ).find((ha: { name: string; code?: string }) => ha.name == pd.healthArea)
+      ?.code as unknown as { name: string }[];
     programMetadata.setProgramMetadata(programMetadata_new);
 
     return importSummaryValues;
   };
 
   const importReadingTracker = (
-    { teaData, templateData },
-    { programDetails, mappingDetails },
-    programSpecificType
-  ) => {
-    const importSummaryValues: ImportSummaryValues = buildTrackerSummary(
+    {
+      teaData,
+      templateData,
+    }: {
+      teaData: Record<string, unknown>[] | undefined;
+      templateData: TemplateWorksheetData[];
+    },
+    {
+      programDetails: rawProgramDetails,
+      mappingDetails: rawMappingDetails,
+    }: { programDetails: unknown; mappingDetails: unknown },
+    programSpecificType: ProgramTypesEnum
+  ): TrackerSummary | { error: string } => {
+    const programDetails = rawProgramDetails as Record<string, unknown>;
+    const mappingDetails = rawMappingDetails as Record<string, unknown>;
+    const importSummaryValues = buildTrackerSummary(
       programSpecificType,
       currentStagesData.length
-    );
-    const importedStages = [];
-    let importError = undefined;
-    const skippedSections = [];
+    ) as TrackerSummary;
+    const importedStages: unknown[] = [];
+    let importError: string | undefined = undefined;
+    const skippedSections: { stage: string; ignoredSections: unknown[] }[] = [];
 
     currentStagesData.forEach((currentStage, index) => {
       const stageIndex = templateData.findIndex(
@@ -479,7 +531,9 @@ const Importer = ({
             stageNumber: index + 1,
           },
           templateData: templateData[stageIndex].data,
-          programPrefix: programDetails.dePrefix || programDetails.id,
+          programPrefix: (programDetails.dePrefix || programDetails.id) as
+            | string
+            | undefined,
           optionSets: mappingDetails.optionSets,
           legendSets: mappingDetails.legendSets,
           currentSectionsData: setUpProgramStageSections(currentStage),
@@ -487,8 +541,11 @@ const Importer = ({
           importSummaryValues: importSummaryValues.stages[index],
         });
 
-        if (ignoredSections.length > 0) {
-          skippedSections.push({ stage: currentStage.name, ignoredSections });
+        if ((ignoredSections ?? []).length > 0) {
+          skippedSections.push({
+            stage: currentStage.name,
+            ignoredSections: ignoredSections ?? [],
+          });
         }
 
         importedStages.push({
@@ -504,12 +561,19 @@ const Importer = ({
       return { error: importError };
     }
 
-    const importedProgramSections = [];
-    const ignoredProgramSections = [];
+    const importedProgramSections: {
+      id?: unknown;
+      name: unknown;
+      sortOrder: number;
+      trackedEntityAttributes: unknown[];
+      importStatus: string;
+      isBasicForm: boolean;
+    }[] = [];
+    const ignoredProgramSections: { name: unknown; rowNum: number }[] = [];
     if (teaData) {
       let programSectionIndex = -1;
       let isBasicForm = false;
-      teaData.forEach((row, rowNum) => {
+      teaData.forEach((row: Record<string, unknown>, rowNum: number) => {
         switch (row[TRACKER_TEA_MAP.structure]) {
           case 'Section':
             if (
@@ -537,26 +601,30 @@ const Importer = ({
               isBasicForm,
             };
             if (row[TRACKER_TEA_MAP.programSection]) {
-              importSummaryValues.teaSummary.programSections.updated += 1;
+              importSummaryValues.teaSummary!.programSections.updated += 1;
             } else {
-              importSummaryValues.teaSummary.programSections.new += 1;
+              importSummaryValues.teaSummary!.programSections.new += 1;
             }
             break;
           case 'TEA':
             if (programSectionIndex === -1) {
               programSectionIndex += 1;
               isBasicForm = true;
-              importedProgramSections[programSectionIndex] =
-                getBasicForm('TEA');
+              importedProgramSections[programSectionIndex] = getBasicForm(
+                'TEA'
+              ) as (typeof importedProgramSections)[0];
             }
             importedProgramSections[
               programSectionIndex
             ].trackedEntityAttributes.push({
               trackedEntityAttribute: {
-                id: row[TRACKER_TEA_MAP.uid]?.result,
+                id: (row[TRACKER_TEA_MAP.uid] as { result?: unknown } | null)
+                  ?.result,
                 name: row[TRACKER_TEA_MAP.name],
               },
-              valueType: row[TRACKER_TEA_MAP.valueType]?.result,
+              valueType: (
+                row[TRACKER_TEA_MAP.valueType] as { result?: unknown } | null
+              )?.result,
               allowFutureDate: row[TRACKER_TEA_MAP.allowFutureDate] === 'Yes',
               displayInList: row[TRACKER_TEA_MAP.displayInList] === 'Yes',
               mandatory: row[TRACKER_TEA_MAP.mandatory] === 'Yes',
@@ -604,9 +672,9 @@ const Importer = ({
 
       countChanges({
         sections: importedProgramSections,
-        sectionsSummary: importSummaryValues.teaSummary.programSections,
+        sectionsSummary: importSummaryValues.teaSummary!.programSections,
         countObject: 'trackedEntityAttributes',
-        summaryObject: importSummaryValues.teaSummary.teas,
+        summaryObject: importSummaryValues.teaSummary!.teas,
         currentData: currentTEAData.sections,
         impObjId: 'programTrackedEntityAttribute',
       });
@@ -655,7 +723,7 @@ const Importer = ({
           {(currentTask || executedTasks.length > 0) && (
             <div style={{ width: '100%', marginBottom: '1em' }}>
               <ImportStatusBox
-                title="Configurations File - Import Status"
+                title="Configuration File - Import Status"
                 currentTask={currentTask}
                 executedTasks={executedTasks}
                 isError={isNotificationError}
@@ -685,17 +753,25 @@ const Importer = ({
               )}
             </div>
           )}
-          {importSummary &&
-            programSpecificType === TEMPLATE_PROGRAM_TYPES.hnqis2 && (
-              <ImportSummary
-                title="Import Summary"
-                importCategories={[
-                  { name: 'Questions', content: importSummary.questions },
-                  { name: 'Sections', content: importSummary.sections },
-                  { name: 'Scores', content: importSummary.scores },
-                ]}
-              />
-            )}
+          {importSummary && !isTracker(programSpecificType) && (
+            <ImportSummary
+              title="Import Summary"
+              importCategories={[
+                {
+                  name: 'Questions',
+                  content: (importSummary as HNQISSummary).questions,
+                },
+                {
+                  name: 'Sections',
+                  content: (importSummary as HNQISSummary).sections,
+                },
+                {
+                  name: 'Scores',
+                  content: (importSummary as HNQISSummary).scores,
+                },
+              ]}
+            />
+          )}
 
           {!importSummary && (
             <FileSelector
@@ -715,36 +791,39 @@ const Importer = ({
               overflowX: 'hidden',
             }}
           >
-            {importSummary.teaSummary && (
+            {(importSummary as TrackerSummary).teaSummary && (
               <ImportSummary
                 title={`Import Summary - Tracked Entity Attributes`}
                 importCategories={[
                   {
                     name: 'Sections',
-                    content: importSummary.teaSummary.programSections,
+                    content: (importSummary as TrackerSummary).teaSummary!
+                      .programSections,
                   },
                   {
                     name: 'Tracked Entity Attributes',
-                    content: importSummary.teaSummary.teas,
+                    content: (importSummary as TrackerSummary).teaSummary!.teas,
                   },
                 ]}
               />
             )}
-            {importSummary.stages.map((stage, index) => {
-              return (
-                <ImportSummary
-                  key={stage.stageName + index}
-                  title={`Import Summary - ${stage.stageName}`}
-                  importCategories={[
-                    { name: 'Sections', content: stage.sections },
-                    {
-                      name: 'Stage Data Elements',
-                      content: stage.dataElements,
-                    },
-                  ]}
-                />
-              );
-            })}
+            {(importSummary as TrackerSummary).stages.map(
+              (stage: StageSummary, index: number) => {
+                return (
+                  <ImportSummary
+                    key={(stage.stageName ?? '') + index}
+                    title={`Import Summary - ${stage.stageName ?? ''}`}
+                    importCategories={[
+                      { name: 'Sections', content: stage.sections },
+                      {
+                        name: 'Stage Data Elements',
+                        content: stage.dataElements,
+                      },
+                    ]}
+                  />
+                );
+              }
+            )}
           </div>
         )}
       </DialogContent>
@@ -762,11 +841,10 @@ const Importer = ({
           <Button
             variant="outlined"
             startIcon={<UploadFileIcon />}
-            disabled={buttonDisabled}
+            disabled={buttonDisabled || !selectedFile}
             onClick={() => startImportProcess(isTracker(programSpecificType))}
           >
-            {' '}
-            Import{' '}
+            Import
           </Button>
         )}
       </DialogActions>

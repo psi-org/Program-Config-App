@@ -1,6 +1,5 @@
 import {
   HNQIS2_TEMPLATE_MAP,
-  TEMPLATE_PROGRAM_TYPES,
   TRACKER_TEMPLATE_MAP,
 } from '../../configs/TemplateConstants.js';
 import {
@@ -9,6 +8,7 @@ import {
   countChanges,
   getBasicForm,
 } from '../../utils/importerUtils.js';
+import { isHnqisPCAType } from '../../utils/Utils.jsx';
 
 export const readTemplateData = ({
   templateData,
@@ -20,7 +20,7 @@ export const readTemplateData = ({
   mode,
   importSummaryValues,
 }) => {
-  const isHNQIS = mode === TEMPLATE_PROGRAM_TYPES.hnqis2;
+  const isHNQIS = isHnqisPCAType(mode);
   let sectionIndex = -1;
   let isBasicForm = false;
   const ignoredSections = [];
@@ -139,7 +139,7 @@ export const readTemplateData = ({
     currentData: currentData.sections,
   });
 
-  if (mode === TEMPLATE_PROGRAM_TYPES.hnqis2) {
+  if (isHNQIS) {
     // New scores
     importedScores.forEach((i_score) => {
       i_score.importStatus = i_score.id == null ? 'new' : 'update';
