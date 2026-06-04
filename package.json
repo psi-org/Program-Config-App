@@ -2,7 +2,7 @@
   "name": "program_configuration",
   "title": "Program Configuration",
   "author": "BAO Systems",
-  "version": "3.0.0-alpha",
+  "version": "3.0.0",
   "description": "Tracker Programs management tool",
   "license": "CC-BY-4.0",
   "private": true,

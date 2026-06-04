@@ -124,7 +124,6 @@ export interface BuildProgramRuleVariablesParams {
   scoresSection: { dataElements: PcaDataElement[] };
   compositeScores: string[];
   programId: string;
-  useCompetencyClass?: string;
   uidPool: string[];
 }
 

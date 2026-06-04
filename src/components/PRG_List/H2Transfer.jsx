@@ -17,7 +17,6 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   METADATA,
-  COMPETENCY_ATTRIBUTE,
   ASSESSMENT_DATE_ATTRIBUTE,
   HEALTH_AREA_ATTRIBUTE,
   ORGANISATION_UNIT_ATTRIBUTE,
@@ -389,11 +388,6 @@ const H2Transfer = ({
           event.dataValues.find((dv) => dv.dataElement === H1_COMPETENCY_CLASS)
             ?.value
         ];
-
-      hnqisTEI.attributes.push({
-        attribute: COMPETENCY_ATTRIBUTE,
-        value: eventCompetency,
-      });
 
       assessmentEvent.dataValues.push({
         dataElement: COMPETENCY_CLASS,

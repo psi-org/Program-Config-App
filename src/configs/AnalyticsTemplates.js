@@ -12,8 +12,9 @@ export const ProgramIndicatorTemplate = {
     userGroups: {},
     public: '--------',
   },
-  filter: 'A{ulU9KKgSLYe} == "competent"',
+  filter: '#{<stageId>.NAaHST5ZDTE} == "competent"',
   analyticsType: 'ENROLLMENT',
+  displayInForm: true,
   program: { id: '<programId>' },
   analyticsPeriodBoundaries: [
     {

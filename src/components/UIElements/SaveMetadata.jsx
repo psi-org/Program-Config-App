@@ -25,21 +25,6 @@ import {
 import CustomMUIDialog from './CustomMUIDialog.js';
 import CustomMUIDialogTitle from './CustomMUIDialogTitle.jsx';
 
-const competencyClassAttribute = {
-  mandatory: false,
-  searchable: false,
-  renderOptionsAsRadio: false,
-  displayInList: false,
-  valueType: 'TEXT',
-  sortOrder: 5,
-  program: { id: null },
-  trackedEntityAttribute: { id: COMPETENCY_ATTRIBUTE },
-  userGroupAccesses: [],
-  attributeValues: [],
-  programTrackedEntityAttributeGroups: [],
-  translations: [],
-  userAccesses: [],
-};
 const queryId = {
   results: {
     resource: 'system/id.json',
@@ -339,25 +324,22 @@ const processStageData = ({
   }
 
   //* PROGRAM TRACKED ENTITY ATTRIBUTES
-  const currentCompetencyAttribute =
-    programPayload.programTrackedEntityAttributes.find(
-      (att) => att.trackedEntityAttribute.id === COMPETENCY_ATTRIBUTE
-    );
-  if (
-    hnqisMode &&
-    new_programMetadata.useCompetencyClass == 'Yes' &&
-    !currentCompetencyAttribute
-  ) {
-    competencyClassAttribute.program.id = programPayload.id;
-    programPayload.programTrackedEntityAttributes.push(
-      competencyClassAttribute
-    );
-    criticalSection.dataElements.push({ id: COMPETENCY_CLASS });
-  } else if (hnqisMode && new_programMetadata.useCompetencyClass == 'No') {
+  // Remove legacy COMPETENCY_ATTRIBUTE TEA from program if present
+  if (hnqisMode) {
     programPayload.programTrackedEntityAttributes =
       programPayload.programTrackedEntityAttributes.filter(
-        (att) => att.trackedEntityAttribute.id != COMPETENCY_ATTRIBUTE
+        (att) => att.trackedEntityAttribute.id !== COMPETENCY_ATTRIBUTE
       );
+  }
+
+  //* COMPETENCY CLASS Data Element in Critical Section
+  if (hnqisMode && new_programMetadata.useCompetencyClass == 'Yes') {
+    if (
+      !criticalSection.dataElements.some((de) => de.id === COMPETENCY_CLASS)
+    ) {
+      criticalSection.dataElements.push({ id: COMPETENCY_CLASS });
+    }
+  } else if (hnqisMode && new_programMetadata.useCompetencyClass == 'No') {
     criticalSection.dataElements = criticalSection.dataElements.filter(
       (de) => de.id != COMPETENCY_CLASS
     );

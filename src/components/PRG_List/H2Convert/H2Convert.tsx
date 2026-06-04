@@ -30,7 +30,6 @@ import {
   SCORE_NUM_ATTRIBUTE,
 } from '../../../configs/Constants';
 import {
-  COMPETENCY_TEA,
   HnqisProgramConfigs,
   Program,
   PS_ActionPlanStage,
@@ -540,10 +539,6 @@ const H2Convert = ({
       if (competencyIndex > -1) {
         criticalSteps.dataElements.splice(competencyIndex, 1);
       }
-    } else {
-      convertedProgram.programTrackedEntityAttributes.push(
-        DeepCopy(COMPETENCY_TEA)
-      );
     }
 
     assessmentStage.programStageDataElements = programStageDataElements.map(

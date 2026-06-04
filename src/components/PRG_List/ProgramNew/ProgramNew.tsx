@@ -13,7 +13,6 @@ import Tooltip from '@mui/material/Tooltip';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ASSESSMENT_TET,
-  COMPETENCY_ATTRIBUTE,
   COMPETENCY_CLASS,
   CRITICAL_STEPS,
   NON_CRITICAL_STEPS,
@@ -65,7 +64,6 @@ import type {
   ProgramStage,
   ProgramTeaItem,
   ProgramTeaState,
-  ProgramTrackedEntityAttribute,
   QueryResults,
   SelectOption,
   SnackParams,
@@ -85,7 +83,6 @@ import {
   hasPublicAddPermission,
   mergeSelectedTeaIds,
   nextUid,
-  removeCompetencyAttribute,
   removeCompetencyClass,
   sanitizeSections,
   stepsLimit,
@@ -616,10 +613,6 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
       );
 
       if (!useCompetency) {
-        prgrm.programTrackedEntityAttributes = removeCompetencyAttribute(
-          prgrm.programTrackedEntityAttributes
-        );
-
         if (props.data) {
           criticalSteps = prgrm.programStages
             .flatMap((stage: ProgramStage) => stage.programStageSections ?? [])
@@ -665,21 +658,6 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
             { id: COMPETENCY_CLASS },
           ];
         }
-
-        prgrm.programTrackedEntityAttributes =
-          prgrm.programTrackedEntityAttributes.filter(
-            (ptea: ProgramTrackedEntityAttribute) =>
-              ptea.trackedEntityAttribute.id !== COMPETENCY_ATTRIBUTE
-          );
-
-        prgrm.programTrackedEntityAttributes.push({
-          trackedEntityAttribute: { id: 'ulU9KKgSLYe' },
-          mandatory: false,
-          valueType: 'TEXT',
-          searchable: false,
-          displayInList: false,
-          sortOrder: 5,
-        });
       }
 
       createOrUpdateMetaData({

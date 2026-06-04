@@ -549,25 +549,6 @@
           "value": "HNQIS - Fecha de evaluación"
         }
       ]
-    },
-    {
-      "id": "ulU9KKgSLYe",
-      "name": "HNQIS - Competency Class",
-      "shortName": "HNQIS - Competency Class",
-      "aggregationType": "NONE",
-      "displayInListNoProgram": false,
-      "pattern": "",
-      "skipSynchronization": false,
-      "generated": false,
-      "displayOnVisitSchedule": false,
-      "valueType": "TEXT",
-      "formName": "Competency Class",
-      "orgunitScope": false,
-      "confidential": false,
-      "unique": false,
-      "inherit": false,
-      "optionSet": { "id": "NDfZ129owtz" },
-      "translations": []
     }
   ],
   "trackedEntityTypes": [

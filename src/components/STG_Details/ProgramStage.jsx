@@ -2,7 +2,7 @@ import { useDataQuery } from '@dhis2/app-runtime';
 import { NoticeBox, CircularLoader } from '@dhis2/ui';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import actionCreators from '../../state/action-creators/index.js';
 import {
@@ -29,6 +29,7 @@ const ProgramStage = () => {
   const h2Ready = localStorage.getItem('h2Ready') === 'true';
 
   const { id } = useParams();
+  const { key: locationKey } = useLocation();
 
   if (id && id.length == 11) {
     const dispatch = useDispatch();
@@ -44,7 +45,7 @@ const ProgramStage = () => {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [locationKey]); // Re-fetch on every navigation to this route
 
   if (!id && !programStage) {
     return (

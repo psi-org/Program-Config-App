@@ -59,15 +59,6 @@ export const HnqisProgramConfigs = {
   userGroupAccesses: [],
 };
 
-export const COMPETENCY_TEA = {
-  trackedEntityAttribute: { id: 'ulU9KKgSLYe' },
-  mandatory: false,
-  valueType: 'TEXT',
-  searchable: false,
-  displayInList: false,
-  sortOrder: 5,
-};
-
 export const PS_AssessmentStage = {
   autoGenerateEvent: true,
   executionDateLabel: 'Assessment date',

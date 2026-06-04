@@ -1,5 +1,4 @@
 import {
-  COMPETENCY_ATTRIBUTE,
   COMPETENCY_CLASS,
   MAX_PREFIX_LENGTH,
   MAX_PROGRAM_NAME_LENGTH,
@@ -221,13 +220,6 @@ export const createOrUpdateMetaData = ({
     value: JSON.stringify(payload),
   });
 };
-
-export const removeCompetencyAttribute = (
-  programTrackedEntityAttributes: ProgramTrackedEntityAttribute[]
-): ProgramTrackedEntityAttribute[] =>
-  programTrackedEntityAttributes.filter(
-    (attr) => attr.trackedEntityAttribute.id !== COMPETENCY_ATTRIBUTE
-  );
 
 export const removeCompetencyClass = <T extends { id: string }>(
   dataElements: T[]

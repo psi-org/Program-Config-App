@@ -1002,7 +1002,6 @@ const StageSections = ({
           scoresSection: pcaScoresSection,
           compositeScores: definedCompositeScores,
           programId,
-          useCompetencyClass: programMetadata?.useCompetencyClass,
           uidPool: localUidPool,
         });
 
@@ -1312,6 +1311,22 @@ const StageSections = ({
   useEffect(() => {
     return () => setCriticalSection(undefined);
   }, []);
+
+  // Re-sync criticalSection when the number of its data elements changes
+  // (e.g. competency class toggled in ProgramNew and stage data is re-fetched)
+  useEffect(() => {
+    if (!hnqisMode) return;
+    setCriticalSection(
+      programStage.programStageSections.find(
+        (s) => s.name === 'Critical Steps Calculations'
+      )
+    );
+  }, [
+    // eslint-disable-line react-hooks/exhaustive-deps
+    programStage.programStageSections.find(
+      (s) => s.name === 'Critical Steps Calculations'
+    )?.dataElements?.length,
+  ]);
 
   useEffect(() => {
     getUIDs();

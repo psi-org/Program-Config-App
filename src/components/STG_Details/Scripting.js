@@ -19,7 +19,7 @@ import {
 import {
   FEEDBACK_ORDER,
   METADATA,
-  COMPETENCY_ATTRIBUTE,
+  COMPETENCY_CLASS,
   ACTION_PLAN_ACTION,
   VISUALIZATIONS_LEGEND,
   NON_CRITICAL_STEPS,
@@ -585,12 +585,7 @@ const buildCompetencyRules = (programId, stageId, uidPool) => {
   return { competencyRules, competencyActions };
 };
 
-const buildAttributesRules = ({
-  programId,
-  uidPool,
-  useCompetencyClass = 'Yes',
-  healthArea,
-}) => {
+const buildAttributesRules = ({ programId, uidPool, healthArea }) => {
   const attributeActions = [];
 
   const attributeRules = [
@@ -651,38 +646,6 @@ const buildAttributesRules = ({
       ],
     },
   ];
-
-  if (useCompetencyClass == 'Yes') {
-    attributeRules.push({
-      name: `PR - Attributes - CompClass `,
-      displayName: `PR - Attributes - CompClass `,
-      description: '_Scripted',
-      condition:
-        '!d2:hasValue(#{_criticalNewest}) || !d2:hasValue(#{_NoncriticalNewest})',
-      program: { id: '' },
-      programRuleActions: [
-        {
-          programRuleActionType: 'HIDEFIELD',
-          trackedEntityAttribute: { id: 'ulU9KKgSLYe' },
-        },
-      ],
-    });
-
-    attributeRules.push({
-      name: 'PR - Attributes - Assign Competency',
-      displayName: 'PR - Attributes - Assign Competency',
-      condition: 'd2:hasValue(#{_competencyNewest})',
-      program: { id: '' },
-      description: '_Scripted',
-      programRuleActions: [
-        {
-          data: '#{_competencyNewest}',
-          programRuleActionType: 'ASSIGN',
-          trackedEntityAttribute: { id: 'ulU9KKgSLYe' },
-        },
-      ],
-    });
-  }
 
   attributeRules.forEach((rule) => {
     const programRuleUid = uidPool.shift();
@@ -889,7 +852,6 @@ export const buildProgramRuleVariables = ({
   scoresSection,
   compositeScores,
   programId,
-  useCompetencyClass = 'Yes',
   uidPool,
 }) => {
   // const criticalStepCalculations = sections.find(s => s.name == "Critical Step Calculations");
@@ -967,17 +929,6 @@ export const buildProgramRuleVariables = ({
     },
   ];
 
-  // Competency Class Variable
-  if (useCompetencyClass == 'Yes') {
-    criticalVariables.push({
-      id: uidPool.shift(),
-      name: '_competencyNewest',
-      programRuleVariableSourceType: 'DATAELEMENT_NEWEST_EVENT_PROGRAM',
-      useCodeForOptionSet: true,
-      program: { id: programId },
-      dataElement: { id: 'NAaHST5ZDTE' },
-    });
-  }
   return programRuleVariables.concat(criticalVariables);
 };
 
@@ -1346,7 +1297,6 @@ export const buildProgramRules = ({
   const { attributeRules, attributeActions } = buildAttributesRules({
     programId,
     uidPool,
-    useCompetencyClass,
     healthArea,
   });
 
@@ -1404,14 +1354,17 @@ export const buildProgramIndicators = ({
   const indicatorValues =
     useCompetency === 'Yes'
       ? [
-          { name: 'C', condition: `A{${COMPETENCY_ATTRIBUTE}} == "competent"` },
+          {
+            name: 'C',
+            condition: `#{${programStage.id}.${COMPETENCY_CLASS}} == "competent"`,
+          },
           {
             name: 'CNI',
-            condition: `A{${COMPETENCY_ATTRIBUTE}} == "improvement"`,
+            condition: `#{${programStage.id}.${COMPETENCY_CLASS}} == "improvement"`,
           },
           {
             name: 'NC',
-            condition: `A{${COMPETENCY_ATTRIBUTE}} == "notcompetent"`,
+            condition: `#{${programStage.id}.${COMPETENCY_CLASS}} == "notcompetent"`,
           },
         ]
       : [
