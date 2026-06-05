@@ -1,5 +1,5 @@
 import { useDataMutation, useDataQuery } from '@dhis2/app-runtime';
-import { OrganisationUnitTree } from '@dhis2/ui';
+import { getAllExpandedOrgUnitPaths, OrganisationUnitTree } from '@dhis2/ui';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -22,7 +22,7 @@ import {
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   concatArraysUnique,
   parseErrorsJoin,
@@ -64,6 +64,7 @@ const ouQuery = {
       paging: false,
       fields: ['id', 'path'],
       level: [level],
+      withinUserHierarchy: false,
     }),
   },
 };
@@ -75,6 +76,7 @@ const ouGroupQuery = {
       paging: false,
       fields: ['id', 'path'],
       includeDescendants: true,
+      withinUserHierarchy: false,
       filter: ['organisationUnitGroups.id:eq:' + groupId],
     }),
   },
@@ -87,7 +89,7 @@ const searchOrgUnitQuery = {
       pageSize: 100,
       fields: ['id', 'path', 'displayName'],
       filter: [`identifiable:token:${filterString}`],
-      withinUserHierarchy: true,
+      withinUserHierarchy: false,
     }),
   },
 };
@@ -114,7 +116,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
       resource: 'programs/' + id + '/metadata.json',
     },
   };
-  let level, filterString, groupId;
+  let level, groupId;
   const filterRef = useRef(null);
   const [orgUnitLevel, setOrgUnitLevel] = useState(undefined);
   const [orgUnitGroup, setOrgUnitGroup] = useState('');
@@ -125,6 +127,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
   const [orgUnitTreeRoot, setOrgUnitTreeRoot] = useState([]);
   const [orgUnitFiltered, setOrgUnitFiltered] = useState([]);
   const [orgUnitExpanded, setOrgUnitExpanded] = useState([]);
+  const [expandedPaths, setExpandedPaths] = useState([]);
   const [filterValue, setFilterValue] = useState('');
   const [filterLoading, setFilterLoading] = useState(false);
   const [fetchErrors, setFetchErrors] = useState(undefined);
@@ -138,9 +141,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
   const oUnitsByGroups = useDataQuery(ouGroupQuery, {
     variables: { id: id, groupId: groupId },
   });
-  const searchOunits = useDataQuery(searchOrgUnitQuery, {
-    variables: { filterString: filterString },
-  });
+  const searchOunits = useDataQuery(searchOrgUnitQuery, { lazy: true });
   const { loading: metadataLoading, data: prgMetaData } = useDataQuery(
     programMetadata,
     {
@@ -165,7 +166,10 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     },
   });
 
-  let userOrgUnits;
+  const userOrgUnits = useMemo(
+    () => ouMetadata?.userOrgUnits?.organisationUnits.map((ou) => ou.id) ?? [],
+    [ouMetadata]
+  );
 
   const cutOrgUnitsPath = (route) => {
     const routeParts = route.split('/');
@@ -211,12 +215,6 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     }
   };
 
-  if (!ouMetadataLoading) {
-    userOrgUnits = ouMetadata.userOrgUnits?.organisationUnits.map(
-      (ou) => ou.id
-    );
-  }
-
   const metadataRequest = {
     mutate: metadataDM[0],
     loading: metadataDM[1].loading,
@@ -246,6 +244,11 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     setHasChanges(true);
   };
 
+  const handleExpandOuTree = ({ path }) =>
+    setExpandedPaths((prev) => [...prev, path]);
+  const handleCollapseOuTree = ({ path }) =>
+    setExpandedPaths((prev) => prev.filter((p) => p !== path));
+
   const doSearch = () => {
     setFilterLoading(true);
     const filterString = filterRef.current.value;
@@ -257,8 +260,8 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
             ...data.results?.organisationUnits.map((ou) => ou.path),
           ].map(cutOrgUnitsPath);
           setOrgUnitFiltered(filterResults);
-          setOrgUnitTreeRoot(userOrgUnits);
           setOrgUnitExpanded(filterResults);
+          setExpandedPaths(getAllExpandedOrgUnitPaths(filterResults));
         }
         setFilterLoading(false);
       });
@@ -271,6 +274,7 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
     setFilterValue('');
     setOrgUnitFiltered([]);
     setOrgUnitExpanded([]);
+    setExpandedPaths([]);
     setOrgUnitTreeRoot(userOrgUnits);
     setFilterLoading(false);
   };
@@ -486,6 +490,9 @@ const OunitScreen = ({ id, readOnly, setOrgUnitProgram, setNotification }) => {
                         selected={orgUnitPathSelected}
                         filter={orgUnitFiltered}
                         highlighted={orgUnitExpanded}
+                        expanded={expandedPaths}
+                        handleExpand={handleExpandOuTree}
+                        handleCollapse={handleCollapseOuTree}
                       />
                     </div>
                   )}
