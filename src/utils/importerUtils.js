@@ -151,6 +151,29 @@ export const workbookValidation = (
     }
   });
 
+  const errorsArray = [];
+  if (!instructionsWS) {
+    errorsArray.push('Instructions');
+  }
+  if (isTracker && !teasWS && !isEvent) {
+    errorsArray.push('TEAs');
+  }
+  if (templateWS.length === 0) {
+    errorsArray.push(isTracker && !isEvent ? 'Stage Template(s)' : 'Template');
+  }
+  if (!mappingWS) {
+    errorsArray.push('Mapping');
+  }
+  if (errorsArray.length > 0) {
+    task.status = 'error';
+    status = false;
+    task.name = `Missing the following required Tab(s): ${errorsArray.join(
+      ', '
+    )}.`;
+    setNotificationError(true);
+    return { status, teasWS, templateWS, instructionsWS, mappingWS };
+  }
+
   const templateIsHNQIS = Object.keys(HNQIS_TYPES).includes(
     instructionsWS.getCell(HQNIS2_PROGRAM_TYPE_CELL).value
   );
@@ -176,28 +199,6 @@ export const workbookValidation = (
 
   if (!status) {
     return false;
-  }
-
-  const errorsArray = [];
-  if (!instructionsWS) {
-    errorsArray.push('Instructions');
-  }
-  if (isTracker && !teasWS && !isEvent) {
-    errorsArray.push('TEAs');
-  }
-  if (templateWS.length === 0) {
-    errorsArray.push(isTracker && !isEvent ? 'Stage Template(s)' : 'Template');
-  }
-  if (!mappingWS) {
-    errorsArray.push('Mapping');
-  }
-  if (errorsArray.length > 0) {
-    task.status = 'error';
-    status = false;
-    task.name = `Missing the following required Tab(s): ${errorsArray.join(
-      ', '
-    )}.`;
-    setNotificationError(true);
   }
 
   return { status, teasWS, templateWS, instructionsWS, mappingWS };
