@@ -809,7 +809,7 @@ const labelsRulesLogic = (hideShowLabels, programId, uidPool) => {
 
     if (hsRule.parent == 'None') {
       pr.name = 'PR - Assign labels text';
-      pr.condition = `'true'`;
+      pr.condition = 'true';
     } else {
       pr.name = `PR - Assign labels when ${hsRule.parent} is ${hsRule.condition}`;
       const conditionValue = ['0', '1'].includes(String(hsRule.condition))
@@ -1126,7 +1126,7 @@ export const buildFeedbackRules = ({
               name: `PR - Feedback - Text - ${question.id || index}`,
               condition: questionCondition,
               action: makeText({
-                data: `d2:condition('#{${prv?.name}} == 0', '${preparedFeedback}', '')`,
+                data: `d2:condition('d2:hasValue(#{${prv?.name}}) && #{${prv?.name}} == 0', '${preparedFeedback}', '')`,
               }),
             });
           }
