@@ -167,14 +167,14 @@ const processStageData = ({
         //new_dataElements.push(dataElement);
       }
 
+      delete dataElement.importStatus;
+
       const existingPSDE = originalStageDataElements?.find(
         (psde) => psde.dataElement.id === dataElement.id
       );
       if (existingPSDE) {
         dataElement = mergeWithPriority(dataElement, existingPSDE.dataElement);
       }
-
-      delete dataElement.importStatus;
       new_programStageDataElements.push({
         compulsory:
           DE_metadata.isCompulsory == 'Yes' && !DE_metadata.parentQuestion, // True: mandatory is Yes and has no parents.

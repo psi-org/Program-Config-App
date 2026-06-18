@@ -758,7 +758,7 @@ const Importer = ({
               title="Import Summary"
               importCategories={[
                 {
-                  name: 'Questions',
+                  name: 'Questions/Labels',
                   content: (importSummary as HNQISSummary).questions,
                 },
                 {
