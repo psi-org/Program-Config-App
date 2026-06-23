@@ -674,6 +674,13 @@ const StageSections = ({
   // ── Save / Commit ─────────────────────────────────────────────────────────
 
   const commit = useCallback(() => {
+    if (hnqisMode && !scoresSection) {
+      pushNotification(
+        'Cannot save: the Scores section is missing from this assessment.',
+        'error'
+      );
+      return;
+    }
     setAddedSection(undefined);
     if ((createMetadata.data as unknown as MetadataImportResponse)?.status) {
       delete (createMetadata.data as Record<string, unknown>).status;
@@ -689,6 +696,9 @@ const StageSections = ({
     setRemovedElements(removed as ProgramStageDataElement[]);
     setSavingMetadata(true);
   }, [
+    hnqisMode,
+    scoresSection,
+    pushNotification,
     createMetadata.data,
     originalProgramStageDataElements,
     programStageDataElements,
@@ -1287,10 +1297,10 @@ const StageSections = ({
   }, [importerEnabled]);
 
   useEffect(() => {
-    if (sections && scoresSection && !backupData) {
+    if (sections && (!hnqisMode || scoresSection) && !backupData) {
       storeBackupData();
     }
-  }, [sections, scoresSection, backupData, storeBackupData]);
+  }, [sections, scoresSection, backupData, storeBackupData, hnqisMode]);
 
   useEffect(() => {
     if (savedAndValidated) {

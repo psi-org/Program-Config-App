@@ -161,8 +161,8 @@ const ValidateMetadata = ({
         }
 
         let score_errors = 0;
-        delete importedScoresV.errors;
         if (hnqisMode) {
+          delete importedScoresV.errors;
           importedScoresV.dataElements.forEach((dataElement) => {
             excelRow += 1;
             const errorDetails = {
