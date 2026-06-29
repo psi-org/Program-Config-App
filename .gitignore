@@ -6,3 +6,4 @@ src/scss
 build
 .idea
 .vscode
+.DS_Store
