@@ -1,0 +1,18 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_upload_active_svg",
+      "label": "Upload Icon (Active State)",
+      "file_type": "image",
+      "description": "24x24 UI icon showing an upward arrow inside a circular arc \u2014 represents an upload or publish action; rendered in orange (#F18A1F) as the active/in-progress state",
+      "source_file": "src/images/i-upload_active.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

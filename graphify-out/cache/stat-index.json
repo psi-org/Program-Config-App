@@ -1,0 +1,382 @@
+{
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/.claude/settings.json": {
+    "size": 2165,
+    "mtime_ns": 1782843879946802006,
+    "hash": "a21e560ad30ac97756728a7c40072a7c65f72885807903fc7378bf87c4b13fdc"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/.claude/settings.local.json": {
+    "size": 60,
+    "mtime_ns": 1778552817973727083,
+    "hash": "af66a29fcf2c7c2e11848b53a1c493cc6fda0f8a84e4e0635fc14b7ef54284ba"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/.husky/_/husky.sh": {
+    "size": 160,
+    "mtime_ns": 1776893554780260327,
+    "hash": "6db0aa99aece6ebd17bbc27c5e5287a462fb39cc4a2ca3a82a6277c166bdb3a0"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/.releaserc.json": {
+    "size": 2308,
+    "mtime_ns": 1782770594298650362,
+    "hash": "750fe792ea2414ca3450a8aa92d5432c402e4ac74715161e65ef2ee80e39629c"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/package.json": {
+    "size": 2216,
+    "mtime_ns": 1782769753998342572,
+    "hash": "e79bf2b7a111b0f2f9a5f7c07d1bec54df2ecda1d3f3c10898ad009c64cabbeb"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/configs/HNQIS2_Metadata_Package.json": {
+    "size": 24976,
+    "mtime_ns": 1782769754015610463,
+    "hash": "ad95aff5d136e379fc0c610b78d43b7f31dba19435c6d957fe8cb1527345a5ee"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/configs/pcaMetadataPackage.json": {
+    "size": 4708,
+    "mtime_ns": 1782769754016606126,
+    "hash": "96e00d2beac90fc3ff77d6afcfd1b59ddb0880f7d8cba8b4244d44befb95ac01"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/tsconfig.json": {
+    "size": 399,
+    "mtime_ns": 1782769754031479569,
+    "hash": "472e98cb8a7965e795d95aa8d476b494baca614cb9839f521db6779990b552ed"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/.github/workflows/release.yml": {
+    "size": 2383,
+    "mtime_ns": 1782769753997018493,
+    "hash": "9db650e2e52ea173cc03f535de0bfbd5a86d3472a587a092958af57a9d57beab"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/CHANGELOG.md": {
+    "size": 1518,
+    "mtime_ns": 1782778415725382389,
+    "hash": "d72f41e4a3835a78e59ddd8c53387f56c762107efa274d9446847ff23b141c5f"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/CLAUDE.md": {
+    "size": 772,
+    "mtime_ns": 1782843879946478841,
+    "hash": "3612256e7473a2e5f67ef4778d4edeefb44794ef22bac5529bee9c87dc5d8f3d"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/LICENSE.md": {
+    "size": 18142,
+    "mtime_ns": 1782769753997651366,
+    "hash": "16454a9ae86176562ee391dea4d963ef8c061ab961feaf05c211bb2c260b0d7e"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/README.md": {
+    "size": 1734,
+    "mtime_ns": 1782769753997803532,
+    "hash": "fa132a92aa157edd2fe215b24844a67bd2a61c966e62d1b38996b3433b71f80e"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/public/dhis2-app-icon.png": {
+    "size": 3704,
+    "mtime_ns": 1736356325487607128,
+    "hash": "a70c82f82589d0886a0f203958b61e4e74beb4081364e44bd46788e946e0c84b"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/public/favicon-16x16.png": {
+    "size": 2371,
+    "mtime_ns": 1736356325487863781,
+    "hash": "a0a7ce9854adef69118d8175f9474e1f7216177fffa3572e2cf7e513bfbd4175"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/public/favicon-32x32.png": {
+    "size": 2949,
+    "mtime_ns": 1736356325488041064,
+    "hash": "c1d79e7277fb4c77dd6dacfe16264b289d774966a252ce08dd040181b3a7bb1d"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/public/favicon-48x48.png": {
+    "size": 3704,
+    "mtime_ns": 1736356325488221679,
+    "hash": "2c462d33d51a37e86f7899a587c45c8812acfd6a0442a960ef642ba047b4fca1"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/KTT-logo.png": {
+    "size": 3794,
+    "mtime_ns": 1736356325514241206,
+    "hash": "71d1356227fbabdaf0eb3dcec0219bed99c99ba08efdc1d0e8af3892e6f5527f"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/PCA-logo.png": {
+    "size": 24115,
+    "mtime_ns": 1736356325514363908,
+    "hash": "11d2c4a00171a35954aa785c2939f869215719b308359bc41ebdba65fe574fdd"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/PSI-logo.png": {
+    "size": 7232,
+    "mtime_ns": 1736356325514521816,
+    "hash": "80d24a3cff4d6e664d5967399dc9f31d35591e7b42b47520b4c8693f5ad79bb4"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/bao-logo.svg": {
+    "size": 3837,
+    "mtime_ns": 1782769754017227457,
+    "hash": "30780284e4169c70bdb6db57542ade365ce7d864b55c072f874ae09c2554f352"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/cogs.svg": {
+    "size": 3965,
+    "mtime_ns": 1736356325514632310,
+    "hash": "4c456188d8588c3def877fed4dfbd0edeb4ca474c5e809d5b6ad6a337c0824f2"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/dhis2-app-icon.png": {
+    "size": 3704,
+    "mtime_ns": 1736356325514736430,
+    "hash": "410cc460dea9cf4f47e03d605443759af14bec589558b8d8192d26650ef31615"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/graphic_e-1.jpg": {
+    "size": 9425,
+    "mtime_ns": 1736356325514903088,
+    "hash": "9405c510ac23f72413093b6b2ba773196e94e25e2aed33c6e061c2fc860f5a99"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/graphic_e-2.jpg": {
+    "size": 8210,
+    "mtime_ns": 1736356325515053747,
+    "hash": "5c52785905e362bbdbe42c568a30ba0d7f5ca420a11fcc584d81ae58b54e68ba"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/graphic_e-3.jpg": {
+    "size": 7581,
+    "mtime_ns": 1736356325515201823,
+    "hash": "1f64df0a41f6c7a79ebbc05c55a098c3ffe37abe4dd641c5f5f9673a0639d2df"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/graphic_e-4.jpg": {
+    "size": 7581,
+    "mtime_ns": 1736356325515340649,
+    "hash": "ec583750519a06b60487bf8d856cfd5a23325534c1be29ffcf88e16479a1a179"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/hash.svg": {
+    "size": 976,
+    "mtime_ns": 1736356325515453851,
+    "hash": "37990cc0580e137b69833156d342d1de43616955a38173845ea9638022b0ad19"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-arrow_colaps_black.svg": {
+    "size": 152,
+    "mtime_ns": 1736356325515562929,
+    "hash": "55f04bfde4e6274eafa100a3f5bcaa18ccba40cc3a2d328609209c9dbafb5b0a"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-arrow_colaps_white.svg": {
+    "size": 170,
+    "mtime_ns": 1736356325515684798,
+    "hash": "851f89cac7148334f19c3eea01afcb10c4bdb5302eff81aaf865aa0cf61f6c08"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-arrow_expand_black.svg": {
+    "size": 177,
+    "mtime_ns": 1736356325515809333,
+    "hash": "0045227072f5985171b7bccbe95277d53a89ea994db37ce0dbdfcac037f984f4"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-arrow_expand_white.svg": {
+    "size": 175,
+    "mtime_ns": 1736356325515920660,
+    "hash": "277e94650fcc6941476b6b24f10c4725e3e7df06e4f85ca858f2bb99f9679823"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-close_black.svg": {
+    "size": 287,
+    "mtime_ns": 1736356325516031738,
+    "hash": "970bdf5589196263dcbd361ca1f26429ef3151bd16a0830ebcfd20cab883b12d"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-close_white.svg": {
+    "size": 285,
+    "mtime_ns": 1736356325516161898,
+    "hash": "e239dc63b8fd01df9ffdb93546d6ca7c25cf27d5f2ff639a178117a9a7a80aa9"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-contracted-bottom_black.svg": {
+    "size": 215,
+    "mtime_ns": 1736356325516283225,
+    "hash": "60597625789348648af6316cf4c2ad25d94911e6e383f07d6d787761da8fe7a6"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-contracted-bottom_white.svg": {
+    "size": 213,
+    "mtime_ns": 1736356325516418593,
+    "hash": "a6c48135933889fd76ad56569d3a07691a465ab80b93ada54d8c21fc43a75826"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-download.svg": {
+    "size": 611,
+    "mtime_ns": 1736356325516550919,
+    "hash": "77368d9b8f93bd3a59e53d8caced981ce52f2e041e7270d01aecd05b1a12a837"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-download_active.svg": {
+    "size": 611,
+    "mtime_ns": 1736356325516689204,
+    "hash": "1746942b42c19a0c2d97b9f0a8ed7241659814447bb0bce7963e4786623349ad"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-drag_black.svg": {
+    "size": 164,
+    "mtime_ns": 1736356325516834113,
+    "hash": "8260e4b438e8f261fbca16dc16f5985c8a83aa364ebe3f949ef08fa461bb3a06"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-drag_gray.svg": {
+    "size": 181,
+    "mtime_ns": 1736356325516984397,
+    "hash": "8a875ff00b4328014e4ba43b0ceb58afcd618ba826259690f60e0e7600b5e2cc"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-drag_white.svg": {
+    "size": 162,
+    "mtime_ns": 1736356325517127181,
+    "hash": "3447647da9fe61539e616bb36305f1d0630993a37a52bc62caa1b977ffdb39de"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-edit_black.svg": {
+    "size": 346,
+    "mtime_ns": 1736356325517359002,
+    "hash": "c4a350f3d0b4a8d83ece9b2100c19a2135fe9910aff4bee6690595ee8a7c1176"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-edit_white.svg": {
+    "size": 344,
+    "mtime_ns": 1736356325517570825,
+    "hash": "16d1d6c3a2d810951d8ba6096941b58a966cb7029b39e9df4ee354d33c020205"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-error.svg": {
+    "size": 429,
+    "mtime_ns": 1736356325517684861,
+    "hash": "2a52ee0145168f1e8055647ebf21b8115e2c490ed8d0c742bcd39cec1b141934"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-exiting_data_element.svg": {
+    "size": 439,
+    "mtime_ns": 1736356325517814437,
+    "hash": "b50d9e35f24f15ef7f568a325549c8a9a17eaf7a3b6e4e70bfa696b7029d318f"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-expand-left_black.svg": {
+    "size": 215,
+    "mtime_ns": 1736356325517934348,
+    "hash": "d1469d4f6b6d38d3ccbb565ba91ddcffeb365a1fa6ad427eb0aaf987fc8ad730"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-expand-left_white.svg": {
+    "size": 213,
+    "mtime_ns": 1736356325518072674,
+    "hash": "4f70285177bccbe686681dc0cc39d46ad97cc57adf40117c656e5a36f14d93ba"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-expanded-bottom_black.svg": {
+    "size": 216,
+    "mtime_ns": 1736356325518196334,
+    "hash": "3d40bb25aae5b154e17cdefe4011e0c3d53a06e6723c0e6a32f9fb78b98c1a88"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-expanded-bottom_white.svg": {
+    "size": 214,
+    "mtime_ns": 1736356325518315828,
+    "hash": "fb4ef5280d7257bd41812f5c1dc91007529d9c87fbfbcb07f6728ec5aaf44265"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-fab_add_dark.svg": {
+    "size": 172,
+    "mtime_ns": 1736356325518429280,
+    "hash": "9e354f139c7a97b53f4a483f47b47aa424b274ac6ca76ff182e58f8f3a704c2c"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-fab_add_light.svg": {
+    "size": 170,
+    "mtime_ns": 1736356325518540775,
+    "hash": "73079b3cb7fdb983b8c1e5924668bd608f69dd2144ccbfe819580ec758ff3fac"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-help.svg": {
+    "size": 480,
+    "mtime_ns": 1736356325518670560,
+    "hash": "ec1361d6e1dc620f653d1a96b713d54acba1644f50d92cdf058714de182318c3"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-help_active.svg": {
+    "size": 480,
+    "mtime_ns": 1736356325518796886,
+    "hash": "39465b8b1b6bec8077f1880a1751493d3dbabe4b57bfedced3a16ed79db56dbb"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-hnqis_compiling_rules.svg": {
+    "size": 737,
+    "mtime_ns": 1736356325518913005,
+    "hash": "e4fc15c3d0e7e68951f2e1b7fa8382b67c20a89f55ed50e9308e01f260bc0253"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-hnqis_compiling_rules_active.svg": {
+    "size": 737,
+    "mtime_ns": 1736356325519014125,
+    "hash": "1bc8b283f617f273f07a60e1492d1da165390db43ae244df2cdf3dd230239f60"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-list_menu_arrow.svg": {
+    "size": 152,
+    "mtime_ns": 1736356325519121953,
+    "hash": "10da165b25905c8b68f55eec1e4618705de2223d4b92a17139d6331bde80c291"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-more_vert_black.svg": {
+    "size": 403,
+    "mtime_ns": 1736356325519244197,
+    "hash": "0616ce0b75cea1851bb91df91feaff77741c81b7e83d6665bc009f0c29c4dd96"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-more_vert_white.svg": {
+    "size": 401,
+    "mtime_ns": 1736356325519368440,
+    "hash": "b4ade13a1e23462f223afaec8a3f188155fdd1e1dfe2056254e861ba9669d74e"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-new_de.svg": {
+    "size": 334,
+    "mtime_ns": 1736356325519489934,
+    "hash": "61af4ab00916e4667095210a1b8251cb772d4935f93c2130bbd05f9fa13a267d"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-program_black.svg": {
+    "size": 2156,
+    "mtime_ns": 1736356325519595553,
+    "hash": "a9ab429e34334b88887cb9b15aaa4eb7a7834acd28c2774f43f173b8bf308aea"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-program_white.svg": {
+    "size": 2154,
+    "mtime_ns": 1736356325519705131,
+    "hash": "433609ff3c4d7741992b3c26abd89d4ddf26022b4c02cb8b65c32e683b9a566c"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-share_black.svg": {
+    "size": 610,
+    "mtime_ns": 1736356325519826208,
+    "hash": "d93a3519b724762be24ef7c20cfe105fd92d8ba9c2e50d288f7474145b22792d"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-share_white.svg": {
+    "size": 608,
+    "mtime_ns": 1736356325519930828,
+    "hash": "229f9da49cef926386afeec77007533d41e87cd2703362c4d331631ce3065835"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-subLevel_arrow_black.svg": {
+    "size": 203,
+    "mtime_ns": 1736356325520043697,
+    "hash": "3d127fdba7b54aa27b973c3ef8bfbf1aaab41b46cc5c4294ecd03524998a68f5"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-subLevel_arrow_white.svg": {
+    "size": 201,
+    "mtime_ns": 1736356325520160857,
+    "hash": "7832e8ee01c85f67028db20342a815d679b5f2403c8d41c3e994d23b6101cbeb"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-survey_black.svg": {
+    "size": 221,
+    "mtime_ns": 1736356325520281684,
+    "hash": "f44c4f56b0f58d29d709420a5e421bf8d9a77a5162962e7cba09226060aa99b7"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-survey_white.svg": {
+    "size": 221,
+    "mtime_ns": 1736356325520391762,
+    "hash": "a3ada7b5e60a5242b29775866135ec12529eea9cd91c14b8d323c937fc381c55"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-upload.svg": {
+    "size": 663,
+    "mtime_ns": 1736356325520658456,
+    "hash": "05cd8a041022abbbf62947c7d03b3b27242ea240675c142a519a53a8690fb0f3"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-upload_active.svg": {
+    "size": 647,
+    "mtime_ns": 1736356325520780242,
+    "hash": "7a08010b9eac7da35b0196e396088fca592a5e92c381b982228305cc95a9206c"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/i-warning.svg": {
+    "size": 325,
+    "mtime_ns": 1736356325520901652,
+    "hash": "ccc9a76c1af5c159ae00d113e557aed831f6c4c4e8b0cdbccceda087986aabcc"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/logo_hnqis.svg": {
+    "size": 4812,
+    "mtime_ns": 1736356325521058186,
+    "hash": "42d0eb1e88efe91bcaf73f7e1cbeb915f193b4913401dc0497b0f334602e6b34"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/more_vert_black.svg": {
+    "size": 403,
+    "mtime_ns": 1736356325521202178,
+    "hash": "82753bbd69e81badb449a4e3d435e67dea9f4c0b0a4e50a38a4b1dcdfa00ca06"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/more_vert_white.svg": {
+    "size": 401,
+    "mtime_ns": 1736356325521327172,
+    "hash": "0dca9f2f564fec45552b698024bfe891e73eabc685d60fc410c0286e20aebb03"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/open_external.svg": {
+    "size": 1715,
+    "mtime_ns": 1736356325521458748,
+    "hash": "d995b465e2ff8edb6da5ce0e4e752772ea31c60dbc4440f7b116423299306247"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/path-logo.svg": {
+    "size": 1749,
+    "mtime_ns": 1782769754017362498,
+    "hash": "47cd3ef6f82a437f4e6f0ea5dce11347fd880b9a9fc8859314cbc5a9c510cbb4"
+  },
+  "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/images/scores.svg": {
+    "size": 668,
+    "mtime_ns": 1736356325521580784,
+    "hash": "6632f4a9587eb278b3c1053bc3509fd08877abd22f46463fa320ba49a8737a6c"
+  }
+}

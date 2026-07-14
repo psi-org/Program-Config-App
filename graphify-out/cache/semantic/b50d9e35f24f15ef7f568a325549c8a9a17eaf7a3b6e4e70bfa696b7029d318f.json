@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_exiting_data_element_svg",
+      "label": "Exiting Data Element Icon (Search with List)",
+      "file_type": "image",
+      "source_file": "src/images/i-exiting_data_element.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_images_i_exiting_data_element_svg",
+      "target": "src_images_i_new_de_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "src/images/i-exiting_data_element.svg",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

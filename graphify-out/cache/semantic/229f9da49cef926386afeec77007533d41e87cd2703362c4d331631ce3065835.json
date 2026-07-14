@@ -1,0 +1,18 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_share_white_svg",
+      "label": "Share Icon White",
+      "file_type": "image",
+      "description": "24x24 UI icon showing three connected nodes in a network/fork shape \u2014 represents share or social sharing action in white color for dark backgrounds",
+      "source_file": "src/images/i-share_white.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

@@ -1,0 +1,18 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_sublevel_arrow_white_svg",
+      "label": "Sub-Level Arrow Icon White",
+      "file_type": "image",
+      "description": "24x24 UI icon depicting an L-shaped arrow pointing right then down from a corner \u2014 represents hierarchical sub-level navigation or indented child item in white color",
+      "source_file": "src/images/i-subLevel_arrow_white.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

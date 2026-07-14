@@ -77,9 +77,9 @@ const queryProgramEvent = {
         'event',
         'program',
         'orgUnit',
-        'eventDate',
+        'occurredAt',
         'status',
-        'completedDate',
+        'completedAt',
         'storedBy',
         'dataValues[dataElement, value]',
         'notes',
@@ -101,7 +101,7 @@ const queryEventList = {
 };
 
 const metadataMutation = {
-  resource: 'tracker/trackedEntityInstances',
+  resource: 'tracker?async=false&skipRuleEngine=true',
   type: 'create',
   data: ({ data }) => data,
 };
@@ -210,7 +210,7 @@ const H2Transfer = ({
       return undefined;
     }
 
-    eventTemplate.eventDate = completionDate || eventTemplate.eventDate;
+    eventTemplate.occurredAt = completionDate || eventTemplate.occurredAt;
     eventTemplate.programStage = apStage;
 
     eventTemplate.dataValues.push({
@@ -244,17 +244,17 @@ const H2Transfer = ({
     const hnqisTEI = {};
     const h2Events = [];
 
-    const pasedEventDate = event.eventDate.split('T')[0];
+    const pasedEventDate = event.occurredAt.split('T')[0];
 
     // *Events Creation (One event for the assessment and up to three action plans)
     const eventTemplate = {
       dataValues: [], //* Format -> {dataElement: 'id', value: 'value'}
-      eventDate: pasedEventDate,
+      occurredAt: pasedEventDate,
       orgUnit: event.orgUnit,
       program: h2Program.id,
       programStage: '',
       storedBy: event.storedBy,
-      completedDate: event.completedDate,
+      completedAt: event.completedAt,
       status: event.status,
     };
 
@@ -389,10 +389,12 @@ const H2Transfer = ({
             ?.value
         ];
 
-      assessmentEvent.dataValues.push({
-        dataElement: COMPETENCY_CLASS,
-        value: eventCompetency,
-      });
+      if (eventCompetency) {
+        assessmentEvent.dataValues.push({
+          dataElement: COMPETENCY_CLASS,
+          value: eventCompetency,
+        });
+      }
     }
 
     h2Events.push(assessmentEvent);
@@ -402,8 +404,8 @@ const H2Transfer = ({
       {
         orgUnit: event.orgUnit,
         program: h2Program.id,
-        enrollmentDate: pasedEventDate,
-        incidentDate: pasedEventDate,
+        enrolledAt: pasedEventDate,
+        occurredAt: pasedEventDate,
         events: h2Events,
       },
     ];
@@ -560,22 +562,24 @@ const H2Transfer = ({
           });
 
           const storedData = await metadataRequest.mutate({
-            data: { trackedEntityInstances: [hnqisTEI] },
+            data: { trackedEntities: [hnqisTEI] },
           });
 
-          if (storedData.httpStatus === 'OK') {
-            const trackedEntityInstance =
-              storedData.response.importSummaries[0];
-            const enrollment =
-              trackedEntityInstance?.enrollments?.importSummaries[0];
+          if (storedData.status === 'OK') {
+            const trackedEntityReport =
+              storedData.bundleReport?.typeReportMap?.TRACKED_ENTITY
+                ?.objectReports?.[0];
+            const enrollmentReport =
+              storedData.bundleReport?.typeReportMap?.ENROLLMENT
+                ?.objectReports?.[0];
 
             obj[eventReq.event] = {
               transferDate: new Date().toLocaleString(
                 'en-US',
                 DATE_FORMAT_OPTIONS
               ),
-              trackedEntityInstance: trackedEntityInstance?.reference,
-              enrollment: enrollment?.reference,
+              trackedEntityInstance: trackedEntityReport?.uid,
+              enrollment: enrollmentReport?.uid,
               originEvent: eventReq.event,
             };
             await dsUpdateRequest.mutate({

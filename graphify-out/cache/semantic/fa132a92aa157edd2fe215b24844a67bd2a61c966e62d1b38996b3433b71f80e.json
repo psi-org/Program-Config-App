@@ -1,0 +1,125 @@
+{
+  "nodes": [
+    {
+      "id": "readme",
+      "label": "Program Configuration App README",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "hnqis_methodology",
+      "label": "HNQIS \u2014 Health Network Quality Improvement System",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": "line 9",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "dhis2_platform",
+      "label": "DHIS2 App Platform",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": "line 11",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "pca_program_config_app",
+      "label": "Program Configuration App (PCA)",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "readme",
+      "target": "license",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "line 19",
+      "weight": 1.0
+    },
+    {
+      "source": "readme",
+      "target": "pca_program_config_app",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "line 7",
+      "weight": 1.0
+    },
+    {
+      "source": "readme",
+      "target": "hnqis_methodology",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "line 9",
+      "weight": 1.0
+    },
+    {
+      "source": "readme",
+      "target": "dhis2_platform",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "line 11",
+      "weight": 1.0
+    },
+    {
+      "source": "pca_program_config_app",
+      "target": "dhis2_platform",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "README.md",
+      "source_location": "line 11",
+      "weight": 0.9
+    },
+    {
+      "source": "pca_program_config_app",
+      "target": "hnqis_methodology",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "README.md",
+      "source_location": "line 9",
+      "weight": 0.9
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "pca_dhis2_hnqis_triad",
+      "label": "PCA built on DHIS2 to implement HNQIS methodology",
+      "nodes": [
+        "pca_program_config_app",
+        "dhis2_platform",
+        "hnqis_methodology"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md"
+    }
+  ]
+}

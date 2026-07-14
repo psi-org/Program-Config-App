@@ -1,0 +1,29 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_share_black_svg",
+      "label": "Share Icon Black",
+      "file_type": "image",
+      "description": "24x24 UI icon showing three connected nodes in a network/fork shape \u2014 represents share or social sharing action in dark (#333333) color",
+      "source_file": "src/images/i-share_black.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_images_i_share_black_svg",
+      "target": "src_images_i_share_white_svg",
+      "relation": "light_dark_variant_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/images/i-share_black.svg",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}
