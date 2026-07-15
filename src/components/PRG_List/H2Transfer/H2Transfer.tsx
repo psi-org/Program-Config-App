@@ -28,9 +28,11 @@ import {
 } from '../../../configs/Constants';
 import type { TrackerImportResponse } from '../../../types';
 import { parseErrorsJoin } from '../../../utils/Utils';
+import AlertDialogSlide from '../../UIElements/AlertDialogSlide';
 import { getProgramFromResponse } from '../H2Convert/h2Convert.utils';
 import FailedRecordsList from './components/FailedRecordsList';
 import {
+  buildAddProgramOrgUnitsMutation,
   buildDataStoreCreateMutation,
   buildDataStoreQuery,
   buildDataStoreUpdateMutation,
@@ -114,6 +116,9 @@ const H2Transfer = ({
 
   const [progressValue, setProgressValue] = useState(0);
   const cancelTransfer = useRef(false);
+
+  const [confirmAddOrgUnitsOpen, setConfirmAddOrgUnitsOpen] = useState(false);
+  const [addingOrgUnits, setAddingOrgUnits] = useState(false);
 
   const { data: programData } = useDataQuery(queryEventList, {
     variables: { program: programConfig.id },
@@ -367,7 +372,7 @@ const H2Transfer = ({
           failed.length
         } of ${requestsData.length} assessment${
           failed.length === 1 ? '' : 's'
-        } could not be transferred — see the panel for details.`,
+        } could not be transferred, see the panel for details.`,
         severity: 'warning',
       });
     } else {
@@ -412,6 +417,45 @@ const H2Transfer = ({
           severity: 'error',
         });
       });
+  };
+
+  const addMissingOrgUnitsToProgram = async () => {
+    if (!h2Program || missingOrgUnits.length === 0) {
+      return;
+    }
+
+    setAddingOrgUnits(true);
+
+    const updatedOrgUnits = [
+      ...h2Program.organisationUnits,
+      ...missingOrgUnits.map((id) => ({ id })),
+    ];
+
+    try {
+      await engine.mutate(
+        buildAddProgramOrgUnitsMutation(h2Program.id) as unknown as Mutation,
+        {
+          variables: {
+            additions: missingOrgUnits.map((id) => ({ id })),
+          },
+        }
+      );
+      setH2Program({ ...h2Program, organisationUnits: updatedOrgUnits });
+      setNotification({
+        message: `${missingOrgUnits.length} Organisation Unit${
+          missingOrgUnits.length === 1 ? '' : 's'
+        } added to ${h2Program.name}`,
+        severity: 'success',
+      });
+    } catch (err) {
+      const error = err as { details?: unknown };
+      setNotification({
+        message: parseErrorsJoin(error.details ?? error, '\n'),
+        severity: 'error',
+      });
+    } finally {
+      setAddingOrgUnits(false);
+    }
   };
 
   return (
@@ -496,7 +540,7 @@ const H2Transfer = ({
               justifyContent: 'space-between',
             }}
           >
-            <Card sx={{ maxWidth: '30%' }} raised>
+            <Card sx={{ maxWidth: '30%' }} variant="outlined">
               <CardContent>
                 <Typography variant="h6" component="div">
                   Current Program
@@ -505,7 +549,7 @@ const H2Transfer = ({
               </CardContent>
             </Card>
             <DoubleArrowIcon className="progress-animation" />
-            <Card sx={{ maxWidth: '25%' }} raised>
+            <Card sx={{ maxWidth: '25%' }} variant="outlined">
               <CardContent>
                 <Typography variant="h6" component="div">
                   Transfer Data
@@ -516,7 +560,7 @@ const H2Transfer = ({
               </CardContent>
             </Card>
             <DoubleArrowIcon className="progress-animation" />
-            <Card sx={{ maxWidth: '30%' }} raised>
+            <Card sx={{ maxWidth: '30%' }} variant="outlined">
               <CardContent>
                 <Typography variant="h6" component="div">
                   New Program
@@ -546,16 +590,44 @@ const H2Transfer = ({
                 : ''}
               .
             </p>
-            <Button
-              onClick={copyMissingOrgUnits}
-              size="small"
-              variant="text"
-              sx={{ mt: 0.5 }}
-            >
-              Copy Org Units list
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+              <Button onClick={copyMissingOrgUnits} size="small" variant="text">
+                Copy Org Units list
+              </Button>
+              <Button
+                onClick={() => setConfirmAddOrgUnitsOpen(true)}
+                size="small"
+                variant="text"
+                color="error"
+                disabled={addingOrgUnits}
+              >
+                {addingOrgUnits
+                  ? 'Adding Org Units…'
+                  : 'Add Org Units to Program'}
+              </Button>
+            </Box>
           </NoticeBox>
         )}
+
+        <AlertDialogSlide
+          open={confirmAddOrgUnitsOpen}
+          title={`Add ${missingOrgUnits.length} Organisation Unit${
+            missingOrgUnits.length === 1 ? '' : 's'
+          } to ${h2Program?.name ?? 'the target Program'}?`}
+          content={`This will update the target Program's configuration in DHIS2, assigning it to the Organisation Unit${
+            missingOrgUnits.length === 1 ? '' : 's'
+          } listed above. This changes the live Program metadata and cannot be undone from here.`}
+          primaryText="Yes, add them"
+          secondaryText="Cancel"
+          color="error"
+          actions={{
+            primary: () => {
+              setConfirmAddOrgUnitsOpen(false);
+              void addMissingOrgUnitsToProgram();
+            },
+            secondary: () => setConfirmAddOrgUnitsOpen(false),
+          }}
+        />
 
         {loadingConversion && (
           <Box sx={{ width: '100%' }}>

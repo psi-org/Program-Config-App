@@ -2,18 +2,18 @@
 
 ## Corpus Check
 
-- 222 files · ~105,022 words
+- 222 files · ~105,448 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
 
-- 1126 nodes · 2525 edges · 77 communities (53 shown, 24 thin omitted)
+- 1127 nodes · 2530 edges · 79 communities (54 shown, 25 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 43 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
 
-- Built from commit: `c13ee204`
+- Built from commit: `561325c3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -91,11 +91,13 @@
 - [[_COMMUNITY_Scores Icon|Scores Icon]]
 - [[_COMMUNITY_Community 70|Community 70]]
 - [[_COMMUNITY_Community 71|Community 71]]
+- [[_COMMUNITY_Community 72|Community 72]]
 - [[_COMMUNITY_Community 73|Community 73]]
 - [[_COMMUNITY_Community 74|Community 74]]
 - [[_COMMUNITY_Community 75|Community 75]]
 - [[_COMMUNITY_Community 76|Community 76]]
 - [[_COMMUNITY_Community 79|Community 79]]
+- [[_COMMUNITY_Community 80|Community 80]]
 
 ## God Nodes (most connected - your core abstractions)
 
@@ -125,11 +127,11 @@
 
 ## Import Cycles
 
-- 3-file cycle: `src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/Category.ts -> src/types/BaseMetadataObject.ts`
-- 3-file cycle: `src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/FileResource.ts -> src/types/BaseMetadataObject.ts`
-- 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/UserRole.ts -> src/types/BaseIdentifiableObject.ts`
-- 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/CategoryOptionGroupSet.ts -> src/types/BaseIdentifiableObject.ts`
 - 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/UserGroup.ts -> src/types/BaseIdentifiableObject.ts`
+- 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/UserRole.ts -> src/types/BaseIdentifiableObject.ts`
+- 3-file cycle: `src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/Category.ts -> src/types/BaseMetadataObject.ts`
+- 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/CategoryOptionGroupSet.ts -> src/types/BaseIdentifiableObject.ts`
+- 3-file cycle: `src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/FileResource.ts -> src/types/BaseMetadataObject.ts`
 - 5-file cycle: `src/types/BaseDimensionalItemObject.ts -> src/types/LegendSet.ts -> src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/OrganisationUnit.ts -> src/types/BaseDimensionalItemObject.ts`
 - 5-file cycle: `src/types/BaseDimensionalItemObject.ts -> src/types/BaseNameableObject.ts -> src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/OrganisationUnit.ts -> src/types/BaseDimensionalItemObject.ts`
 
@@ -147,7 +149,7 @@
 - **Upload Action Icon State Pair (default and active)** — src_images_i_upload_svg, src_images_i_upload_active_svg [EXTRACTED 1.00]
 - **HNQIS / PATH Application Brand Assets** — src_images_logo_hnqis_svg, src_images_path_logo_svg, src_images_scores_svg [INFERRED 0.75]
 
-## Communities (77 total, 24 thin omitted)
+## Communities (79 total, 25 thin omitted)
 
 ### Community 0 - "Data Types & Interfaces"
 
@@ -166,8 +168,8 @@ Nodes (49): CurrentSectionsData, CurrentStagesData, HNQISSummary, Importer(), Im
 
 ### Community 3 - "Import Validation Engine"
 
-Cohesion: 0.08
-Nodes (42): ValidateTracker(), ValidateMetadata(), buildFeedbackErrorObject(), buildProgramConfigurations(), checkDuplicatedFeedbacks(), checkHasFormName(), checkHasProperty(), checkSectionHasFormName() (+34 more)
+Cohesion: 0.07
+Nodes (45): ValidateTracker(), ValidateMetadata(), buildFeedbackErrorObject(), buildProgramConfigurations(), checkDuplicatedFeedbacks(), checkHasFormName(), checkHasProperty(), checkSectionHasFormName() (+37 more)
 
 ### Community 4 - "HNQIS2 Converter UI"
 
@@ -186,18 +188,18 @@ Nodes (33): createMutation, deleteMetadataMutation, queryAndroidSettingsAnalytic
 
 ### Community 7 - "Data Element Editor"
 
-Cohesion: 0.17
-Nodes (12): DataElementForm(), DataElementItem(), DataElementStatusPool, DEActionsProps, DEStatus, getDEIcon(), ImportDataElement, a11yProps() (+4 more)
+Cohesion: 0.24
+Nodes (8): DataElementItem(), DataElementStatusPool, DEActionsProps, DEStatus, getDEIcon(), ImportDataElement, AlertDialogSlide(), Transition
 
 ### Community 8 - "Program Attributes Modal"
 
-Cohesion: 0.07
-Nodes (28): AttributesModal(), createMutation, exitDisclaimerModal(), queryIds, queryProgram, queryTEA, InputModal(), ConversionStatusDialogProps (+20 more)
+Cohesion: 0.06
+Nodes (34): AttributesModal(), createMutation, exitDisclaimerModal(), queryIds, queryProgram, queryTEA, InputModal(), ConversionStatusDialogProps (+26 more)
 
 ### Community 9 - "Setup Progress Dialog"
 
-Cohesion: 0.14
-Nodes (18): ICONS, ProgressStepProps, StepStatus, androidStatus(), androidText(), ErrorAccordionProps, formatFallbackError(), ParsedError (+10 more)
+Cohesion: 0.13
+Nodes (19): ICONS, ProgressStepProps, StepStatus, androidStatus(), androidText(), ErrorAccordionProps, formatFallbackError(), ParsedError (+11 more)
 
 ### Community 10 - "NPM Dependencies"
 
@@ -206,28 +208,28 @@ Nodes (28): dependencies, core-js, @dhis2/app-runtime, @dhis2/data-engine, @dhis
 
 ### Community 11 - "Stage Creation & Export"
 
-Cohesion: 0.11
-Nodes (23): metadataMutation, queryId, StageNew(), queryLegends, queryProgramSections, fieldSetStyle, orgUnitsQuery, ouUnitQuery (+15 more)
+Cohesion: 0.12
+Nodes (22): metadataMutation, queryId, queryLegends, queryProgramSections, fieldSetStyle, orgUnitsQuery, ouUnitQuery, query (+14 more)
 
 ### Community 12 - "Scripting Rule Builder"
 
-Cohesion: 0.09
-Nodes (31): buildAttributesRules(), buildCompetencyRules(), buildCriticalScore(), buildFeedbackRules(), buildFeedbackTree(), buildNonCriticalScore(), buildProgramRules(), buildProgramRuleVariables() (+23 more)
+Cohesion: 0.11
+Nodes (23): buildFeedbackRules(), buildFeedbackTree(), buildProgramRuleVariables(), checkScores(), FEEDBACK_ACTION_TEMPLATE, FEEDBACK_RULE_TEMPLATE, readQuestionComposites(), AssessmentByCompetencyByColumn (+15 more)
 
 ### Community 13 - "Program Details Editor"
 
-Cohesion: 0.14
-Nodes (14): Alert, createMutation, deleteMetadataMutation, ProgramDetails(), query, queryHNQIS2Metadata, queryIds, queryPR (+6 more)
+Cohesion: 0.12
+Nodes (17): Alert, createMutation, deleteMetadataMutation, ProgramDetails(), query, queryHNQIS2Metadata, queryIds, queryPR (+9 more)
 
 ### Community 14 - "HNQIS2 Metadata Transfer"
 
-Cohesion: 0.20
-Nodes (10): ProgramItem(), Alert, ProgramList(), query, queryHNQIS2Metadata, queryProgramType, formatAlert(), getHnqisType() (+2 more)
+Cohesion: 0.14
+Nodes (16): dataStoreMutation, H2Metadata(), metadataMutation, queryHNQIS2Metadata, updateDataStoreMutation, ProgramItem(), Alert, ProgramList() (+8 more)
 
 ### Community 15 - "App Bootstrap & Routing"
 
-Cohesion: 0.16
-Nodes (13): metadataMutation, orgUnitsQuery, ouGroupQuery, OunitScreen(), ouQuery, programOrgUnitsQuery, searchOrgUnitQuery, dataStoreMutationUpdate (+5 more)
+Cohesion: 0.22
+Nodes (12): metadataMutation, orgUnitsQuery, ouGroupQuery, OunitScreen(), ouQuery, programOrgUnitsQuery, searchOrgUnitQuery, BackupScreen() (+4 more)
 
 ### Community 16 - "Program Stage & Utilities"
 
@@ -257,7 +259,7 @@ Nodes (16): DataElementItemProps, AddedSectionState, AttributeValue, BackupData,
 ### Community 21 - "Data Element Form"
 
 Cohesion: 0.13
-Nodes (13): legendSetsQuery, optionSetQuery, programRuleVariableQuery, queryId, MarkDownEditor(), RowRadioButtonsGroup(), ColorPicker(), InfoBox() (+5 more)
+Nodes (14): legendSetsQuery, optionSetQuery, programRuleVariableQuery, queryId, MarkDownEditor(), RowRadioButtonsGroup(), ColorPicker(), IconPicker() (+6 more)
 
 ### Community 22 - "New Program Type Defs"
 
@@ -271,8 +273,8 @@ Nodes (12): SharingItem(), SharingOptions(), btnOptions, entitiesQuery, metadata
 
 ### Community 24 - "PCA Config Constants"
 
-Cohesion: 0.07
-Nodes (23): App(), queryPCAAvailableMetadata, queryServerInfo, LoadingPage(), VersionErrorPage(), H2_REQUIRED, PCA_ATTRIBUTES, PCA_OPTION_SETS (+15 more)
+Cohesion: 0.12
+Nodes (16): H2_REQUIRED, PCA_ATTRIBUTES, PCA_OPTION_SETS, PCA_OPTIONS, PCA_USER_ROLES, queryH2Attributes, queryH2DataElements, queryH2LegendSets (+8 more)
 
 ### Community 25 - "TypeScript Config"
 
@@ -281,8 +283,8 @@ Nodes (14): compilerOptions, allowJs, esModuleInterop, forceConsistentCasingInFi
 
 ### Community 26 - "Org Units Screen"
 
-Cohesion: 0.33
-Nodes (5): dataStoreMutation, dataStoreMutationUpdate, MetadataErrorPage(), metadataMutation, queryDataStore
+Cohesion: 0.10
+Nodes (16): App(), queryPCAAvailableMetadata, queryServerInfo, LoadingPage(), dataStoreMutation, dataStoreMutationUpdate, MetadataErrorPage(), metadataMutation (+8 more)
 
 ### Community 27 - "Package Metadata"
 
@@ -297,22 +299,22 @@ Nodes (12): scripts, build, deploy, format, format-d2, format:staged, lint, lint
 ### Community 29 - "TEA Editor"
 
 Cohesion: 0.18
-Nodes (14): AttributeValue, ProgramStageDataElement, BuildHnqisTEIArgs, EventListItem, H2ProgramMetadata, H2ProgramStage, H2TransferProps, HnqisTrackedEntity (+6 more)
+Nodes (14): AttributeValue, ProgramStageDataElement, BuildActionPlanArgs, BuildHnqisTEIArgs, EventListItem, H2ProgramMetadata, H2ProgramStage, H2TransferProps (+6 more)
 
 ### Community 30 - "Restore & Backup"
 
-Cohesion: 0.13
-Nodes (14): FailedRecordAccordionProps, FailedRecordsListProps, FailedTransferRecord, MetadataErrorReport, MetadataImportResponse, MetadataObjectReport, MetadataStats, MetadataTypeReport (+6 more)
+Cohesion: 0.21
+Nodes (10): MetadataErrorReport, MetadataImportResponse, MetadataObjectReport, MetadataStats, MetadataTypeReport, TrackerBundleReport, TrackerImportResponse, TrackerObjectReport (+2 more)
 
 ### Community 31 - "Object Sharing"
 
-Cohesion: 0.12
-Nodes (22): ObjectSharing(), sharingQuery, sharingQuery, VisualizationSharing(), buildH2BaseVisualizations(), buildProgramIndicators(), makeKVP(), makeText() (+14 more)
+Cohesion: 0.22
+Nodes (9): ObjectSharing(), sharingQuery, sharingQuery, VisualizationSharing(), buildH2BaseVisualizations(), buildProgramIndicators(), makeKVP(), makeText() (+1 more)
 
 ### Community 32 - "PCA API Types"
 
-Cohesion: 0.31
-Nodes (9): H2Convert(), HNQIS_VERSIONS, metadataMutation, queryHealthAreas, queryId, queryOptions, queryProgramMetadata, queryProgramType (+1 more)
+Cohesion: 0.20
+Nodes (12): ModernSettingsAccordionProps, H2Convert(), HNQIS_VERSIONS, metadataMutation, queryHealthAreas, queryId, queryOptions, queryProgramMetadata (+4 more)
 
 ### Community 33 - "Project Docs & CI"
 
@@ -341,8 +343,8 @@ Nodes (7): clickableStepSx, ProgramNewStepper(), ProgramNewStepperProps, createO
 
 ### Community 38 - "Score Builder Rules"
 
-Cohesion: 0.15
-Nodes (14): StageItem(), CriticalCalculations(), DraggableDataElement(), Scores(), DraggableSection(), BadgeErrors(), BadgeWarnings(), Errors() (+6 more)
+Cohesion: 0.19
+Nodes (12): StageNew(), DraggableDataElement(), Scores(), DraggableSection(), BadgeErrors(), BadgeWarnings(), Messages(), ValidationErrorItem() (+4 more)
 
 ### Community 39 - "Program Rules List"
 
@@ -377,12 +379,12 @@ Nodes (5): Share Icon Black, Share Icon White, Upload Icon (Active State), Uploa
 ### Community 45 - "Attributes Form Step"
 
 Cohesion: 0.22
-Nodes (15): H2Transfer(), buildDataStoreCreateMutation(), buildDataStoreQuery(), buildDataStoreUpdateMutation(), metadataMutation, queryEventList, queryProgramEvent, queryProgramMetadata (+7 more)
+Nodes (16): H2Transfer(), buildAddProgramOrgUnitsMutation(), buildDataStoreCreateMutation(), buildDataStoreQuery(), buildDataStoreUpdateMutation(), metadataMutation, queryEventList, queryProgramEvent (+8 more)
 
 ### Community 46 - "Program New Utils"
 
-Cohesion: 0.21
-Nodes (11): BackupScreen(), RestoreItem(), metadataMutation, metadataValidation, programRulesNVariableMutation, RestoreOptions(), StyledTableCell, RestoreScreen() (+3 more)
+Cohesion: 0.20
+Nodes (8): RestoreItem(), metadataMutation, metadataValidation, programRulesNVariableMutation, RestoreOptions(), StyledTableCell, RestoreScreen(), styles
 
 ### Community 48 - "Graphic E Series"
 
@@ -406,30 +408,35 @@ Nodes (7): ProgramStage(), query, actionCreators, setProgram(), setProgramStage(
 
 ### Community 70 - "Community 70"
 
-Cohesion: 0.50
-Nodes (3): ModernSettingsAccordionProps, H2SettingRef, H2Setting
+Cohesion: 0.33
+Nodes (4): FailedRecordAccordionProps, FailedRecordsListProps, FailedTransferRecord, TrackerErrorReport
 
 ### Community 71 - "Community 71"
 
 Cohesion: 0.29
 Nodes (5): Credits, Introduction, License, Program Configuration App, Usage and Installation
 
+### Community 72 - "Community 72"
+
+Cohesion: 0.29
+Nodes (7): buildAttributesRules(), buildCompetencyRules(), buildCriticalScore(), buildNonCriticalScore(), buildProgramRules(), buildScores(), labelsRulesLogic()
+
 ## Knowledge Gaps
 
 - **290 isolated node(s):** `{ config }`, `husky.sh script`, `config`, `name`, `title` (+285 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **25 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `DeepCopy()` connect `Object Sharing` to `PCA API Types`, `Excel Data Processor`, `Import Validation Engine`, `Stage Section Queries`, `Stage Creation & Export`, `Scripting Rule Builder`, `Program Details Editor`, `Program New Utils`, `Attributes Form Step`, `Program Stage & Utilities`, `Program Stage Actions`, `Sharing UI Components`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
-- **Why does `CustomMUIDialog` connect `Program Attributes Modal` to `PCA API Types`, `Excel Importer`, `Import Validation Engine`, `Score Builder Rules`, `Data Element Editor`, `Stage Creation & Export`, `Program Details Editor`, `Program New Utils`, `App Bootstrap & Routing`, `About Page`, `New Program Creation`, `Object Sharing`?**
-  _High betweenness centrality (0.015) - this node is a cross-community bridge._
-- **Why does `CustomMUIDialogTitle()` connect `Program Attributes Modal` to `PCA API Types`, `Excel Importer`, `Import Validation Engine`, `Score Builder Rules`, `Data Element Editor`, `Stage Creation & Export`, `Program Details Editor`, `Program New Utils`, `App Bootstrap & Routing`, `About Page`, `New Program Creation`, `Object Sharing`?**
+- **Why does `DeepCopy()` connect `Object Sharing` to `PCA API Types`, `Excel Data Processor`, `Import Validation Engine`, `Stage Section Queries`, `Program Attributes Modal`, `Setup Progress Dialog`, `Stage Creation & Export`, `Scripting Rule Builder`, `Program Details Editor`, `Attributes Form Step`, `App Bootstrap & Routing`, `Program Stage & Utilities`, `Program New Utils`, `Program Stage Actions`, `Sharing UI Components`?**
+  _High betweenness centrality (0.017) - this node is a cross-community bridge._
+- **Why does `CustomMUIDialog` connect `Program Attributes Modal` to `PCA API Types`, `Excel Importer`, `Import Validation Engine`, `Score Builder Rules`, `Stage Creation & Export`, `Program Details Editor`, `HNQIS2 Metadata Transfer`, `App Bootstrap & Routing`, `Program New Utils`, `About Page`, `New Program Creation`?**
   _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `CustomMUIDialogTitle()` connect `Program Attributes Modal` to `PCA API Types`, `Excel Importer`, `Import Validation Engine`, `Score Builder Rules`, `Stage Creation & Export`, `Program Details Editor`, `HNQIS2 Metadata Transfer`, `App Bootstrap & Routing`, `Program New Utils`, `About Page`, `New Program Creation`?**
+  _High betweenness centrality (0.013) - this node is a cross-community bridge._
 - **What connects `{ config }`, `husky.sh script`, `config` to the rest of the system?**
   _291 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Data Types & Interfaces` be split into smaller, more focused modules?**

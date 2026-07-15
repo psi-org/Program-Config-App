@@ -83,9 +83,9 @@ const FailedRecordAccordion = ({
               </TableCell>
               <TableCell sx={{ fontWeight: 600 }}>Message</TableCell>
               <TableCell
-                sx={{ fontWeight: 600, width: '1%', whiteSpace: 'nowrap' }}
+                sx={{ fontWeight: 600, width: '20%', whiteSpace: 'nowrap' }}
               >
-                Data Element / UID
+                UID
               </TableCell>
             </TableRow>
           </TableHead>

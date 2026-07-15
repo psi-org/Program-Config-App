@@ -78,3 +78,13 @@ export const buildDataStoreUpdateMutation = (
     type: 'update',
     data: ({ data }: { data: Record<string, unknown> }) => data,
   } as const);
+
+export const buildAddProgramOrgUnitsMutation = (programId: string) =>
+  ({
+    resource: `programs/${programId}/organisationUnits`,
+    type: 'create',
+    data: ({ additions }: { additions: Array<{ id: string }> }) => ({
+      additions,
+      deletions: [],
+    }),
+  } as const);

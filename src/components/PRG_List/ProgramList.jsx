@@ -21,6 +21,7 @@ import MuiAlert from '@mui/material/Alert';
 import MuiButton from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
+import Portal from '@mui/material/Portal';
 import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import React, { useState, useEffect } from 'react';
@@ -516,19 +517,22 @@ const ProgramList = () => {
         />
       )}
 
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={notification !== undefined}
-        key={'topcenter'}
-      >
-        <Alert
-          onClose={() => setNotification(undefined)}
-          severity={notification?.severity || snackSeverity}
-          sx={{ width: '100%' }}
+      <Portal>
+        <Snackbar
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          open={notification !== undefined}
+          key={'topcenter'}
+          sx={{ zIndex: (theme) => theme.zIndex.tooltip + 1 }}
         >
-          {formatAlert(notification?.message)}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={() => setNotification(undefined)}
+            severity={notification?.severity || snackSeverity}
+            sx={{ width: '100%' }}
+          >
+            {formatAlert(notification?.message)}
+          </Alert>
+        </Snackbar>
+      </Portal>
 
       {aboutModal && (
         <About aboutModal={aboutModal} setAboutModal={setAboutModal} />
