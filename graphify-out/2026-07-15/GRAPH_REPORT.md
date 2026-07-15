@@ -2,7 +2,7 @@
 
 ## Corpus Check
 
-- 222 files · ~105,145 words
+- 222 files · ~105,022 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -126,10 +126,10 @@
 ## Import Cycles
 
 - 3-file cycle: `src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/Category.ts -> src/types/BaseMetadataObject.ts`
+- 3-file cycle: `src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/FileResource.ts -> src/types/BaseMetadataObject.ts`
+- 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/UserRole.ts -> src/types/BaseIdentifiableObject.ts`
 - 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/CategoryOptionGroupSet.ts -> src/types/BaseIdentifiableObject.ts`
 - 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/UserGroup.ts -> src/types/BaseIdentifiableObject.ts`
-- 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/UserRole.ts -> src/types/BaseIdentifiableObject.ts`
-- 3-file cycle: `src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/FileResource.ts -> src/types/BaseMetadataObject.ts`
 - 5-file cycle: `src/types/BaseDimensionalItemObject.ts -> src/types/LegendSet.ts -> src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/OrganisationUnit.ts -> src/types/BaseDimensionalItemObject.ts`
 - 5-file cycle: `src/types/BaseDimensionalItemObject.ts -> src/types/BaseNameableObject.ts -> src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/OrganisationUnit.ts -> src/types/BaseDimensionalItemObject.ts`
 

@@ -37,7 +37,7 @@ import BackupScreen from './BackupScreen.jsx';
 import DependencyExport from './DependencyExport.jsx';
 import H2Convert from './H2Convert';
 import H2Metadata from './H2Metadata.jsx';
-import H2Transfer from './H2Transfer.jsx';
+import H2Transfer from './H2Transfer';
 import ProgramItem from './ProgramItem.jsx';
 import ProgramNew from './ProgramNew';
 import RestoreScreen from './RestoreScreen.jsx';
