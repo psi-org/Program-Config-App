@@ -70,6 +70,9 @@ export const readTemplateData = ({
 
         importedSections[sectionIndex] =
           sectionsPool[row[templateMap.programSection]] || {};
+        delete importedSections[sectionIndex].errors;
+        delete importedSections[sectionIndex].errorsCount;
+        delete importedSections[sectionIndex].warnings;
         importedSections[sectionIndex].id = row[templateMap.programSection];
         importedSections[sectionIndex].name = row[templateMap.formName];
         importedSections[sectionIndex].displayName = row[templateMap.formName];

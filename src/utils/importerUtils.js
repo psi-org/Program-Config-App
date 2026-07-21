@@ -331,6 +331,8 @@ export const mapImportedDEHNQIS2 = ({
     dataElementsPool[data[HNQIS2_TEMPLATE_MAP.dataElementId]] || {};
 
   const parsedDE = JSON.parse(JSON.stringify(existingDe));
+  delete parsedDE.errors;
+  delete parsedDE.warnings;
 
   const criticalIdentifier =
     data[HNQIS2_TEMPLATE_MAP.isCritical] == 'Yes' ? ' [C]' : '';
@@ -506,6 +508,8 @@ export const mapImportedDE = ({
   const existingDe =
     dataElementsPool[data[TRACKER_TEMPLATE_MAP.dataElementId]] || {};
   const parsedDE = JSON.parse(JSON.stringify(existingDe));
+  delete parsedDE.errors;
+  delete parsedDE.warnings;
 
   parsedDE.id = data[TRACKER_TEMPLATE_MAP.dataElementId] || undefined;
   parsedDE.name = autoNaming

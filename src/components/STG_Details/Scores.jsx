@@ -55,10 +55,10 @@ const Scores = ({ stageSection, program }) => {
           className="ml_item-warning_error "
           onClick={() => showIssues(stageSection.dataElements)}
         >
-          {stageSection.warnings && stageSection.warnings > 0 && (
+          {stageSection.warnings > 0 && (
             <BadgeWarnings counts={stageSection.warnings} />
           )}
-          {stageSection.errors && stageSection.errors > 0 && (
+          {stageSection.errors > 0 && (
             <BadgeErrors counts={stageSection.errors} />
           )}
         </div>

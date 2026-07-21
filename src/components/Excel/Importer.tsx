@@ -472,6 +472,7 @@ const Importer = ({
     newScoresSection.dataElements =
       importedScores as import('../../types').PcaDataElement[];
     delete newScoresSection.errors;
+    delete newScoresSection.warnings;
 
     previous.setSections(
       importedSections as import('../../types').PcaSection[]

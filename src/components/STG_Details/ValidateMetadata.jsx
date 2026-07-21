@@ -154,9 +154,7 @@ const ValidateMetadata = ({
                 section_errors += dataElement.errors.errors.length;
               }
             });
-            if (section_errors > 0) {
-              section.errorsCount = section_errors;
-            }
+            section.errorsCount = section_errors;
           });
         }
 
@@ -207,9 +205,7 @@ const ValidateMetadata = ({
             }
           });
         }
-        if (score_errors > 0) {
-          importedScoresV.errors = score_errors;
-        }
+        importedScoresV.errors = score_errors;
         // SUMMARY - RESULTS
         if (errorCounts === 0) {
           setValid(true);

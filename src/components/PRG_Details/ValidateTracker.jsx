@@ -145,9 +145,7 @@ const ValidateTracker = ({
         });
 
         errorCounts += stage_errors;
-        if (stage_errors > 0) {
-          stage.errorsCount = stage_errors;
-        }
+        stage.errorsCount = stage_errors;
       });
 
       if (errorCounts === 0) {
