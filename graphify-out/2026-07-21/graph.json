@@ -4542,7 +4542,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_stg_details_stagesections_components_progressstep",
-      "community": 77,
+      "community": 9,
       "norm_label": "progressstep.tsx"
     },
     {
@@ -4552,7 +4552,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "src_components_stg_details_stagesections_components_progressstep_stepstatus",
-      "community": 77,
+      "community": 9,
       "norm_label": "stepstatus"
     },
     {
@@ -4562,7 +4562,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_components_stg_details_stagesections_components_progressstep_icons",
-      "community": 77,
+      "community": 9,
       "norm_label": "icons"
     },
     {
@@ -4572,7 +4572,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "src_components_stg_details_stagesections_components_progressstep_progressstepprops",
-      "community": 77,
+      "community": 9,
       "norm_label": "progressstepprops"
     },
     {
@@ -4582,7 +4582,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "src_components_stg_details_stagesections_components_progressstep_progressstep",
-      "community": 77,
+      "community": 9,
       "norm_label": "progressstep()"
     },
     {
@@ -10419,7 +10419,7 @@
       "label": "mapImportedDE()",
       "file_type": "code",
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L489",
+      "source_location": "L491",
       "_origin": "ast",
       "id": "src_utils_importerutils_mapimportedde",
       "community": 2,
@@ -10429,7 +10429,7 @@
       "label": "countChanges()",
       "file_type": "code",
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L608",
+      "source_location": "L612",
       "_origin": "ast",
       "id": "src_utils_importerutils_countchanges",
       "community": 2,
@@ -10439,7 +10439,7 @@
       "label": "getBasicForm()",
       "file_type": "code",
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L660",
+      "source_location": "L664",
       "_origin": "ast",
       "id": "src_utils_importerutils_getbasicform",
       "community": 2,
@@ -14766,7 +14766,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/components/Excel/Importer.tsx",
-      "source_location": "L509",
+      "source_location": "L510",
       "weight": 1.0,
       "source": "src_components_excel_importer_importer",
       "target": "src_utils_importerutils_buildtrackersummary",
@@ -14777,7 +14777,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/components/Excel/Importer.tsx",
-      "source_location": "L673",
+      "source_location": "L674",
       "weight": 1.0,
       "source": "src_components_excel_importer_importer",
       "target": "src_utils_importerutils_countchanges",
@@ -14788,7 +14788,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/components/Excel/Importer.tsx",
-      "source_location": "L613",
+      "source_location": "L614",
       "weight": 1.0,
       "source": "src_components_excel_importer_importer",
       "target": "src_utils_importerutils_getbasicform",
@@ -14833,7 +14833,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/Excel/Importer.tsx",
-      "source_location": "L697",
+      "source_location": "L698",
       "weight": 1.0,
       "source": "src_components_excel_importer_importer",
       "target": "src_utils_importerutils_istracker"
@@ -14843,7 +14843,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/components/Excel/Importer.tsx",
-      "source_location": "L528",
+      "source_location": "L529",
       "weight": 1.0,
       "source": "src_components_excel_importer_importer",
       "target": "src_utils_utils_setupprogramstagesections",
@@ -27521,7 +27521,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/STG_Details/importReader.js",
-      "source_location": "L134",
+      "source_location": "L137",
       "weight": 1.0,
       "source": "src_components_stg_details_importreader_readtemplatedata",
       "target": "src_utils_importerutils_countchanges"
@@ -37513,7 +37513,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L527",
+      "source_location": "L531",
       "weight": 1.0,
       "source": "src_utils_importerutils_mapimportedde",
       "target": "src_utils_utils_getkeybyvalue"
@@ -37546,7 +37546,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L564",
+      "source_location": "L568",
       "weight": 1.0,
       "source": "src_utils_importerutils_mapimportedde",
       "target": "src_utils_utils_getobjectidbyproperty"
@@ -37557,7 +37557,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L421",
+      "source_location": "L423",
       "weight": 1.0,
       "source": "src_utils_importerutils_mapimporteddehnqis2",
       "target": "src_utils_utils_getobjectidbyproperty"
@@ -37579,7 +37579,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L547",
+      "source_location": "L551",
       "weight": 1.0,
       "source": "src_utils_importerutils_mapimportedde",
       "target": "src_utils_utils_getobjectbyproperty"
@@ -37590,7 +37590,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L395",
+      "source_location": "L397",
       "weight": 1.0,
       "source": "src_utils_importerutils_mapimporteddehnqis2",
       "target": "src_utils_utils_getobjectbyproperty"
@@ -37612,7 +37612,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L451",
+      "source_location": "L453",
       "weight": 1.0,
       "source": "src_utils_importerutils_mapimporteddehnqis2",
       "target": "src_utils_utils_buildattributevalue"
@@ -37706,7 +37706,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L608",
+      "source_location": "L612",
       "weight": 1.0,
       "source": "src_utils_importerutils",
       "target": "src_utils_importerutils_countchanges",
@@ -37726,7 +37726,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L660",
+      "source_location": "L664",
       "weight": 1.0,
       "source": "src_utils_importerutils",
       "target": "src_utils_importerutils_getbasicform",
@@ -37786,7 +37786,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/utils/importerUtils.js",
-      "source_location": "L489",
+      "source_location": "L491",
       "weight": 1.0,
       "source": "src_utils_importerutils",
       "target": "src_utils_importerutils_mapimportedde",

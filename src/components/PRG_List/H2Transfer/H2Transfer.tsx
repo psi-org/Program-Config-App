@@ -120,9 +120,12 @@ const H2Transfer = ({
   const [confirmAddOrgUnitsOpen, setConfirmAddOrgUnitsOpen] = useState(false);
   const [addingOrgUnits, setAddingOrgUnits] = useState(false);
 
-  const { data: programData } = useDataQuery(queryEventList, {
-    variables: { program: programConfig.id },
-  });
+  const { data: programData, error: programDataError } = useDataQuery(
+    queryEventList,
+    {
+      variables: { program: programConfig.id },
+    }
+  );
 
   const { refetch: getEvent } = useDataQuery(queryProgramEvent, {
     variables: { program: undefined, eventId: undefined },
@@ -516,7 +519,7 @@ const H2Transfer = ({
           gap: 2,
         }}
       >
-        {loading && (
+        {loading && !programDataError && (
           <Box
             sx={{
               display: 'flex',
@@ -530,6 +533,14 @@ const H2Transfer = ({
               Fetching and Preparing Data
             </Typography>
           </Box>
+        )}
+
+        {programDataError && (
+          <NoticeBox error title="An error has occurred">
+            <p>
+              {programDataError.details?.message ?? programDataError.message}
+            </p>
+          </NoticeBox>
         )}
 
         {!loading && h2Program && (

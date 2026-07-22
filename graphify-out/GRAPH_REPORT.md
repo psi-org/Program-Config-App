@@ -2,18 +2,18 @@
 
 ## Corpus Check
 
-- 222 files · ~105,405 words
+- 222 files · ~105,427 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
 
-- 1127 nodes · 2530 edges · 79 communities (54 shown, 25 thin omitted)
+- 1127 nodes · 2530 edges · 81 communities (56 shown, 25 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 43 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
 
-- Built from commit: `df6d8267`
+- Built from commit: `99aaaac9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -96,6 +96,8 @@
 - [[_COMMUNITY_Community 74|Community 74]]
 - [[_COMMUNITY_Community 75|Community 75]]
 - [[_COMMUNITY_Community 76|Community 76]]
+- [[_COMMUNITY_Community 77|Community 77]]
+- [[_COMMUNITY_Community 78|Community 78]]
 - [[_COMMUNITY_Community 79|Community 79]]
 - [[_COMMUNITY_Community 80|Community 80]]
 
@@ -129,11 +131,11 @@
 
 - 3-file cycle: `src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/FileResource.ts -> src/types/BaseMetadataObject.ts`
 - 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/UserGroup.ts -> src/types/BaseIdentifiableObject.ts`
-- 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/CategoryOptionGroupSet.ts -> src/types/BaseIdentifiableObject.ts`
 - 3-file cycle: `src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/Category.ts -> src/types/BaseMetadataObject.ts`
+- 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/CategoryOptionGroupSet.ts -> src/types/BaseIdentifiableObject.ts`
 - 3-file cycle: `src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/UserRole.ts -> src/types/BaseIdentifiableObject.ts`
-- 5-file cycle: `src/types/BaseDimensionalItemObject.ts -> src/types/LegendSet.ts -> src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/OrganisationUnit.ts -> src/types/BaseDimensionalItemObject.ts`
 - 5-file cycle: `src/types/BaseDimensionalItemObject.ts -> src/types/BaseNameableObject.ts -> src/types/BaseIdentifiableObject.ts -> src/types/User.ts -> src/types/OrganisationUnit.ts -> src/types/BaseDimensionalItemObject.ts`
+- 5-file cycle: `src/types/BaseDimensionalItemObject.ts -> src/types/LegendSet.ts -> src/types/BaseMetadataObject.ts -> src/types/User.ts -> src/types/OrganisationUnit.ts -> src/types/BaseDimensionalItemObject.ts`
 
 ## Hyperedges (group relationships)
 
@@ -149,7 +151,7 @@
 - **Upload Action Icon State Pair (default and active)** — src_images_i_upload_svg, src_images_i_upload_active_svg [EXTRACTED 1.00]
 - **HNQIS / PATH Application Brand Assets** — src_images_logo_hnqis_svg, src_images_path_logo_svg, src_images_scores_svg [INFERRED 0.75]
 
-## Communities (79 total, 25 thin omitted)
+## Communities (81 total, 25 thin omitted)
 
 ### Community 0 - "Data Types & Interfaces"
 
@@ -198,8 +200,8 @@ Nodes (34): AttributesModal(), createMutation, exitDisclaimerModal(), queryIds, 
 
 ### Community 9 - "Setup Progress Dialog"
 
-Cohesion: 0.13
-Nodes (19): ICONS, ProgressStepProps, StepStatus, androidStatus(), androidText(), ErrorAccordionProps, formatFallbackError(), ParsedError (+11 more)
+Cohesion: 0.18
+Nodes (16): androidStatus(), androidText(), ErrorAccordionProps, formatFallbackError(), ParsedError, resolvePayload(), safeParseErrors(), SetupProgressDialog() (+8 more)
 
 ### Community 10 - "NPM Dependencies"
 
@@ -263,8 +265,8 @@ Nodes (14): legendSetsQuery, optionSetQuery, programRuleVariableQuery, queryId, 
 
 ### Community 22 - "New Program Type Defs"
 
-Cohesion: 0.10
-Nodes (21): ProgramNew(), H2SettingRef, ProgramSection, ProgramStage, ProgramTeaState, ProgramTrackedEntityAttribute, ValidationErrors, buildTrackerTeaState() (+13 more)
+Cohesion: 0.12
+Nodes (17): H2SettingRef, ProgramSection, ProgramStage, ProgramTeaState, ProgramTrackedEntityAttribute, ValidationErrors, buildTrackerTeaState(), getRequiredTetAttributeIds() (+9 more)
 
 ### Community 23 - "Sharing UI Components"
 
@@ -420,6 +422,16 @@ Nodes (5): Credits, Introduction, License, Program Configuration App, Usage and 
 
 Cohesion: 0.29
 Nodes (7): buildAttributesRules(), buildCompetencyRules(), buildCriticalScore(), buildNonCriticalScore(), buildProgramRules(), buildScores(), labelsRulesLogic()
+
+### Community 77 - "Community 77"
+
+Cohesion: 0.40
+Nodes (3): ICONS, ProgressStepProps, StepStatus
+
+### Community 78 - "Community 78"
+
+Cohesion: 0.50
+Nodes (4): ProgramNew(), cloneDeep(), getInitialSectionsEnabled(), toOption()
 
 ## Knowledge Gaps
 

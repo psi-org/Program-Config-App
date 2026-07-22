@@ -14,9 +14,9 @@ import {
   validateSectionsHNQIS2,
 } from '../../utils/ImportValidatorUtils.js';
 import { DeepCopy, getPCAMetadataDE } from '../../utils/Utils.jsx';
-import SaveMetadata from '../UIElements/SaveMetadata.jsx';
 import CustomMUIDialog from '../UIElements/CustomMUIDialog.js';
 import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.jsx';
+import SaveMetadata from '../UIElements/SaveMetadata.jsx';
 
 const ValidateMetadata = ({
   hnqisMode,
