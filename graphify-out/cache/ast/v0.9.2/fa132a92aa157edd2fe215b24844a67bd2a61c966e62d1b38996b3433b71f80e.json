@@ -1,0 +1,104 @@
+{
+  "nodes": [
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_readme_md",
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_readme_program_configuration_app",
+      "label": "Program Configuration App",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_readme_introduction",
+      "label": "Introduction",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L5"
+    },
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_readme_usage_and_installation",
+      "label": "Usage and Installation",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L13"
+    },
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_readme_license",
+      "label": "License",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L17"
+    },
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_readme_credits",
+      "label": "Credits",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L21"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_marlpzg_desktop_bao_dev_program_config_app_readme_md",
+      "target": "users_marlpzg_desktop_bao_dev_program_config_app_readme_program_configuration_app",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_marlpzg_desktop_bao_dev_program_config_app_readme_program_configuration_app",
+      "target": "users_marlpzg_desktop_bao_dev_program_config_app_readme_introduction",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "users_marlpzg_desktop_bao_dev_program_config_app_readme_program_configuration_app",
+      "target": "users_marlpzg_desktop_bao_dev_program_config_app_readme_usage_and_installation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "users_marlpzg_desktop_bao_dev_program_config_app_readme_program_configuration_app",
+      "target": "users_marlpzg_desktop_bao_dev_program_config_app_readme_license",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "users_marlpzg_desktop_bao_dev_program_config_app_readme_md",
+      "target": "users_marlpzg_desktop_bao_dev_program_config_app_license_md",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_marlpzg_desktop_bao_dev_program_config_app_readme_program_configuration_app",
+      "target": "users_marlpzg_desktop_bao_dev_program_config_app_readme_credits",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L21",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

@@ -130,7 +130,7 @@ const StageItem = ({
         className="ml_item-warning_error "
         onClick={() => setShowValidationMessage(!showValidationMessage)}
       >
-        {importResults?.errorsCount && importResults?.errorsCount > 0 && (
+        {importResults?.errorsCount > 0 && (
           <BadgeErrors counts={importResults?.errorsCount} />
         )}
       </div>

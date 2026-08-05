@@ -1,0 +1,95 @@
+{
+  "nodes": [
+    {
+      "id": "_github_workflows_release_yml",
+      "label": "Release GitHub Actions Workflow",
+      "file_type": "code",
+      "source_file": ".github/workflows/release.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "semantic_release_concept",
+      "label": "Semantic Release \u2014 Automated Versioning and Changelog",
+      "file_type": "concept",
+      "source_file": ".github/workflows/release.yml",
+      "source_location": "line 66",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "baseline_version_tag_bootstrap",
+      "label": "Bootstrap Baseline Version Tag (v2.2.1)",
+      "file_type": "rationale",
+      "source_file": ".github/workflows/release.yml",
+      "source_location": "line 49",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Creates a v2.2.1 tag at the initial commit on the first run so that semantic-release treats all v3.0.0 commits as new. Subsequent runs skip this step because a version tag will already exist."
+    }
+  ],
+  "edges": [
+    {
+      "source": "_github_workflows_release_yml",
+      "target": "semantic_release_concept",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/release.yml",
+      "source_location": "line 66",
+      "weight": 1.0
+    },
+    {
+      "source": "_github_workflows_release_yml",
+      "target": "changelog",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/release.yml",
+      "source_location": "line 69",
+      "weight": 1.0
+    },
+    {
+      "source": "_github_workflows_release_yml",
+      "target": "baseline_version_tag_bootstrap",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/release.yml",
+      "source_location": "line 52",
+      "weight": 1.0
+    },
+    {
+      "source": "semantic_release_concept",
+      "target": "changelog",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": ".github/workflows/release.yml",
+      "source_location": "line 69",
+      "weight": 0.9
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "release_pipeline",
+      "label": "Release Pipeline: Workflow, Semantic Release, and Changelog",
+      "nodes": [
+        "_github_workflows_release_yml",
+        "semantic_release_concept",
+        "changelog"
+      ],
+      "relation": "implement",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": ".github/workflows/release.yml"
+    }
+  ]
+}

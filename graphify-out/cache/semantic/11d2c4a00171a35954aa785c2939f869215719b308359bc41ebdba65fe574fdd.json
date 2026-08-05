@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_pca_logo_pca_logo",
+      "label": "PCA App Icon (clipboard + gear configuration metaphor)",
+      "file_type": "image",
+      "source_file": "src/images/PCA-logo.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_images_pca_logo_pca_logo",
+      "target": "public_dhis2_app_icon_dhis2_app_icon",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "src/images/PCA-logo.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,43 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_logo_hnqis_svg",
+      "label": "HNQIS Logo",
+      "file_type": "image",
+      "description": "47x47 brand logo for HNQIS (Health Network Quality Improvement System) \u2014 four colored quadrant sections: top-left orange PRG label, top-right yellow puzzle/checklist shape, bottom-left green bar chart, bottom-right blue line graph with upward trend",
+      "source_file": "src/images/logo_hnqis.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_images_logo_hnqis_svg",
+      "target": "src_images_path_logo_svg",
+      "relation": "co_brand_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "src/images/logo_hnqis.svg",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hnqis_path_brand_set",
+      "label": "HNQIS / PATH Application Brand Assets",
+      "nodes": [
+        "src_images_logo_hnqis_svg",
+        "src_images_path_logo_svg",
+        "src_images_scores_svg"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "src/images/logo_hnqis.svg"
+    }
+  ]
+}

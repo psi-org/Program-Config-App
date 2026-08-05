@@ -163,10 +163,10 @@ const DraggableSection = ({
               className="ml_item-warning_error "
               onClick={() => setShowValidationMessage(!showValidationMessage)}
             >
-              {stageSection.warnings && stageSection.warnings > 0 && (
+              {stageSection.warnings > 0 && (
                 <BadgeWarnings counts={stageSection.warnings} />
               )}
-              {stageSection.errorsCount && stageSection.errorsCount > 0 && (
+              {stageSection.errorsCount > 0 && (
                 <BadgeErrors counts={stageSection.errorsCount} />
               )}
             </div>

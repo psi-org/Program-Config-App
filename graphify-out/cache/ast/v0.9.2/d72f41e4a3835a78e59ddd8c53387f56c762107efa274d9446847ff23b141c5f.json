@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_md",
+      "label": "CHANGELOG.md",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_3_0_0_https_github_com_psi_org_program_config_app_compare_v2_0_7_v3_0_0_2026_06_29",
+      "label": "[3.0.0](https://github.com/psi-org/Program-Config-App/compare/v2.0.7...v3.0.0) (2026-06-29)",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_breaking_changes",
+      "label": "\u26a0 BREAKING CHANGES",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_features",
+      "label": "Features",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_bug_fixes",
+      "label": "Bug Fixes",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L14"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_md",
+      "target": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_3_0_0_https_github_com_psi_org_program_config_app_compare_v2_0_7_v3_0_0_2026_06_29",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_3_0_0_https_github_com_psi_org_program_config_app_compare_v2_0_7_v3_0_0_2026_06_29",
+      "target": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_breaking_changes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_3_0_0_https_github_com_psi_org_program_config_app_compare_v2_0_7_v3_0_0_2026_06_29",
+      "target": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_features",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_3_0_0_https_github_com_psi_org_program_config_app_compare_v2_0_7_v3_0_0_2026_06_29",
+      "target": "users_marlpzg_desktop_bao_dev_program_config_app_changelog_bug_fixes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L14",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

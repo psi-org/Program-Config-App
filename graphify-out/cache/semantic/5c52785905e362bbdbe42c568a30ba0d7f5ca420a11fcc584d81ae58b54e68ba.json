@@ -1,0 +1,39 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_graphic_e_2_graphic_e_2",
+      "label": "Graphic E-2",
+      "file_type": "image",
+      "source_file": "src/images/graphic_e-2.jpg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "description": "Abstract geometric graphic composed of a checkerboard pattern in yellow and white, an orange-and-blue horizontal stripe block, and an orange triangle on the left. Uses the same bold flat color palette as the rest of the Graphic E series."
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_images_graphic_e_2_graphic_e_2",
+      "target": "src_images_graphic_e_3_graphic_e_3",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "src/images/graphic_e-2.jpg",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "src_images_graphic_e_2_graphic_e_2",
+      "target": "src_images_graphic_e_4_graphic_e_4",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "src/images/graphic_e-2.jpg",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_drag_white_drag_white",
+      "label": "Drag Handle Icon (White) - Two horizontal bars for drag-to-reorder",
+      "file_type": "image",
+      "source_file": "src/images/i-drag_white.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

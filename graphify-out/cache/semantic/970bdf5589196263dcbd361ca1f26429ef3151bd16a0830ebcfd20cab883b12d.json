@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_close_black_close_black",
+      "label": "Close / Dismiss Icon (Black) - X cross mark",
+      "file_type": "image",
+      "source_file": "src/images/i-close_black.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "src_images_i_close_black_close_black",
+      "target": "src_images_i_close_white_close_white",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "src/images/i-close_black.svg",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,6 +1,6 @@
 import { useDataQuery } from '@dhis2/app-runtime';
 import { NoticeBox, CircularLoader } from '@dhis2/ui';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams, useLocation } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
@@ -43,8 +43,10 @@ const ProgramStage = () => {
     variables: { programStage },
   });
 
+  const [fetchToken, setFetchToken] = useState(0);
+
   useEffect(() => {
-    refetch();
+    refetch().finally(() => setFetchToken((t) => t + 1));
   }, [locationKey]); // Re-fetch on every navigation to this route
 
   if (!id && !programStage) {
@@ -96,6 +98,7 @@ const ProgramStage = () => {
 
     return (
       <StageSections
+        key={`${programStageData.id}-${fetchToken}`}
         programStage={programStageData}
         stageRefetch={refetch}
         hnqisMode={hnqisMode}

@@ -1,0 +1,18 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_warning_svg",
+      "label": "Warning Icon",
+      "file_type": "image",
+      "description": "24x24 UI icon showing a triangle outline with an exclamation mark inside \u2014 represents a warning, alert, or validation error; rendered in amber/yellow (#F19F00) with white stroke",
+      "source_file": "src/images/i-warning.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}
