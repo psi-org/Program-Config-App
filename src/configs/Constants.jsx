@@ -30,14 +30,14 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_DATE = 'June 29, 2026';
+const BUILD_DATE = 'August 05, 2026';
 const MIN_VERSION = '2.41.x';
 const MAX_VERSION = '2.43.x';
 
 const PCA_METADATA_VERSION = '1.2.1';
 const H2_METADATA_VERSION = '2.0.1';
 
-const REQUIRED_H2_PROGRAM_BUILD_VERSION = '2.0.6';
+const REQUIRED_H2_PROGRAM_BUILD_VERSION = '3.0.0';
 
 const DHIS2_PRIMARY_COLOR = '#2c6693';
 const LIGHT_BLUE_COLOR = '#66aee5';
