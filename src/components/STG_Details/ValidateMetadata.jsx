@@ -14,9 +14,9 @@ import {
   validateSectionsHNQIS2,
 } from '../../utils/ImportValidatorUtils.js';
 import { DeepCopy, getPCAMetadataDE } from '../../utils/Utils.jsx';
-import SaveMetadata from '../UIElements/SaveMetadata.jsx';
 import CustomMUIDialog from '../UIElements/CustomMUIDialog.js';
 import CustomMUIDialogTitle from '../UIElements/CustomMUIDialogTitle.jsx';
+import SaveMetadata from '../UIElements/SaveMetadata.jsx';
 
 const ValidateMetadata = ({
   hnqisMode,
@@ -154,9 +154,7 @@ const ValidateMetadata = ({
                 section_errors += dataElement.errors.errors.length;
               }
             });
-            if (section_errors > 0) {
-              section.errorsCount = section_errors;
-            }
+            section.errorsCount = section_errors;
           });
         }
 
@@ -206,8 +204,6 @@ const ValidateMetadata = ({
               score_errors += dataElement.errors.errors.length;
             }
           });
-        }
-        if (score_errors > 0) {
           importedScoresV.errors = score_errors;
         }
         // SUMMARY - RESULTS

@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_close_white_close_white",
+      "label": "Close / Dismiss Icon (White) - X cross mark",
+      "file_type": "image",
+      "source_file": "src/images/i-close_white.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

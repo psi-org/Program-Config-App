@@ -1,0 +1,18 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_survey_white_svg",
+      "label": "Survey Icon White",
+      "file_type": "image",
+      "description": "24x24 UI icon showing a 2x2 grid of squares with the bottom-right square containing a plus sign \u2014 represents a survey/form with add item capability in white color",
+      "source_file": "src/images/i-survey_white.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_drag_gray_drag_gray",
+      "label": "Drag Handle Icon (Gray/Semi-transparent) - Two horizontal bars for drag-to-reorder",
+      "file_type": "image",
+      "source_file": "src/images/i-drag_gray.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

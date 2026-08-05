@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "src_images_i_error_svg",
+      "label": "Error Icon",
+      "file_type": "image",
+      "source_file": "src/images/i-error.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

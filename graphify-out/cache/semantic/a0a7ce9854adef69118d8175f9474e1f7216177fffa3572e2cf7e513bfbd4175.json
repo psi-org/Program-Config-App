@@ -1,0 +1,38 @@
+{
+  "nodes": [
+    {
+      "id": "public_favicon_16x16_favicon",
+      "label": "Favicon 16x16",
+      "file_type": "image",
+      "source_file": "public/favicon-16x16.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "public_favicon_16x16_favicon",
+      "target": "public_dhis2_app_icon_dhis2_app_icon",
+      "relation": "is_variant_of",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "public/favicon-16x16.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "public_favicon_16x16_favicon",
+      "target": "public_favicon_32x32_favicon",
+      "relation": "is_variant_of",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "public/favicon-16x16.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}
