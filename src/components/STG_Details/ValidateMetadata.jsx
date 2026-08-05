@@ -204,8 +204,8 @@ const ValidateMetadata = ({
               score_errors += dataElement.errors.errors.length;
             }
           });
+          importedScoresV.errors = score_errors;
         }
-        importedScoresV.errors = score_errors;
         // SUMMARY - RESULTS
         if (errorCounts === 0) {
           setValid(true);
