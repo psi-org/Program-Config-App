@@ -1,3 +1,9 @@
+## [3.1.1](https://github.com/psi-org/Program-Config-App/compare/v3.1.0...v3.1.1) (2026-08-12)
+
+### Bug Fixes
+
+- fix duplicated DE Prefix validation when creating new programs ([3bf0c47](https://github.com/psi-org/Program-Config-App/commit/3bf0c478387dcdbf4fabcd10f823d141f4411bba))
+
 ## [3.1.0](https://github.com/psi-org/Program-Config-App/compare/v3.0.0...v3.1.0) (2026-08-05)
 
 ### Features
