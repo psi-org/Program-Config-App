@@ -30,7 +30,7 @@ import TextIcon from '@mui/icons-material/TextFields';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import React from 'react';
 
-const BUILD_DATE = 'August 05, 2026';
+const BUILD_DATE = 'August 12, 2026';
 const MIN_VERSION = '2.41.x';
 const MAX_VERSION = '2.43.x';
 
