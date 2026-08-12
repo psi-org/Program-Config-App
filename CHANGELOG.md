@@ -1,3 +1,17 @@
+## [3.1.0](https://github.com/psi-org/Program-Config-App/compare/v3.0.0...v3.1.0) (2026-08-05)
+
+### Features
+
+- implement auto add OUs to H1 transfer target program [PCA-26] ([df6d826](https://github.com/psi-org/Program-Config-App/commit/df6d82674982d7745a295a093c39fd10cf3df163))
+- improve H1 Transfer UX/UI to display errors w/o crashing [PCA-25] ([561325c](https://github.com/psi-org/Program-Config-App/commit/561325c334990a7dff0749e36cdb7ed3a1a84106))
+
+### Bug Fixes
+
+- address old tracker format for H1 data transfer [PCA-24] ([c13ee20](https://github.com/psi-org/Program-Config-App/commit/c13ee2047359210ad04eb2c97332bc3cdbfd2c70))
+- address Program Stage not refreshing after changes [PCA-29] ([8a6f2cc](https://github.com/psi-org/Program-Config-App/commit/8a6f2ccadddec038b8452af96e8896dff456f6b9))
+- notify when missing access to H1 transfer events [PCA-28] ([659cefd](https://github.com/psi-org/Program-Config-App/commit/659cefda789fe356b700a028e82940c6b133b2ef))
+- remove validation errors when importing new templates [PCA-27] ([99aaaac](https://github.com/psi-org/Program-Config-App/commit/99aaaac9424ac0d31ab32611e9e506d2560ce727))
+
 ## [3.0.0](https://github.com/psi-org/Program-Config-App/compare/v2.0.7...v3.0.0) (2026-06-29)
 
 ### ⚠ BREAKING CHANGES
