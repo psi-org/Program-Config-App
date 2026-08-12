@@ -15,6 +15,7 @@ import {
   ASSESSMENT_TET,
   COMPETENCY_CLASS,
   CRITICAL_STEPS,
+  METADATA,
   NON_CRITICAL_STEPS,
 } from '../../../configs/Constants';
 import {
@@ -58,6 +59,7 @@ import type {
   CurrentUserResults,
   H2SettingRef,
   MetadataMutateResponse,
+  PcaMetadataValue,
   ProgramAttributeValue,
   ProgramNewProps,
   ProgramSection,
@@ -149,11 +151,14 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
   >(queryCatCombos, { lazy: true });
 
   const { refetch: checkForExistingPrefix } = useDataQuery<
-    QueryResults<{ programs?: Array<{ id: string }> }>
-  >(queryAvailablePrefix, {
-    lazy: true,
-    variables: { dePrefix: undefined, program: undefined },
-  });
+    QueryResults<{
+      programs?: Array<{
+        id: string;
+        name?: string;
+        attributeValues?: ProgramAttributeValue[];
+      }>;
+    }>
+  >(queryAvailablePrefix, { lazy: true });
 
   const { refetch: getIds } = useDataQuery<QueryResults<{ codes?: string[] }>>(
     queryIds,
@@ -496,12 +501,37 @@ const ProgramNew: React.FC<ProgramNewProps> = (props) => {
       ? getH2Metadata(h2SettingsRef.current).useCompetencyClass === 'Yes'
       : undefined;
 
-    const prefixResult = (await checkForExistingPrefix({
-      dePrefix,
-      program: props.data?.name,
-    })) as QueryResults<{ programs?: Array<{ id: string }> }>;
+    const prefixResult = (await checkForExistingPrefix()) as QueryResults<{
+      programs?: Array<{
+        id: string;
+        name?: string;
+        attributeValues?: ProgramAttributeValue[];
+      }>;
+    }>;
 
-    if ((prefixResult.results?.programs?.length ?? 0) > 0) {
+    const prefixInUse = prefixResult.results?.programs?.some((program) => {
+      if (program.name === props.data?.name) {
+        return false;
+      }
+
+      const metadataValue = program.attributeValues?.find(
+        (attributeValue) => attributeValue.attribute.id === METADATA
+      )?.value;
+
+      if (!metadataValue) {
+        return false;
+      }
+
+      try {
+        return (
+          (JSON.parse(metadataValue) as PcaMetadataValue).dePrefix === dePrefix
+        );
+      } catch {
+        return false;
+      }
+    });
+
+    if (prefixInUse) {
       setValidationErrors((current) => ({
         ...current,
         prefix: 'The specified Data Element Prefix is already in use',

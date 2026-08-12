@@ -69,18 +69,10 @@ export const queryCatCombos = {
 export const queryAvailablePrefix = {
   results: {
     resource: 'programs',
-    params: (variables: QueryVariables) => {
-      const dePrefix = variables.dePrefix as string | undefined;
-      const program = variables.program as string | undefined;
-      const filters = [`${METADATA}:like:"dePrefix":"${dePrefix}"`];
-      if (program) {
-        filters.push(`name:!eq:${program}`);
-      }
-
-      return {
-        fields: ['id'],
-        filters,
-      };
+    params: {
+      fields: ['id', 'name', 'attributeValues[attribute[id],value]'],
+      filter: [`attributeValues.attribute.id:eq:${METADATA}`],
+      paging: false,
     },
   },
 };
