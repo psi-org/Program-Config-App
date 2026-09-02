@@ -73,7 +73,7 @@ const createMutation = {
 };
 
 const deleteMetadataMutation = {
-  resource: 'metadata?importStrategy=DELETE',
+  resource: 'metadata?importStrategy=DELETE&atomicMode=NONE',
   type: 'create',
   data: ({ data }) => data,
 };
@@ -447,12 +447,24 @@ const ProgramDetails = () => {
                 return prv.name[0] == '_';
               });
 
-            const programRulesDel =
-              toDeleteReferences?.programRules ||
-              mapIdArray(prDQ.data.results.programRules);
-            const programRuleVariablesDel =
-              toDeleteReferences?.programRuleVariables ||
-              mapIdArray(fallbackRuleVariables);
+            const mergeIds = (tracked, fallback) => {
+              const merged = new Map(
+                [...(tracked || []), ...mapIdArray(fallback)].map((item) => [
+                  item.id,
+                  item,
+                ])
+              );
+              return Array.from(merged.values());
+            };
+
+            const programRulesDel = mergeIds(
+              toDeleteReferences?.programRules,
+              prDQ.data.results.programRules
+            );
+            const programRuleVariablesDel = mergeIds(
+              toDeleteReferences?.programRuleVariables,
+              fallbackRuleVariables
+            );
 
             const oldMetadata = {
               programRules:
