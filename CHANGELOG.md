@@ -1,3 +1,9 @@
+## [3.1.2](https://github.com/psi-org/Program-Config-App/compare/v3.1.1...v3.1.2) (2026-09-02)
+
+### Bug Fixes
+
+- fix object conflicts when delete fails in Set Up Program [PCA-13] ([65537e2](https://github.com/psi-org/Program-Config-App/commit/65537e27089f852d5dcd1a1232c769f599704f0d))
+
 ## [3.1.1](https://github.com/psi-org/Program-Config-App/compare/v3.1.0...v3.1.1) (2026-08-12)
 
 ### Bug Fixes
