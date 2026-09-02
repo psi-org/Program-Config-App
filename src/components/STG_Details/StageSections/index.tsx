@@ -1135,9 +1135,15 @@ const StageSections = ({
         ).results.programRuleVariables.filter((prv) => prv.name?.[0] === '_');
 
         const oldIds = (key: string, fallback: unknown[]) => {
-          const ids: unknown[] =
-            toDeleteReferences?.[key] ?? mapIdArray(fallback);
-          return ids?.length ? ids : undefined;
+          const tracked = (toDeleteReferences?.[key] ?? []) as Array<{
+            id: string;
+          }>;
+          const tagged = mapIdArray(fallback) as Array<{ id: string }>;
+          const merged = new Map(
+            [...tracked, ...tagged].map((item) => [item.id, item])
+          );
+          const ids = Array.from(merged.values());
+          return ids.length ? ids : undefined;
         };
 
         const oldMetadata = {

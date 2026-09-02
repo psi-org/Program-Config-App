@@ -91,7 +91,7 @@ export const deleteMetadataMutation = {
   resource: 'metadata',
   type: 'create' as const,
   data: ({ data }: { data: unknown }) => data,
-  params: { importStrategy: 'DELETE' },
+  params: { importStrategy: 'DELETE', atomicMode: 'NONE' },
 };
 
 export const queryIds = {
