@@ -1,3 +1,9 @@
+## [3.1.3](https://github.com/psi-org/Program-Config-App/compare/v3.1.2...v3.1.3) (2026-09-04)
+
+### Bug Fixes
+
+- address incorrect org unit levels on generated visualizations ([c20b3c3](https://github.com/psi-org/Program-Config-App/commit/c20b3c3af9e398c048ff56e5c9d901090b864e22))
+
 ## [3.1.2](https://github.com/psi-org/Program-Config-App/compare/v3.1.1...v3.1.2) (2026-09-02)
 
 ### Bug Fixes
