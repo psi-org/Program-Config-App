@@ -1,7 +1,7 @@
 {
   "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/.claude/settings.json": {
     "size": 2166,
-    "mtime_ns": 1784057496087584231,
+    "mtime_ns": 1785947404775763759,
     "hash": "c22b0a3656cf183f15017ab0a609ed0fae6c1728acb24d42d5d55871e35cf850"
   },
   "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/.claude/settings.local.json": {
@@ -16,13 +16,13 @@
   },
   "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/.releaserc.json": {
     "size": 2308,
-    "mtime_ns": 1782770594298650362,
+    "mtime_ns": 1785947367274963569,
     "hash": "750fe792ea2414ca3450a8aa92d5432c402e4ac74715161e65ef2ee80e39629c"
   },
   "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/package.json": {
     "size": 2216,
-    "mtime_ns": 1782769753998342572,
-    "hash": "e79bf2b7a111b0f2f9a5f7c07d1bec54df2ecda1d3f3c10898ad009c64cabbeb"
+    "mtime_ns": 1788381485076722232,
+    "hash": "ad4a2fe34f9adaa6288c734dbd1aa6ddf03ae54ce8b59435f8b85316e3a440bb"
   },
   "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/src/configs/HNQIS2_Metadata_Package.json": {
     "size": 24976,
@@ -45,13 +45,13 @@
     "hash": "9db650e2e52ea173cc03f535de0bfbd5a86d3472a587a092958af57a9d57beab"
   },
   "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/CHANGELOG.md": {
-    "size": 1518,
-    "mtime_ns": 1782778415725382389,
-    "hash": "d72f41e4a3835a78e59ddd8c53387f56c762107efa274d9446847ff23b141c5f"
+    "size": 3236,
+    "mtime_ns": 1788381485076485606,
+    "hash": "a1abca56a2a5f3d7c6e4c1648a494c937856fa7e33b3200095400e88efe1bb0e"
   },
   "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/CLAUDE.md": {
     "size": 773,
-    "mtime_ns": 1784057516570718377,
+    "mtime_ns": 1785947404775995842,
     "hash": "ff660f38cb090bb2dff136d6d4af5fc33bdd77a893f49e41e11de8d043782a2b"
   },
   "/Users/marlpzg/Desktop/BAO_Dev/Program-Config-App/LICENSE.md": {

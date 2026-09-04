@@ -1538,7 +1538,7 @@ export const buildH2BaseVisualizations = ({
   avergeScorebyTable.series = [series.at(4)];
   avergeScorebyTable.dataDimensionItems = [dataDimensionItems.at(4)];
   avergeScorebyTable.organisationUnits[0].id = ouRoot;
-  avergeScorebyTable.organisationUnitLevels = [1];
+  avergeScorebyTable.organisationUnitLevels = [visualizationLevel];
   avergeScorebyTable.legendSet.id = VISUALIZATIONS_LEGEND;
   visualizations.push(avergeScorebyTable);
   // Dashboard - Tables
@@ -1626,12 +1626,12 @@ export const buildH2BaseVisualizations = ({
   GlobalScorebyMap.publicAccess = sharingSettings.public;
   GlobalScorebyMap.sharing = sharingSettings;
   GlobalScorebyMap.mapViews[0].sharing = sharingSettings;
-  GlobalScorebyMap.mapViews[0].organisationUnitLevels = [1];
+  GlobalScorebyMap.mapViews[0].organisationUnitLevels = [mapLevel];
   GlobalScorebyMap.mapViews[0].organisationUnits[0].id = ouRoot;
   GlobalScorebyMap.mapViews[1].sharing = sharingSettings;
   GlobalScorebyMap.mapViews[1].program.id = programId;
   GlobalScorebyMap.mapViews[1].dataDimensionItems = [dataDimensionItems.at(4)];
-  GlobalScorebyMap.mapViews[1].organisationUnitLevels = [1];
+  GlobalScorebyMap.mapViews[1].organisationUnitLevels = [mapLevel];
   GlobalScorebyMap.mapViews[1].organisationUnits[0].id = ouRoot;
   GlobalScorebyMap.mapViews[1].legendSet.id = VISUALIZATIONS_LEGEND;
   maps.push(GlobalScorebyMap);
@@ -1657,7 +1657,7 @@ export const buildH2BaseVisualizations = ({
   LineListScore.dataElementDimensions[0].dataElement.id = ACTION_PLAN_ACTION;
   LineListScore.programIndicatorDimensions[0].programIndicator.id = gsInd;
   LineListScore.organisationUnits[0].id = ouRoot;
-  LineListScore.organisationUnitLevels = [1];
+  LineListScore.organisationUnitLevels = [visualizationLevel];
 
   eventReports.push(LineListScore);
   //Dashboard - Event Report
